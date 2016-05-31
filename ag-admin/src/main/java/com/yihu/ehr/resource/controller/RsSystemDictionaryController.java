@@ -28,7 +28,7 @@ public class RsSystemDictionaryController extends BaseController {
     @Autowired
     private RsSystemDictionaryClient rsSystemDictionaryClient;
 
-    @RequestMapping(value = ServiceApi.Resources.SystemDicts, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取系统字典列表", notes = "根据查询条件获取系统字典列表")
     public Envelop searchRsSystemDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -55,7 +55,7 @@ public class RsSystemDictionaryController extends BaseController {
 
 
 
-    @RequestMapping(value = ServiceApi.Resources.SystemDicts, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建系统字典", notes = "创建系统字典")
     public Envelop createRsSystemDictionary(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
@@ -72,7 +72,7 @@ public class RsSystemDictionaryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.SystemDicts, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.SystemDictList, method = RequestMethod.PUT)
     @ApiOperation(value = "修改系统字典", notes = "修改系统字典")
     public Envelop updateRsSystemDictionary(
             @ApiParam(name = "json_data", value = "")

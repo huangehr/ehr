@@ -1,11 +1,15 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.agModel.resource.RsAdapterSchemaModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.adaption.MAdapterOrg;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.resource.MRsAdapterSchema;
+import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.resource.client.AdapterSchemaClient;
+import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -35,6 +39,17 @@ public class AdapterSchemaController extends BaseController {
 
     @Autowired
     private ConventionalDictEntryClient dictClint;
+
+    @Autowired
+    private CDAVersionClient cdaVersionClient;
+
+    @Autowired
+    private AdapterOrgClient adapterOrgClient;
+
+
+    private static  final  String PLAT_FORM ="1";
+
+    private static  final  String THIRD_PARTY ="2";
 
     @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.POST)
     @ApiOperation("创建适配方案")
@@ -152,13 +167,27 @@ public class AdapterSchemaController extends BaseController {
             List<MRsAdapterSchema> rsAdapterSchemas = responseEntity.getBody();
             List<RsAdapterSchemaModel> rsAdapterSchemaModels = new ArrayList<RsAdapterSchemaModel>();
             for(MRsAdapterSchema mRsAdapterSchema: rsAdapterSchemas){
+                RsAdapterSchemaModel rsAdapterSchemaModel = new RsAdapterSchemaModel();
+                BeanUtils.copyProperties(mRsAdapterSchema,rsAdapterSchemaModel);
                 if(StringUtils.isNotBlank(mRsAdapterSchema.getType())){
-                    RsAdapterSchemaModel rsAdapterSchemaModel = new RsAdapterSchemaModel();
-                    BeanUtils.copyProperties(mRsAdapterSchema,rsAdapterSchemaModel);
                     MConventionalDict adapterType=  dictClint.getResourceAdaptScheme(mRsAdapterSchema.getType());
                     rsAdapterSchemaModel.setTypeName(adapterType.getValue());
-                    rsAdapterSchemaModels.add(rsAdapterSchemaModel);
+
                 }
+                if(StringUtils.isNotBlank(mRsAdapterSchema.getAdapterVersion())){
+                    if(PLAT_FORM.equals(mRsAdapterSchema.getType())){//格式化平台标准
+                        MCDAVersion mcdaVersion =  cdaVersionClient.getVersion(mRsAdapterSchema.getAdapterVersion());
+                        if(mcdaVersion!=null){
+                            rsAdapterSchemaModel.setAdapterVersionName(mcdaVersion.getVersionName());
+                        }
+                    }else if(THIRD_PARTY.equals(mRsAdapterSchema.getType())){//格式化第三方标准
+                        MAdapterOrg mAdapterOrg =  adapterOrgClient.getAdapterOrg(mRsAdapterSchema.getAdapterVersion());
+                        if(mAdapterOrg!=null){
+                            rsAdapterSchemaModel.setAdapterVersionName(mAdapterOrg.getName());
+                        }
+                    }
+                }
+                rsAdapterSchemaModels.add(rsAdapterSchemaModel);
             }
             Envelop envelop = getResult(rsAdapterSchemaModels, getTotalCount(responseEntity), page, size);
             return envelop;

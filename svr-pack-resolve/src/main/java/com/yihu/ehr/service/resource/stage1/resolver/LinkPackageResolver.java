@@ -2,10 +2,10 @@ package com.yihu.ehr.service.resource.stage1.resolver;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.yihu.ehr.service.resource.stage1.MetaDataRecord;
-import com.yihu.ehr.service.resource.stage1.LinkDataSet;
-import com.yihu.ehr.service.resource.stage1.LinkPackModel;
-import com.yihu.ehr.service.resource.stage1.StdPackModel;
+import com.yihu.ehr.profile.util.MetaDataRecord;
+import com.yihu.ehr.service.resource.stage1.LinkPackageDataSet;
+import com.yihu.ehr.service.resource.stage1.LinkPackage;
+import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,14 +24,14 @@ import java.util.Iterator;
 @Component
 public class LinkPackageResolver extends PackageResolver {
     @Override
-    public void resolve(StdPackModel profile, File root) throws IOException, ParseException {
-        LinkPackModel linkPackModel = (LinkPackModel) profile;
+    public void resolve(StandardPackage profile, File root) throws IOException, ParseException {
+        LinkPackage linkPackModel = (LinkPackage) profile;
 
         File indexFile = new File(root.getAbsolutePath() + File.pathSeparator + "index/patient_index.json");
         parseFile(linkPackModel, indexFile);
     }
 
-    private void parseFile(LinkPackModel profile, File indexFile) throws IOException, ParseException {
+    private void parseFile(LinkPackage profile, File indexFile) throws IOException, ParseException {
         JsonNode jsonNode = objectMapper.readTree(indexFile);
 
         String patientId = jsonNode.get("patient_id").asText();
@@ -55,7 +55,7 @@ public class LinkPackageResolver extends PackageResolver {
             String dataSetCode = fieldNames.next();
             String url = dataSetNode.get(dataSetCode).asText();
 
-            LinkDataSet dataSet = new LinkDataSet();
+            LinkPackageDataSet dataSet = new LinkPackageDataSet();
             dataSet.setUrl(url);
 
             profile.insertDataSet(dataSetCode, dataSet);
@@ -69,8 +69,8 @@ public class LinkPackageResolver extends PackageResolver {
         while (fieldNames.hasNext()) {
             String dataSetCode = fieldNames.next();
 
-            LinkDataSet linkDataSet = (LinkDataSet)profile.getDataSet(dataSetCode);
-            if (linkDataSet == null) linkDataSet = new LinkDataSet();
+            LinkPackageDataSet linkPackageDataSet = (LinkPackageDataSet)profile.getDataSet(dataSetCode);
+            if (linkPackageDataSet == null) linkPackageDataSet = new LinkPackageDataSet();
 
             ArrayNode arrayNode = (ArrayNode) summaryNode.get(dataSetCode);
             for (int i = 0; i < arrayNode.size(); ++i){
@@ -82,10 +82,10 @@ public class LinkPackageResolver extends PackageResolver {
                     record.putMetaData(metaDataCode, arrayNode.get(i).get(metaDataCode).asText());
                 }
 
-                linkDataSet.addRecord(Integer.toString(linkDataSet.getRecordCount()), record);
+                linkPackageDataSet.addRecord(Integer.toString(linkPackageDataSet.getRecordCount()), record);
             }
 
-            profile.insertDataSet(dataSetCode, linkDataSet);
+            profile.insertDataSet(dataSetCode, linkPackageDataSet);
         }
     }
 }

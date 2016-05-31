@@ -23,53 +23,54 @@ public class ServiceApi {
         public static final String Schema                         = "/adaptions/schemas/{id}";
         public static final String Schemas                        = "/adaptions/schemas";
 
-        public static final String SchemaMetadatas                 ="/adaptions/schema/metadatas";
-        public static final String SchemaMetadata                  ="/adaptions/schema/metadatas/{id}";
-        public static final String SchemaMetadatasBatch            ="/adaptions/schema/metadatas/batch";
+        public static final String SchemaMetadataList             ="/adaptions/schema/metadata";
+        public static final String SchemaMetadata                 ="/adaptions/schema/metadata/{id}";
+        public static final String SchemaMetadataBatch            ="/adaptions/schema/metadata/batch";
 
     }
 
     public static class Resources{
-        public static final String Resources                    = "/resources";
-        public static final String Resource                     = "/resources/{id}";
+        public static final String Resources                         = "/resources";
+        public static final String Resource                          = "/resources/{id}";
 
-        public static final String ResourceMetadatas           = "/resources/rsmetadatas";
-        public static final String ResourceMetadatasBatch      = "/resources/rsmetadatas/batch";
-        public static final String ResourceMetadata            = "/resources/rsmetadatas/{id}";
+        public static final String ResourceMetadataList              = "/resources/rs_metadata";
+        public static final String ResourceMetadataBatch             = "/resources/rs_metadata/batch";
+        public static final String ResourceMetadataBatchByResourceId = "/resources/rs_metadata/resource_ids/batch";
+        public static final String ResourceMetadata                  = "/resources/rs_metadata/{id}";
 
         public static final String ResourceGrant                 = "/resources/grants/{id}";
         public static final String ResourceGrants                = "/resources/grants";
-        public static final String AppsGrantResources             = "/resources/apps/{appId}/grant";
-        public static final String ResourceGrantApps            = "/resources/{resourceId}/grant";
+        public static final String AppsGrantResources            = "/resources/apps/{appId}/grant";
+        public static final String ResourceGrantApps             = "/resources/{resourceId}/grant";
         public static final String ResourceApps                  = "/resources/{resource_id}/app";
 
         public static final String ResourceMetadatasValid      = "/resources/metadatas/valid";
-        public static final String ResourceMetadatasGrants      = "/resources/metadatas/grants";
-        public static final String ResourceMetadatasGrant      = "/resources/metadatas/grants/{id}";
-        public static final String ResourceMetadataGrantApp      = "/resources/appresources/{appResourceId}/grant/metadatas/{metadataId}";
-        public static final String ResourceMetadatasGrantApp      = "/resources/metadatas/grant/{appResourceId}";
+        public static final String ResourceMetadataGrants       = "/resources/metadata/grants";
+        public static final String ResourceMetadataGrant        = "/resources/metadata/grants/{id}";
+        public static final String ResourceMetadataGrantApp     = "/resources/app_resource/{appResourceId}/grant/metadata/{metadataId}";
+        public static final String ResourceMetadataListGrantApp = "/resources/metadata/grant/{appResourceId}";
 
-        public static final String Metadatas                    ="/resources/metadatas";
-        public static final String MetadatasBatch               ="/resources/metadatas/batch";
-        public static final String Metadata                     ="/resources/metadatas/{id}";
-        public static final String MetadatasExistence           ="/resources/metadatas/existence";
+        public static final String MetadataList                 ="/resources/metadata";
+        public static final String MetadataBatch                ="/resources/metadata/batch";
+        public static final String Metadata                     ="/resources/metadata/{id}";
+        public static final String MetadataExistence            ="/resources/metadata/existence";
 
-        public static final String Dicts                         ="/resources/dicts";
-        public static final String DictsBatch                    ="/resources/dicts/batch";
-        public static final String Dict                          ="/resources/dicts/{id}";
-        public static final String DictsExistence                ="/resources/dicts/existence";
+        public static final String DictList                     ="/resources/dict";
+        public static final String DictBatch                    ="/resources/dict/batch";
+        public static final String Dict                         ="/resources/dict/{id}";
+        public static final String DictExistence                ="/resources/dict/existence";
 
-        public static final String DictEntries                   ="/resources/dictentries";
-        public static final String DictEntry                     ="/resources/dictentries/{id}";
-        public static final String DictEntriesExistence          ="/resources/dictentries/existence";
+        public static final String DictEntries                   ="/resources/dict_entries";
+        public static final String DictEntry                     ="/resources/dict_entries/{id}";
+        public static final String DictEntriesExistence          ="/resources/dict_entries/existence";
 
-        public static final String SystemDicts                   ="/resources/systemdicts";
-        public static final String SystemDict                    ="/resources/systemdicts/{id}";
+        public static final String SystemDictList               ="/resources/system_dict";
+        public static final String SystemDict                   ="/resources/system_dict/{id}";
 
-        public static final String SystemDictEntries             ="/resources/systemdictentries";
-        public static final String SystemDictEntry               ="/resources/systemdictentries/{id}";
+        public static final String SystemDictEntries            ="/resources/system_dict_entries";
+        public static final String SystemDictEntry              ="/resources/system_dict_entries/{id}";
 
-        public static final String Interfaces                       ="/resources/interfaces";
+        public static final String Interfaces                    ="/resources/interfaces";
         public static final String Interface                       ="/resources/interfaces/{id}";
         public static final String InterfaceNameExistence          ="/resources/existence/name";
 

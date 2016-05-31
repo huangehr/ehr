@@ -33,7 +33,7 @@ public class MetadataController extends BaseController {
     @Autowired
     private SystemDictClient systemDictClient;
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.POST)
     @ApiOperation("创建数据元")
     public Envelop createMetadata(
             @ApiParam(name = "metadata", value = "数据元JSON", defaultValue = "")
@@ -51,7 +51,7 @@ public class MetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.MetadatasBatch, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.MetadataBatch, method = RequestMethod.POST)
     @ApiOperation("批量创建数据元")
     public Envelop createMetadataPatch(
             @ApiParam(name = "metadatas", value = "数据元JSON", defaultValue = "")
@@ -69,7 +69,7 @@ public class MetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.PUT)
     @ApiOperation("更新数据元")
     public Envelop updateMetadata(
             @ApiParam(name = "metadata", value = "数据元JSON", defaultValue = "")
@@ -104,7 +104,7 @@ public class MetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.DELETE)
     @ApiOperation("批量删除数据元")
     public Envelop deleteMetadataBatch(
             @ApiParam(name = "ids", value = "数据元ID", defaultValue = "")
@@ -139,7 +139,7 @@ public class MetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.MetadatasExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.MetadataExistence,method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public Envelop isExistence(
             @ApiParam(name="filters",value="filters",defaultValue = "")
@@ -153,7 +153,7 @@ public class MetadataController extends BaseController {
         }
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.GET)
     @ApiOperation("查询数据元")
     public Envelop getMetadata(
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")

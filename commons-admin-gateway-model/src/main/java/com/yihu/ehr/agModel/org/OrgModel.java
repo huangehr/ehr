@@ -21,6 +21,7 @@ public class OrgModel {
     private String createDate;
     private String imgRemotePath;
     private String imgLocalPath;
+    private int administrativeDivision;
 
     public String getOrgCode() {
         return orgCode;
@@ -148,5 +149,13 @@ public class OrgModel {
 
     public void setImgLocalPath(String imgLocalPath) {
         this.imgLocalPath = imgLocalPath;
+    }
+
+    public int getAdministrativeDivision() {
+        return administrativeDivision;
+    }
+
+    public void setAdministrativeDivision(int administrativeDivision) {
+        this.administrativeDivision = administrativeDivision;
     }
 }

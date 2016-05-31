@@ -1,6 +1,6 @@
 package com.yihu.ehr.service.resource.stage1.extractor;
 
-import com.yihu.ehr.service.resource.StdDataSet;
+import com.yihu.ehr.profile.util.PackageDataSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ public class ExtractorChain {
         extractors[2] = context.getBean(CardInfoExtractor.class);
     }
 
-    public Object doExtract(StdDataSet dataSet, KeyDataExtractor.Filter filter) throws ParseException {
+    public Object doExtract(PackageDataSet dataSet, KeyDataExtractor.Filter filter) throws ParseException {
         for (KeyDataExtractor extractor : extractors){
             Object data = extractor.extract(dataSet, filter);
             if (data != null) return data;

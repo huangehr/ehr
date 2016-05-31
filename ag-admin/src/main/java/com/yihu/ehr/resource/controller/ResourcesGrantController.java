@@ -18,7 +18,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -281,7 +280,7 @@ public class ResourcesGrantController extends BaseController {
     }
 
     @ApiOperation("资源数据元批量授权")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrantApp, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataListGrantApp, method = RequestMethod.POST)
     public Envelop grantRsMetaDataBatch(
             @ApiParam(name = "appResourceId", value = "资源ID", defaultValue = "")
             @PathVariable(value = "appResourceId") String appResourceId,
@@ -300,7 +299,7 @@ public class ResourcesGrantController extends BaseController {
     }
 
     @ApiOperation("资源数据元授权删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrant, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant, method = RequestMethod.DELETE)
     public Envelop deleteMetadataGrant(
             @ApiParam(name = "id", value = "授权ID", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
@@ -316,7 +315,7 @@ public class ResourcesGrantController extends BaseController {
     }
 
     @ApiOperation("资源数据元授权批量删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrants, method = RequestMethod.DELETE)
     public Envelop deleteMetadataGrantBatch(
             @ApiParam(name = "ids", value = "授权ID", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception {
@@ -331,7 +330,7 @@ public class ResourcesGrantController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrant,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源数据元授权")
     public Envelop getRsMetadataGrantById(
             @ApiParam(name="id",value="id",defaultValue = "")
@@ -350,7 +349,7 @@ public class ResourcesGrantController extends BaseController {
     }
 
     @ApiOperation("资源数据元授权查询")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrants, method = RequestMethod.GET)
     public Envelop queryAppRsMetadataGrant(
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,

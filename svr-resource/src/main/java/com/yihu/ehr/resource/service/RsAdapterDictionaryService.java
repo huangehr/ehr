@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.RsAdapterDictionaryQueryDao;
+import com.yihu.ehr.resource.dao.AdapterDictionaryQueryDao;
 import com.yihu.ehr.resource.dao.intf.RsAdapterDictionaryDao;
 import com.yihu.ehr.resource.model.RsAdapterDictionary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +20,13 @@ public class RsAdapterDictionaryService extends BaseJpaService<RsAdapterDictiona
     private RsAdapterDictionaryDao adapterDictionaryDao;
 
     @Autowired
-    private RsAdapterDictionaryQueryDao rsAdapterDictionaryQueryDao;
+    private AdapterDictionaryQueryDao adapterDictionaryQueryDao;
 
     public RsAdapterDictionary findById(String id) {
         return adapterDictionaryDao.findOne(id);
     }
 
     public void batchInsertAdapterDictionaries(RsAdapterDictionary[] AdapterDictionaries) {
-        rsAdapterDictionaryQueryDao.batchInsertAdapterDictionaries(AdapterDictionaries);
+        adapterDictionaryQueryDao.batchInsertAdapterDictionaries(AdapterDictionaries);
     }
 }

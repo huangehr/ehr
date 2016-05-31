@@ -3,10 +3,12 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.model.RsResourceMetadata;
+import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,9 @@ import java.util.List;
 public class ResourceMetadataService extends BaseJpaService<RsResourceMetadata, ResourceMetadataDao> {
     @Autowired
     private ResourceMetadataDao rsMetadataDao;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * 资源数据元创建
@@ -94,5 +99,11 @@ public class ResourceMetadataService extends BaseJpaService<RsResourceMetadata, 
 
     public List<RsResourceMetadata> getRsMetadataByResourcesId(String resourcesId) {
         return rsMetadataDao.findByResourcesId(resourcesId);
+    }
+
+    public void deleteByResourcesIds(String[] resourcesIds) {
+        Query query = currentSession().createQuery("delete from RsResourceMetadata rm where rm.resourcesId in (:resourcesIds)");
+        query.setParameterList("resourcesIds", resourcesIds);
+        query.executeUpdate();
     }
 }
