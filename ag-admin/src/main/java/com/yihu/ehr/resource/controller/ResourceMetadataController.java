@@ -162,7 +162,7 @@ public class ResourceMetadataController extends BaseController {
         Envelop envelop = new Envelop();
         try{
             List<MRsResourceMetadata> metadataList  = resourceMetadataClient.getRsMetadataByResourcesId(resourcesId);
-            envelop.setObj(metadataList);
+            envelop.setDetailModelList(metadataList);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             e.printStackTrace();

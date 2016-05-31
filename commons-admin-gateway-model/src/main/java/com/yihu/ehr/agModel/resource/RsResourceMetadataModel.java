@@ -10,6 +10,7 @@ public class RsResourceMetadataModel {
     private String groupType;
     private String groupData;
     private String description;
+    private String dictId;
 
     private String stdCode;
     private String name;
@@ -90,5 +91,13 @@ public class RsResourceMetadataModel {
 
     public void setColumnType(String columnType) {
         this.columnType = columnType;
+    }
+
+    public String getDictId() {
+        return dictId;
+    }
+
+    public void setDictId(String dictId) {
+        this.dictId = dictId;
     }
 }
