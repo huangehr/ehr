@@ -28,7 +28,7 @@ public class AdapterMetadataController extends BaseController {
     @Autowired
     private AdapterMetadataClient adapterMetadataClient;
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.POST)
     @ApiOperation("创建适配数据元")
     public Envelop createMetadata(
             @ApiParam(name = "adapterMetadata", value = "数据元JSON", defaultValue = "")
@@ -45,7 +45,7 @@ public class AdapterMetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.PUT)
     @ApiOperation("更新适配数据元")
     public Envelop updateMetadata(
             @ApiParam(name = "adapterMetadata", value = "数据元JSON", defaultValue = "")
@@ -78,7 +78,7 @@ public class AdapterMetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.DELETE)
     @ApiOperation("批量删除适配数据元")
     public Envelop deleteMetadataBatch(
             @ApiParam(name = "ids", value = "数据元ids", defaultValue = "")
@@ -112,7 +112,7 @@ public class AdapterMetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.GET)
     @ApiOperation("查询适配数据元")
     public Envelop getMetadata(
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
@@ -141,7 +141,7 @@ public class AdapterMetadataController extends BaseController {
         }
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatasBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量创建适配数据元", notes = "批量创建适配数据元")
     public Envelop createRsMetaDataBatch(
             @ApiParam(name = "json_data", value = "", defaultValue = "")

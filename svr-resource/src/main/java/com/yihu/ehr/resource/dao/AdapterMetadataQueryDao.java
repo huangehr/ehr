@@ -27,8 +27,8 @@ public class AdapterMetadataQueryDao {
     @Value("${deploy.region}")
     Short deployRegion = 3502;
 
-    public void batchAdapterMetadatas(RsAdapterMetadata[] adapterMetadatas) {
-        final RsAdapterMetadata[] tempDictionaries = adapterMetadatas;
+    public void batchAdapterMetadata(RsAdapterMetadata[] adapterMetadata) {
+        final RsAdapterMetadata[] tempDictionaries = adapterMetadata;
         String sql = "insert into rs_adapter_metadata(id,schema_id,metadata_id,src_dataset_code,src_metadata_code,src_metadata_name,metadata_domain) values(?,?,?,?,?,?,?)";
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             public void setValues(PreparedStatement ps, int i) throws SQLException {

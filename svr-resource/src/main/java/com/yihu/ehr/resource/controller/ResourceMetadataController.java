@@ -34,7 +34,7 @@ public class ResourceMetadataController extends BaseRestController {
     private ResourceMetadataService rsMetadataService;
 
     @ApiOperation("创建资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MRsResourceMetadata createResourceMetadata(
             @ApiParam(name = "metadata", value = "资源数据元", defaultValue = "")
             @RequestBody String metadata) throws Exception {
@@ -45,7 +45,7 @@ public class ResourceMetadataController extends BaseRestController {
     }
 
     @ApiOperation("批量创建资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Collection<MRsResourceMetadata> createResourceMetadataBatch(
             @ApiParam(name = "metadatas", value = "资源数据元", defaultValue = "")
             @RequestBody String metadatas) throws Exception {
@@ -61,7 +61,7 @@ public class ResourceMetadataController extends BaseRestController {
     }
 
     @ApiOperation("更新资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.PUT)
     public MRsResourceMetadata updateResourceMetadata(
             @ApiParam(name = "dimension", value = "资源数据元", defaultValue = "")
             @RequestParam(value = "dimension") String metadata) throws Exception {
@@ -80,7 +80,7 @@ public class ResourceMetadataController extends BaseRestController {
     }
 
     @ApiOperation("根据ids批量资源数据元删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataBatch, method = RequestMethod.DELETE)
     public boolean deleteResourceMetadataBatchById(
             @ApiParam(name = "ids", value = "ids", defaultValue = "")
             @RequestParam(value = "ids") String[] ids) throws Exception {
@@ -88,12 +88,21 @@ public class ResourceMetadataController extends BaseRestController {
         return true;
     }
 
-    @ApiOperation("根据资源ID批量删除资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.DELETE)
+    @ApiOperation("根据resourceIds批量删除资源数据元")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.DELETE)
     public boolean deleteResourceMetadataBatchByResourceId(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId) throws Exception {
         rsMetadataService.deleteRsMetadataByResourceId(resourceId);
+        return true;
+    }
+
+    @ApiOperation("根据ResourceIds列表批量资源数据元删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataBatchByResourceId, method = RequestMethod.DELETE)
+    public boolean deleteResourceMetadataBatchByResourceId(
+            @ApiParam(name = "resource_ids", value = "resource_ids", defaultValue = "")
+            @RequestParam(value = "resource_ids") String[] resourceIds) throws Exception {
+        rsMetadataService.deleteByResourcesIds(resourceIds);
         return true;
     }
 
@@ -115,7 +124,7 @@ public class ResourceMetadataController extends BaseRestController {
     }
 
     @ApiOperation("资源数据元查询")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.GET)
     public List<MRsResourceMetadata> queryDimensions(
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
