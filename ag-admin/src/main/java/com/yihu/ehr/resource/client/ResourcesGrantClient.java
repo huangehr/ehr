@@ -7,7 +7,6 @@ import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,28 +68,28 @@ public interface ResourcesGrantClient {
             @PathVariable(value = "appResourceId") String appResourceId);
 
     @ApiOperation("资源数据元批量授权")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrantApp, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataListGrantApp, method = RequestMethod.POST)
     Collection<MRsAppResourceMetadata> grantRsMetaDataBatch(
             @PathVariable(value = "appResourceId") String appResourceId,
             @RequestParam(value = "metadataIds") String metadataIds);
 
     @ApiOperation("资源数据元授权删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrant, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant, method = RequestMethod.DELETE)
     boolean deleteMetadataGrant(
             @PathVariable(value = "id") String id);
 
     @ApiOperation("资源数据元授权批量删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrants, method = RequestMethod.DELETE)
     boolean deleteMetadataGrantBatch(
             @RequestParam(value = "ids") String ids);
 
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrant,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源数据元授权")
     public MRsAppResourceMetadata getRsMetadataGrantById(
             @PathVariable(value="id") String id);
 
     @ApiOperation("资源数据元授权查询")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrants, method = RequestMethod.GET)
     ResponseEntity<List<MRsAppResourceMetadata>> queryAppRsMetadataGrant(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,

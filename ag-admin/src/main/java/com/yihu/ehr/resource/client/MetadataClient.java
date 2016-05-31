@@ -23,17 +23,17 @@ import java.util.List;
 @ApiIgnore
 public interface MetadataClient {
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建数据元")
     MRsMetadata createMetadata(
             @RequestBody String metadata);
 
-    @RequestMapping(value = ServiceApi.Resources.MetadatasBatch, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.MetadataBatch, method = RequestMethod.POST)
     @ApiOperation("批量创建数据元")
     Collection<MRsMetadata> createMetadataPatch(
             @RequestParam(value = "metadatas") String metadatas);
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新数据元")
     MRsMetadata updateMetadata(
             @RequestBody String metadata);
@@ -43,7 +43,7 @@ public interface MetadataClient {
     boolean deleteMetadata(
             @PathVariable(value = "id") String id);
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.DELETE)
     @ApiOperation("批量删除数据元")
     boolean deleteMetadataBatch(
             @RequestParam(value = "ids") String id);
@@ -53,7 +53,7 @@ public interface MetadataClient {
     public MRsMetadata getMetadataById(
             @PathVariable(value="id") String id);
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.GET)
     @ApiOperation("查询数据元")
     ResponseEntity<List<MRsMetadata>> getMetadata(
             @RequestParam(value = "fields", required = false) String fields,
@@ -62,7 +62,7 @@ public interface MetadataClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
 
-    @RequestMapping(value = ServiceApi.Resources.MetadatasExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.MetadataExistence,method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     boolean isExistence(
             @RequestParam(value="filters") String filters);

@@ -35,7 +35,7 @@ public class MetaDataEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private MetadataService metadataService;
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建数据元")
     public MRsMetadata createMetadata(
         @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
@@ -47,7 +47,7 @@ public class MetaDataEndPoint extends EnvelopRestEndPoint {
         return convertToModel(rsMetadata,MRsMetadata.class);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.MetadatasBatch,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.MetadataBatch,method = RequestMethod.POST)
     @ApiOperation("批量创建数据元")
     public Collection<MRsMetadata> createMetadataPatch(
             @ApiParam(name="metadatas",value="数据元JSON",defaultValue = "")
@@ -65,7 +65,7 @@ public class MetaDataEndPoint extends EnvelopRestEndPoint {
         return convertToModels(metadataList,new ArrayList<MRsMetadata>(),MRsMetadata.class,"");
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新数据元")
     public MRsMetadata updateMetadata(
             @ApiParam(name="metadata",value="数据元JSON",defaultValue = "")
@@ -86,7 +86,7 @@ public class MetaDataEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList,method = RequestMethod.DELETE)
     @ApiOperation("批量删除数据元")
     public boolean deleteMetadataBatch(
             @ApiParam(name="ids",value="数据元ID",defaultValue = "")
@@ -105,7 +105,7 @@ public class MetaDataEndPoint extends EnvelopRestEndPoint {
         return convertToModel(metadataService.getMetadataById(id),MRsMetadata.class);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.MetadatasExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.MetadataExistence,method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public boolean isExistence(
             @ApiParam(name="filters",value="filters",defaultValue = "")
@@ -115,7 +115,7 @@ public class MetaDataEndPoint extends EnvelopRestEndPoint {
         return metadata!=null && metadata.size()>0;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Metadatas,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.MetadataList,method = RequestMethod.GET)
     @ApiOperation("查询数据元")
     public List<MRsMetadata> getMetadata(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")

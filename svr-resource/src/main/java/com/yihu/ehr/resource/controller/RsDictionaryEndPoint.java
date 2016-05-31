@@ -35,7 +35,7 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RsDictionaryEntryService dictionaryEntryService;
 
-    @RequestMapping(value = ServiceApi.Resources.Dicts, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取标准字典列表", notes = "根据查询条件获取标准字典列表")
     public List<MRsDictionary> searchRsDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -58,7 +58,7 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
 
 
 
-    @RequestMapping(value = ServiceApi.Resources.Dicts, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.DictList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建标准字典", notes = "创建标准字典")
     public MRsDictionary createRsDictionary(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
@@ -73,7 +73,7 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
 
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Dicts, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.DictList, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改标准字典", notes = "修改标准字典")
     public MRsDictionary updateRsDictionary(
             @ApiParam(name = "json_data", value = "")
@@ -104,7 +104,7 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
         return convertToModel(dictionary, MRsDictionary.class);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.DictsBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.DictBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量创建标准字典", notes = "批量创建标准字典")
     public boolean createRsDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
@@ -114,7 +114,7 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.DictsExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictExistence,method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public boolean isExistenceFilters(
             @ApiParam(name="filters",value="filters",defaultValue = "")

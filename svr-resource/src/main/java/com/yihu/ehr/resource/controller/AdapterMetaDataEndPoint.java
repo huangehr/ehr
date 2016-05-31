@@ -34,7 +34,7 @@ public class AdapterMetaDataEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AdapterMetadataService metadataService;
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配数据元")
     public MRsAdapterMetadata createMetadata(
             @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
@@ -46,7 +46,7 @@ public class AdapterMetaDataEndPoint extends EnvelopRestEndPoint {
         return convertToModel(metadata,MRsAdapterMetadata.class);
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新适配数据元")
     public MRsAdapterMetadata updateMetadata(
             @ApiParam(name="adapterMetadata",value="数据元JSON",defaultValue = "")
@@ -67,7 +67,7 @@ public class AdapterMetaDataEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList,method = RequestMethod.DELETE)
     @ApiOperation("批量删除适配数据元")
     public boolean deleteMetadataBatch(
             @ApiParam(name="ids",value="数据元ID",defaultValue = "")
@@ -87,7 +87,7 @@ public class AdapterMetaDataEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList,method = RequestMethod.GET)
     @ApiOperation("查询适配数据元")
     public List<MRsAdapterMetadata> getMetadata(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
@@ -121,13 +121,13 @@ public class AdapterMetaDataEndPoint extends EnvelopRestEndPoint {
         return (List<MRsAdapterMetadata>)metaList;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatasBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量创建适配数据元", notes = "批量创建适配数据元")
     public boolean createRsMetaDataBatch(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        RsAdapterMetadata[] adapterMetadatas = toEntity(jsonData,RsAdapterMetadata[].class);
-        metadataService.batchInsertAdapterMetadatas(adapterMetadatas);
+        RsAdapterMetadata[] adapterMetadata = toEntity(jsonData,RsAdapterMetadata[].class);
+        metadataService.batchInsertAdapterMetadata(adapterMetadata);
         return true;
     }
 }
