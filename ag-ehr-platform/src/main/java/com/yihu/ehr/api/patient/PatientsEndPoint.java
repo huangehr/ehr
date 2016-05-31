@@ -7,6 +7,9 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.feign.PatientClient;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.profile.util.DataSetParser;
+import com.yihu.ehr.profile.util.MetaDataRecord;
+import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.IdValidator;
 import io.swagger.annotations.Api;
@@ -32,8 +35,8 @@ import java.text.ParseException;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "patients", description = "患者服务")
 public class PatientsEndPoint {
-    /*@Autowired
-    DataSetResolver dataSetResolver;
+    @Autowired
+    DataSetParser dataSetParser;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -49,7 +52,7 @@ public class PatientsEndPoint {
             @ApiParam(name = "json", value = "患者人口学数据集")
             @RequestParam(value = "json", required = true) String patientInfo) throws IOException, ParseException {
         ObjectNode patientNode = (ObjectNode) objectMapper.readTree(patientInfo);
-        StdDataSet dataSet = dataSetResolver.parseStructuredJsonDataSet(patientNode, false);
+        PackageDataSet dataSet = dataSetParser.parseStructuredJsonDataSet(patientNode, false);
 
         for (String key : dataSet.getRecordKeys()) {
             MetaDataRecord record = dataSet.getRecord(key);
@@ -110,13 +113,13 @@ public class PatientsEndPoint {
         return "";
     }
 
-    *//**
+    /**
      * 判断患者是否已注册。
      *
      * @param demographicId
      * @return
-     *//*
+     */
     protected boolean isPatientRegistered(String demographicId) {
         return patientClient.isRegistered(demographicId);
-    }*/
+    }
 }

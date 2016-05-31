@@ -8,7 +8,7 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -32,7 +32,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "Application", description = "EHR应用管理", tags = {"应用管理"})
-public class AppEndPoint extends BaseRestController {
+public class AppEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppService appService;
 

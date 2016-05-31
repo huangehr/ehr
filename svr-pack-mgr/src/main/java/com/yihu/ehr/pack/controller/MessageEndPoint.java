@@ -8,7 +8,7 @@ import com.yihu.ehr.constants.Channel;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.pack.service.Package;
 import com.yihu.ehr.pack.service.PackageService;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -32,7 +32,7 @@ import java.util.*;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "message_service", description = "消息服务")
-public class MessageEndPoint extends BaseRestController {
+public class MessageEndPoint extends EnvelopRestEndPoint {
     @Autowired
     ObjectMapper objectMapper;
 

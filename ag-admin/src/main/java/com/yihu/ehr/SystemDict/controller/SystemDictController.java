@@ -39,7 +39,7 @@ public class SystemDictController extends BaseController {
     @Autowired
     private ObjectMapper objectMapper;
 //    @Autowired
-//    private BaseRestController baseRestController;
+//    private EnvelopRestEndPoint baseRestController;
 
     @ApiOperation(value = "获取字典列表")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)

@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "standard cache", description = "标准缓存服务")
+@Api(value = "standard cache", description = "CDA标准缓存服务，缓存CDA标准数据至Redis")
 public class CacheEndPoint {
     @Autowired
     StdCache stdCache;

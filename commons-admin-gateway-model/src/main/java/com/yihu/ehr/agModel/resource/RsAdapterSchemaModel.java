@@ -9,8 +9,17 @@ public class RsAdapterSchemaModel {
     private String name;
     private String code;
     private String adapterVersion;
+    private String adapterVersionName;
     private String description;
     private String typeName;
+
+    public String getAdapterVersionName() {
+        return adapterVersionName;
+    }
+
+    public void setAdapterVersionName(String adapterVersionName) {
+        this.adapterVersionName = adapterVersionName;
+    }
 
     public String getTypeName() {
         return typeName;

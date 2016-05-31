@@ -416,7 +416,7 @@ Link字段包含一个或多个超媒体链接关系。*rel*可能值如下：
 
 例如：
 	
-	User-Agent: client health-profile-browser
+	User-Agent: client 1FtXTrSL8D
 	
 	User-Agent: user developer
 	

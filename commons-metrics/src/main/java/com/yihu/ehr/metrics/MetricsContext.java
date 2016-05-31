@@ -29,11 +29,11 @@ public class MetricsContext {
     private int statsdPort;
 
     @Value("${spring.application.name:application}")
-    private String prefix = "ag-ehr-platform";
+    private String prefix = "";
 
     @Bean
     @ExportMetricWriter
     MetricWriter metricWriter() {
-        return new StatsdMetricWriter(prefix, statsdHost, statsdPort);
+        return new StatsdMetricWriterExt(prefix, statsdHost, statsdPort);
     }
 }
