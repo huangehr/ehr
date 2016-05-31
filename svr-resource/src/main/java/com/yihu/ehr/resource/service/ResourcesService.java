@@ -51,8 +51,6 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
             rsMetadataDao.deleteByResourcesId(id_);
             rsDao.delete(id_);
         }
-
-        rsDao.delete(id);
     }
 
     /**
