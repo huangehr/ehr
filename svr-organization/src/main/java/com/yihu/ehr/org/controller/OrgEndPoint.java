@@ -10,7 +10,7 @@ import com.yihu.ehr.org.feign.SecurityClient;
 import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.org.service.Organization;
 import com.yihu.ehr.util.PinyinUtil;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -36,7 +36,7 @@ import java.util.*;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "org", description = "组织机构管理服务", tags = {"机构管理"})
-public class OrgEndPoint extends BaseRestController {
+public class OrgEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private OrgService orgService;

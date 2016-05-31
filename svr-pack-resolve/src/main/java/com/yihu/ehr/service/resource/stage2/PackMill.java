@@ -47,7 +47,7 @@ public class PackMill {
             if(DataSetUtil.isOriginDataSet(dataSet.getCode())) continue;
 
             Set<String> keys = dataSet.getRecordKeys();
-            if (dataSet.isMultiRecord()){
+            if (!dataSet.isMultiRecord()){
                 MasterRecord masterRecord = resourceBucket.getMasterRecord();
 
                 for (String key : keys){

@@ -93,11 +93,9 @@ public class ResolveEndPoint {
         } catch (LegacyPackageException e) {
             packageMgrClient.reportStatus(packageId, ArchiveStatus.LegacyIgnored, e.getMessage());
 
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         } catch (Exception e) {
-            LogService.getLogger().error("Package resolve job error: package " + e.getMessage());
-
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 

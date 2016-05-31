@@ -154,7 +154,7 @@ public class StdDataSet {
 
                 Set<String> codes = record.getMetaDataCodes();
                 for (String code : codes) {
-                    metaData.put(code.substring(0, code.lastIndexOf('_')), record.getMetaData(code));
+                    metaData.put(code, record.getMetaData(code));
                 }
             }
         }

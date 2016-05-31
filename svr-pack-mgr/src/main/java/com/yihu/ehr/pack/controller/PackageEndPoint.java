@@ -14,7 +14,7 @@ import com.yihu.ehr.pack.feign.UserClient;
 import com.yihu.ehr.pack.service.Package;
 import com.yihu.ehr.pack.service.PackageService;
 import com.yihu.ehr.pack.task.MessageBuffer;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
@@ -48,7 +48,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "package_service", description = "档案包服务")
-public class PackageEndPoint extends BaseRestController {
+public class PackageEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private SecurityClient securityClient;
 
