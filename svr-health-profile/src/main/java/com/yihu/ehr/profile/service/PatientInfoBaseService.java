@@ -138,7 +138,7 @@ public class PatientInfoBaseService {
             }
 
             //住院诊断
-            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"table\":\""+BasisConstant.zyzdTable+"\",\"join\":\"patient_id:"+demographicId+"\"}");//暂时没数据demographic_id************10291272
+            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"table\":\""+BasisConstant.zyzdTable+"\",\"join\":\"demographic_id:"+demographicId+"\"}");
             if(hospitalized.getDetailModelList()!=null && hospitalized.getDetailModelList().size()>0)
             {
                 for(int i=0;i<hospitalized.getDetailModelList().size();i++)
@@ -423,7 +423,7 @@ public class PatientInfoBaseService {
             }
         }
         //住院诊断
-        Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"table\":\""+BasisConstant.zyzdTable+"\",\"join\":\"patient_id:"+demographicId+"\"}");//暂时没数据demographic_id************10291272
+        Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"table\":\""+BasisConstant.zyzdTable+"\",\"join\":\"demographic_id:"+demographicId+"\"}");
         if(hospitalized.getDetailModelList()!=null && hospitalized.getDetailModelList().size()>0) {
             for(int i=0;i<hospitalized.getDetailModelList().size();i++) {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
