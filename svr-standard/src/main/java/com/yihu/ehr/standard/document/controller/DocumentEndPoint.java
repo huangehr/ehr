@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "cda document", description = "CDA文档服务")
-public class ExtendEndPoint extends ExtendEndPoint<MCDADocument> {
+public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
 
     @Autowired
     private CDADocumentService cdaDocumentService;

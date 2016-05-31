@@ -3,11 +3,11 @@ package com.yihu.ehr.service.resource.stage2;
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.ResourceAdaptionKeySchema;
-import com.yihu.ehr.service.resource.StdDataSet;
-import com.yihu.ehr.service.resource.stage1.FilePackModel;
-import com.yihu.ehr.service.resource.stage1.StdPackModel;
-import com.yihu.ehr.service.resource.stage1.MetaDataRecord;
-import com.yihu.ehr.service.util.DataSetUtil;
+import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.service.resource.stage1.FilePackage;
+import com.yihu.ehr.service.resource.stage1.StandardPackage;
+import com.yihu.ehr.profile.util.MetaDataRecord;
+import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -35,15 +35,15 @@ public class PackMill {
     /**
      * 将解析好的档案拆解成资源。
      *
-     * @param packModel
+     * @param stdPack
      * @return
      */
-    public ResourceBucket grindingPackModel(StdPackModel packModel){
+    public ResourceBucket grindingPackModel(StandardPackage stdPack){
         ResourceBucket resourceBucket = new ResourceBucket();
-        BeanUtils.copyProperties(packModel, resourceBucket);
+        BeanUtils.copyProperties(stdPack, resourceBucket);
 
-        Collection<StdDataSet> stdDataSets = packModel.getDataSets();
-        for (StdDataSet dataSet : stdDataSets){
+        Collection<PackageDataSet> packageDataSets = stdPack.getDataSets();
+        for (PackageDataSet dataSet : packageDataSets){
             if(DataSetUtil.isOriginDataSet(dataSet.getCode())) continue;
 
             Set<String> keys = dataSet.getRecordKeys();
@@ -53,7 +53,7 @@ public class PackMill {
                 for (String key : keys){
                     MetaDataRecord metaDataRecord = dataSet.getRecord(key);
                     for (String metaDataCode : metaDataRecord.getMetaDataCodes()){
-                        String resourceMetaData = ResourceMetaData(packModel.getCdaVersion(), dataSet.getCode(), metaDataCode);
+                        String resourceMetaData = resourceMetaData(stdPack.getCdaVersion(), dataSet.getCode(), metaDataCode);
                         if (StringUtils.isEmpty(resourceMetaData)) continue;
 
                         masterRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
@@ -68,11 +68,11 @@ public class PackMill {
                 int index = 0;
                 for (String key : keys){
                     SubRecord subRecord = new SubRecord();
-                    subRecord.setRowkey(packModel.getId(), dataSet.getCode(), index++);
+                    subRecord.setRowkey(stdPack.getId(), dataSet.getCode(), index++);
 
                     MetaDataRecord metaDataRecord = dataSet.getRecord(key);
                     for (String metaDataCode : metaDataRecord.getMetaDataCodes()){
-                        String resourceMetaData = ResourceMetaData(packModel.getCdaVersion(), dataSet.getCode(), metaDataCode);
+                        String resourceMetaData = resourceMetaData(stdPack.getCdaVersion(), dataSet.getCode(), metaDataCode);
                         if (StringUtils.isEmpty(resourceMetaData)) continue;
 
                         subRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
@@ -84,8 +84,8 @@ public class PackMill {
         }
 
         // files that unable to get structured data, store as they are
-        if (packModel.getProfileType() == ProfileType.File){
-            resourceBucket.setCdaDocuments(((FilePackModel)packModel).getCdaDocuments());
+        if (stdPack.getProfileType() == ProfileType.File){
+            resourceBucket.setCdaDocuments(((FilePackage) stdPack).getCdaDocuments());
         }
 
         return resourceBucket;
@@ -99,7 +99,7 @@ public class PackMill {
      * @param metaDataCode
      * @return
      */
-     protected String ResourceMetaData(String cdaVersion, String dataSetCode, String metaDataCode){
+     protected String resourceMetaData(String cdaVersion, String dataSetCode, String metaDataCode){
          // TODO: 翻译时需要的内容：对CODE与VALUE处理后再翻译
         if (metaDataCode.contains("_CODE")){
             metaDataCode = metaDataCode.substring(0, metaDataCode.indexOf("_CODE"));

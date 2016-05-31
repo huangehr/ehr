@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.util;
+package com.yihu.ehr.profile.exception;
 
 /**
  * 历史档案包异常。当解析EHR 0.1版本采集的数据时会出现此异常。

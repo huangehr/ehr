@@ -1,10 +1,10 @@
 package com.yihu.ehr.service.resource.stage1.resolver;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.service.resource.stage1.StdPackModel;
+import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage1.PackModelFactory;
-import com.yihu.ehr.service.resource.StdDataSet;
-import com.yihu.ehr.service.util.DataSetUtil;
+import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ import java.util.Properties;
 @Component
 public class StdPackageResolver extends PackageResolver {
     @Override
-    public void resolve(StdPackModel profile, File root) throws IOException, ParseException {
+    public void resolve(StandardPackage profile, File root) throws IOException, ParseException {
         File standardFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.StandardFolder);
         parseFiles(profile, standardFolder.listFiles(), false);
 
@@ -35,9 +35,9 @@ public class StdPackageResolver extends PackageResolver {
     /**
      * 结构化档案包解析JSON文件中的数据。
      */
-    private void parseFiles(StdPackModel profile, File[] files, boolean origin) throws ParseException, IOException {
+    private void parseFiles(StandardPackage profile, File[] files, boolean origin) throws ParseException, IOException {
         for (File file : files) {
-            StdDataSet dataSet = generateDataSet(file, origin);
+            PackageDataSet dataSet = generateDataSet(file, origin);
 
             String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
             dataSet.setCode(dataSetCode);
@@ -79,13 +79,13 @@ public class StdPackageResolver extends PackageResolver {
      * @return
      * @throws IOException
      */
-    private StdDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
+    private PackageDataSet generateDataSet(File jsonFile, boolean isOrigin) throws IOException {
         JsonNode jsonNode = objectMapper.readTree(jsonFile);
         if (jsonNode.isNull()) {
             throw new IOException("Invalid json file when generate data set");
         }
 
-        StdDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
+        PackageDataSet dataSet = dataSetResolverWithTranslator.parseStructuredJsonDataSet(jsonNode, isOrigin);
         return dataSet;
     }
 }

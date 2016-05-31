@@ -1,6 +1,6 @@
 package com.yihu.ehr.service.resource.stage1.extractor;
 
-import com.yihu.ehr.service.resource.StdDataSet;
+import com.yihu.ehr.profile.util.PackageDataSet;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -28,7 +28,7 @@ public class CardInfoExtractor extends KeyDataExtractor {
      * @return
      */
     @Override
-    public Object extract(StdDataSet dataSet, Filter filter) throws ParseException {
+    public Object extract(PackageDataSet dataSet, Filter filter) throws ParseException {
         return null;
 
         /*if (filter == Filter.CardInfo && CardInfoContainedDataSet.contains(dataSet.getCode())) {

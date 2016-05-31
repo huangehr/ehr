@@ -9,7 +9,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.lang.SpringContext;
 /*import com.yihu.ehr.service.memory.intermediate.MetaDataRecord;
 import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
-import com.yihu.ehr.service.memory.intermediate.StdDataSet;
+import com.yihu.ehr.service.memory.intermediate.PackageDataSet;
 import com.yihu.ehr.profile.persist.ProfileIndices;
 import com.yihu.ehr.profile.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.persist.ProfileService;
@@ -98,7 +98,7 @@ public class SanofiEndPoint {
 
     private void convert(ObjectNode document, MemoryProfile profile) throws IOException {
         JsonNode section;
-        StdDataSet dataSet;
+        PackageDataSet dataSet;
         String[] innerCodes;
 
         // 人口学信息
@@ -171,8 +171,8 @@ public class SanofiEndPoint {
         }
     }
 
-    private void mergeData(JsonNode section, MemoryProfile profile, StdDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
-        StdDataSet dataSet = dataSetRepo.findOne(profile.getCdaVersion(),
+    private void mergeData(JsonNode section, MemoryProfile profile, PackageDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
+        PackageDataSet dataSet = dataSetRepo.findOne(profile.getCdaVersion(),
                 emptyDataSet.getCode(),
                 profile.getProfileType(),
                 emptyDataSet.getRecordKeys(),

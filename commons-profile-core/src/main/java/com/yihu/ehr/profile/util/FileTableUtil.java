@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.util;
+package com.yihu.ehr.profile.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;

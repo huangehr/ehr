@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.resource;
+package com.yihu.ehr.profile.util;
 
 import com.yihu.ehr.util.StringBuilderUtil;
 

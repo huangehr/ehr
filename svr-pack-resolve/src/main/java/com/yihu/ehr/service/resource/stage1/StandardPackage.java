@@ -7,12 +7,12 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.annotation.Column;
 import com.yihu.ehr.profile.annotation.Table;
+import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.service.resource.stage1.extractor.EventExtractor;
 import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
-import com.yihu.ehr.service.resource.ProfileId;
+import com.yihu.ehr.profile.util.ProfileId;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.service.resource.StdDataSet;
-import com.yihu.ehr.service.util.ResourceStorageUtil;
+import com.yihu.ehr.profile.util.ResourceStorageUtil;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,13 +20,13 @@ import java.text.ParseException;
 import java.util.*;
 
 /**
- * 在内存中构建一个临时的档案结构，将档案包的数据解析进去之后，再使用资源化工具入库。
+ * 在内存中构建一个标准档案包结构，将档案包的数据解析进去之后，再使用资源化工具入库。
  *
  * @author Sand
  * @created 2015.08.16 10:44
  */
 @Table(ResourceStorageUtil.MasterTable)
-public class StdPackModel {
+public class StandardPackage {
     protected ObjectMapper objectMapper = SpringContext.getService("objectMapper");
 
     private ProfileId profileId;                        // 档案ID
@@ -42,9 +42,9 @@ public class StdPackModel {
     private ProfileType profileType;
     private EventType eventType;
 
-    protected Map<String, StdDataSet> dataSets = new TreeMap<>();
+    protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 
-    public StdPackModel() {
+    public StandardPackage() {
         cardId = "";
         orgCode = "";
         patientId = "";
@@ -169,15 +169,15 @@ public class StdPackModel {
         this.createDate = createDate;
     }
 
-    public void insertDataSet(String dataSetCode, StdDataSet dataSet) {
+    public void insertDataSet(String dataSetCode, PackageDataSet dataSet) {
         this.dataSets.put(dataSetCode, dataSet);
     }
 
-    public StdDataSet getDataSet(String dataSetCode) {
+    public PackageDataSet getDataSet(String dataSetCode) {
         return this.dataSets.get(dataSetCode);
     }
 
-    public Collection<StdDataSet> getDataSets() {
+    public Collection<PackageDataSet> getDataSets() {
         return dataSets.values();
     }
 
@@ -220,7 +220,7 @@ public class StdPackModel {
 
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {
-            StdDataSet dataSet = dataSets.get(dataSetCode);
+            PackageDataSet dataSet = dataSets.get(dataSetCode);
             dataSetsNode.putPOJO(dataSetCode, dataSet.toJson());
         }
 
@@ -229,7 +229,7 @@ public class StdPackModel {
 
     public void regularRowKey() {
         for (String dataSetCode : dataSets.keySet()) {
-            StdDataSet dataSet = dataSets.get(dataSetCode);
+            PackageDataSet dataSet = dataSets.get(dataSetCode);
 
             int rowIndex = 0;
             String sortFormat = dataSet.getRecordCount() > 10 ? "%s$%03d" : "%s$%1d";
@@ -245,7 +245,7 @@ public class StdPackModel {
 
         EventExtractor eventExtractor = SpringContext.getService(EventExtractor.class);
         for (String dataSetCode : dataSets.keySet()) {
-            StdDataSet dataSet = dataSets.get(dataSetCode);
+            PackageDataSet dataSet = dataSets.get(dataSetCode);
             EventType eventType = (EventType) eventExtractor.extract(dataSet, KeyDataExtractor.Filter.EventType);
             if (eventType != null) {
                 setEventType(eventType);

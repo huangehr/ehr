@@ -2,8 +2,8 @@ package com.yihu.ehr.service.resource.stage1;
 
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.schema.StdMetaDataKeySchema;
-import com.yihu.ehr.service.util.DataSetResolver;
-import com.yihu.ehr.service.util.QualifierTranslator;
+import com.yihu.ehr.profile.util.DataSetParser;
+import com.yihu.ehr.profile.util.QualifierTranslator;
 import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * @created 2015.08.16 10:44
  */
 @Component
-public class DataSetResolverWithTranslator extends DataSetResolver {
+public class DataSetParserWithTranslator extends DataSetParser {
     @Autowired
     CacheReader cacheReader;
 

@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.resource.stage1;
+package com.yihu.ehr.profile.util;
 
 import java.util.Map;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.util;
+package com.yihu.ehr.profile.util;
 
 import com.yihu.ehr.profile.family.SubResourceFamily;
 import com.yihu.ehr.service.resource.stage2.MasterRecord;

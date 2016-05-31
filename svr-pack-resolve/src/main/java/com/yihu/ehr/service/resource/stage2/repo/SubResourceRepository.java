@@ -6,7 +6,7 @@ import com.yihu.ehr.profile.family.SubResourceFamily;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.SubRecord;
 import com.yihu.ehr.service.resource.stage2.SubRecords;
-import com.yihu.ehr.service.util.ResourceStorageUtil;
+import com.yihu.ehr.profile.util.ResourceStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,11 +59,11 @@ public class SubResourceRepository {
      * @return
      * @throws IOException
      *//*
-    public Pair<String, StdDataSet> findOne(String cdaVersion,
+    public Pair<String, PackageDataSet> findOne(String cdaVersion,
                                             String dataSetCode,
                                             ProfileType profileType,
                                             String[] rowkeys) throws IOException {
-        StdDataSet dataSet = profileType == ProfileType.Link ? new LinkDataSet() : new StdDataSet();
+        PackageDataSet dataSet = profileType == ProfileType.Link ? new LinkPackageDataSet() : new PackageDataSet();
         dataSet.setCdaVersion(cdaVersion);
         dataSet.setCode(dataSetCode);
 
@@ -88,7 +88,7 @@ public class SubResourceRepository {
      * @return
      * @throws IOException
      *//*
-    public Pair<String, StdDataSet> findOne(String version,
+    public Pair<String, PackageDataSet> findOne(String version,
                                             String dataSetCode,
                                             ProfileType profileType,
                                             Set<String> rowkeys,
@@ -114,7 +114,7 @@ public class SubResourceRepository {
             dataSetBundle.addFamily(rowkey, SubResourceFamily.Extension);
         }
 
-        StdDataSet dataSet = profileType == ProfileType.Link ? new LinkDataSet() : new StdDataSet();
+        PackageDataSet dataSet = profileType == ProfileType.Link ? new LinkPackageDataSet() : new PackageDataSet();
         dataSet.setCdaVersion(version);
         dataSet.setCode(dataSetCode);
 
@@ -132,10 +132,10 @@ public class SubResourceRepository {
      * @param rowKeys
      * @return
      *//*
-    public Pair<String, StdDataSet> findIndices(String cdaVersion,
+    public Pair<String, PackageDataSet> findIndices(String cdaVersion,
                                                 String dataSetCode,
                                                 String[] rowKeys) {
-        StdDataSet dataSet = new StdDataSet();
+        PackageDataSet dataSet = new PackageDataSet();
         dataSet.setCdaVersion(cdaVersion);
         dataSet.setCode(dataSetCode);
 
@@ -146,7 +146,7 @@ public class SubResourceRepository {
         return new ImmutablePair<>(dataSetCode, dataSet);
     }
 
-    private void extractResultToDataSet(StdDataSet dataSet, Object[] results) {
+    private void extractResultToDataSet(PackageDataSet dataSet, Object[] results) {
         for (Object item : results) {
             MetaDataRecord record = new MetaDataRecord();
 
@@ -161,8 +161,8 @@ public class SubResourceRepository {
                     record.putMetaData(qualifier, result.getCellValue(cell));
                 }
 
-                if (qualifier.equals(dataSet.getCode()) && dataSet instanceof LinkDataSet) {
-                    ((LinkDataSet) dataSet).setUrl(result.getCellValue(cell));
+                if (qualifier.equals(dataSet.getCode()) && dataSet instanceof LinkPackageDataSet) {
+                    ((LinkPackageDataSet) dataSet).setUrl(result.getCellValue(cell));
                 }
             }
 

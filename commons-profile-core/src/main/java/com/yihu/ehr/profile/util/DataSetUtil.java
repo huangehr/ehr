@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.util;
+package com.yihu.ehr.profile.util;
 
 /**
  * 档案工具。

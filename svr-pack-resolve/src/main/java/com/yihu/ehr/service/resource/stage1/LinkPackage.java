@@ -2,7 +2,7 @@ package com.yihu.ehr.service.resource.stage1;
 
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.annotation.Table;
-import com.yihu.ehr.service.util.ResourceStorageUtil;
+import com.yihu.ehr.profile.util.ResourceStorageUtil;
 
 import java.util.Date;
 
@@ -14,10 +14,10 @@ import java.util.Date;
  * @created 2015.08.16 10:44
  */
 @Table(ResourceStorageUtil.MasterTable)
-public class LinkPackModel extends StdPackModel {
+public class LinkPackage extends StandardPackage {
     public Date expireDate;
 
-    public LinkPackModel(){
+    public LinkPackage(){
         setProfileType(ProfileType.Link);
     }
 

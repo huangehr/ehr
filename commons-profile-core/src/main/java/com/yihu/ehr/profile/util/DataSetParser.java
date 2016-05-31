@@ -1,10 +1,9 @@
-package com.yihu.ehr.service.util;
+package com.yihu.ehr.profile.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.yihu.ehr.profile.exception.LegacyPackageException;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.StdDataSetKeySchema;
-import com.yihu.ehr.service.resource.stage1.MetaDataRecord;
-import com.yihu.ehr.service.resource.StdDataSet;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,7 @@ import java.util.Map;
  * @created 2015.08.16 10:44
  */
 @Component
-public class DataSetResolver {
+public class DataSetParser {
     @Autowired
     StdDataSetKeySchema dataSetKeySchema;
 
@@ -38,8 +37,8 @@ public class DataSetResolver {
      * @param isOrigin
      * @return
      */
-    public StdDataSet parseStructuredJsonDataSet(JsonNode root, boolean isOrigin) {
-        StdDataSet dataSet = new StdDataSet();
+    public PackageDataSet parseStructuredJsonDataSet(JsonNode root, boolean isOrigin) {
+        PackageDataSet dataSet = new PackageDataSet();
 
         try {
             String version = root.get("inner_version").asText();

@@ -1,21 +1,20 @@
-package com.yihu.ehr.service.resource;
+package com.yihu.ehr.profile.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.service.resource.stage1.MetaDataRecord;
 
 import java.util.*;
 
 /**
- * 标准档案数据集。
+ * 档案包数据集。
  *
  * @author Sand
  * @version 1.0
  * @created 2015.08.16 11:13
  */
-public class StdDataSet {
+public class PackageDataSet {
     protected String code;
     protected String name;
     protected String patientId;
@@ -110,14 +109,6 @@ public class StdDataSet {
 
     public int getRecordCount(){
         return records.size();
-    }
-
-    public String getFirstRowkey(){
-        for (String rowkey : records.keySet()){
-            return rowkey;
-        }
-
-        return null;
     }
 
     public void updateRecordKey(String origin, String newer) {

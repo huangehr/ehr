@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.service.resource.StdDataSet;
+import com.yihu.ehr.profile.util.PackageDataSet;
 
 /**
  * 链接型数据集，保存少量数据元及数据集本身的链接。数据本身包含在机构档案中。
@@ -12,7 +12,7 @@ import com.yihu.ehr.service.resource.StdDataSet;
  * @author Sand
  * @created 2016.04.26 19:31
  */
-public class LinkDataSet extends StdDataSet {
+public class LinkPackageDataSet extends PackageDataSet {
     protected String url;           // 数据集相对路径
 
     public String getUrl() {
