@@ -9,6 +9,42 @@ public class RsAdapterMetadataModel {
     private String metadataId;
     private String srcDatasetCode;
     private String srcMetadataCode;
+    private String srcMetadataName;
+    private String metadataDomainName;
+    private String metadataDomain;
+    private String metadataName;
+
+    public String getSrcMetadataName() {
+        return srcMetadataName;
+    }
+
+    public void setSrcMetadataName(String srcMetadataName) {
+        this.srcMetadataName = srcMetadataName;
+    }
+
+    public String getMetadataDomainName() {
+        return metadataDomainName;
+    }
+
+    public void setMetadataDomainName(String metadataDomainName) {
+        this.metadataDomainName = metadataDomainName;
+    }
+
+    public String getMetadataDomain() {
+        return metadataDomain;
+    }
+
+    public void setMetadataDomain(String metadataDomain) {
+        this.metadataDomain = metadataDomain;
+    }
+
+    public String getMetadataName() {
+        return metadataName;
+    }
+
+    public void setMetadataName(String metadataName) {
+        this.metadataName = metadataName;
+    }
 
     public String getId() {
         return id;

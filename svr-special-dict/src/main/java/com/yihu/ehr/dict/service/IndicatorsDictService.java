@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.IndicatorsDict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  * 用户公私钥管理
@@ -53,5 +55,13 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
         dict.setName(dict.getName());
         indicatorsDictRepo.save(dict);
         return dict;
+    }
+
+    public IndicatorsDict findByCode(String code) {
+        return indicatorsDictRepo.findByCode(code);
+    }
+
+    public List<IndicatorsDict> getIndicatorsDictByIds(String[] ids) {
+        return indicatorsDictRepo.findByIds(ids);
     }
 }

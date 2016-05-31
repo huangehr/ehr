@@ -43,8 +43,8 @@ public class ResourcesQueryDao {
 
     /**
      * 获取Hbase主表
-     * queryParams可为solr表达式，也可为json例：{"q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
-     * q和fq都存在则做join操作
+     * queryParams可为solr表达式，也可为json例：{"q":"*:*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * 有join参数做join操作
      */
     public Page<Map<String,Object>> getEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
         String core = mainCore;
@@ -66,17 +66,11 @@ public class ResourcesQueryDao {
                     sort = obj.get("sort");
                 }
 
-                //q和fq都存在则做join操作
-                if (obj.containsKey("fq")) {
-                    fq = obj.get("fq");
-                    if(q.length()>0)
-                    {
-                        q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}" +q;
-                    }
-                    else
-                    {
-                        q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}*:*";
-                    }
+                //join操作
+                if (obj.containsKey("join")) {
+                    String join = obj.get("join");
+                    fq = q;
+                    q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}" +join;
                 }
 
             }
@@ -99,8 +93,8 @@ public class ResourcesQueryDao {
 
     /**
      * 获取Hbase细表
-     * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","fq":"","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
-     * q和fq都存在则做join操作
+     * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * 有join参数做join操作
      */
     public Page<Map<String,Object>> getEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
         String core = subCore;
@@ -122,38 +116,27 @@ public class ResourcesQueryDao {
                     sort = obj.get("sort");
                 }
 
-                //q和fq都存在则做join操作
-                if (obj.containsKey("fq")) {
-                    fq = obj.get("fq");
-                    if(q.length()>0)
-                    {
-                        q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}" +q;
-                    }
-                    else
-                    {
-                        q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}*:*";
-                    }
-                }
-
-                //细表数据集条件
-                if (obj.containsKey("table")) {
-                    if(q.startsWith("{!join"))
-                    {
+                //join操作
+                if (obj.containsKey("join")) {
+                    String join = obj.get("join");
+                    fq = q;
+                    q = "{!join  fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}" +join;
+                    if (obj.containsKey("table")) {
                         if (fq.length() > 0) {
                             fq += " AND rowkey:*" + obj.get("table") + "*";
                         } else {
                             fq = "rowkey:*" + obj.get("table") + "*";
                         }
                     }
-                    else{
-                        if (q.length() > 0) {
-                            q += " AND rowkey:*" + obj.get("table") + "*";
-                        } else {
-                            q = "rowkey:*" + obj.get("table") + "*";
-                        }
-                    }
-
                 }
+                else{
+                    if (q.length() > 0) {
+                        q += " AND rowkey:*" + obj.get("table") + "*";
+                    } else {
+                        q = "rowkey:*" + obj.get("table") + "*";
+                    }
+                }
+
             } else {
                 q = queryParams;
             }
@@ -180,11 +163,12 @@ public class ResourcesQueryDao {
         Map<String, Object> params = objectMapper.readValue(queryParams, Map.class);
 
         String q = "";
+        String fq = "";
         String groupFields = "";
         String statsFields = "";
         List<SolrGroupEntity> customGroup = new ArrayList<>();
         if (params.containsKey("q")) {
-            q = params.get("q").toString();
+            fq = params.get("q").toString();
         }
         if (params.containsKey("groupFields")) {
             groupFields = params.get("groupFields").toString();
@@ -203,13 +187,18 @@ public class ResourcesQueryDao {
                 }
             }
         }
+        //join操作
+        if (params.containsKey("join")) {
+            String join = params.get("join").toString();
+            q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}" +join;
+        }
 
         if (groupFields.length() == 0 && customGroup.size() == 0) {
             throw new Exception("缺少分组条件！");
         }
         //数值统计
         if (statsFields != null && statsFields.length() > 0) {
-            return solr.getStats(core, groupFields, statsFields, q, customGroup);
+            return solr.getStats(core, groupFields, statsFields, q,fq, customGroup);
         }
         //总数统计
         else {
@@ -225,12 +214,12 @@ public class ResourcesQueryDao {
 
                 //多分组
                 if (groupFields.contains(",")) {
-                    return solr.getGroupMult(core, groupFields, q, page, size);
+                    return solr.getGroupMult(core, groupFields, q,fq, page, size);
                 } else {
-                    return solr.getGroupCount(core, groupFields, q, page, size);
+                    return solr.getGroupCount(core, groupFields, q,fq, page, size);
                 }
             } else {
-                return solr.getGroupMult(core, groupFields, customGroup, q);
+                return solr.getGroupMult(core, groupFields, customGroup, q,fq);
             }
         }
 
@@ -246,10 +235,11 @@ public class ResourcesQueryDao {
         Map<String, String> params = objectMapper.readValue(queryParams, Map.class);
 
         String q = "";
+        String fq="";
         String groupFields = "";
         String statsFields = "";
         if (params.containsKey("q")) {
-            q = params.get("q");
+            fq = params.get("q");
         }
         if (params.containsKey("groupFields")) {
             groupFields = params.get("groupFields");
@@ -260,23 +250,28 @@ public class ResourcesQueryDao {
             statsFields = params.get("statsFields");
         }
         if (params.containsKey("table")) {
-            if (q.length() > 0) {
-                q += " AND rowkey:*" + params.get("table") + "*";
+            if (fq.length() > 0) {
+                fq += " AND rowkey:*" + params.get("table") + "*";
             } else {
-                q = "rowkey:*" + params.get("table") + "*";
+                fq = "rowkey:*" + params.get("table") + "*";
             }
+        }
+        //join操作
+        if (params.containsKey("join")) {
+            String join = params.get("join").toString();
+            q = "{!join  fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}" +join;
         }
 
         //数值统计
         if (statsFields != null && statsFields.length() > 0) {
-            return solr.getStats(core, groupFields, statsFields, q);
+            return solr.getStats(core, groupFields, statsFields, q,fq);
         }
         //总数统计
         else {
             if (groupFields.contains(",")) //多分组
             {
                 String[] groups = groupFields.split(",");
-                return solr.getGroupMult(core, groupFields, null, q); //自定义分组未完善
+                return solr.getGroupMult(core, groupFields, null, q,fq); //自定义分组未完善
             } else { //单分组
                 //默认第一页
                 if (page == null) {
@@ -286,7 +281,7 @@ public class ResourcesQueryDao {
                 if (size == null) {
                     size = defaultSize;
                 }
-                return solr.getGroupCount(core, groupFields, q, page, size);
+                return solr.getGroupCount(core, groupFields, q,fq, page, size);
             }
         }
 

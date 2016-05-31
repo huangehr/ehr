@@ -103,6 +103,32 @@ public class OrganizationController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/organizations/combo", method = RequestMethod.GET)
+    @ApiOperation(value = "机构下拉列表")
+    public Envelop searchOrgsForCombo(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
+
+        try {
+            ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);
+            int totalCount = getTotalCount(responseEntity);
+            return getResult(responseEntity.getBody(), totalCount, page, size);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
     /**
      * 将微服务返回的结果转化为前端OrgModel模型
      *

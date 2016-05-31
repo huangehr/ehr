@@ -3,6 +3,7 @@ package com.yihu.ehr.profile.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.profile.service.PatientInfoBaseService;
 import com.yihu.ehr.profile.service.PatientInfoDetailService;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -42,7 +43,7 @@ public class ResourcesBrowseController {
     }
 
 
-    @ApiOperation("门户 - 病史信息")
+    @ApiOperation("门户 - 病史信息（临时数据）")
     @RequestMapping(value = "/home/getDiseaseHistory", method = RequestMethod.GET)
     public String getDiseaseHistory(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
@@ -60,165 +61,53 @@ public class ResourcesBrowseController {
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
 
-
         return patient.getHealthProblem(demographicId);
     }
 
 
     @ApiOperation("门户 - 最近就诊事件")
     @RequestMapping(value = "/home/getMedicalEvents", method = RequestMethod.GET)
-    public String getMedicalEvents(
+    public List<Map<String,Object>> getMedicalEvents(
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true) String demographicId,
-            @ApiParam(name = "medicalEventsType", value = "就诊事件类别")
-            @RequestParam(value = "medicalEventsType", required = false) String medicalEventsType,
-            @ApiParam(name = "year", value = "年份", defaultValue = "当前年份")
+            @ApiParam(name = "eventsType", value = "就诊事件类别")
+            @RequestParam(value = "eventsType", required = false) String eventsType,
+            @ApiParam(name = "year", value = "年份")
             @RequestParam(value = "year", required = false, defaultValue = "") String year,
             @ApiParam(name = "area", value = "地区")
             @RequestParam(value = "area", required = false) String area,
             @ApiParam(name = "hpId", value = "健康问题id")
             @RequestParam(value = "hpId", required = false) String hpId,
-            @ApiParam(name = "diagnosisCode", value = "疾病代码（逗号分隔）")
-            @RequestParam(value = "diagnosisCode", required = false) String diagnosisCode,
-            @ApiParam(name = "page", value = "当前页")
-            @RequestParam(value = "page", required = false,defaultValue = "1") int page,
-            @ApiParam(name = "size", value = "行数")
-            @RequestParam(value = "size", required = false, defaultValue = "5") int size) throws Exception {
+            @ApiParam(name = "diseaseId", value = "疾病id")
+            @RequestParam(value = "diseaseId", required = false) String diseaseId) throws Exception {
 
-        return file2String("/json/MedicalEventInfo.json");
+        return patient.getMedicalEvents(demographicId,eventsType,year,area,hpId,diseaseId);
 
     }
 
-    @ApiOperation("门户 - 相关健康指标")
-    @RequestMapping(value = "/home/getHealthIndicators", method = RequestMethod.GET)
-    public String getHealthIndicators(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
-            @ApiParam(name = "medicalIndexId", value = "指标项ID（逗号分隔）") @RequestParam(value = "medicalIndexId", required = false) String medicalIndexId,
-            @ApiParam(name = "startTime", value = "查询开始时间") @RequestParam(value = "startTime", required = false) String startTime,
-            @ApiParam(name = "endTime", value = "查询结束时间") @RequestParam(value = "endTime", required = false) String endTime,
-            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-
-        return file2String("/json/HealthIndicators.json");
+    @ApiOperation("就诊过的疾病")
+    @RequestMapping(value = "/home/getPatientDisease", method = RequestMethod.GET)
+    public List<String> getPatientDisease(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
+        return patient.getPatientDisease(demographicId);
     }
 
-
-    /************************************
-     * 就诊事件详情
-     *****************************************************************/
-//    @ApiOperation("左侧档案列表导航")
-//    @RequestMapping(value = "/cda/getPatientCdaList", method = RequestMethod.GET)
-//    public String getPatientCdaList(
-//            @ApiParam(name = "rowKey", value = "档案ID") @RequestParam(value = "rowKey", required = true) String rowKey,
-//            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
-//            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-//            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-//
-//        return file2String("/json/MedicalEventInfo.json");
-//
-//    }
-    @ApiOperation("右侧档案模版展示")
-    @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
-    public String getPatientCdaInfo(
-            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = true) String profileId) throws Exception {
-
-        return "跟泽华要数据";
-    }
-
-    /************************************
-     * 疾病事件
-     *****************************************************************/
-    @ApiOperation("疾病事件 - 历史用药 - 药品清单")
-    @RequestMapping(value = "/disease/getDrugList", method = RequestMethod.GET)
-    public String getDrugList(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
-            @ApiParam(name = "diagnosisCode", value = "疾病代码（逗号分隔）") @RequestParam(value = "diagnosisCode", required = false) String diagnosisCode,
-            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-
-        return file2String("/json/DrugList.json");
-
-    }
-//
-//    @ApiOperation("疾病事件 - 历史用药 - 处方记录")
-//    @RequestMapping(value = "/disease/getPrescriptionRecord", method = RequestMethod.GET)
-//    public DataList getPrescriptionRecord(@ApiParam(name = "idNo", value = "身份证号码") @RequestParam(value = "idNo", required = true) String idNo,
-//                              @ApiParam(name = "queryType", value = "查询内容代码") @RequestParam(value = "queryType", required = true) Integer queryType,
-//                              @ApiParam(name = "year", value = "年份") @RequestParam(value = "year", required = false) String year,
-//                              @ApiParam(name = "healthProblemCode", value = "健康问题代码") @RequestParam(value = "healthProblemCode", required = false) String healthProblemCode,
-//                              @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-//                              @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
-//
-//            return null;
-//
-//    }
-//
-//    @ApiOperation("疾病事件 - 历史用药 - 用药记录")
-//    @RequestMapping(value = "/disease/getUsingDrugRecords", method = RequestMethod.GET)
-//    public DataList getUsingDrugRecords(@ApiParam(name = "idNo", value = "身份证号码") @RequestParam(value = "idNo", required = true) String idNo,
-//                                      @ApiParam(name = "year", value = "年份") @RequestParam(value = "year", required = false) String year,
-//                                      @ApiParam(name = "month", value = "月份") @RequestParam(value = "month", required = false) String month,
-//                                        @ApiParam(name = "healthProblemCode", value = "健康问题代码") @RequestParam(value = "healthProblemCode", required = false) String healthProblemCode,
-//                                        @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-//                                        @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
-//
-//        return null;
-//
-//    }
-//
-
-    /************************************
-     * 健康指标
-     *****************************************************************/
-    @ApiOperation("左侧指标列表导航")
-    @RequestMapping(value = "/health/getHealthIndicatorItems", method = RequestMethod.GET)
-    public String getHealthIndicatorItems(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = false) String demographicId,
-            @ApiParam(name = "hpId", value = "指标项ID（逗号分隔）") @RequestParam(value = "hpId", required = false) String hpId) throws Exception {
-
-        return file2String("/json/indicatorItems.json");
-
-    }
-
-
-    /************************************
-     * 机构列表
-     *****************************************************************/
-    @ApiOperation("机构列表")
-    @RequestMapping(value = "/common/getDiagnosisList", method = RequestMethod.GET)
-    public String getDiagnosisList(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = false) String demographicId) throws Exception {
-
-        return "跟泽华要数据";
-
-    }
-//
-//    @ApiOperation("卡信息一览")
-//    @RequestMapping(value = "/common/getCardTypeList", method = RequestMethod.GET)
-//    public DataList getCardTypeList(@ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-//                                   @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
-//
-//        return null;
-//
-//    }
-
-
-    /************************************
-     * 就诊过的城市
-     *****************************************************************/
     @ApiOperation("就诊过的城市")
-    @RequestMapping(value = "/medic/getOrganizations", method = RequestMethod.GET)
-    public String getEventOrganizations(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
-            @ApiParam(name = "beginTime", value = "查询开始时间") @RequestParam(value = "beginTime", required = false) String beginTime,
-            @ApiParam(name = "endTime", value = "查询结束时间") @RequestParam(value = "endTime", required = false) String endTime) throws Exception {
+    @RequestMapping(value = "/home/getPatientArea", method = RequestMethod.GET)
+    public List<String> getPatientArea(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
+        return patient.getPatientArea(demographicId);
+    }
 
-        return file2String("/json/MedicalOrganizations.json");
-
-
+    @ApiOperation("就诊过的年份")
+    @RequestMapping(value = "/home/getPatientYear", method = RequestMethod.GET)
+    public List<String> getPatientYear(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
+        return patient.getPatientYear(demographicId);
     }
 
 
+    /******************** CDA相关接口 ***************************************/
     @ApiOperation("档案搜索接口")
     @RequestMapping(value = "/medic/getArchives", method = RequestMethod.GET)
     public String getArchives(
@@ -229,8 +118,81 @@ public class ResourcesBrowseController {
 
     }
 
+    @ApiOperation("右侧档案模版展示")
+    @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
+    public String getPatientCdaInfo(
+            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = true) String profileId) throws Exception {
 
-    public String file2String(String path) throws IOException {
+        return "";
+    }
+
+    /************************************
+     * 疾病事件
+     *****************************************************************/
+    @ApiOperation("疾病事件 - 历史用药 - 药品清单")
+    @RequestMapping(value = "/disease/getDrugList", method = RequestMethod.GET)
+    public Envelop getDrugList(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "hpId", value = "健康代码") @RequestParam(value = "hpId", required = false) String hpId,
+            @ApiParam(name = "startTime", value = "开始时间") @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(name = "endTime", value = "结束时间") @RequestParam(value = "endTime", required = false) String endTime,
+            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+
+        //return file2String("/json/DrugList.json");
+        return patientDetail.getDrugList(demographicId,hpId,startTime,endTime,page,size);
+    }
+
+    @ApiOperation("疾病事件 - 历史用药 - 用药统计")
+    @RequestMapping(value = "/disease/getDrugListStat", method = RequestMethod.GET)
+    public List<Map<String,Object>> getDrugListStat(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "hpId", value = "健康代码") @RequestParam(value = "hpId", required = false) String hpId) throws Exception {
+
+        return patientDetail.getDrugListStat(demographicId, hpId);
+    }
+
+
+    /************************************
+     * 健康指标
+     *****************************************************************/
+    //根据档案ID获取相关指标
+
+
+    //获取指标指标
+    @ApiOperation("门户 - 相关健康指标")
+    @RequestMapping(value = "/health/getHealthIndicators", method = RequestMethod.GET)
+    public Envelop getHealthIndicators(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "hpId", value = "健康问题") @RequestParam(value = "hpId", required = false) String hpId,
+            @ApiParam(name = "medicalIndexId", value = "指标项ID") @RequestParam(value = "medicalIndexId", required = false) String medicalIndexId,
+            @ApiParam(name = "startTime", value = "查询开始时间") @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(name = "endTime", value = "查询结束时间") @RequestParam(value = "endTime", required = false) String endTime,
+            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+
+        //return file2String("/json/HealthIndicators.json");
+        return patientDetail.getHealthIndicators(demographicId,hpId,medicalIndexId,startTime,endTime,page,size);
+    }
+
+    @ApiOperation("左侧指标列表导航")
+    @RequestMapping(value = "/health/getHealthIndicatorItems", method = RequestMethod.GET)
+    public String getHealthIndicatorItems(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = false) String demographicId,
+            @ApiParam(name = "hpId", value = "指标项ID（逗号分隔）") @RequestParam(value = "hpId", required = false) String hpId) throws Exception {
+
+        return file2String("/json/indicatorItems.json");
+    }
+
+
+
+
+
+
+
+
+
+    private String file2String(String path) throws IOException {
         String folder=System.getProperty("java.io.tmpdir");
         String filePath = folder+path;
         File file = new File(filePath);

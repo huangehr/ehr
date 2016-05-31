@@ -1,5 +1,7 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.Icd10Dict;
+import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,8 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import java.util.List;
 
 
 /**
@@ -23,12 +24,10 @@ import javax.persistence.PersistenceContext;
 @Service
 public class Icd10DictService extends BaseJpaService<Icd10Dict, XIcd10DictRepository> {
 
-    @PersistenceContext
-    protected EntityManager entityManager;
     @Autowired
     private XIcd10DictRepository icd10DictRepo;
     @Autowired
-    private XHpIcd10RelationRepository hpIcd10ReRepo;
+    private XIcd10HpRelationRepository hpIcd10ReRepo;
     @Autowired
     private XIcd10DrugRelationRepository icd10DrugReRepo;
     @Autowired
@@ -60,4 +59,7 @@ public class Icd10DictService extends BaseJpaService<Icd10Dict, XIcd10DictReposi
         return result;
     }
 
+    public List<MIcd10Dict> findByIds(String[] ids) {
+        return  icd10DictRepo.findByIds(ids);
+    }
 }

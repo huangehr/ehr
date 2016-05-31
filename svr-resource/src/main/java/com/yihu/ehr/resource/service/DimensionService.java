@@ -3,7 +3,6 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.DimensionDao;
 import com.yihu.ehr.resource.model.RsDimension;
-import com.yihu.ehr.resource.service.intf.IDimensionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class DimensionService extends BaseJpaService<RsDimension,DimensionDao>  implements IDimensionService{
+public class DimensionService extends BaseJpaService<RsDimension,DimensionDao> {
     @Autowired
     private DimensionDao dimensionDao;
 

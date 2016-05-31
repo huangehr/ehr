@@ -1,19 +1,25 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.resource.MRsCategory;
+import com.yihu.ehr.model.resource.MRsInterface;
 import com.yihu.ehr.model.resource.MRsResources;
+import com.yihu.ehr.resource.client.ResourcesCategoryClient;
 import com.yihu.ehr.resource.client.ResourcesClient;
+import com.yihu.ehr.resource.client.RsInterfaceClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +32,11 @@ import java.util.List;
 public class ResourcesController extends BaseController {
     @Autowired
     private ResourcesClient resourcesClient;
+    @Autowired
+    private RsInterfaceClient rsInterfaceClient;
+    @Autowired
+    private ResourcesCategoryClient rsCategoryClient;
+
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST)
@@ -127,7 +138,22 @@ public class ResourcesController extends BaseController {
         try
         {
             ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources(fields,filters,sorts,page,size);
-            List<MRsResources> rsResources = responseEntity.getBody();
+            List<MRsResources> mRsResources = responseEntity.getBody();
+            List<RsResourcesModel> rsResources = new ArrayList<>(mRsResources.size());
+            for(MRsResources m:mRsResources){
+                RsResourcesModel rsResourcesModel = convertToModel(m,RsResourcesModel.class);
+                String categoryId =  rsResourcesModel.getCategoryId();
+                if (!StringUtils.isEmpty(categoryId)){
+                    MRsCategory category = rsCategoryClient.getRsCategoryById(categoryId);
+                    rsResourcesModel.setCategoryName(category==null?"":category.getName());
+                }
+                String rsInterfaceId = m.getRsInterface();
+                if (!StringUtils.isEmpty(rsInterfaceId)){
+                    MRsInterface rsInterface = rsInterfaceClient.getRsInterfaceById(rsInterfaceId);
+                    rsResourcesModel.setRsInterfaceName(rsInterface==null?"":rsInterface.getName());
+                }
+                rsResources.add(rsResourcesModel);
+            }
             Envelop envelop = getResult(rsResources, getTotalCount(responseEntity), page, size);
             return envelop;
         }

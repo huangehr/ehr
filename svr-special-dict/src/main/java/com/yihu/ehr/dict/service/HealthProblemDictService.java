@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.HealthProblemDict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, 
     @Autowired
     private XHealthProblemDictRepository hpDictRepo;
     @Autowired
-    private XHpIcd10RelationRepository hpIcd10ReRepo;
+    private XIcd10HpRelationRepository hpIcd10ReRepo;
 
     public Page<HealthProblemDict> getDictList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
@@ -56,4 +57,7 @@ public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, 
         return result;
     }
 
+    public HealthProblemDict findHpDictByCode(String code) {
+        return hpDictRepo.findByCode(code);
+    }
 }

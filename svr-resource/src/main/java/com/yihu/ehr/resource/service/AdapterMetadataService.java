@@ -1,16 +1,13 @@
 package com.yihu.ehr.resource.service;
 
-import com.yihu.ehr.model.resource.MRsAdapterMetadata;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.AdapterMetadataQueryDao;
 import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
-import com.yihu.ehr.resource.service.intf.IAdapterMetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,7 +19,7 @@ import javax.transaction.Transactional;
  */
 @Service
 @Transactional
-public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,AdapterMetadataDao> implements IAdapterMetadataService{
+public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,AdapterMetadataDao> {
     @Autowired
     private AdapterMetadataDao adMetadataDao;
 
@@ -84,7 +81,6 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
         return adMetadataDao.findOne(id);
     }
 
-    @Override
     public void batchInsertAdapterMetadatas(RsAdapterMetadata[] adapterMetadatas) {
         adapterMetadataQueryDao.batchAdapterMetadatas(adapterMetadatas);
     }

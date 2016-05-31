@@ -5,7 +5,6 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.RsResources;
-import com.yihu.ehr.resource.service.intf.IResourcesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +20,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> implements IResourcesService {
+public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> {
     @Autowired
     private ResourcesDao rsDao;
     @Autowired
@@ -52,8 +51,6 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
             rsMetadataDao.deleteByResourcesId(id_);
             rsDao.delete(id_);
         }
-
-        rsDao.delete(id);
     }
 
     /**

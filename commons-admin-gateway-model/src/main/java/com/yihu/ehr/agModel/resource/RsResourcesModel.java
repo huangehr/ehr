@@ -9,7 +9,9 @@ public class RsResourcesModel {
     private String code;
     private String name;
     private String categoryId;
+    private String categoryName;
     private String rsInterface;
+    private String rsInterfaceName;
     private String grantType;
     private String description;
 
@@ -41,6 +43,13 @@ public class RsResourcesModel {
         this.categoryId = categoryId;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
     public String getRsInterface()
     {
         return rsInterface;
@@ -48,6 +57,13 @@ public class RsResourcesModel {
     public void setRsInterface(String rsInterface)
     {
         this.rsInterface = rsInterface;
+    }
+
+    public String getRsInterfaceName() {
+        return rsInterfaceName;
+    }
+    public void setRsInterfaceName(String rsInterfaceName) {
+        this.rsInterfaceName = rsInterfaceName;
     }
 
     public String getGrantType()

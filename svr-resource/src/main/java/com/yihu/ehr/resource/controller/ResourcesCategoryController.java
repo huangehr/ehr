@@ -1,21 +1,18 @@
 package com.yihu.ehr.resource.controller;
+
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.resource.model.RsCategory;
-import com.yihu.ehr.resource.service.intf.IResourcesCategoryService;
+import com.yihu.ehr.resource.service.ResourcesCategoryService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +33,7 @@ import java.util.List;
 public class ResourcesCategoryController extends BaseRestController {
 
     @Autowired
-    private IResourcesCategoryService rsCategoryService;
+    private ResourcesCategoryService rsCategoryService;
 
     @RequestMapping(value= ServiceApi.Resources.Categories,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("资源类别创建")
@@ -118,6 +115,15 @@ public class ResourcesCategoryController extends BaseRestController {
 
         pagedResponse(request,response,total,page,size);
         return (List<MRsCategory>)rsList;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.NoPageCategories,method = RequestMethod.GET)
+    @ApiOperation("获取资源类别")
+    public List<MRsCategory> getAllCategories(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws  Exception {
+        List<RsCategory> resources = rsCategoryService.search(filters);
+        return (List<MRsCategory>) convertToModels(resources, new ArrayList<MRsCategory>(resources.size()), MRsCategory.class, null);
     }
 
 }

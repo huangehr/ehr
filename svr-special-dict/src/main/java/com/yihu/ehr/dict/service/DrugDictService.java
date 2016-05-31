@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.DrugDict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,8 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  * 用户公私钥管理
@@ -22,8 +22,6 @@ import javax.persistence.PersistenceContext;
 @Service
 public class DrugDictService extends BaseJpaService<DrugDict, XDrugDictRepository> {
 
-    @PersistenceContext
-    protected EntityManager entityManager;
     @Autowired
     private XDrugDictRepository drugDictRepo;
     @Autowired
@@ -53,5 +51,9 @@ public class DrugDictService extends BaseJpaService<DrugDict, XDrugDictRepositor
     public boolean isUsage(String id){
         boolean result = (icd10DrugReRepo.findByDrugId(id) != null);
         return result;
+    }
+
+    public List<DrugDict> getDrugDictByIds(String[] ids) {
+        return drugDictRepo.findByIds(ids);
     }
 }

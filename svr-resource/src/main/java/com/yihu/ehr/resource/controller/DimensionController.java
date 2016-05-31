@@ -4,7 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsDimension;
 import com.yihu.ehr.resource.model.RsDimension;
-import com.yihu.ehr.resource.service.intf.IDimensionService;
+import com.yihu.ehr.resource.service.DimensionService;
 import com.yihu.ehr.util.controller.BaseRestController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +34,7 @@ import java.util.List;
 public class DimensionController extends BaseRestController {
 
     @Autowired
-    private IDimensionService dimensionService;
+    private DimensionService dimensionService;
 
     @ApiOperation("创建维度")
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

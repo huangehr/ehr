@@ -1,5 +1,6 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.model.Icd10DrugRelation;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -54,5 +55,9 @@ public class Icd10DrugRelationService extends BaseJpaService<Icd10DrugRelation, 
     public Page<Icd10DrugRelation> getRelationList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return icd10DrugRelaRepo.findAll(pageable);
+    }
+
+    public List<Icd10DrugRelation> getIcd10DrugRelationsByIcd10Ids(String[] icd10Ids) {
+        return icd10DrugRelaRepo.findByIcd10Ids(icd10Ids);
     }
 }

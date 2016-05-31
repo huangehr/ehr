@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.specialdict.service.HealthProblemDictClient;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
-import com.yihu.ehr.model.specialdict.MHpIcd10Relation;
+import com.yihu.ehr.model.specialdict.MIcd10HpRelation;
 import com.yihu.ehr.specialdict.service.Icd10DictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -135,11 +135,11 @@ public class HealthProblemDictController extends BaseController {
         for (MHealthProblemDict mHpDict:mHealthProblemDicts){
             HealthProblemDictModel hpDictModel = convertToModel(mHpDict,HealthProblemDictModel.class);
             //获取关联的icd10字典名称
-            Collection<MHpIcd10Relation> relations = hpDictClient.getHpIcd10RelationListWithoutPaging("hpId=" + hpDictModel.getId());
+            Collection<MIcd10HpRelation> relations = hpDictClient.getHpIcd10RelationListWithoutPaging("hpId=" + hpDictModel.getId());
             String icd10Names = "";
             if(relations.size() != 0){
                 String icd110Ids = "";
-                for(MHpIcd10Relation relation:relations){
+                for(MIcd10HpRelation relation:relations){
                     icd110Ids += relation.getIcd10Id()+",";
                 }
                 icd110Ids = icd110Ids.substring(0,icd110Ids.length()-1);
@@ -194,7 +194,7 @@ public class HealthProblemDictController extends BaseController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson){
 
-        MHpIcd10Relation hpIcd10Relation = hpDictClient.createHpIcd10Relation(dictJson);
+        MIcd10HpRelation hpIcd10Relation = hpDictClient.createHpIcd10Relation(dictJson);
         HpIcd10RelationModel hpIcd10RelationModel = convertToModel(hpIcd10Relation,HpIcd10RelationModel.class);
 
         Envelop envelop = new Envelop();
@@ -218,8 +218,8 @@ public class HealthProblemDictController extends BaseController {
             @ApiParam(name = "create_user",value = "创建者")
             @RequestParam(value = "create_user") String createUser){
         Envelop envelop = new Envelop();
-        Collection<MHpIcd10Relation> mHpIcd10Relations = hpDictClient.createHpIcd10Relations(hpId, icd10Ids,createUser);
-        List<HpIcd10RelationModel> hpIcd10RelationModels = (List<HpIcd10RelationModel>)convertToModels(mHpIcd10Relations,new ArrayList<>(),HpIcd10RelationModel.class,null);
+        Collection<MIcd10HpRelation> mIcd10HpRelations = hpDictClient.createHpIcd10Relations(hpId, icd10Ids,createUser);
+        List<HpIcd10RelationModel> hpIcd10RelationModels = (List<HpIcd10RelationModel>)convertToModels(mIcd10HpRelations,new ArrayList<>(),HpIcd10RelationModel.class,null);
         if(hpIcd10RelationModels.size() != 0){
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(hpIcd10RelationModels);
@@ -236,7 +236,7 @@ public class HealthProblemDictController extends BaseController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson){
 
-        MHpIcd10Relation hpIcd10Relation = hpDictClient.updateHpIcd10Relation(dictJson);
+        MIcd10HpRelation hpIcd10Relation = hpDictClient.updateHpIcd10Relation(dictJson);
         HpIcd10RelationModel hpIcd10RelationModel = convertToModel(hpIcd10Relation,HpIcd10RelationModel.class);
 
         Envelop envelop = new Envelop();
@@ -289,11 +289,11 @@ public class HealthProblemDictController extends BaseController {
             @RequestParam(value = "page", required = false) int page){
 
         List<HpIcd10RelationModel> hpIcd10RelationModelList = new ArrayList<>();
-        ResponseEntity<Collection<MHpIcd10Relation>> responseEntity = hpDictClient.getHpIcd10RelationList(fields, filters, sorts, size, page);
-        Collection<MHpIcd10Relation> mHpIcd10Relations  = responseEntity.getBody();
+        ResponseEntity<Collection<MIcd10HpRelation>> responseEntity = hpDictClient.getHpIcd10RelationList(fields, filters, sorts, size, page);
+        Collection<MIcd10HpRelation> mIcd10HpRelations = responseEntity.getBody();
         Integer totalCount = getTotalCount(responseEntity);
-        for (MHpIcd10Relation mHpIcd10Relation:mHpIcd10Relations){
-            HpIcd10RelationModel hpIcd10RelationModel = convertToModel(mHpIcd10Relation,HpIcd10RelationModel.class);
+        for (MIcd10HpRelation mIcd10HpRelation : mIcd10HpRelations){
+            HpIcd10RelationModel hpIcd10RelationModel = convertToModel(mIcd10HpRelation,HpIcd10RelationModel.class);
             hpIcd10RelationModelList.add(hpIcd10RelationModel);
         }
         Envelop envelop = getResult(hpIcd10RelationModelList,totalCount,page,size);
@@ -307,9 +307,9 @@ public class HealthProblemDictController extends BaseController {
             @RequestParam(value = "filters", required = false) String filters){
         Envelop envelop = new Envelop();
         List<HpIcd10RelationModel> hpIcd10RelationModelList = new ArrayList<>();
-        Collection<MHpIcd10Relation> mHpIcd10Relations = hpDictClient.getHpIcd10RelationListWithoutPaging(filters);
-        for (MHpIcd10Relation mHpIcd10Relation:mHpIcd10Relations){
-            HpIcd10RelationModel hpIcd10RelationModel = convertToModel(mHpIcd10Relation,HpIcd10RelationModel.class);
+        Collection<MIcd10HpRelation> mIcd10HpRelations = hpDictClient.getHpIcd10RelationListWithoutPaging(filters);
+        for (MIcd10HpRelation mIcd10HpRelation : mIcd10HpRelations){
+            HpIcd10RelationModel hpIcd10RelationModel = convertToModel(mIcd10HpRelation,HpIcd10RelationModel.class);
             hpIcd10RelationModelList.add(hpIcd10RelationModel);
         }
         envelop.setSuccessFlg(true);
