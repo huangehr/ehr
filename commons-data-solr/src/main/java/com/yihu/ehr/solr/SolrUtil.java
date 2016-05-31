@@ -140,7 +140,7 @@ public class SolrUtil {
     /**
      * 单组分组Count统计（start从0开始）
      */
-    public Map<String,Long> groupCount(String core,String q,String groupField,int start,int rows) throws Exception
+    public Map<String,Long> groupCount(String core,String q,String fq,String groupField,int start,int rows) throws Exception
     {
         SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
@@ -151,6 +151,11 @@ public class SolrUtil {
         else {
             query.setQuery("*:*");
         }
+        if(null != fq && !fq.equals("")) //设置过滤条件
+        {
+            query.setFilterQueries(fq);
+        }
+
         query.setFacet(true);//设置facet=on
         query.setRows(0);
         query.addFacetField(groupField);
@@ -177,7 +182,7 @@ public class SolrUtil {
     /**
      * 多组分组Count(独立计算)
      */
-    public List<FacetField> groupCount(String core,String q,String[] groups) throws Exception{
+    public List<FacetField> groupCount(String core,String q,String fq,String[] groups) throws Exception{
         SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if(null != q && !q.equals("")) //设置查询条件
@@ -187,6 +192,11 @@ public class SolrUtil {
         else{
             query.setQuery("*:*");
         }
+        if(null != fq && !fq.equals("")) //设置过滤条件
+        {
+            query.setFilterQueries(fq);
+        }
+
         query.setFacet(true);//设置facet=on
         query.setRows(0);
         query.addFacetField(groups);
@@ -208,7 +218,7 @@ public class SolrUtil {
      * 多组分组Count统计（关联计算）
      * @return
      */
-    public List<PivotField> groupCountMult(String core,String q,String groupFields,int start,int rows) throws Exception
+    public List<PivotField> groupCountMult(String core,String q,String fq,String groupFields,int start,int rows) throws Exception
     {
         SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
@@ -219,6 +229,11 @@ public class SolrUtil {
         else {
             query.setQuery("*:*");
         }
+        if(null != fq && !fq.equals("")) //设置过滤条件
+        {
+            query.setFilterQueries(fq);
+        }
+
         query.setFacet(true);//设置facet=on
         query.setRows(0);
         query.addFacetPivotField(groupFields);
@@ -250,7 +265,7 @@ public class SolrUtil {
      * @param groupField 分组字段
      * @return
      */
-    public List<FieldStatsInfo> getStats(String core,String q,String statsField,String groupField) throws Exception{
+    public List<FieldStatsInfo> getStats(String core,String q,String fq,String statsField,String groupField) throws Exception{
         SolrClient conn =  pool.getConnection(core);
         SolrQuery query = new SolrQuery();
         if (null != q && !q.equals("")) //设置查询条件
@@ -259,6 +274,11 @@ public class SolrUtil {
         } else {
             query.setQuery("*:*");
         }
+        if(null != fq && !fq.equals("")) //设置过滤条件
+        {
+            query.setFilterQueries(fq);
+        }
+
         query.addGetFieldStatistics(statsField);
         query.addStatsFieldFacets(statsField, groupField);
         query.setRows(0);

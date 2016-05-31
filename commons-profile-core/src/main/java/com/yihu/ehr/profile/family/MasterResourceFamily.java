@@ -18,7 +18,7 @@ public class MasterResourceFamily extends ResourceFamily {
         public static final String DemographicId = "demographic_id";
         public static final String ClientId = "client_id";
         public static final String CreateDate = "create_date";
-        public static final String CdaVersion = "inner_version";
+        public static final String CdaVersion = "cda_version";
     }
 
     /**

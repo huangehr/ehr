@@ -30,7 +30,8 @@ public class PatientInfoDetailService {
     public List<Map<String,Object>> getDrugListStat(String demographicId,String hpId) throws Exception
     {
         List<Map<String,Object>> re = new ArrayList<>();
-        Envelop result = resource.getResources(BasisConstant.medicationStat,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
+        //中药统计
+        Envelop result = resource.getResources(BasisConstant.medicationStat,appId,"{\"\":\"\",\"join\":\"demographic_id:"+demographicId+"\"}");
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
 
@@ -96,8 +97,8 @@ public class PatientInfoDetailService {
         return resource.getResources(BasisConstant.inspectionReport,appId,queryParams,page,size);
     }
 
-    //检验指标
-    public Envelop getHealthIndicators(String demographicId,String hpId,String startTime,String endTime,int page,int size) throws Exception
+    //检验指标（可分页）
+    public Envelop getHealthIndicators(String demographicId,String hpId,String medicalIndexId,String startTime,String endTime,int page,int size) throws Exception
     {
         String q = "";
         //时间范围
@@ -113,6 +114,12 @@ public class PatientInfoDetailService {
             else if(endTime!=null && endTime.length()>0) {
                 q = BasisConstant.jysj +":[* TO "+endTime+"]";
             }
+        }
+
+        //指标ID不为空
+        if(medicalIndexId!=null && medicalIndexId.length()>0)
+        {
+
         }
 
         //健康问题
