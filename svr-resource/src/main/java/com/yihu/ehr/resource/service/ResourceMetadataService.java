@@ -91,4 +91,8 @@ public class ResourceMetadataService extends BaseJpaService<RsResourceMetadata, 
     public RsResourceMetadata getRsMetadataById(String id) {
         return rsMetadataDao.findOne(id);
     }
+
+    public List<RsResourceMetadata> getRsMetadataByResourcesId(String resourcesId) {
+        return rsMetadataDao.findByResourcesId(resourcesId);
+    }
 }

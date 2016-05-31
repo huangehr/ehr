@@ -154,6 +154,23 @@ public class ResourceMetadataController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/resources/{resources_id}/metadata_list", method = RequestMethod.GET)
+    @ApiOperation("根据资源id(resourcesId)获取资源数据元列表")
+    public Envelop getRsMetadataByResourcesId(
+            @ApiParam(name = "resources_id", value = "resources_id", defaultValue = "")
+            @PathVariable(value = "resources_id") String resourcesId) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            List<MRsResourceMetadata> metadataList  = resourceMetadataClient.getRsMetadataByResourcesId(resourcesId);
+            envelop.setObj(metadataList);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
     @ApiOperation("资源数据元查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.GET)
     public Envelop queryDimensions(

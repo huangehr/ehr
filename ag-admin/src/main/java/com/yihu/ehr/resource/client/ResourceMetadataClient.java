@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsResourceMetadata;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -67,4 +69,12 @@ public interface ResourceMetadataClient {
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch, method = RequestMethod.DELETE)
     void deleteResourceMetadataBatchById(
             @RequestParam(value = "ids", required = false) List<String> ids);
+
+
+
+    @RequestMapping(value = "/resources/{resources_id}/metadata_list", method = RequestMethod.GET)
+    @ApiOperation("根据资源id(resourcesId)获取资源数据元列表")
+    List<MRsResourceMetadata> getRsMetadataByResourcesId(
+            @PathVariable(value = "resources_id") String resourcesId);
+
 }

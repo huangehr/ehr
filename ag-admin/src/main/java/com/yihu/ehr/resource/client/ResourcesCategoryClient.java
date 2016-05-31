@@ -4,7 +4,9 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsCategory;
+import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,5 +55,10 @@ public interface ResourcesCategoryClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size
     );
+
+    @RequestMapping(value = ServiceApi.Resources.NoPageCategories,method = RequestMethod.GET)
+    @ApiOperation("获取资源类别")
+    List<MRsCategory> getAllCategories(
+            @RequestParam(value="filters",required = false)String filters);
 
 }

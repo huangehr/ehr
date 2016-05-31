@@ -105,6 +105,15 @@ public class ResourceMetadataController extends BaseRestController {
         return convertToModel(rsMetadataService.getRsMetadataById(id), MRsResourceMetadata.class);
     }
 
+    @RequestMapping(value = "/resources/{resources_id}/metadata_list", method = RequestMethod.GET)
+    @ApiOperation("根据资源id(resourcesId)获取资源数据元列表")
+    public List<MRsResourceMetadata> getRsMetadataByResourcesId(
+            @ApiParam(name = "resources_id", value = "resources_id", defaultValue = "")
+            @PathVariable(value = "resources_id") String resourcesId) throws Exception {
+        List<RsResourceMetadata> metadataList = rsMetadataService.getRsMetadataByResourcesId(resourcesId);
+        return (List<MRsResourceMetadata>) convertToModels(metadataList, new ArrayList<MRsResourceMetadata>(metadataList.size()), MRsResourceMetadata.class, "");
+    }
+
     @ApiOperation("资源数据元查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.GET)
     public List<MRsResourceMetadata> queryDimensions(

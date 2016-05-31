@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.resource.MRsAdapterDictionary;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.resource.client.ResourcesCategoryClient;
 import com.yihu.ehr.util.Envelop;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -109,8 +111,7 @@ public class ResourcesCategoryController extends BaseController {
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size) throws Exception {
-        try
-        {
+        try {
             ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories(fields,filters,sorts,page,size);
             List<MRsCategory> rsCategories = responseEntity.getBody();
             Envelop envelop = getResult(rsCategories, getTotalCount(responseEntity), page, size);
@@ -124,5 +125,23 @@ public class ResourcesCategoryController extends BaseController {
             return envelop;
         }
     }
+
+    @RequestMapping(value = ServiceApi.Resources.NoPageCategories,method = RequestMethod.GET)
+    @ApiOperation("获取资源类别")
+    public Envelop getAllCategories(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws  Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<MRsCategory> resources = resourcesCategoryClient.getAllCategories(filters);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(resources);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
 
 }

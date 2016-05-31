@@ -117,4 +117,13 @@ public class ResourcesCategoryController extends BaseRestController {
         return (List<MRsCategory>)rsList;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.NoPageCategories,method = RequestMethod.GET)
+    @ApiOperation("获取资源类别")
+    public List<MRsCategory> getAllCategories(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws  Exception {
+        List<RsCategory> resources = rsCategoryService.search(filters);
+        return (List<MRsCategory>) convertToModels(resources, new ArrayList<MRsCategory>(resources.size()), MRsCategory.class, null);
+    }
+
 }

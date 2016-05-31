@@ -19,6 +19,7 @@ public class RsDictionaryEntryService extends BaseJpaService<RsDictionaryEntry, 
 
     @Autowired
     private RsDictionaryEntryDao dictionaryEntryDao;
+
     public RsDictionaryEntry findById(String id) {
         return dictionaryEntryDao.findOne(id);
     }
