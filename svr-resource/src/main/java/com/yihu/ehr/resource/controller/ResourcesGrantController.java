@@ -72,9 +72,15 @@ public class ResourcesGrantController extends BaseRestController{
     {
         String[] appIdArray = appIds.split(",");
         List<RsAppResource> appRsList = new ArrayList<RsAppResource>();
-
+        List<RsAppResource> rsGrant = rsGrantService.search("", "resourceId="+ resourceId +";appId="+ appIds, "", 1, 999);
+        String existGrant = "";
+        for(RsAppResource rsAppResource : rsGrant){
+            existGrant += "," + rsAppResource.getAppId();
+        }
         for(String _appId : appIdArray)
         {
+            if(existGrant.contains(_appId))
+                continue;
             RsAppResource appRs = new RsAppResource();
 
             appRs.setId(getObjectId(BizObject.AppResource));
@@ -83,8 +89,19 @@ public class ResourcesGrantController extends BaseRestController{
 
             appRsList.add(appRs);
         }
+        return convertToModels(rsGrantService.addList(appRsList, resourceId),new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
+    }
 
-        return convertToModels(rsGrantService.grantResourceBatch(appRsList),new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
+    @ApiOperation("资源授权删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceApps, method = RequestMethod.DELETE)
+    public boolean deleteGrantByResId(
+            @ApiParam(name="resource_id",value="授权ID",defaultValue = "")
+            @PathVariable(value="resource_id")String resourceId,
+            @ApiParam(name="app_ids",value="授权ID",defaultValue = "")
+            @RequestParam(value="app_ids") String appIds) throws Exception
+    {
+        rsGrantService.deleteGrantByResId(resourceId, appIds.split(","));
+        return true;
     }
 
     @ApiOperation("资源授权删除")
@@ -262,5 +279,17 @@ public class ResourcesGrantController extends BaseRestController{
 
         pagedResponse(request,response,total,page,size);
         return (List<MRsAppResourceMetadata>)rsAppMetaList;
+    }
+
+    @ApiOperation("资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasValid,method = RequestMethod.PUT)
+    public boolean valid(
+            @ApiParam(name="ids",value="授权数据元ID",defaultValue = "")
+            @RequestParam(value="ids") String ids,
+            @ApiParam(name="valid",value="授权数据元ID",defaultValue = "")
+            @RequestParam(value="valid") int valid) throws Exception
+    {
+        rsMetadataGrantService.valid(ids, valid);
+        return true;
     }
 }

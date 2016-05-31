@@ -8,8 +8,10 @@ public class RsAppResourceMetadataModel {
     private String appResourceId;
     private String appId;
     private String resourceMetadataId;
+    private String resourceMetadataName;
     private String dimensionId;
     private String dimensionValue;
+    private String valid = "1";
 
     public String getId() {
         return id;
@@ -53,4 +55,19 @@ public class RsAppResourceMetadataModel {
         this.dimensionValue = dimensionValue;
     }
 
+    public String getResourceMetadataName() {
+        return resourceMetadataName;
+    }
+
+    public void setResourceMetadataName(String resourceMetadataName) {
+        this.resourceMetadataName = resourceMetadataName;
+    }
+
+    public String getValid() {
+        return valid;
+    }
+
+    public void setValid(String valid) {
+        this.valid = valid;
+    }
 }
