@@ -48,20 +48,18 @@ public class IndicatorsDictController extends BaseRestController {
 
     @RequestMapping(value = "dict/indicator/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除指标字典")
-    public boolean deleteIndicatorsDict(
+    public boolean deleteIndicatorDict(
             @ApiParam(name = "id", value = "指标字典代码")
             @PathVariable( value = "id") String id) {
-
         indicatorsDictService.delete(id);
         return true;
     }
 
     @RequestMapping(value = "dict/indicators", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据ids批量删除指标字典")
-    public boolean deleteIndicatorsDicts(
+    public boolean deleteIndicatorsDict(
             @ApiParam(name = "ids", value = "指标字典代码,多个以逗号分隔")
             @RequestParam( value = "ids") String ids) {
-
         indicatorsDictService.delete(ids.split(","));
         return true;
     }

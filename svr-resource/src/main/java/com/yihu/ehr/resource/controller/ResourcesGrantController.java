@@ -172,7 +172,7 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源数据元批量授权")
-    @RequestMapping(value=ServiceApi.Resources.ResourceMetadatasGrantApp,method = RequestMethod.POST)
+    @RequestMapping(value=ServiceApi.Resources.ResourceMetadataListGrantApp,method = RequestMethod.POST)
     public Collection<MRsAppResourceMetadata> grantRsMetaDataBatch(
             @ApiParam(name="appResourceId",value="资源ID",defaultValue = "")
             @PathVariable(value="appResourceId")String appResourceId,
@@ -198,7 +198,7 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源数据元授权删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrant,method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant,method = RequestMethod.DELETE)
     public boolean deleteMetadataGrant(
             @ApiParam(name="id",value="授权ID",defaultValue = "")
             @PathVariable(value="id")String id) throws Exception
@@ -208,7 +208,7 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源数据元授权批量删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants,method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrants,method = RequestMethod.DELETE)
     public boolean deleteMetadataGrantBatch(
             @ApiParam(name="ids",value="授权ID",defaultValue = "")
             @RequestParam(value="ids")String ids) throws Exception
@@ -218,7 +218,7 @@ public class ResourcesGrantController extends BaseRestController{
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrant,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源数据元授权")
     public MRsAppResourceMetadata getRsMetadataGrantById(
             @ApiParam(name="id",value="id",defaultValue = "")
@@ -228,7 +228,7 @@ public class ResourcesGrantController extends BaseRestController{
     }
 
     @ApiOperation("资源数据元授权查询")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasGrants,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrants,method = RequestMethod.GET)
     public List<MRsAppResourceMetadata> queryAppRsMetadataGrant(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,

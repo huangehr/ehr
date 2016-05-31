@@ -46,9 +46,9 @@ public class CD10Service {
     public List<MDrugDict> getDrugDictList(String problemCode){
         //获取健康问题id
         MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(problemCode);
-        String healthProblemDictId = healthProblemDict.getId();
+        long healthProblemDictId = healthProblemDict.getId();
         //根据健康问题id获取健康问题ICD10关系
-        List<MIcd10HpRelation> hpIcd10Relations = hpIcd10RelationClient.getHpIcd10RelationByHpId(healthProblemDictId);
+        List<MIcd10HpRelation> hpIcd10Relations = hpIcd10RelationClient.getHpIcd10RelationByHpId(Long.toString(healthProblemDictId));
         //获取ICD10id列表
         List<String> icd10Ids = new ArrayList<>();
         for (MIcd10HpRelation hpIcd10Relation : hpIcd10Relations){
@@ -74,9 +74,9 @@ public class CD10Service {
     public List<MIndicatorsDict> getIndicatorsDictList(String problemCode) {
         //获取健康问题id
         MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(problemCode);
-        String healthProblemDictId = healthProblemDict.getId();
+        long healthProblemDictId = healthProblemDict.getId();
         //根据健康问题id获取健康问题ICD10关系
-        List<MIcd10HpRelation> hpIcd10Relations = hpIcd10RelationClient.getHpIcd10RelationByHpId(healthProblemDictId);
+        List<MIcd10HpRelation> hpIcd10Relations = hpIcd10RelationClient.getHpIcd10RelationByHpId(Long.toString(healthProblemDictId));
         //获取ICD10id列表
         List<String> icd10Ids = new ArrayList<>();
         for (MIcd10HpRelation hpIcd10Relation : hpIcd10Relations){
@@ -101,9 +101,9 @@ public class CD10Service {
      */
     public List<MIcd10Dict> getIcd10DictList(String problemCode) {
         MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(problemCode);
-        String hpId = healthProblemDict.getId();
+        long hpId = healthProblemDict.getId();
         //根据健康问题id获取健康问题ICD10关系列表
-        List<MIcd10HpRelation> hpIcd10RelationList = hpIcd10RelationClient.getHpIcd10RelationByHpId(hpId);
+        List<MIcd10HpRelation> hpIcd10RelationList = hpIcd10RelationClient.getHpIcd10RelationByHpId(Long.toString(hpId));
         //获取ICD10字典id列表
         List<String> icd10Ids = new ArrayList<>();
         for (MIcd10HpRelation h: hpIcd10RelationList){

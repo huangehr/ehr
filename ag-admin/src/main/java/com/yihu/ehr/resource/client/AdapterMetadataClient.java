@@ -22,12 +22,12 @@ import java.util.List;
 @ApiIgnore
 public interface AdapterMetadataClient {
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配数据元")
     MRsAdapterMetadata createMetadata(
             @RequestBody String adapterMetadata);
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新适配数据元")
     MRsAdapterMetadata updateMetadata(
             @RequestBody String adapterMetadata);
@@ -37,7 +37,7 @@ public interface AdapterMetadataClient {
     boolean deleteMetadata(
             @PathVariable(value = "id") String id);
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.DELETE)
     @ApiOperation("批量删除适配数据元")
     boolean deleteMetadataBatch(
             @RequestParam(value = "ids") String ids);
@@ -47,7 +47,7 @@ public interface AdapterMetadataClient {
     public MRsAdapterMetadata getMetadataById(
             @PathVariable(value="id") String id);
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.GET)
     @ApiOperation("查询适配数据元")
     ResponseEntity<List<MRsAdapterMetadata>> getMetadata(
             @RequestParam(value = "fields", required = false) String fields,
@@ -56,7 +56,7 @@ public interface AdapterMetadataClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadatasBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("批量创建适配数据元")
     MRsAdapterMetadata createRsMetaDataBatch(@RequestBody String jsonData);
 }
