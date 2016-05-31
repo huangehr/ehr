@@ -2,7 +2,6 @@ package com.yihu.ehr.resource.model;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
