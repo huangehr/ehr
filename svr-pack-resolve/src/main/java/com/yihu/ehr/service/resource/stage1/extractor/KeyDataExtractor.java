@@ -1,6 +1,6 @@
 package com.yihu.ehr.service.resource.stage1.extractor;
 
-import com.yihu.ehr.service.resource.StdDataSet;
+import com.yihu.ehr.profile.util.PackageDataSet;
 
 import java.text.ParseException;
 
@@ -20,5 +20,5 @@ public abstract class KeyDataExtractor {
         EventType
     }
 
-    public abstract Object extract(StdDataSet dataSet, Filter filter) throws ParseException;
+    public abstract Object extract(PackageDataSet dataSet, Filter filter) throws ParseException;
 }

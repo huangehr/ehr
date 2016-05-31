@@ -7,7 +7,7 @@ import com.yihu.ehr.security.feign.AppClient;
 import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.security.service.KeyManager;
 import com.yihu.ehr.security.service.TokenManager;
-import com.yihu.ehr.util.controller.BaseRestController;
+import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "securities", description = "Token接口")
-public class TokenEndPoint extends BaseRestController {
+public class TokenEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private KeyManager keyManager;
 

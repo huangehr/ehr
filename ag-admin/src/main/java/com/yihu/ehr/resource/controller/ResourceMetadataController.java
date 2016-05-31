@@ -37,7 +37,7 @@ public class ResourceMetadataController extends BaseController {
     private MetadataClient metadataClient;
 
     @ApiOperation("创建资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.POST)
     public Envelop createResourceMetadata(
             @ApiParam(name = "metadata", value = "资源数据元", defaultValue = "")
             @RequestParam(value = "metadata") String metadata) throws Exception {
@@ -54,7 +54,7 @@ public class ResourceMetadataController extends BaseController {
     }
 
     @ApiOperation("批量创建资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataBatch, method = RequestMethod.POST)
     public Envelop createResourceMetadataBatch(
             @ApiParam(name = "metadatas", value = "资源数据元", defaultValue = "")
             @RequestParam(value = "metadatas") String metadatas) throws Exception {
@@ -71,7 +71,7 @@ public class ResourceMetadataController extends BaseController {
     }
 
     @ApiOperation("更新资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.PUT)
     public Envelop updateResourceMetadata(
             @ApiParam(name = "dimension", value = "资源数据元", defaultValue = "")
             @RequestParam(value = "dimension") String metadata) throws Exception {
@@ -104,7 +104,7 @@ public class ResourceMetadataController extends BaseController {
     }
 
     @ApiOperation("根据ids批量资源数据元删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasBatch, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataBatch, method = RequestMethod.DELETE)
     public Envelop deleteResourceMetadataBatchById(
             @ApiParam(name = "ids", value = "ids", defaultValue = "")
             @RequestParam(value = "ids") String[] idArray) throws Exception {
@@ -121,7 +121,7 @@ public class ResourceMetadataController extends BaseController {
     }
 
     @ApiOperation("根据资源ID批量删除资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.DELETE)
     public Envelop deleteResourceMetadataBatch(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId) throws Exception {
@@ -172,7 +172,7 @@ public class ResourceMetadataController extends BaseController {
     }
 
     @ApiOperation("资源数据元查询")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.GET)
     public Envelop queryDimensions(
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
             @RequestParam(name = "fields", required = false) String fields,

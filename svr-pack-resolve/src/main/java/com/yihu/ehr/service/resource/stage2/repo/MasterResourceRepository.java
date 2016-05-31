@@ -8,8 +8,6 @@ import com.yihu.ehr.service.util.ResourceStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 /**
  * 档案资源主库。
  *

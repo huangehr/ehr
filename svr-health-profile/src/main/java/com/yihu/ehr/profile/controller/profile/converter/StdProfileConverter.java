@@ -161,7 +161,7 @@ public class StdProfileConverter {
         return validDocument ? document : null;
     }
 
-    protected void convertDataSet(String version, MProfileDocument document, StdDataSet dataSet) {
+    protected void convertDataSet(String version, MProfileDocument document, PackageDataSet dataSet) {
         if (dataSet != null) {
             String dataSetCode = DataSetUtil.standardDataSetCode(dataSet.getCode());
 

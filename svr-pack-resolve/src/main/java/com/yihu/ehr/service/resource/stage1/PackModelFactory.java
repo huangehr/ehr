@@ -27,7 +27,7 @@ public class PackModelFactory {
      * @param root
      * @return
      */
-    public static StdPackModel createPackModel(File root) {
+    public static StandardPackage createPackModel(File root) {
         List<String> directories = CollectionUtils.arrayToList(root.list());
 
         if (directories.contains(StandardFolder) && directories.contains(OriginFolder)) {
@@ -41,16 +41,16 @@ public class PackModelFactory {
         return null;
     }
 
-    public static StdPackModel createPackModel(ProfileType type){
+    public static StandardPackage createPackModel(ProfileType type){
         switch(type){
             case Standard:
-                return new StdPackModel();
+                return new StandardPackage();
 
             case File:
-                return new FilePackModel();
+                return new FilePackage();
 
             case Link:
-                return new LinkPackModel();
+                return new LinkPackage();
 
             default:
                 return null;

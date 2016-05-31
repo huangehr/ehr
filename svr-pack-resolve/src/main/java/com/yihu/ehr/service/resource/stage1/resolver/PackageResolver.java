@@ -1,9 +1,9 @@
 package com.yihu.ehr.service.resource.stage1.resolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.service.resource.stage1.StdPackModel;
+import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage1.extractor.ExtractorChain;
-import com.yihu.ehr.service.resource.stage1.DataSetResolverWithTranslator;
+import com.yihu.ehr.service.resource.stage1.DataSetParserWithTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -17,7 +17,7 @@ import java.io.File;
  */
 public abstract class PackageResolver {
     @Autowired
-    protected DataSetResolverWithTranslator dataSetResolverWithTranslator;
+    protected DataSetParserWithTranslator dataSetResolverWithTranslator;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -25,5 +25,5 @@ public abstract class PackageResolver {
     @Autowired
     protected ExtractorChain extractorChain;
 
-    public abstract void resolve(StdPackModel profile, File root) throws Exception;
+    public abstract void resolve(StandardPackage profile, File root) throws Exception;
 }
