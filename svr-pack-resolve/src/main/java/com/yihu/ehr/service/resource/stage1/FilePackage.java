@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.annotation.Table;
-import com.yihu.ehr.profile.util.ResourceStorageUtil;
+import com.yihu.ehr.service.util.ResourceStorageUtil;
 
 import java.util.HashSet;
 import java.util.Map;

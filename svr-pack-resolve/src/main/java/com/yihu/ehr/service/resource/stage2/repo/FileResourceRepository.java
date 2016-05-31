@@ -6,7 +6,7 @@ import com.yihu.ehr.data.hbase.TableBundle;
 import com.yihu.ehr.profile.family.FileFamily;
 import com.yihu.ehr.service.resource.stage1.CdaDocument;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
-import com.yihu.ehr.profile.util.FileTableUtil;
+import com.yihu.ehr.service.util.FileTableUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

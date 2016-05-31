@@ -118,7 +118,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void savePackageWithOrg(
-            @ApiParam(name = "package", value = "档案包", allowMultiple = true) MultipartHttpServletRequest pack,
+            @ApiParam(name = "pack", value = "档案包", allowMultiple = true)
+            @RequestPart() MultipartFile pack,
             @ApiParam(name = "org_code", value = "机构代码")
             @RequestParam(value = "org_code") String orgCode,
             @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
@@ -127,9 +128,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "md5", required = false) String md5,
             HttpServletRequest request) throws Exception {
 
-        MultipartFile multipartFile = pack.getFile("file");
-        if (multipartFile == null) throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.MissParameter, "file");
-
         MKey key = securityClient.getOrgKey(orgCode);
         String privateKey = key.getPrivateKey();
         if (null == privateKey) {
@@ -137,7 +135,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
 
         String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        Package aPackage = packService.receive(multipartFile.getInputStream(), password, md5, orgCode, getClientId(request));
+        Package aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }

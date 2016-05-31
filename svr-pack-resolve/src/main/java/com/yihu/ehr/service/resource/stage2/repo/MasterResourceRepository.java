@@ -4,7 +4,7 @@ import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.TableBundle;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
-import com.yihu.ehr.profile.util.ResourceStorageUtil;
+import com.yihu.ehr.service.util.ResourceStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

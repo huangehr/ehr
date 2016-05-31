@@ -79,7 +79,7 @@ public class ResolveEndPoint {
 
             packageMgrClient.reportStatus(pack.getId(),
                     ArchiveStatus.Finished,
-                    String.format("Rowkey: %s, identity: %s", standardPackage.getId(), standardPackage.getDemographicId()));
+                    String.format("Profile: %s, identity: %s", standardPackage.getId(), standardPackage.getDemographicId()));
 
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
