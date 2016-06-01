@@ -1,10 +1,17 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.TreeModel;
 import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.resource.client.ResourcesGrantClient;
+import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -12,10 +19,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author linaz
@@ -28,6 +35,93 @@ public class ResourcesGrantController extends BaseController {
 
     @Autowired
     private ResourcesGrantClient resourcesGrantClient;
+    @Autowired
+    AppClient appClient;
+    @Autowired
+    OrganizationClient organizationClient;
+    @Autowired
+    SystemDictClient systemDictClient;
+
+    private List<MRsAppResource> searchGrantApp(String fields, String filters, String sorts, int page, int size){
+        ResponseEntity<List<MRsAppResource>> responseEntity =
+                resourcesGrantClient.queryAppResourceGrant(fields, filters, sorts , page, size);
+        return responseEntity.getBody();
+    }
+
+    private List<MApp> searchApp(String fields, String filters, String sorts, int page, int size){
+        ResponseEntity<List<MApp>> responseEntity =
+                appClient.getApps(fields, filters, sorts, size, page);
+        return responseEntity.getBody();
+    }
+
+    private List<MOrganization> searchOrgs(String fields, String filters, String sorts, int page, int size){
+        ResponseEntity<List<MOrganization>> responseEntity =
+                organizationClient.searchOrgs(fields, filters, sorts, size, page);
+        return responseEntity.getBody();
+    }
+
+    private List<MDictionaryEntry> searchDictEntries(String fields, String filters, String sorts, int page, int size){
+        ResponseEntity<List<MDictionaryEntry>> responseEntity =
+                systemDictClient.getDictEntries(fields, filters, sorts, size, page);
+        return responseEntity.getBody();
+    }
+
+    @ApiOperation("资源授权应用树结构")
+    @RequestMapping(value = "/resources/grant/app/tree", method = RequestMethod.GET)
+    public Object resourceGrantTree(
+            @ApiParam(name = "resourceId", value = "返回字段", defaultValue = "")
+            @RequestParam(value = "resourceId", required = true) String resourceId) throws Exception {
+        try
+        {
+            List<MRsAppResource> rsAppResources = searchGrantApp("", "resourceId="+resourceId, "" ,1 ,500);
+            String ids = "";
+            Map<String, String> mapping = new HashMap<>();
+            for(MRsAppResource appResource: rsAppResources){
+                ids += "," + appResource.getAppId();
+                mapping.put(appResource.getAppId(), appResource.getId());
+            }
+            List<MApp> apps = searchApp("", "id=" + ids.substring(1), "+org", 1, 500);
+            for(MApp app: apps){
+                if(ids.indexOf(app.getOrg())==-1)
+                    ids += ","+ app.getOrg();
+            }
+            List<MOrganization> orgs = searchOrgs("", "orgCode=" + ids.substring(1), "+orgCode", 1, 500);
+            List<MDictionaryEntry> dicts = searchDictEntries("", "dictId=7", "", 1, 50);
+            Map<String, List<TreeModel>> rs = new HashMap<>();
+            List<TreeModel> orgTree, appTree;
+            MApp app;
+            int i =0;
+            TreeModel treeModel;
+            for(MOrganization org: orgs){
+                if((orgTree = rs.get(org.getOrgType()))==null){
+                    orgTree = new ArrayList<>();
+                    rs.put(org.getOrgType(), orgTree);
+                }
+                appTree = new ArrayList<>();
+                for(; i<apps.size(); i++){
+                    app = apps.get(i);
+                    if(!org.getOrgCode().equals(app.getOrg())){
+                        break;
+                    }
+                    treeModel = new TreeModel(app.getId(), app.getName());
+                    treeModel.addOtherPro("appResourceId", mapping.get(app.getId()));
+                    appTree.add(treeModel);
+                }
+                orgTree.add(new TreeModel("org_" + org.getOrgCode(), org.getFullName(), appTree));
+            }
+            List ls = new ArrayList<>();
+            for(MDictionaryEntry dict: dicts){
+                if((orgTree=rs.get(dict.getCode())) != null){
+                    ls.add(new TreeModel(dict.getCode(), dict.getValue(), orgTree));
+                }
+            }
+            return ls;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return failed("获取数据错误！");
+        }
+    }
 
     @ApiOperation("单个应用授权多个资源")
     @RequestMapping(value = ServiceApi.Resources.AppsGrantResources, method = RequestMethod.POST)
@@ -53,18 +147,26 @@ public class ResourcesGrantController extends BaseController {
     public Envelop grantResourceApp(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @PathVariable(value = "resourceId") String resourceId,
-            @ApiParam(name = "appIds", value = "资源ID", defaultValue = "")
-            @RequestParam(value = "appIds") String appIds) throws Exception {
+            @ApiParam(name = "addIds", value = "新增应用ID", defaultValue = "")
+            @RequestParam(value = "addIds") String addIds,
+            @ApiParam(name = "deleteIds", value = "删除应用ID", defaultValue = "")
+            @RequestParam(value = "deleteIds") String deleteIds) throws Exception {
+
         Envelop envelop = new Envelop();
         try{
-            Collection<MRsAppResource> rsAppResource = resourcesGrantClient.grantResourceApp(resourceId,appIds);
-            envelop.setObj(rsAppResource);
-            envelop.setSuccessFlg(true);
+            if(StringUtils.isEmpty(deleteIds) || resourcesGrantClient.deleteGrantByResId(resourceId, deleteIds)){
+                Collection<MRsAppResource> rsAppResource = new ArrayList<>();
+                if(!StringUtils.isEmpty(addIds))
+                    rsAppResource = resourcesGrantClient.grantResourceApp(resourceId, addIds);
+                envelop.setObj(rsAppResource);
+                envelop.setSuccessFlg(true);
+                return envelop;
+            }else
+                return failed("授权失败");
         }catch (Exception e){
             e.printStackTrace();
-            envelop.setSuccessFlg(false);
+            return failed("授权失败");
         }
-        return envelop;
     }
 
     @ApiOperation("资源授权删除")
@@ -97,6 +199,18 @@ public class ResourcesGrantController extends BaseController {
             envelop.setSuccessFlg(false);
         }
         return envelop;
+    }
+
+    @ApiOperation("资源授权删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceApps, method = RequestMethod.DELETE)
+    public boolean deleteGrantByResId(
+            @ApiParam(name="resource_id",value="授权ID",defaultValue = "")
+            @PathVariable(value="resource_id")String resourceId,
+            @ApiParam(name="app_ids",value="删除应用ID",defaultValue = "")
+            @RequestParam(value="app_ids") String appIds) throws Exception
+    {
+        resourcesGrantClient.deleteGrantByResId(resourceId, appIds);
+        return true;
     }
 
     @RequestMapping(value = ServiceApi.Resources.ResourceGrant,method = RequestMethod.GET)
@@ -261,5 +375,16 @@ public class ResourcesGrantController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
+    }
+
+    @ApiOperation("资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasValid,method = RequestMethod.PUT)
+    public boolean valid(
+            @ApiParam(name="ids",value="授权数据元ID",defaultValue = "")
+            @RequestParam(value="ids") String ids,
+            @ApiParam(name="valid",value="授权数据元ID",defaultValue = "")
+            @RequestParam(value="valid") int valid) throws Exception
+    {
+        return resourcesGrantClient.valid(ids, valid);
     }
 }
