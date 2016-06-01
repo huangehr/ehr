@@ -13,7 +13,7 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface XIcd10DictRepository extends PagingAndSortingRepository<Icd10Dict, String> {
+public interface XIcd10DictRepository extends PagingAndSortingRepository<Icd10Dict, Long> {
 
     Icd10Dict findByCode(String code);
     Icd10Dict findByName(String name);

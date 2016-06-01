@@ -80,7 +80,12 @@ public class ResourcesCategoryEndPoint extends EnvelopRestEndPoint {
     public List<MRsCategory> getRsCategoryByPid(
             @ApiParam(name="pid",value="pid",defaultValue = "")
             @PathVariable(value="pid") String pid) throws Exception {
-        List<RsCategory> categoryList = rsCategoryService.getRsCategoryByPid(pid);
+        List<RsCategory> categoryList;
+        if(StringUtils.isEmpty(pid)){
+            categoryList = rsCategoryService.findAll();
+        }else {
+            categoryList = rsCategoryService.getRsCategoryByPid(pid);
+        }
         return (List<MRsCategory>) convertToModels(categoryList, new ArrayList<MRsCategory>(categoryList.size()), MRsCategory.class, null);
     }
 
