@@ -30,7 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value= ApiVersion.Version1_0)
 @Api(value = "metadata", description = "数据元服务接口")
-public class MetaDataEndPoint extends EnvelopRestEndPoint {
+public class MetadataEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private MetadataService metadataService;
