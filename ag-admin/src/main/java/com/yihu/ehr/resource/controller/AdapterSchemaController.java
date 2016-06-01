@@ -83,7 +83,12 @@ public class AdapterSchemaController extends BaseController {
         {
             MRsAdapterSchema rsAdapterSchema = adapterSchemaClient.updateSchema(adapterSchema);
             envelop.setObj(rsAdapterSchema);
-            envelop.setSuccessFlg(true);
+            if(rsAdapterSchema!=null){
+                envelop.setSuccessFlg(true);
+            }
+            else {
+                envelop.setSuccessFlg(false);
+            }
         }
         catch (Exception e)
         {
