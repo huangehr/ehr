@@ -27,6 +27,11 @@ public class ServiceApi {
         public static final String SchemaMetadata                 ="/adaptions/schema/metadata/{id}";
         public static final String SchemaMetadataBatch            ="/adaptions/schema/metadata/batch";
 
+
+        public static final String RsAdapterDictionaries          ="/adaptions/adapter/dictionaries";
+        public static final String RsAdapterDictionary            ="/adaptions/adapter/dictionaries/{id}";
+
+
     }
 
     public static class Resources{
