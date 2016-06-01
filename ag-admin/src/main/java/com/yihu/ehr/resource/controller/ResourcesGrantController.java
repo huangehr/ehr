@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsAppResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.TreeModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
@@ -7,10 +8,9 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.resource.MRsAppResource;
-import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
+import com.yihu.ehr.model.resource.*;
 import com.yihu.ehr.organization.service.OrganizationClient;
-import com.yihu.ehr.resource.client.ResourcesGrantClient;
+import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -41,6 +41,14 @@ public class ResourcesGrantController extends BaseController {
     OrganizationClient organizationClient;
     @Autowired
     SystemDictClient systemDictClient;
+    @Autowired
+    ResourceMetadataClient resourceMetadataClient;
+    @Autowired
+    MetadataClient metadataClient;
+    @Autowired
+    private RsDictionaryClient rsDictionaryClient;
+    @Autowired
+    private RsDictionaryEntryClient rsDictionaryEntryClient;
 
     private List<MRsAppResource> searchGrantApp(String fields, String filters, String sorts, int page, int size){
         ResponseEntity<List<MRsAppResource>> responseEntity =
@@ -339,7 +347,16 @@ public class ResourcesGrantController extends BaseController {
         Envelop envelop = new Envelop();
         try{
             MRsAppResourceMetadata rsAppResourceMetadata = resourcesGrantClient.getRsMetadataGrantById(id);
-            envelop.setObj(rsAppResourceMetadata);
+            RsAppResourceMetadataModel model = convertToModel(rsAppResourceMetadata, RsAppResourceMetadataModel.class);
+            if(model!=null){
+                MRsResourceMetadata rsResourceMetadata = resourceMetadataClient.getRsMetadataById(model.getResourceMetadataId());
+                MRsMetadata mRsMetadata = metadataClient.getMetadataById(rsResourceMetadata.getMetadataId());
+                model.setMetaColunmType(mRsMetadata.getColumnType());
+                model.setMetaId(mRsMetadata.getId());
+                if(!StringUtils.isEmpty(mRsMetadata.getDictCode()) && !"0".equals(mRsMetadata.getDictCode()))
+                    model.setDictEntries(rsDictionaryEntryClient.searchRsDictionaryEntries("", "dictCode=" +mRsMetadata.getDictCode(), "", 1, 500).getBody());
+            }
+            envelop.setObj(model);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             e.printStackTrace();
@@ -387,4 +404,23 @@ public class ResourcesGrantController extends BaseController {
     {
         return resourcesGrantClient.valid(ids, valid);
     }
+    @ApiOperation("资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant, method = RequestMethod.POST)
+    public Envelop metadataGrant(
+            @ApiParam(name = "id", value = "授权ID", defaultValue = "")
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "dimension", value = "授权ID", defaultValue = "")
+            @RequestParam(value = "dimension") String dimension) throws Exception {
+
+        Envelop envelop = new Envelop();
+        try{
+            envelop.setObj(resourcesGrantClient.metadataGrant(id, dimension));
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("授权失败！");
+        }
+    }
+
 }
