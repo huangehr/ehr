@@ -5,10 +5,11 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.AdapterDictionaryQueryDao;
 import com.yihu.ehr.resource.dao.AdapterMetadataQueryDao;
 import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
-import com.yihu.ehr.resource.dao.intf.AdapterSchemaDao;
+import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
+import com.yihu.ehr.resource.dao.intf.RsAdapterDictionaryDao;
 import com.yihu.ehr.resource.model.RsAdapterDictionary;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
-import com.yihu.ehr.resource.model.RsAdapterSchema;
+import com.yihu.ehr.resource.model.RsAdapterScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -30,13 +30,16 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, AdapterSchemaDao> {
+public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, AdapterSchemeDao> {
 
     @Autowired
-    private AdapterSchemaDao schemaDao;
+    private AdapterSchemeDao schemaDao;
 
     @Autowired
     private AdapterMetadataDao metadataDao;
+
+    @Autowired
+    private RsAdapterDictionaryDao adapterDictionaryDao;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -59,19 +62,19 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
      * @param adapterSchema RsAdapterSchema 适配方案
      * @return RsAdapterSchema 适配方案
      */
-    public RsAdapterSchema saveAdapterSchema(RsAdapterSchema adapterSchema) throws Exception {
+    public RsAdapterScheme saveAdapterSchema(RsAdapterScheme adapterSchema) throws Exception {
         String type = adapterSchema.getType();
         if ("1".equals(type)) {
             //平台标准
             if (schemaDao.findOne(adapterSchema.getId()) == null) {
                 batchAdapterMetadata(adapterSchema);
-                batchAdapterDictEntries(adapterSchema);
+                batchAdapterDictionary(adapterSchema);
             }
         } else if ("2".equals(type)) {
             //第三方标准
             if (schemaDao.findOne(adapterSchema.getId()) == null) {
                 batchAdapterOrgMetaData(adapterSchema);
-                batchAdapterOrgDictEntries(adapterSchema);
+                batchAdapterOrgDictionary(adapterSchema);
             }
         }
         return schemaDao.save(adapterSchema);
@@ -101,7 +104,7 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
     }
 
     //第三方标准字典适配
-    public void batchAdapterOrgDictEntries(RsAdapterSchema adapterSchema) throws Exception {
+    public void batchAdapterOrgDictionary(RsAdapterScheme adapterSchema) throws Exception {
         String orgDataSetSql = "select * from org_std_dict where organization = '" + adapterSchema.getCode() + "'";
         List<Map<String, Object>> orgDictList = jdbcTemplate.queryForList(orgDataSetSql);
         List<RsAdapterDictionary> adapterDictionaryList = new ArrayList<>();
@@ -124,7 +127,7 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
 
 
     //第三方标准数据元适配
-    public void batchAdapterOrgMetaData(RsAdapterSchema adapterSchema) throws Exception {
+    public void batchAdapterOrgMetaData(RsAdapterScheme adapterSchema) throws Exception {
         String orgDataSetSql = "select * from org_std_dataset where organization = '" + adapterSchema.getCode() + "'";
         List<Map<String, Object>> orgDataSetList = jdbcTemplate.queryForList(orgDataSetSql);
         List<RsAdapterMetadata> adapterMetadataList = new ArrayList<>();
@@ -150,7 +153,7 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
 
 
     //平台标准字典适配
-    public void batchAdapterDictEntries(RsAdapterSchema adapterSchema) throws Exception {
+    public void batchAdapterDictionary(RsAdapterScheme adapterSchema) throws Exception {
         String sdSql = "select * from std_dictionary_" + adapterSchema.getAdapterVersion();
         List<Map<String, Object>> dictionaryList = jdbcTemplate.queryForList(sdSql);
         List<RsAdapterDictionary> adapterDictionaryList = new ArrayList<>();
@@ -173,7 +176,7 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
     }
 
     //平台标准数据元适配
-    public void batchAdapterMetadata(RsAdapterSchema adapterSchema) throws Exception {
+    public void batchAdapterMetadata(RsAdapterScheme adapterSchema) throws Exception {
         String sdsSql = "select * from std_data_set_" + adapterSchema.getAdapterVersion();
         List<Map<String, Object>> dataSetList = jdbcTemplate.queryForList(sdsSql);
         List<RsAdapterMetadata> adapterMetadataList = new ArrayList<>();
@@ -220,7 +223,7 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
      * @param size  int 分页大小
      * @return Page<RsAdapterSchema>
      */
-    public Page<RsAdapterSchema> getAdapterSchema(String sorts, int page, int size) {
+    public Page<RsAdapterScheme> getAdapterSchema(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
 
         return schemaDao.findAll(pageable);
@@ -233,7 +236,13 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
      * @param id String Id
      * @return RsAdapterSchema
      */
-    public RsAdapterSchema getAdapterSchemaById(String id) {
+    public RsAdapterScheme getAdapterSchemaById(String id) {
         return schemaDao.findOne(id);
+    }
+
+    public void deleteById(String id) {
+        schemaDao.delete(id);
+        metadataDao.deleteBySchemaId(id);
+        adapterDictionaryDao.deleteBySchemaId(id);
     }
 }
