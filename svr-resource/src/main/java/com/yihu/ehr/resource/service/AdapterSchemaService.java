@@ -74,8 +74,7 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
                 batchAdapterOrgDictEntries(adapterSchema);
             }
         }
-        //return schemaDao.save(adapterSchema);
-        return null;
+        return schemaDao.save(adapterSchema);
     }
 
 
@@ -110,8 +109,6 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
             String sdeSql = "select * from org_std_dictentry where org_dict = '" + orgDictMap.get("id").toString() + "'";
 
             List<Map<String, Object>> orgDictEntryList = jdbcTemplate.queryForList(sdeSql);
-
-
             for (Map<String, Object> dictionariesMap : orgDictEntryList) {
                 adapterDictionaryList = adapterDictionaryList(adapterDictionaryList,
                         adapterSchema.getId(),
@@ -132,7 +129,7 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
         List<Map<String, Object>> orgDataSetList = jdbcTemplate.queryForList(orgDataSetSql);
         List<RsAdapterMetadata> adapterMetadataList = new ArrayList<>();
         for (Map<String, Object> orgDataSetMap : orgDataSetList) {
-            String sdeSql = "select * from org_std_meta_data where org_dataset = '" + orgDataSetMap.get("id").toString() + "'";
+            String sdeSql = "select * from org_std_metadata where org_dataset = '" + orgDataSetMap.get("id").toString() + "'";
 
             List<Map<String, Object>> orgDataSet = jdbcTemplate.queryForList(sdeSql);
 
