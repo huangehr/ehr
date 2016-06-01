@@ -16,8 +16,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,92 +61,94 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
      */
     public RsAdapterSchema saveAdapterSchema(RsAdapterSchema adapterSchema) throws Exception {
         String type = adapterSchema.getType();
-        if("1".equals(type)){
+        if ("1".equals(type)) {
             //平台标准
             if (schemaDao.findOne(adapterSchema.getId()) == null) {
                 batchAdapterMetadata(adapterSchema);
                 batchAdapterDictEntries(adapterSchema);
             }
-        }else if("2".equals(type)){
+        } else if ("2".equals(type)) {
             //第三方标准
             if (schemaDao.findOne(adapterSchema.getId()) == null) {
                 batchAdapterOrgMetaData(adapterSchema);
                 batchAdapterOrgDictEntries(adapterSchema);
             }
         }
-        return schemaDao.save(adapterSchema);
+        //return schemaDao.save(adapterSchema);
+        return null;
     }
 
 
     //获取标准适配字典列表
-    private List<RsAdapterDictionary> adapterDictionaryList(List<RsAdapterDictionary> adapterDictionaryList,String adapterSchemaId,String srcDictCode,String srcDictEntryCode,String srcDictEntryName){
+    private List<RsAdapterDictionary> adapterDictionaryList(List<RsAdapterDictionary> adapterDictionaryList, String adapterSchemaId, String srcDictCode, String srcDictEntryCode, String srcDictEntryName) {
         RsAdapterDictionary rsAdapterDictionary = new RsAdapterDictionary();
         rsAdapterDictionary.setSchemeId(adapterSchemaId);
         rsAdapterDictionary.setSrcDictCode(srcDictCode);
         rsAdapterDictionary.setSrcDictEntryCode(srcDictEntryCode);
         rsAdapterDictionary.setSrcDictEntryName(srcDictEntryName);
         adapterDictionaryList.add(rsAdapterDictionary);
-        return  adapterDictionaryList;
+        return adapterDictionaryList;
     }
 
     //获取标准适配数据元列表
-    private List<RsAdapterMetadata> adapterMetadataList(List<RsAdapterMetadata> adapterMetadataList,String adapterSchemaId,String srcDataSetCode,String srcMetadataCode,String srcMetadataName){
+    private List<RsAdapterMetadata> adapterMetadataList(List<RsAdapterMetadata> adapterMetadataList, String adapterSchemaId, String srcDataSetCode, String srcMetadataCode, String srcMetadataName) {
         RsAdapterMetadata adapterMetadata = new RsAdapterMetadata();
         adapterMetadata.setSchemaId(adapterSchemaId);
         adapterMetadata.setSrcDatasetCode(srcDataSetCode);
         adapterMetadata.setSrcMetadataCode(srcMetadataCode);
         adapterMetadata.setSrcMetadataName(srcMetadataName);
         adapterMetadataList.add(adapterMetadata);
-        return  adapterMetadataList;
+        return adapterMetadataList;
     }
 
     //第三方标准字典适配
     public void batchAdapterOrgDictEntries(RsAdapterSchema adapterSchema) throws Exception {
-        String orgDataSetSql = "select * from org_std_dict where organization = '"+adapterSchema.getCode()+"'";
+        String orgDataSetSql = "select * from org_std_dict where organization = '" + adapterSchema.getCode() + "'";
         List<Map<String, Object>> orgDictList = jdbcTemplate.queryForList(orgDataSetSql);
-
+        List<RsAdapterDictionary> adapterDictionaryList = new ArrayList<>();
         for (Map<String, Object> orgDictMap : orgDictList) {
-            String sdeSql = "select * from org_std_dictentry where org_dict = '"+orgDictMap.get("id").toString()+"'";
+            String sdeSql = "select * from org_std_dictentry where org_dict = '" + orgDictMap.get("id").toString() + "'";
 
             List<Map<String, Object>> orgDictEntryList = jdbcTemplate.queryForList(sdeSql);
 
-            List<RsAdapterDictionary> adapterDictionaryList = new ArrayList<>();
-            for(Map<String, Object> dictionariesMap :orgDictEntryList){
+
+            for (Map<String, Object> dictionariesMap : orgDictEntryList) {
                 adapterDictionaryList = adapterDictionaryList(adapterDictionaryList,
                         adapterSchema.getId(),
                         orgDictMap.get("code").toString(),
                         dictionariesMap.get("code").toString(),
                         dictionariesMap.get("name").toString());
             }
-            String jsonData = objectMapper.writeValueAsString(adapterDictionaryList);
-            RsAdapterDictionary[] adapterDictionaryArray = objectMapper.readValue(jsonData, RsAdapterDictionary[].class);
-            adapterDictionaryQueryDao.batchInsertAdapterDictionaries(adapterDictionaryArray);
         }
+        String jsonData = objectMapper.writeValueAsString(adapterDictionaryList);
+        RsAdapterDictionary[] adapterDictionaryArray = objectMapper.readValue(jsonData, RsAdapterDictionary[].class);
+        adapterDictionaryQueryDao.batchInsertAdapterDictionaries(adapterDictionaryArray);
     }
 
 
     //第三方标准数据元适配
     public void batchAdapterOrgMetaData(RsAdapterSchema adapterSchema) throws Exception {
-        String orgDataSetSql = "select * from org_std_dataset where organization = '"+adapterSchema.getCode()+"'";
+        String orgDataSetSql = "select * from org_std_dataset where organization = '" + adapterSchema.getCode() + "'";
         List<Map<String, Object>> orgDataSetList = jdbcTemplate.queryForList(orgDataSetSql);
-
+        List<RsAdapterMetadata> adapterMetadataList = new ArrayList<>();
         for (Map<String, Object> orgDataSetMap : orgDataSetList) {
-            String sdeSql = "select * from org_std_meta_data where org_dataset = '"+orgDataSetMap.get("id").toString()+"'";
+            String sdeSql = "select * from org_std_meta_data where org_dataset = '" + orgDataSetMap.get("id").toString() + "'";
 
             List<Map<String, Object>> orgDataSet = jdbcTemplate.queryForList(sdeSql);
 
-            List<RsAdapterMetadata> adapterMetadataList = new ArrayList<>();
-            for(Map<String, Object> metaDataMap : orgDataSet){
+
+            for (Map<String, Object> metaDataMap : orgDataSet) {
                 adapterMetadataList = adapterMetadataList(adapterMetadataList,
                         adapterSchema.getId(),
                         orgDataSetMap.get("code").toString(),
                         metaDataMap.get("code").toString(),
                         metaDataMap.get("name").toString());
             }
-            String jsonData = objectMapper.writeValueAsString(adapterMetadataList);
-            RsAdapterMetadata[] adapterMetadataArray = objectMapper.readValue(jsonData, RsAdapterMetadata[].class);
-            adapterMetadataQueryDao.batchAdapterMetadata(adapterMetadataArray);
         }
+        String jsonData = objectMapper.writeValueAsString(adapterMetadataList);
+        RsAdapterMetadata[] adapterMetadataArray = objectMapper.readValue(jsonData, RsAdapterMetadata[].class);
+        adapterMetadataQueryDao.batchAdapterMetadata(adapterMetadataArray);
+
     }
 
 
@@ -153,50 +156,48 @@ public class AdapterSchemaService extends BaseJpaService<RsAdapterSchema, Adapte
     public void batchAdapterDictEntries(RsAdapterSchema adapterSchema) throws Exception {
         String sdSql = "select * from std_dictionary_" + adapterSchema.getAdapterVersion();
         List<Map<String, Object>> dictionaryList = jdbcTemplate.queryForList(sdSql);
+        List<RsAdapterDictionary> adapterDictionaryList = new ArrayList<>();
         for (Map<String, Object> dictionaryMap : dictionaryList) {
             String dictionaryEntrySql = "select * from std_dictionary_entry_" + adapterSchema.getAdapterVersion()
                     + " where dict_id = '" + dictionaryMap.get("id").toString() + "'";
-
             List<Map<String, Object>> dictionaryEntriesMap = jdbcTemplate.queryForList(dictionaryEntrySql);
 
-            List<RsAdapterDictionary> adapterDictionaryList = new ArrayList<>();
-            for(Map<String, Object> dictionaryEntryMap :dictionaryEntriesMap){
+            for (Map<String, Object> dictionaryEntryMap : dictionaryEntriesMap) {
                 adapterDictionaryList(adapterDictionaryList,
                         adapterSchema.getId(),
                         dictionaryMap.get("code").toString(),
                         dictionaryEntryMap.get("code").toString(),
                         dictionaryEntryMap.get("value").toString());
             }
-            String jsonData = objectMapper.writeValueAsString(adapterDictionaryList);
-            RsAdapterDictionary[] adapterDictionaryArray = objectMapper.readValue(jsonData, RsAdapterDictionary[].class);
-            adapterDictionaryQueryDao.batchInsertAdapterDictionaries(adapterDictionaryArray);
         }
+        String jsonData = objectMapper.writeValueAsString(adapterDictionaryList);
+        RsAdapterDictionary[] adapterDictionaryArray = objectMapper.readValue(jsonData, RsAdapterDictionary[].class);
+        adapterDictionaryQueryDao.batchInsertAdapterDictionaries(adapterDictionaryArray);
     }
 
     //平台标准数据元适配
     public void batchAdapterMetadata(RsAdapterSchema adapterSchema) throws Exception {
-            String sdsSql = "select * from std_data_set_" + adapterSchema.getAdapterVersion();
-            List<Map<String, Object>> dataSetList = jdbcTemplate.queryForList(sdsSql);
+        String sdsSql = "select * from std_data_set_" + adapterSchema.getAdapterVersion();
+        List<Map<String, Object>> dataSetList = jdbcTemplate.queryForList(sdsSql);
+        List<RsAdapterMetadata> adapterMetadataList = new ArrayList<>();
+        for (Map<String, Object> dataSetMap : dataSetList) {
+            String metadataSql = "select * from std_meta_data_" + adapterSchema.getAdapterVersion()
+                    + " where dataset_id = '" + dataSetMap.get("id").toString() + "'";
+            List<Map<String, Object>> map = jdbcTemplate.queryForList(metadataSql);
 
-            for (Map<String, Object> dataSetMap : dataSetList) {
-                String metadataSql = "select * from std_meta_data_" + adapterSchema.getAdapterVersion()
-                        + " where dataset_id = '" + dataSetMap.get("id").toString() + "'";
-                List<Map<String, Object>> map = jdbcTemplate.queryForList(metadataSql);
-                List<RsAdapterMetadata> adapterMetadataList = new ArrayList<>();
-                for(Map<String, Object> metaDataMap :map){
-                    adapterMetadataList = adapterMetadataList(adapterMetadataList,
-                            adapterSchema.getId(),
-                            dataSetMap.get("code").toString(),
-                            metaDataMap.get("column_name").toString(),
-                            metaDataMap.get("column_name").toString());
-                }
-                String jsonData = objectMapper.writeValueAsString(adapterMetadataList);
-                RsAdapterMetadata[] adapterMetadataArray = objectMapper.readValue(jsonData, RsAdapterMetadata[].class);
-                adapterMetadataQueryDao.batchAdapterMetadata(adapterMetadataArray);
+            for (Map<String, Object> metaDataMap : map) {
+                adapterMetadataList = adapterMetadataList(adapterMetadataList,
+                        adapterSchema.getId(),
+                        dataSetMap.get("code").toString(),
+                        metaDataMap.get("column_name").toString(),
+                        metaDataMap.get("column_name").toString());
             }
+        }
+        String jsonData = objectMapper.writeValueAsString(adapterMetadataList);
+        RsAdapterMetadata[] adapterMetadataArray = objectMapper.readValue(jsonData, RsAdapterMetadata[].class);
+        adapterMetadataQueryDao.batchAdapterMetadata(adapterMetadataArray);
 
     }
-
 
 
     /**

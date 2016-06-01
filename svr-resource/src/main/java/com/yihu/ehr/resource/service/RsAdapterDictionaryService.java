@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
+
 /**
  * @author linaz
  * @created 2016.05.17 16:33
@@ -26,7 +28,7 @@ public class RsAdapterDictionaryService extends BaseJpaService<RsAdapterDictiona
         return adapterDictionaryDao.findOne(id);
     }
 
-    public void batchInsertAdapterDictionaries(RsAdapterDictionary[] AdapterDictionaries) {
+    public void batchInsertAdapterDictionaries(RsAdapterDictionary[] AdapterDictionaries) throws SQLException {
         adapterDictionaryQueryDao.batchInsertAdapterDictionaries(AdapterDictionaries);
     }
 }
