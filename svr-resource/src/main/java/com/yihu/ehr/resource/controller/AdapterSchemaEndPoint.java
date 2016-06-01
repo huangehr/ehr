@@ -51,7 +51,7 @@ public class AdapterSchemaEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "adapterSchemaa", value = "数据元JSON", defaultValue = "")
             @RequestBody String adapterSchema) throws Exception {
         RsAdapterSchema schema = toEntity(adapterSchema, RsAdapterSchema.class);
-        schema = schemaService.saveAdapterSchema(schema);
+        schema = schemaService.save(schema);
         return convertToModel(schema, MRsAdapterSchema.class);
     }
 
