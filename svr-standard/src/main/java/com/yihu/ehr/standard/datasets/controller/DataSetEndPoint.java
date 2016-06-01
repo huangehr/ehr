@@ -3,7 +3,7 @@ package com.yihu.ehr.standard.datasets.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDataSet;
-import com.yihu.ehr.standard.commons.ExtendController;
+import com.yihu.ehr.standard.commons.ExtendEndPoint;
 import com.yihu.ehr.standard.datasets.service.BaseDataSet;
 import com.yihu.ehr.standard.datasets.service.DataSetService;
 import io.swagger.annotations.Api;
@@ -28,7 +28,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "Dataset", description = "数据集服务")
-public class DataSetEndPoint extends ExtendController<MStdDataSet> {
+public class DataSetEndPoint extends ExtendEndPoint<MStdDataSet> {
 
     @Autowired
     private DataSetService dataSetService;

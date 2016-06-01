@@ -1,9 +1,9 @@
 package com.yihu.ehr.service.resource.stage1.extractor;
 
 import com.yihu.ehr.constants.EventType;
-import com.yihu.ehr.service.resource.stage1.MetaDataRecord;
-import com.yihu.ehr.service.resource.StdDataSet;
-import com.yihu.ehr.service.util.DataSetUtil;
+import com.yihu.ehr.profile.util.MetaDataRecord;
+import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,7 +27,7 @@ public class EventExtractor extends KeyDataExtractor {
     private List<String> metaData = new ArrayList<>();            // 事件时间数据元
 
     @Override
-    public Object extract(StdDataSet dataSet, Filter filter) throws ParseException {
+    public Object extract(PackageDataSet dataSet, Filter filter) throws ParseException {
         if (dataSets.containsKey(dataSet.getCode())) {
             if (filter == Filter.EventDate) {
                 for (String rowKey : dataSet.getRecordKeys()) {

@@ -11,13 +11,12 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.service.resource.stage1.StdPackModel;
+import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
 import com.yihu.ehr.service.resource.stage2.PackMill;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.ResourceService;
-import com.yihu.ehr.service.util.LegacyPackageException;
-import com.yihu.ehr.util.log.LogService;
+import com.yihu.ehr.profile.exception.LegacyPackageException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -32,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 @RestController
@@ -75,29 +73,27 @@ public class ResolveEndPoint {
             if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
             String zipFile = downloadTo(pack.getRemotePath());
 
-            StdPackModel stdPackModel = packResolveEngine.doResolve(pack, zipFile);
-            ResourceBucket resourceBucket = packMill.grindingPackModel(stdPackModel);
+            StandardPackage standardPackage = packResolveEngine.doResolve(pack, zipFile);
+            ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
             resourceService.save(resourceBucket);
 
             packageMgrClient.reportStatus(pack.getId(),
                     ArchiveStatus.Finished,
-                    String.format("Rowkey: %s, identity: %s", stdPackModel.getId(), stdPackModel.getDemographicId()));
+                    String.format("Profile: %s, identity: %s", standardPackage.getId(), standardPackage.getDemographicId()));
 
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
             if (echo) {
-                return new ResponseEntity<>(stdPackModel.toJson(), HttpStatus.OK);
+                return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("", HttpStatus.OK);
             }
         } catch (LegacyPackageException e) {
             packageMgrClient.reportStatus(packageId, ArchiveStatus.LegacyIgnored, e.getMessage());
 
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         } catch (Exception e) {
-            LogService.getLogger().error("Package resolve job error: package " + e.getMessage());
-
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -139,7 +135,7 @@ public class ResolveEndPoint {
             pack.setClientId(clientId);
             pack.setArchiveStatus(ArchiveStatus.Received);
 
-            StdPackModel packModel = packResolveEngine.doResolve(pack, zipFile);
+            StandardPackage packModel = packResolveEngine.doResolve(pack, zipFile);
             packModel.setClientId(clientId);
 
             ResourceBucket resourceBucket = packMill.grindingPackModel(packModel);

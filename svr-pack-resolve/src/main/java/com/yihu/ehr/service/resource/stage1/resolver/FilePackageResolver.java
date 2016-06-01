@@ -6,11 +6,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.profile.util.MetaDataRecord;
+import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.schema.StdMetaDataKeySchema;
-import com.yihu.ehr.service.resource.*;
 import com.yihu.ehr.service.resource.stage1.*;
 import com.yihu.ehr.service.resource.stage1.PackModelFactory;
-import com.yihu.ehr.service.util.QualifierTranslator;
+import com.yihu.ehr.profile.util.QualifierTranslator;
 import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.util.DateTimeUtils;
 import com.yihu.ehr.util.log.LogService;
@@ -45,14 +46,14 @@ public class FilePackageResolver extends PackageResolver {
     FastDFSUtil fastDFSUtil;
 
     @Override
-    public void resolve(StdPackModel profile, File root) throws Exception {
-        FilePackModel filePackModel = (FilePackModel) profile;
+    public void resolve(StandardPackage profile, File root) throws Exception {
+        FilePackage filePackModel = (FilePackage) profile;
 
         File metaFile = new File(root.getAbsolutePath() + File.separator + "meta.json");
         parseFile(filePackModel, metaFile);
     }
 
-    private void parseFile(FilePackModel profile, File metaFile) throws Exception {
+    private void parseFile(FilePackage profile, File metaFile) throws Exception {
         JsonNode root = objectMapper.readTree(metaFile);
 
         String demographicId = root.get("demographic_id").asText();
@@ -77,7 +78,7 @@ public class FilePackageResolver extends PackageResolver {
         parseFiles(profile, (ArrayNode) root.get("files"), metaFile.getParent() + File.separator + PackModelFactory.DocumentFolder);
     }
 
-    private void parseDataSets(FilePackModel profile, ObjectNode dataSets) {
+    private void parseDataSets(FilePackage profile, ObjectNode dataSets) {
         if (dataSets == null) return;
 
         Iterator<Map.Entry<String, JsonNode>> iterator = dataSets.fields();
@@ -86,7 +87,7 @@ public class FilePackageResolver extends PackageResolver {
             String dataSetCode = item.getKey();
             ArrayNode records = (ArrayNode) item.getValue();
 
-            StdDataSet dataSet = new StdDataSet();
+            PackageDataSet dataSet = new PackageDataSet();
             dataSet.setCode(dataSetCode);
             dataSet.setPatientId(profile.getPatientId());
             dataSet.setEventNo(profile.getEventNo());
@@ -113,7 +114,7 @@ public class FilePackageResolver extends PackageResolver {
         }
     }
 
-    private void parseFiles(FilePackModel profile, ArrayNode files, String documentsPath) throws Exception {
+    private void parseFiles(FilePackage profile, ArrayNode files, String documentsPath) throws Exception {
         for (int i = 0; i < files.size(); ++i) {
             ObjectNode objectNode = (ObjectNode) files.get(i);
             String cdaDocumentId = objectNode.get("cda_doc_id").asText();

@@ -45,7 +45,7 @@ public class PackageResolveEngine {
      * 5. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finished。
      * 6. 以上步骤有任何一个失败的，将文档标记为 Failed 状态，即无法决定该JSON档案的去向，需要人为干预。
      */
-    public StdPackModel doResolve(MPackage pack, String zipFile) throws Exception {
+    public StandardPackage doResolve(MPackage pack, String zipFile) throws Exception {
         File root = null;
         try {
             root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
@@ -53,7 +53,7 @@ public class PackageResolveEngine {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
 
-            StdPackModel profile = PackModelFactory.createPackModel(root);
+            StandardPackage profile = PackModelFactory.createPackModel(root);
             PackageResolver packageResolver;
             switch (profile.getProfileType()) {
                 case Standard:

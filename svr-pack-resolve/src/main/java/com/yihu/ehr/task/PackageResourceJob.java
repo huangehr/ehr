@@ -9,17 +9,16 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.queue.MessageBuffer;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
-import com.yihu.ehr.service.resource.stage1.StdPackModel;
+import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage2.PackMill;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.ResourceService;
-import com.yihu.ehr.service.util.LegacyPackageException;
+import com.yihu.ehr.profile.exception.LegacyPackageException;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.UnableToInterruptJobException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.NoSuchElementException;
 
@@ -60,8 +59,8 @@ public class PackageResourceJob implements InterruptableJob {
 
             long start = System.currentTimeMillis();
 
-            StdPackModel stdPackModel = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
-            ResourceBucket resourceBucket = packMill.grindingPackModel(stdPackModel);
+            StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
+            ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
             resourceService.save(resourceBucket);
 
             packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,

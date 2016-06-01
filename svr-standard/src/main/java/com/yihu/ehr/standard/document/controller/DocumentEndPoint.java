@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
-import com.yihu.ehr.standard.commons.ExtendController;
+import com.yihu.ehr.standard.commons.ExtendEndPoint;
 import com.yihu.ehr.standard.document.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "cda document", description = "CDA文档服务")
-public class DocumentEndPoint extends ExtendController<MCDADocument> {
+public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
 
     @Autowired
     private CDADocumentService cdaDocumentService;

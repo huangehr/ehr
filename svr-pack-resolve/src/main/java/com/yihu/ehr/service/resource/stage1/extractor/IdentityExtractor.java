@@ -1,7 +1,7 @@
 package com.yihu.ehr.service.resource.stage1.extractor;
 
-import com.yihu.ehr.service.resource.stage1.MetaDataRecord;
-import com.yihu.ehr.service.resource.StdDataSet;
+import com.yihu.ehr.profile.util.MetaDataRecord;
+import com.yihu.ehr.profile.util.PackageDataSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ public class IdentityExtractor extends KeyDataExtractor {
     private static final String IdCardNoDictEntry = "01;02";    // 身份字典项代码：身份证号与护照
 
     @Override
-    public Object extract(StdDataSet dataSet, Filter filter) throws ParseException {
+    public Object extract(PackageDataSet dataSet, Filter filter) throws ParseException {
         if (filter == Filter.DemographicInfo && dataSets.contains(dataSet.getCode())) {
             for (String key : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(key);
