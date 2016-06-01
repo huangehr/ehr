@@ -57,9 +57,9 @@ public class AdapterDictionaryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionaries, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配字典")
     public MRsAdapterDictionary createDictionaries(
-            @ApiParam(name = "adapterMetadata", value = "数据元JSON", defaultValue = "")
-            @RequestBody String adapterMetadata) throws Exception {
-        RsAdapterDictionary adapterDictionary = toEntity(adapterMetadata, RsAdapterDictionary.class);
+            @ApiParam(name = "json_data", value = "适配字典JSON", defaultValue = "")
+            @RequestBody String jsonData) throws Exception {
+        RsAdapterDictionary adapterDictionary = toEntity(jsonData, RsAdapterDictionary.class);
         adapterDictionary.setId(getObjectId(BizObject.RsAdapterDictionary));
         adapterDictionary = rsAdapterDictionaryService.save(adapterDictionary);
         return convertToModel(adapterDictionary, MRsAdapterDictionary.class);
@@ -68,9 +68,9 @@ public class AdapterDictionaryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionaries, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新适配字典")
     public MRsAdapterDictionary updateDictionary(
-            @ApiParam(name = "adapterMetadata", value = "数据元JSON", defaultValue = "")
-            @RequestBody String adapterMetadata) throws Exception {
-        RsAdapterDictionary adapterDictionary = toEntity(adapterMetadata, RsAdapterDictionary.class);
+            @ApiParam(name = "json_data", value = "适配字典JSON", defaultValue = "")
+            @RequestBody String jsonData) throws Exception {
+        RsAdapterDictionary adapterDictionary = toEntity(jsonData, RsAdapterDictionary.class);
         adapterDictionary = rsAdapterDictionaryService.save(adapterDictionary);
         return convertToModel(adapterDictionary, MRsAdapterDictionary.class);
     }
@@ -78,7 +78,7 @@ public class AdapterDictionaryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionary, method = RequestMethod.DELETE)
     @ApiOperation("删除适配字典")
     public boolean deleteDictionary(
-            @ApiParam(name = "id", value = "数据元ID", defaultValue = "")
+            @ApiParam(name = "id", value = "适配字典ID", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
         rsAdapterDictionaryService.delete(id);
         return true;
