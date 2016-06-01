@@ -35,7 +35,7 @@ public class BasisConstant {
     public static String zycfTable = "HDSC01_08";//中药处方数据集
 
     /********** 数据元 *******************/
-    public static String profileId = "main_rowkey";//细表外键profile_id
+    public static String profileId = "profile_id";//细表外键profile_id
     public static String mzzd = "EHR_000109";//门诊诊断代码
     public static String zyzd = "EHR_000293";//住院诊断代码
     public static String xybm = "EHR_000099";//西药编码

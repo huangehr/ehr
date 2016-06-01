@@ -38,8 +38,8 @@ public class ResourcesQueryDao {
 
     private String mainCore = "HealthProfile";
     private String subCore = "HealthProfileSub";
-    private String mainJoinCore = "HealthProfile_shard2_replica1";
-    private String subJoinCore = "HealthProfileSub_shard2_replica1";
+    private String mainJoinCore = "HealthProfile_shard1_replica1";
+    private String subJoinCore = "HealthProfileSub_shard1_replica1";
 
     /**
      * 获取Hbase主表
