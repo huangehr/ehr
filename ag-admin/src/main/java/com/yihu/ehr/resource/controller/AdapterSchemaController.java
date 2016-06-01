@@ -59,7 +59,13 @@ public class AdapterSchemaController extends BaseController {
         Envelop envelop = new Envelop();
         try
         {
-            MRsAdapterSchema rsAdapterSchema = adapterSchemaClient.createSchema(adapterSchema);
+            MRsAdapterSchema rsAdapterSchema = toEntity(adapterSchema, MRsAdapterSchema.class);
+            ResponseEntity<List<MRsAdapterSchema>> responseEntity = adapterSchemaClient.getSchema("", "code=" + rsAdapterSchema.getCode(), "", 1, 1);
+            List<MRsAdapterSchema> mRsAdapterSchemas = responseEntity.getBody();
+            if(mRsAdapterSchemas.size()>0){
+                return failed("方案编码已经存在请修改！");
+            }
+            rsAdapterSchema = adapterSchemaClient.createSchema(adapterSchema);
             envelop.setObj(rsAdapterSchema);
             envelop.setSuccessFlg(true);
 
@@ -81,7 +87,13 @@ public class AdapterSchemaController extends BaseController {
         Envelop envelop = new Envelop();
         try
         {
-            MRsAdapterSchema rsAdapterSchema = adapterSchemaClient.updateSchema(adapterSchema);
+            MRsAdapterSchema rsAdapterSchema = toEntity(adapterSchema, MRsAdapterSchema.class);
+            ResponseEntity<List<MRsAdapterSchema>> responseEntity = adapterSchemaClient.getSchema("", "code=" + rsAdapterSchema.getCode()+";id<>"+rsAdapterSchema.getId(), "", 1, 1);
+            List<MRsAdapterSchema> mRsAdapterSchemas = responseEntity.getBody();
+            if(mRsAdapterSchemas.size()>0){
+                return failed("方案编码已经存在请修改！");
+            }
+            rsAdapterSchema = adapterSchemaClient.updateSchema(adapterSchema);
             envelop.setObj(rsAdapterSchema);
             if(rsAdapterSchema!=null){
                 envelop.setSuccessFlg(true);
