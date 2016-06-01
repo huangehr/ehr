@@ -88,7 +88,7 @@ public class RsInterfaceController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.InterfaceById, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取标准字典")
     public Envelop getRsInterfaceById(
             @ApiParam(name = "id", value = "", defaultValue = "")
@@ -96,6 +96,28 @@ public class RsInterfaceController extends BaseController {
         Envelop envelop = new Envelop();
         try{
             MRsInterface mRsInterface = rsInterfaceClient.getRsInterfaceById(id);
+            RsInterfaceModel rsInterface = convertToModel(mRsInterface,RsInterfaceModel.class);
+            if(rsInterface ==null){
+                envelop.setSuccessFlg(false);
+            }else {
+                envelop.setObj(rsInterface);
+                envelop.setSuccessFlg(true);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @ApiOperation(value = "根据资源接口编码resourceInterface获取资源接口")
+    public Envelop findByResourceInterface(
+            @ApiParam(name = "resource_interface", value = "", defaultValue = "")
+            @RequestParam(value = "resource_interface") String resourceInterface) {
+        Envelop envelop = new Envelop();
+        try{
+            MRsInterface mRsInterface = rsInterfaceClient.findByResourceInterface(resourceInterface);
             RsInterfaceModel rsInterface = convertToModel(mRsInterface,RsInterfaceModel.class);
             if(rsInterface ==null){
                 envelop.setSuccessFlg(false);
@@ -130,7 +152,7 @@ public class RsInterfaceController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.InterfaceById, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源", notes = "删除资源")
     public Envelop deleteRsInterface(
             @ApiParam(name = "id", value = "id", defaultValue = "")

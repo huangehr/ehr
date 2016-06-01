@@ -68,8 +68,9 @@ public class ServiceApi {
         public static final String SystemDictEntries            ="/resources/system_dict_entries";
         public static final String SystemDictEntry              ="/resources/system_dict_entries/{id}";
 
-        public static final String Interfaces                    ="/resources/interfaces";
-        public static final String Interface                       ="/resources/interfaces/{id}";
+        public static final String Interfaces                       ="/resources/interfaces";
+        public static final String InterfaceById                       ="/resources/interfaces/{id}";
+        public static final String Interface                       ="/resources/interface";
         public static final String InterfaceNameExistence          ="/resources/existence/name";
 
         public static final String Categories                       ="/resources/categories/no_paging";

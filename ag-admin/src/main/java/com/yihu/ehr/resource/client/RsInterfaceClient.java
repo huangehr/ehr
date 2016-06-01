@@ -43,11 +43,17 @@ public interface RsInterfaceClient {
     MRsInterface updateRsInterface(
             @RequestBody String jsonData);
 
-    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.InterfaceById, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取标准字典")
     MRsInterface getRsInterfaceById(
             @ApiParam(name = "id", value = "", defaultValue = "")
             @PathVariable(value = "id") String id);
+
+    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @ApiOperation(value = "根据资源接口编码resourceInterface获取资源接口")
+    MRsInterface findByResourceInterface(
+            @ApiParam(name = "resource_interface", value = "", defaultValue = "")
+            @RequestParam(value = "resource_interface") String resourceInterface);
 
     @RequestMapping(value = ServiceApi.Resources.InterfaceNameExistence, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取标准字典")
@@ -55,7 +61,7 @@ public interface RsInterfaceClient {
             @ApiParam(name = "name", value = "", defaultValue = "")
             @RequestParam(value = "name") String name);
 
-    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.InterfaceById, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源", notes = "删除资源")
     boolean deleteRsInterface(
             @PathVariable(value = "id") String id);
