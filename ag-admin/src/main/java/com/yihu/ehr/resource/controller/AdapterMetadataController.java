@@ -43,7 +43,7 @@ public class AdapterMetadataController extends BaseController {
     @Autowired
     private MetadataClient metadataClient;
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadata, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.POST)
     @ApiOperation("创建适配数据元")
     public Envelop createMetadata(
             @ApiParam(name = "adapterMetadata", value = "数据元JSON", defaultValue = "")
@@ -60,7 +60,7 @@ public class AdapterMetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadata, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.PUT)
     @ApiOperation("更新适配数据元")
     public Envelop updateMetadata(
             @ApiParam(name = "adapterMetadata", value = "数据元JSON", defaultValue = "")
@@ -93,7 +93,7 @@ public class AdapterMetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadata, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.DELETE)
     @ApiOperation("批量删除适配数据元")
     public Envelop deleteMetadataBatch(
             @ApiParam(name = "ids", value = "数据元ids", defaultValue = "")
@@ -127,7 +127,7 @@ public class AdapterMetadataController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadata, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.GET)
     @ApiOperation("查询适配数据元")
     public Envelop getMetadata(
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
