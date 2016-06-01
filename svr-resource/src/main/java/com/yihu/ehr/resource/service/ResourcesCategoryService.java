@@ -90,4 +90,8 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
     public List<RsCategory> getRsCategoryByPid(String pid) {
         return rsCategoryDao.findByPid(pid);
     }
+
+    public List<RsCategory> findAll() {
+        return (List<RsCategory>) rsCategoryDao.findAll();
+    }
 }

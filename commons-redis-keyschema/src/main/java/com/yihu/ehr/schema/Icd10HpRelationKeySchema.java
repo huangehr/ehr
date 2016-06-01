@@ -17,9 +17,12 @@ public class Icd10HpRelationKeySchema extends KeySchema {
     private String Table = "hp_icd10_relation";
 
     @Value("${ehr.redis-key-schema.hp_icd10_relation.icd10_id}")
-    private String Name = "icd10_id";
+    private String icd10Id = "icd10_id";
+
+    @Value("${ehr.redis-key-schema.hp_icd10_relation.icd10_code}")
+    private String icd10Code = "icd10_code";
 
     public String icd10HpRelation(String codeName){
-        return makeKey(Table, codeName, Name);
+        return makeKey(Table, codeName, icd10Code);
     }
 }
