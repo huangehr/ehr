@@ -88,7 +88,7 @@ public class ResourceMetadataEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @ApiOperation("根据resourceIds批量删除资源数据元")
+    @ApiOperation("根据resourceId删除资源数据元")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.DELETE)
     public boolean deleteResourceMetadataBatchByResourceId(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")

@@ -61,4 +61,8 @@ public interface ResourcesCategoryClient {
     List<MRsCategory> getAllCategories(
             @RequestParam(value="filters",required = false)String filters);
 
+    @RequestMapping(value = ServiceApi.Resources.CategoryByPid,method = RequestMethod.GET)
+    @ApiOperation("根据pid获取资源类别列表")
+    List<MRsCategory> getRsCategoryByPid(
+            @PathVariable(value="pid") String pid);
 }
