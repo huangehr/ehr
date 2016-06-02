@@ -4,8 +4,10 @@ import com.yihu.ehr.agModel.resource.RsMetadataModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
+import com.yihu.ehr.model.resource.MRsDictionary;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.resource.client.MetadataClient;
+import com.yihu.ehr.resource.client.RsDictionaryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -14,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -32,6 +35,9 @@ public class MetadataController extends BaseController {
 
     @Autowired
     private SystemDictClient systemDictClient;
+
+    @Autowired
+    private RsDictionaryClient rsDictionaryClient;
 
     @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.POST)
     @ApiOperation("创建数据元")
@@ -192,10 +198,19 @@ public class MetadataController extends BaseController {
                 model = convertToModel(mRsMetadata, RsMetadataModel.class);
                 model.setDomainName(nullToSpace(domain.get(model.getDomain())));
                 model.setColumnTypeName(nullToSpace(columnType.get(model.getColumnType())));
+                model.setDictName(getDictName(mRsMetadata.getDictCode()));
                 rs.add(model);
             }
         }
         return rs;
+    }
+
+    private String getDictName(String dictCode){
+        if(!StringUtils.isEmpty(dictCode)){
+            MRsDictionary dictionary = rsDictionaryClient.getRsDictionaryById(dictCode);
+            return dictionary!=null ? dictionary.getName() : "";
+        }
+        return "";
     }
 
     private Map<String, String> getDictMap(int dictId){
