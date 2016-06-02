@@ -46,7 +46,7 @@ public class ResourcesQueryEndPoint {
 
     @ApiOperation("测试--Hbase主表")
     @RequestMapping(value = "/getEhrCenter", method = RequestMethod.GET)
-    public Page<Map<String,Object>> getEhrCenter(@ApiParam(name="queryParams",defaultValue="{\"q\":\"demographic_id:412726196106128414\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
+    public Page<Map<String,Object>> getEhrCenter(@ApiParam(name="queryParams",defaultValue="{\"q\":\"demographic_id:422726196802192219\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                  @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                                  @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
         return resourcesQueryDao.getEhrCenter(queryParams, page, size);
@@ -54,7 +54,7 @@ public class ResourcesQueryEndPoint {
 
     @ApiOperation("测试--Hbase从表")
     @RequestMapping(value = "/getEhrCenterSub", method = RequestMethod.GET)
-    public Page<Map<String,Object>> getEhrCenterSub(@ApiParam(name="queryParams",defaultValue="{\"table\":\"HDSD00_08\",\"q\":\"main_rowkey:41872607-9_10289499_000618952_1443715200000\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
+    public Page<Map<String,Object>> getEhrCenterSub(@ApiParam(name="queryParams",defaultValue="{\"table\":\"HDSC02_12\",\"join\":\"demographic_id:422726196802192219\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                     @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                                     @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
         return resourcesQueryDao.getEhrCenterSub(queryParams, page, size);

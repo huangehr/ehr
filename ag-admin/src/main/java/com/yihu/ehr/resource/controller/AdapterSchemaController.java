@@ -51,7 +51,7 @@ public class AdapterSchemaController extends BaseController {
 
     private static  final  String THIRD_PARTY ="2";
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.POST)
     @ApiOperation("创建适配方案")
     public Envelop createSchema(
             @ApiParam(name = "adapterSchema", value = "数据元JSON", defaultValue = "")
@@ -59,7 +59,13 @@ public class AdapterSchemaController extends BaseController {
         Envelop envelop = new Envelop();
         try
         {
-            MRsAdapterSchema rsAdapterSchema = adapterSchemaClient.createSchema(adapterSchema);
+            MRsAdapterSchema rsAdapterSchema = toEntity(adapterSchema, MRsAdapterSchema.class);
+            ResponseEntity<List<MRsAdapterSchema>> responseEntity = adapterSchemaClient.getSchema("", "code=" + rsAdapterSchema.getCode(), "", 1, 1);
+            List<MRsAdapterSchema> mRsAdapterSchemas = responseEntity.getBody();
+            if(mRsAdapterSchemas.size()>0){
+                return failed("方案编码已经存在请修改！");
+            }
+            rsAdapterSchema = adapterSchemaClient.createSchema(adapterSchema);
             envelop.setObj(rsAdapterSchema);
             envelop.setSuccessFlg(true);
 
@@ -73,7 +79,7 @@ public class AdapterSchemaController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.PUT)
     @ApiOperation("更新适配方案")
     public Envelop updateSchema(
             @ApiParam(name = "adapterSchema", value = "数据元JSON", defaultValue = "")
@@ -81,9 +87,20 @@ public class AdapterSchemaController extends BaseController {
         Envelop envelop = new Envelop();
         try
         {
-            MRsAdapterSchema rsAdapterSchema = adapterSchemaClient.updateSchema(adapterSchema);
+            MRsAdapterSchema rsAdapterSchema = toEntity(adapterSchema, MRsAdapterSchema.class);
+            ResponseEntity<List<MRsAdapterSchema>> responseEntity = adapterSchemaClient.getSchema("", "code=" + rsAdapterSchema.getCode()+";id<>"+rsAdapterSchema.getId(), "", 1, 1);
+            List<MRsAdapterSchema> mRsAdapterSchemas = responseEntity.getBody();
+            if(mRsAdapterSchemas.size()>0){
+                return failed("方案编码已经存在请修改！");
+            }
+            rsAdapterSchema = adapterSchemaClient.updateSchema(adapterSchema);
             envelop.setObj(rsAdapterSchema);
-            envelop.setSuccessFlg(true);
+            if(rsAdapterSchema!=null){
+                envelop.setSuccessFlg(true);
+            }
+            else {
+                envelop.setSuccessFlg(false);
+            }
         }
         catch (Exception e)
         {
@@ -94,7 +111,7 @@ public class AdapterSchemaController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schema, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.Scheme, method = RequestMethod.DELETE)
     @ApiOperation("删除适配方案")
     public Envelop deleteSchema(
             @ApiParam(name = "id", value = "数据元ID", defaultValue = "")
@@ -110,7 +127,7 @@ public class AdapterSchemaController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.DELETE)
     @ApiOperation("批量删除适配方案")
     public Envelop deleteSchemaBatch(
             @ApiParam(name = "ids", value = "数据元ID", defaultValue = "")
@@ -126,7 +143,7 @@ public class AdapterSchemaController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schema,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.Scheme,method = RequestMethod.GET)
     @ApiOperation("根据ID获取适配方案")
     public Envelop getMetadataById(
             @ApiParam(name="id",value="id",defaultValue = "")
@@ -148,7 +165,7 @@ public class AdapterSchemaController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.GET)
     @ApiOperation("查询适配方案")
     public Envelop getSchema(
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")

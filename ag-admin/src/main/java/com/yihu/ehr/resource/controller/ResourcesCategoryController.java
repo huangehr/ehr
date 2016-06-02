@@ -98,6 +98,24 @@ public class ResourcesCategoryController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/resources/categories/{pid}/category",method = RequestMethod.GET)
+    @ApiOperation("根据pid获取资源类别列表")
+    public Envelop getRsCategoryByPid(
+            @ApiParam(name="pid",value="pid",defaultValue = "")
+            @PathVariable(value="pid") String pid) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            List<MRsCategory> rsCategoryList = resourcesCategoryClient.getRsCategoryByPid(pid);
+            envelop.setDetailModelList(rsCategoryList);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+
     @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.GET)
     @ApiOperation("获取资源类别")
     public Envelop getRsCategories(

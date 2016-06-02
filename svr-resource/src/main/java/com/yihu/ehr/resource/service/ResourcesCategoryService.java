@@ -1,6 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 
+import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourcesCategoryDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 /**
@@ -82,5 +85,13 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
     public RsCategory getRsCategoryById(String id)
     {
         return rsCategoryDao.findOne(id);
+    }
+
+    public List<RsCategory> getRsCategoryByPid(String pid) {
+        return rsCategoryDao.findByPid(pid);
+    }
+
+    public List<RsCategory> findAll() {
+        return (List<RsCategory>) rsCategoryDao.findAll();
     }
 }

@@ -292,4 +292,18 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         rsMetadataGrantService.valid(ids, valid);
         return true;
     }
+
+    @ApiOperation("资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant, method = RequestMethod.POST)
+    public MRsAppResourceMetadata metadataGrant(
+            @ApiParam(name = "id", value = "授权ID", defaultValue = "")
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "dimension", value = "授权ID", defaultValue = "")
+            @RequestParam(value = "dimension") String dimension) throws Exception {
+
+        RsAppResourceMetadata rsAppResourceMetadata = rsMetadataGrantService.retrieve(id);
+        rsAppResourceMetadata.setDimensionValue(dimension);
+        rsMetadataGrantService.save(rsAppResourceMetadata);
+        return convertToModel(rsAppResourceMetadata, MRsAppResourceMetadata.class);
+    }
 }

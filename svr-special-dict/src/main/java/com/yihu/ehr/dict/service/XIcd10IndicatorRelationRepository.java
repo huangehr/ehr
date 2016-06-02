@@ -12,7 +12,7 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface XIcd10IndicatorRelationRepository extends PagingAndSortingRepository<Icd10IndicatorRelation, String> {
+public interface XIcd10IndicatorRelationRepository extends PagingAndSortingRepository<Icd10IndicatorRelation, Long> {
 
     List<Icd10IndicatorRelation> findByIcd10Id(String icd10Id);
     List<Icd10IndicatorRelation> findByIndicatorId(String indicatorId);

@@ -11,7 +11,7 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface XIcd10HpRelationRepository extends PagingAndSortingRepository<Icd10HpRelation, String> {
+public interface XIcd10HpRelationRepository extends PagingAndSortingRepository<Icd10HpRelation, Long> {
 
     List<Icd10HpRelation> findByIcd10Id(String icd10Id);
 

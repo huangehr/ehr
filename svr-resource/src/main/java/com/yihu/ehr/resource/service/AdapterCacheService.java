@@ -3,9 +3,9 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
-import com.yihu.ehr.resource.dao.intf.AdapterSchemaDao;
+import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
-import com.yihu.ehr.resource.model.RsAdapterSchema;
+import com.yihu.ehr.resource.model.RsAdapterScheme;
 import com.yihu.ehr.schema.ResourceAdaptionKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import javax.transaction.Transactional;
  */
 @Service
 @Transactional
-public class AdapterCacheService extends BaseJpaService<RsAdapterSchema,AdapterSchemaDao>{
+public class AdapterCacheService extends BaseJpaService<RsAdapterScheme,AdapterSchemeDao>{
     @Autowired
     private ResourceAdaptionKeySchema keySchema;
 
@@ -26,7 +26,7 @@ public class AdapterCacheService extends BaseJpaService<RsAdapterSchema,AdapterS
     private RedisClient redisClient;
 
     @Autowired
-    private AdapterSchemaDao schemaDao;
+    private AdapterSchemeDao schemaDao;
 
     @Autowired
     private AdapterMetadataDao metadataDao;
@@ -38,7 +38,7 @@ public class AdapterCacheService extends BaseJpaService<RsAdapterSchema,AdapterS
      */
     public void cacheData(String schema_id)
     {
-        RsAdapterSchema schema = schemaDao.findOne(schema_id);
+        RsAdapterScheme schema = schemaDao.findOne(schema_id);
         Iterable<RsAdapterMetadata> metaIterable = metadataDao.findBySchemaId(schema_id);
 
         for(RsAdapterMetadata meta : metaIterable)

@@ -12,7 +12,7 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface XDrugDictRepository extends PagingAndSortingRepository<DrugDict, String> {
+public interface XDrugDictRepository extends PagingAndSortingRepository<DrugDict, Long> {
 
     DrugDict findByCode(String code);
     DrugDict findByName(String name);
