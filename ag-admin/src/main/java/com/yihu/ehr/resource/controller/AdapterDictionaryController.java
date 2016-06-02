@@ -1,15 +1,12 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsAdapterDictionaryModel;
 import com.yihu.ehr.agModel.resource.RsAdapterMetadataModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.resource.MRsAdapterDictionary;
-import com.yihu.ehr.model.resource.MRsAdapterMetadata;
-import com.yihu.ehr.model.resource.MRsMetadata;
-import com.yihu.ehr.resource.client.AdapterDictionaryClient;
-import com.yihu.ehr.resource.client.AdapterMetadataClient;
-import com.yihu.ehr.resource.client.MetadataClient;
+import com.yihu.ehr.model.resource.*;
+import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -19,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,8 +39,14 @@ public class AdapterDictionaryController extends BaseController {
     @Autowired
     private ConventionalDictEntryClient conventionalDictEntryClient;
 
+    @Autowired
+    private RsDictionaryClient rsDictionaryClient;
 
-    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionaries, method = RequestMethod.POST)
+    @Autowired
+    private RsDictionaryEntryClient dictionaryEntryClient;
+
+
+    @RequestMapping(value = "/adaptions/adapter/dictionaries", method = RequestMethod.POST)
     @ApiOperation("创建适配字典项")
     public Envelop createDictionaries(
             @ApiParam(name = "json_data", value = "字典项JSON", defaultValue = "")
@@ -59,7 +63,7 @@ public class AdapterDictionaryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionaries, method = RequestMethod.PUT)
+    @RequestMapping(value = "/adaptions/adapter/dictionaries", method = RequestMethod.PUT)
     @ApiOperation("更新适配字典项")
     public Envelop updateDictionary(
             @ApiParam(name = "json_data", value = "字典项JSON", defaultValue = "")
@@ -76,7 +80,7 @@ public class AdapterDictionaryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionary, method = RequestMethod.DELETE)
+    @RequestMapping(value = "/adaptions/adapter/dictionaries", method = RequestMethod.DELETE)
     @ApiOperation("删除适配字典项")
     public Envelop deleteDictionary(
             @ApiParam(name = "id", value = "字典项ID", defaultValue = "")
@@ -94,7 +98,7 @@ public class AdapterDictionaryController extends BaseController {
 
 
 
-    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionary,method = RequestMethod.GET)
+    @RequestMapping(value = "/adaptions/adapter/dictionaries/{id}",method = RequestMethod.GET)
     @ApiOperation("根据ID获取适配字典项")
     public Envelop getDictionaryById(
             @ApiParam(name="id",value="id",defaultValue = "")
@@ -112,7 +116,7 @@ public class AdapterDictionaryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionaries, method = RequestMethod.GET)
+    @RequestMapping(value = "/adaptions/adapter/dictionaries", method = RequestMethod.GET)
     @ApiOperation("查询适配字典项")
     public Envelop getDictionaries(
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
@@ -129,10 +133,28 @@ public class AdapterDictionaryController extends BaseController {
         {
             ResponseEntity<List<MRsAdapterDictionary>> responseEntity = adapterDictionaryClient.getDictionaries(fields, filters, sorts, page, size);
             List<MRsAdapterDictionary> mRsAdapterDictionaries = responseEntity.getBody();
+            List<RsAdapterDictionaryModel> rsAdapterDictionaryModels = new ArrayList<>();
+            RsAdapterDictionaryModel rsAdapterDictionaryModel = null;
             for (MRsAdapterDictionary mRsAdapterDictionary: mRsAdapterDictionaries){
-
+                rsAdapterDictionaryModel= new RsAdapterDictionaryModel();
+                BeanUtils.copyProperties(mRsAdapterDictionary,rsAdapterDictionaryModel);
+                     if(StringUtils.isNotBlank(rsAdapterDictionaryModel.getDictCode())){
+                    ResponseEntity<List<MRsDictionary>> responseEntitys = rsDictionaryClient.searchRsDictionaries("", "code=" + rsAdapterDictionaryModel.getDictCode(), "", 1, 1);
+                    List<MRsDictionary> mRsDictionaries = responseEntitys.getBody();
+                    if(mRsDictionaries!=null&&mRsDictionaries.size()>0){
+                        rsAdapterDictionaryModel.setDictName(mRsDictionaries.get(0).getName());
+                    }
+                }
+                if(StringUtils.isNotBlank(rsAdapterDictionaryModel.getDictEntryCode())){
+                    ResponseEntity<List<MRsDictionaryEntry>> responseEntitys = dictionaryEntryClient.searchRsDictionaryEntries("", "dictCode=" + rsAdapterDictionaryModel.getDictCode() + ";code=" + rsAdapterDictionaryModel.getDictEntryCode(), "", 1, 1);
+                    List<MRsDictionaryEntry> mRsDictionaryEntries = responseEntitys.getBody();
+                    if(mRsDictionaryEntries!=null&&mRsDictionaryEntries.size()>0){
+                        rsAdapterDictionaryModel.setDictEntryName(mRsDictionaryEntries.get(0).getName());
+                    }
+                }
+                rsAdapterDictionaryModels.add(rsAdapterDictionaryModel);
             }
-            Envelop envelop = getResult(mRsAdapterDictionaries, getTotalCount(responseEntity), page, size);
+            Envelop envelop = getResult(rsAdapterDictionaryModels, getTotalCount(responseEntity), page, size);
             return envelop;
         }
         catch (Exception e)

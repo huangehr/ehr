@@ -1,4 +1,4 @@
-package com.yihu.ehr.task;
+package com.yihu.ehr.service.task;
 
 import com.codahale.metrics.MetricRegistry;
 import com.yihu.ehr.config.MetricNames;

@@ -2,7 +2,7 @@ package com.yihu.ehr.service.resource.stage1;
 
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.annotation.Table;
-import com.yihu.ehr.service.util.ResourceStorageUtil;
+import com.yihu.ehr.util.ResourceStorageUtil;
 
 import java.util.Date;
 

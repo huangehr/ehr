@@ -6,7 +6,7 @@ import com.yihu.ehr.profile.family.SubResourceFamily;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.SubRecord;
 import com.yihu.ehr.service.resource.stage2.SubRecords;
-import com.yihu.ehr.service.util.ResourceStorageUtil;
+import com.yihu.ehr.util.ResourceStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

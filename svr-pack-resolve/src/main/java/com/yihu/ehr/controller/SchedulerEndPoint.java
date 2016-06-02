@@ -3,7 +3,7 @@ package com.yihu.ehr.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.task.PackageResourceJob;
+import com.yihu.ehr.service.task.PackageResourceJob;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

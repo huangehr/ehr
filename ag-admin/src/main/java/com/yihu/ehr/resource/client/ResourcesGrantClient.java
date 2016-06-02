@@ -108,4 +108,10 @@ public interface ResourcesGrantClient {
     boolean valid(
             @RequestParam(value="ids") String ids,
             @RequestParam(value="valid") int valid);
+
+    @ApiOperation("资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant, method = RequestMethod.POST)
+    MRsAppResourceMetadata metadataGrant(
+            @PathVariable(value = "id") String id,
+            @RequestParam(value = "dimension") String dimension);
 }
