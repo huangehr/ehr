@@ -125,24 +125,25 @@ public class ResourcesBrowseController {
     }
 
     /************************************
-     * 疾病事件
+     * 详细数据
      *****************************************************************/
-    @ApiOperation("疾病事件 - 历史用药 - 药品清单")
-    @RequestMapping(value = "/disease/getDrugList", method = RequestMethod.GET)
+    @ApiOperation("历史用药 - 药品清单")
+    @RequestMapping(value = "/detail/getDrugList", method = RequestMethod.GET)
     public Envelop getDrugList(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
             @ApiParam(name = "hpId", value = "健康代码") @RequestParam(value = "hpId", required = false) String hpId,
+            @ApiParam(name = "type", value = "0中药 1西药") @RequestParam(value = "type", required = false) String type,
             @ApiParam(name = "startTime", value = "开始时间") @RequestParam(value = "startTime", required = false) String startTime,
             @ApiParam(name = "endTime", value = "结束时间") @RequestParam(value = "endTime", required = false) String endTime,
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
         //return file2String("/json/DrugList.json");
-        return patientDetail.getDrugList(demographicId,hpId,startTime,endTime,page,size);
+        return patientDetail.getDrugList(demographicId,hpId,type,startTime,endTime,page,size);
     }
 
-    @ApiOperation("疾病事件 - 历史用药 - 用药统计")
-    @RequestMapping(value = "/disease/getDrugListStat", method = RequestMethod.GET)
+    @ApiOperation("历史用药 - 用药统计")
+    @RequestMapping(value = "/detail/getDrugListStat", method = RequestMethod.GET)
     public List<Map<String,Object>> getDrugListStat(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
             @ApiParam(name = "hpId", value = "健康代码") @RequestParam(value = "hpId", required = false) String hpId) throws Exception {
@@ -150,7 +151,29 @@ public class ResourcesBrowseController {
         return patientDetail.getDrugListStat(demographicId, hpId);
     }
 
+    @ApiOperation("门诊费用清单")
+    @RequestMapping(value = "/detail/getOutpatientCost", method = RequestMethod.GET)
+    public Envelop getOutpatientCost(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "startTime", value = "开始时间") @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(name = "endTime", value = "结束时间") @RequestParam(value = "endTime", required = false) String endTime,
+            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
+        return patientDetail.getOutpatientCost(demographicId, startTime, endTime, page, size);
+    }
+
+    @ApiOperation("住院费用")
+    @RequestMapping(value = "/detail/getHospitalizedCost", method = RequestMethod.GET)
+    public Envelop getHospitalizedCost(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "startTime", value = "开始时间") @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(name = "endTime", value = "结束时间") @RequestParam(value = "endTime", required = false) String endTime,
+            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+
+        return patientDetail.getHospitalizedCost(demographicId,startTime,endTime,page,size);
+    }
     /************************************
      * 健康指标
      *****************************************************************/

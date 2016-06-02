@@ -60,9 +60,9 @@ public class ResourcesQueryService  {
             newParam = "\""+key+"\":"+value;
         }
         else{
-            newParam = "\""+key+"\":\""+value+"\"";
+            newParam = "\""+key+"\":\""+value.replace("\"","\\\"")+"\"";
         }
-        if(oldParams.length()>3 && oldParams.startsWith("{") && oldParams.endsWith("}"))
+        if(oldParams!=null && oldParams.length()>3 && oldParams.startsWith("{") && oldParams.endsWith("}"))
         {
             return oldParams.substring(0,oldParams.length()-1)+","+newParam+"}";
         }
@@ -114,7 +114,7 @@ public class ResourcesQueryService  {
             List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
             for(ResourceDefaultParam param:paramsList)
             {
-                addParams(queryParams,param.getParamKey(),param.getParamValue());
+                queryParams = addParams(queryParams,param.getParamKey(),param.getParamValue());
             }
 
             if(metadataList!=null && metadataList.size()>0)
@@ -154,17 +154,17 @@ public class ResourcesQueryService  {
                 if(groupFields.length()>0)
                 {
                     groupFields = groupFields.substring(0,groupFields.length()-1);
-                    addParams(queryParams,"groupFields",groupFields);
+                    queryParams = addParams(queryParams,"groupFields",groupFields);
                 }
                 if(statsFields.length()>0)
                 {
                     statsFields = statsFields.substring(0,statsFields.length()-1);
-                    addParams(queryParams,"statsFields",statsFields);
+                    queryParams = addParams(queryParams,"statsFields",statsFields);
                 }
                 if(customGroup.length()>0)
                 {
                     customGroup = "["+customGroup.substring(0,customGroup.length()-1)+"]";
-                    addParams(queryParams,"customGroup",customGroup);
+                    queryParams = addParams(queryParams,"customGroup",customGroup);
                 }
 
                 /************** 执行函数 *************************/
@@ -305,11 +305,11 @@ public class ResourcesQueryService  {
             }
             queryParams = solr.conditionToString(ql);
 
-            //通过资源代码获取默认参数******************
-            List paramsList = new ArrayList<>();
-            for(Object param:paramsList)
+            //通过资源代码获取默认参数
+            List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
+            for(ResourceDefaultParam param:paramsList)
             {
-                addParams(queryParams,"","");
+                queryParams = addParams(queryParams,param.getParamKey(),param.getParamValue());
             }
         }
         return getResources(resourcesCode,"JKZL",queryParams,page,size);

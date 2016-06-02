@@ -49,7 +49,7 @@ public class PatientInfoBaseService {
     public Map<String,Object> getPatientInfo(String demographicId) throws Exception
     {
         //时间排序
-        Envelop result = resource.getResources(BasisConstant.patientInfo,appId,"{\"q\":\"demographic_id:"+demographicId+"\",\"sort\":\"{\\\"event_date\\\":\\\"desc\\\"}\"}");
+        Envelop result = resource.getResources(BasisConstant.patientInfo,appId,"{\"q\":\"demographic_id:"+demographicId+"\"}");
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
             List<Map<String,Object>> list = result.getDetailModelList();
@@ -81,7 +81,7 @@ public class PatientInfoBaseService {
     }
 
     /*
-     * 根据患者住院门诊记录做健康问题统计
+     * @根据患者住院门诊记录做健康问题统计
      *"healthProblemCode":"健康问题代码",
     "healthProblemName":"高血压",
     "visitTimes":"3",
@@ -96,7 +96,7 @@ public class PatientInfoBaseService {
     {
         List<Map<String,Object>> re = new ArrayList<>();
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,"{\"q\":\"demographic_id:"+demographicId+"\",\"sort\":\"{\\\"event_date\\\":\\\"desc\\\"}\"}");
+        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,"{\"q\":\"demographic_id:"+demographicId+"\"}");
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
             List<Map<String,Object>> eventList = (List<Map<String,Object>>)result.getDetailModelList();
@@ -106,7 +106,7 @@ public class PatientInfoBaseService {
             Map<String,List<String>> hospitalizedMap = new HashMap<>();
 
             //门诊诊断
-            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"table\":\""+BasisConstant.mzzdTable+"\",\"join\":\"demographic_id:"+demographicId+"\"}");
+            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
             if(outpatient.getDetailModelList()!=null && outpatient.getDetailModelList().size()>0)
             {
                 for(int i=0;i<outpatient.getDetailModelList().size();i++)
@@ -137,7 +137,7 @@ public class PatientInfoBaseService {
             }
 
             //住院诊断
-            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"table\":\""+BasisConstant.zyzdTable+"\",\"join\":\"demographic_id:"+demographicId+"\"}");
+            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
             if(hospitalized.getDetailModelList()!=null && hospitalized.getDetailModelList().size()>0)
             {
                 for(int i=0;i<hospitalized.getDetailModelList().size();i++)
@@ -411,7 +411,7 @@ public class PatientInfoBaseService {
     {
         List<String> list = new ArrayList<>();
         //门诊诊断
-        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"table\":\""+BasisConstant.mzzdTable+"\",\"join\":\"demographic_id:"+demographicId+"\"}");
+        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
         if(outpatient.getDetailModelList()!=null && outpatient.getDetailModelList().size()>0) {
             for(int i=0;i<outpatient.getDetailModelList().size();i++) {
                 Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
@@ -422,7 +422,7 @@ public class PatientInfoBaseService {
             }
         }
         //住院诊断
-        Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"table\":\""+BasisConstant.zyzdTable+"\",\"join\":\"demographic_id:"+demographicId+"\"}");
+        Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
         if(hospitalized.getDetailModelList()!=null && hospitalized.getDetailModelList().size()>0) {
             for(int i=0;i<hospitalized.getDetailModelList().size();i++) {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
