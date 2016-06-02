@@ -36,10 +36,10 @@ public class ResourcesQueryDao {
     private Integer defaultPage = 1;
     private Integer defaultSize = 50;
 
-    private String mainCore = "EHR_CENTER";
-    private String subCore = "EHR_CENTER_SUB";
-    private String mainJoinCore = "EHR_CENTER_shard1_replica1";
-    private String subJoinCore = "EHR_CENTER_SUB_shard1_replica1";
+    private String mainCore = "HealthProfile";
+    private String subCore = "HealthProfileSub";
+    private String mainJoinCore = "HealthProfile_shard1_replica1";
+    private String subJoinCore = "HealthProfileSub_shard1_replica1";
 
     /**
      * 获取Hbase主表
@@ -70,9 +70,8 @@ public class ResourcesQueryDao {
                 if (obj.containsKey("join")) {
                     String join = obj.get("join");
                     fq = q;
-                    q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}" +join;
+                    q = "{!join fromIndex="+subJoinCore+" from=profile_id to=rowkey}" +join;
                 }
-
             }
             else {
                 q = queryParams;
@@ -120,7 +119,7 @@ public class ResourcesQueryDao {
                 if (obj.containsKey("join")) {
                     String join = obj.get("join");
                     fq = q;
-                    q = "{!join  fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}" +join;
+                    q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=profile_id}" +join;
                     if (obj.containsKey("table")) {
                         if (fq.length() > 0) {
                             fq += " AND rowkey:*" + obj.get("table") + "*";
@@ -190,7 +189,7 @@ public class ResourcesQueryDao {
         //join操作
         if (params.containsKey("join")) {
             String join = params.get("join").toString();
-            q = "{!join fromIndex="+subJoinCore+" from=main_rowkey to=rowkey}" +join;
+            q = "{!join fromIndex="+subJoinCore+" from=profile_id to=rowkey}" +join;
         }
 
         if (groupFields.length() == 0 && customGroup.size() == 0) {
@@ -259,7 +258,7 @@ public class ResourcesQueryDao {
         //join操作
         if (params.containsKey("join")) {
             String join = params.get("join").toString();
-            q = "{!join  fromIndex="+mainJoinCore+" from=rowkey to=main_rowkey}" +join;
+            q = "{!join  fromIndex="+mainJoinCore+" from=rowkey to=profile_id}" +join;
         }
 
         //数值统计

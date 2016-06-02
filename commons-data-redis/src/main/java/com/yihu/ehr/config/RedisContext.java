@@ -1,15 +1,11 @@
 package com.yihu.ehr.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.Serializable;
 
@@ -19,7 +15,7 @@ import java.io.Serializable;
  * @created 2015.11.25 17:33
  */
 @Configuration
-public class RedisConfig {
+public class RedisContext {
 
     @Bean
     RedisTemplate<String, Serializable> redisTemplate(RedisConnectionFactory connectionFactory) {

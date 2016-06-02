@@ -3,7 +3,6 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
 import com.yihu.ehr.agModel.resource.RsResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
-import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.model.resource.MRsMetadata;
@@ -79,6 +78,7 @@ public class ResourceBrowseController extends BaseController {
                     rsMetadataModel.setStdCode(mRsMetadataList.get(0).getStdCode());
                     rsMetadataModel.setName(mRsMetadataList.get(0).getName());
                     rsMetadataModel.setColumnType(mRsMetadataList.get(0).getColumnType());
+                    rsMetadataModel.setDictId(mRsMetadataList.get(0).getDictCode());
                     rsMetadataModels.add(rsMetadataModel);
                 }
             }
@@ -94,7 +94,7 @@ public class ResourceBrowseController extends BaseController {
     @RequestMapping(value = "/resources/ResourceBrowses/categories", method = RequestMethod.GET)
     public Envelop getCategories(
             @ApiParam(name = "id", value = "返回字段", defaultValue = "")
-            @RequestParam(value = "id") String id) throws Exception {
+            @RequestParam(value = "id" ,required = false) String id) throws Exception {
 
         Envelop envelop = new Envelop();
         List<RsCategoryTypeTreeModel> rsCategoryTypeTreeModelList = new ArrayList<>();
@@ -131,6 +131,4 @@ public class ResourceBrowseController extends BaseController {
         }
         return envelop;
     }
-
-
 }

@@ -5,12 +5,14 @@ import com.yihu.ehr.resource.dao.intf.AppResourceMetadataDao;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.model.RsAppResourceMetadata;
 import com.yihu.ehr.resource.model.RsResourceMetadata;
+import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -19,7 +21,7 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMetadata,ResourceMetadataDao>  {
+public class ResourceMetadataGrantService  extends BaseJpaService<RsAppResourceMetadata,AppResourceMetadataDao>  {
     @Autowired
     private AppResourceMetadataDao appRsMetadataDao;
 
@@ -88,5 +90,20 @@ public class ResourceMetadataGrantService  extends BaseJpaService<RsResourceMeta
     public RsAppResourceMetadata getRsMetadataGrantById(String id)
     {
         return appRsMetadataDao.findOne(id);
+    }
+
+    /**
+     * 生失效操作
+     *
+     */
+    public void valid(String ids, int valid)
+    {
+        String hql = "update RsAppResourceMetadata t set t.valid=:valid";
+        hql += StringUtils.isEmpty(ids) ? "" : " where id in(:ids)";
+        Query query = currentSession().createQuery(hql);
+        if(!StringUtils.isEmpty(ids))
+            query.setParameterList("ids", ids.split(","));
+        query.setParameter("valid", String.valueOf(valid));
+        query.executeUpdate();
     }
 }

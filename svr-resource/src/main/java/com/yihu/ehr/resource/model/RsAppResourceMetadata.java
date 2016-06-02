@@ -14,8 +14,10 @@ public class RsAppResourceMetadata {
     private String appId;
     private String appResourceId;
     private String resourceMetadataId;
+    private String resourceMetadataName;
     private String dimensionId;
     private String dimensionValue;
+    private String valid = "1";
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -68,4 +70,19 @@ public class RsAppResourceMetadata {
         this.dimensionValue = dimensionValue;
     }
 
+    @Column(name="resource_metadata_name",nullable = false)
+    public String getResourceMetadataName() {
+        return resourceMetadataName;
+    }
+    public void setResourceMetadataName(String resourceMetadataName) {
+        this.resourceMetadataName = resourceMetadataName;
+    }
+
+    @Column(name="valid",nullable = false)
+    public String getValid() {
+        return valid;
+    }
+    public void setValid(String valid) {
+        this.valid = valid;
+    }
 }

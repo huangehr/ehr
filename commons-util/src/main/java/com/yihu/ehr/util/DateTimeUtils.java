@@ -13,12 +13,12 @@ import java.util.Date;
  */
 public class DateTimeUtils {
     public static final String simpleDateTimePattern = "yyyy-MM-dd HH:mm:ss";
-    public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'ZZ";
+    public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final String slashDateTimePattern = "yyyy/MM/dd HH:mm:ss";
     public static final String simpleDatePattern = "yyyy-MM-dd";
     public static final String simpleDateTimeShortPattern = "yyyy/MM/dd HH:mm";
 
-    public static final String ISO8601Pattern = "yyyy-MM-dd'T'HH:mm:ssZ";
+    public static final String ISO8601Pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'ZZ";
 
     private static ThreadLocal<SimpleDateFormat> simpleDateTimeShortFormat = new ThreadLocal<SimpleDateFormat>(){
         @Override
@@ -55,6 +55,13 @@ public class DateTimeUtils {
         }
     };
 
+    private static ThreadLocal<SimpleDateFormat> iso8601Format = new ThreadLocal<SimpleDateFormat>(){
+        @Override
+        protected synchronized SimpleDateFormat initialValue(){
+            return new SimpleDateFormat(ISO8601Pattern);
+        }
+    };
+
     public static String simpleDateTimeFormat(final Date date){
         String time = simpleDateTimeFormat.get().format(date);
         return time;
@@ -64,6 +71,18 @@ public class DateTimeUtils {
         if(StringUtils.isEmpty(date)) return null;
 
         Date parsedDate = simpleDateTimeFormat.get().parse(date);
+        return parsedDate;
+    }
+
+    public static String iso8601DateTimeFormat(final Date date){
+        String time = iso8601Format.get().format(date);
+        return time;
+    }
+
+    public static Date iso8601DateTimeParse(final String date) throws ParseException {
+        if(StringUtils.isEmpty(date)) return null;
+
+        Date parsedDate = iso8601Format.get().parse(date);
         return parsedDate;
     }
 

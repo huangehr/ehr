@@ -71,7 +71,7 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 " src_dict_entry_code, " +
                 " src_dict_entry_name " +
                 ") SELECT " +
-                " '"+adapterSchema.getAdapterVersion()+"', " +
+                " '"+adapterSchema.getId()+"', " +
                 " osd. CODE, " +
                 " osde. CODE, " +
                 " osde. NAME " +
@@ -83,7 +83,7 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 "WHERE " +
                 " 1 = 1 " +
                 "AND osde.org_dict = osd.id " +
-                "AND osd.organization = '"+adapterSchema.getCode()+"'";
+                "AND osd.organization = '"+adapterSchema.getAdapterVersion()+"'";
         jdbcTemplate.execute(sql);
     }
 
@@ -96,7 +96,7 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 " src_metadata_code, " +
                 " src_metadata_name " +
                 ") SELECT " +
-                " '"+adapterSchema.getAdapterVersion()+"', " +
+                " '"+adapterSchema.getId()+"', " +
                 " osd. CODE, " +
                 " osm. CODE, " +
                 " osm. NAME " +
@@ -106,7 +106,7 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 "WHERE " +
                 " 1 = 1 " +
                 "AND osm.org_dataset = osd.id " +
-                "AND osd.organization = '"+adapterSchema.getCode()+"'";
+                "AND osd.organization = '"+adapterSchema.getAdapterVersion()+"'";
         jdbcTemplate.execute(sql);
     }
 
@@ -119,7 +119,7 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 " src_dict_entry_code, " +
                 " src_dict_entry_name " +
                 ") SELECT " +
-                " '"+adapterSchema.getAdapterVersion()+"', " +
+                " '"+adapterSchema.getId()+"', " +
                 " sd. CODE, " +
                 " sde. CODE, " +
                 " sde. " +
@@ -142,7 +142,7 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 " src_metadata_code,  " +
                 " src_metadata_name  " +
                 ") SELECT  " +
-                " '"+adapterSchema.getAdapterVersion()+"',  " +
+                " '"+adapterSchema.getId()+"',  " +
                 " sds. CODE,  " +
                 " smd.column_name,  " +
                 " smd. NAME  " +

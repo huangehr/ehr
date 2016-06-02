@@ -1,11 +1,10 @@
-package com.yihu.ehr.service.util;
+package com.yihu.ehr.util;
 
 import com.yihu.ehr.profile.family.SubResourceFamily;
 import com.yihu.ehr.service.resource.stage2.MasterRecord;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.service.resource.stage2.SubRecord;
-import com.yihu.ehr.util.DateTimeUtils;
 
 import java.util.Date;
 import java.util.HashMap;

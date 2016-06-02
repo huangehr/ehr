@@ -156,7 +156,9 @@ public class AdapterMetadataController extends BaseController {
                 }
                 if(StringUtils.isNotBlank(rsAdapterMetadata.getMetadataId())){
                     MRsMetadata mRsMetadata =  metadataClient.getMetadataById(rsAdapterMetadata.getMetadataId());
-                    rsAdapterMetadataModel.setMetadataName(mRsMetadata.getName());
+                    if(mRsMetadata!=null){
+                     rsAdapterMetadataModel.setMetadataName(mRsMetadata.getName());
+                    }
                 }
                 rsAdapterMetadataModels.add(rsAdapterMetadataModel);
             }

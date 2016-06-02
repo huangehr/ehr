@@ -45,7 +45,9 @@ public class ResourcesController extends BaseController {
             @RequestParam(value = "resource") String resource) throws Exception {
         Envelop envelop = new Envelop();
         try{
-            MRsResources rsResources = resourcesClient.createResource(resource);
+            RsResourcesModel rsResourcesModel = objectMapper.readValue(resource,RsResourcesModel.class);
+            MRsResources mRsResources = convertToMModel(rsResourcesModel,MRsResources.class);
+            MRsResources rsResources = resourcesClient.createResource(objectMapper.writeValueAsString(mRsResources));
             envelop.setObj(rsResources);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
@@ -62,7 +64,9 @@ public class ResourcesController extends BaseController {
             @RequestParam(value = "resource") String resource) throws Exception {
         Envelop envelop = new Envelop();
         try{
-            MRsResources rsResources = resourcesClient.updateResources(resource);
+            RsResourcesModel rsResourcesModel = objectMapper.readValue(resource,RsResourcesModel.class);
+            MRsResources mRsResources = convertToMModel(rsResourcesModel,MRsResources.class);
+            MRsResources rsResources = resourcesClient.updateResources(objectMapper.writeValueAsString(mRsResources));
             envelop.setObj(rsResources);
             envelop.setSuccessFlg(true);
         }catch (Exception e){

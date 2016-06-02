@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface RsInterfaceDao extends PagingAndSortingRepository<RsInterface,String> {
     List<RsInterface> findByName(String name);
+
+    List<RsInterface> findByResourceInterface(String resourceInterface);
 }

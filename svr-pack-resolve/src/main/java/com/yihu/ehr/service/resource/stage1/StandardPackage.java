@@ -12,7 +12,7 @@ import com.yihu.ehr.service.resource.stage1.extractor.EventExtractor;
 import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
 import com.yihu.ehr.profile.util.ProfileId;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.service.util.ResourceStorageUtil;
+import com.yihu.ehr.util.ResourceStorageUtil;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
 

@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.util;
+package com.yihu.ehr.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -8,7 +8,6 @@ import com.yihu.ehr.service.resource.stage1.CdaDocument;
 import com.yihu.ehr.profile.family.FileFamily;
 import com.yihu.ehr.service.resource.stage1.OriginFile;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
-import com.yihu.ehr.util.DateTimeUtils;
 
 import java.util.HashMap;
 import java.util.Map;

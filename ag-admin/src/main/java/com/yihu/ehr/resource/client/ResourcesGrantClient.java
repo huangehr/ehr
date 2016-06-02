@@ -48,6 +48,12 @@ public interface ResourcesGrantClient {
     boolean deleteGrantBatch(
             @RequestParam(value = "ids") String ids);
 
+    @ApiOperation("资源授权删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceApps, method = RequestMethod.DELETE)
+    boolean deleteGrantByResId(
+            @PathVariable(value="resource_id")String resourceId,
+            @RequestParam(value="app_ids") String appIds);
+
     @RequestMapping(value = ServiceApi.Resources.ResourceGrant,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源授权")
     public MRsAppResource getRsAppGrantById(
@@ -97,4 +103,15 @@ public interface ResourcesGrantClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
 
+    @ApiOperation("资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasValid,method = RequestMethod.PUT)
+    boolean valid(
+            @RequestParam(value="ids") String ids,
+            @RequestParam(value="valid") int valid);
+
+    @ApiOperation("资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant, method = RequestMethod.POST)
+    MRsAppResourceMetadata metadataGrant(
+            @PathVariable(value = "id") String id,
+            @RequestParam(value = "dimension") String dimension);
 }
