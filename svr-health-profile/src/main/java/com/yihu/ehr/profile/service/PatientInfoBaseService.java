@@ -11,6 +11,7 @@ import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,7 @@ public class PatientInfoBaseService {
     String appId = "svr-health-profile";
 
     /**
-     * 获取患者档案基本信息
+     * @获取患者档案基本信息
      * @return
      * @throws Exception
      */
@@ -79,7 +80,6 @@ public class PatientInfoBaseService {
         }
     }
 
-    //
     /*
      * 根据患者住院门诊记录做健康问题统计
      *"healthProblemCode":"健康问题代码",
@@ -96,8 +96,7 @@ public class PatientInfoBaseService {
     {
         List<Map<String,Object>> re = new ArrayList<>();
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,"{\"q\":\"patient_id:"+demographicId+"\",\"sort\":\"{\\\"event_date\\\":\\\"desc\\\"}\"}");
-        //暂时没数据demographic_id************10291272
+        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,"{\"q\":\"demographic_id:"+demographicId+"\",\"sort\":\"{\\\"event_date\\\":\\\"desc\\\"}\"}");
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
             List<Map<String,Object>> eventList = (List<Map<String,Object>>)result.getDetailModelList();
@@ -149,7 +148,7 @@ public class PatientInfoBaseService {
                         String code = obj.get(BasisConstant.zyzd).toString();
                         String profileId = obj.get(BasisConstant.profileId).toString();
                         //通过疾病ID获取健康问题
-                        String healthProblem = "GZ__骨折";//redisClient.get(keySchema.icd10HpRelation(code));
+                        String healthProblem = redisClient.get(keySchema.icd10HpRelation(code));
                         List<String> profileList = new ArrayList<>();
                         if(hospitalizedMap.containsKey(healthProblem))
                         {
@@ -180,7 +179,7 @@ public class PatientInfoBaseService {
                 {
                     String rowkey = event.get("rowkey").toString();
                     Object eventData = event.get("event_data");
-                    String orgCode = event.get("orgCode").toString(); /*******改为机构名称*********/
+                    String orgCode = event.get("orgCode").toString();
                     for(String profileId:profileList)
                     {
                         if(profileId.equals(rowkey))
@@ -193,7 +192,7 @@ public class PatientInfoBaseService {
                             obj.put("lastVisitDate",eventData);
                             obj.put("lastVisitOrg",orgCode);
                             obj.put("lastVisitRecord",profileId);
-                            obj.put("recentEvent",eventData + " " + " 就诊 " +orgCode);
+                            obj.put("recentEvent","就诊");
                             obj.put("profileId",profileId);
                             re.add(obj);
                             breaked = true;
@@ -206,6 +205,7 @@ public class PatientInfoBaseService {
                     }
                 }
             }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             for(String key : hospitalizedMap.keySet()) //住院
             {
                 String healthProblemCode = key.split("__")[0];
@@ -216,8 +216,8 @@ public class PatientInfoBaseService {
                 boolean breaked = false;
                 for(Map<String,Object> event : eventList) {
                     String rowkey = event.get("rowkey").toString();
-                    Object eventData = event.get("event_data");
-                    String orgCode = event.get("org_code").toString(); /*******改为机构名称*********/
+                    Object eventData = event.get("event_date");
+                    String orgCode = event.get("org_code").toString();
                     for (String profileId : profileList) {
                         if (profileId.equals(rowkey)) {
                             //判断是否已经存在
@@ -226,14 +226,13 @@ public class PatientInfoBaseService {
                                 if(obj.get("healthProblemCode").toString().equals(healthProblemCode))
                                 {
                                     obj.put("hospitalizationTimes",profileList.size());
-                                    //事件是否更早***************************
-                                    //if(eventData<obj.get("lastVisitDate").toString())
-                                    if(true)
+                                    //事件是否更早
+                                    if(sdf.parse(eventData.toString()).getTime() > sdf.parse(obj.get("lastVisitDate").toString()).getTime())
                                     {
                                         obj.put("lastVisitDate",eventData);
                                         obj.put("lastVisitOrg",orgCode);
                                         obj.put("lastVisitRecord",profileId);
-                                        obj.put("recentEvent",eventData + " " + " 住院 " +orgCode);
+                                        obj.put("recentEvent","住院");
                                         obj.put("profileId",profileId);
                                     }
                                 }
@@ -254,7 +253,7 @@ public class PatientInfoBaseService {
                                 obj.put("lastVisitDate",eventData);
                                 obj.put("lastVisitOrg",orgCode);
                                 obj.put("lastVisitRecord",profileId);
-                                obj.put("recentEvent",eventData + " " + " 住院 " +orgCode);
+                                obj.put("recentEvent","住院");
                                 obj.put("profileId",profileId);
                                 re.add(obj);
                                 breaked = true;
@@ -276,7 +275,7 @@ public class PatientInfoBaseService {
         return re;
     }
 
-    //（疾病模型）患者 -> 门诊住院记录
+    //@（疾病模型）患者 -> 门诊住院记录
     public List<Map<String,Object>> getMedicalEvents(String demographicId,String eventType,String year,String area,String hpId,String diseaseId) throws Exception
     {
         List<Map<String,Object>> re = new ArrayList<>();
@@ -407,7 +406,7 @@ public class PatientInfoBaseService {
     }
 
 
-    //患者就诊过的疾病
+    //@患者就诊过的疾病
     public List<String> getPatientDisease(String demographicId) throws Exception
     {
         List<String> list = new ArrayList<>();
@@ -436,7 +435,7 @@ public class PatientInfoBaseService {
         return list;
     }
 
-    //患者就诊过的年份
+    //@患者就诊过的年份
     public List<String> getPatientYear(String demographicId) throws Exception
     {
         List<String> list = new ArrayList<>();
@@ -459,7 +458,7 @@ public class PatientInfoBaseService {
     }
 
 
-    //患者就诊过的地区
+    //@患者就诊过的地区
     public List<String> getPatientArea(String demographicId) throws Exception
     {
         List<String> re = new ArrayList<>();

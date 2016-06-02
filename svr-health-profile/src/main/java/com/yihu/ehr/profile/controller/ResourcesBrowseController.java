@@ -51,7 +51,6 @@ public class ResourcesBrowseController {
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
         return file2String("/json/pastHistory.json");
-
     }
 
 
@@ -82,7 +81,6 @@ public class ResourcesBrowseController {
             @RequestParam(value = "diseaseId", required = false) String diseaseId) throws Exception {
 
         return patient.getMedicalEvents(demographicId,eventsType,year,area,hpId,diseaseId);
-
     }
 
     @ApiOperation("就诊过的疾病")

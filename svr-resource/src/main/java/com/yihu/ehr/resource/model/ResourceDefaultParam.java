@@ -16,8 +16,8 @@ public class ResourceDefaultParam {
     private String id;
     private String resourcesId;
     private String resourcesCode;
-    private String key;
-    private String value;
+    private String paramKey;
+    private String paramValue;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -47,18 +47,20 @@ public class ResourceDefaultParam {
     }
 
     @Column(name = "param_key",nullable = true)
-    public String getKey() {
-        return key;
+    public String getParamKey() {
+        return paramKey;
     }
-    public void setKey(String key) {
-        this.key = key;
+
+    public void setParamKey(String paramKey) {
+        this.paramKey = paramKey;
     }
 
     @Column(name = "param_value",nullable = true)
-    public String getValue() {
-        return value;
+    public String getParamValue() {
+        return paramValue;
     }
-    public void setValue(String value) {
-        this.value = value;
+
+    public void setParamValue(String paramValue) {
+        this.paramValue = paramValue;
     }
 }

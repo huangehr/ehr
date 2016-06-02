@@ -41,7 +41,7 @@ public class PatientInfoDetailService {
     }
 
     //患者历史用药记录（可分页）
-    public Envelop getDrugList(String demographicId,String hpId,String startTime,String endTime,int page,int size) throws Exception
+    public Envelop getDrugList(String demographicId,String hpId,String startTime,String endTime,Integer page,Integer size) throws Exception
     {
         String q = "";
         //时间范围
@@ -98,7 +98,7 @@ public class PatientInfoDetailService {
     }
 
     //检验指标（可分页）
-    public Envelop getHealthIndicators(String demographicId,String hpId,String medicalIndexId,String startTime,String endTime,int page,int size) throws Exception
+    public Envelop getHealthIndicators(String demographicId,String hpId,String medicalIndexId,String startTime,String endTime,Integer page,Integer size) throws Exception
     {
         String q = "";
         //时间范围

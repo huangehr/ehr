@@ -6,8 +6,10 @@ import com.yihu.ehr.query.common.model.QueryEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.resource.dao.ResourcesMetadataQueryDao;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
+import com.yihu.ehr.resource.dao.intf.ResourceDefaultParamDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.DtoResourceMetadata;
+import com.yihu.ehr.resource.model.ResourceDefaultParam;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.util.Envelop;
@@ -40,8 +42,11 @@ public class ResourcesQueryService  {
     @Autowired
     private ResourcesQueryDao resourcesQueryDao;
 
+    @Autowired
+    ResourceDefaultParamDao resourceDefaultParamDao;
+
     //忽略字段
-    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "demographic_id", "patient_id","org_code","event_date","profile_id", "main_rowkey"));
+    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","profile_type","demographic_id", "patient_id","org_code","profile_id", "cda_version"));
 
     /**
      * 新增参数
@@ -105,11 +110,11 @@ public class ResourcesQueryService  {
                 metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode);
             }
 
-            //通过资源代码获取默认参数******************
-            List paramsList = new ArrayList<>();
-            for(Object param:paramsList)
+            //通过资源代码获取默认参数
+            List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
+            for(ResourceDefaultParam param:paramsList)
             {
-                addParams(queryParams,"","");
+                addParams(queryParams,param.getParamKey(),param.getParamValue());
             }
 
             if(metadataList!=null && metadataList.size()>0)
