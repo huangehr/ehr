@@ -40,17 +40,17 @@ public class DataSetParser {
     public PackageDataSet parseStructuredJsonDataSet(JsonNode root, boolean isOrigin) {
         PackageDataSet dataSet = new PackageDataSet();
 
+        String version = root.get("inner_version").asText();
+        if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+
+        String dataSetCode = root.get("code").asText();
+        String eventNo = root.get("event_no").asText();
+        String patientId = root.get("patient_id").asText();
+        String orgCode = root.get("org_code").asText();
+        String createTime = root.get("create_date").isNull() ? "" : root.get("create_date").asText();
+        String eventTime = root.path("event_time").isNull() ? "" : root.path("event_time").asText();    // 旧数据集结构可能不存在这个属性
+
         try {
-            String version = root.get("inner_version").asText();
-            if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
-
-            String dataSetCode = root.get("code").asText();
-            String eventNo = root.get("event_no").asText();
-            String patientId = root.get("patient_id").asText();
-            String orgCode = root.get("org_code").asText();
-            String createTime = root.get("create_date").isNull() ? "" : root.get("create_date").asText();
-            String eventTime = root.path("event_time").isNull() ? "" : root.path("event_time").asText();    // 旧数据集结构可能不存在这个属性
-
             dataSet.setPatientId(patientId);
             dataSet.setEventNo(eventNo);
             dataSet.setCdaVersion(version);
@@ -88,7 +88,7 @@ public class DataSetParser {
                 dataSet.addRecord(Integer.toString(i), record);
             }
         } catch (NullPointerException e) {
-            throw new RuntimeException("Null pointer occurs while generate data set");
+            throw new RuntimeException("Null pointer occurs while generate data set, package cda version: " + version);
         } catch (ParseException e) {
             throw new RuntimeException("Invalid date time format.");
         }

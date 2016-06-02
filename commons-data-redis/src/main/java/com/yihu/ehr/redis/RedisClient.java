@@ -2,14 +2,15 @@ package com.yihu.ehr.redis;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.StringRedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Redis 数据访问接口。
@@ -40,6 +41,26 @@ public class RedisClient {
     }
 
     /**
+     * 批量设置key-value值。
+     *
+     * @param data
+     */
+    public void multiSet(Map<Serializable, Serializable> data){
+        redisTemplate.executePipelined(new RedisCallback<Object>() {
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                StringRedisConnection stringRedisConn = (StringRedisConnection)connection;
+                for(Serializable key : data.keySet()){
+                    Serializable value = data.get(key);
+                    connection.rPushX(SerializationUtils.serialize(key), SerializationUtils.serialize(value));
+                }
+
+                return null;
+            }
+        });
+    }
+
+    /**
      * 获取数据。
      *
      * @param key
@@ -54,6 +75,16 @@ public class RedisClient {
 
             return (Serializable) SerializationUtils.deserialize(bytes);
         });
+    }
+
+    /**
+     * 批量获取key关联的值。
+     *
+     * @param keys
+     * @return
+     */
+    public List<Serializable> multiGet(Collection<String> keys){
+        return redisTemplate.opsForValue().multiGet(keys);
     }
 
     /**
@@ -78,10 +109,9 @@ public class RedisClient {
      * 匹配特定模式的Key列表。
      *
      * @param pattern
-     * @param <T>
      * @return
      */
-    public <T> Set<String> keys(String pattern) {
+    public Set<String> keys(String pattern) {
         return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
             Set<byte[]> keys = connection.keys(pattern.getBytes());
 
@@ -101,6 +131,6 @@ public class RedisClient {
      * @return
      */
     public boolean hasKey(String key) {
-        return redisTemplate.execute((RedisCallback<Boolean>) connection -> connection.exists(key.getBytes()));
+        return redisTemplate.execute((RedisCallback<Boolean>) connection -> connection.exists(SerializationUtils.serialize(key)));
     }
 }
