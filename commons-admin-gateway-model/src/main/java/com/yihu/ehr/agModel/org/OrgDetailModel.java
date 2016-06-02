@@ -34,6 +34,7 @@ public class OrgDetailModel{
     private String tags;
     private String imgRemotePath;
     private String imgLocalPath;
+    private int administrativeDivision;
     //公钥信息
     String publicKey;
     String validTime;
@@ -262,5 +263,13 @@ public class OrgDetailModel{
 
     public void setImgLocalPath(String imgLocalPath) {
         this.imgLocalPath = imgLocalPath;
+    }
+
+    public int getAdministrativeDivision() {
+        return administrativeDivision;
+    }
+
+    public void setAdministrativeDivision(int administrativeDivision) {
+        this.administrativeDivision = administrativeDivision;
     }
 }

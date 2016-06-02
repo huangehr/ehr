@@ -6,7 +6,6 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsAdapterSchema;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,32 +22,32 @@ import java.util.List;
 @ApiIgnore
 public interface AdapterSchemaClient {
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配方案")
     MRsAdapterSchema createSchema(
             @RequestBody String adapterSchema);
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新适配方案")
     MRsAdapterSchema updateSchema(
             @RequestBody String adapterSchema);
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schema, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.Scheme, method = RequestMethod.DELETE)
     @ApiOperation("删除适配方案")
     boolean deleteSchema(
             @PathVariable(value = "id") String id);
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.DELETE)
     @ApiOperation("批量删除适配方案")
     boolean deleteSchemaBatch(
             @RequestParam(value = "ids") String ids);
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schema,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.Scheme,method = RequestMethod.GET)
     @ApiOperation("根据ID获取适配方案")
     public MRsAdapterSchema getAdapterSchemaById(
             @PathVariable(value="id") String id);
 
-    @RequestMapping(value = ServiceApi.Adaptions.Schemas, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.GET)
     @ApiOperation("查询适配方案")
     ResponseEntity<List<MRsAdapterSchema>> getSchema(
             @RequestParam(value = "fields", required = false) String fields,

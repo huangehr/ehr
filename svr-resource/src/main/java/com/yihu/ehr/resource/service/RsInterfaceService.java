@@ -22,5 +22,9 @@ public class RsInterfaceService extends BaseJpaService<RsInterface, RsInterfaceD
         List<RsInterface> list = rsInterfaceDao.findByName(name);
         return list != null&&list.size()!=0;
     }
+    public RsInterface findByResourceInterface(String resourceInterface){
+        List<RsInterface> list = rsInterfaceDao.findByResourceInterface(resourceInterface);
+        return list == null?null:list.get(0);
+    }
 
 }

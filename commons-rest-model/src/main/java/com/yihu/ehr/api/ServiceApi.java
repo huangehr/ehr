@@ -20,12 +20,17 @@ public class ServiceApi {
         public static final String Cache                          = "/adaptions/{id}/cache";
         public static final String CacheGet                       = "/adaptions/{key}/cache";
 
-        public static final String Schema                         = "/adaptions/schemas/{id}";
-        public static final String Schemas                        = "/adaptions/schemas";
+        public static final String Scheme = "/adaptions/schemas/{id}";
+        public static final String Schemes = "/adaptions/schemas";
 
         public static final String SchemaMetadataList             ="/adaptions/schema/metadata";
         public static final String SchemaMetadata                 ="/adaptions/schema/metadata/{id}";
         public static final String SchemaMetadataBatch            ="/adaptions/schema/metadata/batch";
+
+
+        public static final String RsAdapterDictionaries          ="/adaptions/adapter/dictionaries";
+        public static final String RsAdapterDictionary            ="/adaptions/adapter/dictionaries/{id}";
+
 
     }
 
@@ -42,7 +47,9 @@ public class ServiceApi {
         public static final String ResourceGrants                = "/resources/grants";
         public static final String AppsGrantResources            = "/resources/apps/{appId}/grant";
         public static final String ResourceGrantApps             = "/resources/{resourceId}/grant";
+        public static final String ResourceApps                  = "/resources/{resource_id}/app";
 
+        public static final String ResourceMetadatasValid      = "/resources/metadatas/valid";
         public static final String ResourceMetadataGrants       = "/resources/metadata/grants";
         public static final String ResourceMetadataGrant        = "/resources/metadata/grants/{id}";
         public static final String ResourceMetadataGrantApp     = "/resources/app_resource/{appResourceId}/grant/metadata/{metadataId}";
@@ -58,6 +65,10 @@ public class ServiceApi {
         public static final String Dict                         ="/resources/dict/{id}";
         public static final String DictExistence                ="/resources/dict/existence";
 
+        public static final String Params                       ="/resources/param";
+        public static final String Param                        ="/resources/param/{id}";
+
+
         public static final String DictEntries                   ="/resources/dict_entries";
         public static final String DictEntry                     ="/resources/dict_entries/{id}";
         public static final String DictEntriesExistence          ="/resources/dict_entries/existence";
@@ -68,13 +79,15 @@ public class ServiceApi {
         public static final String SystemDictEntries            ="/resources/system_dict_entries";
         public static final String SystemDictEntry              ="/resources/system_dict_entries/{id}";
 
-        public static final String Interfaces                    ="/resources/interfaces";
-        public static final String Interface                       ="/resources/interfaces/{id}";
+        public static final String Interfaces                       ="/resources/interfaces";
+        public static final String InterfaceById                       ="/resources/interfaces/{id}";
+        public static final String Interface                       ="/resources/interface";
         public static final String InterfaceNameExistence          ="/resources/existence/name";
 
         public static final String Categories                       ="/resources/categories/no_paging";
         public static final String NoPageCategories                 ="/resources/categories";
-        public static final String Category                        ="/resources/categories/{id}";
+        public static final String Category                         ="/resources/categories/{id}";
+        public static final String CategoryByPid                    ="/resources/categories/{pid}/category";
 
 
         public static final String AdapterDicts                         ="/resources/adapter/dict";

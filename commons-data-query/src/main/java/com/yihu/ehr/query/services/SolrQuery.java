@@ -1,5 +1,8 @@
 package com.yihu.ehr.query.services;
 
+import com.yihu.ehr.query.common.enums.Logical;
+import com.yihu.ehr.query.common.enums.Operation;
+import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.solr.SolrUtil;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -23,6 +26,94 @@ public class SolrQuery {
 
 	@Autowired
 	SolrUtil solr;
+
+	/**
+	 * solr语法转换
+	 */
+	public String conditionToString(QueryCondition condition)
+	{
+		String s = "";
+		String operation= condition.getOperation();
+		String field = condition.getField();
+		Object keyword = condition.getKeyword();
+		Object[] keywords = condition.getKeywords();
+		switch(operation){
+			case Operation.LIKE:
+				s = field+":*"+keyword+"*";
+				break;
+			case Operation.LEFTLIKE:
+				s = field+":*"+keyword+"";
+				break;
+			case Operation.RIGHTLIKE:
+				s = field+":"+keyword+"*";
+				break;
+			case Operation.RANGE: {
+				if(keywords==null||keywords.length>=2)
+				{
+					s = field + ":[" + keywords[0] + " TO " + keywords[1] + "]";
+				}
+				break;
+			}
+			case Operation.IN:
+			{
+				String in = "";
+				if(keywords!=null && keywords.length>0)
+				{
+					for (Object key : keywords)
+					{
+						if(in!=null&&in.length()>0)
+						{
+							in+=" OR " +field+":"+key;
+						}
+						else
+						{
+							in = field+":"+key;
+						}
+					}
+				}
+				s = "("+in+")";
+				break;
+			}
+			default:
+				s = field+":"+keyword;
+		}
+
+		return s;
+	}
+
+	/**
+	 * solr语法转换
+	 */
+	public String conditionToString(List<QueryCondition> conditions)
+	{
+		String re ="";
+		if(conditions!=null && conditions.size()>0)
+		{
+			for(QueryCondition condition:conditions){
+				if(!re.equals(""))
+				{
+					switch (condition.getLogical())
+					{
+						case Logical.AND:
+							re+=" AND ";
+							break;
+						case Logical.OR:
+							re+=" OR ";
+							break;
+						case Logical.NOT:
+							re+=" NOT ";
+							break;
+					}
+				}
+
+				re+=condition.toString() +" ";
+			}
+		}
+		else {
+			re ="*:* ";
+		}
+		return re;
+	}
 
 	/******************************** Count方法 ******************************************************/
 	/**

@@ -12,7 +12,7 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface XIndicatorsDictRepository extends PagingAndSortingRepository<IndicatorsDict, String> {
+public interface XIndicatorsDictRepository extends PagingAndSortingRepository<IndicatorsDict, Long> {
 
     IndicatorsDict findByCode(String code);
     IndicatorsDict findByName(String name);

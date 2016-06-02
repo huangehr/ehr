@@ -74,7 +74,7 @@ public class RsInterfaceEndPoint extends EnvelopRestEndPoint {
         return convertToModel(rsInterface, MRsInterface.class, null);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.InterfaceById, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取标准字典")
     public MRsInterface getRsInterfaceById(
             @ApiParam(name = "id", value = "", defaultValue = "")
@@ -91,7 +91,16 @@ public class RsInterfaceEndPoint extends EnvelopRestEndPoint {
         return interfaceService.isNameExist(name);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.Interface, method = RequestMethod.GET)
+    @ApiOperation(value = "根据资源接口编码resourceInterface获取资源接口")
+    public MRsInterface findByResourceInterface(
+            @ApiParam(name = "resource_interface", value = "", defaultValue = "")
+            @RequestParam(value = "resource_interface") String resourceInterface) {
+        RsInterface  rsInterface =  interfaceService.findByResourceInterface(resourceInterface);
+        return convertToModel(rsInterface, MRsInterface.class);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.InterfaceById, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源", notes = "删除资源")
     public boolean deleteRsInterface(
             @ApiParam(name = "id", value = "id", defaultValue = "")

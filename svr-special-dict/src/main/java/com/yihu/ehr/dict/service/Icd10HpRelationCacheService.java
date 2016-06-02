@@ -1,11 +1,13 @@
 package com.yihu.ehr.dict.service;
 
 import com.yihu.ehr.dict.model.HealthProblemDict;
+import com.yihu.ehr.dict.model.Icd10Dict;
 import com.yihu.ehr.dict.model.Icd10HpRelation;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,8 @@ import java.util.Set;
  * @author linaz
  * @created 2016.05.28 16:10
  */
-@Component
+@Transactional
+@Service
 public class Icd10HpRelationCacheService {
 
     @Autowired
@@ -30,6 +33,9 @@ public class Icd10HpRelationCacheService {
     @Autowired
     private XHealthProblemDictRepository healthProblemDictRepository;
 
+    @Autowired
+    private XIcd10DictRepository icd10DictRepository;
+
     /**
      * 缓存单个
      * @param icd10Id
@@ -38,9 +44,10 @@ public class Icd10HpRelationCacheService {
         List<Icd10HpRelation> icd10HpRelations = icd10HpRelationRepository.findByIcd10Id(icd10Id);
 
         for (Icd10HpRelation icd10HpRelation : icd10HpRelations) {
-            String hpID = icd10HpRelation.getHpId();
-            HealthProblemDict healthProblemDict = healthProblemDictRepository.findOne(hpID);
-            String redisKey = keySchema.icd10HpRelation(icd10HpRelation.getIcd10Id());
+            String hpId = icd10HpRelation.getHpId();
+            Icd10Dict icd10Dict = icd10DictRepository.findOne(Long.parseLong(icd10Id));
+            HealthProblemDict healthProblemDict = healthProblemDictRepository.findOne(Long.parseLong(hpId));
+            String redisKey = keySchema.icd10HpRelation(icd10Dict.getCode());
             redisClient.set(redisKey, healthProblemDict.getCode()+"__"+healthProblemDict.getName());
         }
     }
@@ -53,11 +60,11 @@ public class Icd10HpRelationCacheService {
         if (force) clean();
         List<Icd10HpRelation> icd10HpRelations = icd10HpRelationRepository.findAllIcd10HpRelation();
         for (Icd10HpRelation icd10HpRelation : icd10HpRelations) {
-            String icd10Id = icd10HpRelation.getIcd10Id();
             String hpId = icd10HpRelation.getHpId();
-            HealthProblemDict healthProblemDict = healthProblemDictRepository.findOne(hpId);
-
-            String redisKey = keySchema.icd10HpRelation(icd10Id);
+            String icd10Id = icd10HpRelation.getIcd10Id();
+            Icd10Dict icd10Dict = icd10DictRepository.findOne(Long.parseLong(icd10Id));
+            HealthProblemDict healthProblemDict = healthProblemDictRepository.findOne(Long.parseLong(hpId));
+            String redisKey = keySchema.icd10HpRelation(icd10Dict.getCode());
             redisClient.set(redisKey, healthProblemDict.getCode()+"__"+healthProblemDict.getName());
         }
     }
@@ -69,7 +76,8 @@ public class Icd10HpRelationCacheService {
      * @return
      */
     public HealthProblemDict healthProblemDict(String icd10Id) {
-        String codeAndName = redisClient.get(keySchema.icd10HpRelation(icd10Id));
+        Icd10Dict icd10Dict = icd10DictRepository.findOne(Long.parseLong(icd10Id));
+        String codeAndName = redisClient.get(keySchema.icd10HpRelation(icd10Dict.getCode()));
         HealthProblemDict healthProblemDict = new HealthProblemDict();
         healthProblemDict.setCode(codeAndName.split("__")[0]);
         healthProblemDict.setName(codeAndName.split("__")[1]);

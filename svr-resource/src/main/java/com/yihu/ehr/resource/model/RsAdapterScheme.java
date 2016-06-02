@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="rs_adapter_schema")
-public class RsAdapterSchema {
+public class RsAdapterScheme {
 
     private String id;
     private String type;
