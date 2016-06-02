@@ -156,6 +156,12 @@ public class AdapterSchemaController extends BaseController {
             BeanUtils.copyProperties(rsAdapterSchema,rsAdapterSchemaModel);
             MConventionalDict adapterType=  dictClint.getResourceAdaptScheme(rsAdapterSchema.getType());
             rsAdapterSchemaModel.setTypeName(adapterType.getValue());
+            if(THIRD_PARTY.equals(rsAdapterSchemaModel.getType())){//格式化第三方标准
+                MAdapterOrg mAdapterOrg =  adapterOrgClient.getAdapterOrg(rsAdapterSchemaModel.getAdapterVersion());
+                if(mAdapterOrg!=null){
+                    rsAdapterSchemaModel.setAdapterVersionName(mAdapterOrg.getName());
+                }
+            }
             envelop.setObj(rsAdapterSchemaModel);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
