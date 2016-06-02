@@ -43,6 +43,27 @@ public class ResourcesQueryEndPoint {
         return resourcesQueryService.getResources(resourcesCode,appId,queryParams,page,size);
     }
 
+    /**
+     *资源数据源结构
+     */
+    @ApiOperation("资源数据源结构")
+    @RequestMapping(value = "/getResourceData", method = RequestMethod.GET)
+    public String getResourceMetadata(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode) throws Exception{
+        return resourcesQueryService.getResourceMetadata(resourcesCode);
+    }
+
+    /**
+     *资源浏览
+     */
+    @ApiOperation("资源浏览")
+    @RequestMapping(value = "/getResourceData", method = RequestMethod.GET)
+    public Envelop getResourceData(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
+                                @ApiParam("queryCondition") @RequestParam(value = "queryCondition", required = false) String queryCondition,
+                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
+        return resourcesQueryService.getResourceData(resourcesCode, queryCondition, page, size);
+    }
+
 
     @ApiOperation("测试--Hbase主表")
     @RequestMapping(value = "/getEhrCenter", method = RequestMethod.GET)

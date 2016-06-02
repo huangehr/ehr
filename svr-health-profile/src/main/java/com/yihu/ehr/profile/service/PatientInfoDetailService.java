@@ -31,7 +31,7 @@ public class PatientInfoDetailService {
     {
         List<Map<String,Object>> re = new ArrayList<>();
         //中药统计
-        Envelop result = resource.getResources(BasisConstant.medicationStat,appId,"{\"\":\"\",\"join\":\"demographic_id:"+demographicId+"\"}");
+        Envelop result = resource.getResources(BasisConstant.medicationStat,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
 
@@ -40,22 +40,35 @@ public class PatientInfoDetailService {
         return re;
     }
 
-    //患者历史用药记录（可分页）
-    public Envelop getDrugList(String demographicId,String hpId,String startTime,String endTime,Integer page,Integer size) throws Exception
+    /**
+     * 患者历史用药记录（可分页）
+     * 0 中药处方 1西药处方
+     */
+    public Envelop getDrugList(String demographicId,String hpId,String type,String startTime,String endTime,Integer page,Integer size) throws Exception
     {
         String q = "";
+        String sj = BasisConstant.xysj;
+        String bm = BasisConstant.xybm;
+        String resourceCode = BasisConstant.medicationWestern;
+        if(type!=null &&type.equals("1")) //默认查询西药
+        {
+            sj = BasisConstant.zysj;
+            bm = BasisConstant.zybm;
+            resourceCode = BasisConstant.medicationChinese;
+        }
+
         //时间范围
         if(startTime!=null &&startTime.length()>0 && endTime!=null && endTime.length()>0)
         {
-            q = BasisConstant.zysj +":["+startTime+" TO "+endTime+"] OR "+BasisConstant.xysj +":["+startTime+" TO "+endTime+"]";
+            q = sj +":["+startTime+" TO "+endTime+"]";
         }
         else{
             if(startTime!=null &&startTime.length()>0)
             {
-                q = BasisConstant.zysj +":["+startTime+" TO *] OR "+BasisConstant.xysj +":["+startTime+" TO *]";
+                q = sj +":["+startTime+" TO *]";
             }
             else if(endTime!=null && endTime.length()>0) {
-                q = BasisConstant.zysj +":[* TO "+endTime+"] OR "+BasisConstant.xysj +":[* TO "+endTime+"]";
+                q = sj +":[* TO "+endTime+"]";
             }
         }
 
@@ -70,9 +83,9 @@ public class PatientInfoDetailService {
                 for (MDrugDict drug : drugList) {
                     String dictCode = drug.getCode();
                     if (ypQuery.length() > 0) {
-                        ypQuery += " OR " + BasisConstant.zybm + ":" + dictCode + " OR " + BasisConstant.xybm + ":" + dictCode;
+                        ypQuery += " OR " + bm + ":" + dictCode;
                     } else {
-                        ypQuery = BasisConstant.jyzb + ":" + dictCode + " OR " + BasisConstant.xybm + ":" + dictCode;
+                        ypQuery = bm + ":" + dictCode;
                     }
                 }
             }
@@ -94,10 +107,12 @@ public class PatientInfoDetailService {
         {
             queryParams = "{\"join\":\"demographic_id:"+demographicId+"\",\"q\":\""+q+"\"}";
         }
-        return resource.getResources(BasisConstant.inspectionReport,appId,queryParams,page,size);
+        return resource.getResources(resourceCode,appId,queryParams,page,size);
     }
 
-    //检验指标（可分页）
+    /**
+     * 检验指标（可分页）
+     */
     public Envelop getHealthIndicators(String demographicId,String hpId,String medicalIndexId,String startTime,String endTime,Integer page,Integer size) throws Exception
     {
         String q = "";
@@ -119,35 +134,71 @@ public class PatientInfoDetailService {
         //指标ID不为空
         if(medicalIndexId!=null && medicalIndexId.length()>0)
         {
-
+            if(q.length()>0)
+            {
+                q+=" AND " +BasisConstant.jyzb+":"+medicalIndexId;
+            }
+            else{
+                q = BasisConstant.jyzb+":"+medicalIndexId;
+            }
         }
+        else{
+            //健康问题
+            if(hpId!=null && hpId.length()>0)
+            {
+                //健康问题->指标代码
+                List<MIndicatorsDict> indicatorsList = dictService.getIndicatorsDictList(hpId);
+                String jyzbQuery = "";
+                if(indicatorsList!=null && indicatorsList.size()>0) {
+                    //遍历指标列表
+                    for (MIndicatorsDict indicators : indicatorsList) {
+                        if (jyzbQuery.length() > 0) {
+                            jyzbQuery += " OR " + BasisConstant.jyzb + ":" + indicators.getCode();
+                        } else {
+                            jyzbQuery = BasisConstant.jyzb + ":" + indicators.getCode();
+                        }
+                    }
+                }
 
-        //健康问题
-        if(hpId!=null && hpId.length()>0)
-        {
-            //健康问题->指标代码
-            List<MIndicatorsDict> indicatorsList = dictService.getIndicatorsDictList(hpId);
-            String jyzbQuery = "";
-            if(indicatorsList!=null && indicatorsList.size()>0) {
-                //遍历指标列表
-                for (MIndicatorsDict indicators : indicatorsList) {
-                    if (jyzbQuery.length() > 0) {
-                        jyzbQuery += " OR " + BasisConstant.jyzb + ":" + indicators.getCode();
-                    } else {
-                        jyzbQuery = BasisConstant.jyzb + ":" + indicators.getCode();
+                if(jyzbQuery.length()>0)
+                {
+                    if(q.length()>0)
+                    {
+                        q+=" AND ("+jyzbQuery+")";
+                    }
+                    else{
+                        q = "("+jyzbQuery+")";
                     }
                 }
             }
+        }
 
-            if(jyzbQuery.length()>0)
+
+        String queryParams = "{\"join\":\"demographic_id:"+demographicId+"\"}";
+        if(q.length()>0)
+        {
+            queryParams = "{\"join\":\"demographic_id:"+demographicId+"\",\"q\":\""+q+"\"}";
+        }
+        return resource.getResources(BasisConstant.laboratoryReport,appId,queryParams,page,size);
+    }
+
+    /**
+     * 门诊费用（可分页）
+     */
+    public Envelop getOutpatientCost(String demographicId,String startTime,String endTime,Integer page,Integer size) throws Exception{
+        String q = "";
+        //时间范围
+        if(startTime!=null &&startTime.length()>0 && endTime!=null && endTime.length()>0)
+        {
+            q = BasisConstant.mzfysj +":["+startTime+" TO "+endTime+"]";
+        }
+        else{
+            if(startTime!=null &&startTime.length()>0)
             {
-                if(q.length()>0)
-                {
-                    q+=" AND ("+jyzbQuery+")";
-                }
-                else{
-                    q = "("+jyzbQuery+")";
-                }
+                q = BasisConstant.mzfysj +":["+startTime+" TO *]";
+            }
+            else if(endTime!=null && endTime.length()>0) {
+                q = BasisConstant.mzfysj +":[* TO "+endTime+"]";
             }
         }
 
@@ -156,9 +207,36 @@ public class PatientInfoDetailService {
         {
             queryParams = "{\"join\":\"demographic_id:"+demographicId+"\",\"q\":\""+q+"\"}";
         }
-        return resource.getResources(BasisConstant.inspectionReport,appId,queryParams,page,size);
+        return resource.getResources(BasisConstant.outpatientCost,appId,queryParams,page,size);
     }
 
-    
+    /**
+     * 住院费用（可分页）
+     */
+    public Envelop getHospitalizedCost(String demographicId,String startTime,String endTime,Integer page,Integer size) throws Exception{
+        String q = "";
+        //时间范围
+        if(startTime!=null &&startTime.length()>0 && endTime!=null && endTime.length()>0)
+        {
+            q = BasisConstant.zyfysj +":["+startTime+" TO "+endTime+"]";
+        }
+        else{
+            if(startTime!=null &&startTime.length()>0)
+            {
+                q = BasisConstant.zyfysj +":["+startTime+" TO *]";
+            }
+            else if(endTime!=null && endTime.length()>0) {
+                q = BasisConstant.zyfysj +":[* TO "+endTime+"]";
+            }
+        }
+
+        String queryParams = "{\"join\":\"demographic_id:"+demographicId+"\"}";
+        if(q.length()>0)
+        {
+            queryParams = "{\"join\":\"demographic_id:"+demographicId+"\",\"q\":\""+q+"\"}";
+        }
+        return resource.getResources(BasisConstant.hospitalizedCost,appId,queryParams,page,size);
+    }
+
 
 }
