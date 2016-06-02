@@ -83,7 +83,7 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 "WHERE " +
                 " 1 = 1 " +
                 "AND osde.org_dict = osd.id " +
-                "AND osd.organization = '"+adapterSchema.getCode()+"'";
+                "AND osd.organization = '"+adapterSchema.getAdapterVersion()+"'";
         jdbcTemplate.execute(sql);
     }
 
@@ -106,7 +106,7 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 "WHERE " +
                 " 1 = 1 " +
                 "AND osm.org_dataset = osd.id " +
-                "AND osd.organization = '"+adapterSchema.getCode()+"'";
+                "AND osd.organization = '"+adapterSchema.getAdapterVersion()+"'";
         jdbcTemplate.execute(sql);
     }
 
