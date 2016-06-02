@@ -78,12 +78,11 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 "VALUE " +
                 " " +
                 "FROM " +
-                " org_std_dict osd, " +
+                " org_std_dict osd " +
+                "LEFT JOIN  " +
                 " org_std_dictentry osde " +
-                "WHERE " +
-                " 1 = 1 " +
-                "AND osde.org_dict = osd.id " +
-                "AND osd.organization = '"+adapterSchema.getAdapterVersion()+"'";
+                "ON osde.org_dict = osd.sequence  and osde.organization =osd.organization " +
+                "WHERE osde.organization = '"+adapterSchema.getAdapterVersion()+"'";
         jdbcTemplate.execute(sql);
     }
 
@@ -101,12 +100,12 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 " osm. CODE, " +
                 " osm. NAME " +
                 "FROM " +
-                " org_std_metadata osm, " +
+                " org_std_metadata osm " +
+                " LEFT JOIN " +
                 " org_std_dataset osd " +
-                "WHERE " +
-                " 1 = 1 " +
-                "AND osm.org_dataset = osd.id " +
-                "AND osd.organization = '"+adapterSchema.getAdapterVersion()+"'";
+                "ON " +
+                " osm.org_dataset = osd.sequence  and osm.organization =osd.organization " +
+                "WHERE osm.organization = '"+adapterSchema.getAdapterVersion()+"'";
         jdbcTemplate.execute(sql);
     }
 
@@ -126,11 +125,11 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 "VALUE " +
                 " " +
                 "FROM " +
-                " std_dictionary_"+adapterSchema.getAdapterVersion()+" sd, " +
+                " std_dictionary_"+adapterSchema.getAdapterVersion()+" sd " +
+                "LEFT JOIN" +
                 " std_dictionary_entry_"+adapterSchema.getAdapterVersion()+" sde " +
-                "WHERE " +
-                " 1 = 1 " +
-                "AND sde.dict_id = sd.id";
+                "ON " +
+                " sde.dict_id = sd.id";
         jdbcTemplate.execute(sql);
     }
 
@@ -147,11 +146,11 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 " smd.column_name,  " +
                 " smd. NAME  " +
                 "FROM  " +
-                " std_meta_data_"+adapterSchema.getAdapterVersion()+" smd,  " +
+                " std_meta_data_"+adapterSchema.getAdapterVersion()+" smd  " +
+                "LEFT JOIN" +
                 " std_data_set_"+adapterSchema.getAdapterVersion()+" sds  " +
-                "WHERE  " +
-                " 1 = 1  " +
-                "AND smd.dataset_id = sds.id";
+                "ON  " +
+                " smd.dataset_id = sds.id";
         jdbcTemplate.execute(sql);
     }
 
