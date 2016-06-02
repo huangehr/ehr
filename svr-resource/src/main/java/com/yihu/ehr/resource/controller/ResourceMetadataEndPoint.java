@@ -48,7 +48,10 @@ public class ResourceMetadataEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadataBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Collection<MRsResourceMetadata> createResourceMetadataBatch(
             @ApiParam(name = "metadatas", value = "资源数据元", defaultValue = "")
-            @RequestBody String metadatas) throws Exception {
+            @RequestParam(value = "metadatas") String metadatas
+//            @RequestBody String metadatas
+
+    ) throws Exception {
         RsResourceMetadata[] rsMetadata = toEntity(metadatas, RsResourceMetadata[].class);
 
         for (RsResourceMetadata metadata : rsMetadata) {
