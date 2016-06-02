@@ -51,7 +51,7 @@ public class CdaDocument {
             ObjectNode objectNode = docList.addObject();
             objectNode.put("mime", originFile.getMime());
             objectNode.put("originUrl", originFile.getOriginUrl());
-            objectNode.put("expireDate", DateTimeUtils.simpleDateFormat(originFile.getExpireDate()));
+            objectNode.put("expireDate", originFile.getExpireDate()==null ? null:DateTimeUtils.simpleDateFormat(originFile.getExpireDate()));
 
             ObjectNode listNode = objectNode.putObject("files");
             Map<String, String> files = originFile.getFileUrls();

@@ -201,7 +201,8 @@ public class StandardPackage {
     }
 
     public String toJson() {
-         return jsonFormat().toString();
+        ObjectNode node = jsonFormat();
+        return node.toString();
     }
 
     protected ObjectNode jsonFormat() {
