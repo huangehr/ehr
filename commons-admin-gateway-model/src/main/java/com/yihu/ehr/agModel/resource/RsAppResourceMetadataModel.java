@@ -1,5 +1,7 @@
 package com.yihu.ehr.agModel.resource;
 
+import java.util.List;
+
 /**
  * Created by lyr on 2016/5/4.
  */
@@ -12,7 +14,9 @@ public class RsAppResourceMetadataModel {
     private String dimensionId;
     private String dimensionValue;
     private String valid = "1";
-
+    private List dictEntries;
+    private String metaColunmType;
+    private String metaId;
     public String getId() {
         return id;
     }
@@ -69,5 +73,29 @@ public class RsAppResourceMetadataModel {
 
     public void setValid(String valid) {
         this.valid = valid;
+    }
+
+    public List getDictEntries() {
+        return dictEntries;
+    }
+
+    public void setDictEntries(List dictEntries) {
+        this.dictEntries = dictEntries;
+    }
+
+    public String getMetaColunmType() {
+        return metaColunmType;
+    }
+
+    public void setMetaColunmType(String metaColunmType) {
+        this.metaColunmType = metaColunmType;
+    }
+
+    public String getMetaId() {
+        return metaId;
+    }
+
+    public void setMetaId(String metaId) {
+        this.metaId = metaId;
     }
 }
