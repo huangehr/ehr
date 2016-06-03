@@ -26,6 +26,40 @@ public class PatientInfoDetailService {
 
     String appId = "svr-health-profile";
 
+
+
+
+    //根据ProfileId或者EventNo查询CDA分类
+    public List<Map<String,Object>> getCDAClass(String profileId,String eventNo) throws Exception{
+        List<Map<String,Object>> re = new ArrayList<>();
+
+        //根据profileId或者eventNo获取主记录
+
+        String cdaVersion = "cda_version";
+        String orgCode = "org_code";
+
+        //根据机构获取定制模板
+
+        //遍历模板
+
+
+        return re;
+    }
+
+    //根据模板获取病人CDA数据
+    public List<Map<String,Object>> getCDAData(String profileId,String eventNo,String templateId)
+    {
+        List<Map<String,Object>> re = new ArrayList<>();
+        return re;
+    }
+
+    //获取模板
+    public String getCDATemplate(String templateId)
+    {
+        return "";
+    }
+
+
     //患者历史用药统计
     public List<Map<String,Object>> getDrugListStat(String demographicId,String hpId) throws Exception
     {
