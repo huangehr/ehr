@@ -73,7 +73,7 @@ public class ZIcd10HpRelationCacheController {
      * 清楚所有缓存
      */
     @RequestMapping(value = "/hp_icd10_relation_cache/all", method = RequestMethod.DELETE)
-    @ApiOperation(value = "清楚所有缓存")
+    @ApiOperation(value = "清除所有缓存")
     public void clean() {
         icd10HpRelationCacheService.clean();
     }

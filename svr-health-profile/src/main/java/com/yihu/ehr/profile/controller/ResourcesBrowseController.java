@@ -106,43 +106,59 @@ public class ResourcesBrowseController {
 
 
     /******************** CDA相关接口 ***************************************/
-    @ApiOperation("档案搜索接口")
-    @RequestMapping(value = "/medic/getArchives", method = RequestMethod.GET)
-    public String getArchives(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
-            @ApiParam(name = "archiveType", value = "就诊类型(传空默认搜索全部数据)") @RequestParam(value = "archiveType", required = false) String archiveType,
-            @ApiParam(name = "name", value = "诊断记录名称") @RequestParam(value = "name", required = false) String name) throws Exception {
-        return file2String("/json/archiveSearch.json");
-
+    @ApiOperation("档案详情 -- CDA分类")
+    @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
+    public List<Map<String,Object>> getPatientCdaInfo(
+            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
+            @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo) throws Exception {
+        if(profileId == null && eventNo == null)
+        {
+            throw new Exception("非法传参！");
+        }
+        return patientDetail.getCDAClass(profileId,eventNo);
     }
 
-    @ApiOperation("右侧档案模版展示")
+    @ApiOperation("档案详情 -- CDA数据")
     @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
-    public String getPatientCdaInfo(
-            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = true) String profileId) throws Exception {
+    public List<Map<String,Object>> getPatientCdaInfo(
+            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
+            @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo,
+            @ApiParam(name = "templateId", value = "模板ID") @RequestParam(value = "templateId", required = true) String templateId) throws Exception {
+        if(profileId == null && eventNo == null)
+        {
+            throw new Exception("非法传参！");
+        }
+        return patientDetail.getCDAData(profileId, eventNo, templateId);
+    }
 
-        return "";
+    @ApiOperation("档案详情 -- CDA模板")
+    @RequestMapping(value = "/cda/getPatientCdaTemplate", method = RequestMethod.GET)
+    public String getPatientCdaTemplate(
+            @ApiParam(name = "templateId", value = "模板ID") @RequestParam(value = "templateId", required = true) String templateId) throws Exception {
+
+        return patientDetail.getCDATemplate(templateId);
     }
 
     /************************************
-     * 疾病事件
+     * 详细数据
      *****************************************************************/
-    @ApiOperation("疾病事件 - 历史用药 - 药品清单")
-    @RequestMapping(value = "/disease/getDrugList", method = RequestMethod.GET)
+    @ApiOperation("历史用药 - 药品清单")
+    @RequestMapping(value = "/detail/getDrugList", method = RequestMethod.GET)
     public Envelop getDrugList(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
             @ApiParam(name = "hpId", value = "健康代码") @RequestParam(value = "hpId", required = false) String hpId,
+            @ApiParam(name = "type", value = "0中药 1西药") @RequestParam(value = "type", required = false) String type,
             @ApiParam(name = "startTime", value = "开始时间") @RequestParam(value = "startTime", required = false) String startTime,
             @ApiParam(name = "endTime", value = "结束时间") @RequestParam(value = "endTime", required = false) String endTime,
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
         //return file2String("/json/DrugList.json");
-        return patientDetail.getDrugList(demographicId,hpId,startTime,endTime,page,size);
+        return patientDetail.getDrugList(demographicId,hpId,type,startTime,endTime,page,size);
     }
 
-    @ApiOperation("疾病事件 - 历史用药 - 用药统计")
-    @RequestMapping(value = "/disease/getDrugListStat", method = RequestMethod.GET)
+    @ApiOperation("历史用药 - 用药统计")
+    @RequestMapping(value = "/detail/getDrugListStat", method = RequestMethod.GET)
     public List<Map<String,Object>> getDrugListStat(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
             @ApiParam(name = "hpId", value = "健康代码") @RequestParam(value = "hpId", required = false) String hpId) throws Exception {
@@ -150,7 +166,29 @@ public class ResourcesBrowseController {
         return patientDetail.getDrugListStat(demographicId, hpId);
     }
 
+    @ApiOperation("门诊费用清单")
+    @RequestMapping(value = "/detail/getOutpatientCost", method = RequestMethod.GET)
+    public Envelop getOutpatientCost(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "startTime", value = "开始时间") @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(name = "endTime", value = "结束时间") @RequestParam(value = "endTime", required = false) String endTime,
+            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
+        return patientDetail.getOutpatientCost(demographicId, startTime, endTime, page, size);
+    }
+
+    @ApiOperation("住院费用")
+    @RequestMapping(value = "/detail/getHospitalizedCost", method = RequestMethod.GET)
+    public Envelop getHospitalizedCost(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "startTime", value = "开始时间") @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(name = "endTime", value = "结束时间") @RequestParam(value = "endTime", required = false) String endTime,
+            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+
+        return patientDetail.getHospitalizedCost(demographicId,startTime,endTime,page,size);
+    }
     /************************************
      * 健康指标
      *****************************************************************/
@@ -183,7 +221,15 @@ public class ResourcesBrowseController {
     }
 
 
+    @ApiOperation("档案搜索接口")
+    @RequestMapping(value = "/medic/getArchives", method = RequestMethod.GET)
+    public String getArchives(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "archiveType", value = "就诊类型(传空默认搜索全部数据)") @RequestParam(value = "archiveType", required = false) String archiveType,
+            @ApiParam(name = "name", value = "诊断记录名称") @RequestParam(value = "name", required = false) String name) throws Exception {
+        return file2String("/json/archiveSearch.json");
 
+    }
 
 
 

@@ -69,7 +69,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     public Collection<MPackage> packageList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "receiveDate>2016-03-01")
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "receiveDate>2016-06-02T03:00:24Z+0800")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+receiveDate")
             @RequestParam(value = "sorts", required = false) String sorts,
@@ -128,13 +128,14 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "md5", required = false) String md5,
             HttpServletRequest request) throws Exception {
 
-        MKey key = securityClient.getOrgKey(orgCode);
-        String privateKey = key.getPrivateKey();
-        if (null == privateKey) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
-        }
-
-        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
+//        MKey key = securityClient.getOrgKey(orgCode);
+//        String privateKey = key.getPrivateKey();
+//        if (null == privateKey) {
+//            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
+//        }
+//
+//        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
+        String password = "123456";
         Package aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));

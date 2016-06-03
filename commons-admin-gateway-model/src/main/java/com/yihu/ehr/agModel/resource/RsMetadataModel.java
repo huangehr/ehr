@@ -14,6 +14,7 @@ public class RsMetadataModel {
     private String columnTypeName;
     private String nullAble;
     private String dictCode;
+    private String dictName;
     private String description;
     private String valid = "1";
 
@@ -101,5 +102,13 @@ public class RsMetadataModel {
 
     public void setColumnTypeName(String columnTypeName) {
         this.columnTypeName = columnTypeName;
+    }
+
+    public String getDictName() {
+        return dictName;
+    }
+
+    public void setDictName(String dictName) {
+        this.dictName = dictName;
     }
 }

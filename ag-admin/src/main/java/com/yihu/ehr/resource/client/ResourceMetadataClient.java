@@ -29,7 +29,7 @@ public interface ResourceMetadataClient {
             @RequestBody String metadata);
 
     @ApiOperation("批量创建资源数据元")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataBatch, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     Collection<MRsResourceMetadata> createResourceMetadataBatch(
             @RequestParam(value = "metadatas") String metadatas);
 
