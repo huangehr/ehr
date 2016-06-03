@@ -43,6 +43,7 @@ public class ResourcesQueryEndPoint {
         return resourcesQueryService.getResources(resourcesCode,appId,queryParams,page,size);
     }
 
+    //-----------------------------给网关-----------------------------------//
     /**
      *资源数据源结构
      */
@@ -63,7 +64,7 @@ public class ResourcesQueryEndPoint {
                                 @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
         return resourcesQueryService.getResourceData(resourcesCode, queryCondition, page, size);
     }
-
+    //-----------------------------给网关-----------------------------------//
 
     @ApiOperation("测试--Hbase主表")
     @RequestMapping(value = "/getEhrCenter", method = RequestMethod.GET)
