@@ -42,4 +42,16 @@ public class MRsCategory  {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        MRsCategory mRsCategory = (MRsCategory)obj;
+        if(mRsCategory.getId().equals(this.getId())){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 }

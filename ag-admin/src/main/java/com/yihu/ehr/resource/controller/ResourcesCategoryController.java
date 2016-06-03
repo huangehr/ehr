@@ -11,9 +11,10 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -90,7 +91,15 @@ public class ResourcesCategoryController extends BaseController {
         Envelop envelop = new Envelop();
         try{
             MRsCategory rsCategory = resourcesCategoryClient.getRsCategoryById(id);
-            envelop.setObj(rsCategory);
+            RsCategoryModel rsCategoryModel = new RsCategoryModel();
+            BeanUtils.copyProperties(rsCategory,rsCategoryModel);
+            if(StringUtils.isNotBlank(rsCategoryModel.getPid())){
+                MRsCategory rsCategoryParent = resourcesCategoryClient.getRsCategoryById(id);
+                if(rsCategoryParent!=null){
+                    rsCategoryModel.setPname(rsCategoryParent.getName());
+                }
+            }
+            envelop.setObj(rsCategoryModel);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             e.printStackTrace();
