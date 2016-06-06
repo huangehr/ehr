@@ -106,22 +106,37 @@ public class ResourcesBrowseController {
 
 
     /******************** CDA相关接口 ***************************************/
-    @ApiOperation("档案搜索接口")
-    @RequestMapping(value = "/medic/getArchives", method = RequestMethod.GET)
-    public String getArchives(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
-            @ApiParam(name = "archiveType", value = "就诊类型(传空默认搜索全部数据)") @RequestParam(value = "archiveType", required = false) String archiveType,
-            @ApiParam(name = "name", value = "诊断记录名称") @RequestParam(value = "name", required = false) String name) throws Exception {
-        return file2String("/json/archiveSearch.json");
-
+    @ApiOperation("档案详情 -- CDA分类")
+    @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
+    public List<Map<String,Object>> getPatientCdaInfo(
+            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
+            @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo) throws Exception {
+        if(profileId == null && eventNo == null)
+        {
+            throw new Exception("非法传参！");
+        }
+        return patientDetail.getCDAClass(profileId,eventNo);
     }
 
-    @ApiOperation("右侧档案模版展示")
+    @ApiOperation("档案详情 -- CDA数据")
     @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
-    public String getPatientCdaInfo(
-            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = true) String profileId) throws Exception {
+    public List<Map<String,Object>> getPatientCdaInfo(
+            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
+            @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo,
+            @ApiParam(name = "templateId", value = "模板ID") @RequestParam(value = "templateId", required = true) String templateId) throws Exception {
+        if(profileId == null && eventNo == null)
+        {
+            throw new Exception("非法传参！");
+        }
+        return patientDetail.getCDAData(profileId, eventNo, templateId);
+    }
 
-        return "";
+    @ApiOperation("档案详情 -- CDA模板")
+    @RequestMapping(value = "/cda/getPatientCdaTemplate", method = RequestMethod.GET)
+    public String getPatientCdaTemplate(
+            @ApiParam(name = "templateId", value = "模板ID") @RequestParam(value = "templateId", required = true) String templateId) throws Exception {
+
+        return patientDetail.getCDATemplate(templateId);
     }
 
     /************************************
@@ -206,7 +221,15 @@ public class ResourcesBrowseController {
     }
 
 
+    @ApiOperation("档案搜索接口")
+    @RequestMapping(value = "/medic/getArchives", method = RequestMethod.GET)
+    public String getArchives(
+            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "archiveType", value = "就诊类型(传空默认搜索全部数据)") @RequestParam(value = "archiveType", required = false) String archiveType,
+            @ApiParam(name = "name", value = "诊断记录名称") @RequestParam(value = "name", required = false) String name) throws Exception {
+        return file2String("/json/archiveSearch.json");
 
+    }
 
 
 
