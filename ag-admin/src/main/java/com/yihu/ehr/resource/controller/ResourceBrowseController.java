@@ -8,10 +8,7 @@ import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.resource.MRsResourceMetadata;
 import com.yihu.ehr.model.resource.MRsResources;
-import com.yihu.ehr.resource.client.MetadataClient;
-import com.yihu.ehr.resource.client.ResourceMetadataClient;
-import com.yihu.ehr.resource.client.ResourcesCategoryClient;
-import com.yihu.ehr.resource.client.ResourcesClient;
+import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -26,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wq on 2016/5/30.
@@ -49,6 +48,9 @@ public class ResourceBrowseController extends BaseController {
     @Autowired
     private MetadataClient metadataClient;
 
+    @Autowired
+    private ResourceBrowseClient resourceBrowseClient;
+
     @ApiOperation("获取资源数据元信息，column信息")
     @RequestMapping(value = "/resources/ResourceBrowses", method = RequestMethod.GET)
     public Envelop queryResources(
@@ -60,7 +62,7 @@ public class ResourceBrowseController extends BaseController {
 
         try {
             //查询资源注册信息
-            ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + categoryId, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
+            ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "id=" + categoryId, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
             List<MRsResources> rsResources = categoryResponseEntity.getBody();
 
             //查询资源数据元信息
@@ -94,34 +96,65 @@ public class ResourceBrowseController extends BaseController {
     @RequestMapping(value = "/resources/ResourceBrowses/categories", method = RequestMethod.GET)
     public Envelop getCategories(
             @ApiParam(name = "id", value = "返回字段", defaultValue = "")
-            @RequestParam(value = "id" ,required = false) String id) throws Exception {
+            @RequestParam(value = "id", required = false) String id) throws Exception {
 
         Envelop envelop = new Envelop();
         List<RsCategoryTypeTreeModel> rsCategoryTypeTreeModelList = new ArrayList<>();
 
+        List<MRsResources> rsResources = new ArrayList<>();
+
         try {
 
+            List<MRsCategory> rsCategories = new ArrayList<>();
             String filters = "";
-            if (!StringUtils.isEmpty(id))
-                filters = "pid=" + id;
 
             //查询资源分类
-            ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories("", filters, "", 1, 999);// TODO: 2016/5/30 :测试数据，无需分页（尚无接口）
-            List<MRsCategory> rsCategories = responseEntity.getBody();
+            if (!StringUtils.isEmpty(id)) {
+                filters = "pid=" + id;
+                ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories("", filters, "", 1, 999);// TODO: 2016/5/30 :测试数据，无需分页（尚无接口）
+                rsCategories = responseEntity.getBody();
+
+                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + id, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
+                rsResources = categoryResponseEntity.getBody();
+
+                if (rsResources.size() > 0&&!StringUtils.isEmpty(id)) {
+                    List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
+                    for (RsResourcesModel resourcesModel: resourcesModelList){
+                        RsCategoryTypeTreeModel rsCategoryTypeModel = new RsCategoryTypeTreeModel();
+                        rsCategoryTypeModel.setId(resourcesModel.getId());
+                        rsCategoryTypeModel.setPid(id);
+                        rsCategoryTypeModel.setResourceIds(resourcesModel.getId());
+                        rsCategoryTypeModel.setName(resourcesModel.getName());
+                        rsCategoryTypeTreeModelList.add(rsCategoryTypeModel);
+                    }
+                }
+
+
+            } else {
+                rsCategories = resourcesCategoryClient.getRsCategoryByPid(id);
+            }
 
             for (MRsCategory mRsCategory : rsCategories) {
                 //查询资源注册信息
                 RsCategoryTypeTreeModel rsCategoryTypeTreeModel = convertToModel(mRsCategory, RsCategoryTypeTreeModel.class);
 
-                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + rsCategoryTypeTreeModel.getId(), "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
-                List<MRsResources> rsResources = categoryResponseEntity.getBody();
+//                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + rsCategoryTypeTreeModel.getId(), "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
+//                rsResources = categoryResponseEntity.getBody();
+//
+//                if (rsResources.size() > 0&&!StringUtils.isEmpty(id)) {
+//                    List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
+//                    for (RsResourcesModel resourcesModel: resourcesModelList){
+//                        RsCategoryTypeTreeModel rsCategoryTypeModel = new RsCategoryTypeTreeModel();
+//                        rsCategoryTypeModel.setResourceIds(resourcesModel.getId());
+//                        rsCategoryTypeModel.setName(resourcesModel.getName());
+//                        rsCategoryTypeTreeModelList.add(rsCategoryTypeModel);
+//                    }
+//                }
 
-                if (rsResources.size()>0){
-                    List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
-                    rsCategoryTypeTreeModel.setResourceIds(resourcesModelList);
-                }
                 rsCategoryTypeTreeModelList.add(rsCategoryTypeTreeModel);
             }
+
+
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(rsCategoryTypeTreeModelList);
 
@@ -131,4 +164,24 @@ public class ResourceBrowseController extends BaseController {
         }
         return envelop;
     }
+
+
+    @ApiOperation("资源浏览")
+    @RequestMapping(value = "/resources/ResourceBrowses/getResourceData", method = RequestMethod.GET)
+    public Envelop getResourceData(
+            @ApiParam("resourcesCode")
+            @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
+            @ApiParam("queryCondition")
+            @RequestParam(value = "queryCondition", required = false) String queryCondition,
+            @ApiParam("page")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam("size")
+            @RequestParam(value = "size", required = false) Integer size) throws Exception {
+
+        Envelop categoryResponseEntity = resourceBrowseClient.getResourceData(resourcesCode, queryCondition, page, size);
+
+        return null;
+    }
+
+
 }
