@@ -3,12 +3,15 @@ package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
+import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
+import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,9 +27,16 @@ public class PatientInfoDetailService {
     @Autowired
     CD10Service dictService;
 
+    //模板服务
+    @Autowired
+    XTemplateRepository templateService;
+
+    //CDA服务
+    @Autowired
+    XCDADocumentClient cdaService;
+
+
     String appId = "svr-health-profile";
-
-
 
 
     //根据ProfileId或者EventNo查询CDA分类
@@ -39,28 +49,65 @@ public class PatientInfoDetailService {
         String orgCode = "org_code";
 
         //根据机构获取定制模板
-
+        List<Template> list = templateService.findByOrganizationCodeAndCdaVersion(orgCode,cdaVersion);
         //遍历模板
+        if(list!=null&&list.size()>0)
+        {
+            for(Template template : list)
+            {
+                Map<String,Object> obj = new HashMap<>();
+                String cdaDocumentId = template.getCdaDocumentId();
+                List<MCdaDataSetRelationship> datasetList = cdaService.getCDADataSetRelationshipByCDAId(cdaVersion, cdaDocumentId);
 
+                //判断是否有数据
+                if(datasetList!=null && datasetList.size()>0)
+                {
+                    String q="";
+                    for(MCdaDataSetRelationship dataset :datasetList)
+                    {
+
+                    }
+                }
+            }
+        }
 
         return re;
     }
 
-    //根据模板获取病人CDA数据
-    public List<Map<String,Object>> getCDAData(String profileId,String eventNo,String templateId)
+    //根据模板获取病人CDA数据（未完成）
+    public List<Map<String,Object>> getCDAData(String profileId,String eventNo,String templateId) throws Exception
     {
         List<Map<String,Object>> re = new ArrayList<>();
+
+
+
         return re;
     }
 
-    //获取模板
-    public String getCDATemplate(String templateId)
+    //通过事件号获取模板
+    public String getCDATemplate(String eventNo,String cdaType) throws Exception
     {
-        return "";
+        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,"{\"q\":\"event_no:"+eventNo+"\"}");
+
+        //是否有数据
+        if(result.getDetailModelList()!=null && result.getTotalCount()>0)
+        {
+            Map<String,Object> obj = (Map<String,Object>)result.getDetailModelList().get(0);
+            String orgCode = obj.get("org_code").toString();
+            String cdaVersion = obj.get("cda_version").toString();
+            //获取模板ID
+            Template template = templateService.findByOrganizationCodeAndCdaVersionAndCdaType(orgCode,cdaVersion,cdaType);
+            if(template!=null)
+            {
+                return String.valueOf(template.getId());
+            }
+        }
+
+        throw new Exception("未找到相关模板！");
     }
 
 
-    //患者历史用药统计
+    //患者历史用药统计（未完成）
     public List<Map<String,Object>> getDrugListStat(String demographicId,String hpId) throws Exception
     {
         List<Map<String,Object>> re = new ArrayList<>();

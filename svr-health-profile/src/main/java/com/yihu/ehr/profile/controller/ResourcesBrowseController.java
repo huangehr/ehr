@@ -119,8 +119,8 @@ public class ResourcesBrowseController {
     }
 
     @ApiOperation("档案详情 -- CDA数据")
-    @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
-    public List<Map<String,Object>> getPatientCdaInfo(
+    @RequestMapping(value = "/cda/getCDAData", method = RequestMethod.GET)
+    public List<Map<String,Object>> getCDAData(
             @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
             @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo,
             @ApiParam(name = "templateId", value = "模板ID") @RequestParam(value = "templateId", required = true) String templateId) throws Exception {
@@ -131,12 +131,13 @@ public class ResourcesBrowseController {
         return patientDetail.getCDAData(profileId, eventNo, templateId);
     }
 
-    @ApiOperation("档案详情 -- CDA模板")
+    @ApiOperation("档案详情 -- 通过事件号获取templateId")
     @RequestMapping(value = "/cda/getPatientCdaTemplate", method = RequestMethod.GET)
     public String getPatientCdaTemplate(
-            @ApiParam(name = "templateId", value = "模板ID") @RequestParam(value = "templateId", required = true) String templateId) throws Exception {
+            @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = true) String eventNo,
+            @ApiParam(name = "cdaType", value = "模板类别") @RequestParam(value = "cdaType", required = true) String cdaType) throws Exception {
 
-        return patientDetail.getCDATemplate(templateId);
+        return patientDetail.getCDATemplate(eventNo,cdaType);
     }
 
     /************************************
