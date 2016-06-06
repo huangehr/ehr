@@ -37,6 +37,7 @@ public class ResourceStorageUtil {
             map.put(MasterResourceFamily.BasicColumns.EventType, Integer.toString(profile.getEventType().ordinal()));
             map.put(MasterResourceFamily.BasicColumns.ProfileType, Integer.toString(profile.getProfileType().ordinal()));
             map.put(MasterResourceFamily.BasicColumns.DemographicId, profile.getDemographicId() == null ? "" : profile.getDemographicId());
+            map.put(MasterResourceFamily.BasicColumns.ClientId, profile.getClientId());
             map.put(MasterResourceFamily.BasicColumns.CreateDate, DateTimeUtils.utcDateTimeFormat(new Date()));
             map.put(MasterResourceFamily.BasicColumns.CdaVersion, profile.getCdaVersion());
         } else if (family.equals(MasterResourceFamily.Data)){
