@@ -60,7 +60,7 @@ public class ResolveEndPoint {
     public ResponseEntity<String> resolve(
             @ApiParam(value = "id", defaultValue = "OLDEST")
             @PathVariable("id") String packageId,
-            @ApiParam(value = "模拟应用ID", defaultValue = "usa911Em")
+            @ApiParam(value = "模拟应用ID", defaultValue = "FBIWarning911")
             @RequestParam("clientId") String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
             @RequestParam("echo") boolean echo) throws Throwable {
@@ -117,7 +117,7 @@ public class ResolveEndPoint {
             @RequestPart() MultipartFile file,
             @ApiParam("档案包密码")
             @RequestParam("password") String password,
-            @ApiParam(value = "模拟应用ID", defaultValue = "usa911Em")
+            @ApiParam(value = "模拟应用ID", defaultValue = "FBIWarning911")
             @RequestParam("clientId") String clientId,
             @ApiParam(value = "是否入库")
             @RequestParam(value = "persist", defaultValue = "false") boolean persist) throws Throwable {

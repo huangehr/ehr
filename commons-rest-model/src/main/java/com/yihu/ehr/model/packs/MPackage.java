@@ -2,6 +2,7 @@ package com.yihu.ehr.model.packs;
 
 import com.yihu.ehr.constants.ArchiveStatus;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -106,7 +107,7 @@ public class MPackage implements Serializable {
     }
 
     public String getClientId() {
-        return clientId;
+        return StringUtils.isEmpty(clientId) ? "kHAbVppx44" : clientId;
     }
 
     public void setClientId(String clientId) {
