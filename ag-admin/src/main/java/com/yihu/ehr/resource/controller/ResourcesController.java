@@ -151,9 +151,9 @@ public class ResourcesController extends BaseController {
                     MRsCategory category = rsCategoryClient.getRsCategoryById(categoryId);
                     rsResourcesModel.setCategoryName(category==null?"":category.getName());
                 }
-                String rsInterfaceId = m.getRsInterface();
-                if (!StringUtils.isEmpty(rsInterfaceId)){
-                    MRsInterface rsInterface = rsInterfaceClient.getRsInterfaceById(rsInterfaceId);
+                String rsInterfaceCode = m.getRsInterface();
+                if (!StringUtils.isEmpty(rsInterfaceCode)){
+                    MRsInterface rsInterface = rsInterfaceClient.findByResourceInterface(rsInterfaceCode);
                     rsResourcesModel.setRsInterfaceName(rsInterface==null?"":rsInterface.getName());
                 }
                 rsResources.add(rsResourcesModel);
