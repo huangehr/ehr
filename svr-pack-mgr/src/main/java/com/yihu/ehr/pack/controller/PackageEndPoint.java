@@ -128,14 +128,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "md5", required = false) String md5,
             HttpServletRequest request) throws Exception {
 
-//        MKey key = securityClient.getOrgKey(orgCode);
-//        String privateKey = key.getPrivateKey();
-//        if (null == privateKey) {
-//            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
-//        }
-//
-//        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        String password = "123456";
+        MKey key = securityClient.getOrgKey(orgCode);
+        String privateKey = key.getPrivateKey();
+        if (null == privateKey) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
+        }
+
+        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
         Package aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
