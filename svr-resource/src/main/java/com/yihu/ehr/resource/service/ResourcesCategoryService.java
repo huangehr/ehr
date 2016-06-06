@@ -1,17 +1,19 @@
 package com.yihu.ehr.resource.service;
 
 
-import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourcesCategoryDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.RsCategory;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -87,11 +89,25 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
         return rsCategoryDao.findOne(id);
     }
 
-    public List<RsCategory> getRsCategoryByPid(String pid) {
-        return rsCategoryDao.findByPid(pid);
-    }
-
     public List<RsCategory> findAll() {
         return (List<RsCategory>) rsCategoryDao.findAll();
     }
+    /**
+     * 根据父级ID获取下级类别
+     */
+    public List<RsCategory> getRsCategoryByPid(String pid) {
+        Session session = currentSession();
+        String strSql="";
+        if(StringUtils.isEmpty(pid)){
+            strSql += "from RsCategory a where 1=1 and (a.pid is null or a.pid='')";
+        }else{
+            strSql += "from RsCategory a where 1=1 and a.pid =:pid";
+        }
+        Query query = session.createQuery(strSql);
+        if(!StringUtils.isEmpty(pid)){
+            query.setString("pid", pid);
+        }
+        return query.list();
+    }
+
 }

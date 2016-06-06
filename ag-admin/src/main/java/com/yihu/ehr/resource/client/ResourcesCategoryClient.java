@@ -4,17 +4,13 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsCategory;
-import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,5 +60,5 @@ public interface ResourcesCategoryClient {
     @RequestMapping(value = ServiceApi.Resources.CategoryByPid,method = RequestMethod.GET)
     @ApiOperation("根据pid获取资源类别列表")
     List<MRsCategory> getRsCategoryByPid(
-            @PathVariable(value="pid") String pid);
+            @RequestParam(value="pid",required = false) String pid);
 }

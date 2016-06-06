@@ -8,10 +8,11 @@ import java.util.List;
 public class RsCategoryTypeTreeModel {
     private String id;
     private String name;
-    private String parentId;
+    private String pid;
     private String description;
     private List<RsCategoryTypeTreeModel> children;
-    private List<RsResourcesModel> resourceIds;
+//    private List<RsResourcesModel> resourceIds;
+    private String resourceIds;
 
     public String getId() {
         return id;
@@ -21,12 +22,12 @@ public class RsCategoryTypeTreeModel {
         this.id = id;
     }
 
-    public String getParentId() {
-        return parentId;
+    public String getPid() {
+        return pid;
     }
 
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
+    public void setPid(String pid) {
+        this.pid = pid;
     }
 
     public String getDescription() {
@@ -53,11 +54,11 @@ public class RsCategoryTypeTreeModel {
         this.children = children;
     }
 
-    public List<RsResourcesModel> getResourceIds() {
+    public String getResourceIds() {
         return resourceIds;
     }
 
-    public void setResourceIds(List<RsResourcesModel> resourceIds) {
+    public void setResourceIds(String resourceIds) {
         this.resourceIds = resourceIds;
     }
 }

@@ -119,7 +119,10 @@ public class FilePackageResolver extends PackageResolver {
             ObjectNode objectNode = (ObjectNode) files.get(i);
             String cdaDocumentId = objectNode.get("cda_doc_id").asText();
             String url = objectNode.get("url").asText();
-            Date expireDate = DateTimeUtils.simpleDateParse(objectNode.get("expire_date").asText());
+            Date expireDate = null;
+            if(objectNode.get("expire_date")!=null){
+                expireDate = DateTimeUtils.simpleDateParse(objectNode.get("expire_date").asText());
+            }
 
             // 解析过程中，使用cda文档id作为文档列表的主键，待解析完成后，统一更新为rowkey
             CdaDocument cdaDocument = profile.getCdaDocuments().get(cdaDocumentId);
