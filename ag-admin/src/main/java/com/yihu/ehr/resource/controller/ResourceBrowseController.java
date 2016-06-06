@@ -62,7 +62,7 @@ public class ResourceBrowseController extends BaseController {
 
         try {
             //查询资源注册信息
-            ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + categoryId, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
+            ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "id=" + categoryId, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
             List<MRsResources> rsResources = categoryResponseEntity.getBody();
 
             //查询资源数据元信息
@@ -100,7 +100,7 @@ public class ResourceBrowseController extends BaseController {
 
         Envelop envelop = new Envelop();
         List<RsCategoryTypeTreeModel> rsCategoryTypeTreeModelList = new ArrayList<>();
-        RsCategoryTypeTreeModel rsCategoryTypeTreeModel = new RsCategoryTypeTreeModel();
+
         List<MRsResources> rsResources = new ArrayList<>();
 
         try {
@@ -113,33 +113,48 @@ public class ResourceBrowseController extends BaseController {
                 filters = "pid=" + id;
                 ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories("", filters, "", 1, 999);// TODO: 2016/5/30 :测试数据，无需分页（尚无接口）
                 rsCategories = responseEntity.getBody();
+
+                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + id, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
+                rsResources = categoryResponseEntity.getBody();
+
+                if (rsResources.size() > 0&&!StringUtils.isEmpty(id)) {
+                    List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
+                    for (RsResourcesModel resourcesModel: resourcesModelList){
+                        RsCategoryTypeTreeModel rsCategoryTypeModel = new RsCategoryTypeTreeModel();
+                        rsCategoryTypeModel.setId(resourcesModel.getId());
+                        rsCategoryTypeModel.setPid(id);
+                        rsCategoryTypeModel.setResourceIds(resourcesModel.getId());
+                        rsCategoryTypeModel.setName(resourcesModel.getName());
+                        rsCategoryTypeTreeModelList.add(rsCategoryTypeModel);
+                    }
+                }
+
+
             } else {
                 rsCategories = resourcesCategoryClient.getRsCategoryByPid(id);
             }
 
             for (MRsCategory mRsCategory : rsCategories) {
                 //查询资源注册信息
-                rsCategoryTypeTreeModel = convertToModel(mRsCategory, RsCategoryTypeTreeModel.class);
+                RsCategoryTypeTreeModel rsCategoryTypeTreeModel = convertToModel(mRsCategory, RsCategoryTypeTreeModel.class);
 
-                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + rsCategoryTypeTreeModel.getId(), "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
-                rsResources = categoryResponseEntity.getBody();
-
-//                if (rsResources.size() > 0) {
+//                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + rsCategoryTypeTreeModel.getId(), "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
+//                rsResources = categoryResponseEntity.getBody();
+//
+//                if (rsResources.size() > 0&&!StringUtils.isEmpty(id)) {
 //                    List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
-//                    rsCategoryTypeTreeModel.setResourceIds(resourcesModelList);
 //                    for (RsResourcesModel resourcesModel: resourcesModelList){
+//                        RsCategoryTypeTreeModel rsCategoryTypeModel = new RsCategoryTypeTreeModel();
+//                        rsCategoryTypeModel.setResourceIds(resourcesModel.getId());
+//                        rsCategoryTypeModel.setName(resourcesModel.getName());
+//                        rsCategoryTypeTreeModelList.add(rsCategoryTypeModel);
 //                    }
 //                }
+
                 rsCategoryTypeTreeModelList.add(rsCategoryTypeTreeModel);
             }
 
-            if (rsResources.size() > 0) {
-                List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
-                for (RsResourcesModel resourcesModel: resourcesModelList){
-                    rsCategoryTypeTreeModel.setId(resourcesModel.getId());
-                        rsCategoryTypeTreeModelList.add(rsCategoryTypeTreeModel);
-                }
-            }
+
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(rsCategoryTypeTreeModelList);
 
@@ -152,7 +167,7 @@ public class ResourceBrowseController extends BaseController {
 
 
     @ApiOperation("资源浏览")
-    @RequestMapping(value = "/getResourceData", method = RequestMethod.GET)
+    @RequestMapping(value = "/resources/ResourceBrowses/getResourceData", method = RequestMethod.GET)
     public Envelop getResourceData(
             @ApiParam("resourcesCode")
             @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
@@ -163,7 +178,7 @@ public class ResourceBrowseController extends BaseController {
             @ApiParam("size")
             @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        Envelop categoryResponseEntity = resourceBrowseClient.getResourceData(resourcesCode, queryCondition, 1, 15);
+        Envelop categoryResponseEntity = resourceBrowseClient.getResourceData(resourcesCode, queryCondition, page, size);
 
         return null;
     }
