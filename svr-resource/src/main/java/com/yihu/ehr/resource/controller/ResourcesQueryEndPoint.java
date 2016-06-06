@@ -48,7 +48,7 @@ public class ResourcesQueryEndPoint {
      *资源数据源结构
      */
     @ApiOperation("资源数据源结构")
-    @RequestMapping(value = "/getResourceData", method = RequestMethod.GET)
+    @RequestMapping(value = "/getResourceMetadata", method = RequestMethod.GET)
     public String getResourceMetadata(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode) throws Exception{
         return resourcesQueryService.getResourceMetadata(resourcesCode);
     }

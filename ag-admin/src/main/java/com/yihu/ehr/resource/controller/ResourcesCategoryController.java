@@ -16,8 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -277,5 +276,76 @@ public class ResourcesCategoryController extends BaseController {
         }
         return treeList;
     }
+
+    //-返回资源分类对象集合，普通的RsCategotyModel集合-------开始---------------------------------------
+    @RequestMapping(value = "/resources/categories/list", method = RequestMethod.GET)
+    @ApiOperation("获取资源类别,用于tree")
+    public Envelop getTreeData(
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters){
+        Envelop envelop = new Envelop();
+        List<MRsCategory> mRsCategories = resourcesCategoryClient.getAllCategories(filters);
+        Set<MRsCategory> set = new HashSet<>();
+        for(MRsCategory m:mRsCategories){
+            String pid = m.getPid();
+            String id = m.getId();
+            //获取父级资源分类
+            set.add(m);
+            if(!StringUtils.isEmpty(pid)){
+                set = getParentById(pid, set);
+            }
+            //获取子集资源分类
+            if (!StringUtils.isEmpty(id)){
+                set = getChildById(id,set);
+            }
+        }
+        if(set.size()==0){
+            return envelop;
+        }
+        List list=new ArrayList();
+        Iterator it=set.iterator();
+        while(it.hasNext()){
+            list.add(it.next());
+        }
+        List<RsCategoryModel> rsCategoryModels = (List<RsCategoryModel>)convertToModels(list,new ArrayList<>(),RsCategoryModel.class,null);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(rsCategoryModels);
+        return envelop;
+    }
+
+    /**
+     * 获取父级、父级的父级。。。
+     */
+    public Set<MRsCategory> getParentById(String id,Set<MRsCategory> set){
+        if(!StringUtils.isEmpty(id)){
+            MRsCategory mRsCategory = resourcesCategoryClient.getRsCategoryById(id);
+            set.add(mRsCategory);
+            if(mRsCategory != null){
+                String childPid = mRsCategory.getPid();
+                this.getParentById(childPid,set);
+            }
+            return set;
+        }
+        return set;
+    }
+
+    /**
+     * 获取子集、子集的子集。。。。
+     */
+    public Set<MRsCategory> getChildById(String id,Set<MRsCategory> set){
+        if(!StringUtils.isEmpty(id)){
+            List<MRsCategory> mRsCategories = resourcesCategoryClient.getAllCategories("pid="+id);
+            if(mRsCategories==null&&mRsCategories.size()==0){
+                return set;
+            }
+            for(MRsCategory m:mRsCategories){
+                set.add(m);
+                this.getChildById(m.getId(),set);
+            }
+            return set;
+        }
+        return set;
+    }
+    //----------------------------------------------------结束-----------
 
 }
