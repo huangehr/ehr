@@ -1,5 +1,7 @@
 package com.yihu.ehr.model.resource;
 
+import java.util.Objects;
+
 /**
  * Created by hzp on 2016/5/4.
  * 资源类别
@@ -41,5 +43,18 @@ public class MRsCategory  {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MRsCategory that = (MRsCategory) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

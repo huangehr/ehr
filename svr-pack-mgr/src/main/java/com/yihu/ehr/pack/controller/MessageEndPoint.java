@@ -56,7 +56,7 @@ public class MessageEndPoint extends EnvelopRestEndPoint {
 
         List<Package> packages = packageService.search(null, filters, sorts, 1, count);
         Collection<MPackage> mPackages = new HashSet<>(packages.size());
-        mPackages = convertToModels(packages, mPackages, MPackage.class, "id,pwd,remotePath");
+        mPackages = convertToModels(packages, mPackages, MPackage.class, "id,pwd,remotePath,clientId");
 
         Map<String, String> packs = new HashMap<>();
         for (MPackage pack : mPackages) {
