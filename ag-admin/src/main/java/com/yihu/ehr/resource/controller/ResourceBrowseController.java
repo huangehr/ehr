@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsBrowseModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
 import com.yihu.ehr.agModel.resource.RsResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
@@ -14,6 +15,7 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.omg.CORBA.Object;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -117,14 +119,16 @@ public class ResourceBrowseController extends BaseController {
                 ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + id, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
                 rsResources = categoryResponseEntity.getBody();
 
-                if (rsResources.size() > 0&&!StringUtils.isEmpty(id)) {
+                if (rsResources.size() > 0 && !StringUtils.isEmpty(id)) {
                     List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
-                    for (RsResourcesModel resourcesModel: resourcesModelList){
+                    for (RsResourcesModel resourcesModel : resourcesModelList) {
                         RsCategoryTypeTreeModel rsCategoryTypeModel = new RsCategoryTypeTreeModel();
                         rsCategoryTypeModel.setId(resourcesModel.getId());
                         rsCategoryTypeModel.setPid(id);
                         rsCategoryTypeModel.setResourceIds(resourcesModel.getId());
                         rsCategoryTypeModel.setName(resourcesModel.getName());
+                        rsCategoryTypeModel.setResourceCode(resourcesModel.getCode());
+
                         rsCategoryTypeTreeModelList.add(rsCategoryTypeModel);
                     }
                 }
@@ -180,8 +184,37 @@ public class ResourceBrowseController extends BaseController {
 
         Envelop categoryResponseEntity = resourceBrowseClient.getResourceData(resourcesCode, queryCondition, page, size);
 
-        return null;
+        return categoryResponseEntity;
     }
 
+    @ApiOperation("资源数据源结构")
+    @RequestMapping(value = "/resources/ResourceBrowses/getResourceMetadata", method = RequestMethod.GET)
+    public Envelop getResourceData(
+            @ApiParam("resourcesCode")
+            @RequestParam(value = "resourcesCode", required = true) String resourcesCode) {
+
+        Envelop envelop = new Envelop();
+        List<RsBrowseModel> rsBrowseModelList = new ArrayList<>();
+
+        String resourceMetadata = resourceBrowseClient.getResourceMetadata(resourcesCode);
+        RsBrowseModel resourceMetadataModel = toEntity(resourceMetadata, RsBrowseModel.class);
+
+        List<String> code = resourceMetadataModel.getColunmCode();
+        List<String> value = resourceMetadataModel.getColunmName();
+        List<String> type = resourceMetadataModel.getColunmType();
+        List<String> dict = resourceMetadataModel.getColunmDict();
+
+        for (int i = 0; i < code.size(); i++) {
+            RsBrowseModel rsBrowseModel = new RsBrowseModel();
+            rsBrowseModel.setCode(code.get(i));
+            rsBrowseModel.setValue(value.get(i));
+            rsBrowseModel.setType(type.get(i));
+            rsBrowseModel.setDict(dict.get(i));
+            rsBrowseModelList.add(rsBrowseModel);
+        }
+
+        envelop.setDetailModelList(rsBrowseModelList);
+        return envelop;
+    }
 
 }
