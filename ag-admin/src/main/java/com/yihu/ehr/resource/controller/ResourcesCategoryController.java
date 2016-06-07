@@ -153,6 +153,21 @@ public class ResourcesCategoryController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/types/parent", method = RequestMethod.GET)
+    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
+    public Envelop getCdaTypeExcludeSelfAndChildren(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") String id) throws Exception {
+        Envelop envelop = new Envelop();
+        List<MRsCategory> mcdaTypeList = resourcesCategoryClient.getCateTypeExcludeSelfAndChildren(id);
+        if(mcdaTypeList.size() == 0){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("没有匹配的cda类别列表！");
+        }
+        envelop.setDetailModelList(convertToRsCategoryModels(mcdaTypeList));
+        return  envelop;
+    }
+
     @RequestMapping(value = ServiceApi.Resources.NoPageCategories,method = RequestMethod.GET)
     @ApiOperation("获取资源类别")
     public Envelop getAllCategories(
