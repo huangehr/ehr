@@ -22,9 +22,9 @@ public class EhrFileUtils {
         return FileUtil.readAsString(file);
     }
 
-    public static void main(String[] args) {
-        String folder=System.getProperty("java.io.tmpdir");
-        //C:\Users\ADMINI~1\AppData\Local\Temp\json
-    }
+//    public static void main(String[] args) {
+//        String folder=System.getProperty("java.io.tmpdir");
+//        //C:\Users\ADMINI~1\AppData\Local\Temp\json
+//    }
 
 }

@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsCategory;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -61,4 +62,9 @@ public interface ResourcesCategoryClient {
     @ApiOperation("根据pid获取资源类别列表")
     List<MRsCategory> getRsCategoryByPid(
             @RequestParam(value="pid",required = false) String pid);
+
+    @RequestMapping(value = ServiceApi.Resources.CategoryExitSelfAndChild, method = RequestMethod.GET)
+    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
+    List<MRsCategory> getCateTypeExcludeSelfAndChildren(@ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") String id);
 }

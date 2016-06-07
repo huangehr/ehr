@@ -1,0 +1,94 @@
+{
+  "events": [
+	{
+      "date": "2016-01-01",
+      "summary": "住院-医嘱",
+      "orgName": "互联网医院",
+      "orgCode": "CS0324001",
+      "dept": "消化内科",
+      "etiology": "胃炎",
+      "diagnosisName": "",
+      "diagnosisCode": "",
+	  "orginType":"1"
+      "documents": [
+        {
+          "cdaVersion": "56395d75b854",
+          "cdaDocumentId": "0dae0006568b67720dc35654490ac6da",
+          "cdaDocumentName": "住院-医嘱",
+          "orgCode": "CS0324001",
+          "dataSets": [
+            {
+              "dataSetCode": "HDSD02_03",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSD02_03_ORIGIN",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSA00_01",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSA00_01_ORIGIN",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSD02_01",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSD02_01_ORIGIN",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            }
+          ]
+        }
+      ]
+    },
+	{
+      "date": "2016-01-02",
+      "summary": "住院-医嘱",
+      "orgName": "互联网医院",
+      "orgCode": "CS0324001",
+      "dept": "消化内科",
+      "etiology": "胃炎",
+      "diagnosisName": "",
+      "diagnosisCode": "",
+	  "orginType":"1"
+      "documents": [
+        {
+          "cdaVersion": "56395d75b854",
+          "cdaDocumentId": "0dae0006568b67720dc35654490ac6da",
+          "cdaDocumentName": "住院-医嘱",
+          "orgCode": "CS0324001",
+          "dataSets": [
+            {
+              "dataSetCode": "HDSD02_03",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSD02_03_ORIGIN",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSA00_01",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSA00_01_ORIGIN",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSD02_01",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            },
+            {
+              "dataSetCode": "HDSD02_01_ORIGIN",
+              "dataKeys": "CS0324001_1004192_888888_1451581200000$0,"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

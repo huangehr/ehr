@@ -9,7 +9,16 @@ public class RsCategoryModel {
     private String id;
     private String name;
     private String pid;
+    private String pname;
     private String description;
+
+    public String getPname() {
+        return pname;
+    }
+
+    public void setPname(String pname) {
+        this.pname = pname;
+    }
 
     public String getId() {
         return id;
