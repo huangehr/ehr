@@ -8,7 +8,7 @@ package com.yihu.ehr.constants;
  * @created 2016.01.11 8:54
  */
 public class MicroServices {
-    public static final String Adaption = "svr-adaption";
+    public static final String Adaption = "svr-standard";
     public static final String Application = "svr-app";
     public static final String Configuration = "svr-configuration";
     public static final String Dictionary = "svr-dict";
@@ -27,6 +27,6 @@ public class MicroServices {
     public static final String FileResource = "svr-file-resource";
     public static final String Cipher = "svr-cipher";
     public static final String Resource = "svr-resource";
-    public static final String SpecialDict = "svr-special-dict";
+    public static final String SpecialDict = "svr-dict";
 
 }

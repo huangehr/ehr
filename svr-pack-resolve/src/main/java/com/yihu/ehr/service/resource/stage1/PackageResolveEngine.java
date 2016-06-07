@@ -1,5 +1,6 @@
 package com.yihu.ehr.service.resource.stage1;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.service.resource.stage1.resolver.FilePackageResolver;
@@ -34,6 +35,7 @@ public class PackageResolveEngine {
 
     Map<ProfileType, PackageResolver> packageResolvers;
 
+
     private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
 
     /**
@@ -52,7 +54,6 @@ public class PackageResolveEngine {
             if (root == null || !root.isDirectory() || root.list().length == 0) {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
-
             StandardPackage profile = PackModelFactory.createPackModel(root);
             PackageResolver packageResolver;
             switch (profile.getProfileType()) {
@@ -72,13 +73,10 @@ public class PackageResolveEngine {
                     packageResolver = null;
                     break;
             }
-
             packageResolver.resolve(profile, root);
-
             profile.setClientId(pack.getClientId());
             profile.regularRowKey();
             profile.determineEventType();
-
             return profile;
         } finally {
             houseKeep(zipFile, root);

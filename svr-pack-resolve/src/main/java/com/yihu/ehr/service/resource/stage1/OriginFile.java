@@ -1,5 +1,8 @@
 package com.yihu.ehr.service.resource.stage1;
 
+import com.yihu.ehr.constants.UrlScope;
+
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,20 +14,12 @@ import java.util.TreeMap;
  * @created 2015.08.16 10:44
  */
 public class OriginFile {
-    private String originUrl;               // 机构健康档案中的地址
     private String mime;
     private Date expireDate;
+    private UrlScope urlScope;
 
     // 文件索引，key为文件名
     private Map<String, String> fileUrls = new TreeMap<>();
-
-    public String getOriginUrl() {
-        return originUrl;
-    }
-
-    public void setOriginUrl(String fileUrl) {
-        this.originUrl = fileUrl;
-    }
 
     public Date getExpireDate() {
         return expireDate;
@@ -46,7 +41,25 @@ public class OriginFile {
         return fileUrls;
     }
 
-    public void addStorageUrl(String fileName, String storageUrl){
+    public void addUrl(String fileName, String storageUrl){
         fileUrls.put(fileName, storageUrl);
     }
+
+    public UrlScope getUrlScope() {
+        return urlScope;
+    }
+
+    public void setUrlScope(UrlScope urlScope) {
+        this.urlScope = urlScope;
+    }
+
+    public String getUrlsStr() {
+        Collection values = fileUrls.values();
+        String urls = "";
+        for (Object object : values) {
+            urls+=object.toString();
+        }
+        return urls;
+    }
+
 }
