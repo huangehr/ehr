@@ -46,7 +46,7 @@ public class ResourcesQueryService  {
     ResourceDefaultParamDao resourceDefaultParamDao;
 
     //忽略字段
-    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","profile_type","demographic_id", "patient_id","org_code","profile_id", "cda_version"));
+    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","profile_type","demographic_id", "patient_id","org_code","profile_id", "cda_version", "client_id"));
 
     /**
      * 新增参数
@@ -69,7 +69,6 @@ public class ResourcesQueryService  {
         else{
             return "{"+newParam+"}";
         }
-
     }
 
     /**
@@ -303,7 +302,7 @@ public class ResourcesQueryService  {
                     }
                 }
             }
-            queryParams = solr.conditionToString(ql);
+            queryParams = addParams(queryParams,"q",solr.conditionToString(ql));
 
             //通过资源代码获取默认参数
             List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
