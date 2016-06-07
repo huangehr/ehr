@@ -274,9 +274,6 @@
         </repository>
     </repositories>
 
-
-
-
     <pluginRepositories>
         <pluginRepository>
             <id>nexus</id>
@@ -316,60 +313,10 @@
         <module>../commons-redis-mq</module>
         <module>../commons-data-query</module>
         <module>../commons-metrics</module>
-        <!--<module>../commons-thrift-services</module>
+        <!--
+        <module>../commons-thrift-services</module>
         <module>../commons-thrift-client</module>
-        <module>../commons-thrift-server</module>-->
+        <module>../commons-thrift-server</module>
+        -->
     </modules>
-
-    <profiles>
-        <!--开发库-->
-        <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <wagonServerId>192.168.1.220</wagonServerId>
-                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
-            </properties>
-        </profile>
-
-
-        <!--tomcat部署-->
-        <profile>
-            <id>tomcat</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <wagonServerId>192.168.1.220</wagonServerId>
-                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
-            </properties>
-        </profile>
-
-        <!--测试库-->
-        <profile>
-            <id>test</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <wagonServerId>192.168.1.220</wagonServerId>
-                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>prod</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <wagonServerId>192.168.1.220</wagonServerId>
-                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
-            </properties>
-        </profile>
-    </profiles>
-
-
 </project>

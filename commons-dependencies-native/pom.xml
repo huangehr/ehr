@@ -13,7 +13,35 @@
     <artifactId>commons-dependencies-native</artifactId>
     <name>commons-dependencies-native</name>
     <packaging>pom</packaging>
-    <description>Spring Boot原始应用部署模板</description>
+    <description>EHR微服务部署模板</description>
+
+    <modules>
+        <!--注意：模块添加请按字母顺序-->
+        <!--module>../svr-adaption</module-->
+        <module>../svr-adaption</module>
+        <module>../svr-app</module>
+        <module>../svr-cipher</module>
+        <module>../svr-configuration</module>
+        <module>../svr-dict</module>
+        <module>../svr-discovery</module>
+        <module>../svr-esb</module>
+        <module>../svr-family</module>
+        <module>../svr-file-resource</module>
+        <module>../svr-geography</module>
+        <module>../svr-health-profile</module>
+        <!--module>../svr-health-profile-search</module-->
+        <module>../svr-organization</module>
+        <module>../svr-pack-mgr</module>
+        <module>../svr-pack-resolve</module>
+        <module>../svr-patient</module>
+        <module>../svr-resource</module>
+        <module>../svr-security</module>
+        <!--module>../svr-special-dict</module-->
+        <module>../svr-standard</module>
+        <module>../svr-user</module>
+        <module>../ag-admin</module>
+        <module>../ag-ehr-platform</module>
+    </modules>
 
     <build>
         <extensions>
@@ -24,7 +52,6 @@
             </extension>
         </extensions>
         <plugins>
-            <!--oauth2 插件-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -32,7 +59,6 @@
                     <executable>true</executable>
                 </configuration>
             </plugin>
-            <!--wagon 插件-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>wagon-maven-plugin</artifactId>
@@ -42,9 +68,7 @@
                     <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
                     <url>${wagonUrl}</url>
                     <commands>
-                        <!-- 杀死原来的进程 -->
                         <command>pkill -f ${project.build.finalName}.jar</command>
-                        <!-- 重新启动进程，程序的输出结果写到nohup.out文件中 -->
                         <command>java -Djava.security.egd=file:/dev/./urandom -jar ${project.build.finalName}.jar</command>
                     </commands>
                     <displayCommandOutputs>true</displayCommandOutputs>
@@ -53,7 +77,6 @@
         </plugins>
         <pluginManagement>
             <plugins>
-                <!--site 插件-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
@@ -70,14 +93,17 @@
         </pluginManagement>
     </build>
 
+    <!--
+    profiles分为三种场景(dev,test,prod)，三种部署模式(jar,war,docker).
+    预计是9种模式，但目前仅使用到dev,test,prod的jar,test的war.
+    若有需要可以组合配置这些部署模式.
+    -->
     <profiles>
-        <!--开发库-->
         <profile>
-            <id>dev</id>
+            <id>dev-jar</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
                 <property>
-                    <name>oauth2.profiles.active</name>
+                    <name>spring.profiles.active</name>
                     <value>default,dev</value>
                 </property>
             </activation>
@@ -99,51 +125,37 @@
                     <artifactId>spring-integration-jmx</artifactId>
                 </dependency>
             </dependencies>
-            <modules>
-                <module>../svr-adaption</module>
-                <module>../svr-app</module>
-                <module>../svr-configuration</module>
-                <module>../svr-dict</module>
-                <module>../svr-discovery</module>
-                <module>../svr-geography</module>
-                <!--<module>../svr-health-profile-search</module>-->
-                <module>../svr-health-profile</module>
-                <module>../svr-organization</module>
-                <module>../svr-pack-mgr</module>
-                <module>../svr-pack-resolve</module>
-                <module>../svr-patient</module>
-                <module>../svr-security</module>
-                <module>../svr-special-dict</module>
-                <module>../svr-standard</module>
-                <module>../svr-user</module>
-                <module>../svr-esb</module>
-                <module>../ag-admin</module>
-                <module>../ag-ehr-platform</module>
-                <module>../svr-family</module>
-                <module>../svr-resource</module>
-                <module>../svr-cipher</module>
-                <!--<module>../app-ehr-browser</module>-->
-                <module>../svr-file-resource</module>
-            </modules>
         </profile>
-
-
-        <!--tomcat部署-->
         <profile>
-            <id>tomcat</id>
+            <id>test-jar</id>
+            <properties>
+                <skipTests>true</skipTests>
+                <packaging>jar</packaging>
+                <wagonServerId>192.168.1.220</wagonServerId>
+                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
+            </properties>
+
+            <distributionManagement>
+                <repository>
+                    <id>test</id>
+                    <url>ssh://root:ceshi@192.168.1.220/home/root/ehr-release</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>test-war</id>
+            <activation>
+                <property>
+                    <name>spring.profiles.active</name>
+                    <value>default,test</value>
+                </property>
+            </activation>
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>war</packaging>
                 <wagonServerId>192.168.1.220</wagonServerId>
                 <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
             </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>oauth2.profiles.active</name>
-                    <value>default,prod</value>
-                </property>
-            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
@@ -171,123 +183,27 @@
                     <url>ssh://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</url>
                 </repository>
             </distributionManagement>
-            <modules>
-                <module>../svr-adaption</module>
-                <module>../svr-app</module>
-                <module>../svr-configuration</module>
-                <module>../svr-dict</module>
-                <module>../svr-discovery</module>
-                <module>../svr-geography</module>
-                <!--<module>../svr-health-profile-search</module>-->
-                <!--<module>../svr-health-profile</module>-->
-                <module>../svr-organization</module>
-                <!--<module>../svr-pack-mgr</module>-->
-                <!--<module>../svr-pack-resolve</module>-->
-                <module>../svr-patient</module>
-                <module>../svr-security</module>
-                <!--<module>../svr-special-dict</module>-->
-                <module>../svr-standard</module>
-                <module>../svr-user</module>
-                <module>../svr-esb</module>
-                <!--<module>../ag-admin</module>-->
-                <!--<module>../ag-ehr-platform</module>-->
-                <module>../svr-family</module>
-                <!--<module>../svr-resource</module>-->
-                <!--<module>../svr-cipher</module>-->
-                <!--<module>../app-ehr-browser</module>-->
-                <!--<module>../svr-file-resource</module>-->
-            </modules>
         </profile>
-
-        <!--测试库-->
         <profile>
-            <id>test</id>
+            <id>prod-jar</id>
+            <activation>
+                <property>
+                    <name>spring.profiles.active</name>
+                    <value>default,prod</value>
+                </property>
+            </activation>
             <properties>
                 <skipTests>true</skipTests>
                 <packaging>jar</packaging>
                 <wagonServerId>192.168.1.220</wagonServerId>
                 <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
             </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>oauth2.profiles.active</name>
-                    <value>default,prod</value>
-                </property>
-            </activation>
-            <distributionManagement>
-                <repository>
-                    <id>test</id>
-                    <url>ssh://root:ceshi@192.168.1.220/home/root/ehr-release</url>
-                </repository>
-            </distributionManagement>
-            <modules>
-                <module>../svr-adaption</module>
-                <module>../svr-app</module>
-                <module>../svr-configuration</module>
-                <module>../svr-dict</module>
-                <module>../svr-discovery</module>
-                <module>../svr-geography</module>
-                <module>../svr-health-profile</module>
-                <module>../svr-organization</module>
-                <module>../svr-pack-mgr</module>
-                <module>../svr-pack-resolve</module>
-                <module>../svr-patient</module>
-                <module>../svr-security</module>
-                <module>../svr-special-dict</module>
-                <module>../svr-standard</module>
-                <module>../svr-user</module>
-                <module>../svr-esb</module>
-                <module>../ag-admin</module>
-                <module>../ag-ehr-platform</module>
-                <module>../svr-cipher</module>
-                <!--<module>../app-ehr-browser</module>-->
-            </modules>
-        </profile>
-
-        <profile>
-            <id>prod</id>
-            <properties>
-                <skipTests>true</skipTests>
-                <packaging>jar</packaging>
-                <wagonServerId>192.168.1.220</wagonServerId>
-                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
-            </properties>
-            <activation>
-                <property>
-                    <name>oauth2.profiles.active</name>
-                    <value>default,prod</value>
-                </property>
-            </activation>
             <distributionManagement>
                 <repository>
                     <id>prod</id>
                     <url>ssh://root:111111@11.1.2.21/home/root/ehr-release</url>
                 </repository>
             </distributionManagement>
-            <modules>
-                <module>../svr-adaption</module>
-                <module>../svr-app</module>
-                <module>../svr-configuration</module>
-                <module>../svr-dict</module>
-                <module>../svr-discovery</module>
-                <module>../svr-geography</module>
-                <module>../svr-health-profile</module>
-                <module>../svr-organization</module>
-                <module>../svr-pack-mgr</module>
-                <module>../svr-pack-resolve</module>
-                <module>../svr-patient</module>
-                <module>../svr-security</module>
-                <module>../svr-special-dict</module>
-                <module>../svr-standard</module>
-                <module>../svr-user</module>
-                <module>../svr-esb</module>
-                <module>../ag-admin</module>
-                <module>../ag-ehr-platform</module>
-                <module>../svr-cipher</module>
-                <!--<module>../app-ehr-browser</module>-->
-            </modules>
         </profile>
     </profiles>
-
 </project>
