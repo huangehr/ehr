@@ -13,6 +13,7 @@ public class RsCategoryTypeTreeModel {
     private List<RsCategoryTypeTreeModel> children;
 //    private List<RsResourcesModel> resourceIds;
     private String resourceIds;
+    private String resourceCode;
 
     public String getId() {
         return id;
@@ -60,5 +61,13 @@ public class RsCategoryTypeTreeModel {
 
     public void setResourceIds(String resourceIds) {
         this.resourceIds = resourceIds;
+    }
+
+    public String getResourceCode() {
+        return resourceCode;
+    }
+
+    public void setResourceCode(String resourceCode) {
+        this.resourceCode = resourceCode;
     }
 }

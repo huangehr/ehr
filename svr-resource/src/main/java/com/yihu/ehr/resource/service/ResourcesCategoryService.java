@@ -110,4 +110,17 @@ public class ResourcesCategoryService extends BaseJpaService<RsCategory,Resource
         return query.list();
     }
 
+    public List<RsCategory> getCateTypeExcludeSelfAndChildren(String ids) {
+        Session session = currentSession();
+        String strSql="";
+        if(!StringUtils.isEmpty(ids)){
+            strSql += "from RsCategory a where 1=1 and a.id not in(:ids)";
+        }
+        Query query = session.createQuery(strSql);
+        if(!StringUtils.isEmpty(ids)){
+            query.setParameterList("ids", ids.split(","));
+        }
+        return query.list();
+    }
+
 }
