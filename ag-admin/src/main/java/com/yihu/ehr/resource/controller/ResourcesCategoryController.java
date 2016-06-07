@@ -176,7 +176,7 @@ public class ResourcesCategoryController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/types/parent", method = RequestMethod.GET)
+    @RequestMapping(value = "/resources/types/parent", method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
     public Envelop getCdaTypeExcludeSelfAndChildren(
             @ApiParam(name = "id", value = "id")
