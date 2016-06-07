@@ -129,4 +129,27 @@ public class ResourcesCategoryEndPoint extends EnvelopRestEndPoint {
         return (List<MRsCategory>) convertToModels(resources, new ArrayList<MRsCategory>(resources.size()), MRsCategory.class, null);
     }
 
+    @RequestMapping(value = ServiceApi.Resources.CategoryExitSelfAndChild, method = RequestMethod.GET)
+    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
+    public List<MRsCategory> getCateTypeExcludeSelfAndChildren(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") String id) throws Exception {
+        List<RsCategory> parentTypes = rsCategoryService.getRsCategoryByPid(id);
+        String childrenIds = getChildIncludeSelfByParentsAndChildrenIds(parentTypes,id+",");   //递归获取
+        List<RsCategory> cdaTypes = rsCategoryService.getCateTypeExcludeSelfAndChildren(childrenIds);
+        return  (List<MRsCategory>)convertToModels(cdaTypes,new ArrayList<MRsCategory>(cdaTypes.size()),MRsCategory.class,"");
+    }
+
+    public String getChildIncludeSelfByParentsAndChildrenIds(List<RsCategory> parentTypes,String childrenIds) {
+        for (int i = 0; i < parentTypes.size(); i++) {
+            RsCategory typeInfo = parentTypes.get(i);
+            childrenIds+=typeInfo.getId()+",";
+            List<RsCategory> listChild = rsCategoryService.getRsCategoryByPid(typeInfo.getId());
+            if(listChild.size()>0){
+                childrenIds = getChildIncludeSelfByParentsAndChildrenIds(listChild,childrenIds);
+            }
+        }
+        return childrenIds;
+    }
+
 }
