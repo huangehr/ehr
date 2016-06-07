@@ -16,9 +16,21 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 
 @FeignClient(name = MicroServices.Resource)
-@RequestMapping(value = ApiVersion.Version1_0)
+@RequestMapping(value = ApiVersion.Version1_0 + "/rs/query")
 @ApiIgnore
 public interface ResourceBrowseClient {
+
+
+
+    /**
+     *资源数据源结构
+     */
+    @ApiOperation("资源数据源结构")
+    @RequestMapping(value = "/getResourceMetadata", method = RequestMethod.GET)
+    public String getResourceMetadata(
+            @ApiParam("resourcesCode")
+            @RequestParam(value = "resourcesCode", required = true) String resourcesCode);
+
 
     @ApiOperation("资源浏览")
     @RequestMapping(value = "/getResourceData", method = RequestMethod.GET)

@@ -84,7 +84,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
         pagedResponse(request, response, packService.getCount(filters), page, size);
 
-        return convertToModels(packageList, new ArrayList<MPackage>(packageList.size()), MPackage.class, fields);
+        return convertToModels(packageList, new ArrayList<>(packageList.size()), MPackage.class, fields);
     }
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.DELETE)

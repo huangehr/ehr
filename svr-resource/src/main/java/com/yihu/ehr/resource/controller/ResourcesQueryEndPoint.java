@@ -58,7 +58,7 @@ public class ResourcesQueryEndPoint {
      */
     @ApiOperation("资源浏览")
     @RequestMapping(value = "/getResourceData", method = RequestMethod.GET)
-    public Envelop getResourceData(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
+    public Envelop getResourceData(@ApiParam(name="resourcesCode",defaultValue = "RS_HOSPITALIZED_DIAGNOSIS") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
                                 @ApiParam("queryCondition") @RequestParam(value = "queryCondition", required = false) String queryCondition,
                                 @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                 @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
@@ -68,7 +68,7 @@ public class ResourcesQueryEndPoint {
 
     @ApiOperation("测试--Hbase主表")
     @RequestMapping(value = "/getEhrCenter", method = RequestMethod.GET)
-    public Page<Map<String,Object>> getEhrCenter(@ApiParam(name="queryParams",defaultValue="{\"q\":\"demographic_id:422726196802192219\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
+    public Page<Map<String,Object>> getEhrCenter(@ApiParam(name="queryParams",defaultValue="{\"q\":\"demographic_id:420521195812172917\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                  @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                                  @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
         return resourcesQueryDao.getEhrCenter(queryParams, page, size);
@@ -76,7 +76,7 @@ public class ResourcesQueryEndPoint {
 
     @ApiOperation("测试--Hbase从表")
     @RequestMapping(value = "/getEhrCenterSub", method = RequestMethod.GET)
-    public Page<Map<String,Object>> getEhrCenterSub(@ApiParam(name="queryParams",defaultValue="{\"table\":\"HDSC02_12\",\"join\":\"demographic_id:422726196802192219\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
+    public Page<Map<String,Object>> getEhrCenterSub(@ApiParam(name="queryParams",defaultValue="{\"table\":\"HDSC02_17\",\"join\":\"demographic_id:420521195812172917\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                     @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                                     @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception{
         return resourcesQueryDao.getEhrCenterSub(queryParams, page, size);

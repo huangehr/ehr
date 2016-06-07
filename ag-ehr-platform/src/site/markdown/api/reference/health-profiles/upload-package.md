@@ -112,7 +112,7 @@ ZIP包：
 
 	根目录：
     	|---documents/文件列表
-    	|---meta.json
+    	|---documents.json
 	
 其中documents目录包含本次档案所有的非结构化原始文件，根目录下的meta.json文件包含此患者的部分摘要信息，其结构如下：
 	
@@ -138,16 +138,18 @@ ZIP包：
 		[
 			{
 				"cda_doc_id": "CDA文档ID",
-				"url": "档案请求路径，使用相对路径，主机名使用机构参数中的回调URL。若路径中含有特殊字符，请使用URL编码，如：冒号，点号等。",
-                "expire_date": "过期时间，格式：2015-11-05 17:30:56",
 				"content":
 				[
 					{
-						"mime_type": "文件类型，参见:https://en.wikipedia.org/wiki/MIME",
-						"name": "文件名1.扩展名;文件名2.扩展名"
+						"mime_type": "必选。文件类型，参见:https://en.wikipedia.org/wiki/MIME",
+						"url": "可选。档案请求路径，使用相对路径，主机名使用机构参数中的回调URL。若路径中含有特殊字符，请使用URL编码，如：冒号，点号等",
+						"url_scope": "可选，与url匹配.Private;Public",
+						"name": "可选。文件名1.扩展名;文件名2.扩展名"
 					},
 					{
 						"mime_type": "文件类型，参见:https://en.wikipedia.org/wiki/MIME",
+						"url": "可选。档案请求路径，使用相对路径，主机名使用机构参数中的回调URL。若路径中含有特殊字符，请使用URL编码，如：冒号，点号等",
+                        "url_scope": "可选，与url匹配.Private;Public",
 						"name": "文件名.扩展名"
 					}
 				]
@@ -166,9 +168,9 @@ ZIP包：
 		|------检查报告1.pdf
 		|------检查报告2.pdf
 		|------检查报告3.pdf
-	|---meta.json
+	|---documents.json
 	
-meta.json
+documents.json
 
 	{
 		"demographic_id": ""350322198511153812,
@@ -257,8 +259,6 @@ meta.json
 		[
 			{
 				"cda_doc_id": "CDA_ABC",
-				"url": "/api/patient/patient_id=10295514&event_no=000622508",
-				"expire_date": "2016-10-10 00:00:00",
 				"content":{
 					"mime_type": "application/msword",
 					"name": "住院病历.doc"
@@ -266,15 +266,17 @@ meta.json
 			}，
 			{
 				"cda_doc_id: "CDA_DEF",
-				"url": "/api/patient/patient_id=10295514&event_no=000622508",
-				"expire_date": "2016-10-10 00:00:00",
 				"content":[
 					{
 						"mime_type": "application/png",
+						"url": "/api/patient/patient_id=10295514&event_no=000622508",
+						"url_scope": "Public",
 						"name": "检验报告-血常规.png;检验报告-尿常规.png"
 					},
 					{
 						"mime_type": "application/x-pdf",
+						"url": "/api/patient/patient_id=10295514&event_no=000622508",
+						"url_scope": "Public",
 						"name": "检验报告-肝功能.pdf;检验报告-肾功能.pdf"
 					}
 				]
@@ -290,7 +292,7 @@ meta.json
 **ZIP包结构**
 
 	根目录：
-	|---index/patient_index.json
+	|---link.json
 	
 其中index目录保存病人的档案数据，档案包仅有此目录。此目录下的patient_index.json文件包含患者档案在机构的访问路径和部分平台所需要的摘要数据，其结构如下：
 
