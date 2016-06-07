@@ -11,12 +11,15 @@ import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +92,8 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     public boolean deleteRsDictionary(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
+
+        id = URLDecoder.decode(id, "UTF-8");
         RsDictionary dictionary = dictionaryService.findById(id);
         hasChild(dictionary);
         dictionaryService.delete(id);
@@ -99,8 +104,9 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据id获取获取标准字典")
     public MRsDictionary getRsDictionaryById(
             @ApiParam(name = "id", value = "", defaultValue = "")
-            @RequestParam(value = "id") String id) {
-        RsDictionary dictionary = dictionaryService.findById(id);
+            @PathVariable(value = "id") String id) throws UnsupportedEncodingException {
+
+        RsDictionary dictionary = dictionaryService.findById(URLDecoder.decode(id, "UTF-8"));
         return convertToModel(dictionary, MRsDictionary.class);
     }
 

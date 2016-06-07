@@ -50,7 +50,7 @@ public interface RsDictionaryClient {
     @RequestMapping(value = ServiceApi.Resources.Dict, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取标准字典")
     MRsDictionary getRsDictionaryById(
-            @RequestParam(value = "id") String id);
+            @PathVariable(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Resources.DictBatch, method = RequestMethod.POST , consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量创建标准字典", notes = "批量创建标准字典")

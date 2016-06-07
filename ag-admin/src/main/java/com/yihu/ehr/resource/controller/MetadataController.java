@@ -19,6 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.beans.Encoder;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -188,7 +191,7 @@ public class MetadataController extends BaseController {
         }
     }
 
-    private List<RsMetadataModel> coverModelLs(List<MRsMetadata> rsMetadatas){
+    private List<RsMetadataModel> coverModelLs(List<MRsMetadata> rsMetadatas) throws UnsupportedEncodingException {
         List<RsMetadataModel> rs = new ArrayList<>();
         if(!isEmpty(rsMetadatas)){
             RsMetadataModel model;
@@ -198,7 +201,7 @@ public class MetadataController extends BaseController {
                 model = convertToModel(mRsMetadata, RsMetadataModel.class);
                 model.setDomainName(nullToSpace(domain.get(model.getDomain())));
                 model.setColumnTypeName(nullToSpace(columnType.get(model.getColumnType())));
-                model.setDictName(getDictName(mRsMetadata.getDictCode()));
+                model.setDictName(getDictName(URLEncoder.encode(mRsMetadata.getDictCode(), "UTF-8")));
                 rs.add(model);
             }
         }
