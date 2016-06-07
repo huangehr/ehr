@@ -106,7 +106,7 @@ public class SolrQuery {
 					}
 				}
 
-				re+=condition.toString() +" ";
+				re += conditionToString(condition) +" ";
 			}
 		}
 		else {

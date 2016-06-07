@@ -302,7 +302,7 @@ public class ResourcesQueryService  {
                     }
                 }
             }
-            queryParams = solr.conditionToString(ql);
+            queryParams = addParams(queryParams,"q",solr.conditionToString(ql));
 
             //通过资源代码获取默认参数
             List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
