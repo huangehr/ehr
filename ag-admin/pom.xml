@@ -4,20 +4,17 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>commons-dependencies-native</artifactId>
+        <artifactId>ehr-ms-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies-native</relativePath>
+        <relativePath>../ehr-ms-parent-pom</relativePath>
     </parent>
 
-	<artifactId>ag-admin</artifactId>
-	<packaging>${packaging}</packaging>
-	<name>总支撑管理网关</name>
-	<description>总支撑管理网关</description>
+	<artifactId>ag-ehr-admin</artifactId>
+	<packaging>${packaging.type}</packaging>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

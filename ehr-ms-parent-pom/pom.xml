@@ -4,16 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>commons-dependencies</artifactId>
         <groupId>com.yihu.ehr</groupId>
+        <artifactId>ehr-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies/pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>commons-dependencies-native</artifactId>
-    <name>commons-dependencies-native</name>
+    <artifactId>ehr-ms-parent-pom</artifactId>
     <packaging>pom</packaging>
-    <description>EHR微服务部署模板</description>
+    <description>EHR micro service parent pom</description>
 
     <modules>
         <!--注意：模块添加请按字母顺序-->
@@ -44,37 +43,6 @@
     </modules>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
-                <version>2.8</version>
-            </extension>
-        </extensions>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <executable>true</executable>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>wagon-maven-plugin</artifactId>
-                <version>1.0</version>
-                <configuration>
-                    <serverId>${wagonServerId}</serverId>
-                    <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
-                    <url>${wagonUrl}</url>
-                    <commands>
-                        <command>pkill -f ${project.build.finalName}.jar</command>
-                        <command>java -Djava.security.egd=file:/dev/./urandom -jar ${project.build.finalName}.jar</command>
-                    </commands>
-                    <displayCommandOutputs>true</displayCommandOutputs>
-                </configuration>
-            </plugin>
-        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -91,12 +59,37 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
-
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${version.spring}</version>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${version.spring}</version>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+    </dependencies>
     <!--
-    profiles分为三种场景(dev,test,prod)，三种部署模式(jar,war,docker).
-    预计是9种模式，但目前仅使用到dev,test,prod的jar,test的war.
-    若有需要可以组合配置这些部署模式.
+    profiles分为三种场景(dev,test,prod)，三种部署模式(jar,war,docker).预计是9种模式，
+    但目前仅使用到dev,test,prod的jar,test的war.若有需要可以组合配置这些部署模式.
+
+    - dev的可执行jar包，在本机调试，不需要配置wagon参数。
+    - test,prod的可执行jar包，需要在编译后传送到服务器上部署，故需配置wagon参数，参数可根据服务需要自行配置。
+    - dev,test,prod的war包，编译后使用tomcat api部署，故需配置tomcat参数，参数可根据服务需要自行配置。
     -->
     <profiles>
         <profile>
@@ -109,38 +102,38 @@
             </activation>
             <properties>
                 <skipTests>true</skipTests>
-                <packaging>jar</packaging>
-                <wagonServerId>192.168.1.220</wagonServerId>
-                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
+                <packaging.type>jar</packaging.type>
+                <dependency.scope>compile</dependency.scope>
             </properties>
-            <distributionManagement>
-                <repository>
-                    <id>192.168.1.220</id>
-                    <url>ssh://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</url>
-                </repository>
-            </distributionManagement>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.integration</groupId>
-                    <artifactId>spring-integration-jmx</artifactId>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>test-jar</id>
             <properties>
                 <skipTests>true</skipTests>
-                <packaging>jar</packaging>
-                <wagonServerId>192.168.1.220</wagonServerId>
-                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
+                <packaging.type>jar</packaging.type>
+                <dependency.scope>compile</dependency.scope>
+                <wagonServerId/>
+                <wagonUrl/>
             </properties>
-
-            <distributionManagement>
-                <repository>
-                    <id>test</id>
-                    <url>ssh://root:ceshi@192.168.1.220/home/root/ehr-release</url>
-                </repository>
-            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>wagon-maven-plugin</artifactId>
+                        <version>1.0</version>
+                        <configuration>
+                            <serverId>${wagonServerId}</serverId>
+                            <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
+                            <url>${wagonUrl}</url>
+                            <commands>
+                                <command>pkill -f ${project.build.finalName}.jar</command>
+                                <command>java -Djava.security.egd=file:/dev/./urandom -jar ${project.build.finalName}.jar</command>
+                            </commands>
+                            <displayCommandOutputs>true</displayCommandOutputs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>test-war</id>
@@ -152,16 +145,10 @@
             </activation>
             <properties>
                 <skipTests>true</skipTests>
-                <packaging>war</packaging>
-                <wagonServerId>192.168.1.220</wagonServerId>
-                <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
+                <packaging.type>war</packaging.type>
+                <dependency.scope>provided</dependency.scope>
             </properties>
             <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <scope>compile</scope>
-                </dependency>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-web</artifactId>
@@ -175,14 +162,9 @@
                 <dependency>
                     <groupId>org.springframework.integration</groupId>
                     <artifactId>spring-integration-jmx</artifactId>
+                    <scope>${dependency.scope}</scope>
                 </dependency>
             </dependencies>
-            <distributionManagement>
-                <repository>
-                    <id>192.168.1.220</id>
-                    <url>ssh://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</url>
-                </repository>
-            </distributionManagement>
         </profile>
         <profile>
             <id>prod-jar</id>
@@ -194,16 +176,11 @@
             </activation>
             <properties>
                 <skipTests>true</skipTests>
-                <packaging>jar</packaging>
+                <packaging.type>war</packaging.type>
+                <dependency.scope>compile</dependency.scope>
                 <wagonServerId>192.168.1.220</wagonServerId>
                 <wagonUrl>scp://sand:timeneverstop@192.168.1.220/home/sand/ehr-release</wagonUrl>
             </properties>
-            <distributionManagement>
-                <repository>
-                    <id>prod</id>
-                    <url>ssh://root:111111@11.1.2.21/home/root/ehr-release</url>
-                </repository>
-            </distributionManagement>
         </profile>
     </profiles>
 </project>

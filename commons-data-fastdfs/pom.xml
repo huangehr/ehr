@@ -3,14 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>commons-dependencies</artifactId>
+        <artifactId>ehr-lib-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies</relativePath>
+        <relativePath>../ehr-lib-parent-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>commons-data-fastdfs</artifactId>
     <packaging>jar</packaging>
-    <name>commons-data-fastdfs</name>
 
     <dependencies>
         <dependency>
@@ -23,9 +22,10 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
-            <version>1.1.0</version>
+            <version>${version.ehr}</version>
         </dependency>
     </dependencies>
+
     <repositories>
         <!--<repository>
             <id>Releases</id>

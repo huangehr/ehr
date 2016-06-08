@@ -4,21 +4,20 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>commons-dependencies</artifactId>
+        <artifactId>ehr-lib-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies</relativePath>
+        <relativePath>../ehr-lib-parent-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>commons-admin-gateway-model</artifactId>
-	<packaging>jar</packaging>
-	<name>commons-admin-gateway-model</name>
+    <packaging>jar</packaging>
 	<description>EHR platform admin api gateway object model</description>
 
     <dependencies>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
-            <version>1.1.0</version>
+            <version>${version.ehr}</version>
         </dependency>
     </dependencies>
 </project>

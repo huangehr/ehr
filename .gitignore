@@ -3,6 +3,7 @@ ehr.ipr
 ehr.iws
 ehr.ids
 */*.iml
+ehr.iml
 */target
 .idea/*
 app-admin/.idea/*

@@ -4,19 +4,19 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>commons-dependencies-native</artifactId>
+        <artifactId>ehr-ms-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies-native</relativePath>
+        <relativePath>../ehr-ms-parent-pom</relativePath>
     </parent>
 
 	<artifactId>svr-configuration</artifactId>
-	<packaging>${packaging}</packaging>
+	<packaging>${packaging.type}</packaging>
 	<name>svr-configuration</name>
 	<description>EHR platform configuration service</description>
 
     <properties>
-        <docker.host>http://192.168.1.220:2376</docker.host>
-        <docker.expose.port>1221:1221</docker.expose.port>
+        <wagonServerId>192.168.1.220</wagonServerId>
+        <wagonUrl>scp://sand:timeneverstop@192.168.1.221/home/sand/ehr-release</wagonUrl>
     </properties>
 
 	<dependencies>

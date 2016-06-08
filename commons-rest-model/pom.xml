@@ -4,15 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>commons-dependencies</artifactId>
+        <artifactId>ehr-lib-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies</relativePath>
+        <relativePath>../ehr-lib-parent-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>commons-rest-model</artifactId>
-	<packaging>jar</packaging>
-	<name>commons-rest-model</name>
-	<description>EHR platform rest api object model</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
