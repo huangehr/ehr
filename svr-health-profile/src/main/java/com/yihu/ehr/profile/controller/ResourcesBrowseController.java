@@ -109,8 +109,8 @@ public class ResourcesBrowseController {
 
     /******************** CDA相关接口 ***************************************/
     @ApiOperation("档案详情 -- CDA分类")
-    @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
-    public List<Map<String,Object>> getPatientCdaInfo(
+    @RequestMapping(value = "/cda/getCDAClass", method = RequestMethod.GET)
+    public List<Map<String,Object>> getCDAClass(
             @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
             @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo) throws Exception {
         if(profileId == null && eventNo == null)

@@ -13,6 +13,7 @@ import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -305,7 +306,7 @@ public class PatientInfoBaseService {
         //事件年份
         if(year!=null && year.length()>0)
         {
-            q += " AND event_date:["+year+" TO "+(Integer.parseInt(year)+1)+"]";
+            q += " AND event_date:[" + year + "-01-01T00:00:00Z TO " + year + "-12-31T23:59:59Z]";
         }
 
         String queryParams = "{\"q\":\""+q+"\"}";
@@ -364,7 +365,7 @@ public class PatientInfoBaseService {
         }
 
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,queryParams);
+        Envelop result = resource.getResources(BasisConstant.patientEvent,appId, URLEncoder.encode(queryParams, "utf-8"));
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
             re = result.getDetailModelList();
@@ -417,33 +418,30 @@ public class PatientInfoBaseService {
         List<String> list = new ArrayList<>();
         List<Map<String,String>> healthProblemDictMapList = new ArrayList<>();
         //门诊诊断
-//        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
-//        if(outpatient.getDetailModelList()!=null && outpatient.getDetailModelList().size()>0) {
-//            for(int i=0;i<outpatient.getDetailModelList().size();i++) {
-//                Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
-//                if(obj.containsKey(BasisConstant.mzzd)) {
-//                    String code = obj.get(BasisConstant.mzzd).toString();
-//                    list.add(code);
-//                }
-//            }
-//        }
+        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
+        if(outpatient.getDetailModelList()!=null && outpatient.getDetailModelList().size()>0) {
+            for(int i=0;i<outpatient.getDetailModelList().size();i++) {
+                Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
+                if(obj.containsKey(BasisConstant.mzzd)) {
+                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList,obj);
+                }
+            }
+        }
         //住院诊断
         Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
         if(hospitalized.getDetailModelList()!=null && hospitalized.getDetailModelList().size()>0) {
             for(int i=0;i<hospitalized.getDetailModelList().size();i++) {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
                 if(obj.containsKey(BasisConstant.zyzd)) {
-                    String code = obj.get(BasisConstant.zyzd).toString();
-                    MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(code);
-                    Map<String,String> map = new HashMap<>();
-                    map.put(healthProblemDict.getCode(),healthProblemDict.getName());
-//                    list.add(code);
-                    healthProblemDictMapList.add(map);
+                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList,obj);
                 }
             }
         }
         return healthProblemDictMapList;
     }
+
+
+
 
     //@患者就诊过的年份
     public List<String> getPatientYear(String demographicId) throws Exception
@@ -504,6 +502,17 @@ public class PatientInfoBaseService {
         }
 
         return organizationMapList;
+    }
+
+
+
+    private  List<Map<String,String>> getHealthProblemDictMapList(List<Map<String,String>> healthProblemDictMapList,Map<String, Object> obj){
+        String code = (String)obj.get(BasisConstant.zyzd);
+        MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(code);
+        Map<String,String> map = new HashMap<>();
+        map.put(healthProblemDict.getCode(),healthProblemDict.getName());
+        healthProblemDictMapList.add(map);
+        return healthProblemDictMapList;
     }
 
 

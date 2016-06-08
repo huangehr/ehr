@@ -140,12 +140,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 
-//    public void jiajiemi(){
-//        String unPassword = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));//解密
-//        String enPassword = RSA.encrypt(packageCrypto, RSA.genPublicKey(publicKey));//加密
-//
-//    }
-
     /**
      * 获取档案包信息。
      *

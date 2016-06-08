@@ -66,9 +66,8 @@ public class ResourcesQueryEndPoint {
                                    @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
         return resourcesQueryService.getResourceData(resourcesCode, queryCondition, page, size);
     }
-    //-----------------------------给网关-----------------------------------//
 
-    @ApiOperation("测试--Hbase主表")
+    @ApiOperation("内部--Hbase主表")
     @RequestMapping(value = "/getEhrCenter", method = RequestMethod.GET)
     public Page<Map<String, Object>> getEhrCenter(@ApiParam(name = "queryParams", defaultValue = "{\"q\":\"demographic_id:420521195812172917\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                   @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
@@ -76,15 +75,23 @@ public class ResourcesQueryEndPoint {
         return resourcesQueryDao.getEhrCenter(queryParams, page, size);
     }
 
-    @ApiOperation("测试--Hbase从表")
+    @ApiOperation("内部--Hbase从表")
     @RequestMapping(value = "/getEhrCenterSub", method = RequestMethod.GET)
-    public Page<Map<String, Object>> getEhrCenterSub(@ApiParam(name = "queryParams", defaultValue = "{\"table\":\"HDSC02_17\",\"join\":\"demographic_id:420521195812172917\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                                     @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                                     @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourcesQueryDao.getEhrCenterSub(queryParams, page, size);
+    public Envelop getEhrCenterSub(
+            @ApiParam(name = "queryParams", defaultValue = "{\"table\":\"HDSC02_17\",\"join\":\"demographic_id:420521195812172917\"}")
+            @RequestParam(value = "queryParams", required = false) String queryParams,
+            @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+        Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenterSub(queryParams, page, size);
+        Envelop re = new Envelop();
+        re.setCurrPage(result.getNumber());
+        re.setPageSize(result.getSize());
+        re.setTotalCount(new Long(result.getTotalElements()).intValue());
+        re.setDetailModelList(result.getContent());
+        return re;
     }
 
-    @ApiOperation("测试--Hbase主表统计")
+    @ApiOperation("内部--Hbase主表统计")
     @RequestMapping(value = "/countEhrCenter", method = RequestMethod.GET)
     public Page<Map<String, Object>> countEhrCenter(@ApiParam(value = "queryParams", defaultValue = "{\"groupFields\":\"org_code,HDSD00_01_003_VALUE_S,HDSA00_01_015_VALUE_S\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                     @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
@@ -92,7 +99,7 @@ public class ResourcesQueryEndPoint {
         return resourcesQueryDao.countEhrCenter(queryParams, page, size);
     }
 
-    @ApiOperation("测试--Hbase从表统计")
+    @ApiOperation("内部--Hbase从表统计")
     @RequestMapping(value = "/countEhrCenterSub", method = RequestMethod.GET)
     public Page<Map<String, Object>> countEhrCenterSub(@ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                        @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
@@ -100,7 +107,7 @@ public class ResourcesQueryEndPoint {
         return resourcesQueryDao.countEhrCenterSub(queryParams, page, size);
     }
 
-    @ApiOperation("测试--Mysql查询")
+    @ApiOperation("内部--Mysql查询")
     @RequestMapping(value = "/getMysqlData", method = RequestMethod.GET)
     public Page<Map<String, Object>> getMysqlData(@ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                   @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
