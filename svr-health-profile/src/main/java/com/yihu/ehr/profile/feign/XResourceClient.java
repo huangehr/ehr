@@ -37,4 +37,9 @@ public interface XResourceClient {
                                           @RequestParam(value = "page", required = false) Integer page,
                                           @RequestParam(value = "size", required = false) Integer size) throws Exception;
 
+    //不通过资源代码查询细表数据
+    @RequestMapping(value = ApiVersion.Version1_0+ "/rs/query/getEhrCenterSub", method = GET)
+    Envelop getEhrCenterSub(@RequestParam(value = "queryParams", required = true) String queryParams,
+                         @RequestParam(value = "page", required = false) Integer page,
+                         @RequestParam(value = "size", required = false) Integer size) throws Exception;
 }

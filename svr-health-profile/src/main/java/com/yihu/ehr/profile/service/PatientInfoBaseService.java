@@ -13,6 +13,7 @@ import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -305,7 +306,7 @@ public class PatientInfoBaseService {
         //事件年份
         if(year!=null && year.length()>0)
         {
-            q += " AND event_date:["+year+" TO "+(Integer.parseInt(year)+1)+"]";
+            q += " AND event_date:[" + year + "-01-01T00:00:00Z TO " + year + "-12-31T23:59:59Z]";
         }
 
         String queryParams = "{\"q\":\""+q+"\"}";
@@ -364,7 +365,7 @@ public class PatientInfoBaseService {
         }
 
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,queryParams);
+        Envelop result = resource.getResources(BasisConstant.patientEvent,appId, URLEncoder.encode(queryParams, "utf-8"));
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
             re = result.getDetailModelList();
