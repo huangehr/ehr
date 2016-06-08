@@ -154,6 +154,7 @@ public class ResourcesQueryService {
 
                 Envelop re = new Envelop();
                 if (result != null) {
+                    re.setSuccessFlg(true);
                     re.setCurrPage(result.getNumber());
                     re.setPageSize(result.getSize());
                     re.setTotalCount(new Long(result.getTotalElements()).intValue());
@@ -201,6 +202,8 @@ public class ResourcesQueryService {
                         }
                         re.setDetailModelList(list);
                     }
+                }else {
+                    re.setSuccessFlg(false);
                 }
                 return re;
             }
