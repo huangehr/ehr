@@ -2,6 +2,8 @@ package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -46,11 +48,11 @@ public interface ResourcesBrowseClient {
             @RequestParam(value = "diseaseId", required = false) String diseaseId);
 
     @RequestMapping(value = "/home/getPatientDisease", method = RequestMethod.GET)
-    List<String> getPatientDisease(
+    List<MHealthProblemDict> getPatientDisease(
             @RequestParam(value = "demographicId", required = true) String demographicId);
 
     @RequestMapping(value = "/home/getPatientArea", method = RequestMethod.GET)
-    List<String> getPatientArea(
+    List<MOrganization> getPatientArea(
             @RequestParam(value = "demographicId", required = true) String demographicId);
 
     @RequestMapping(value = "/home/getPatientYear", method = RequestMethod.GET)
@@ -58,12 +60,12 @@ public interface ResourcesBrowseClient {
             @RequestParam(value = "demographicId", required = true) String demographicId);
 
 
-    @RequestMapping(value = "/cda/getPatientCdaInfo/1", method = RequestMethod.GET)
+    @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
     List<Map<String,Object>> getPatientCdaInfo(
             @RequestParam(value = "profileId", required = false) String profileId,
             @RequestParam(value = "eventNo", required = false) String eventNo);
 
-    @RequestMapping(value = "/cda/getPatientCdaInfo/2", method = RequestMethod.GET)
+    @RequestMapping(value = "/cda/getCDAData", method = RequestMethod.GET)
     List<Map<String,Object>> getPatientCdaInfo(
             @RequestParam(value = "profileId", required = false) String profileId,
             @RequestParam(value = "eventNo", required = false) String eventNo,

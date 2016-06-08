@@ -28,7 +28,7 @@ import java.util.*;
  * Created by hzp on 2016/4/13.
  */
 @Service("resourcesQueryService")
-public class ResourcesQueryService  {
+public class ResourcesQueryService {
 
     @Autowired
     SolrQuery solr;
@@ -46,184 +46,155 @@ public class ResourcesQueryService  {
     ResourceDefaultParamDao resourceDefaultParamDao;
 
     //忽略字段
-    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","profile_type","demographic_id", "patient_id","org_code","profile_id", "cda_version", "client_id"));
+    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "profile_type", "demographic_id", "patient_id", "org_code", "profile_id", "cda_version", "client_id"));
 
     /**
      * 新增参数
+     *
      * @return
      */
-    private String addParams(String oldParams,String key,String value)
-    {
+    private String addParams(String oldParams, String key, String value) {
         String newParam = "";
-        if(value.startsWith("[") && value.endsWith("]"))
-        {
-            newParam = "\""+key+"\":"+value;
+        if (value.startsWith("[") && value.endsWith("]")) {
+            newParam = "\"" + key + "\":" + value;
+        } else {
+            newParam = "\"" + key + "\":\"" + value.replace("\"", "\\\"") + "\"";
         }
-        else{
-            newParam = "\""+key+"\":\""+value.replace("\"","\\\"")+"\"";
-        }
-        if(oldParams!=null && oldParams.length()>3 && oldParams.startsWith("{") && oldParams.endsWith("}"))
-        {
-            return oldParams.substring(0,oldParams.length()-1)+","+newParam+"}";
-        }
-        else{
-            return "{"+newParam+"}";
+        if (oldParams != null && oldParams.length() > 3 && oldParams.startsWith("{") && oldParams.endsWith("}")) {
+            return oldParams.substring(0, oldParams.length() - 1) + "," + newParam + "}";
+        } else {
+            return "{" + newParam + "}";
         }
     }
 
     /**
      * 获取资源
+     *
      * @param resourcesCode
      * @param appId
-     * @param queryParams Mysql为sql语句，Hbase为solr查询语法
+     * @param queryParams   Mysql为sql语句，Hbase为solr查询语法
      * @param page
      * @param size
      * @return
      * @throws Exception
      */
-    public Envelop getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception {
+    public Envelop getResources(String resourcesCode, String appId, String queryParams, Integer page, Integer size) throws Exception {
         //获取资源信息
         RsResources rs = resourcesDao.findByCode(resourcesCode);
-        if(rs!=null)
-        {
+        if (rs != null) {
             String methodName = rs.getRsInterface(); //执行函数
             String grantType = rs.getGrantType(); //访问方式 0开放 1授权
             //资源结构
             List<DtoResourceMetadata> metadataList;
-            if(grantType=="1" && appId!="JKZL")
-            {
+            if (grantType == "1" && appId != "JKZL") {
                 //判断是否有资源权限
                 RsAppResource appResource = resourceMetadataQueryDao.loadAppResource(appId);
-                if(appResource!=null)
-                {
+                if (appResource != null) {
                     //授权数据源
-                    metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode,appResource.getId());
+                    metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode, appResource.getId());
+                } else {
+                    throw new Exception("该应用[appId=" + appId + "]无权访问资源[resourcesCode=" + resourcesCode + "]");
                 }
-                else
-                {
-                    throw new Exception("该应用[appId="+appId+"]无权访问资源[resourcesCode="+resourcesCode+"]");
-                }
-            }
-            else{
+            } else {
                 //所有数据元
                 metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode);
             }
 
             //通过资源代码获取默认参数
             List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
-            for(ResourceDefaultParam param:paramsList)
-            {
-                queryParams = addParams(queryParams,param.getParamKey(),param.getParamValue());
+            for (ResourceDefaultParam param : paramsList) {
+                queryParams = addParams(queryParams, param.getParamKey(), param.getParamValue());
             }
 
-            if(metadataList!=null && metadataList.size()>0)
-            {
+            if (metadataList != null && metadataList.size() > 0) {
                 /*************** 分组统计数据元 *********************/
                 String groupFields = "";
                 String statsFields = "";
                 String customGroup = "";
                 //遍历资源数据元，获取分组/统计字段
-                for(DtoResourceMetadata metadada : metadataList) {
+                for (DtoResourceMetadata metadada : metadataList) {
                     String key = metadada.getId();
-                    if(metadada.getDictCode()!=null&& metadada.getDictCode().length()>0&&!metadada.getDictCode().equals("0"))
-                    {
+                    if (metadada.getDictCode() != null && metadada.getDictCode().length() > 0 && !metadada.getDictCode().equals("0")) {
                         key += "_CODE";
                     }
                     String groupType = metadada.getGroupType();
-                    String groupData =  metadada.getGroupData();
+                    String groupData = metadada.getGroupData();
 
-                    if(groupType!=null)
-                    {
-                        if(grantType.equals("0")) //分组字段
+                    if (groupType != null) {
+                        if (grantType.equals("0")) //分组字段
                         {
-                            if(groupData!=null && groupData.length()>0)
-                            {
-                                customGroup +="{\"groupField\":\""+key+"\",\"groupCondition\":"+groupData+"},";
-                            }
-                            else {
+                            if (groupData != null && groupData.length() > 0) {
+                                customGroup += "{\"groupField\":\"" + key + "\",\"groupCondition\":" + groupData + "},";
+                            } else {
                                 groupFields += key + ",";
                             }
-                        }
-                        else if(grantType.equals("1")) //统计字段
+                        } else if (grantType.equals("1")) //统计字段
                         {
-                            statsFields += key +",";
+                            statsFields += key + ",";
                         }
                     }
                 }
-                if(groupFields.length()>0)
-                {
-                    groupFields = groupFields.substring(0,groupFields.length()-1);
-                    queryParams = addParams(queryParams,"groupFields",groupFields);
+                if (groupFields.length() > 0) {
+                    groupFields = groupFields.substring(0, groupFields.length() - 1);
+                    queryParams = addParams(queryParams, "groupFields", groupFields);
                 }
-                if(statsFields.length()>0)
-                {
-                    statsFields = statsFields.substring(0,statsFields.length()-1);
-                    queryParams = addParams(queryParams,"statsFields",statsFields);
+                if (statsFields.length() > 0) {
+                    statsFields = statsFields.substring(0, statsFields.length() - 1);
+                    queryParams = addParams(queryParams, "statsFields", statsFields);
                 }
-                if(customGroup.length()>0)
-                {
-                    customGroup = "["+customGroup.substring(0,customGroup.length()-1)+"]";
-                    queryParams = addParams(queryParams,"customGroup",customGroup);
+                if (customGroup.length() > 0) {
+                    customGroup = "[" + customGroup.substring(0, customGroup.length() - 1) + "]";
+                    queryParams = addParams(queryParams, "customGroup", customGroup);
                 }
 
                 /************** 执行函数 *************************/
                 Class<ResourcesQueryDao> classType = ResourcesQueryDao.class;
-                Method method = classType.getMethod(methodName, new Class[]{String.class,Integer.class,Integer.class});
-                Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
+                Method method = classType.getMethod(methodName, new Class[]{String.class, Integer.class, Integer.class});
+                Page<Map<String, Object>> result = (Page<Map<String, Object>>) method.invoke(resourcesQueryDao, queryParams, page, size);
 
                 Envelop re = new Envelop();
-                if(result!=null)
-                {
+                if (result != null) {
                     re.setCurrPage(result.getNumber());
                     re.setPageSize(result.getSize());
                     re.setTotalCount(new Long(result.getTotalElements()).intValue());
 
-                    if(result.getContent()!=null&&result.getContent().size()>0)
-                    {
+                    if (result.getContent() != null && result.getContent().size() > 0) {
                         //是否统计
 
                         //转译
-                        List<Map<String,Object>> list = new ArrayList<>();
+                        List<Map<String, Object>> list = new ArrayList<>();
                         //遍历所有行
-                        for(int i=0;i<result.getContent().size();i++)
-                        {
-                            Map<String,Object> oldObj = (Map<String,Object>)result.getContent().get(i);
-                            Map<String,Object> newObj = new HashMap<>();
+                        for (int i = 0; i < result.getContent().size(); i++) {
+                            Map<String, Object> oldObj = (Map<String, Object>) result.getContent().get(i);
+                            Map<String, Object> newObj = new HashMap<>();
                             //遍历资源数据元
-                            for(DtoResourceMetadata metadada : metadataList) {
+                            for (DtoResourceMetadata metadada : metadataList) {
                                 String key = metadada.getId();
 
-                                if(oldObj.containsKey(key))
-                                {
-                                    newObj.put(metadada.getId(),oldObj.get(key));
-                                }
-                                else{
-                                    if(metadada.getDictCode()!=null&& metadada.getDictCode().length()>0&&!metadada.getDictCode().equals("0"))
-                                    {
-                                        if(oldObj.containsKey(key+"_CODE"))
-                                        {
-                                            newObj.put(metadada.getId(),oldObj.get(key+"_CODE"));
+                                if (oldObj.containsKey(key)) {
+                                    newObj.put(metadada.getId(), oldObj.get(key));
+                                } else {
+                                    if (metadada.getDictCode() != null && metadada.getDictCode().length() > 0 && !metadada.getDictCode().equals("0")) {
+                                        if (oldObj.containsKey(key + "_CODE")) {
+                                            newObj.put(metadada.getId(), oldObj.get(key + "_CODE"));
                                         }
-                                        if(oldObj.containsKey(key+"_VALUE"))
-                                        {
-                                            newObj.put(metadada.getId(),oldObj.get(key+"_VALUE"));
+                                        if (oldObj.containsKey(key + "_VALUE")) {
+                                            newObj.put(metadada.getId(), oldObj.get(key + "_VALUE"));
                                         }
                                     }
                                 }
                             }
 
 
-
-                            for(String key : oldObj.keySet())
-                            {
+                            for (String key : oldObj.keySet()) {
                                 //统计字段
                                 if (key.startsWith("$")) {
-                                    newObj.put(key,oldObj.get(key));
+                                    newObj.put(key, oldObj.get(key));
                                 }
 
                                 //忽略字段
                                 if (ignoreField.contains(key)) {
-                                    newObj.put(key,oldObj.get(key));
+                                    newObj.put(key, oldObj.get(key));
                                 }
                             }
                             list.add(newObj);
@@ -235,13 +206,14 @@ public class ResourcesQueryService  {
             }
         }
 
-        throw new Exception("未找到资源" + resourcesCode +"，或者该资源为空！");
+        throw new Exception("未找到资源" + resourcesCode + "，或者该资源为空！");
 
     }
 
 
     /**
      * 资源浏览 -- 资源数据元结构
+     *
      * @return
      */
     public String getResourceMetadata(String resourcesCode) {
@@ -274,14 +246,14 @@ public class ResourcesQueryService  {
 
     /**
      * 资源浏览
+     *
      * @return
      */
-    public Envelop getResourceData(String resourcesCode,String queryCondition,Integer page,Integer size) throws Exception
-    {
+    public Envelop getResourceData(String resourcesCode, String queryCondition, Integer page, Integer size) throws Exception {
         String queryParams = "";
         //获取资源信息
         RsResources rs = resourcesDao.findByCode(resourcesCode);
-        if(rs!=null) {
+        if (rs != null) {
             List<QueryCondition> ql = new ArrayList<>();
 
             //设置参数
@@ -293,25 +265,22 @@ public class ResourcesQueryService  {
                     String field = String.valueOf(jo.get("field")).trim();
                     String cond = String.valueOf(jo.get("condition")).trim();
                     String value = String.valueOf(jo.get("value"));
-                    if(value.indexOf(",")>0)
-                    {
+                    if (value.indexOf(",") > 0) {
                         ql.add(new QueryCondition(andOr, cond, field, value.split(",")));
-                    }
-                    else{
+                    } else {
                         ql.add(new QueryCondition(andOr, cond, field, value));
                     }
                 }
             }
-            queryParams = addParams(queryParams,"q",solr.conditionToString(ql));
+            queryParams = addParams(queryParams, "q", solr.conditionToString(ql));
 
             //通过资源代码获取默认参数
             List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
-            for(ResourceDefaultParam param:paramsList)
-            {
-                queryParams = addParams(queryParams,param.getParamKey(),param.getParamValue());
+            for (ResourceDefaultParam param : paramsList) {
+                queryParams = addParams(queryParams, param.getParamKey(), param.getParamValue());
             }
         }
-        return getResources(resourcesCode,"JKZL",queryParams,page,size);
+        return getResources(resourcesCode, "JKZL", queryParams, page, size);
     }
 
 }
