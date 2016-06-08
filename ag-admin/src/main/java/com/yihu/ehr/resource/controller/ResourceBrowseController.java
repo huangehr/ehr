@@ -133,12 +133,6 @@ public class ResourceBrowseController extends BaseController {
                             rsCategoryTypeTreeModelList.add(rsCategoryTypeModel);
                         }
                     }
-//                    else {
-//
-//                        RsCategoryTypeTreeModel rsCategoryTypeTreeModel = convertToModel(mRsCategory, RsCategoryTypeTreeModel.class);
-//
-//                        rsCategoryTypeTreeModelList.add(rsCategoryTypeTreeModel);
-//                    }
                 }
 
             envelop.setSuccessFlg(true);
