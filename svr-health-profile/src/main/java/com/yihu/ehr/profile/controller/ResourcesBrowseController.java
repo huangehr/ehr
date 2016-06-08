@@ -87,14 +87,14 @@ public class ResourcesBrowseController {
 
     @ApiOperation("就诊过的疾病")
     @RequestMapping(value = "/home/getPatientDisease", method = RequestMethod.GET)
-    public List<MHealthProblemDict> getPatientDisease(
+    public List<Map<String,String>> getPatientDisease(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
         return patient.getPatientDisease(demographicId);
     }
 
     @ApiOperation("就诊过的城市")
     @RequestMapping(value = "/home/getPatientArea", method = RequestMethod.GET)
-    public List<MOrganization> getPatientArea(
+    public List<Map<String,String>> getPatientArea(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
         return patient.getPatientArea(demographicId);
     }
