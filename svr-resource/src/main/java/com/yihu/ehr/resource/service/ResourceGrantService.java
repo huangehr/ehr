@@ -134,29 +134,29 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
         if(appRsList.size()==0)
             return appRsList;
 
-        String sql = "SELECT sm.id, m.name FROM rs_resource_metadata sm LEFT JOIN rs_metadata m ON sm.METADATA_ID=m.ID WHERE " +
-                "sm.resources_id=:resourcesId";
+//        String sql = "SELECT sm.id, m.name FROM rs_resource_metadata sm LEFT JOIN rs_metadata m ON sm.METADATA_ID=m.ID WHERE " +
+//                "sm.resources_id=:resourcesId";
 
-        SQLQuery query = currentSession().createSQLQuery(sql);
-        query.setParameter("resourcesId", resourcesId);
-        List<Object[]> rsResourceMetadatas = query.list();
+//        SQLQuery query = currentSession().createSQLQuery(sql);
+//        query.setParameter("resourcesId", resourcesId);
+//        List<Object[]> rsResourceMetadatas = query.list();
 
         appRsDao.save(appRsList);
 
-        List<RsAppResourceMetadata> appRsMetadataList = new ArrayList<>();
-        RsAppResourceMetadata appRsMetadata;
-        for(RsAppResource appResource: appRsList){
-            for(Object[] rsResourceMetadata: rsResourceMetadatas){
-                appRsMetadata = new RsAppResourceMetadata();
-                appRsMetadata.setId(new ObjectId(deployRegion, BizObject.AppResourceMetadata).toString());
-                appRsMetadata.setAppResourceId(appResource.getId());
-                appRsMetadata.setAppId(appResource.getAppId());
-                appRsMetadata.setResourceMetadataId(StringUtils.isEmpty(rsResourceMetadata[0])?"":(String)rsResourceMetadata[0]);
-                appRsMetadata.setResourceMetadataName(StringUtils.isEmpty(rsResourceMetadata[1])?"":(String)rsResourceMetadata[1]);
-                appRsMetadataList.add(appRsMetadata);
-            }
-        }
-        rsMetadataGrantService.grantRsMetadataBatch(appRsMetadataList);
+//        List<RsAppResourceMetadata> appRsMetadataList = new ArrayList<>();
+//        RsAppResourceMetadata appRsMetadata;
+//        for(RsAppResource appResource: appRsList){
+//            for(Object[] rsResourceMetadata: rsResourceMetadatas){
+//                appRsMetadata = new RsAppResourceMetadata();
+//                appRsMetadata.setId(new ObjectId(deployRegion, BizObject.AppResourceMetadata).toString());
+//                appRsMetadata.setAppResourceId(appResource.getId());
+//                appRsMetadata.setAppId(appResource.getAppId());
+//                appRsMetadata.setResourceMetadataId(StringUtils.isEmpty(rsResourceMetadata[0])?"":(String)rsResourceMetadata[0]);
+//                appRsMetadata.setResourceMetadataName(StringUtils.isEmpty(rsResourceMetadata[1])?"":(String)rsResourceMetadata[1]);
+//                appRsMetadataList.add(appRsMetadata);
+//            }
+//        }
+//        rsMetadataGrantService.grantRsMetadataBatch(appRsMetadataList);
         return appRsList;
     }
 }
