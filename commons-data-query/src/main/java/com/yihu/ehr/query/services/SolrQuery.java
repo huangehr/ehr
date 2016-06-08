@@ -54,6 +54,10 @@ public class SolrQuery {
 				}
 				break;
 			}
+			case Operation.NE: {
+				s = field+":(NOT "+keyword+")";
+				break;
+			}
 			case Operation.IN:
 			{
 				String in = "";

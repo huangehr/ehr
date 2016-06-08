@@ -5,9 +5,9 @@ import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.profile.feign.XHealthProblemDictClient;
+import com.yihu.ehr.profile.feign.XIcd10DictClient;
 import com.yihu.ehr.profile.feign.XOrganizationClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +37,7 @@ public class PatientInfoBaseService {
 
     //ICD10缓存服务
     @Autowired
-    private RedisClient redisClient;
-
-    @Autowired
-    Icd10HpRelationKeySchema keySchema;
+    XIcd10DictClient ict10Dict;
 
     @Autowired
     private XHealthProblemDictClient healthProblemDictClient;
@@ -123,7 +120,8 @@ public class PatientInfoBaseService {
                         String code = obj.get(BasisConstant.mzzd).toString();
                         String profileId = obj.get(BasisConstant.profileId).toString();
                         //通过疾病ID获取健康问题
-                        String healthProblem = redisClient.get(keySchema.icd10HpRelation(code));
+                        MIcd10Dict icd10Dict = ict10Dict.getIcd10DictValue(code);
+                        String healthProblem =icd10Dict.getCode()+"__"+icd10Dict.getName();
                         List<String> profileList = new ArrayList<>();
                         if(outpatientMap.containsKey(healthProblem))
                         {
@@ -154,7 +152,8 @@ public class PatientInfoBaseService {
                         String code = obj.get(BasisConstant.zyzd).toString();
                         String profileId = obj.get(BasisConstant.profileId).toString();
                         //通过疾病ID获取健康问题
-                        String healthProblem = redisClient.get(keySchema.icd10HpRelation(code));
+                        MIcd10Dict icd10Dict = ict10Dict.getIcd10DictValue(code);
+                        String healthProblem =icd10Dict.getCode()+"__"+icd10Dict.getName();
                         List<String> profileList = new ArrayList<>();
                         if(hospitalizedMap.containsKey(healthProblem))
                         {
