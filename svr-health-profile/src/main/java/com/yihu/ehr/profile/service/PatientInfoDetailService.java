@@ -10,6 +10,7 @@ import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,34 +45,62 @@ public class PatientInfoDetailService {
         List<Map<String,Object>> re = new ArrayList<>();
 
         //根据profileId或者eventNo获取主记录
-
-        String cdaVersion = "cda_version";
-        String orgCode = "org_code";
-
-        //根据机构获取定制模板
-        List<Template> list = templateService.findByOrganizationCodeAndCdaVersion(orgCode,cdaVersion);
-        //遍历模板
-        if(list!=null&&list.size()>0)
+        String q = "{\"q\":\"rowkey:"+profileId+"\"}";
+        if(profileId==null && eventNo!=null)
         {
-            for(Template template : list)
-            {
-                Map<String,Object> obj = new HashMap<>();
-                String cdaDocumentId = template.getCdaDocumentId();
-                List<MCdaDataSetRelationship> datasetList = cdaService.getCDADataSetRelationshipByCDAId(cdaVersion, cdaDocumentId);
+            q = "{\"q\":\"event_no:"+eventNo+"\"}";
+        }
+        else{
+            throw new Exception("非法传参！");
+        }
+        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,q);
+        if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
+        {
+            Map<String,Object> obj = (Map<String,Object>)result.getDetailModelList().get(0);
+            String cdaVersion = obj.get("cda_version").toString();
+            String orgCode = obj.get("org_code").toString();
 
-                //判断是否有数据
-                if(datasetList!=null && datasetList.size()>0)
+            //根据机构获取定制模板
+            List<Template> list = templateService.findByOrganizationCodeAndCdaVersion(orgCode,cdaVersion);
+            //遍历模板
+            if(list!=null&&list.size()>0)
+            {
+                for(Template template : list)
                 {
-                    String q="";
-                    for(MCdaDataSetRelationship dataset :datasetList)
+                    Map<String,Object> item = new HashMap<>();
+                    String cdaDocumentId = template.getCdaDocumentId();
+                    List<MCdaDataSetRelationship> datasetList = cdaService.getCDADataSetRelationshipByCDAId(cdaVersion, cdaDocumentId);
+
+                    //CDA关联数据集
+                    if(datasetList!=null && datasetList.size()>0)
                     {
+                        String query = "";
+                        for(MCdaDataSetRelationship dataset :datasetList)
+                        {
+                            if(query.length()>0)
+                            {
+                                query += "";
+                            }
+                            else{
+                                query = "";
+                            }
+                        }
+                        //判断是否包含相关数据
+                        Envelop data = resource.getEhrCenterSub(query,null,null);
+                        if(data.getDetailModelList()!=null&&data.getDetailModelList().size()>0)
+                        {
+
+                        }
 
                     }
                 }
             }
-        }
 
-        return re;
+            return re;
+        }
+        else{
+            throw new Exception("");
+        }
     }
 
     //根据模板获取病人CDA数据（未完成）
@@ -188,7 +217,7 @@ public class PatientInfoDetailService {
         {
             queryParams = "{\"join\":\"demographic_id:"+demographicId+"\",\"q\":\""+q+"\"}";
         }
-        return resource.getResources(resourceCode,appId,queryParams,page,size);
+        return resource.getResources(resourceCode,appId, URLEncoder.encode(queryParams),page,size);
     }
 
     /**
@@ -260,7 +289,7 @@ public class PatientInfoDetailService {
         {
             queryParams = "{\"join\":\"demographic_id:"+demographicId+"\",\"q\":\""+q+"\"}";
         }
-        return resource.getResources(BasisConstant.laboratoryReport,appId,queryParams,page,size);
+        return resource.getResources(BasisConstant.laboratoryReport,appId,URLEncoder.encode(queryParams),page,size);
     }
 
     /**
@@ -288,7 +317,7 @@ public class PatientInfoDetailService {
         {
             queryParams = "{\"join\":\"demographic_id:"+demographicId+"\",\"q\":\""+q+"\"}";
         }
-        return resource.getResources(BasisConstant.outpatientCost,appId,queryParams,page,size);
+        return resource.getResources(BasisConstant.outpatientCost,appId,URLEncoder.encode(queryParams),page,size);
     }
 
     /**
@@ -316,7 +345,7 @@ public class PatientInfoDetailService {
         {
             queryParams = "{\"join\":\"demographic_id:"+demographicId+"\",\"q\":\""+q+"\"}";
         }
-        return resource.getResources(BasisConstant.hospitalizedCost,appId,queryParams,page,size);
+        return resource.getResources(BasisConstant.hospitalizedCost,appId,URLEncoder.encode(queryParams),page,size);
     }
 
 

@@ -1,10 +1,11 @@
 package com.yihu.ehr.pack.task;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.Channel;
 import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -25,13 +26,16 @@ public class MessageSendTask {
     MessageBuffer messageBuffer;
 
     @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
     RedisTemplate<String, Serializable> redisTemplate;
 
     @Scheduled(cron = "0/2 * * * * ?")
-    public void sendResolveMessage(){
+    public void sendResolveMessage() throws JsonProcessingException {
         Set<MPackage> packages = messageBuffer.pickMessages();
         for (MPackage pack : packages){
-            redisTemplate.convertAndSend(Channel.PackageResolve, pack);
+            redisTemplate.convertAndSend(Channel.PackageResolve, objectMapper.writeValueAsString(pack));
         }
     }
 }
