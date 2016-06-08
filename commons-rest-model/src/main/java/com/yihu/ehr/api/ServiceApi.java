@@ -54,6 +54,8 @@ public class ServiceApi {
         public static final String ResourceMetadataGrant        = "/resources/metadata/grants/{id}";
         public static final String ResourceMetadataGrantApp     = "/resources/app_resource/{appResourceId}/grant/metadata/{metadataId}";
         public static final String ResourceMetadataListGrantApp = "/resources/metadata/grant/{appResourceId}";
+        public static final String ResourceAppMetadataGrants       = "/resources/app_resource/{app_res_id}/metadata";
+        public static final String ResourceAppMetadataGrant       = "/resources/app_resource/metadata/grant";
 
         public static final String MetadataList                 ="/resources/metadata";
         public static final String MetadataBatch                ="/resources/metadata/batch";
