@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/3/3.
  */
-@FeignClient(name = MicroServices.Adaption)
+@FeignClient(name = "svr-adaption")
 @ApiIgnore
 public interface AdapterDispatchClient {
 
