@@ -14,6 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author linaz
@@ -46,11 +47,6 @@ public interface ResourcesGrantClient {
     boolean deleteGrantBatch(
             @RequestParam(value = "ids") String ids);
 
-    @ApiOperation("资源授权删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceApps, method = RequestMethod.DELETE)
-    boolean deleteGrantByResId(
-            @PathVariable(value="resource_id")String resourceId,
-            @RequestParam(value="app_ids") String appIds);
 
     @RequestMapping(value = ServiceApi.Resources.ResourceGrant,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源授权")
@@ -122,4 +118,9 @@ public interface ResourcesGrantClient {
     @RequestMapping(value = ServiceApi.Resources.ResourceAppMetadataGrants,method = RequestMethod.GET)
     ResponseEntity<List<MRsAppResourceMetadata>> getAppRsMetadatas(
             @PathVariable(value="app_res_id")String appResId);
+
+    @ApiOperation("查询资源应用下存在多少授权数据元")
+    @RequestMapping(value = ServiceApi.Resources.ResourceAppMetadataGrantExistence, method = RequestMethod.GET)
+    List<Map> appMetaExistence(
+            @RequestParam("res_app_ids") String resAppIds);
 }

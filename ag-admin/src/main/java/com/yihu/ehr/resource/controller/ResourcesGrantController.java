@@ -8,9 +8,15 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.resource.*;
+import com.yihu.ehr.model.resource.MRsAppResource;
+import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
+import com.yihu.ehr.model.resource.MRsMetadata;
+import com.yihu.ehr.model.resource.MRsResourceMetadata;
 import com.yihu.ehr.organization.service.OrganizationClient;
-import com.yihu.ehr.resource.client.*;
+import com.yihu.ehr.resource.client.MetadataClient;
+import com.yihu.ehr.resource.client.ResourceMetadataClient;
+import com.yihu.ehr.resource.client.ResourcesGrantClient;
+import com.yihu.ehr.resource.client.RsDictionaryEntryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.Envelop;
 import com.yihu.ehr.util.controller.BaseController;
@@ -18,7 +24,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -46,8 +51,6 @@ public class ResourcesGrantController extends BaseController {
     ResourceMetadataClient resourceMetadataClient;
     @Autowired
     MetadataClient metadataClient;
-    @Autowired
-    private RsDictionaryClient rsDictionaryClient;
     @Autowired
     private RsDictionaryEntryClient rsDictionaryEntryClient;
 
@@ -156,14 +159,21 @@ public class ResourcesGrantController extends BaseController {
     public Envelop grantResourceApp(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @PathVariable(value = "resourceId") String resourceId,
-            @ApiParam(name = "addIds", value = "新增应用ID", defaultValue = "")
+            @ApiParam(name = "addIds", value = "新增的应用ID", defaultValue = "")
             @RequestParam(value = "addIds") String addIds,
-            @ApiParam(name = "deleteIds", value = "删除应用ID", defaultValue = "")
+            @ApiParam(name = "deleteIds", value = "删除的授权应用ID", defaultValue = "")
             @RequestParam(value = "deleteIds") String deleteIds) throws Exception {
 
         Envelop envelop = new Envelop();
         try{
-            if(StringUtils.isEmpty(deleteIds) || resourcesGrantClient.deleteGrantByResId(resourceId, deleteIds)){
+            String existMetaApp;
+            if(!StringUtils.isEmpty(deleteIds) && !StringUtils.isEmpty((existMetaApp= appMetaExistence(deleteIds)))) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(existMetaApp.substring(1) + "等应用已存在授权数据，不可取消！");
+                return envelop;
+            }
+
+            if(resourcesGrantClient.deleteGrantBatch(deleteIds)) {
                 Collection<MRsAppResource> rsAppResource = new ArrayList<>();
                 if(!StringUtils.isEmpty(addIds))
                     rsAppResource = resourcesGrantClient.grantResourceApp(resourceId, addIds);
@@ -176,6 +186,23 @@ public class ResourcesGrantController extends BaseController {
             e.printStackTrace();
             return failed("授权失败");
         }
+    }
+
+    private String appMetaExistence(String deleteIds){
+        List<Map> exiLs = resourcesGrantClient.appMetaExistence(deleteIds);
+        if(exiLs.size()>0){
+            String apps = "";
+            for(Map m : exiLs){
+                apps += "," + m.get("appId");
+            }
+            List<MApp> appLs = appClient.getApps("name", "id=" + apps.substring(1), "", 10, 1).getBody();
+            apps = "";
+            for(MApp app: appLs){
+                apps += "," + app.getName();
+            }
+            return apps;
+        }
+        return "";
     }
 
     @ApiOperation("资源授权删除")
@@ -210,17 +237,6 @@ public class ResourcesGrantController extends BaseController {
         return envelop;
     }
 
-    @ApiOperation("资源授权删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceApps, method = RequestMethod.DELETE)
-    public boolean deleteGrantByResId(
-            @ApiParam(name="resource_id",value="授权ID",defaultValue = "")
-            @PathVariable(value="resource_id")String resourceId,
-            @ApiParam(name="app_ids",value="删除应用ID",defaultValue = "")
-            @RequestParam(value="app_ids") String appIds) throws Exception
-    {
-        resourcesGrantClient.deleteGrantByResId(resourceId, appIds);
-        return true;
-    }
 
     @RequestMapping(value = ServiceApi.Resources.ResourceGrant,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源授权")
@@ -388,14 +404,6 @@ public class ResourcesGrantController extends BaseController {
         try{
             MRsAppResourceMetadata rsAppResourceMetadata = resourcesGrantClient.getRsMetadataGrantById(id);
             RsAppResourceMetadataModel model = convertToModel(rsAppResourceMetadata, RsAppResourceMetadataModel.class);
-//            if(model!=null){
-//                MRsResourceMetadata rsResourceMetadata = resourceMetadataClient.getRsMetadataById(model.getResourceMetadataId());
-//                MRsMetadata mRsMetadata = metadataClient.getMetadataById(rsResourceMetadata.getMetadataId());
-//                model.setMetaColunmType(mRsMetadata.getColumnType());
-//                model.setMetaId(mRsMetadata.getId());
-//                if(!StringUtils.isEmpty(mRsMetadata.getDictCode()) && !"0".equals(mRsMetadata.getDictCode()))
-//                    model.setDictEntries(rsDictionaryEntryClient.searchRsDictionaryEntries("", "dictCode=" +mRsMetadata.getDictCode(), "", 1, 500).getBody());
-//            }
             envelop.setObj(getDetail(model));
             envelop.setSuccessFlg(true);
         }catch (Exception e){
