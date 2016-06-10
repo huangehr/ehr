@@ -23,7 +23,7 @@ import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.template.service.TemplateClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.util.operator.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

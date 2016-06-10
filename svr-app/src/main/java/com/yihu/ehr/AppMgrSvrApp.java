@@ -6,21 +6,19 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.integration.jmx.config.EnableIntegrationMBeanExport;
 import org.springframework.jmx.support.RegistrationPolicy;
 
 @EnableFeignClients
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableIntegrationMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
-public class SvrAppApplication  extends SpringBootServletInitializer{
+public class AppMgrSvrApp extends SpringBootServletInitializer{
 
 	public static void main(String[] args) {
-		SpringApplication.run(SvrAppApplication.class, args);
+		SpringApplication.run(AppMgrSvrApp.class, args);
 	}
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(SvrAppApplication.class);
+		return application.sources(AppMgrSvrApp.class);
 	}
 }

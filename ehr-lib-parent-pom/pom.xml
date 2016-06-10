@@ -22,6 +22,7 @@
         <module>../commons-ehr-constants</module>
         <module>../commons-ui-swagger</module>
         <module>../commons-util</module>
+        <module>../commons-web</module>
         <module>../commons-data-fastdfs</module>
         <module>../commons-data-hbase</module>
         <module>../commons-data-mysql</module>

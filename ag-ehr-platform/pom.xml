@@ -10,7 +10,7 @@
     </parent>
 
     <url>https://ehr.yihu.com</url>
-    <artifactId>ag-ehr-api</artifactId>
+    <artifactId>ag-ehr</artifactId>
     <packaging>${packaging.type}</packaging>
 
     <properties>

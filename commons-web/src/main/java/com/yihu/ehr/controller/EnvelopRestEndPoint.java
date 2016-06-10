@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.controller;
+package com.yihu.ehr.controller;
 
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.util.Envelop;

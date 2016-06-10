@@ -2,13 +2,11 @@ package com.yihu.ehr.esb.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosEsbMiniInstallLogClient;
-import com.yihu.ehr.esb.client.HosReleaseClient;
 import com.yihu.ehr.model.esb.MHosEsbMiniInstallLog;
-import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

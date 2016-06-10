@@ -6,7 +6,7 @@
         <groupId>com.yihu.ehr</groupId>
 		<artifactId>ehr-ms-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../ehr-ms-parent-pom</relativePath>
+        <relativePath>../ehr-ms-parent-pom/pom.xml</relativePath>
     </parent>
 
 	<artifactId>svr-app</artifactId>
@@ -20,6 +20,37 @@
 	</properties>
 
 	<dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -45,21 +76,6 @@
 			<artifactId>spring-cloud-starter</artifactId>
             <scope>${dependency.scope}</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-            <scope>${dependency.scope}</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
-            <scope>${dependency.scope}</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-commons</artifactId>
-            <scope>${dependency.scope}</scope>
-		</dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-feign</artifactId>
@@ -71,38 +87,33 @@
             <scope>${dependency.scope}</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-            <scope>${dependency.scope}</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
             <scope>${dependency.scope}</scope>
 		</dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-ehr-constants</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
 			<artifactId>commons-util</artifactId>
-			<version>1.1.0</version>
-            <scope>${dependency.scope}</scope>
 		</dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-ui-swagger</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
 			<artifactId>commons-data-mysql</artifactId>
-			<version>1.1.0</version>
-            <scope>${dependency.scope}</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.yihu.ehr</groupId>
 			<artifactId>commons-rest-model</artifactId>
-			<version>1.1.0</version>
-            <scope>${dependency.scope}</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.yihu.ehr</groupId>
-			<artifactId>commons-ui-swagger</artifactId>
-			<version>1.1.0</version>
-            <scope>${dependency.scope}</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-web</artifactId>
+        </dependency>
 	</dependencies>
 </project>

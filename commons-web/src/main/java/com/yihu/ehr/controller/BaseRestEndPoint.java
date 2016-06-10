@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.controller;
+package com.yihu.ehr.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

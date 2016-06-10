@@ -1,4 +1,4 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.web;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;

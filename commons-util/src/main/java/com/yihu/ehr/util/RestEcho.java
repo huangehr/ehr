@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ErrorCode;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -16,7 +14,6 @@ import java.io.Serializable;
  *
  * 仅供旧版本代码使用。
  */
-@ApiModel
 @Deprecated
 public class RestEcho implements Serializable {
     private final static String CodeNode = "code";
@@ -62,17 +59,14 @@ public class RestEcho implements Serializable {
         return this;
     }
 
-    @ApiModelProperty(required = true, readOnly = true, dataType = "String", allowableValues = "ok/null/ErrorCode", value = "操作结果代码。正确时为ok或null，错误时为相应的错误提示")
     public JsonNode getCode() {
         return root.get(CodeNode);
     }
 
-    @ApiModelProperty(required = true, readOnly = true, dataType = "String", value = "操作结果消息或错误提示")
     public JsonNode getMessage() {
         return root.get(MessageNode);
     }
 
-    @ApiModelProperty(required = true, readOnly = true, dataType = "String", value = "结果值，一个JSON子节点。操作出错时为null")
     public JsonNode getResult() {
         return root.get(ResultNode);
     }

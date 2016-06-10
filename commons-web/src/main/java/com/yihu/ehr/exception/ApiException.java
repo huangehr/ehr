@@ -77,8 +77,6 @@ public class ApiException extends RuntimeException {
         this(HttpStatus.FORBIDDEN, errorCode, null, null, null);
     }
 
-
-
     @Override
     public String toString(){
         try {
