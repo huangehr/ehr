@@ -106,7 +106,7 @@ public class ResourcesBrowseController {
 
     /******************** CDA相关接口 ***************************************/
     @ApiOperation("档案详情 -- CDA分类")
-    @RequestMapping(value = "/cda/getPatientCdaInfo/1", method = RequestMethod.GET)
+    @RequestMapping(value = "/cda/getPatientCdaInfo", method = RequestMethod.GET)
     public String getPatientCdaInfo(
             @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
             @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo) throws Exception {
@@ -115,7 +115,7 @@ public class ResourcesBrowseController {
     }
 
     @ApiOperation("档案详情 -- CDA数据")
-    @RequestMapping(value = "/cda/getPatientCdaInfo/2", method = RequestMethod.GET)
+    @RequestMapping(value = "/cda/getCDAData", method = RequestMethod.GET)
     public String getPatientCdaInfo(
             @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
             @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo,

@@ -2,7 +2,9 @@ package com.yihu.ehr.profile.service;
 
 
 import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
+import com.yihu.ehr.profile.feign.XHealthProblemDictClient;
 import com.yihu.ehr.profile.feign.XOrganizationClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.redis.RedisClient;
@@ -11,6 +13,7 @@ import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +41,9 @@ public class PatientInfoBaseService {
 
     @Autowired
     Icd10HpRelationKeySchema keySchema;
+
+    @Autowired
+    private XHealthProblemDictClient healthProblemDictClient;
 
     String appId = "svr-health-profile";
 
@@ -300,7 +306,7 @@ public class PatientInfoBaseService {
         //事件年份
         if(year!=null && year.length()>0)
         {
-            q += " AND event_date:["+year+" TO "+(Integer.parseInt(year)+1)+"]";
+            q += " AND event_date:[" + year + "-01-01T00:00:00Z TO " + year + "-12-31T23:59:59Z]";
         }
 
         String queryParams = "{\"q\":\""+q+"\"}";
@@ -359,7 +365,7 @@ public class PatientInfoBaseService {
         }
 
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent,appId,queryParams);
+        Envelop result = resource.getResources(BasisConstant.patientEvent,appId, URLEncoder.encode(queryParams, "utf-8"));
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
             re = result.getDetailModelList();
@@ -407,9 +413,10 @@ public class PatientInfoBaseService {
 
 
     //@患者就诊过的疾病
-    public List<String> getPatientDisease(String demographicId) throws Exception
+    public List<MHealthProblemDict> getPatientDisease(String demographicId) throws Exception
     {
         List<String> list = new ArrayList<>();
+        List<MHealthProblemDict> healthProblemDictList = new ArrayList<>();
         //门诊诊断
         Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
         if(outpatient.getDetailModelList()!=null && outpatient.getDetailModelList().size()>0) {
@@ -428,11 +435,13 @@ public class PatientInfoBaseService {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
                 if(obj.containsKey(BasisConstant.zyzd)) {
                     String code = obj.get(BasisConstant.zyzd).toString();
-                    list.add(code);
+                    MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(code);
+//                    list.add(code);
+                    healthProblemDictList.add(healthProblemDict);
                 }
             }
         }
-        return list;
+        return healthProblemDictList;
     }
 
     //@患者就诊过的年份
@@ -459,11 +468,12 @@ public class PatientInfoBaseService {
 
 
     //@患者就诊过的地区
-    public List<String> getPatientArea(String demographicId) throws Exception
+    public List<MOrganization> getPatientArea(String demographicId) throws Exception
     {
-        List<String> re = new ArrayList<>();
+        List<MOrganization> organizationList = new ArrayList<>();
+
         //患者事件列表
-        List<String> orgCodelist = new ArrayList<>();
+        List<String> orgCodeList = new ArrayList<>();
         Envelop result = resource.getResources(BasisConstant.patientEvent,appId,"{\"q\":\"demographic_id:"+demographicId+"\"}");
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
@@ -472,26 +482,28 @@ public class PatientInfoBaseService {
                 Map<String,Object> obj = (Map<String,Object>)result.getDetailModelList().get(i);
                 String orgCode = obj.get("org_code").toString();
 
-                if(!orgCodelist.contains(orgCode))
+                if(!orgCodeList.contains(orgCode))
                 {
-                    orgCodelist.add(orgCode);
+                    orgCodeList.add(orgCode);
                 }
             }
         }
         //通过机构代码列表获取地区列表
-        List<MOrganization> orglist = organization.getOrgs(orgCodelist);
-
-        for(MOrganization org:orglist)
-        {
+        List<MOrganization> orgList = organization.getOrgs(orgCodeList);
+        List<String> re = new ArrayList<>();
+        for(MOrganization org:orgList) {
+            MOrganization organization = new MOrganization();
             String areaCode = new Integer(org.getAdministrativeDivision()).toString();
             areaCode = areaCode.substring(0,areaCode.length()-2) +"00"; //转换成市级代码
-            if(!re.contains(areaCode))
-            {
+            if(!re.contains(areaCode)) {
                 re.add(areaCode);
+                organization.setOrgCode(org.getOrgCode());
+                organization.setAdministrativeDivision(Integer.parseInt(areaCode));
+                organizationList.add(organization);
             }
         }
 
-        return re;
+        return organizationList;
     }
 
 

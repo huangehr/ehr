@@ -1,6 +1,8 @@
 package com.yihu.ehr.profile.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.profile.service.PatientInfoBaseService;
 import com.yihu.ehr.profile.service.PatientInfoDetailService;
 import com.yihu.ehr.util.Envelop;
@@ -85,14 +87,14 @@ public class ResourcesBrowseController {
 
     @ApiOperation("就诊过的疾病")
     @RequestMapping(value = "/home/getPatientDisease", method = RequestMethod.GET)
-    public List<String> getPatientDisease(
+    public List<MHealthProblemDict> getPatientDisease(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
         return patient.getPatientDisease(demographicId);
     }
 
     @ApiOperation("就诊过的城市")
     @RequestMapping(value = "/home/getPatientArea", method = RequestMethod.GET)
-    public List<String> getPatientArea(
+    public List<MOrganization> getPatientArea(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
         return patient.getPatientArea(demographicId);
     }
@@ -107,8 +109,8 @@ public class ResourcesBrowseController {
 
     /******************** CDA相关接口 ***************************************/
     @ApiOperation("档案详情 -- CDA分类")
-    @RequestMapping(value = "/cda/getPatientCdaInfo/1", method = RequestMethod.GET)
-    public List<Map<String,Object>> getPatientCdaInfo(
+    @RequestMapping(value = "/cda/getCDAClass", method = RequestMethod.GET)
+    public List<Map<String,Object>> getCDAClass(
             @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
             @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo) throws Exception {
         if(profileId == null && eventNo == null)
