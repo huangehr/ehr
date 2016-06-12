@@ -133,8 +133,7 @@ public class ResourcesBrowseController {
     public List<Map<String,String>> getCDAClass(
             @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
             @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo) throws Exception {
-        if(profileId == null && eventNo == null)
-        {
+        if(profileId == null && eventNo == null) {
             throw new Exception("非法传参！");
         }
         return patientDetail.getCDAClass(profileId,eventNo);

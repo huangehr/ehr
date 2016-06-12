@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.ResourceAdaptionKeySchema;
 import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.service.resource.stage1.FilePackage;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.profile.util.MetaDataRecord;
@@ -32,6 +33,9 @@ public class PackMill {
     @Autowired
     private ResourceAdaptionKeySchema resAdaptionKeySchema;
 
+    @Autowired
+    StdDataSetKeySchema dataSetKeySchema;
+
     /**
      * 将解析好的档案拆解成资源。
      *
@@ -47,7 +51,8 @@ public class PackMill {
             if(DataSetUtil.isOriginDataSet(dataSet.getCode())) continue;
 
             Set<String> keys = dataSet.getRecordKeys();
-            if (!dataSet.isMultiRecord()){
+            Boolean isMultiRecord = redisClient.get(dataSetKeySchema.dataSetMultiRecord(dataSet.getCdaVersion(), dataSet.getCode()));
+            if (isMultiRecord == null || !isMultiRecord){
                 MasterRecord masterRecord = resourceBucket.getMasterRecord();
 
                 for (String key : keys){

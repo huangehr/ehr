@@ -138,14 +138,15 @@ public class FilePackageResolver extends PackageResolver {
             for (int j = 0; j < content.size(); ++j) {
                 ObjectNode file = (ObjectNode) content.get(j);
                 String mimeType = file.get("mine_type").asText();
-//                String url_scope = file.get("url_scope").asText();
-                String url_scope = "Private";
+                String url_scope = file.get("url_scope").asText();
                 String url = file.get("url").asText();
+                String document_name = file.get("document_name").asText();
 
                 OriginFile originFile = new OriginFile();
                 originFile.setMime(mimeType);
                 originFile.setExpireDate(expireDate);
                 originFile.setUrlScope(UrlScope.valueOf(url_scope));
+                originFile.setDocumentName(document_name);
                 if(file.get("name")!=null){
                     String fileList[] = file.get("name").asText().split(";");
                     for (String fileName : fileList){
