@@ -94,17 +94,6 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         return convertToModels(rsGrantService.addList(appRsList, resourceId),new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
     }
 
-    @ApiOperation("资源授权删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceApps, method = RequestMethod.DELETE)
-    public boolean deleteGrantByResId(
-            @ApiParam(name="resource_id",value="授权ID",defaultValue = "")
-            @PathVariable(value="resource_id")String resourceId,
-            @ApiParam(name="app_ids",value="授权ID",defaultValue = "")
-            @RequestParam(value="app_ids") String appIds) throws Exception
-    {
-        rsGrantService.deleteGrantByResId(resourceId, appIds.split(","));
-        return true;
-    }
 
     @ApiOperation("资源授权删除")
     @RequestMapping(value = ServiceApi.Resources.ResourceGrant,method = RequestMethod.DELETE)
@@ -120,10 +109,9 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.ResourceGrants,method = RequestMethod.DELETE)
     public boolean deleteGrantBatch(
             @ApiParam(name="ids",value="授权ID",defaultValue = "")
-            @RequestParam(value="ids")String ids) throws Exception
+            @RequestParam(value="ids") String ids) throws Exception
     {
-        rsGrantService.deleteResourceGrant(ids);
-
+        rsGrantService.deleteGrantByIds(ids.split(","));
         return true;
     }
 
@@ -349,5 +337,15 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         if(StringUtils.isEmpty(model.getId()))
             model.setId(getObjectId(BizObject.AppResourceMetadata));
         return convertToModel(rsMetadataGrantService.save(model), MRsAppResourceMetadata.class);
+    }
+
+    @ApiOperation("查询资源应用下存在多少授权数据元")
+    @RequestMapping(value = ServiceApi.Resources.ResourceAppMetadataGrantExistence, method = RequestMethod.GET)
+    List<Map> appMetaExistence(
+            @ApiParam(name = "dimension", value = "授权ID", defaultValue = "")
+            @RequestParam("res_app_ids") String resAppIds) throws Exception {
+
+        List<Map> ls = rsMetadataGrantService.appMetaExistence(resAppIds.split(","));
+        return  ls;
     }
 }

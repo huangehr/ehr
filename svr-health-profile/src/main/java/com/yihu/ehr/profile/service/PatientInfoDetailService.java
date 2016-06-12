@@ -30,7 +30,10 @@ public class PatientInfoDetailService {
 
     //模板服务
     @Autowired
-    XTemplateRepository templateService;
+    XTemplateRepository templateRepository;
+
+    @Autowired
+    TemplateService templateService;
 
     //CDA服务
     @Autowired
@@ -41,57 +44,65 @@ public class PatientInfoDetailService {
 
 
     //根据ProfileId或者EventNo查询CDA分类
-    public List<Map<String,Object>> getCDAClass(String profileId,String eventNo) throws Exception{
-        List<Map<String,Object>> re = new ArrayList<>();
+    public List<Map<String,String>> getCDAClass(String profileId,String eventNo) throws Exception{
+        List<Map<String,String>> re = new ArrayList<>();
 
         //根据profileId或者eventNo获取主记录
         String q = "{\"q\":\"rowkey:"+profileId+"\"}";
-        if(profileId==null && eventNo!=null)
+        if(profileId==null)
         {
-            q = "{\"q\":\"event_no:"+eventNo+"\"}";
+            if(eventNo!=null)
+            {
+                q = "{\"q\":\"event_no:"+eventNo+"\"}";
+            }
+            else{
+                throw new Exception("非法传参！");
+            }
         }
-        else{
-            throw new Exception("非法传参！");
-        }
+
         Envelop result = resource.getResources(BasisConstant.patientEvent,appId,q);
         if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
         {
             Map<String,Object> obj = (Map<String,Object>)result.getDetailModelList().get(0);
+            profileId = obj.get("rowkey").toString();
             String cdaVersion = obj.get("cda_version").toString();
             String orgCode = obj.get("org_code").toString();
 
             //根据机构获取定制模板
-            List<Template> list = templateService.findByOrganizationCodeAndCdaVersion(orgCode,cdaVersion);
+            List<Template> list = templateRepository.findByOrganizationCodeAndCdaVersion(orgCode,cdaVersion);
             //遍历模板
             if(list!=null&&list.size()>0)
             {
                 for(Template template : list)
                 {
-                    Map<String,Object> item = new HashMap<>();
                     String cdaDocumentId = template.getCdaDocumentId();
+                    //获取CDA关联数据集************
                     List<MCdaDataSetRelationship> datasetList = cdaService.getCDADataSetRelationshipByCDAId(cdaVersion, cdaDocumentId);
-
-                    //CDA关联数据集
                     if(datasetList!=null && datasetList.size()>0)
                     {
                         String query = "";
                         for(MCdaDataSetRelationship dataset :datasetList)
                         {
+                            String datasetCode = "";
                             if(query.length()>0)
                             {
-                                query += "";
+                                query += " OR rowkey:*"+datasetCode +"*";
                             }
                             else{
-                                query = "";
+                                query = "rowkey:*"+datasetCode +"*";
                             }
                         }
                         //判断是否包含相关数据
-                        Envelop data = resource.getEhrCenterSub(query,null,null);
+                        String queryParams = "{\"q\":\"("+query+") AND profile_id:"+profileId+"\"}";
+                        Envelop data = resource.getEhrCenterSub(queryParams,null,null);
                         if(data.getDetailModelList()!=null&&data.getDetailModelList().size()>0)
                         {
-
+                            Map<String,String> item = new HashMap<>();
+                            item.put("profile_id",profileId);
+                            item.put("template_id",String.valueOf(template.getId()));
+                            item.put("template_name",template.getTitle());
+                            re.add(item);
                         }
-
                     }
                 }
             }
@@ -99,15 +110,51 @@ public class PatientInfoDetailService {
             return re;
         }
         else{
-            throw new Exception("");
+            throw new Exception("未查到相关记录！");
         }
     }
 
-    //根据模板获取病人CDA数据（未完成）
-    public List<Map<String,Object>> getCDAData(String profileId,String eventNo,String templateId) throws Exception
+    //根据模板获取病人CDA数据
+    public Map<String,List<Map<String,Object>>> getCDAData(String profileId,Integer templateId) throws Exception
     {
-        List<Map<String,Object>> re = new ArrayList<>();
+        Map<String,List<Map<String,Object>>> re = new HashMap<>();
+        //主表记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:"+profileId+"\"}");
+        if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
+        {
+            //通过模板获取cda信息
+            Template template = templateService.getTemplate(templateId);
+            if(template!=null)
+            {
+                String cdaVersion = ((Map<String,Object>)result.getDetailModelList().get(0)).get("cda_version").toString();
+                String cdaDocumentId = template.getCdaDocumentId();
+                //获取CDA关联数据集************
+                List<MCdaDataSetRelationship> datasetList = cdaService.getCDADataSetRelationshipByCDAId(cdaVersion, cdaDocumentId);
+                if(datasetList!=null && datasetList.size()>0)
+                {
+                    for(MCdaDataSetRelationship dataset : datasetList)
+                    {
+                        String datasetCode = "";
 
+                        String q = "{\"q\":\"rowkey:*"+datasetCode+"* AND profile_id:"+profileId+"\"}";
+                        //获取Hbase数据
+                        Envelop data = resource.getEhrCenterSub(URLEncoder.encode(q),null,null);
+
+                        if(data.getDetailModelList()!=null&&data.getDetailModelList().size()>0)
+                        {
+                            List<Map<String,Object>> table = data.getDetailModelList();
+
+                            //根据cdaVersion转译************
+                            List<Map<String,Object>> dataList = new ArrayList<>();
+                            re.put(datasetCode,dataList);
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            throw new Exception("未查到相关就诊住院记录！profileId:"+profileId);
+        }
 
 
         return re;
@@ -125,7 +172,7 @@ public class PatientInfoDetailService {
             String orgCode = obj.get("org_code").toString();
             String cdaVersion = obj.get("cda_version").toString();
             //获取模板ID
-            Template template = templateService.findByOrganizationCodeAndCdaVersionAndCdaType(orgCode,cdaVersion,cdaType);
+            Template template = templateRepository.findByOrganizationCodeAndCdaVersionAndCdaType(orgCode,cdaVersion,cdaType);
             if(template!=null)
             {
                 return String.valueOf(template.getId());

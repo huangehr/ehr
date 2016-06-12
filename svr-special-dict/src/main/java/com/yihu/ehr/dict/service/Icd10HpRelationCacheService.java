@@ -3,6 +3,7 @@ package com.yihu.ehr.dict.service;
 import com.yihu.ehr.dict.model.HealthProblemDict;
 import com.yihu.ehr.dict.model.Icd10Dict;
 import com.yihu.ehr.dict.model.Icd10HpRelation;
+import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,10 +76,10 @@ public class Icd10HpRelationCacheService {
      * @param icd10Id
      * @return
      */
-    public HealthProblemDict healthProblemDict(String icd10Id) {
+    public MIcd10Dict healthProblemDict(String icd10Id) {
         Icd10Dict icd10Dict = icd10DictRepository.findOne(Long.parseLong(icd10Id));
         String codeAndName = redisClient.get(keySchema.icd10HpRelation(icd10Dict.getCode()));
-        HealthProblemDict healthProblemDict = new HealthProblemDict();
+        MIcd10Dict healthProblemDict = new MIcd10Dict();
         healthProblemDict.setCode(codeAndName.split("__")[0]);
         healthProblemDict.setName(codeAndName.split("__")[1]);
         return healthProblemDict;

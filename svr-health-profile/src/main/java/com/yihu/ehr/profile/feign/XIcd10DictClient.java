@@ -23,4 +23,8 @@ public interface XIcd10DictClient {
     @ApiOperation(value = "根据id列表获取ICD10字典信息")
     List<MIcd10Dict> getIcd10DictListByIds(@RequestParam(value = "ids") List<String> ids);
 
+    @RequestMapping(value = "/hp_icd10_relation_cache/one" , method = RequestMethod.GET)
+    @ApiOperation(value = "获取单个缓存")
+    MIcd10Dict getIcd10DictValue(@RequestParam(value = "icd10Id") String icd10Id);
+
 }
