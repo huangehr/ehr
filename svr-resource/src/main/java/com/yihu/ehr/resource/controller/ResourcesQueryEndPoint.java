@@ -121,11 +121,9 @@ public class ResourcesQueryEndPoint {
     @RequestMapping(value="/stdlisttransform",method = RequestMethod.POST)
     public List<Map<String,Object>> convertDisplayCodes(
             @ApiParam(name="resources",value="资源",required = true)
-            @RequestParam(value = "resources",required = true)
-                    String resources,
+            @RequestParam(value = "resources",required = true) String resources,
             @ApiParam(name="version",value="版本",required = true)
-            @RequestParam(value = "version",required = true)
-                    String version)
+            @RequestParam(value = "version",required = true) String version)
     {
         JSONArray dataArray = new JSONArray(resources);
         Iterator iterator = dataArray.iterator();
@@ -151,11 +149,9 @@ public class ResourcesQueryEndPoint {
     @RequestMapping(value="/stdtransform",method = RequestMethod.POST)
     public List<Map<String,Object>> convertDisplayCode(
             @ApiParam(name="resource",value="资源",required = true)
-            @RequestParam(value = "resource",required = true)
-                    String resource,
+            @RequestParam(value = "resource",required = true) String resource,
             @ApiParam(name="version",value="版本",required = true)
-            @RequestParam(value = "version",required = true)
-                    String version)
+            @RequestParam(value = "version",required = true) String version)
     {
         List<Map<String,Object>> rsData = new ArrayList<Map<String, Object>>();
         JSONObject object = new JSONObject(resource);
