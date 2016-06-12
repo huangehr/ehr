@@ -7,6 +7,8 @@ import com.yihu.ehr.util.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hzp on 2016/4/13.
@@ -113,5 +115,55 @@ public class ResourcesQueryEndPoint {
                                                   @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                                   @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
         return resourcesQueryDao.getMysqlData(queryParams, page, size);
+    }
+
+    @ApiOperation("EHR内部标准转国家标准")
+    @RequestMapping(value="/stdlisttransform",method = RequestMethod.POST)
+    public List<Map<String,Object>> convertDisplayCodes(
+            @ApiParam(name="resources",value="资源",required = true)
+            @RequestParam(value = "resources",required = true) String resources,
+            @ApiParam(name="version",value="版本",required = true)
+            @RequestParam(value = "version",required = true) String version)
+    {
+        JSONArray dataArray = new JSONArray(resources);
+        Iterator iterator = dataArray.iterator();
+        List<Map<String,Object>> rsData = new ArrayList<Map<String, Object>>();
+
+        while(iterator.hasNext())
+        {
+            JSONObject object = (JSONObject)iterator.next();
+            Map<String,Object> map = new HashMap<String,Object>();
+
+            for(String key : object.keySet())
+            {
+                map.put(key,object.get(key));
+            }
+
+            rsData.add(map);
+        }
+
+        return resourcesQueryService.displayCodeConvert(rsData,version);
+    }
+
+    @ApiOperation("EHR内部标准转国家标准")
+    @RequestMapping(value="/stdtransform",method = RequestMethod.POST)
+    public List<Map<String,Object>> convertDisplayCode(
+            @ApiParam(name="resource",value="资源",required = true)
+            @RequestParam(value = "resource",required = true) String resource,
+            @ApiParam(name="version",value="版本",required = true)
+            @RequestParam(value = "version",required = true) String version)
+    {
+        List<Map<String,Object>> rsData = new ArrayList<Map<String, Object>>();
+        JSONObject object = new JSONObject(resource);
+        Map<String,Object> map = new HashMap<String,Object>();
+
+        for(String key : object.keySet())
+        {
+            map.put(key,object.get(key));
+        }
+
+        rsData.add(map);
+
+        return resourcesQueryService.displayCodeConvert(rsData,version);
     }
 }
