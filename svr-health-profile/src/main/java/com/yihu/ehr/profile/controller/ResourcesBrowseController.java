@@ -1,8 +1,7 @@
 package com.yihu.ehr.profile.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.specialdict.MHealthProblemDict;
+import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.profile.service.PatientInfoBaseService;
 import com.yihu.ehr.profile.service.PatientInfoDetailService;
 import com.yihu.ehr.util.Envelop;
@@ -36,12 +35,24 @@ public class ResourcesBrowseController {
     @Autowired
     PatientInfoDetailService patientDetail;
 
+    @Autowired
+    XTransformClient transform;
+
     @ApiOperation("门户 - 用户基本信息")
     @RequestMapping(value = "/home/getPatientInfo", method = RequestMethod.GET)
     public Map<String,Object> getPatientInfo(
             @ApiParam(name = "demographicId", value = "身份证号")
-            @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
-        return patient.getPatientInfo(demographicId);
+            @RequestParam(value = "demographicId", required = true) String demographicId,
+            @RequestParam(value = "version", required = false) String version) throws Exception {
+
+        Map<String,Object> re = patient.getPatientInfo(demographicId);
+        if(version!=null)
+        {
+            return transform.stdTransform(re,version);
+        }
+        else{
+            return re;
+        }
     }
 
 
@@ -60,7 +71,8 @@ public class ResourcesBrowseController {
     @RequestMapping(value = "/home/getHealthProblem", method = RequestMethod.GET)
     public List<Map<String,Object>> getHealthProblem(
             @ApiParam(name = "demographicId", value = "身份证号")
-            @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
+            @RequestParam(value = "demographicId", required = true) String demographicId,
+            @RequestParam(value = "version", required = false) String version) throws Exception {
 
         return patient.getHealthProblem(demographicId);
     }
@@ -80,9 +92,17 @@ public class ResourcesBrowseController {
             @ApiParam(name = "hpId", value = "健康问题id")
             @RequestParam(value = "hpId", required = false) String hpId,
             @ApiParam(name = "diseaseId", value = "疾病id")
-            @RequestParam(value = "diseaseId", required = false) String diseaseId) throws Exception {
+            @RequestParam(value = "diseaseId", required = false) String diseaseId,
+            @RequestParam(value = "version", required = false) String version) throws Exception {
 
-        return patient.getMedicalEvents(demographicId,eventsType,year,area,hpId,diseaseId);
+        List<Map<String,Object>> re = patient.getMedicalEvents(demographicId,eventsType,year,area,hpId,diseaseId);
+        if(version!=null)
+        {
+            return transform.stdTransformList(re, version);
+        }
+        else{
+            return re;
+        }
     }
 
     @ApiOperation("就诊过的疾病")
@@ -140,7 +160,7 @@ public class ResourcesBrowseController {
     /************************************
      * 详细数据
      *****************************************************************/
-    @ApiOperation("历史用药 - 药品清单")
+    /*@ApiOperation("历史用药 - 药品清单")
     @RequestMapping(value = "/detail/getDrugList", method = RequestMethod.GET)
     public Envelop getDrugList(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
@@ -149,11 +169,17 @@ public class ResourcesBrowseController {
             @ApiParam(name = "startTime", value = "开始时间") @RequestParam(value = "startTime", required = false) String startTime,
             @ApiParam(name = "endTime", value = "结束时间") @RequestParam(value = "endTime", required = false) String endTime,
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size,
+            @RequestParam(value = "version", required = false) String version) throws Exception {
 
         //return file2String("/json/DrugList.json");
-        return patientDetail.getDrugList(demographicId,hpId,type,startTime,endTime,page,size);
-    }
+        Envelop re = patientDetail.getDrugList(demographicId, hpId, type, startTime, endTime, page, size);
+        if(version!=null) {
+            re.setDetailModelList(transform.stdTransformList(re.getDetailModelList(), version));
+        }
+
+        return re;
+    }*/
 
     @ApiOperation("历史用药 - 用药统计")
     @RequestMapping(value = "/detail/getDrugListStat", method = RequestMethod.GET)
@@ -164,7 +190,7 @@ public class ResourcesBrowseController {
         return patientDetail.getDrugListStat(demographicId, hpId);
     }
 
-    @ApiOperation("门诊费用清单")
+    /*@ApiOperation("门诊费用清单")
     @RequestMapping(value = "/detail/getOutpatientCost", method = RequestMethod.GET)
     public Envelop getOutpatientCost(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
@@ -173,6 +199,10 @@ public class ResourcesBrowseController {
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
+        Envelop re = patientDetail.getDrugList(demographicId, hpId, type, startTime, endTime, page, size);
+        if(version!=null) {
+            re.setDetailModelList(transform.stdTransformList(re.getDetailModelList(), version));
+        }
         return patientDetail.getOutpatientCost(demographicId, startTime, endTime, page, size);
     }
 
@@ -186,7 +216,7 @@ public class ResourcesBrowseController {
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
         return patientDetail.getHospitalizedCost(demographicId,startTime,endTime,page,size);
-    }
+    }*/
     /************************************
      * 健康指标
      *****************************************************************/

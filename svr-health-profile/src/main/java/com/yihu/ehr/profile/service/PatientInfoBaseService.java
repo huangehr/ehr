@@ -486,18 +486,24 @@ public class PatientInfoBaseService {
                 }
             }
         }
-        //通过机构代码列表获取地区列表
-        List<MOrganization> orgList = organization.getOrgs(orgCodeList);
-        List<String> re = new ArrayList<>();
-        for(MOrganization org:orgList) {
-            Map<String,String> organizationMap = new HashMap<>();
-            String areaCode = new Integer(org.getAdministrativeDivision()).toString();
-            areaCode = areaCode.substring(0,areaCode.length()-2) +"00"; //转换成市级代码
-            if(!re.contains(areaCode)) {
-                re.add(areaCode);
-                organizationMap.put(areaCode,org.getFullName());
-                organizationMapList.add(organizationMap);
+        try {
+            //通过机构代码列表获取地区列表
+            List<MOrganization> orgList = organization.getOrgs(orgCodeList);
+            List<String> re = new ArrayList<>();
+            for (MOrganization org : orgList) {
+                Map<String, String> organizationMap = new HashMap<>();
+                String areaCode = new Integer(org.getAdministrativeDivision()).toString();
+                areaCode = areaCode.substring(0, areaCode.length() - 2) + "00"; //转换成市级代码
+                if (!re.contains(areaCode)) {
+                    re.add(areaCode);
+                    organizationMap.put(areaCode, org.getFullName());
+                    organizationMapList.add(organizationMap);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            throw ex;
         }
 
         return organizationMapList;
