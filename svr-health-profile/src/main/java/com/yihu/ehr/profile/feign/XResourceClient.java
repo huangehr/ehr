@@ -17,9 +17,8 @@ import java.util.Map;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
- * @author Sand
+ * @author hzp
  * @version 1.0
- * @created 2016.02.01 14:58
  */
 @ApiIgnore
 @FeignClient(value = MicroServices.Resource)
