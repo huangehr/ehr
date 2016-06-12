@@ -169,4 +169,33 @@ public class ResourcesController extends BaseController {
             return envelop;
         }
     }
+    @ApiOperation("资源编码是否已存在")
+    @RequestMapping(value = "/resources/isExistCode/{code}" , method = RequestMethod.GET)
+    public Envelop isExistCode(
+            @ApiParam(name = "code", value = "code", defaultValue = "")
+            @PathVariable(value = "code") String code){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","code="+code,"",1,999);
+        List<MRsResources> mRsResources = responseEntity.getBody();
+        if(mRsResources.size() != 0){
+            envelop.setSuccessFlg(true);
+        }
+        return envelop;
+    }
+
+    @ApiOperation("资源名称是否已存在")
+    @RequestMapping(value = "/resources/isExistName",method = RequestMethod.GET)
+    public Object isExistName(
+            @ApiParam(name = "name", value = "name", defaultValue = "")
+            @RequestParam(value = "name") String name){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","name="+name,"",1,999);
+        List<MRsResources> mRsResources = responseEntity.getBody();
+        if(mRsResources.size() != 0){
+            envelop.setSuccessFlg(true);
+        }
+        return envelop;
+    }
 }
