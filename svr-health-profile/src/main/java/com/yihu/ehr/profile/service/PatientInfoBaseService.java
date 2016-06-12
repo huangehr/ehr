@@ -413,18 +413,17 @@ public class PatientInfoBaseService {
 
 
     //@患者就诊过的疾病
-    public List<MHealthProblemDict> getPatientDisease(String demographicId) throws Exception
+    public List<Map<String,String>> getPatientDisease(String demographicId) throws Exception
     {
         List<String> list = new ArrayList<>();
-        List<MHealthProblemDict> healthProblemDictList = new ArrayList<>();
+        List<Map<String,String>> healthProblemDictMapList = new ArrayList<>();
         //门诊诊断
         Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"join\":\"demographic_id:"+demographicId+"\"}");
         if(outpatient.getDetailModelList()!=null && outpatient.getDetailModelList().size()>0) {
             for(int i=0;i<outpatient.getDetailModelList().size();i++) {
                 Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
                 if(obj.containsKey(BasisConstant.mzzd)) {
-                    String code = obj.get(BasisConstant.mzzd).toString();
-                    list.add(code);
+                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList,obj);
                 }
             }
         }
@@ -434,15 +433,15 @@ public class PatientInfoBaseService {
             for(int i=0;i<hospitalized.getDetailModelList().size();i++) {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
                 if(obj.containsKey(BasisConstant.zyzd)) {
-                    String code = obj.get(BasisConstant.zyzd).toString();
-                    MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(code);
-//                    list.add(code);
-                    healthProblemDictList.add(healthProblemDict);
+                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList,obj);
                 }
             }
         }
-        return healthProblemDictList;
+        return healthProblemDictMapList;
     }
+
+
+
 
     //@患者就诊过的年份
     public List<String> getPatientYear(String demographicId) throws Exception
@@ -468,9 +467,9 @@ public class PatientInfoBaseService {
 
 
     //@患者就诊过的地区
-    public List<MOrganization> getPatientArea(String demographicId) throws Exception
+    public List<Map<String,String>> getPatientArea(String demographicId) throws Exception
     {
-        List<MOrganization> organizationList = new ArrayList<>();
+        List<Map<String,String>> organizationMapList = new ArrayList<>();
 
         //患者事件列表
         List<String> orgCodeList = new ArrayList<>();
@@ -492,18 +491,28 @@ public class PatientInfoBaseService {
         List<MOrganization> orgList = organization.getOrgs(orgCodeList);
         List<String> re = new ArrayList<>();
         for(MOrganization org:orgList) {
-            MOrganization organization = new MOrganization();
+            Map<String,String> organizationMap = new HashMap<>();
             String areaCode = new Integer(org.getAdministrativeDivision()).toString();
             areaCode = areaCode.substring(0,areaCode.length()-2) +"00"; //转换成市级代码
             if(!re.contains(areaCode)) {
                 re.add(areaCode);
-                organization.setOrgCode(org.getOrgCode());
-                organization.setAdministrativeDivision(Integer.parseInt(areaCode));
-                organizationList.add(organization);
+                organizationMap.put(areaCode,org.getFullName());
+                organizationMapList.add(organizationMap);
             }
         }
 
-        return organizationList;
+        return organizationMapList;
+    }
+
+
+
+    private  List<Map<String,String>> getHealthProblemDictMapList(List<Map<String,String>> healthProblemDictMapList,Map<String, Object> obj){
+        String code = (String)obj.get(BasisConstant.zyzd);
+        MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(code);
+        Map<String,String> map = new HashMap<>();
+        map.put(healthProblemDict.getCode(),healthProblemDict.getName());
+        healthProblemDictMapList.add(map);
+        return healthProblemDictMapList;
     }
 
 

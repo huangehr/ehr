@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.standard.commons.ExtendEndPoint;
 import com.yihu.ehr.standard.document.service.*;
@@ -193,6 +194,22 @@ public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
         List relations = cdaDatasetRelationshipManager.getCDADataSetRelationshipByCDAId(entityClass, cdaId);
         return convertToModels(relations, new ArrayList<>(relations.size()), MCdaDataSetRelationship.class, "");
     }
+
+
+    @RequestMapping(value = "/std/cda_data_set/cda_id", method = RequestMethod.GET)
+    @ApiOperation(value = "根据cda_id获取cda和数据集关系列表（包含数据集code）")
+    public Collection<MCdaDataSet> getCDADataSetByCDAId(
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "document_Id", value = "文档编号")
+            @RequestParam(value = "document_Id") String cdaId) {
+        List<MCdaDataSet> list =  cdaDatasetRelationshipManager.getCDADataSetByCDAId(version, cdaId);
+        return list;
+    }
+
+
+
+
 
     /**
      * 保存CDA信息

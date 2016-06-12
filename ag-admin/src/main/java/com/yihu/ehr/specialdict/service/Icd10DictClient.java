@@ -1,6 +1,7 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.specialdict.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,7 +16,7 @@ import java.util.Collection;
 /**
  * Created by CWS on 2016/2/29.
  */
-@FeignClient("svr-special-dict")
+@FeignClient(MicroServices.SpecialDict)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface Icd10DictClient {
