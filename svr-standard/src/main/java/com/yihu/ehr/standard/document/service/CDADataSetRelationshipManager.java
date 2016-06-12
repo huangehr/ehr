@@ -5,11 +5,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.query.BaseHbmService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
@@ -287,4 +290,18 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
     }
 
 
+    public List<MCdaDataSet> getCDADataSetByCDAId(String version, String cdaId) {
+        String sql = "SELECT " +
+                " scdsr.id id,scdsr.cda_id cdaId,scdsr.dataset_id dataSetId, sds.CODE dataSetCode " +
+                "FROM " +
+                " std_cda_data_set_relationship_"+version+" scdsr, " +
+                " std_data_set_"+version+" sds " +
+                "WHERE " +
+                " 1 = 1 " +
+                "AND scdsr.cda_id = '"+cdaId+"' " +
+                "AND scdsr.dataset_id = sds.id";
+        RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(MCdaDataSet.class);
+        return this.jdbcTemplate.query(sql, rowMapper);
+
+    }
 }

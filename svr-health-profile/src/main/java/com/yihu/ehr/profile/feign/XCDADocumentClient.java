@@ -4,6 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,12 @@ public interface XCDADocumentClient {
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/std/cda_data_set_relationships/cda_id", method = RequestMethod.GET)
     List<MCdaDataSetRelationship> getCDADataSetRelationshipByCDAId(
+            @RequestParam(value = "version") String version,
+            @RequestParam(value = "document_Id") String cdaDocumentId);
+
+
+    @RequestMapping(value = ApiVersion.Version1_0 + "/std/cda_data_set/cda_id", method = RequestMethod.GET)
+    List<MCdaDataSet> getCDADataSetByCDAId(
             @RequestParam(value = "version") String version,
             @RequestParam(value = "document_Id") String cdaDocumentId);
 }

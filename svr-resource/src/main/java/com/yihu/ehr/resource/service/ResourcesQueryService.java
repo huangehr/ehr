@@ -177,8 +177,8 @@ public class ResourcesQueryService  {
                 Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
 
                 Envelop re = new Envelop();
-                if(result!=null)
-                {
+                if (result != null) {
+                    re.setSuccessFlg(true);
                     re.setCurrPage(result.getNumber());
                     re.setPageSize(result.getSize());
                     re.setTotalCount(new Long(result.getTotalElements()).intValue());
@@ -234,8 +234,10 @@ public class ResourcesQueryService  {
                             list.add(newObj);
                         }
                         re.setDetailModelList(list);
+                        return re;
                     }
-                    return re;
+                }else {
+                    re.setSuccessFlg(false);
                 }
                 throw new Exception("未找到资源数据！");
             }

@@ -87,14 +87,14 @@ public class ResourcesBrowseController {
 
     @ApiOperation("就诊过的疾病")
     @RequestMapping(value = "/home/getPatientDisease", method = RequestMethod.GET)
-    public List<MHealthProblemDict> getPatientDisease(
+    public List<Map<String,String>> getPatientDisease(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
         return patient.getPatientDisease(demographicId);
     }
 
     @ApiOperation("就诊过的城市")
     @RequestMapping(value = "/home/getPatientArea", method = RequestMethod.GET)
-    public List<MOrganization> getPatientArea(
+    public List<Map<String,String>> getPatientArea(
             @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
         return patient.getPatientArea(demographicId);
     }
@@ -110,7 +110,7 @@ public class ResourcesBrowseController {
     /******************** CDA相关接口 ***************************************/
     @ApiOperation("档案详情 -- CDA分类")
     @RequestMapping(value = "/cda/getCDAClass", method = RequestMethod.GET)
-    public List<Map<String,Object>> getCDAClass(
+    public List<Map<String,String>> getCDAClass(
             @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
             @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo) throws Exception {
         if(profileId == null && eventNo == null)
@@ -122,15 +122,11 @@ public class ResourcesBrowseController {
 
     @ApiOperation("档案详情 -- CDA数据")
     @RequestMapping(value = "/cda/getCDAData", method = RequestMethod.GET)
-    public List<Map<String,Object>> getCDAData(
-            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
-            @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo,
-            @ApiParam(name = "templateId", value = "模板ID") @RequestParam(value = "templateId", required = true) String templateId) throws Exception {
-        if(profileId == null && eventNo == null)
-        {
-            throw new Exception("非法传参！");
-        }
-        return patientDetail.getCDAData(profileId, eventNo, templateId);
+    public Map<String,List<Map<String,Object>>> getCDAData(
+            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = true) String profileId,
+            @ApiParam(name = "templateId", value = "模板ID") @RequestParam(value = "templateId", required = true) Integer templateId) throws Exception {
+
+        return patientDetail.getCDAData(profileId, templateId);
     }
 
     @ApiOperation("档案详情 -- 通过事件号获取templateId")
