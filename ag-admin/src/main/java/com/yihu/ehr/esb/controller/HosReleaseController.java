@@ -57,7 +57,9 @@ public class HosReleaseController extends BaseController {
         for(MHosEsbMiniRelease mHosEsbMiniRelease: mHosEsbMiniReleases){
             HostReleaseModel  hostReleaseModel = new HostReleaseModel();
             BeanUtils.copyProperties(mHosEsbMiniRelease,hostReleaseModel);
-            hostReleaseModel.setReleaseDate(DateTimeUtils.simpleDateTimeFormat(mHosEsbMiniRelease.getReleaseTime()));
+            if(mHosEsbMiniRelease.getReleaseTime()!=null) {
+                hostReleaseModel.setReleaseDate(DateTimeUtils.simpleDateTimeFormat(mHosEsbMiniRelease.getReleaseTime()));
+            }
             hostReleaseModels.add(hostReleaseModel);
         }
         int totalCount = getTotalCount (responseEntity);
