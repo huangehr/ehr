@@ -119,20 +119,22 @@ public class ResourceMetadataGrantService  extends BaseJpaService<RsAppResourceM
     public List<RsAppResourceMetadata> getAppRsMetadatas(String appResId, String appId, String resId)
     {
         String sql =
-                "SELECT * FROM " +
-                    "(SELECT " +
-                    "   '' AS id, :appResId AS appResourceId, :appId AS appId, m.`NAME` AS resourceMetadataName, rm.ID AS resourceMetadataId, " +
-                    "   '' AS dimensionId, '' AS dimensionValue, 0 AS valid " +
-                    "FROM " +
-                    "   `rs_resource_metadata` rm " +
-                    "LEFT JOIN rs_metadata m on rm.METADATA_ID=m.ID " +
-                    "LEFT JOIN rs_app_resource_metadata pm on (pm.RESOURCE_METADATA_ID=rm.ID AND pm.app_resource_id=:appResId) " +
-                    "WHERE " +
-                    "   pm.ID IS NULL AND rm.resources_id=:resId ) a " +
+                "SELECT * FROM (" +
+                    "SELECT * FROM " +
+                        "(SELECT " +
+                        "   '' AS id, :appResId AS appResourceId, :appId AS appId, m.`NAME` AS resourceMetadataName, rm.ID AS resourceMetadataId, " +
+                        "   '' AS dimensionId, '' AS dimensionValue, 0 AS valid " +
+                        "FROM " +
+                        "   `rs_resource_metadata` rm " +
+                        "LEFT JOIN rs_metadata m on rm.METADATA_ID=m.ID " +
+                        "LEFT JOIN rs_app_resource_metadata pm on (pm.RESOURCE_METADATA_ID=rm.ID AND pm.app_resource_id=:appResId) " +
+                        "WHERE " +
+                        "   pm.ID IS NULL AND rm.resources_id=:resId ) a " +
                 "UNION ALL " +
-                "SELECT b.id, b.APP_RESOURCE_ID as appResourceId, b.APP_ID as appId, b.RESOURCE_METADATA_NAME as resourceMetadataName, b.RESOURCE_METADATA_ID as resourceMetadataId," +
-                        "b.DIMENSION_ID as dimensionId, b.DIMENSION_VALUE as dimensionValue, b.valid" +
-                        " FROM rs_app_resource_metadata b WHERE b.APP_RESOURCE_ID= :appResId";
+                    "SELECT b.id, b.APP_RESOURCE_ID as appResourceId, b.APP_ID as appId, b.RESOURCE_METADATA_NAME as resourceMetadataName, b.RESOURCE_METADATA_ID as resourceMetadataId," +
+                            "b.DIMENSION_ID as dimensionId, b.DIMENSION_VALUE as dimensionValue, b.valid" +
+                            " FROM rs_app_resource_metadata b WHERE b.APP_RESOURCE_ID= :appResId" +
+                ") p ORDER BY p.resourceMetadataName";
 
         SQLQuery query = currentSession().createSQLQuery(sql);
         query.setParameter("appResId", appResId);
@@ -140,15 +142,19 @@ public class ResourceMetadataGrantService  extends BaseJpaService<RsAppResourceM
         query.setParameter("resId", resId);
         query.setResultTransformer(Transformers.aliasToBean(RsAppResourceMetadata.class));
 
-//        query.setFirstResult((page-1) * size);
-//        query.setMaxResults(size);
-//        Map map = new HashMap<>();
-//        map.put("list", query.list());
-//        query = currentSession().createSQLQuery("SELECT count(*) FROM ("+ sql +") p");
-//        query.setParameter("appResId", appResId);
-//        query.setParameter("appId", appId);
-//        query.setParameter("resId", resId);
-//        map.put("total", ((BigInteger) query.list().get(0)).longValue());
+        return query.list();
+    }
+
+    public List<Map> appMetaExistence(String[] appResId){
+        String sql = "SELECT " +
+                "APP_ID as appId, count(APP_ID) as total " +
+                "FROM  " +
+                "`rs_app_resource_metadata` meta " +
+                "WHERE  " +
+                "APP_RESOURCE_ID in(:appResId) GROUP BY APP_ID HAVING count(APP_ID)>0";
+        SQLQuery query = currentSession().createSQLQuery(sql);
+        query.setParameterList("appResId", appResId);
+        query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         return query.list();
     }
 }

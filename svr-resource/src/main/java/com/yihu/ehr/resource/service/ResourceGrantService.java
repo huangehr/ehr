@@ -110,18 +110,16 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
      * 删除资源授权
      *
      */
-    public void deleteGrantByResId(String resId, String[] appIds)
+    public void deleteGrantByIds(String[] appResIds)
     {
-        String hql = "delete from RsAppResource res where resourceId=:resourceId and appId in(:appId)";
+        String hql = "delete from RsAppResource res where id in(:appResIds)";
         Query query = currentSession().createQuery(hql);
-        query.setParameter("resourceId", resId);
-        query.setParameterList("appId", appIds);
+        query.setParameterList("appResIds", appResIds);
         query.executeUpdate();
 
-        hql = "delete from RsAppResourceMetadata meta where appResourceId=:resourceId and appId in(:appId)";
+        hql = "delete from RsAppResourceMetadata meta where appResourceId in(:appResIds)";
         query = currentSession().createQuery(hql);
-        query.setParameter("resourceId", resId);
-        query.setParameterList("appId", appIds);
+        query.setParameterList("appResIds", appResIds);
         query.executeUpdate();
     }
 
