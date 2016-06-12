@@ -14,6 +14,7 @@ public class AppModel {
     private String statusName;
     private String org;
     private String orgName;
+    private String resourceNames;
 
     public String getId() {
         return id;
@@ -93,5 +94,12 @@ public class AppModel {
 
     public void setOrgName(String orgName) {
         this.orgName = orgName;
+    }
+
+    public String getResourceNames() {
+        return resourceNames;
+    }
+    public void setResourceNames(String resourceNames) {
+        this.resourceNames = resourceNames;
     }
 }
