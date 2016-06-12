@@ -78,9 +78,9 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 "VALUE " +
                 " " +
                 "FROM " +
-                " org_std_dict osd " +
-                "LEFT JOIN  " +
                 " org_std_dictentry osde " +
+                "LEFT JOIN  " +
+                " org_std_dict osd " +
                 "ON osde.org_dict = osd.sequence  and osde.organization =osd.organization " +
                 "WHERE osde.organization = '"+adapterSchema.getAdapterVersion()+"'";
         jdbcTemplate.execute(sql);
@@ -125,9 +125,9 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 "VALUE " +
                 " " +
                 "FROM " +
-                " std_dictionary_"+adapterSchema.getAdapterVersion()+" sd " +
-                "LEFT JOIN" +
                 " std_dictionary_entry_"+adapterSchema.getAdapterVersion()+" sde " +
+                "LEFT JOIN" +
+                " std_dictionary_"+adapterSchema.getAdapterVersion()+" sd " +
                 "ON " +
                 " sde.dict_id = sd.id";
         jdbcTemplate.execute(sql);
