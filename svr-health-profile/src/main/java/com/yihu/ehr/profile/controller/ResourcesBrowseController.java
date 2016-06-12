@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.profile.service.PatientInfoBaseService;
@@ -30,6 +31,9 @@ import java.util.Map;
 public class ResourcesBrowseController {
 
     @Autowired
+    ObjectMapper mapper;
+
+    @Autowired
     PatientInfoBaseService patient;
 
     @Autowired
@@ -48,7 +52,7 @@ public class ResourcesBrowseController {
         Map<String,Object> re = patient.getPatientInfo(demographicId);
         if(version!=null)
         {
-            return transform.stdTransform(re,version);
+            return transform.stdTransform(mapper.writeValueAsString(re), version);
         }
         else{
             return re;
@@ -98,7 +102,7 @@ public class ResourcesBrowseController {
         List<Map<String,Object>> re = patient.getMedicalEvents(demographicId,eventsType,year,area,hpId,diseaseId);
         if(version!=null)
         {
-            return transform.stdTransformList(re, version);
+            return transform.stdTransformList(mapper.writeValueAsString(re), version);
         }
         else{
             return re;

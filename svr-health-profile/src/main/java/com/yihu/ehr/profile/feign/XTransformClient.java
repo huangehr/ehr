@@ -25,10 +25,10 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public interface XTransformClient {
 
     @RequestMapping(value = "/rs/transform/stdTransformList", method = RequestMethod.POST)
-    List<Map<String,Object>> stdTransformList(@RequestParam(value = "rsData", required = true) List<Map<String,Object>> rsData,
+    List<Map<String,Object>> stdTransformList(@RequestParam(value = "resource", required = true) String resource,
                          @RequestParam(value = "version", required = true) String version);
 
     @RequestMapping(value = "/rs/transform/stdTransform", method = RequestMethod.POST)
-    Map<String,Object> stdTransform(@RequestParam(value = "rsData", required = true) Map<String,Object> rsData,
+    Map<String,Object> stdTransform(@RequestParam(value = "resource", required = true) String resource,
                                               @RequestParam(value = "version", required = true) String version);
 }
