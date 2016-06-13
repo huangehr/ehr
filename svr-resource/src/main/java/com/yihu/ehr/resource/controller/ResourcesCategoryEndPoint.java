@@ -10,6 +10,8 @@ import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -60,11 +62,19 @@ public class ResourcesCategoryEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.Category, method = RequestMethod.DELETE)
     @ApiOperation("删除资源类别")
-    public boolean deleteResourceCategory(
+    public JSONObject deleteResourceCategory(
             @ApiParam(name = "id", value = "资源类别ID", defaultValue = "string")
             @PathVariable(value = "id") String id) throws Exception {
-        rsCategoryService.deleteRsCategory(id);
-        return true;
+        JSONObject  json = new JSONObject();
+        try{
+            rsCategoryService.deleteRsCategory(id);
+            json.put("successFlg",true);
+            json.put("msg","删除成功！");
+        }catch (Exception e){
+            json.put("successFlg",false);
+            json.put("msg",e.getMessage());
+        }
+        return json;
     }
 
     @RequestMapping(value = ServiceApi.Resources.Category, method = RequestMethod.GET)
