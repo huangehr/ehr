@@ -3,6 +3,7 @@ package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
+import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
@@ -70,12 +71,12 @@ public class PatientInfoDetailService {
             if (list != null && list.size() > 0) {
                 for (Template template : list) {
                     String cdaDocumentId = template.getCdaDocumentId();
-                    //获取CDA关联数据集************
-                    List<MCdaDataSetRelationship> datasetList = cdaService.getCDADataSetRelationshipByCDAId(cdaVersion, cdaDocumentId);
+                    //获取CDA关联数据集
+                    List<MCdaDataSet> datasetList = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
                     if (datasetList != null && datasetList.size() > 0) {
                         String query = "";
-                        for (MCdaDataSetRelationship dataset : datasetList) {
-                            String datasetCode = "";
+                        for (MCdaDataSet dataset : datasetList) {
+                            String datasetCode = dataset.getDataSetCode();
                             if (query.length() > 0) {
                                 query += " OR rowkey:*" + datasetCode + "*";
                             } else {
@@ -84,7 +85,7 @@ public class PatientInfoDetailService {
                         }
                         //判断是否包含相关数据
                         String queryParams = "{\"q\":\"(" + query + ") AND profile_id:" + profileId + "\"}";
-                        Envelop data = resource.getEhrCenterSub(queryParams, null, null);
+                        Envelop data = resource.getEhrCenterSub(URLEncoder.encode(queryParams), null, null);
                         if (data.getDetailModelList() != null && data.getDetailModelList().size() > 0) {
                             Map<String, String> item = new HashMap<>();
                             item.put("profile_id", profileId);
@@ -113,11 +114,11 @@ public class PatientInfoDetailService {
             if (template != null) {
                 String cdaVersion = ((Map<String, Object>) result.getDetailModelList().get(0)).get("cda_version").toString();
                 String cdaDocumentId = template.getCdaDocumentId();
-                //获取CDA关联数据集************
-                List<MCdaDataSetRelationship> datasetList = cdaService.getCDADataSetRelationshipByCDAId(cdaVersion, cdaDocumentId);
+                //获取CDA关联数据集
+                List<MCdaDataSet> datasetList = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
                 if (datasetList != null && datasetList.size() > 0) {
-                    for (MCdaDataSetRelationship dataset : datasetList) {
-                        String datasetCode = "";
+                    for (MCdaDataSet dataset : datasetList) {
+                        String datasetCode = dataset.getDataSetCode();
 
                         String q = "{\"q\":\"rowkey:*" + datasetCode + "* AND profile_id:" + profileId + "\"}";
                         //获取Hbase数据
@@ -127,7 +128,7 @@ public class PatientInfoDetailService {
                             List<Map<String, Object>> table = data.getDetailModelList();
 
                             //根据cdaVersion转译************
-                            List<Map<String, Object>> dataList = new ArrayList<>();
+                            List<Map<String, Object>> dataList = table;
                             re.put(datasetCode, dataList);
                         }
                     }

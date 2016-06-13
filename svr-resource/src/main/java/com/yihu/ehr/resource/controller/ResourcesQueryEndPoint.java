@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -41,7 +42,7 @@ public class ResourcesQueryEndPoint {
                                 @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                 @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return resourcesQueryService.getResources(resourcesCode, appId, queryParams, page, size);
+        return resourcesQueryService.getResources(resourcesCode, appId, URLDecoder.decode(queryParams,"utf-8"), page, size);
     }
 
 
@@ -74,14 +75,14 @@ public class ResourcesQueryEndPoint {
         return resourcesQueryDao.getEhrCenter(queryParams, page, size);
     }
 
-    @ApiOperation("内部--Hbase从表")
+    @ApiOperation("Hbase从表")
     @RequestMapping(value = "/getEhrCenterSub", method = RequestMethod.GET)
     public Envelop getEhrCenterSub(
             @ApiParam(name = "queryParams", defaultValue = "{\"table\":\"HDSC02_17\",\"join\":\"demographic_id:420521195812172917\"}")
             @RequestParam(value = "queryParams", required = false) String queryParams,
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenterSub(queryParams, page, size);
+        Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenterSub(URLDecoder.decode(queryParams,"utf-8"), page, size);
         Envelop re = new Envelop();
         re.setCurrPage(result.getNumber());
         re.setPageSize(result.getSize());
