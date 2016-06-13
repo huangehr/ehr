@@ -129,7 +129,7 @@ public class AdapterSchemeService extends BaseJpaService<RsAdapterScheme, Adapte
                 "LEFT JOIN" +
                 " std_dictionary_"+adapterSchema.getAdapterVersion()+" sd " +
                 "ON " +
-                " sde.dict_id = sd.id";
+                " sde.dict_id = sd.id where sd.code is not null ";
         jdbcTemplate.execute(sql);
     }
 
