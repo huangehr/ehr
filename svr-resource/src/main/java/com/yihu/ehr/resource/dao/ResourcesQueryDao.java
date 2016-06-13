@@ -34,7 +34,7 @@ public class ResourcesQueryDao {
     SolrQuery solr;
 
     private Integer defaultPage = 1;
-    private Integer defaultSize = 50;
+    private Integer defaultSize = 1000;
 
     private String mainCore = "HealthProfile";
     private String subCore = "HealthProfileSub";

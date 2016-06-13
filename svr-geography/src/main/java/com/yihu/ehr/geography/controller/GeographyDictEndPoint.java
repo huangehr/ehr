@@ -1,8 +1,10 @@
 package com.yihu.ehr.geography.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.geography.service.Geography;
 import com.yihu.ehr.geography.service.GeographyDict;
 import com.yihu.ehr.geography.service.GeographyDictService;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
@@ -51,5 +53,16 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
         List<GeographyDict> addressDictList = geographyDictService.getPidToAddr(pid);
         return convertToModels(addressDictList,new ArrayList<>(addressDictList.size()), MGeographyDict.class,"");
     }
+
+
+    @RequestMapping(value = "/geography_entries/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id查询行政区划地址")
+    public MGeographyDict getAddressDictById(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @PathVariable(value = "id") String id) {
+        GeographyDict geographyDict =  geographyDictService.findById(id);
+        return convertToModel(geographyDict, MGeographyDict.class);
+    }
+
 
 }

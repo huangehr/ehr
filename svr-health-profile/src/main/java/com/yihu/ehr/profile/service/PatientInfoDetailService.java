@@ -1,6 +1,9 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.model.standard.MCdaDataSet;
@@ -12,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author hzp 2016-05-26
@@ -39,6 +39,9 @@ public class PatientInfoDetailService {
     //CDA服务
     @Autowired
     XCDADocumentClient cdaService;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
 
     String appId = "svr-health-profile";
@@ -336,6 +339,35 @@ public class PatientInfoDetailService {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
         return resource.getResources(BasisConstant.hospitalizedCost, appId, URLEncoder.encode(queryParams), page, size);
+    }
+
+
+    public List<Map<String,String>> getDocument(String profileId) throws Exception {
+
+        Map<String, List<Map<String, Object>>> re = new HashMap<>();
+        //主表记录
+        Envelop profile = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}");
+
+        LinkedHashMap<String,String> profileMap = (LinkedHashMap<String, String>) profile.getDetailModelList().get(0);
+        String profileStr = objectMapper.writeValueAsString(profileMap);
+        JsonNode profileNode = objectMapper.readTree(profileStr);
+
+        Map<String, Object> map  = (Map<String, Object>) profile.getDetailModelList().get(0);
+
+
+        //从表记录
+        Envelop dataSet = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}",null,null);
+
+        List<LinkedHashMap<String,String>> dataSetList = (List<LinkedHashMap<String,String>>) dataSet.getDetailModelList();
+        String dataSetStr = objectMapper.writeValueAsString(dataSetList);
+        JsonNode dataSetNode = objectMapper.readTree(dataSetStr);
+
+        ObjectNode aa = (ObjectNode) dataSetNode.get(0);
+
+//        for (ObjectNode objectNode : dataSetNode){
+//
+//        }
+        return null;
     }
 
 

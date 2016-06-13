@@ -17,7 +17,7 @@ public class OriginFile {
     private String mime;
     private Date expireDate;
     private UrlScope urlScope;
-    private String documentName;
+    private String reportName;
 
     // 文件索引，key为文件名
     private Map<String, String> fileUrls = new TreeMap<>();
@@ -63,11 +63,11 @@ public class OriginFile {
         return urls;
     }
 
-    public String getDocumentName() {
-        return documentName;
+    public String getReportName() {
+        return reportName;
     }
 
-    public void setDocumentName(String documentName) {
-        this.documentName = documentName;
+    public void setReportName(String reportName) {
+        this.reportName = reportName;
     }
 }

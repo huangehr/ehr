@@ -1,25 +1,18 @@
 package com.yihu.ehr.resource.service;
 
 
-import com.yihu.ehr.query.common.model.QueryCondition;
-import com.yihu.ehr.query.services.SolrQuery;
-import com.yihu.ehr.resource.dao.ResourcesMetadataQueryDao;
-import com.yihu.ehr.resource.dao.ResourcesQueryDao;
 import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
 import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
 import com.yihu.ehr.resource.dao.intf.ResourceDefaultParamDao;
-import com.yihu.ehr.resource.dao.intf.ResourcesDao;
-import com.yihu.ehr.resource.model.*;
-import com.yihu.ehr.util.Envelop;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.yihu.ehr.resource.model.RsAdapterMetadata;
+import com.yihu.ehr.resource.model.RsAdapterScheme;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
