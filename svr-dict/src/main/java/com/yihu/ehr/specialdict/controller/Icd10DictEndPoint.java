@@ -2,6 +2,7 @@ package com.yihu.ehr.specialdict.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.specialdict.model.Icd10Dict;
@@ -11,7 +12,6 @@ import com.yihu.ehr.specialdict.service.Icd10DictService;
 import com.yihu.ehr.specialdict.service.Icd10DrugRelationService;
 import com.yihu.ehr.specialdict.service.Icd10HpRelationService;
 import com.yihu.ehr.specialdict.service.Icd10IndicatorRelationService;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

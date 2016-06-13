@@ -3,7 +3,7 @@ package com.yihu.ehr.profile.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.profile.service.BasisConstant;
 import com.yihu.ehr.profile.service.PatientInternetHospitalService;
-import com.yihu.ehr.util.controller.BaseRestEndPoint;
+import com.yihu.ehr.controller.BaseRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

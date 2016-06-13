@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.agModel.resource.RsCategoryModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
 import com.yihu.ehr.api.ServiceApi;
@@ -11,7 +12,6 @@ import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import net.minidev.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -97,8 +97,8 @@ public class ResourcesCategoryController extends BaseController {
             @PathVariable(value = "id") String id) throws Exception {
         Envelop envelop = new Envelop();
         try{
-            JSONObject obj  = resourcesCategoryClient.deleteResourceCategory(id);
-            envelop.setSuccessFlg((Boolean)obj.get("successFlg"));
+            ObjectNode obj  = resourcesCategoryClient.deleteResourceCategory(id);
+            envelop.setSuccessFlg(obj.get("successFlg").asBoolean());
             envelop.setErrorMsg(String.valueOf(obj.get("msg")));
         }catch (Exception e){
             e.printStackTrace();
