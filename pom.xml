@@ -111,6 +111,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.commons-bean-utils>1.9.2</version.commons-bean-utils>
+        <version.commons-collections>3.2.1</version.commons-collections>
+        <version.commons-compress>1.9</version.commons-compress>
         <version.commons-dbcp2>2.1.1</version.commons-dbcp2>
         <version.commons-dbutils>1.6</version.commons-dbutils>
         <version.commons-io>2.4</version.commons-io>
@@ -120,7 +122,7 @@
         <version.hadoop-client>2.7.1</version.hadoop-client>
         <version.hbase-client>1.2.0</version.hbase-client>
         <version.hibernate>4.3.11.Final</version.hibernate>
-        <version.hibernate-annotations>3.2.0.Final</version.hibernate-annotations>
+        <version.hibernate-annotations>4.0.5.Final</version.hibernate-annotations>
         <version.hibernate-jpa-api>1.0.0.Final</version.hibernate-jpa-api>
         <version.http-client>4.5.1</version.http-client>
         <version.http-core>4.4.3</version.http-core>
@@ -134,17 +136,17 @@
         <version.log4j2>2.4.1</version.log4j2>
         <version.mysql>5.1.38</version.mysql>
         <version.pinyin4j>2.5.0</version.pinyin4j>
+        <version.quartz>2.0.1</version.quartz>
         <version.servlet-api>3.1.0</version.servlet-api>
         <version.slf4j>1.7.21</version.slf4j>
         <version.solr>5.5.1</version.solr>
-        <version.spring>4.2.6.RELEASE</version.spring>
         <version.spring-boot>1.3.5.RELEASE</version.spring-boot>
-        <version.spring-cloud>Brixton.RELEASE</version.spring-cloud>
-        <version.spring-data-common>1.11.2.RELEASE</version.spring-data-common>
+        <version.spring-cloud-release-train>Brixton.RELEASE</version.spring-cloud-release-train>
+        <version.spring-cloud-config-server>1.1.0.RELEASE</version.spring-cloud-config-server>
+        <version.spring-data-release-train>Hopper-SR1</version.spring-data-release-train>
         <version.spring-data-hadoop>2.3.0.RELEASE</version.spring-data-hadoop>
-        <version.spring-data-jpa>1.9.2.RELEASE</version.spring-data-jpa>
-        <version.spring-data-redis>1.6.2.RELEASE</version.spring-data-redis>
-        <version.spring-data-solr>2.0.1.RELEASE</version.spring-data-solr>
+        <version.spring-framework>4.2.6.RELEASE</version.spring-framework>
+        <version.spring-session>1.2.0.RELEASE</version.spring-session>
         <version.statsd-client>3.1.0</version.statsd-client>
         <version.swagger>2.4.0</version.swagger>
         <version.swagger-ui>2.4.0</version.swagger-ui>
@@ -225,6 +227,18 @@
                 <version>${version.commons-io}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${version.commons-collections}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${version.commons-compress}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
 
             <!--Hibernate framework-->
             <dependency>
@@ -238,11 +252,6 @@
                 <artifactId>hibernate-core</artifactId>
                 <version>${version.hibernate}</version>
                 <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-commons-annotations</artifactId>
-                <version>${version.hibernate-annotations}</version>
             </dependency>
 
             <!--Hadoop library-->
@@ -330,6 +339,12 @@
             </dependency>
 
             <!--Miscellaneous-->
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${version.quartz}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
             <dependency>
                 <groupId>net.lingala.zip4j</groupId>
                 <artifactId>zip4j</artifactId>
@@ -426,6 +441,12 @@
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${version.jedis}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${version.log4j}</version>
@@ -450,90 +471,65 @@
                 <scope>${dependency.scope}</scope>
             </dependency>
 
-            <!--Spring framework-->
+            <!--Spring framework family-->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>${version.spring}</version>
+                <version>${version.spring-framework}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>${version.spring}</version>
+                <version>${version.spring-framework}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
-                <version>${version.spring}</version>
+                <version>${version.spring-framework}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>${version.spring}</version>
+                <version>${version.spring-framework}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>${version.spring}</version>
+                <version>${version.spring-framework}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-orm</artifactId>
-                <version>${version.spring}</version>
+                <version>${version.spring-framework}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jdbc</artifactId>
-                <version>${version.spring}</version>
+                <version>${version.spring-framework}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
+
+            <!--Spring session family-->
             <dependency>
-                <groupId>org.springframework.integration</groupId>
-                <artifactId>spring-integration-jmx</artifactId>
-                <version>${version.spring}</version>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session</artifactId>
+                <version>${version.spring-session}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-commons</artifactId>
-                <version>${version.spring-data-common}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
+
+            <!--Spring data family, hadoop not in BOM. see http://projects.spring.io/spring-data/-->
             <dependency>
                 <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-redis</artifactId>
-                <version>${version.spring-data-redis}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-jpa</artifactId>
-                <version>${version.spring-data-jpa}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-hadoop-core</artifactId>
-                <version>${version.spring-data-hadoop}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-hadoop</artifactId>
-                <version>${version.spring-data-hadoop}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-hadoop-batch</artifactId>
-                <version>${version.spring-data-hadoop}</version>
-                <scope>${dependency.scope}</scope>
+                <artifactId>spring-data-releasetrain</artifactId>
+                <version>${version.spring-data-release-train}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
@@ -541,14 +537,18 @@
                 <version>${version.spring-data-hadoop}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
+
+            <!--Spring integration family-->
             <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-solr</artifactId>
-                <version>${version.spring-data-solr}</version>
+                <groupId>org.springframework.integration</groupId>
+                <artifactId>spring-integration-jmx</artifactId>
+                <version>${version.spring-framework}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
 
-            <!--Spring boot-->
+            <!--Spring batch family-->
+
+            <!--Spring boot family-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot</artifactId>
@@ -575,9 +575,21 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-jpa</artifactId>
                 <version>${version.spring-boot}</version>
                 <scope>${dependency.scope}</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-classic</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -587,9 +599,21 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
+                <artifactId>spring-boot-starter-security</artifactId>
                 <version>${version.spring-boot}</version>
                 <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-thymeleaf</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -597,12 +621,24 @@
                 <version>${version.spring-boot}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
 
-            <!--Spring cloud-->
+            <!--Spring cloud family-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-config-server</artifactId>
+                <version>${version.spring-cloud-config-server}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${version.spring-cloud}</version>
+                <version>${version.spring-cloud-release-train}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

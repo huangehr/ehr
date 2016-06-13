@@ -11,22 +11,23 @@
 
     <artifactId>commons-admin-gateway-model</artifactId>
     <packaging>jar</packaging>
-	<description>EHR platform admin api gateway object model</description>
 
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
             <version>${version.ehr}</version>
-            <scope>provided</scope>
+            <scope>${dependency.scope}</scope>
         </dependency>
     </dependencies>
 </project>

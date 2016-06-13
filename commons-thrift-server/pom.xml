@@ -18,7 +18,7 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-thrift-services</artifactId>
             <version>${version.ehr}</version>
-            <scope>provided</scope>
+            <scope>${dependency.scope}</scope>
         </dependency>
     </dependencies>
 </project>

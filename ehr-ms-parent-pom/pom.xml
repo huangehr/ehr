@@ -32,7 +32,7 @@
         <module>../svr-pack-mgr</module>
         <module>../svr-pack-resolve</module>
         <module>../svr-patient</module>
-        <module>../svr-resource</module>
+        <!--<module>../svr-resource</module>-->
         <module>../svr-security</module>
         <!--module>../svr-special-dict</module-->
         <module>../svr-standard</module>
@@ -130,7 +130,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.4</version>
+                    <version>3.3</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.maven.doxia</groupId>
@@ -192,6 +192,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.17</version>
                 <executions>
                     <execution>
                         <id>checkstyle-validation</id>
@@ -224,6 +225,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4</version>
                 <executions>
                     <execution>
                         <id>enforce-rules</id>
@@ -336,43 +338,91 @@
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-ehr-constants</artifactId>
                 <version>${version.ehr}</version>
-                <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-util</artifactId>
                 <version>${version.ehr}</version>
-                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-data-hbase</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-data-fastdfs</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>happy.fish</groupId>
+                <artifactId>fastDFS</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-data-solr</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-redis-keyschema</artifactId>
+                <version>${version.ehr}</version>
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-ui-swagger</artifactId>
                 <version>${version.ehr}</version>
-                <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-data-mysql</artifactId>
                 <version>${version.ehr}</version>
-                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-data-redis</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-data-query</artifactId>
+                <version>${version.ehr}</version>
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-rest-model</artifactId>
                 <version>${version.ehr}</version>
-                <scope>${dependency.scope}</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-ui-swagger</artifactId>
-                <version>${version.ehr}</version>
-                <scope>${dependency.scope}</scope>
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-web</artifactId>
                 <version>${version.ehr}</version>
-                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-profile-core</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-profile-persist</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-redis-mq</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-metrics</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-admin-gateway-model</artifactId>
+                <version>${version.ehr}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -400,6 +450,17 @@
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-web</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                    <scope>${dependency.scope}</scope>
                 </dependency>
             </dependencies>
         </profile>
@@ -424,13 +485,32 @@
                             <url>${wagonUrl}</url>
                             <commands>
                                 <command>pkill -f ${project.build.finalName}.jar</command>
-                                <command>java -Djava.security.egd=file:/dev/./urandom -jar ${project.build.finalName}.jar</command>
+                                <command>nohub java -Djava.security.egd=file:/dev/./urandom -jar
+                                    ${project.build.finalName}.jar &amp;
+                                </command>
                             </commands>
                             <displayCommandOutputs>true</displayCommandOutputs>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                    <scope>${dependency.scope}</scope>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>test-war</id>
@@ -453,11 +533,38 @@
                     <exclusions>
                         <exclusion>
                             <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-tomcat</artifactId>
+                            <artifactId>spring-boot-starter-logging</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>${dependency.scope}</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                    <scope>${dependency.scope}</scope>
+                </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <version>2.2</version>
+                        <configuration>
+                            <url>http://localhost:8080/manager/text</url>
+                            <server>tomcat8</server>
+                            <username>deployer</username>
+                            <password>jkzldeployer</password>
+                            <path>/${project.artifactId}</path>
+                            <update>true</update>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>prod-jar</id>
@@ -479,6 +586,12 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-web</artifactId>
                     <scope>${dependency.scope}</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>

@@ -17,6 +17,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
+            <scope>${dependency.scope}</scope>
         </dependency>
     </dependencies>
 </project>

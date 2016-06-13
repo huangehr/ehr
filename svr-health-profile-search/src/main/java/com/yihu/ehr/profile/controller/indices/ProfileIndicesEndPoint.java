@@ -34,7 +34,7 @@ import java.util.Date;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "健康档案服务", description = "提供档案搜索及完整档案下载")
 public class ProfileIndicesEndPoint extends BaseRestEndPoint {
-    @Autowired
+    /*@Autowired
     ProfileIndicesService indicesService;
 
     @ApiOperation(value = "搜索档案", notes = "返回符合条件的档案列表")
@@ -80,5 +80,5 @@ public class ProfileIndicesEndPoint extends BaseRestEndPoint {
         }
 
         return profileIndices;
-    }
+    }*/
 }

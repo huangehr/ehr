@@ -11,22 +11,16 @@
     <artifactId>commons-data-redis</artifactId>
     <packaging>jar</packaging>
 
-    <properties>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>${version.jedis}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>

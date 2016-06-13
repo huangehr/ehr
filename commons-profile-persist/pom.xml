@@ -21,7 +21,7 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-hbase</artifactId>
             <version>${version.ehr}</version>
-            <scope>provided</scope>
+            <scope>${dependency.scope}</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-lang</artifactId>
@@ -33,19 +33,19 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-profile-core</artifactId>
             <version>${version.ehr}</version>
-            <scope>provided</scope>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-solr</artifactId>
             <version>${version.ehr}</version>
-            <scope>provided</scope>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-redis-keyschema</artifactId>
             <version>${version.ehr}</version>
-            <scope>provided</scope>
+            <scope>${dependency.scope}</scope>
         </dependency>
     </dependencies>
 </project>

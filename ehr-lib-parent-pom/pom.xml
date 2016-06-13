@@ -15,7 +15,7 @@
     <description>EHR library parent pom</description>
 
     <properties>
-        <dependency.scope>provided</dependency.scope>
+        <dependency.scope>compile</dependency.scope>
     </properties>
 
     <modules>
