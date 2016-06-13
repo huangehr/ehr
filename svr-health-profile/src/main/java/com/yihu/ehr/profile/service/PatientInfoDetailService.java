@@ -1,6 +1,9 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.yihu.ehr.constants.EventType;
+import com.yihu.ehr.constants.ProfileType;
+import com.yihu.ehr.model.packs.MFilePackage;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
@@ -11,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author hzp 2016-05-26
@@ -335,6 +335,50 @@ public class PatientInfoDetailService {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
         return resource.getResources(BasisConstant.hospitalizedCost, appId, URLEncoder.encode(queryParams), page, size);
+    }
+
+
+    public List<Map<String,String>> getDocument(String profileId) throws Exception {
+
+        Map<String, List<Map<String, Object>>> re = new HashMap<>();
+        //主表记录
+        Envelop profile = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}");
+
+        MFilePackage filepackage = new MFilePackage();
+
+        Map<String, Object> map  = (Map<String, Object>) profile.getDetailModelList().get(0);
+
+//        String profileId = map.get("profileId").toString();                         // 档案ID
+        String cardId = map.get("cardId").toString();                                 // 就诊时用的就诊卡ID
+        String orgCode = map.get("orgCode").toString();                               // 机构代码
+        String clientId = map.get("clientId").toString();                             // 应用来源
+        String patientId = map.get("patientId").toString();                           // 身份证号
+        String eventNo = map.get("eventNo").toString();                               // 事件号
+        String eventDate = map.get("eventDate").toString();                           // 事件时间，如挂号，出院体检时间
+        String demographicId = map.get("demographicId").toString();                   // 人口学ID
+        String createDate = map.get("createDate").toString();                         // 包创建时间
+        String cdaVersion = map.get("cdaVersion").toString();
+        String profileType = map.get("cdaVersion").toString();
+        String eventType = map.get("eventType").toString();
+
+        filepackage.setProfileId(profileId);
+        filepackage.setCardId(cardId);
+        filepackage.setOrgCode(orgCode);
+        filepackage.setPatientId(patientId);
+        filepackage.setEventNo(eventNo);
+        filepackage.setEventDate(eventDate);
+        filepackage.setDemographicId(demographicId);
+        filepackage.setCreateDate(createDate);
+        filepackage.setCdaVersion(cdaVersion);
+        filepackage.setProfileType(profileType);
+        filepackage.setEventType(eventType);
+        
+
+        //从表记录
+        Envelop document = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}",null,null);
+
+
+        return null;
     }
 
 

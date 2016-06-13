@@ -1,25 +1,18 @@
 package com.yihu.ehr.resource.service;
 
 
-import com.yihu.ehr.query.common.model.QueryCondition;
-import com.yihu.ehr.query.services.SolrQuery;
-import com.yihu.ehr.resource.dao.ResourcesMetadataQueryDao;
-import com.yihu.ehr.resource.dao.ResourcesQueryDao;
 import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
 import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
 import com.yihu.ehr.resource.dao.intf.ResourceDefaultParamDao;
-import com.yihu.ehr.resource.dao.intf.ResourcesDao;
-import com.yihu.ehr.resource.model.*;
-import com.yihu.ehr.util.Envelop;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.yihu.ehr.resource.model.RsAdapterMetadata;
+import com.yihu.ehr.resource.model.RsAdapterScheme;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -39,36 +32,36 @@ public class ResourcesTransformService {
     AdapterMetadataDao adapterMetadataDao;
 
     /**
-     * ×ÊÔ´Êı¾İÏÔÊ¾´úÂë×ª»»
+     * èµ„æºæ•°æ®æ˜¾ç¤ºä»£ç è½¬æ¢
      *
-     * @param resource List<Map<String,Object>> ×ÊÔ´
-     * @param version String ÊÊÅä°æ±¾
+     * @param resource List<Map<String,Object>> èµ„æº
+     * @param version String é€‚é…ç‰ˆæœ¬
      * @return
      */
     public List<Map<String,Object>> displayCodeConvert(List<Map<String,Object>> resource,String version)
     {
-        //·µ»Ø×ÊÔ´
+        //è¿”å›èµ„æº
         List<Map<String,Object>> returnRs =  new ArrayList<Map<String, Object>>();
-        //ÊÊÅä·½°¸
+        //é€‚é…æ–¹æ¡ˆ
         List<RsAdapterScheme> schemeList = adapterSchemeDao.findByAdapterVersion(version);
 
         if ((resource != null && resource.size() > 0) || (schemeList != null && schemeList.size() > 0))
         {
-            //ÊÊÅä·½°¸¶ÔÓ¦Êı¾İÔª
+            //é€‚é…æ–¹æ¡ˆå¯¹åº”æ•°æ®å…ƒ
             List<RsAdapterMetadata> metadataList = adapterMetadataDao.findBySchema(schemeList.get(0).getId());
 
             if(metadataList != null && metadataList.size() > 0)
             {
-                //Êı¾İÔªMap,±ãÓÚ¶ÔÓ¦²éÕÒ
+                //æ•°æ®å…ƒMap,ä¾¿äºå¯¹åº”æŸ¥æ‰¾
                 Map<String,String> adapterMap = new HashMap<String,String>();
 
-                //Êı¾İÔª·ÅÈëMap
+                //æ•°æ®å…ƒæ”¾å…¥Map
                 for(RsAdapterMetadata meta : metadataList)
                 {
                     adapterMap.put(meta.getMetadataId(),meta.getSrcMetadataCode());
                 }
 
-                //Êı¾İÔª´úÂë×ª»»
+                //æ•°æ®å…ƒä»£ç è½¬æ¢
                 for(Map<String,Object> rs : resource)
                 {
                     Map<String,Object> convertedMap = new HashMap<String,Object>();
@@ -94,34 +87,34 @@ public class ResourcesTransformService {
     }
 
     /**
-     * ×ÊÔ´Êı¾İÏÔÊ¾´úÂë×ª»»
-     * @param version String ÊÊÅä°æ±¾
+     * èµ„æºæ•°æ®æ˜¾ç¤ºä»£ç è½¬æ¢
+     * @param version String é€‚é…ç‰ˆæœ¬
      * @return
      */
     public Map<String,Object> displayCodeConvert(Map<String,Object> resource,String version)
     {
-        //·µ»Ø×ÊÔ´
+        //è¿”å›èµ„æº
         Map<String,Object> returnRs =  new HashMap<>();
-        //ÊÊÅä·½°¸
+        //é€‚é…æ–¹æ¡ˆ
         List<RsAdapterScheme> schemeList = adapterSchemeDao.findByAdapterVersion(version);
 
         if ((resource != null && resource.size() > 0) || (schemeList != null && schemeList.size() > 0))
         {
-            //ÊÊÅä·½°¸¶ÔÓ¦Êı¾İÔª
+            //é€‚é…æ–¹æ¡ˆå¯¹åº”æ•°æ®å…ƒ
             List<RsAdapterMetadata> metadataList = adapterMetadataDao.findBySchema(schemeList.get(0).getId());
 
             if(metadataList != null && metadataList.size() > 0)
             {
-                //Êı¾İÔªMap,±ãÓÚ¶ÔÓ¦²éÕÒ
+                //æ•°æ®å…ƒMap,ä¾¿äºå¯¹åº”æŸ¥æ‰¾
                 Map<String,String> adapterMap = new HashMap<String,String>();
 
-                //Êı¾İÔª·ÅÈëMap
+                //æ•°æ®å…ƒæ”¾å…¥Map
                 for(RsAdapterMetadata meta : metadataList)
                 {
                     adapterMap.put(meta.getMetadataId(),meta.getSrcMetadataCode());
                 }
 
-                //Êı¾İÔª´úÂë×ª»»
+                //æ•°æ®å…ƒä»£ç è½¬æ¢
                 for(String key : resource.keySet())
                 {
                     if(adapterMap.containsKey(key))

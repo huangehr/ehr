@@ -148,6 +148,16 @@ public class ResourcesBrowseController {
         return patientDetail.getCDAData(profileId, templateId);
     }
 
+
+    @ApiOperation("公众版门户 -- 档案详情")
+    @RequestMapping(value = "/cda/getDocument", method = RequestMethod.GET)
+    public List<Map<String,String>> getDocument(
+            @ApiParam(name = "profileId", value = "档案ID")
+            @RequestParam(value = "profileId", required = false) String profileId) throws Exception {
+        return patientDetail.getDocument(profileId);
+    }
+
+
     @ApiOperation("档案详情 -- 通过事件号获取templateId")
     @RequestMapping(value = "/cda/getPatientCdaTemplate", method = RequestMethod.GET)
     public String getPatientCdaTemplate(

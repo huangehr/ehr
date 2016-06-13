@@ -1,13 +1,11 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
-import com.yihu.ehr.profile.feign.XHealthProblemDictClient;
-import com.yihu.ehr.profile.feign.XIcd10DictClient;
-import com.yihu.ehr.profile.feign.XOrganizationClient;
-import com.yihu.ehr.profile.feign.XResourceClient;
+import com.yihu.ehr.profile.feign.*;
 import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +39,9 @@ public class PatientInfoBaseService {
 
     @Autowired
     private XHealthProblemDictClient healthProblemDictClient;
+
+    @Autowired
+    private AddressClient addressClient;
 
     String appId = "svr-health-profile";
 
@@ -422,7 +423,7 @@ public class PatientInfoBaseService {
             for(int i=0;i<outpatient.getDetailModelList().size();i++) {
                 Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
                 if(obj.containsKey(BasisConstant.mzzd)) {
-                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList,obj);
+                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList,obj,BasisConstant.mzzd);
                 }
             }
         }
@@ -432,7 +433,7 @@ public class PatientInfoBaseService {
             for(int i=0;i<hospitalized.getDetailModelList().size();i++) {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
                 if(obj.containsKey(BasisConstant.zyzd)) {
-                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList,obj);
+                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList,obj,BasisConstant.zyzd);
                 }
             }
         }
@@ -496,7 +497,8 @@ public class PatientInfoBaseService {
                 areaCode = areaCode.substring(0, areaCode.length() - 2) + "00"; //转换成市级代码
                 if (!re.contains(areaCode)) {
                     re.add(areaCode);
-                    organizationMap.put(areaCode, org.getFullName());
+                    String areaName = addressClient.getAddressDictById(areaCode).getName();
+                    organizationMap.put("areaCode:", areaCode+",areaName:"+areaName);
                     organizationMapList.add(organizationMap);
                 }
             }
@@ -509,10 +511,8 @@ public class PatientInfoBaseService {
         return organizationMapList;
     }
 
-
-
-    private  List<Map<String,String>> getHealthProblemDictMapList(List<Map<String,String>> healthProblemDictMapList,Map<String, Object> obj){
-        String code = (String)obj.get(BasisConstant.zyzd);
+    private  List<Map<String,String>> getHealthProblemDictMapList(List<Map<String,String>> healthProblemDictMapList,Map<String, Object> obj,String basisConstant){
+        String code = (String)obj.get(basisConstant);
         MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(code);
         Map<String,String> map = new HashMap<>();
         map.put(healthProblemDict.getCode(),healthProblemDict.getName());
