@@ -37,6 +37,7 @@ public class ServiceApi {
     public static class Resources{
         public static final String Resources                         = "/resources";
         public static final String Resource                          = "/resources/{id}";
+        public static final String NoPageResources                   = "/NoPageResources";
 
         public static final String ResourceMetadataList              = "/resources/rs_metadata";
         public static final String ResourceMetadataBatch             = "/resources/rs_metadata/batch";
@@ -72,6 +73,7 @@ public class ServiceApi {
 
 
         public static final String DictEntries                   ="/resources/dict_entries";
+        public static final String NoPageDictEntries             ="/resources/noPage_dict_entries";
         public static final String DictEntry                     ="/resources/dict_entries/{id}";
         public static final String DictEntriesExistence          ="/resources/dict_entries/existence";
 
