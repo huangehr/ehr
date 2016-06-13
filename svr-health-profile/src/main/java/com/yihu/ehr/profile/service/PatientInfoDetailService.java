@@ -1,9 +1,9 @@
 package com.yihu.ehr.profile.service;
 
 
-import com.yihu.ehr.constants.EventType;
-import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.model.packs.MFilePackage;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
@@ -38,6 +38,9 @@ public class PatientInfoDetailService {
     //CDA服务
     @Autowired
     XCDADocumentClient cdaService;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
 
     String appId = "svr-health-profile";
@@ -344,40 +347,25 @@ public class PatientInfoDetailService {
         //主表记录
         Envelop profile = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}");
 
-        MFilePackage filepackage = new MFilePackage();
+        LinkedHashMap<String,String> profileMap = (LinkedHashMap<String, String>) profile.getDetailModelList().get(0);
+        String profileStr = objectMapper.writeValueAsString(profileMap);
+        JsonNode profileNode = objectMapper.readTree(profileStr);
 
         Map<String, Object> map  = (Map<String, Object>) profile.getDetailModelList().get(0);
 
-//        String profileId = map.get("profileId").toString();                         // 档案ID
-        String cardId = map.get("cardId").toString();                                 // 就诊时用的就诊卡ID
-        String orgCode = map.get("orgCode").toString();                               // 机构代码
-        String clientId = map.get("clientId").toString();                             // 应用来源
-        String patientId = map.get("patientId").toString();                           // 身份证号
-        String eventNo = map.get("eventNo").toString();                               // 事件号
-        String eventDate = map.get("eventDate").toString();                           // 事件时间，如挂号，出院体检时间
-        String demographicId = map.get("demographicId").toString();                   // 人口学ID
-        String createDate = map.get("createDate").toString();                         // 包创建时间
-        String cdaVersion = map.get("cdaVersion").toString();
-        String profileType = map.get("cdaVersion").toString();
-        String eventType = map.get("eventType").toString();
-
-        filepackage.setProfileId(profileId);
-        filepackage.setCardId(cardId);
-        filepackage.setOrgCode(orgCode);
-        filepackage.setPatientId(patientId);
-        filepackage.setEventNo(eventNo);
-        filepackage.setEventDate(eventDate);
-        filepackage.setDemographicId(demographicId);
-        filepackage.setCreateDate(createDate);
-        filepackage.setCdaVersion(cdaVersion);
-        filepackage.setProfileType(profileType);
-        filepackage.setEventType(eventType);
-        
 
         //从表记录
-        Envelop document = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}",null,null);
+        Envelop dataSet = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}",null,null);
 
+        List<LinkedHashMap<String,String>> dataSetList = (List<LinkedHashMap<String,String>>) dataSet.getDetailModelList();
+        String dataSetStr = objectMapper.writeValueAsString(dataSetList);
+        JsonNode dataSetNode = objectMapper.readTree(dataSetStr);
 
+        ObjectNode aa = (ObjectNode) dataSetNode.get(0);
+
+//        for (ObjectNode objectNode : dataSetNode){
+//
+//        }
         return null;
     }
 
