@@ -161,6 +161,17 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         return (List<MRsAppResource>)rsAppList;
     }
 
+    @ApiOperation("资源授权查询-不分页")
+    @RequestMapping(value = ServiceApi.Resources.ResourceGrantsNoPage,method = RequestMethod.GET)
+    public List<MRsAppResource> queryAppResourceGrantNoPage(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception {
+        Collection<MRsAppResource> rsAppList;
+        List<RsAppResource> rsGrant = rsGrantService.search(filters);
+        rsAppList = convertToModels(rsGrant,new ArrayList<>(rsGrant.size()),MRsAppResource.class,null);
+        return (List<MRsAppResource>)rsAppList;
+    }
+
     @ApiOperation("资源数据元授权")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrantApp,method = RequestMethod.POST)
     public MRsAppResourceMetadata grantRsMetaData(

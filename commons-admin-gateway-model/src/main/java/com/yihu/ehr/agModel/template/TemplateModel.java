@@ -20,6 +20,8 @@ public class TemplateModel {
     private String createTime;
     private String province;
     private String city;
+    private String cdaType;
+    private String cdaTypeName;
 
     public int getId() {
         return id;
@@ -119,5 +121,21 @@ public class TemplateModel {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public String getCdaType() {
+        return cdaType;
+    }
+
+    public void setCdaType(String cdaType) {
+        this.cdaType = cdaType;
+    }
+
+    public String getCdaTypeName() {
+        return cdaTypeName;
+    }
+
+    public void setCdaTypeName(String cdaTypeName) {
+        this.cdaTypeName = cdaTypeName;
     }
 }
