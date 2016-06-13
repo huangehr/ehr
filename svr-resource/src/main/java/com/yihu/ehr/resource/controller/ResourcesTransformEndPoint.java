@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -50,7 +51,7 @@ public class ResourcesTransformEndPoint {
             @RequestParam(value = "version",required = true) String version) throws Exception
     {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.readValue(resource, Map.class);
+        Map<String, Object> map = mapper.readValue(URLDecoder.decode(resource), Map.class);
 
         return resourcesTransformService.displayCodeConvert(map,version);
     }

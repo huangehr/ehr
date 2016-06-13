@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class ResourcesBrowseController {
         Map<String,Object> re = patient.getPatientInfo(demographicId);
         if(version!=null)
         {
-            return transform.stdTransform(mapper.writeValueAsString(re), version);
+            return transform.stdTransform(URLEncoder.encode(mapper.writeValueAsString(re)), version);
         }
         else{
             return re;
