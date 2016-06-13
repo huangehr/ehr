@@ -42,7 +42,7 @@ public class ResourcesQueryEndPoint {
                                 @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                 @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return resourcesQueryService.getResources(resourcesCode, appId, URLDecoder.decode(queryParams), page, size);
+        return resourcesQueryService.getResources(resourcesCode, appId, URLDecoder.decode(queryParams,"utf-8"), page, size);
     }
 
 
@@ -82,7 +82,7 @@ public class ResourcesQueryEndPoint {
             @RequestParam(value = "queryParams", required = false) String queryParams,
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
             @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenterSub(URLDecoder.decode(queryParams), page, size);
+        Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenterSub(URLDecoder.decode(queryParams,"utf-8"), page, size);
         Envelop re = new Envelop();
         re.setCurrPage(result.getNumber());
         re.setPageSize(result.getSize());

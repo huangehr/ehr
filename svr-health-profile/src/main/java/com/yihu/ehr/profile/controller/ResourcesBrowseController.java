@@ -46,14 +46,15 @@ public class ResourcesBrowseController {
     @ApiOperation("门户 - 用户基本信息")
     @RequestMapping(value = "/home/getPatientInfo", method = RequestMethod.GET)
     public Map<String,Object> getPatientInfo(
-            @ApiParam(name = "demographicId", value = "身份证号")
+            @ApiParam(name = "demographicId", value = "身份证号",defaultValue="422428197704250025")
             @RequestParam(value = "demographicId", required = true) String demographicId,
+            @ApiParam(name = "version", value = "版本号",defaultValue="56395d75b854")
             @RequestParam(value = "version", required = false) String version) throws Exception {
 
         Map<String,Object> re = patient.getPatientInfo(demographicId);
         if(version!=null)
         {
-            return transform.stdTransform(URLEncoder.encode(mapper.writeValueAsString(re)), version);
+            return transform.stdTransform(URLEncoder.encode(mapper.writeValueAsString(re),"utf-8"), version);
         }
         else{
             return re;
@@ -75,9 +76,8 @@ public class ResourcesBrowseController {
     @ApiOperation("门户 - 主要健康问题")
     @RequestMapping(value = "/home/getHealthProblem", method = RequestMethod.GET)
     public List<Map<String,Object>> getHealthProblem(
-            @ApiParam(name = "demographicId", value = "身份证号")
-            @RequestParam(value = "demographicId", required = true) String demographicId,
-            @RequestParam(value = "version", required = false) String version) throws Exception {
+            @ApiParam(name = "demographicId", value = "身份证号",defaultValue="420521195812172917")
+            @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
 
         return patient.getHealthProblem(demographicId);
     }
@@ -86,7 +86,7 @@ public class ResourcesBrowseController {
     @ApiOperation("门户 - 最近就诊事件")
     @RequestMapping(value = "/home/getMedicalEvents", method = RequestMethod.GET)
     public List<Map<String,Object>> getMedicalEvents(
-            @ApiParam(name = "demographicId", value = "身份证号")
+            @ApiParam(name = "demographicId", value = "身份证号",defaultValue="420521195812172917")
             @RequestParam(value = "demographicId", required = true) String demographicId,
             @ApiParam(name = "eventsType", value = "就诊事件类别")
             @RequestParam(value = "eventsType", required = false) String eventsType,
@@ -113,21 +113,24 @@ public class ResourcesBrowseController {
     @ApiOperation("就诊过的疾病")
     @RequestMapping(value = "/home/getPatientDisease", method = RequestMethod.GET)
     public List<Map<String,String>> getPatientDisease(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
+            @ApiParam(name = "demographicId", value = "身份证号",defaultValue="420521195812172917")
+            @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
         return patient.getPatientDisease(demographicId);
     }
 
     @ApiOperation("就诊过的城市")
     @RequestMapping(value = "/home/getPatientArea", method = RequestMethod.GET)
     public List<Map<String,String>> getPatientArea(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
+            @ApiParam(name = "demographicId", value = "身份证号",defaultValue="420521195812172917")
+            @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
         return patient.getPatientArea(demographicId);
     }
 
     @ApiOperation("就诊过的年份")
     @RequestMapping(value = "/home/getPatientYear", method = RequestMethod.GET)
     public List<String> getPatientYear(
-            @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
+            @ApiParam(name = "demographicId", value = "身份证号",defaultValue="420521195812172917")
+            @RequestParam(value = "demographicId", required = true) String demographicId) throws Exception {
         return patient.getPatientYear(demographicId);
     }
 
@@ -136,7 +139,7 @@ public class ResourcesBrowseController {
     @ApiOperation("档案详情 -- CDA分类")
     @RequestMapping(value = "/cda/getCDAClass", method = RequestMethod.GET)
     public List<Map<String,String>> getCDAClass(
-            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false) String profileId,
+            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = false,defaultValue="42017976-4_0000145400_ZY010000806438_1454115983000") String profileId,
             @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = false) String eventNo) throws Exception {
         if(profileId == null && eventNo == null) {
             throw new Exception("非法传参！");
@@ -147,8 +150,10 @@ public class ResourcesBrowseController {
     @ApiOperation("档案详情 -- CDA数据")
     @RequestMapping(value = "/cda/getCDAData", method = RequestMethod.GET)
     public Map<String,List<Map<String,Object>>> getCDAData(
-            @ApiParam(name = "profileId", value = "档案ID") @RequestParam(value = "profileId", required = true) String profileId,
-            @ApiParam(name = "templateId", value = "模板ID") @RequestParam(value = "templateId", required = true) Integer templateId) throws Exception {
+            @ApiParam(name = "profileId", value = "档案ID",defaultValue="42017976-4_0000145400_ZY010000806438_1454115983000")
+            @RequestParam(value = "profileId", required = true) String profileId,
+            @ApiParam(name = "templateId", value = "模板ID",defaultValue="186")
+            @RequestParam(value = "templateId", required = true) Integer templateId) throws Exception {
 
         return patientDetail.getCDAData(profileId, templateId);
     }
@@ -156,8 +161,8 @@ public class ResourcesBrowseController {
     @ApiOperation("档案详情 -- 通过事件号获取templateId")
     @RequestMapping(value = "/cda/getPatientCdaTemplate", method = RequestMethod.GET)
     public String getPatientCdaTemplate(
-            @ApiParam(name = "eventNo", value = "事件号") @RequestParam(value = "eventNo", required = true) String eventNo,
-            @ApiParam(name = "cdaType", value = "模板类别") @RequestParam(value = "cdaType", required = true) String cdaType) throws Exception {
+            @ApiParam(name = "eventNo", value = "事件号",defaultValue="ZY010000805783") @RequestParam(value = "eventNo", required = true) String eventNo,
+            @ApiParam(name = "cdaType", value = "模板类别",defaultValue="LSYZ") @RequestParam(value = "cdaType", required = true) String cdaType) throws Exception {
 
         return patientDetail.getCDATemplate(eventNo,cdaType);
     }

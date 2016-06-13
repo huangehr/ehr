@@ -38,7 +38,7 @@ public class ResourcesTransformEndPoint {
     {
         ObjectMapper mapper = new ObjectMapper();
         JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Map.class);
-        List<Map<String, Object>> list = mapper.readValue(resource, javaType);
+        List<Map<String, Object>> list = mapper.readValue(URLDecoder.decode(resource,"utf-8"), javaType);
         return resourcesTransformService.displayCodeConvert(list, version);
     }
 
@@ -51,7 +51,7 @@ public class ResourcesTransformEndPoint {
             @RequestParam(value = "version",required = true) String version) throws Exception
     {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.readValue(URLDecoder.decode(resource), Map.class);
+        Map<String, Object> map = mapper.readValue(URLDecoder.decode(resource,"utf-8"), Map.class);
 
         return resourcesTransformService.displayCodeConvert(map,version);
     }
