@@ -7,14 +7,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.model.standard.MCdaDataSet;
-import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
+import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -42,6 +41,9 @@ public class PatientInfoDetailService {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    XTransformClient transform;
 
 
     String appId = "svr-health-profile";
@@ -88,7 +90,7 @@ public class PatientInfoDetailService {
                         }
                         //判断是否包含相关数据
                         String queryParams = "{\"q\":\"(" + query + ") AND profile_id:" + profileId + "\"}";
-                        Envelop data = resource.getEhrCenterSub(URLEncoder.encode(queryParams), null, null);
+                        Envelop data = resource.getEhrCenterSub(queryParams, null, null);
                         if (data.getDetailModelList() != null && data.getDetailModelList().size() > 0) {
                             Map<String, String> item = new HashMap<>();
                             item.put("profile_id", profileId);
@@ -125,7 +127,7 @@ public class PatientInfoDetailService {
 
                         String q = "{\"q\":\"rowkey:*" + datasetCode + "* AND profile_id:" + profileId + "\"}";
                         //获取Hbase数据
-                        Envelop data = resource.getEhrCenterSub(URLEncoder.encode(q), null, null);
+                        Envelop data = resource.getEhrCenterSub(q, null, null);
 
                         if (data.getDetailModelList() != null && data.getDetailModelList().size() > 0) {
                             List<Map<String, Object>> table = data.getDetailModelList();
@@ -234,7 +236,7 @@ public class PatientInfoDetailService {
         if (q.length() > 0) {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
-        return resource.getResources(resourceCode, appId, URLEncoder.encode(queryParams), page, size);
+        return resource.getResources(resourceCode, appId, queryParams, page, size);
     }
 
     /**
@@ -292,7 +294,7 @@ public class PatientInfoDetailService {
         if (q.length() > 0) {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
-        return resource.getResources(BasisConstant.laboratoryReport, appId, URLEncoder.encode(queryParams), page, size);
+        return resource.getResources(BasisConstant.laboratoryReport, appId, queryParams, page, size);
     }
 
     /**
@@ -315,7 +317,7 @@ public class PatientInfoDetailService {
         if (q.length() > 0) {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
-        return resource.getResources(BasisConstant.outpatientCost, appId, URLEncoder.encode(queryParams), page, size);
+        return resource.getResources(BasisConstant.outpatientCost, appId, queryParams, page, size);
     }
 
     /**
@@ -338,36 +340,81 @@ public class PatientInfoDetailService {
         if (q.length() > 0) {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
-        return resource.getResources(BasisConstant.hospitalizedCost, appId, URLEncoder.encode(queryParams), page, size);
+        return resource.getResources(BasisConstant.hospitalizedCost, appId, queryParams, page, size);
     }
 
 
-    public List<Map<String,String>> getDocument(String profileId) throws Exception {
+    public JsonNode getDocument(String profileId,String version) throws Exception {
 
-        Map<String, List<Map<String, Object>>> re = new HashMap<>();
         //主表记录
         Envelop profile = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}");
 
-        LinkedHashMap<String,String> profileMap = (LinkedHashMap<String, String>) profile.getDetailModelList().get(0);
-        String profileStr = objectMapper.writeValueAsString(profileMap);
-        JsonNode profileNode = objectMapper.readTree(profileStr);
-
-        Map<String, Object> map  = (Map<String, Object>) profile.getDetailModelList().get(0);
-
+        LinkedHashMap<String, String> profileMap = (LinkedHashMap<String, String>) profile.getDetailModelList().get(0);
+//        Map<String,Object> map = transform.stdTransform(objectMapper.writeValueAsString(profileMap), version);
+//        String profileStr = objectMapper.writeValueAsString(map);
+        String profileStr = "\n" +
+                "  \"JDSC02_14_10\": \"44\",\n" +
+                "  \"HDSD00_15_001\": \"44\",\n" +
+                "  \"cda_version\": \"56395d75b854\",\n" +
+                "  \"client_id\": \"kHAbVppx44\",\n" +
+                "  \"HDSD00_01_575\": \"2016-04-01 15:48:55\",\n" +
+                "  \"event_type\": \"1\",\n" +
+                "  \"JDSC02_09_07\": \"A03.04\",\n" +
+                "  \"HDSD00_01_185\": \"2016-04-06 14:18:48\",\n" +
+                "  \"demographic_id\": \"422724195107296713\",\n" +
+                "  \"event_no\": \"ZY010000816319\",\n" +
+                "  \"patient_id\": \"0000786438\",\n" +
+                "  \"HDSD00_01_283\": \"心血管内科专业\",\n" +
+                "  \"HDSD00_16_053\": \"李品睿\",\n" +
+                "  \"HDSD00_16_031\": \"2016-04-01 15:48:55\",\n" +
+                "  \"event_date\": \"2016-04-01T15:48:55Z\",\n" +
+                "  \"HDSD00_01_539\": \"心血管内科专业\",\n" +
+                "  \"JDSC02_09_04\": \"A03.04\",\n" +
+                "  \"rowkey\": \"42017976-4_0000786438_ZY010000816319_1459496935000\",\n" +
+                "  \"HDSD00_16_004\": \"好转\",\n" +
+                "  \"org_code\": \"42017976-4\"\n" +
+                "";
 
         //从表记录
-        Envelop dataSet = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}",null,null);
+        Envelop dataSet = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}", null, null);
 
-        List<LinkedHashMap<String,String>> dataSetList = (List<LinkedHashMap<String,String>>) dataSet.getDetailModelList();
-        String dataSetStr = objectMapper.writeValueAsString(dataSetList);
+        List<LinkedHashMap<String, String>> dataSetList = (List<LinkedHashMap<String, String>>) dataSet.getDetailModelList();
+
+        Map<String,Object> map1 = transform.stdTransform(objectMapper.writeValueAsString(dataSetList), version);
+        String dataSetStr = objectMapper.writeValueAsString(map1);
+
+
         JsonNode dataSetNode = objectMapper.readTree(dataSetStr);
 
-        ObjectNode aa = (ObjectNode) dataSetNode.get(0);
+        List<String> rowKeyList = new ArrayList<>();
 
-//        for (ObjectNode objectNode : dataSetNode){
-//
-//        }
-        return null;
+        for (int j = 0; j < dataSetNode.size(); j++) {
+            ObjectNode dsNode = (ObjectNode) dataSetNode.get(j);
+            String rowKey = dsNode.get("rowkey").asText().split("\\$")[1];
+            if (!rowKeyList.contains(rowKey)) {
+                rowKeyList.add(rowKey);
+            }
+        }
+        String dataSetJsonStr = "";
+        for (int i = 0; i < rowKeyList.size(); i++) {
+            String key = rowKeyList.get(i);
+            for (int j = 0; j < dataSetNode.size(); j++) {
+                ObjectNode dsNode = (ObjectNode) dataSetNode.get(j);
+                String[] rowKeyArray = dsNode.get("rowkey").asText().split("\\$");
+                if (key.equals(rowKeyArray[1])) {
+                    String json = "\"" + rowKeyList.get(i) + "$"+rowKeyArray[2]+"\":" + objectMapper.writeValueAsString(dsNode);
+                    if ("".equals(dataSetJsonStr)) {
+                        dataSetJsonStr += json;
+                    } else {
+                        dataSetJsonStr += "," + json;
+                    }
+                }
+            }
+        }
+
+        dataSetJsonStr = "\"dataSets\":{" + dataSetJsonStr + "}";
+        JsonNode tree = objectMapper.readTree("{" + profileStr + "," + dataSetJsonStr + "}");
+        return tree;
     }
 
 

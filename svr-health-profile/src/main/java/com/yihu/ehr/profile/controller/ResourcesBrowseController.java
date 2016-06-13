@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.profile.feign.XTransformClient;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +54,7 @@ public class ResourcesBrowseController {
         Map<String,Object> re = patient.getPatientInfo(demographicId);
         if(version!=null)
         {
-            return transform.stdTransform(URLEncoder.encode(mapper.writeValueAsString(re),"utf-8"), version);
+            return transform.stdTransform(mapper.writeValueAsString(re), version);
         }
         else{
             return re;
@@ -161,10 +161,14 @@ public class ResourcesBrowseController {
 
     @ApiOperation("公众版门户 -- 档案详情")
     @RequestMapping(value = "/cda/getDocument", method = RequestMethod.GET)
-    public List<Map<String,String>> getDocument(
-            @ApiParam(name = "profileId", value = "档案ID")
-            @RequestParam(value = "profileId", required = false) String profileId) throws Exception {
-        return patientDetail.getDocument(profileId);
+    public JsonNode getDocument(
+            @ApiParam(name = "profileId", value = "档案ID",defaultValue="42017976-4_0000786438_ZY010000816319_1459496935000")
+            @RequestParam(value = "profileId", required = false) String profileId,
+            @ApiParam(name = "version", value = "cda版本",defaultValue="56395d75b854")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
+
+        JsonNode jsonNode =  patientDetail.getDocument(profileId,version);
+        return jsonNode;
     }
 
 

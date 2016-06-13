@@ -1,17 +1,14 @@
 package com.yihu.ehr.profile.service;
 
 
-import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.profile.feign.*;
-import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -321,7 +318,7 @@ public class PatientInfoBaseService {
         }
 
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, URLEncoder.encode(queryParams, "utf-8"));
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, queryParams);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             re = result.getDetailModelList();
 
