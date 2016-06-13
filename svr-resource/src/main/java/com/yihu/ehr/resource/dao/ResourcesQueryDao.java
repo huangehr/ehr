@@ -34,11 +34,11 @@ public class ResourcesQueryDao {
     SolrQuery solr;
 
     private Integer defaultPage = 1;
-    private Integer defaultSize = 50;
+    private Integer defaultSize = 1000;
 
     private String mainCore = "HealthProfile";
     private String subCore = "HealthProfileSub";
-    private String mainJoinCore = "HealthProfile_shard1_replica2";
+    private String mainJoinCore = "HealthProfile_shard1_replica1";
     private String subJoinCore = "HealthProfileSub_shard1_replica1";
 
     /**
@@ -127,8 +127,7 @@ public class ResourcesQueryDao {
                             fq = "rowkey:*" + obj.get("table") + "*";
                         }
                     }
-                }
-                else{
+                } else if(obj.containsKey("table")){
                     if (q.length() > 0) {
                         q += " AND rowkey:*" + obj.get("table") + "*";
                     } else {

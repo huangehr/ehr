@@ -177,8 +177,8 @@ public class ResourcesQueryService  {
                 Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
 
                 Envelop re = new Envelop();
-                if(result!=null)
-                {
+                if (result != null) {
+                    re.setSuccessFlg(true);
                     re.setCurrPage(result.getNumber());
                     re.setPageSize(result.getSize());
                     re.setTotalCount(new Long(result.getTotalElements()).intValue());
@@ -234,8 +234,10 @@ public class ResourcesQueryService  {
                             list.add(newObj);
                         }
                         re.setDetailModelList(list);
+                        return re;
                     }
-                    return re;
+                }else {
+                    re.setSuccessFlg(false);
                 }
                 throw new Exception("未找到资源数据！");
             }
@@ -321,58 +323,4 @@ public class ResourcesQueryService  {
         return getResources(resourcesCode,"JKZL",queryParams,page,size);
     }
 
-    /**
-     * 资源数据显示代码转换
-     *
-     * @param resource List<Map<String,Object>> 资源
-     * @param version String 适配版本
-     * @return
-     */
-    public List<Map<String,Object>> displayCodeConvert(List<Map<String,Object>> resource,String version)
-    {
-        //返回资源
-        List<Map<String,Object>> returnRs =  new ArrayList<Map<String, Object>>();
-        //适配方案
-        List<RsAdapterScheme> schemeList = adapterSchemeDao.findByAdapterVersion(version);
-
-        if ((resource != null && resource.size() > 0) || (schemeList != null && schemeList.size() > 0))
-        {
-            //适配方案对应数据元
-            List<RsAdapterMetadata> metadataList = adapterMetadataDao.findBySchema(schemeList.get(0).getId());
-
-            if(metadataList != null && metadataList.size() > 0)
-            {
-                //数据元Map,便于对应查找
-                Map<String,String> adapterMap = new HashMap<String,String>();
-
-                //数据元放入Map
-                for(RsAdapterMetadata meta : metadataList)
-                {
-                    adapterMap.put(meta.getMetadataId(),meta.getSrcMetadataCode());
-                }
-
-                //数据元代码转换
-                for(Map<String,Object> rs : resource)
-                {
-                    Map<String,Object> convertedMap = new HashMap<String,Object>();
-
-                    for(String key : rs.keySet())
-                    {
-                        if(adapterMap.containsKey(key))
-                        {
-                            convertedMap.put(adapterMap.get(key),rs.get(key));
-                        }
-                        else
-                        {
-                            convertedMap.put(key,rs.get(key));
-                        }
-                    }
-
-                    returnRs.add(convertedMap);
-                }
-            }
-        }
-
-        return returnRs;
-    }
 }

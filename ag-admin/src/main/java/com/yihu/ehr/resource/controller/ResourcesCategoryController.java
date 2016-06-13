@@ -11,6 +11,7 @@ import com.yihu.ehr.util.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -96,11 +97,13 @@ public class ResourcesCategoryController extends BaseController {
             @PathVariable(value = "id") String id) throws Exception {
         Envelop envelop = new Envelop();
         try{
-            resourcesCategoryClient.deleteResourceCategory(id);
-            envelop.setSuccessFlg(true);
+            JSONObject obj  = resourcesCategoryClient.deleteResourceCategory(id);
+            envelop.setSuccessFlg((Boolean)obj.get("successFlg"));
+            envelop.setErrorMsg(String.valueOf(obj.get("msg")));
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("删除失败！");
         }
         return envelop;
     }

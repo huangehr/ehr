@@ -48,11 +48,11 @@ public interface ResourcesBrowseClient {
             @RequestParam(value = "diseaseId", required = false) String diseaseId);
 
     @RequestMapping(value = "/home/getPatientDisease", method = RequestMethod.GET)
-    List<MHealthProblemDict> getPatientDisease(
+    List<Map<String,String>> getPatientDisease(
             @RequestParam(value = "demographicId", required = true) String demographicId);
 
     @RequestMapping(value = "/home/getPatientArea", method = RequestMethod.GET)
-    List<MOrganization> getPatientArea(
+    List<Map<String,String>> getPatientArea(
             @RequestParam(value = "demographicId", required = true) String demographicId);
 
     @RequestMapping(value = "/home/getPatientYear", method = RequestMethod.GET)

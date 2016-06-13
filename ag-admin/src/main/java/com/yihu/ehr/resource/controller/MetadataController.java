@@ -139,7 +139,9 @@ public class MetadataController extends BaseController {
         Envelop envelop = new Envelop();
         try{
             MRsMetadata rsMetadata = metadataClient.getMetadataById(id);
-            envelop.setObj(rsMetadata);
+            RsMetadataModel model = convertToModel(rsMetadata, RsMetadataModel.class);
+            model.setDictName(getDictName(model.getDictCode()));
+            envelop.setObj(model);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             e.printStackTrace();
