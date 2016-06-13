@@ -61,6 +61,12 @@ public interface ResourcesGrantClient {
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
+
+    @ApiOperation("资源授权查询-不分页")
+    @RequestMapping(value = ServiceApi.Resources.ResourceGrantsNoPage,method = RequestMethod.GET)
+    List<MRsAppResource> queryAppResourceGrantNoPage(
+            @RequestParam(value="filters",required = false)String filters);
+
     @ApiOperation("资源数据元授权")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrantApp, method = RequestMethod.POST)
     MRsAppResourceMetadata grantRsMetaData(

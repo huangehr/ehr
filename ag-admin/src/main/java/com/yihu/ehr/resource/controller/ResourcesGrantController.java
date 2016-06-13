@@ -285,6 +285,25 @@ public class ResourcesGrantController extends BaseController {
         }
     }
 
+    @ApiOperation("资源授权查询-不分页")
+    @RequestMapping(value = ServiceApi.Resources.ResourceGrantsNoPage,method = RequestMethod.GET)
+    public Envelop queryAppResourceGrantNoPage(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<MRsAppResource> mRsAppResources = resourcesGrantClient.queryAppResourceGrantNoPage(filters);
+            if(mRsAppResources != null){
+                envelop.setSuccessFlg(true);
+                envelop.setDetailModelList(mRsAppResources);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
     @ApiOperation("资源数据元授权")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrantApp, method = RequestMethod.POST)
     public Envelop grantRsMetaData(
