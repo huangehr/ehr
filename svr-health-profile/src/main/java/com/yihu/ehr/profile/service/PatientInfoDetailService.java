@@ -14,7 +14,6 @@ import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -88,7 +87,7 @@ public class PatientInfoDetailService {
                         }
                         //判断是否包含相关数据
                         String queryParams = "{\"q\":\"(" + query + ") AND profile_id:" + profileId + "\"}";
-                        Envelop data = resource.getEhrCenterSub(URLEncoder.encode(queryParams), null, null);
+                        Envelop data = resource.getEhrCenterSub(queryParams, null, null);
                         if (data.getDetailModelList() != null && data.getDetailModelList().size() > 0) {
                             Map<String, String> item = new HashMap<>();
                             item.put("profile_id", profileId);
@@ -125,7 +124,7 @@ public class PatientInfoDetailService {
 
                         String q = "{\"q\":\"rowkey:*" + datasetCode + "* AND profile_id:" + profileId + "\"}";
                         //获取Hbase数据
-                        Envelop data = resource.getEhrCenterSub(URLEncoder.encode(q), null, null);
+                        Envelop data = resource.getEhrCenterSub(q, null, null);
 
                         if (data.getDetailModelList() != null && data.getDetailModelList().size() > 0) {
                             List<Map<String, Object>> table = data.getDetailModelList();
@@ -234,7 +233,7 @@ public class PatientInfoDetailService {
         if (q.length() > 0) {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
-        return resource.getResources(resourceCode, appId, URLEncoder.encode(queryParams), page, size);
+        return resource.getResources(resourceCode, appId, queryParams, page, size);
     }
 
     /**
@@ -292,7 +291,7 @@ public class PatientInfoDetailService {
         if (q.length() > 0) {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
-        return resource.getResources(BasisConstant.laboratoryReport, appId, URLEncoder.encode(queryParams), page, size);
+        return resource.getResources(BasisConstant.laboratoryReport, appId, queryParams, page, size);
     }
 
     /**
@@ -315,7 +314,7 @@ public class PatientInfoDetailService {
         if (q.length() > 0) {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
-        return resource.getResources(BasisConstant.outpatientCost, appId, URLEncoder.encode(queryParams), page, size);
+        return resource.getResources(BasisConstant.outpatientCost, appId, queryParams, page, size);
     }
 
     /**
@@ -338,7 +337,7 @@ public class PatientInfoDetailService {
         if (q.length() > 0) {
             queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
         }
-        return resource.getResources(BasisConstant.hospitalizedCost, appId, URLEncoder.encode(queryParams), page, size);
+        return resource.getResources(BasisConstant.hospitalizedCost, appId, queryParams, page, size);
     }
 
 
