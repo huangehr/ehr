@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableFeignClients
 @EnableScheduling
+@EnableIntegrationMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
 public class PackResolveServiceApp{
 
 	public static void main(String[] args) {

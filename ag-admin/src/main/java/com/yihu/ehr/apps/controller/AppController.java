@@ -2,7 +2,11 @@ package com.yihu.ehr.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.resource.MRsAppResource;
+import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.organization.service.OrganizationClient;
+import com.yihu.ehr.resource.client.ResourcesClient;
+import com.yihu.ehr.resource.client.ResourcesGrantClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
@@ -40,6 +44,10 @@ public class AppController extends BaseController {
     private ObjectMapper objectMapper;
     @Autowired
     private OrganizationClient organizationClient;
+    @Autowired
+    private ResourcesGrantClient resourcesGrantClient;
+    @Autowired
+    private ResourcesClient resourcesClient;
 
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
@@ -201,6 +209,32 @@ public class AppController extends BaseController {
             MOrganization organization = organizationClient.getOrg(mApp.getOrg());
             appModel.setOrgName(organization == null ? "" : organization.getFullName());
         }
+        //获取已授权资源名称
+        //根据appId获取授权资源rsIds
+        //TODO 提供根据appId获取RsAppResourceModel集合接口来替代
+        ResponseEntity<List<MRsAppResource>> responseEntity = resourcesGrantClient.queryAppResourceGrant("", "appId=" + mApp.getId(), "", 1, 999);
+        List<MRsAppResource> rsAppResources = responseEntity.getBody();
+        if(rsAppResources.size()==0){
+            return appModel;
+        }
+        String rsIds = "";
+        for (MRsAppResource m:rsAppResources){
+            rsIds += m.getResourceId()+",";
+        }
+        rsIds = rsIds.substring(0,rsIds.length()-1);
+        //根据rsIds获取资源对象集合-再获取资源名字字符串
+        //TODO 提供查询资源不分页方法替代
+        ResponseEntity<List<MRsResources>> entity = resourcesClient.queryResources("", "id=" + rsIds, "", 1, 999);
+        List<MRsResources> mRsResources = entity.getBody();
+        if(mRsResources.size() == 0){
+            return appModel;
+        }
+        String rsNames = "";
+        for(MRsResources m:mRsResources){
+            rsNames += m.getName()+",";
+        }
+        rsNames = rsNames.substring(0,rsNames.length()-1);
+        appModel.setResourceNames(rsNames);
         return appModel;
     }
 

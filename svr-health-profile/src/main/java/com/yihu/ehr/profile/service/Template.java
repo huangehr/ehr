@@ -26,6 +26,7 @@ public class Template {
     private String organizationCode;
     private String pcTplURL;
     private String mobileTplURL;
+    private String cdaType;
     private Date createTime = new Date();
 
     final static String UrlSeparator = ";";
@@ -103,6 +104,15 @@ public class Template {
 
     public void setOrganizationCode(String organizationCode) {
         this.organizationCode = organizationCode;
+    }
+
+    @Column(name = "cda_type")
+    public String getCdaType() {
+        return cdaType;
+    }
+
+    public void setCdaType(String cdaType) {
+        this.cdaType = cdaType;
     }
 
     /**

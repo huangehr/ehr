@@ -2,8 +2,6 @@ package com.yihu.ehr.profile.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.profile.exception.LegacyPackageException;
-import com.yihu.ehr.redis.RedisClient;
-import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.util.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,12 +22,6 @@ import java.util.Map;
  */
 @Component
 public class DataSetParser {
-    @Autowired
-    StdDataSetKeySchema dataSetKeySchema;
-
-    @Autowired
-    RedisClient redisClient;
-
     /**
      * 结构化档案包数据集处理
      *
@@ -58,7 +50,6 @@ public class DataSetParser {
             dataSet.setOrgCode(orgCode);
             dataSet.setEventTime(DateTimeUtils.simpleDateParse(eventTime));
             dataSet.setCreateTime(DateTimeUtils.simpleDateParse(createTime));
-            dataSet.setMultiRecord(redisClient.get(dataSetKeySchema.dataSetMultiRecord(version, dataSetCode)));
 
             JsonNode dataNode = root.get("data");
             for (int i = 0; i < dataNode.size(); ++i) {

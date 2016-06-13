@@ -8,6 +8,7 @@ import com.yihu.ehr.service.resource.stage1.OriginFile;
 import com.yihu.ehr.util.DateTimeUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -50,9 +51,10 @@ public class CdaDocument {
         for (OriginFile originFile : originFiles){
             ObjectNode objectNode = docList.addObject();
             objectNode.put("mime", originFile.getMime());
-            objectNode.put("originUrl", originFile.getOriginUrl());
+            objectNode.put("urls", originFile.getUrlsStr());
+            objectNode.put("url_scope", originFile.getUrlScope().name());
             objectNode.put("expireDate", originFile.getExpireDate()==null ? null:DateTimeUtils.simpleDateFormat(originFile.getExpireDate()));
-
+            objectNode.put("report_name",originFile.getReportName());
             ObjectNode listNode = objectNode.putObject("files");
             Map<String, String> files = originFile.getFileUrls();
             for (String fileName : files.keySet()){

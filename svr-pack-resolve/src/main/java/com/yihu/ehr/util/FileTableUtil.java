@@ -33,7 +33,8 @@ public class FileTableUtil {
         for (OriginFile originFile : cdaDocument.getOriginFiles()) {
             ObjectNode subNode = root.addObject();
             subNode.put("mime", originFile.getMime());
-            subNode.put("origin_url", originFile.getOriginUrl());
+            subNode.put("urls", originFile.getUrlsStr());
+            subNode.put("url_score", originFile.getUrlScope().name());
             subNode.put("expire_date", originFile.getExpireDate()==null?"":DateTimeUtils.utcDateTimeFormat(originFile.getExpireDate()));
 
             StringBuilder builder = new StringBuilder();

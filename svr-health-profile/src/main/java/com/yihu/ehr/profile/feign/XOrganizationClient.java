@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.org.MOrganization;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,4 +26,10 @@ public interface XOrganizationClient {
     @ApiOperation(value = "根据机构代码列表批量查询机构")
     List<MOrganization> getOrgs(
             @RequestParam(value = "org_codes") List<String> orgCodes);
+
+
+    @RequestMapping(value = "/organizations/{org_code}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构代码获取机构")
+    MOrganization getOrg(
+            @PathVariable(value = "org_code") String orgCode);
 }

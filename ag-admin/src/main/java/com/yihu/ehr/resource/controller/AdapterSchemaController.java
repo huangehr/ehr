@@ -65,6 +65,11 @@ public class AdapterSchemaController extends BaseController {
             if(mRsAdapterSchemas.size()>0){
                 return failed("方案编码已经存在请修改！");
             }
+            ResponseEntity<List<MRsAdapterSchema>> responseEntityCheck = adapterSchemaClient.getSchema("", "adapterVersion=" + rsAdapterSchema.getAdapterVersion()+";type="+rsAdapterSchema.getType(), "", 1, 1);
+            List<MRsAdapterSchema> mRsAdapterSchemasCheck = responseEntityCheck.getBody();
+            if(mRsAdapterSchemasCheck.size()>0){
+                return failed("此方案类别的版本已经存在请修改！");
+            }
             rsAdapterSchema = adapterSchemaClient.createSchema(adapterSchema);
             envelop.setObj(rsAdapterSchema);
             envelop.setSuccessFlg(true);

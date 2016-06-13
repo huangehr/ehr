@@ -1,6 +1,7 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +17,7 @@ import java.util.Collection;
 /**
  * Created by CWS on 2016/2/29.
  */
-@FeignClient("svr-special-dict")
+@FeignClient(MicroServices.SpecialDict)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface DrugDictClient {

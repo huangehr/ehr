@@ -112,7 +112,7 @@ public class RsDictionaryController extends BaseController {
     @ApiOperation(value = "根据id获取获取标准字典")
     public Envelop getRsDictionaryById(
             @ApiParam(name = "id", value = "", defaultValue = "")
-            @RequestParam(value = "id") String id) {
+            @PathVariable(value = "id") String id) {
         Envelop envelop = new Envelop();
         try{
             MRsDictionary rsDictionary = rsDictionaryClient.getRsDictionaryById(id);

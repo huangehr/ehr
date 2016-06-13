@@ -6,12 +6,11 @@ import com.yihu.ehr.query.common.model.QueryEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.resource.dao.ResourcesMetadataQueryDao;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
+import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
+import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
 import com.yihu.ehr.resource.dao.intf.ResourceDefaultParamDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
-import com.yihu.ehr.resource.model.DtoResourceMetadata;
-import com.yihu.ehr.resource.model.ResourceDefaultParam;
-import com.yihu.ehr.resource.model.RsAppResource;
-import com.yihu.ehr.resource.model.RsResources;
+import com.yihu.ehr.resource.model.*;
 import com.yihu.ehr.util.Envelop;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -45,8 +44,14 @@ public class ResourcesQueryService  {
     @Autowired
     ResourceDefaultParamDao resourceDefaultParamDao;
 
+    @Autowired
+    AdapterSchemeDao adapterSchemeDao;
+
+    @Autowired
+    AdapterMetadataDao adapterMetadataDao;
+
     //忽略字段
-    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","profile_type","demographic_id", "patient_id","org_code","profile_id", "cda_version"));
+    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","demographic_id", "patient_id","org_code","profile_id", "cda_version", "client_id"));//"profile_type",
 
     /**
      * 新增参数
@@ -69,7 +74,6 @@ public class ResourcesQueryService  {
         else{
             return "{"+newParam+"}";
         }
-
     }
 
     /**
@@ -173,8 +177,8 @@ public class ResourcesQueryService  {
                 Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
 
                 Envelop re = new Envelop();
-                if(result!=null)
-                {
+                if (result != null) {
+                    re.setSuccessFlg(true);
                     re.setCurrPage(result.getNumber());
                     re.setPageSize(result.getSize());
                     re.setTotalCount(new Long(result.getTotalElements()).intValue());
@@ -230,13 +234,17 @@ public class ResourcesQueryService  {
                             list.add(newObj);
                         }
                         re.setDetailModelList(list);
+                        return re;
                     }
+                }else {
+                    re.setSuccessFlg(false);
                 }
-                return re;
+                throw new Exception("未找到资源数据！");
             }
+            throw new Exception("未找到资源" + resourcesCode +"数据元配置！");
         }
 
-        throw new Exception("未找到资源" + resourcesCode +"，或者该资源为空！");
+        throw new Exception("未找到资源" + resourcesCode +"！");
 
     }
 
@@ -303,7 +311,7 @@ public class ResourcesQueryService  {
                     }
                 }
             }
-            queryParams = solr.conditionToString(ql);
+            queryParams = addParams(queryParams,"q",solr.conditionToString(ql));
 
             //通过资源代码获取默认参数
             List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);

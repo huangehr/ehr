@@ -54,6 +54,9 @@ public class ServiceApi {
         public static final String ResourceMetadataGrant        = "/resources/metadata/grants/{id}";
         public static final String ResourceMetadataGrantApp     = "/resources/app_resource/{appResourceId}/grant/metadata/{metadataId}";
         public static final String ResourceMetadataListGrantApp = "/resources/metadata/grant/{appResourceId}";
+        public static final String ResourceAppMetadataGrants       = "/resources/app_resource/{app_res_id}/metadata";
+        public static final String ResourceAppMetadataGrant       = "/resources/app_resource/metadata/grant";
+        public static final String ResourceAppMetadataGrantExistence   = "/resources/app_resource/metadata/grant/existence";
 
         public static final String MetadataList                 ="/resources/metadata";
         public static final String MetadataBatch                ="/resources/metadata/batch";
@@ -88,7 +91,7 @@ public class ServiceApi {
         public static final String NoPageCategories                 ="/resources/categories";
         public static final String Category                         ="/resources/categories/{id}";
         public static final String CategoryByPid                    ="/resources/categories/pid";
-
+        public static final String CategoryExitSelfAndChild        ="/resources/categories/parent";
 
         public static final String AdapterDicts                         ="/resources/adapter/dict";
         public static final String AdapterDictsBatch                    ="/resources/adapter/dict/batch";

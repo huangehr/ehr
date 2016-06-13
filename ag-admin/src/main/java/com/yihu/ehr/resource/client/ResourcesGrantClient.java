@@ -7,15 +7,14 @@ import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author linaz
@@ -48,11 +47,6 @@ public interface ResourcesGrantClient {
     boolean deleteGrantBatch(
             @RequestParam(value = "ids") String ids);
 
-    @ApiOperation("资源授权删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceApps, method = RequestMethod.DELETE)
-    boolean deleteGrantByResId(
-            @PathVariable(value="resource_id")String resourceId,
-            @RequestParam(value="app_ids") String appIds);
 
     @RequestMapping(value = ServiceApi.Resources.ResourceGrant,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源授权")
@@ -104,9 +98,9 @@ public interface ResourcesGrantClient {
             @RequestParam(value = "size", required = false) int size);
 
     @ApiOperation("资源数据元生失效操作")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasValid,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasValid,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     boolean valid(
-            @RequestParam(value="ids") String ids,
+            @RequestBody String data,
             @RequestParam(value="valid") int valid);
 
     @ApiOperation("资源数据元维度授权")
@@ -114,4 +108,19 @@ public interface ResourcesGrantClient {
     MRsAppResourceMetadata metadataGrant(
             @PathVariable(value = "id") String id,
             @RequestParam(value = "dimension") String dimension);
+
+    @ApiOperation("资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrants, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    MRsAppResourceMetadata metadataGrant(
+            @RequestBody String model);
+
+    @ApiOperation("资源数据元授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceAppMetadataGrants,method = RequestMethod.GET)
+    ResponseEntity<List<MRsAppResourceMetadata>> getAppRsMetadatas(
+            @PathVariable(value="app_res_id")String appResId);
+
+    @ApiOperation("查询资源应用下存在多少授权数据元")
+    @RequestMapping(value = ServiceApi.Resources.ResourceAppMetadataGrantExistence, method = RequestMethod.GET)
+    List<Map> appMetaExistence(
+            @RequestParam("res_app_ids") String resAppIds);
 }

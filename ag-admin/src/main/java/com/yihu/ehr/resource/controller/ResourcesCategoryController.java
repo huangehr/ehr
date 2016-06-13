@@ -11,9 +11,11 @@ import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.minidev.json.JSONObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -38,6 +40,29 @@ public class ResourcesCategoryController extends BaseController {
             @RequestParam(value = "resourceCategory") String resourceCategory) throws Exception {
         Envelop envelop = new Envelop();
         try{
+            MRsCategory detailModel = objectMapper.readValue(resourceCategory,MRsCategory.class);
+            if(StringUtils.isNotBlank(detailModel.getPid())){
+                List<MRsCategory> mRsCategories =  resourcesCategoryClient.getAllCategories("pid=" + detailModel.getPid() + ";name=" + detailModel.getName());
+                if(mRsCategories.size()>0){
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("同级分类下已经存在名称为【"+detailModel.getName()+"】的分类，请修改！");
+                    return envelop;
+                }
+            }else {
+                List<MRsCategory> mRsCategories = resourcesCategoryClient.getRsCategoryByPid("");
+                Boolean isExit = false;
+                for(MRsCategory mRsCategory: mRsCategories){
+                    if(mRsCategory.getName().equals(detailModel.getName())){
+                        isExit  =true;
+                        break;
+                    }
+                }
+                if(isExit){
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("顶级分类下已经存在名称为【" + detailModel.getName() + "】的分类，请修改！");
+                    return envelop;
+                }
+            }
             MRsCategory rsCategory = resourcesCategoryClient.createRsCategory(resourceCategory);
             envelop.setObj(rsCategory);
             envelop.setSuccessFlg(true);
@@ -72,11 +97,13 @@ public class ResourcesCategoryController extends BaseController {
             @PathVariable(value = "id") String id) throws Exception {
         Envelop envelop = new Envelop();
         try{
-            resourcesCategoryClient.deleteResourceCategory(id);
-            envelop.setSuccessFlg(true);
+            JSONObject obj  = resourcesCategoryClient.deleteResourceCategory(id);
+            envelop.setSuccessFlg((Boolean)obj.get("successFlg"));
+            envelop.setErrorMsg(String.valueOf(obj.get("msg")));
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("删除失败！");
         }
         return envelop;
     }
@@ -89,7 +116,15 @@ public class ResourcesCategoryController extends BaseController {
         Envelop envelop = new Envelop();
         try{
             MRsCategory rsCategory = resourcesCategoryClient.getRsCategoryById(id);
-            envelop.setObj(rsCategory);
+            RsCategoryModel rsCategoryModel = new RsCategoryModel();
+            BeanUtils.copyProperties(rsCategory,rsCategoryModel);
+            if(StringUtils.isNotBlank(rsCategoryModel.getPid())){
+                MRsCategory rsCategoryParent = resourcesCategoryClient.getRsCategoryById(id);
+                if(rsCategoryParent!=null){
+                    rsCategoryModel.setPname(rsCategoryParent.getName());
+                }
+            }
+            envelop.setObj(rsCategoryModel);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             e.printStackTrace();
@@ -142,6 +177,50 @@ public class ResourcesCategoryController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
+    }
+
+    @RequestMapping(value = "/resources/types/parent", method = RequestMethod.GET)
+    @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
+    public Envelop getCdaTypeExcludeSelfAndChildren(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") String id) throws Exception {
+        Envelop envelop = new Envelop();
+        List<MRsCategory> mcdaTypeList = resourcesCategoryClient.getCateTypeExcludeSelfAndChildren(id);
+        if(mcdaTypeList.size() == 0){
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("没有匹配的cda类别列表！");
+        }
+        envelop.setDetailModelList(convertToRsCategoryModels(mcdaTypeList));
+        return  envelop;
+    }
+
+    @RequestMapping(value = "/resources/categories/parent_ids", method = RequestMethod.GET)
+    @ApiOperation("获取该资源类别父级、及父级的父级id组成的字符串,返回前一页面树的定位")
+    public Envelop getCategoryParentIdsById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @RequestParam(value="id") String id) throws Exception{
+        Envelop envelop = new Envelop();
+        List<String> list = new ArrayList<>();
+        list = getPid(id,list);
+        String ids = "";
+        for(String s :list){
+            ids = s+","+ids;
+        }
+        if(!StringUtils.isEmpty(ids)){
+            ids = ids.substring(0,ids.length()-1);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(ids);
+        return envelop;
+    }
+
+    public List<String> getPid(String id,List<String> list){
+        if(!StringUtils.isEmpty(id)){
+            list.add(id);
+            MRsCategory m = resourcesCategoryClient.getRsCategoryById(id);
+            list =this.getPid(m == null?"":m.getPid(),list);
+        }
+        return list;
     }
 
     @RequestMapping(value = ServiceApi.Resources.NoPageCategories,method = RequestMethod.GET)
@@ -277,75 +356,5 @@ public class ResourcesCategoryController extends BaseController {
         return treeList;
     }
 
-    //-返回资源分类对象集合，普通的RsCategotyModel集合-------开始---------------------------------------
-    @RequestMapping(value = "/resources/categories/list", method = RequestMethod.GET)
-    @ApiOperation("获取资源类别,用于tree")
-    public Envelop getTreeData(
-            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters){
-        Envelop envelop = new Envelop();
-        List<MRsCategory> mRsCategories = resourcesCategoryClient.getAllCategories(filters);
-        Set<MRsCategory> set = new HashSet<>();
-        for(MRsCategory m:mRsCategories){
-            String pid = m.getPid();
-            String id = m.getId();
-            //获取父级资源分类
-            set.add(m);
-            if(!StringUtils.isEmpty(pid)){
-                set = getParentById(pid, set);
-            }
-            //获取子集资源分类
-            if (!StringUtils.isEmpty(id)){
-                set = getChildById(id,set);
-            }
-        }
-        if(set.size()==0){
-            return envelop;
-        }
-        List list=new ArrayList();
-        Iterator it=set.iterator();
-        while(it.hasNext()){
-            list.add(it.next());
-        }
-        List<RsCategoryModel> rsCategoryModels = (List<RsCategoryModel>)convertToModels(list,new ArrayList<>(),RsCategoryModel.class,null);
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(rsCategoryModels);
-        return envelop;
-    }
-
-    /**
-     * 获取父级、父级的父级。。。
-     */
-    public Set<MRsCategory> getParentById(String id,Set<MRsCategory> set){
-        if(!StringUtils.isEmpty(id)){
-            MRsCategory mRsCategory = resourcesCategoryClient.getRsCategoryById(id);
-            set.add(mRsCategory);
-            if(mRsCategory != null){
-                String childPid = mRsCategory.getPid();
-                this.getParentById(childPid,set);
-            }
-            return set;
-        }
-        return set;
-    }
-
-    /**
-     * 获取子集、子集的子集。。。。
-     */
-    public Set<MRsCategory> getChildById(String id,Set<MRsCategory> set){
-        if(!StringUtils.isEmpty(id)){
-            List<MRsCategory> mRsCategories = resourcesCategoryClient.getAllCategories("pid="+id);
-            if(mRsCategories==null&&mRsCategories.size()==0){
-                return set;
-            }
-            for(MRsCategory m:mRsCategories){
-                set.add(m);
-                this.getChildById(m.getId(),set);
-            }
-            return set;
-        }
-        return set;
-    }
-    //----------------------------------------------------结束-----------
 
 }

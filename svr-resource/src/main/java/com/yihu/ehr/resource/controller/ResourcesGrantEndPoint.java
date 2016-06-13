@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lyr on 2016/4/26.
@@ -92,17 +94,6 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         return convertToModels(rsGrantService.addList(appRsList, resourceId),new ArrayList<>(appRsList.size()),MRsAppResource.class,"");
     }
 
-    @ApiOperation("资源授权删除")
-    @RequestMapping(value = ServiceApi.Resources.ResourceApps, method = RequestMethod.DELETE)
-    public boolean deleteGrantByResId(
-            @ApiParam(name="resource_id",value="授权ID",defaultValue = "")
-            @PathVariable(value="resource_id")String resourceId,
-            @ApiParam(name="app_ids",value="授权ID",defaultValue = "")
-            @RequestParam(value="app_ids") String appIds) throws Exception
-    {
-        rsGrantService.deleteGrantByResId(resourceId, appIds.split(","));
-        return true;
-    }
 
     @ApiOperation("资源授权删除")
     @RequestMapping(value = ServiceApi.Resources.ResourceGrant,method = RequestMethod.DELETE)
@@ -118,10 +109,9 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.ResourceGrants,method = RequestMethod.DELETE)
     public boolean deleteGrantBatch(
             @ApiParam(name="ids",value="授权ID",defaultValue = "")
-            @RequestParam(value="ids")String ids) throws Exception
+            @RequestParam(value="ids") String ids) throws Exception
     {
-        rsGrantService.deleteResourceGrant(ids);
-
+        rsGrantService.deleteGrantByIds(ids.split(","));
         return true;
     }
 
@@ -281,15 +271,47 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         return (List<MRsAppResourceMetadata>)rsAppMetaList;
     }
 
+    @ApiOperation("资源数据元授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceAppMetadataGrants,method = RequestMethod.GET)
+    public Collection<MRsAppResourceMetadata> getAppRsMetadatas(
+            @ApiParam(name="app_res_id",value="授权应用编号",defaultValue = "1")
+            @PathVariable(value="app_res_id")String appResId) throws Exception
+    {
+        RsAppResource appResource = rsGrantService.retrieve(appResId);
+        List<RsAppResourceMetadata> rsMetadataGrant = new ArrayList<>();
+        if(appResource!=null){
+            rsMetadataGrant = rsMetadataGrantService.getAppRsMetadatas(appResource.getId(), appResource.getAppId(), appResource.getResourceId());
+        }
+        return convertToModels(rsMetadataGrant, new ArrayList<>(rsMetadataGrant.size()), MRsAppResourceMetadata.class, "");
+    }
+
     @ApiOperation("资源数据元生失效操作")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasValid,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasValid,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public boolean valid(
-            @ApiParam(name="ids",value="授权数据元ID",defaultValue = "")
-            @RequestParam(value="ids") String ids,
+            @ApiParam(name="data",value="授权数据元",defaultValue = "")
+            @RequestBody List<RsAppResourceMetadata> data,
             @ApiParam(name="valid",value="授权数据元ID",defaultValue = "")
             @RequestParam(value="valid") int valid) throws Exception
     {
-        rsMetadataGrantService.valid(ids, valid);
+        String ids = "";
+        if(valid==0){
+            for(RsAppResourceMetadata metadata: data){
+                ids += "," + metadata.getId();
+            }
+        }else{
+            List addLs = new ArrayList<>();
+            for(RsAppResourceMetadata metadata: data){
+                if(!StringUtils.isEmpty(metadata.getId()))
+                    ids += "," + metadata.getId();
+                else {
+                    metadata.setId(getObjectId(BizObject.AppResourceMetadata));
+                    addLs.add(metadata);
+                }
+            }
+            rsMetadataGrantService.grantRsMetadataBatch(addLs);
+        }
+        if(ids.length()>0)
+            rsMetadataGrantService.valid(ids.substring(1), valid);
         return true;
     }
 
@@ -305,5 +327,25 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         rsAppResourceMetadata.setDimensionValue(dimension);
         rsMetadataGrantService.save(rsAppResourceMetadata);
         return convertToModel(rsAppResourceMetadata, MRsAppResourceMetadata.class);
+    }
+
+    @ApiOperation("资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrants, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    MRsAppResourceMetadata metadataGrant(
+            @RequestBody RsAppResourceMetadata model) throws Exception {
+
+        if(StringUtils.isEmpty(model.getId()))
+            model.setId(getObjectId(BizObject.AppResourceMetadata));
+        return convertToModel(rsMetadataGrantService.save(model), MRsAppResourceMetadata.class);
+    }
+
+    @ApiOperation("查询资源应用下存在多少授权数据元")
+    @RequestMapping(value = ServiceApi.Resources.ResourceAppMetadataGrantExistence, method = RequestMethod.GET)
+    List<Map> appMetaExistence(
+            @ApiParam(name = "dimension", value = "授权ID", defaultValue = "")
+            @RequestParam("res_app_ids") String resAppIds) throws Exception {
+
+        List<Map> ls = rsMetadataGrantService.appMetaExistence(resAppIds.split(","));
+        return  ls;
     }
 }

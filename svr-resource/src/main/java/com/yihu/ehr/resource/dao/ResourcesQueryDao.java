@@ -34,7 +34,7 @@ public class ResourcesQueryDao {
     SolrQuery solr;
 
     private Integer defaultPage = 1;
-    private Integer defaultSize = 50;
+    private Integer defaultSize = 1000;
 
     private String mainCore = "HealthProfile";
     private String subCore = "HealthProfileSub";
@@ -127,8 +127,7 @@ public class ResourcesQueryDao {
                             fq = "rowkey:*" + obj.get("table") + "*";
                         }
                     }
-                }
-                else{
+                } else if(obj.containsKey("table")){
                     if (q.length() > 0) {
                         q += " AND rowkey:*" + obj.get("table") + "*";
                     } else {

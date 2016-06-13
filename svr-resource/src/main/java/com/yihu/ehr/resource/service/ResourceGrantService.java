@@ -110,18 +110,16 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
      * 删除资源授权
      *
      */
-    public void deleteGrantByResId(String resId, String[] appIds)
+    public void deleteGrantByIds(String[] appResIds)
     {
-        String hql = "delete from RsAppResource res where resourceId=:resourceId and appId in(:appId)";
+        String hql = "delete from RsAppResource res where id in(:appResIds)";
         Query query = currentSession().createQuery(hql);
-        query.setParameter("resourceId", resId);
-        query.setParameterList("appId", appIds);
+        query.setParameterList("appResIds", appResIds);
         query.executeUpdate();
 
-        hql = "delete from RsAppResourceMetadata meta where appResourceId=:resourceId and appId in(:appId)";
+        hql = "delete from RsAppResourceMetadata meta where appResourceId in(:appResIds)";
         query = currentSession().createQuery(hql);
-        query.setParameter("resourceId", resId);
-        query.setParameterList("appId", appIds);
+        query.setParameterList("appResIds", appResIds);
         query.executeUpdate();
     }
 
@@ -134,29 +132,29 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
         if(appRsList.size()==0)
             return appRsList;
 
-        String sql = "SELECT sm.id, m.name FROM rs_resource_metadata sm LEFT JOIN rs_metadata m ON sm.METADATA_ID=m.ID WHERE " +
-                "sm.resources_id=:resourcesId";
+//        String sql = "SELECT sm.id, m.name FROM rs_resource_metadata sm LEFT JOIN rs_metadata m ON sm.METADATA_ID=m.ID WHERE " +
+//                "sm.resources_id=:resourcesId";
 
-        SQLQuery query = currentSession().createSQLQuery(sql);
-        query.setParameter("resourcesId", resourcesId);
-        List<Object[]> rsResourceMetadatas = query.list();
+//        SQLQuery query = currentSession().createSQLQuery(sql);
+//        query.setParameter("resourcesId", resourcesId);
+//        List<Object[]> rsResourceMetadatas = query.list();
 
         appRsDao.save(appRsList);
 
-        List<RsAppResourceMetadata> appRsMetadataList = new ArrayList<>();
-        RsAppResourceMetadata appRsMetadata;
-        for(RsAppResource appResource: appRsList){
-            for(Object[] rsResourceMetadata: rsResourceMetadatas){
-                appRsMetadata = new RsAppResourceMetadata();
-                appRsMetadata.setId(new ObjectId(deployRegion, BizObject.AppResourceMetadata).toString());
-                appRsMetadata.setAppResourceId(appResource.getId());
-                appRsMetadata.setAppId(appResource.getAppId());
-                appRsMetadata.setResourceMetadataId(StringUtils.isEmpty(rsResourceMetadata[0])?"":(String)rsResourceMetadata[0]);
-                appRsMetadata.setResourceMetadataName(StringUtils.isEmpty(rsResourceMetadata[1])?"":(String)rsResourceMetadata[1]);
-                appRsMetadataList.add(appRsMetadata);
-            }
-        }
-        rsMetadataGrantService.grantRsMetadataBatch(appRsMetadataList);
+//        List<RsAppResourceMetadata> appRsMetadataList = new ArrayList<>();
+//        RsAppResourceMetadata appRsMetadata;
+//        for(RsAppResource appResource: appRsList){
+//            for(Object[] rsResourceMetadata: rsResourceMetadatas){
+//                appRsMetadata = new RsAppResourceMetadata();
+//                appRsMetadata.setId(new ObjectId(deployRegion, BizObject.AppResourceMetadata).toString());
+//                appRsMetadata.setAppResourceId(appResource.getId());
+//                appRsMetadata.setAppId(appResource.getAppId());
+//                appRsMetadata.setResourceMetadataId(StringUtils.isEmpty(rsResourceMetadata[0])?"":(String)rsResourceMetadata[0]);
+//                appRsMetadata.setResourceMetadataName(StringUtils.isEmpty(rsResourceMetadata[1])?"":(String)rsResourceMetadata[1]);
+//                appRsMetadataList.add(appRsMetadata);
+//            }
+//        }
+//        rsMetadataGrantService.grantRsMetadataBatch(appRsMetadataList);
         return appRsList;
     }
 }

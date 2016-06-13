@@ -19,4 +19,6 @@ public interface XTemplateRepository extends PagingAndSortingRepository<Template
 
     @Query("SELECT count(e) FROM Template e WHERE e.title = ?1 AND e.cdaVersion = ?2 AND e.organizationCode = ?3")
     int countByTitleAndCdaVersionAndOrgCode(String title, String cdaVersion, String orgCode);
+
+    Template findByOrganizationCodeAndCdaVersionAndCdaType(String orgCode, String cdaVersion, String cdaType);
 }

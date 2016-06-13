@@ -2,6 +2,7 @@ package com.yihu.ehr.service.resource.stage1.resolver;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.yihu.ehr.profile.exception.LegacyPackageException;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.service.resource.stage1.LinkPackageDataSet;
 import com.yihu.ehr.service.resource.stage1.LinkPackage;
@@ -40,6 +41,7 @@ public class LinkPackageResolver extends PackageResolver {
         String version = jsonNode.get("inner_version").asText();
         String eventDate = jsonNode.get("event_time").asText();
         String expireDate = jsonNode.get("expiry_date").asText();
+        if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
 
         profile.setPatientId(patientId);
         profile.setEventNo(eventNo);
