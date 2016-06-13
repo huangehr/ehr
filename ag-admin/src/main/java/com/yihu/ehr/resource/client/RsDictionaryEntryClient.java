@@ -5,12 +5,14 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsDictionaryEntry;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,4 +59,10 @@ public interface RsDictionaryEntryClient {
     @ApiOperation("根据过滤条件判断是否存在")
     boolean isExistence(
             @RequestParam(value="filters") String filters) ;
+
+    @RequestMapping(value = ServiceApi.Resources.NoPageDictEntries, method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件获取标准字典项列表_不分页", notes = "根据查询条件获取标准字典项列表_不分页")
+    List<MRsDictionaryEntry> searchNoPageRsDictEntries(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters);
 }

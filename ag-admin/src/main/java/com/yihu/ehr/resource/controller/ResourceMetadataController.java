@@ -220,7 +220,7 @@ public class ResourceMetadataController extends BaseController {
             if (mRsMetadatas.size()>0) {
                 rsMetadataModel.setName(mRsMetadatas.get(0).getName());
                 rsMetadataModel.setColumnType(mRsMetadatas.get(0).getColumnType());
-                rsMetadataModel.setStdCode(mRsMetadatas.get(0).getStdCode());
+                rsMetadataModel.setStdCode(mRsMetadatas.get(0).getId());
                 rsMetadataModels.add(rsMetadataModel);
             }
         }
