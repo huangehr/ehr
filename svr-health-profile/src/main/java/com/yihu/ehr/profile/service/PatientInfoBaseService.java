@@ -6,12 +6,10 @@ import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.profile.feign.*;
-import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
 import com.yihu.ehr.util.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +39,7 @@ public class PatientInfoBaseService {
     private XHealthProblemDictClient healthProblemDictClient;
 
     @Autowired
-    private AddressClient addressClient;
+    private XGeographyClient addressClient;
 
     String appId = "svr-health-profile";
 
@@ -321,7 +319,7 @@ public class PatientInfoBaseService {
         }
 
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, URLEncoder.encode(queryParams, "utf-8"));
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, queryParams);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             re = result.getDetailModelList();
 
@@ -359,6 +357,25 @@ public class PatientInfoBaseService {
         return re;
     }
 
+    /**
+     * 通过代码获取疾病名称
+     * @return
+     */
+    private Map<String, String> getDiseaseMap(String code)
+    {
+        Map<String, String> map = new HashMap<>();
+        map.put("code",code);
+        MIcd10Dict dict = ict10Dict.getIcd10DictValue(code);
+        if(dict!=null)
+        {
+            map.put("name",dict.getName());
+        }
+        else{
+            map.put("name",code);
+        }
+
+        return map;
+    }
 
     //@患者就诊过的疾病
     public List<Map<String, String>> getPatientDisease(String demographicId) throws Exception {
@@ -370,7 +387,8 @@ public class PatientInfoBaseService {
             for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
                 if (obj.containsKey(BasisConstant.mzzd)) {
-                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList, obj, BasisConstant.mzzd);
+                    String code =obj.get(BasisConstant.mzzd).toString();
+                    healthProblemDictMapList.add(getDiseaseMap(code));
                 }
             }
         }
@@ -380,7 +398,8 @@ public class PatientInfoBaseService {
             for (int i = 0; i < hospitalized.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
                 if (obj.containsKey(BasisConstant.zyzd)) {
-                    healthProblemDictMapList = getHealthProblemDictMapList(healthProblemDictMapList, obj, BasisConstant.zyzd);
+                    String code =obj.get(BasisConstant.zyzd).toString();
+                    healthProblemDictMapList.add(getDiseaseMap(code));
                 }
             }
         }
@@ -424,31 +443,31 @@ public class PatientInfoBaseService {
                 }
             }
         }
-            //通过机构代码列表获取地区列表
-            List<MOrganization> orgList = organization.getOrgs(orgCodeList);
-            List<String> re = new ArrayList<>();
-            for (MOrganization org : orgList) {
-                Map<String, String> organizationMap = new HashMap<>();
-                String areaCode = new Integer(org.getAdministrativeDivision()).toString();
-                areaCode = areaCode.substring(0, areaCode.length() - 2) + "00"; //转换成市级代码
-                if (!re.contains(areaCode)) {
-                    re.add(areaCode);
-                    String areaName = addressClient.getAddressDictById(areaCode).getName();
-                    organizationMap.put("areaCode:", areaCode + ",areaName:" + areaName);
-                    organizationMapList.add(organizationMap);
+
+        //通过机构代码列表获取地区列表
+        List<MOrganization> orgList = organization.getOrgs(orgCodeList);
+        List<String> array = new ArrayList<>();
+        for (MOrganization org : orgList) {
+            Map<String, String> organizationMap = new HashMap<>();
+            String areaCode = new Integer(org.getAdministrativeDivision()).toString();
+            areaCode = areaCode.substring(0, areaCode.length() - 2) + "00"; //转换成市级代码
+            if (!array.contains(areaCode)) {
+                array.add(areaCode);
+                organizationMap.put("code", areaCode);
+
+                MGeographyDict area = addressClient.getAddressDictById(areaCode);
+                if(area !=null)
+                {
+                    String areaName = area.getName();
+                    organizationMap.put("name", areaName);
                 }
+                else{
+                    organizationMap.put("name", areaCode);
+                }
+                organizationMapList.add(organizationMap);
             }
+        }
         return organizationMapList;
     }
-
-    private List<Map<String, String>> getHealthProblemDictMapList(List<Map<String, String>> healthProblemDictMapList, Map<String, Object> obj, String basisConstant) {
-        String code = (String) obj.get(basisConstant);
-        MHealthProblemDict healthProblemDict = healthProblemDictClient.getHpDictByCode(code);
-        Map<String, String> map = new HashMap<>();
-        map.put(healthProblemDict.getCode(), healthProblemDict.getName());
-        healthProblemDictMapList.add(map);
-        return healthProblemDictMapList;
-    }
-
 
 }
