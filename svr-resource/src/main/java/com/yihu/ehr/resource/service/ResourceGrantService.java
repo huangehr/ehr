@@ -1,14 +1,10 @@
 package com.yihu.ehr.resource.service;
 
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.AppResourceDao;
 import com.yihu.ehr.resource.dao.intf.AppResourceMetadataDao;
 import com.yihu.ehr.resource.model.RsAppResource;
-import com.yihu.ehr.resource.model.RsAppResourceMetadata;
-import com.yihu.ehr.util.ObjectId;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -16,9 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
