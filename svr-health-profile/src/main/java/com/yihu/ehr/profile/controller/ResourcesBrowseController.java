@@ -1,7 +1,9 @@
 package com.yihu.ehr.profile.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.profile.service.PatientInfoBaseService;
 import com.yihu.ehr.profile.service.PatientInfoDetailService;
@@ -53,7 +55,10 @@ public class ResourcesBrowseController {
         Map<String,Object> re = patient.getPatientInfo(demographicId);
         if(version!=null)
         {
-            return transform.stdTransform(mapper.writeValueAsString(re), version);
+            MStdTransformDto stdTransformDto = new MStdTransformDto();
+            stdTransformDto.setSource(mapper.writeValueAsString(re));
+            stdTransformDto.setVersion(version);
+            return transform.stdTransform(mapper.writeValueAsString(stdTransformDto));
         }
         else{
             return re;
@@ -102,7 +107,10 @@ public class ResourcesBrowseController {
         List<Map<String,Object>> re = patient.getMedicalEvents(demographicId,eventsType,year,area,hpId,diseaseId);
         if(version!=null)
         {
-            return transform.stdTransformList(mapper.writeValueAsString(re), version);
+            MStdTransformDto stdTransformDto = new MStdTransformDto();
+            stdTransformDto.setVersion(version);
+            stdTransformDto.setSource(mapper.writeValueAsString(re));
+            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
         }
         else{
             return re;
@@ -160,10 +168,14 @@ public class ResourcesBrowseController {
 
     @ApiOperation("公众版门户 -- 档案详情")
     @RequestMapping(value = "/cda/getDocument", method = RequestMethod.GET)
-    public List<Map<String,String>> getDocument(
-            @ApiParam(name = "profileId", value = "档案ID")
-            @RequestParam(value = "profileId", required = false) String profileId) throws Exception {
-        return patientDetail.getDocument(profileId);
+    public JsonNode getDocument(
+            @ApiParam(name = "profileId", value = "档案ID",defaultValue="42017976-4_0000786438_ZY010000816319_1459496935000")
+            @RequestParam(value = "profileId", required = false) String profileId,
+            @ApiParam(name = "version", value = "cda版本",defaultValue="56395d75b854")
+            @RequestParam(value = "version", required = false) String version) throws Throwable {
+
+        JsonNode jsonNode =  patientDetail.getDocument(profileId,version);
+        return jsonNode;
     }
 
 

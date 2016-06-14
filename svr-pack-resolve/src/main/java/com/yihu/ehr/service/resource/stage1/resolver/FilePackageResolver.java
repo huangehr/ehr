@@ -145,7 +145,7 @@ public class FilePackageResolver extends PackageResolver {
                 OriginFile originFile = new OriginFile();
                 originFile.setMime(mine_type);
                 originFile.setExpireDate(expireDate);
-                originFile.setUrlScope(UrlScope.valueOf(url_scope));
+                originFile.setUrlScope(UrlScope.valueOf(Integer.parseInt(url_scope)));
                 originFile.setReportName(report_name);
                 if(file.get("name")!=null){
                     String fileList[] = file.get("name").asText().split(";");

@@ -3,6 +3,8 @@ package com.yihu.ehr.profile.feign;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,11 +23,11 @@ import java.util.Map;
 @FeignClient(value = MicroServices.Resource)
 public interface XTransformClient {
 
-    @RequestMapping(value = "/rs/transform/stdTransformList", method = RequestMethod.POST)
-    List<Map<String,Object>> stdTransformList(@RequestParam(value = "resource", required = true) String resource,
-                         @RequestParam(value = "version", required = true) String version);
+    @RequestMapping(value = "/rs/transform/stdTransformList", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    List<Map<String, Object>> stdTransformList(
+            @RequestBody String stdTransformDtoJson);
 
-    @RequestMapping(value = "/rs/transform/stdTransform", method = RequestMethod.POST)
-    Map<String,Object> stdTransform(@RequestParam(value = "resource", required = true) String resource,
-                                              @RequestParam(value = "version", required = true) String version);
+    @RequestMapping(value = "/rs/transform/stdTransform", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    Map<String, Object> stdTransform(
+            @RequestBody String stdTransformDtoJson);
 }

@@ -4,12 +4,24 @@ package com.yihu.ehr.profile.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.data.hbase.HBaseDao;
+import com.yihu.ehr.data.hbase.ResultUtil;
+import com.yihu.ehr.data.hbase.TableBundle;
+import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.model.standard.MCdaDataSet;
+<<<<<<< HEAD
+import com.yihu.ehr.profile.family.FileFamily;
+import com.yihu.ehr.profile.feign.XCDADocumentClient;
+import com.yihu.ehr.profile.feign.XResourceClient;
+import com.yihu.ehr.profile.feign.XTransformClient;
+import com.yihu.ehr.util.Envelop;
+=======
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
+>>>>>>> 107ca958bdcb6b3235b387397c742365c79b8d65
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,8 +53,16 @@ public class PatientInfoDetailService {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    XTransformClient transform;
+
+    @Autowired
+    HBaseDao hBaseDao;
+
 
     String appId = "svr-health-profile";
+
+    public static final String Table = "RawFiles";
 
 
     //根据ProfileId或者EventNo查询CDA分类
@@ -340,32 +360,91 @@ public class PatientInfoDetailService {
     }
 
 
-    public List<Map<String,String>> getDocument(String profileId) throws Exception {
+    public JsonNode getDocument(String profileId,String version) throws Throwable {
 
-        Map<String, List<Map<String, Object>>> re = new HashMap<>();
         //主表记录
         Envelop profile = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}");
 
-        LinkedHashMap<String,String> profileMap = (LinkedHashMap<String, String>) profile.getDetailModelList().get(0);
+        LinkedHashMap<String, String> profileMap = (LinkedHashMap<String, String>) profile.getDetailModelList().get(0);
         String profileStr = objectMapper.writeValueAsString(profileMap);
-        JsonNode profileNode = objectMapper.readTree(profileStr);
 
-        Map<String, Object> map  = (Map<String, Object>) profile.getDetailModelList().get(0);
+
+        String profileType = profileMap.get("profile_type");
+        if("1".equals(profileType)){
+            //结构化档案
+        }else if("2".equals(profileType)){
+            //非结构化档案
+        }
+
+        MStdTransformDto stdTransformDto = new MStdTransformDto();
+        stdTransformDto.setVersion(version);
+        stdTransformDto.setSource(profileStr);
+        Map<String,Object> map = transform.stdTransform(objectMapper.writeValueAsString(stdTransformDto));
+        profileStr = objectMapper.writeValueAsString(map).replace("{","").replace("}","");
 
 
         //从表记录
-        Envelop dataSet = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}",null,null);
+        Envelop dataSet = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}", null, null);
 
-        List<LinkedHashMap<String,String>> dataSetList = (List<LinkedHashMap<String,String>>) dataSet.getDetailModelList();
+        List<LinkedHashMap<String, String>> dataSetList = (List<LinkedHashMap<String, String>>) dataSet.getDetailModelList();
         String dataSetStr = objectMapper.writeValueAsString(dataSetList);
+
+        stdTransformDto.setSource(dataSetStr);
+        List<Map<String,Object>> list = transform.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
+        dataSetStr = objectMapper.writeValueAsString(list);
         JsonNode dataSetNode = objectMapper.readTree(dataSetStr);
 
-        ObjectNode aa = (ObjectNode) dataSetNode.get(0);
+        List<String> rowKeyList = new ArrayList<>();
 
-//        for (ObjectNode objectNode : dataSetNode){
-//
-//        }
-        return null;
+        for (int j = 0; j < dataSetNode.size(); j++) {
+            ObjectNode dsNode = (ObjectNode) dataSetNode.get(j);
+            String rowKey = dsNode.get("rowkey").asText().split("\\$")[1];
+            if (!rowKeyList.contains(rowKey)) {
+                rowKeyList.add(rowKey);
+            }
+        }
+        String dataSetJsonStr = "";
+        for (int i = 0; i < rowKeyList.size(); i++) {
+            String key = rowKeyList.get(i);
+            String json = "\"" + rowKeyList.get(i) +"\":[";
+            boolean flag=true;
+            for (int j = 0; j < dataSetNode.size(); j++) {
+                ObjectNode dsNode = (ObjectNode) dataSetNode.get(j);
+                String[] rowKeyArray = dsNode.get("rowkey").asText().split("\\$");
+                if (key.equals(rowKeyArray[1])) {
+                    if (flag) {
+                        json += objectMapper.writeValueAsString(dsNode);
+                    } else {
+                        json += "," + objectMapper.writeValueAsString(dsNode);
+                    }
+                    flag = false;
+                }
+            }
+            json+="]";
+            if("".equals(dataSetJsonStr)){
+                dataSetJsonStr +=json;
+            }else {
+                dataSetJsonStr +=","+json;
+            }
+
+        }
+
+        dataSetJsonStr = "\"dataSets\":{" + dataSetJsonStr + "}";
+        JsonNode tree = objectMapper.readTree("{" + profileStr + "," + dataSetJsonStr + "}");
+
+        //文件记录
+        String[] rowKeys = hBaseDao.findRowKeys(Table, "^" + profileId);
+        TableBundle bundle = new TableBundle();
+        bundle.addRows(rowKeys);
+        Object  results[] = hBaseDao.get("RawFiles", bundle);
+        for(Object result : results){
+            ResultUtil util= new ResultUtil(result);
+            String cda_document_id = util.getCellValue("d", "cda_document_id", "");
+            String file_list = util.getCellValue("d", "file_list", "");
+        }
+
+
+        return tree;
     }
 
 
