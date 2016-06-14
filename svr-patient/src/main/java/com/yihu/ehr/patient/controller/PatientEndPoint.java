@@ -9,7 +9,7 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.util.encode.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;

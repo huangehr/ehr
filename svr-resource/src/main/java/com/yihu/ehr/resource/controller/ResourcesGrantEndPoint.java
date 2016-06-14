@@ -9,7 +9,7 @@ import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsAppResourceMetadata;
 import com.yihu.ehr.resource.service.ResourceGrantService;
 import com.yihu.ehr.resource.service.ResourceMetadataGrantService;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -158,6 +158,17 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         }
 
         pagedResponse(request,response,total,page,size);
+        return (List<MRsAppResource>)rsAppList;
+    }
+
+    @ApiOperation("资源授权查询-不分页")
+    @RequestMapping(value = ServiceApi.Resources.ResourceGrantsNoPage,method = RequestMethod.GET)
+    public List<MRsAppResource> queryAppResourceGrantNoPage(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception {
+        Collection<MRsAppResource> rsAppList;
+        List<RsAppResource> rsGrant = rsGrantService.search(filters);
+        rsAppList = convertToModels(rsGrant,new ArrayList<>(rsGrant.size()),MRsAppResource.class,null);
         return (List<MRsAppResource>)rsAppList;
     }
 

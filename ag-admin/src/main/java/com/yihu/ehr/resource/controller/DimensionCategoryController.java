@@ -3,7 +3,7 @@
 //import com.yihu.ehr.constants.ApiVersion;
 //import com.yihu.ehr.model.resource.MRsDimensionCategory;
 //import com.yihu.ehr.resource.client.DimensionCategoryClient;
-//import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+//import com.yihu.ehr.controller.EnvelopRestEndPoint;
 //import io.swagger.annotations.Api;
 //import io.swagger.annotations.ApiOperation;
 //import io.swagger.annotations.ApiParam;

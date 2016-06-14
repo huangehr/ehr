@@ -4,7 +4,7 @@ import com.yihu.ehr.api.esb.model.HosAcqTask;
 import com.yihu.ehr.api.esb.service.HosAcqTaskService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.esb.MHosAcqTask;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

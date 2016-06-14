@@ -6,7 +6,7 @@ import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgModel;
 import com.yihu.ehr.adapter.controller.OrgDataSetController;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.controller.BaseController;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;

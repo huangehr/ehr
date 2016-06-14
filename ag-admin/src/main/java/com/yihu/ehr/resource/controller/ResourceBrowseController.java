@@ -11,7 +11,7 @@ import com.yihu.ehr.model.resource.MRsResourceMetadata;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,9 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by wq on 2016/5/30.

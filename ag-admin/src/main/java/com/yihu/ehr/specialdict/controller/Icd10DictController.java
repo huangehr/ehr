@@ -11,7 +11,7 @@ import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.model.specialdict.MIcd10DrugRelation;
 import com.yihu.ehr.model.specialdict.MIcd10IndicatorRelation;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

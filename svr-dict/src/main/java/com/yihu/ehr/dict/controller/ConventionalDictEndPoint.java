@@ -4,7 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.dict.service.SystemDictEntry;
 import com.yihu.ehr.dict.service.SystemDictEntryService;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

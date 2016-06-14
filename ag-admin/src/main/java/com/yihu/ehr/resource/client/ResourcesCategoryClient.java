@@ -1,12 +1,12 @@
 package com.yihu.ehr.resource.client;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsCategory;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import net.minidev.json.JSONObject;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +36,7 @@ public interface ResourcesCategoryClient {
 
     @RequestMapping(value = ServiceApi.Resources.Category, method = RequestMethod.DELETE)
     @ApiOperation("删除资源类别")
-    JSONObject deleteResourceCategory(
+    ObjectNode deleteResourceCategory(
             @PathVariable(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Resources.Category,method = RequestMethod.GET)

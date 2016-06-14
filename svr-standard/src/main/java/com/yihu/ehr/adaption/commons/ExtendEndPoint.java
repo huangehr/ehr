@@ -1,8 +1,8 @@
 package com.yihu.ehr.adaption.commons;
 
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;

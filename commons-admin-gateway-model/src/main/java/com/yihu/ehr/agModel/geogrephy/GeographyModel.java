@@ -1,7 +1,6 @@
 package com.yihu.ehr.agModel.geogrephy;
 
-
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 

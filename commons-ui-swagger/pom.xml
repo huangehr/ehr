@@ -5,28 +5,29 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>commons-dependencies</artifactId>
+        <artifactId>ehr-lib-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies</relativePath>
+        <relativePath>../ehr-lib-parent-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>commons-ui-swagger</artifactId>
     <packaging>jar</packaging>
 
-    <name>commons-ui-swagger</name>
-    <description>EHR swagger component</description>
-
     <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>2.4.0</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
-
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.4.0</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
     </dependencies>
 </project>

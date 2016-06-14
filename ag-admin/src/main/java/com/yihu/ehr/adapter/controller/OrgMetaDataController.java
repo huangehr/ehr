@@ -9,7 +9,7 @@ import com.yihu.ehr.adapter.service.OrgMetaDataClient;
 import com.yihu.ehr.model.adaption.MOrgDataSet;
 import com.yihu.ehr.model.adaption.MOrgMetaData;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

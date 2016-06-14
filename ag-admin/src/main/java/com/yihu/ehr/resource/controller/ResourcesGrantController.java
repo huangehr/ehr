@@ -19,7 +19,7 @@ import com.yihu.ehr.resource.client.ResourcesGrantClient;
 import com.yihu.ehr.resource.client.RsDictionaryEntryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -283,6 +283,25 @@ public class ResourcesGrantController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
+    }
+
+    @ApiOperation("资源授权查询-不分页")
+    @RequestMapping(value = ServiceApi.Resources.ResourceGrantsNoPage,method = RequestMethod.GET)
+    public Envelop queryAppResourceGrantNoPage(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<MRsAppResource> mRsAppResources = resourcesGrantClient.queryAppResourceGrantNoPage(filters);
+            if(mRsAppResources != null){
+                envelop.setSuccessFlg(true);
+                envelop.setDetailModelList(mRsAppResources);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 
     @ApiOperation("资源数据元授权")

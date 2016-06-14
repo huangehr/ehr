@@ -1,6 +1,5 @@
 package com.yihu.ehr.model.family;// default package
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**

@@ -1,9 +1,6 @@
 package com.yihu.ehr.model.standard;
 
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
 
@@ -13,7 +10,6 @@ import java.util.Objects;
  * @version 1.0
  * @created 2016.2.22
  */
-@MappedSuperclass
 public class MStdDict {
     long id;
     String code;//字典代码

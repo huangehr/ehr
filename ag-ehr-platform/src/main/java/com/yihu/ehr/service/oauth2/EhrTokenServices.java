@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.common.exceptions.InvalidTokenExcepti
 import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.token.*;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Date;
@@ -55,7 +54,6 @@ public class EhrTokenServices implements AuthorizationServerTokenServices, Resou
         Assert.notNull(tokenStore, "tokenStore 未设置");
     }
 
-    @Transactional
     public OAuth2AccessToken createAccessToken(OAuth2Authentication authentication) throws AuthenticationException {
 
         OAuth2AccessToken existingAccessToken = tokenStore.getAccessToken(authentication);
@@ -105,7 +103,6 @@ public class EhrTokenServices implements AuthorizationServerTokenServices, Resou
 
     }
 
-    @Transactional(noRollbackFor = {InvalidTokenException.class, InvalidGrantException.class})
     public OAuth2AccessToken refreshAccessToken(String refreshTokenValue, TokenRequest tokenRequest)
             throws AuthenticationException {
 

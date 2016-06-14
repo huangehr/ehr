@@ -8,7 +8,7 @@ import com.yihu.ehr.model.profile.MTemplate;
 import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.util.compress.Zipper;
-import com.yihu.ehr.util.controller.BaseRestEndPoint;
+import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

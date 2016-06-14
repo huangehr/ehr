@@ -6,12 +6,11 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsInterface;
 import com.yihu.ehr.resource.client.RsInterfaceClient;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

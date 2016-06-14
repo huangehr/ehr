@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsSystemDictionary;
 import com.yihu.ehr.resource.client.RsSystemDictionaryClient;
 import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
