@@ -45,6 +45,7 @@ public class ServiceApi {
 
         public static final String ResourceGrant                 = "/resources/grants/{id}";
         public static final String ResourceGrants                = "/resources/grants";
+        public static final String ResourceGrantsNoPage          = "/resources/grants/no_paging";
         public static final String AppsGrantResources            = "/resources/apps/{appId}/grant";
         public static final String ResourceGrantApps             = "/resources/{resourceId}/grant";
         public static final String ResourceApps                  = "/resources/{resource_id}/app";

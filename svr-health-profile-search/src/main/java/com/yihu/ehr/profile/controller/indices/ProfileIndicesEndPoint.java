@@ -1,27 +1,10 @@
 package com.yihu.ehr.profile.controller.indices;
 
-import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.util.DateTimeUtils;
-import com.yihu.ehr.util.controller.BaseRestEndPoint;
+import com.yihu.ehr.controller.BaseRestEndPoint;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.ParseException;
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * 档案接口。提供就诊数据的原始档案，以CDA文档配置作为数据内容架构。
@@ -34,7 +17,7 @@ import java.util.Date;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "健康档案服务", description = "提供档案搜索及完整档案下载")
 public class ProfileIndicesEndPoint extends BaseRestEndPoint {
-    @Autowired
+    /*@Autowired
     ProfileIndicesService indicesService;
 
     @ApiOperation(value = "搜索档案", notes = "返回符合条件的档案列表")
@@ -71,7 +54,7 @@ public class ProfileIndicesEndPoint extends BaseRestEndPoint {
         String name = query.getName();
         String telephone = query.getTelephone();
         String gender = query.getGender();
-        Date birthday = DateTimeUtils.simpleDateParse(query.getBirthday());
+        Date birthday = DateTimeUtil.simpleDateParse(query.getBirthday());
 
         Pageable pageable = new PageRequest(page, size);
         Page<ProfileIndices> profileIndices = indicesService.findByOrganizationIndices(orgCode, patientId, eventNo, since, to, pageable);
@@ -80,5 +63,5 @@ public class ProfileIndicesEndPoint extends BaseRestEndPoint {
         }
 
         return profileIndices;
-    }
+    }*/
 }

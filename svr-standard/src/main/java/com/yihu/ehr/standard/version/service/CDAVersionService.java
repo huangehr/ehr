@@ -4,8 +4,7 @@ import com.yihu.ehr.config.StdHibernateConfig;
 import com.yihu.ehr.config.StdSessionFactoryBean;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
-import com.yihu.ehr.util.classpool.ClassPoolUtils;
-import com.yihu.ehr.util.log.LogService;
+import com.yihu.ehr.util.reflection.ClassPoolUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

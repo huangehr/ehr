@@ -9,8 +9,8 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.util.encode.HashUtil;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -150,7 +150,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             @RequestBody String jsonData) throws Exception{
         DemographicInfo demographicInfo = toEntity(jsonData, DemographicInfo.class);
         String pwd = "123456";
-        demographicInfo.setPassword(HashUtil.hashStr(pwd));
+        demographicInfo.setPassword(HashUtil.hash(pwd));
         demographicInfo.setRegisterTime(new Date());
         demographicService.savePatient(demographicInfo);
         return convertToModel(demographicInfo,MDemographicInfo.class);

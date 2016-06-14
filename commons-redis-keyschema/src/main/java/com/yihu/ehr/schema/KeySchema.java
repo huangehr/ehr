@@ -1,6 +1,6 @@
 package com.yihu.ehr.schema;
 
-import com.yihu.ehr.util.StringBuilderUtil;
+import com.yihu.ehr.util.string.StringBuilderEx;
 
 /**
  * @author Sand
@@ -11,7 +11,7 @@ public class KeySchema {
     protected static final String KeySchema = "%1:%2:%3";
 
     protected static String makeKey(String table, String key, String column){
-        return new StringBuilderUtil(KeySchema)
+        return new StringBuilderEx(KeySchema)
                 .arg(table)
                 .arg(key)
                 .arg(column)

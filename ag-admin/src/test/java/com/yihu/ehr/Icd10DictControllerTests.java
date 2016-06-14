@@ -7,7 +7,7 @@ import com.yihu.ehr.specialdict.controller.HealthProblemDictController;
 import com.yihu.ehr.specialdict.controller.Icd10DictController;
 import com.yihu.ehr.specialdict.controller.IndicatorDictController;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;

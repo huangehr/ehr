@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.client;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
@@ -35,7 +36,7 @@ public interface ResourcesCategoryClient {
 
     @RequestMapping(value = ServiceApi.Resources.Category, method = RequestMethod.DELETE)
     @ApiOperation("删除资源类别")
-    boolean deleteResourceCategory(
+    ObjectNode deleteResourceCategory(
             @PathVariable(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Resources.Category,method = RequestMethod.GET)

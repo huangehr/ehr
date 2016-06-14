@@ -15,6 +15,7 @@ public class MTemplate {
     private String organizationCode;
     private String pcTplURL;
     private String mobileTplURL;
+    private String cdaType;
     private Date createTime = new Date();
 
     public int getId() {
@@ -65,6 +66,13 @@ public class MTemplate {
         this.pcTplURL = pcTplURL;
     }
 
+    public String getCdaType() {
+        return cdaType;
+    }
+
+    public void setCdaType(String cdaType) {
+        this.cdaType = cdaType;
+    }
 
     public Date getCreateTime() {
         return createTime;

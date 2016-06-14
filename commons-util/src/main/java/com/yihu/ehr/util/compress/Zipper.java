@@ -38,14 +38,14 @@ public class Zipper {
      * 使用给定密码解压指定的ZIP压缩文件到当前目录
      *
      * @param zip    指定的ZIP压缩文件
-     * @param passwd ZIP文件的密码
+     * @param pwd ZIP文件的密码
      * @return 解压后文件数组
      * @throws ZipException 压缩文件有损坏或者解压缩失败抛出
      */
-    public File[] unzip(String zip, String passwd) throws ZipException {
+    public File[] unzip(String zip, String pwd) throws ZipException {
         File zipFile = new File(zip);
         File parentDir = zipFile.getParentFile();
-        return unzip(zipFile, parentDir.getAbsolutePath(), passwd);
+        return unzip(zipFile, parentDir.getAbsolutePath(), pwd);
     }
 
     /**

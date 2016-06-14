@@ -5,6 +5,7 @@ import com.yihu.ehr.service.resource.stage2.MasterRecord;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.service.resource.stage2.SubRecord;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -33,12 +34,12 @@ public class ResourceStorageUtil {
             map.put(MasterResourceFamily.BasicColumns.OrgCode, profile.getOrgCode());
             map.put(MasterResourceFamily.BasicColumns.PatientId, profile.getPatientId());
             map.put(MasterResourceFamily.BasicColumns.EventNo, profile.getEventNo());
-            map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtils.utcDateTimeFormat(profile.getEventDate()));
+            map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(profile.getEventDate()));
             map.put(MasterResourceFamily.BasicColumns.EventType, Integer.toString(profile.getEventType().ordinal()));
             map.put(MasterResourceFamily.BasicColumns.ProfileType, Integer.toString(profile.getProfileType().ordinal()));
             map.put(MasterResourceFamily.BasicColumns.DemographicId, profile.getDemographicId() == null ? "" : profile.getDemographicId());
             map.put(MasterResourceFamily.BasicColumns.ClientId, profile.getClientId());
-            map.put(MasterResourceFamily.BasicColumns.CreateDate, DateTimeUtils.utcDateTimeFormat(new Date()));
+            map.put(MasterResourceFamily.BasicColumns.CreateDate, DateTimeUtil.utcDateTimeFormat(new Date()));
             map.put(MasterResourceFamily.BasicColumns.CdaVersion, profile.getCdaVersion());
         } else if (family.equals(MasterResourceFamily.Data)){
             MasterRecord masterRecord = profile.getMasterRecord();

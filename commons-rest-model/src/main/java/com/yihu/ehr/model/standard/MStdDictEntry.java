@@ -1,9 +1,6 @@
 package com.yihu.ehr.model.standard;
 
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
 import java.util.Objects;
 
 /**

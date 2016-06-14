@@ -3,7 +3,6 @@ package com.yihu.ehr.geography.service;
 
 import com.yihu.ehr.geography.dao.XGeographyRepository;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.util.po.PoUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,76 +38,6 @@ public class GeographyService extends BaseJpaService<Geography,XGeographyReposit
     public String saveAddress(Geography geography) {
         return geographyRepository.save(geography).getId();
     }
-//	public String saveAddress(Geography address) {
-//        Session session = entityManager.unwrap(org.hibernate.Session.class);
-//        Criteria criteria = session.createCriteria(Geography.class);
-//        String country = address.getCountry();
-//        String province = address.getProvince();
-//        String city = address.getCity();
-//        String district = address.getDistrict();
-//        String town = address.getTown();
-//        String street = address.getStreet();
-//        String extra = address.getExtra();
-//        String townnew;
-//        String streetnew;
-//        String extranew;
-//
-//        if (isNullAddress(address)) {
-//            return null;
-//        }
-//        if (country == null) {
-//            address.setCountry("中国");
-//        }
-//        if (province == null) {
-//            List<Geography> addressList = geographyRepository.findAddressListByCountry(country);
-//            criteria.add(Restrictions.eq("country", country));
-//            List<Geography> addr = criteria.list();
-//            if (!addressList.isEmpty()) {
-//                address = addressList.get(0);
-//                return address.getId();
-//            } else {
-//                geographyRepository.save(address);
-//                return address.getId();
-//            }
-//        }
-//
-//        criteria.add(Restrictions.eq("province", province));
-//        criteria.add(Restrictions.eq("city", city));
-//        if (district != null) {
-//            criteria.add(Restrictions.eq("district", district));
-//        }
-//
-//        if (town == null && street == null && extra == null) {
-//            criteria.add(Restrictions.isNull("town"));
-//            criteria.add(Restrictions.isNull("street"));
-//            criteria.add(Restrictions.isNull("extra"));
-//            List<Geography> addr = criteria.setFetchSize(1).list();
-//            if (!addr.isEmpty()) {
-//                address = addr.get(0);
-//                return address.getId();
-//            } else {
-//                geographyRepository.save(address);
-//            }
-//
-//        } else {
-//            List<Geography> addrs = criteria.list();
-//            for (Geography addr : addrs) {
-//                townnew = addr.getTown();
-//                streetnew = addr.getStreet();
-//                extranew = addr.getExtra();
-//                if ((townnew == null ? "" : townnew).equals(town == null ? "" : town)) {
-//                    if ((streetnew == null ? "" : streetnew).equals(street == null ? "" : street)) {
-//                        if ((extranew == null ? "" : extranew).equals(extra == null ? "" : extra)) {
-//                            return addr.getId();
-//                        }
-//                    }
-//                }
-//            }
-//            geographyRepository.save(address);
-//            return address.getId();
-//        }
-//        return address.getId();
-//    }
 
     public boolean isNullAddress(Geography geography) {
         return

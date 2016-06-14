@@ -10,24 +10,20 @@ import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.resource.MRsResourceMetadata;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.client.*;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.omg.CORBA.Object;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by wq on 2016/5/30.
@@ -102,62 +98,38 @@ public class ResourceBrowseController extends BaseController {
 
         Envelop envelop = new Envelop();
         List<RsCategoryTypeTreeModel> rsCategoryTypeTreeModelList = new ArrayList<>();
-
         List<MRsResources> rsResources = new ArrayList<>();
 
         try {
 
             List<MRsCategory> rsCategories = new ArrayList<>();
-            String filters = "";
 
             //查询资源分类
-            if (!StringUtils.isEmpty(id)) {
-                filters = "pid=" + id;
-                ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories("", filters, "", 1, 999);// TODO: 2016/5/30 :测试数据，无需分页（尚无接口）
-                rsCategories = responseEntity.getBody();
+                List<MRsCategory> resources = resourcesCategoryClient.getAllCategories("");
+                for (MRsCategory mRsCategory:resources){
 
-                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + id, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
-                rsResources = categoryResponseEntity.getBody();
+                    RsCategoryTypeTreeModel rsCategoryModel = new RsCategoryTypeTreeModel();
+                    rsCategoryModel.setId(mRsCategory.getId());
+                    rsCategoryModel.setPid(mRsCategory.getPid());
+                    rsCategoryModel.setName(mRsCategory.getName());
+                    rsCategoryTypeTreeModelList.add(rsCategoryModel);
 
-                if (rsResources.size() > 0 && !StringUtils.isEmpty(id)) {
-                    List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
-                    for (RsResourcesModel resourcesModel : resourcesModelList) {
-                        RsCategoryTypeTreeModel rsCategoryTypeModel = new RsCategoryTypeTreeModel();
-                        rsCategoryTypeModel.setId(resourcesModel.getId());
-                        rsCategoryTypeModel.setPid(id);
-                        rsCategoryTypeModel.setResourceIds(resourcesModel.getId());
-                        rsCategoryTypeModel.setName(resourcesModel.getName());
-                        rsCategoryTypeModel.setResourceCode(resourcesModel.getCode());
+                    ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999);// TODO: 2016/5/30 测试数据15（无不分页查询）
+                    rsResources = categoryResponseEntity.getBody();
+                    if (rsResources.size() > 0) {
+                        List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
+                        for (RsResourcesModel resourcesModel : resourcesModelList) {
+                            RsCategoryTypeTreeModel rsCategoryTypeModel = new RsCategoryTypeTreeModel();
+                            rsCategoryTypeModel.setId(resourcesModel.getId());
+                            rsCategoryTypeModel.setPid(mRsCategory.getId());
+                            rsCategoryTypeModel.setResourceIds(resourcesModel.getId());
+                            rsCategoryTypeModel.setName(resourcesModel.getName());
+                            rsCategoryTypeModel.setResourceCode(resourcesModel.getCode());
 
-                        rsCategoryTypeTreeModelList.add(rsCategoryTypeModel);
+                            rsCategoryTypeTreeModelList.add(rsCategoryTypeModel);
+                        }
                     }
                 }
-
-
-            } else {
-                rsCategories = resourcesCategoryClient.getRsCategoryByPid(id);
-            }
-
-            for (MRsCategory mRsCategory : rsCategories) {
-                //查询资源注册信息
-                RsCategoryTypeTreeModel rsCategoryTypeTreeModel = convertToModel(mRsCategory, RsCategoryTypeTreeModel.class);
-
-//                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + rsCategoryTypeTreeModel.getId(), "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
-//                rsResources = categoryResponseEntity.getBody();
-//
-//                if (rsResources.size() > 0&&!StringUtils.isEmpty(id)) {
-//                    List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
-//                    for (RsResourcesModel resourcesModel: resourcesModelList){
-//                        RsCategoryTypeTreeModel rsCategoryTypeModel = new RsCategoryTypeTreeModel();
-//                        rsCategoryTypeModel.setResourceIds(resourcesModel.getId());
-//                        rsCategoryTypeModel.setName(resourcesModel.getName());
-//                        rsCategoryTypeTreeModelList.add(rsCategoryTypeModel);
-//                    }
-//                }
-
-                rsCategoryTypeTreeModelList.add(rsCategoryTypeTreeModel);
-            }
-
 
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(rsCategoryTypeTreeModelList);

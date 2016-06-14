@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.service.resource.stage1.OriginFile;
-import com.yihu.ehr.util.DateTimeUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,9 +49,10 @@ public class CdaDocument {
         for (OriginFile originFile : originFiles){
             ObjectNode objectNode = docList.addObject();
             objectNode.put("mime", originFile.getMime());
-            objectNode.put("originUrl", originFile.getOriginUrl());
-            objectNode.put("expireDate", originFile.getExpireDate()==null ? null:DateTimeUtils.simpleDateFormat(originFile.getExpireDate()));
-
+            objectNode.put("urls", originFile.getUrlsStr());
+            objectNode.put("url_scope", originFile.getUrlScope().name());
+            objectNode.put("expireDate", originFile.getExpireDate()==null ? null: DateTimeUtil.simpleDateFormat(originFile.getExpireDate()));
+            objectNode.put("report_name",originFile.getReportName());
             ObjectNode listNode = objectNode.putObject("files");
             Map<String, String> files = originFile.getFileUrls();
             for (String fileName : files.keySet()){

@@ -3,6 +3,7 @@ package com.yihu.ehr.dict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.dict.service.Icd10HpRelationCacheService;
 import com.yihu.ehr.dict.model.HealthProblemDict;
+import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -53,7 +54,7 @@ public class ZIcd10HpRelationCacheController {
      */
     @RequestMapping(value = "/hp_icd10_relation_cache/one", method = RequestMethod.GET)
     @ApiOperation(value = "获取单个缓存")
-    public HealthProblemDict healthProblemDict(
+    public MIcd10Dict healthProblemDict(
             @ApiParam(name = "icd10_id", value = "icd10_id")
             @RequestParam(value = "icd10_id") String icd10Id) {
         return icd10HpRelationCacheService.healthProblemDict(icd10Id);

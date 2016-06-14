@@ -1,6 +1,6 @@
 package com.yihu.ehr.security.service;
 
-import com.yihu.ehr.util.token.TokenUtil;
+import com.yihu.ehr.util.oauth2.TokenUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;

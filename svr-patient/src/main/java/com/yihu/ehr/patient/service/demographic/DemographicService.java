@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.patient.feign.GeographyClient;
-import com.yihu.ehr.util.encode.HashUtil;
+import com.yihu.ehr.util.hash.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,7 +142,7 @@ public class DemographicService {
 
         String pwd = "123456";
         DemographicInfo demInfo = getDemographicInfo(id);
-        demInfo.setPassword(HashUtil.hashStr(pwd));
+        demInfo.setPassword(HashUtil.hash(pwd));
         demographicInfoRepository.save(demInfo);
     }
 }

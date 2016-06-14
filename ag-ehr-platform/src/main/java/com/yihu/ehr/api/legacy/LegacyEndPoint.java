@@ -8,9 +8,9 @@ import com.yihu.ehr.feign.*;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
-import com.yihu.ehr.util.DateTimeUtils;
-import com.yihu.ehr.util.IdValidator;
-import com.yihu.ehr.util.RestEcho;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.id.IdValidator;
+import com.yihu.ehr.util.rest.RestEcho;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
@@ -308,7 +308,7 @@ public class LegacyEndPoint {
             String homeAddressJsonData = objectMaper.writeValueAsString(homeAddress);
             String birthPlacejsonData = objectMaper.writeValueAsString(birthAddress);
 
-            demoInfo.setBirthday(DateTimeUtils.simpleDateParse(birthday));
+            demoInfo.setBirthday(DateTimeUtil.simpleDateParse(birthday));
             demoInfo.setNativePlace(nativePlace);
             //demoInfo.setTelephoneNo(telMap.get(0));
             demoInfo.setTelephoneNo(new ObjectMapper().writeValueAsString(telMap));//电话号码格式调整

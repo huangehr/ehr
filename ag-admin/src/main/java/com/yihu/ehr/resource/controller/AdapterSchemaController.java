@@ -11,8 +11,8 @@ import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.resource.client.AdapterSchemaClient;
 import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -64,6 +64,11 @@ public class AdapterSchemaController extends BaseController {
             List<MRsAdapterSchema> mRsAdapterSchemas = responseEntity.getBody();
             if(mRsAdapterSchemas.size()>0){
                 return failed("方案编码已经存在请修改！");
+            }
+            ResponseEntity<List<MRsAdapterSchema>> responseEntityCheck = adapterSchemaClient.getSchema("", "adapterVersion=" + rsAdapterSchema.getAdapterVersion()+";type="+rsAdapterSchema.getType(), "", 1, 1);
+            List<MRsAdapterSchema> mRsAdapterSchemasCheck = responseEntityCheck.getBody();
+            if(mRsAdapterSchemasCheck.size()>0){
+                return failed("此方案类别的版本已经存在请修改！");
             }
             rsAdapterSchema = adapterSchemaClient.createSchema(adapterSchema);
             envelop.setObj(rsAdapterSchema);

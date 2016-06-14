@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.standard.commons.ExtendEndPoint;
 import com.yihu.ehr.standard.dispatch.service.DispatchService;
-import com.yihu.ehr.util.RestEcho;
+import com.yihu.ehr.util.rest.RestEcho;
 import com.yihu.ehr.util.encrypt.RSA;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

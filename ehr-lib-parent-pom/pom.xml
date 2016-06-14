@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.yihu.ehr</groupId>
+        <artifactId>ehr-parent-pom</artifactId>
+        <version>1.1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ehr-lib-parent-pom</artifactId>
+    <packaging>pom</packaging>
+    <description>EHR library parent pom</description>
+
+    <properties>
+        <dependency.scope>compile</dependency.scope>
+    </properties>
+
+    <modules>
+        <module>../commons-ehr-constants</module>
+        <module>../commons-ui-swagger</module>
+        <module>../commons-util</module>
+        <module>../commons-web</module>
+        <module>../commons-data-fastdfs</module>
+        <module>../commons-data-hbase</module>
+        <module>../commons-data-mysql</module>
+        <module>../commons-data-redis</module>
+        <module>../commons-data-solr</module>
+        <module>../commons-redis-keyschema</module>
+        <module>../commons-profile-core</module>
+        <module>../commons-profile-persist</module>
+        <module>../commons-rest-model</module>
+        <module>../commons-admin-gateway-model</module>
+        <module>../commons-redis-mq</module>
+        <module>../commons-data-query</module>
+        <module>../commons-metrics</module>
+        <!--..
+        <module>../commons-thrift-services</module>
+        <module>../commons-thrift-client</module>
+        <module>../commons-thrift-server</module>
+        -->
+    </modules>
+</project>

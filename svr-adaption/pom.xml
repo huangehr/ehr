@@ -4,29 +4,25 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.yihu.ehr</groupId>
-		<artifactId>commons-dependencies-native</artifactId>
+		<artifactId>ehr-ms-parent-pom</artifactId>
 		<version>1.1.0</version>
-		<relativePath>../commons-dependencies-native</relativePath>
+		<relativePath>../ehr-ms-parent-pom/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>svr-adaption</artifactId>
-	<packaging>${packaging}</packaging>
+	<packaging>${packaging.type}</packaging>
 	<name>svr-adaption</name>
 	<description>EHR platform standard service</description>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
+        <wagonServerId>192.168.1.220</wagonServerId>
+        <wagonUrl>scp://sand:timeneverstop@192.168.1.221/home/sand/ehr-release</wagonUrl>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-actuator-docs</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -43,6 +39,12 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.data</groupId>

@@ -4,9 +4,9 @@ import com.yihu.ehr.agModel.esb.HosAcqTaskModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosAcqTaskClient;
 import com.yihu.ehr.model.esb.MHosAcqTask;
-import com.yihu.ehr.util.DateTimeUtils;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -63,9 +63,9 @@ public class HosAcqTaskController extends BaseController {
      * utc时间转化成yyyy-MM-dd HH:mm:ss
      */
     public HosAcqTaskModel utcTimeChange(HosAcqTaskModel hosAcqTaskModel,MHosAcqTask mHosAcqTask){
-        hosAcqTaskModel.setStartTime(DateTimeUtils.simpleDateTimeFormat(mHosAcqTask.getStartTime()));
-        hosAcqTaskModel.setEndTime(DateTimeUtils.simpleDateTimeFormat(mHosAcqTask.getEndTime()));
-        hosAcqTaskModel.setCreateTime(DateTimeUtils.simpleDateTimeFormat(mHosAcqTask.getCreateTime()));
+        hosAcqTaskModel.setStartTime(DateTimeUtil.simpleDateTimeFormat(mHosAcqTask.getStartTime()));
+        hosAcqTaskModel.setEndTime(DateTimeUtil.simpleDateTimeFormat(mHosAcqTask.getEndTime()));
+        hosAcqTaskModel.setCreateTime(DateTimeUtil.simpleDateTimeFormat(mHosAcqTask.getCreateTime()));
         return hosAcqTaskModel;
     }
 

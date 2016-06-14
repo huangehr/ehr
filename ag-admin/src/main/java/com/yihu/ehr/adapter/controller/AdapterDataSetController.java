@@ -14,7 +14,7 @@ import com.yihu.ehr.std.service.DataSetClient;
 import com.yihu.ehr.model.adaption.*;
 import com.yihu.ehr.model.standard.MStdDataSet;
 import com.yihu.ehr.model.standard.MStdMetaData;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

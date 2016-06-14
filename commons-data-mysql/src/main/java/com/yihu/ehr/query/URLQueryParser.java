@@ -1,21 +1,18 @@
 package com.yihu.ehr.query;
 
-import com.yihu.ehr.constants.AgAdminConstants;
-import com.yihu.ehr.util.DateTimeUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.url.URLQueryBuilder;
 import javafx.util.Pair;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.NumberUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
 import java.text.ParseException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * URL 查询串解析器。将 {@link com.yihu.ehr.util.URLQueryBuilder} 中产生的查询字符串反解析。
+ * URL 查询串解析器。将 {@link URLQueryBuilder} 中产生的查询字符串反解析。
  *
  * @author Sand
  * @version 1.0
@@ -137,7 +134,7 @@ public class URLQueryParser<T> {
      * =：使用"="来表示，如：status=2
      * >=：使用大于号和大于等于语法，如：createDate>2012
      * <=：使用小于号和小于等于语法，如：createDate<=2015
-     * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接
+     * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接 GB/T 2261.2-2003
      * 多条件组合：使用";"来分隔
      * <p/>
      * 生成 where 条件。
@@ -202,7 +199,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, ">=", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
+                Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
                 predicate = cb.greaterThanOrEqualTo(pair.getKey(), date);
             }else {
                 predicate = cb.greaterThanOrEqualTo(pair.getKey(),value);
@@ -211,7 +208,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, ">", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
+                Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
                 predicate = cb.greaterThan(pair.getKey(), date);
             }else {
                 predicate = cb.greaterThan(pair.getKey(),value);
@@ -220,7 +217,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, "<=", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
+                Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
                 predicate = cb.lessThanOrEqualTo(pair.getKey(), date);
             }else {
                 predicate = cb.lessThanOrEqualTo(pair.getKey(),value);
@@ -229,7 +226,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, "<", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
+                Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
                 predicate = cb.lessThan(pair.getKey(), date);
             }else {
                 predicate = cb.lessThan(pair.getKey(),value);
@@ -243,7 +240,7 @@ public class URLQueryParser<T> {
                 } else if (pair.getKey().getJavaType().equals(Boolean.TYPE)) {
                     values.add(BooleanUtils.toBoolean(value));
                 } else if(pair.getKey().getJavaType() == Date.class){
-                    Date date = DateTimeUtils.utcDateTimeParse(pair.getValue());
+                    Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
                     values.add(date);
                 }else {
                     values.add(value);

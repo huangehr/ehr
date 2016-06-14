@@ -1,8 +1,8 @@
 package com.yihu.ehr.standard.version.service;
 
-
-import com.yihu.ehr.util.ObjectVersion;
+import com.yihu.ehr.util.id.ObjectVersion;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -73,7 +73,7 @@ public class CDAVersion{
         return baseVersion.toString();
     }
     public void setBaseVersion(String baseVersion) {
-        this.baseVersion = baseVersion == null ? null : new ObjectVersion(baseVersion);
+        this.baseVersion = StringUtils.isEmpty(baseVersion) ? null : new ObjectVersion(baseVersion);
     }
 
     @Column(name = "commit_time", unique = false, nullable = true)

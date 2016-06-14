@@ -1,6 +1,5 @@
 package com.yihu.ehr.model.profile;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.constants.ProfileType;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +13,6 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.26 16:08
  */
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class MProfile {
     private String id;
     private String orgCode;

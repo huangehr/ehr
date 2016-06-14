@@ -1,8 +1,5 @@
 package com.yihu.ehr.util.encode;
 
-/**
- * @created Created by Air on 2015/6/2.
- */
 public class HexEncode {
     static public String toHexString(byte[] bytes) {
         StringBuilder stringBuffer = new StringBuilder();

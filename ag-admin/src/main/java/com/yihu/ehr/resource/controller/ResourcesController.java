@@ -9,8 +9,8 @@ import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.client.ResourcesCategoryClient;
 import com.yihu.ehr.resource.client.ResourcesClient;
 import com.yihu.ehr.resource.client.RsInterfaceClient;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -151,9 +151,9 @@ public class ResourcesController extends BaseController {
                     MRsCategory category = rsCategoryClient.getRsCategoryById(categoryId);
                     rsResourcesModel.setCategoryName(category==null?"":category.getName());
                 }
-                String rsInterfaceId = m.getRsInterface();
-                if (!StringUtils.isEmpty(rsInterfaceId)){
-                    MRsInterface rsInterface = rsInterfaceClient.getRsInterfaceById(rsInterfaceId);
+                String rsInterfaceCode = m.getRsInterface();
+                if (!StringUtils.isEmpty(rsInterfaceCode)){
+                    MRsInterface rsInterface = rsInterfaceClient.findByResourceInterface(rsInterfaceCode);
                     rsResourcesModel.setRsInterfaceName(rsInterface==null?"":rsInterface.getName());
                 }
                 rsResources.add(rsResourcesModel);
@@ -168,5 +168,34 @@ public class ResourcesController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
+    }
+    @ApiOperation("资源编码是否已存在")
+    @RequestMapping(value = "/resources/isExistCode/{code}" , method = RequestMethod.GET)
+    public Envelop isExistCode(
+            @ApiParam(name = "code", value = "code", defaultValue = "")
+            @PathVariable(value = "code") String code){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","code="+code,"",1,999);
+        List<MRsResources> mRsResources = responseEntity.getBody();
+        if(mRsResources.size() != 0){
+            envelop.setSuccessFlg(true);
+        }
+        return envelop;
+    }
+
+    @ApiOperation("资源名称是否已存在")
+    @RequestMapping(value = "/resources/isExistName",method = RequestMethod.GET)
+    public Object isExistName(
+            @ApiParam(name = "name", value = "name", defaultValue = "")
+            @RequestParam(value = "name") String name){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","name="+name,"",1,999);
+        List<MRsResources> mRsResources = responseEntity.getBody();
+        if(mRsResources.size() != 0){
+            envelop.setSuccessFlg(true);
+        }
+        return envelop;
     }
 }

@@ -1,13 +1,14 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.agModel.resource.RsCategoryModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.resource.client.ResourcesCategoryClient;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -96,11 +97,13 @@ public class ResourcesCategoryController extends BaseController {
             @PathVariable(value = "id") String id) throws Exception {
         Envelop envelop = new Envelop();
         try{
-            resourcesCategoryClient.deleteResourceCategory(id);
-            envelop.setSuccessFlg(true);
+            ObjectNode obj  = resourcesCategoryClient.deleteResourceCategory(id);
+            envelop.setSuccessFlg(obj.get("successFlg").asBoolean());
+            envelop.setErrorMsg(String.valueOf(obj.get("msg")));
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("删除失败！");
         }
         return envelop;
     }
@@ -176,7 +179,7 @@ public class ResourcesCategoryController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/types/parent", method = RequestMethod.GET)
+    @RequestMapping(value = "/resources/types/parent", method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
     public Envelop getCdaTypeExcludeSelfAndChildren(
             @ApiParam(name = "id", value = "id")
@@ -189,6 +192,35 @@ public class ResourcesCategoryController extends BaseController {
         }
         envelop.setDetailModelList(convertToRsCategoryModels(mcdaTypeList));
         return  envelop;
+    }
+
+    @RequestMapping(value = "/resources/categories/parent_ids", method = RequestMethod.GET)
+    @ApiOperation("获取该资源类别父级、及父级的父级id组成的字符串,返回前一页面树的定位")
+    public Envelop getCategoryParentIdsById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @RequestParam(value="id") String id) throws Exception{
+        Envelop envelop = new Envelop();
+        List<String> list = new ArrayList<>();
+        list = getPid(id,list);
+        String ids = "";
+        for(String s :list){
+            ids = s+","+ids;
+        }
+        if(!StringUtils.isEmpty(ids)){
+            ids = ids.substring(0,ids.length()-1);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(ids);
+        return envelop;
+    }
+
+    public List<String> getPid(String id,List<String> list){
+        if(!StringUtils.isEmpty(id)){
+            list.add(id);
+            MRsCategory m = resourcesCategoryClient.getRsCategoryById(id);
+            list =this.getPid(m == null?"":m.getPid(),list);
+        }
+        return list;
     }
 
     @RequestMapping(value = ServiceApi.Resources.NoPageCategories,method = RequestMethod.GET)
@@ -324,75 +356,5 @@ public class ResourcesCategoryController extends BaseController {
         return treeList;
     }
 
-    //-返回资源分类对象集合，普通的RsCategotyModel集合-------开始---------------------------------------
-    @RequestMapping(value = "/resources/categories/list", method = RequestMethod.GET)
-    @ApiOperation("获取资源类别,用于tree")
-    public Envelop getTreeData(
-            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters){
-        Envelop envelop = new Envelop();
-        List<MRsCategory> mRsCategories = resourcesCategoryClient.getAllCategories(filters);
-        Set<MRsCategory> set = new HashSet<>();
-        for(MRsCategory m:mRsCategories){
-            String pid = m.getPid();
-            String id = m.getId();
-            //获取父级资源分类
-            set.add(m);
-            if(!StringUtils.isEmpty(pid)){
-                set = getParentById(pid, set);
-            }
-            //获取子集资源分类
-            if (!StringUtils.isEmpty(id)){
-                set = getChildById(id,set);
-            }
-        }
-        if(set.size()==0){
-            return envelop;
-        }
-        List list=new ArrayList();
-        Iterator it=set.iterator();
-        while(it.hasNext()){
-            list.add(it.next());
-        }
-        List<RsCategoryModel> rsCategoryModels = (List<RsCategoryModel>)convertToModels(list,new ArrayList<>(),RsCategoryModel.class,null);
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(rsCategoryModels);
-        return envelop;
-    }
-
-    /**
-     * 获取父级、父级的父级。。。
-     */
-    public Set<MRsCategory> getParentById(String id,Set<MRsCategory> set){
-        if(!StringUtils.isEmpty(id)){
-            MRsCategory mRsCategory = resourcesCategoryClient.getRsCategoryById(id);
-            set.add(mRsCategory);
-            if(mRsCategory != null){
-                String childPid = mRsCategory.getPid();
-                this.getParentById(childPid,set);
-            }
-            return set;
-        }
-        return set;
-    }
-
-    /**
-     * 获取子集、子集的子集。。。。
-     */
-    public Set<MRsCategory> getChildById(String id,Set<MRsCategory> set){
-        if(!StringUtils.isEmpty(id)){
-            List<MRsCategory> mRsCategories = resourcesCategoryClient.getAllCategories("pid="+id);
-            if(mRsCategories==null&&mRsCategories.size()==0){
-                return set;
-            }
-            for(MRsCategory m:mRsCategories){
-                set.add(m);
-                this.getChildById(m.getId(),set);
-            }
-            return set;
-        }
-        return set;
-    }
-    //----------------------------------------------------结束-----------
 
 }

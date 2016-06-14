@@ -14,7 +14,7 @@ import com.yihu.ehr.pack.feign.UserClient;
 import com.yihu.ehr.pack.service.Package;
 import com.yihu.ehr.pack.service.PackageService;
 import com.yihu.ehr.pack.task.MessageBuffer;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
@@ -128,14 +128,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "md5", required = false) String md5,
             HttpServletRequest request) throws Exception {
 
-//        MKey key = securityClient.getOrgKey(orgCode);
-//        String privateKey = key.getPrivateKey();
-//        if (null == privateKey) {
-//            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
-//        }
-//
-//        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
-        String password = "123456";
+        MKey key = securityClient.getOrgKey(orgCode);
+        String privateKey = key.getPrivateKey();
+        if (null == privateKey) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
+        }
+
+        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
         Package aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));

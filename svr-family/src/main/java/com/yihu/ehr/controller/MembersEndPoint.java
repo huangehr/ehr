@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.family.MMembers;
 import com.yihu.ehr.service.Members;
 import com.yihu.ehr.service.MembersService;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
