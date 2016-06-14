@@ -1,0 +1,32 @@
+server:
+  port: 8761
+
+spring:
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    serviceUrl:
+      defaultZone: http://127.0.0.1:${server.port}/eureka/
+
+info:
+  app:
+    name: DiscoveryService
+    description: EHR platform global discovery service
+    version: 1.0.0
+
+---
+spring:
+  profiles: dev
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod

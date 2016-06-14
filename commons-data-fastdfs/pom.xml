@@ -1,0 +1,96 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.yihu.ehr</groupId>
+        <artifactId>ehr-lib-parent-pom</artifactId>
+        <version>1.1.0</version>
+        <relativePath>../ehr-lib-parent-pom/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>commons-data-fastdfs</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>happy.fish</groupId>
+            <artifactId>fastDFS</artifactId>
+            <version>1.1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/fastdfs_lib.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-util</artifactId>
+            <version>${version.ehr}</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <!--<repository>
+            <id>Releases</id>
+            <name>local private nexus</name>
+            <url>http://172.19.103.47:8081/nexus/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>snapshots</id>
+            <name>local private nexus</name>
+            <url>http://172.19.103.47:8081/nexus/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>-->
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <groupId>happy.fish</groupId>
+                    <artifactId>fastDFS</artifactId>
+                    <version>1.1.0</version>
+                    <packaging>jar</packaging>
+                    <file>${basedir}/lib/fastdfs_lib.jar</file>
+                    <generatePom>true</generatePom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-jar-lib</id>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

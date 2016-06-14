@@ -1,0 +1,22 @@
+server:
+  port: ${svr-patient.server.port}
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: PatientService
+    description: EHR platform json patient service.
+    version: 1.0.0
+
+---
+spring:
+  profiles: dev
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="${project.organization.name}">
+    <bannerRight>
+        <src>images/logos/platform-logo.png</src>
+    </bannerRight>
+    <body>
+        <menu name="API">
+            <item name="参考" href="api/reference/overview.html"/>
+            <item name="向导" href="api/guides/guides.html"/>
+            <item name="客户端" href="api/libraries/libraries.html"/>
+        </menu>
+        <menu name="开发者">
+            <item name="介绍" href="developers/introduction.html"/>
+        </menu>
+        <menu name="博客">
+            <item name="博客列表" ref="blogs/blogs.html"/>
+        </menu>
+        <menu name="技术支持">
+            <item name="技术支持" href="support/support.html"/>
+        </menu>
+
+        <footer><![CDATA[保留所有权利。]]></footer>
+    </body>
+    <skin>
+        <groupId>lt.velykis.maven.skins</groupId>
+        <artifactId>reflow-maven-skin</artifactId>
+        <version>1.1.1</version>
+    </skin>
+</project>

@@ -1,0 +1,23 @@
+server:
+  port: ${svr-geography.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: GeographyService
+    description: EHR platform json geography service.
+    version: 1.0.0
+
+---
+spring:
+  profiles: dev
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod
