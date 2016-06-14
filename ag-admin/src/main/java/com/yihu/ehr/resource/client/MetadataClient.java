@@ -30,7 +30,7 @@ public interface MetadataClient {
 
     @RequestMapping(value = ServiceApi.Resources.MetadataBatch, method = RequestMethod.POST)
     @ApiOperation("批量创建数据元")
-    Collection<MRsMetadata> createMetadataPatch(
+    boolean createMetadataPatch(
             @RequestParam(value = "metadatas") String metadatas);
 
     @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -66,4 +66,15 @@ public interface MetadataClient {
     @ApiOperation("根据过滤条件判断是否存在")
     boolean isExistence(
             @RequestParam(value="filters") String filters);
+
+
+    @RequestMapping(value = ServiceApi.Resources.MetadataStdCodeExistence,method = RequestMethod.GET)
+    @ApiOperation("获取已存在内部编码")
+    List stdCodeExistence(
+            @RequestParam(value="std_codes") String stdCodes);
+
+    @RequestMapping(value = ServiceApi.Resources.MetadataIdExistence,method = RequestMethod.GET)
+    @ApiOperation("获取已存在资源标准编码")
+    List idExistence(
+            @RequestParam(value="ids") String ids);
 }

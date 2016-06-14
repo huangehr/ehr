@@ -6,7 +6,7 @@
         <groupId>com.yihu.ehr</groupId>
         <artifactId>ehr-ms-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../ehr-ms-parent-pom</relativePath>
+        <relativePath>../ehr-ms-parent-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>ag-ehr-admin</artifactId>

@@ -76,8 +76,8 @@ public class Icd10HpRelationCacheService {
      * @return
      */
     public HealthProblemDict healthProblemDict(String icd10Id) {
-        Icd10Dict icd10Dict = icd10DictRepository.findOne(Long.parseLong(icd10Id));
-        String codeAndName = redisClient.get(keySchema.icd10HpRelation(icd10Dict.getCode()));
+        //Icd10Dict icd10Dict = icd10DictRepository.findOne(Long.parseLong(icd10Id));
+        String codeAndName = redisClient.get(keySchema.icd10HpRelation(icd10Id));
         HealthProblemDict healthProblemDict = new HealthProblemDict();
         healthProblemDict.setCode(codeAndName.split("__")[0]);
         healthProblemDict.setName(codeAndName.split("__")[1]);

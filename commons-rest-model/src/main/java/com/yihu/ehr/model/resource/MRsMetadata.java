@@ -7,7 +7,6 @@ public class MRsMetadata {
     private String id;
     private String domain;
     private String name;
-    private String code;
     private String stdCode;
     private String displayCode;
     private String columnType;
@@ -35,13 +34,6 @@ public class MRsMetadata {
     }
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getStdCode() {
