@@ -1,16 +1,12 @@
 package com.yihu.ehr.esb.controller;
 
 import com.yihu.ehr.agModel.esb.HostReleaseModel;
-import com.yihu.ehr.agModel.standard.dict.DictModel;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosReleaseClient;
 import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
-import com.yihu.ehr.model.esb.MHosLog;
-import com.yihu.ehr.model.standard.MStdDict;
-import com.yihu.ehr.util.DateTimeUtils;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +53,7 @@ public class HosReleaseController extends BaseController {
             HostReleaseModel  hostReleaseModel = new HostReleaseModel();
             BeanUtils.copyProperties(mHosEsbMiniRelease,hostReleaseModel);
             if(mHosEsbMiniRelease.getReleaseTime()!=null) {
-                hostReleaseModel.setReleaseDate(DateTimeUtils.simpleDateTimeFormat(mHosEsbMiniRelease.getReleaseTime()));
+                hostReleaseModel.setReleaseDate(DateTimeUtil.simpleDateTimeFormat(mHosEsbMiniRelease.getReleaseTime()));
             }
             hostReleaseModels.add(hostReleaseModel);
         }

@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.standard.cdatype.service.CDAType;
 import com.yihu.ehr.standard.cdatype.service.CDATypeManager;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

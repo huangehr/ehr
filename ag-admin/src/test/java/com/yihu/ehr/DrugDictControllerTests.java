@@ -5,7 +5,7 @@ import com.yihu.ehr.agModel.specialdict.DrugDictModel;
 import com.yihu.ehr.agModel.specialdict.Icd10DictModel;
 import com.yihu.ehr.specialdict.controller.DrugDictController;
 import com.yihu.ehr.specialdict.controller.Icd10DictController;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;

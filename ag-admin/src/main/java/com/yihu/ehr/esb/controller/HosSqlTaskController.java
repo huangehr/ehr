@@ -4,9 +4,9 @@ import com.yihu.ehr.agModel.esb.HosSqlTaskModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosSqlTaskClient;
 import com.yihu.ehr.model.esb.MHosSqlTask;
-import com.yihu.ehr.util.DateTimeUtils;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -51,7 +51,7 @@ public class HosSqlTaskController extends BaseController {
             HosSqlTaskModel hosSqlTaskModel = null;
             try {
                 hosSqlTaskModel = convertToModelDetail(mHosSqlTask,HosSqlTaskModel.class);
-                hosSqlTaskModel.setCreateTime(DateTimeUtils.simpleDateTimeFormat(mHosSqlTask.getCreateTime()));
+                hosSqlTaskModel.setCreateTime(DateTimeUtil.simpleDateTimeFormat(mHosSqlTask.getCreateTime()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -70,7 +70,7 @@ public class HosSqlTaskController extends BaseController {
         MHosSqlTask mHosSqlTask = hosSqlTaskClient.getHosSqlTask(id);
         try{
             HosSqlTaskModel hosSqlTaskModel = convertToModelDetail(mHosSqlTask,HosSqlTaskModel.class);
-            hosSqlTaskModel.setCreateTime(DateTimeUtils.simpleDateTimeFormat(mHosSqlTask.getCreateTime()));
+            hosSqlTaskModel.setCreateTime(DateTimeUtil.simpleDateTimeFormat(mHosSqlTask.getCreateTime()));
             envelop.setObj(hosSqlTaskModel);
             envelop.setSuccessFlg(true);
         }catch (Exception e){

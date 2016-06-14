@@ -2,7 +2,7 @@ package com.yihu.ehr.std.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.util.RestEcho;
+import com.yihu.ehr.util.rest.RestEcho;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;

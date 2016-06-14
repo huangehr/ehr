@@ -12,8 +12,8 @@ import com.yihu.ehr.user.feign.ConventionalDictClient;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.User;
 import com.yihu.ehr.user.service.UserManager;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.util.encode.*;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -89,9 +89,9 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         if (!StringUtils.isEmpty(user.getPassword())){
-            user.setPassword(HashUtil.hashStr(user.getPassword()));
+            user.setPassword(HashUtil.hash(user.getPassword()));
         }else {
-            user.setPassword(HashUtil.hashStr(default_password));
+            user.setPassword(HashUtil.hash(default_password));
         }
         String userType = user.getUserType();
         MConventionalDict dict = conventionalDictClient.getUserType(userType);
@@ -173,7 +173,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
             @RequestParam(value = "password") String password) throws Exception {
-        String hashPassWord = HashUtil.hashStr(password);
+        String hashPassWord = HashUtil.hash(password);
         userManager.changePassWord(userId,hashPassWord);
         return true;
     }

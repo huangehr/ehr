@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.ResourcesService;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

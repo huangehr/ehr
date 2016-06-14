@@ -8,7 +8,7 @@ import com.yihu.ehr.resource.model.RsSystemDictionary;
 import com.yihu.ehr.resource.model.RsSystemDictionaryEntry;
 import com.yihu.ehr.resource.service.RsSystemDictionaryEntryService;
 import com.yihu.ehr.resource.service.RsSystemDictionaryService;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

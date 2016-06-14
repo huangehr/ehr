@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.version.service;
 
-import com.yihu.ehr.util.ObjectVersion;
+import com.yihu.ehr.util.id.ObjectVersion;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.util.StringUtils;
 

@@ -15,7 +15,7 @@ import com.yihu.ehr.std.service.DictClient;
 import com.yihu.ehr.model.adaption.*;
 import com.yihu.ehr.model.standard.MStdDict;
 import com.yihu.ehr.model.standard.MStdDictEntry;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

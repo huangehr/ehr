@@ -7,7 +7,7 @@ import com.yihu.ehr.security.feign.AppClient;
 import com.yihu.ehr.security.feign.UserClient;
 import com.yihu.ehr.security.service.KeyManager;
 import com.yihu.ehr.security.service.TokenManager;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

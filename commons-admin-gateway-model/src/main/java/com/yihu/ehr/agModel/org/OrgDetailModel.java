@@ -210,7 +210,7 @@ public class OrgDetailModel{
 
     public List<String> getTags() {
         List<String> list = new ArrayList<>();
-        if(org.springframework.util.StringUtils.isEmpty(tags)){
+        if(StringUtils.isEmpty(tags)){
         }else {
             String[] arr = tags.split(";|；");
             list = Arrays.asList(arr);

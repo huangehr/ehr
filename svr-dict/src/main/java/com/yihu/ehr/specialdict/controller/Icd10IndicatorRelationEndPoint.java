@@ -6,7 +6,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.specialdict.MIcd10IndicatorRelation;
 import com.yihu.ehr.specialdict.model.Icd10IndicatorRelation;
 import com.yihu.ehr.specialdict.service.Icd10IndicatorRelationService;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

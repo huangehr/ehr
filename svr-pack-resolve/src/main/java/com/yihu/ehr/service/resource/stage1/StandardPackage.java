@@ -13,7 +13,7 @@ import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
 import com.yihu.ehr.profile.util.ProfileId;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.util.ResourceStorageUtil;
-import com.yihu.ehr.util.DateTimeUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
@@ -214,8 +214,8 @@ public class StandardPackage {
         root.put("eventNo", this.getEventNo());
         root.put("cdaVersion", this.getCdaVersion());
         root.put("clientId", this.getClientId());
-        root.put("eventTime", DateTimeUtils.utcDateTimeFormat(this.getEventDate()));
-        root.put("createTime", DateTimeUtils.utcDateTimeFormat(this.getCreateDate()));
+        root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventDate()));
+        root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
         root.put("eventType", this.getEventType().toString());
         root.put("profileType", this.getProfileType().toString());
 

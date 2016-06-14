@@ -2,12 +2,11 @@ package com.yihu.ehr.esb.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosLogClient;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.esb.MHosLog;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.organization.service.OrganizationClient;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -16,9 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.regex.Matcher;

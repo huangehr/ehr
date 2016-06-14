@@ -8,7 +8,7 @@ import com.yihu.ehr.specialdict.model.HealthProblemDict;
 import com.yihu.ehr.specialdict.model.Icd10HpRelation;
 import com.yihu.ehr.specialdict.service.HealthProblemDictService;
 import com.yihu.ehr.specialdict.service.Icd10HpRelationService;
-import com.yihu.ehr.util.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

@@ -4,15 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>commons-dependencies</artifactId>
         <groupId>com.yihu.ehr</groupId>
+        <artifactId>ehr-lib-parent-pom</artifactId>
         <version>1.1.0</version>
-        <relativePath>../commons-dependencies/pom.xml</relativePath>
+        <relativePath>../ehr-lib-parent-pom/pom.xml</relativePath>
     </parent>
 
     <artifactId>commons-profile-persist</artifactId>
     <packaging>jar</packaging>
-    <description>EHR profile persist component</description>
 
     <properties>
     </properties>
@@ -21,7 +20,8 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-hbase</artifactId>
-            <version>1.1.0</version>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-lang</artifactId>
@@ -32,17 +32,20 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-profile-core</artifactId>
-            <version>1.1.0</version>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-solr</artifactId>
-            <version>1.1.0</version>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-redis-keyschema</artifactId>
-            <version>1.1.0</version>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
     </dependencies>
 </project>

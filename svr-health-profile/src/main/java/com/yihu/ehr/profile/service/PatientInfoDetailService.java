@@ -11,11 +11,17 @@ import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.model.standard.MCdaDataSet;
+<<<<<<< HEAD
 import com.yihu.ehr.profile.family.FileFamily;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.util.Envelop;
+=======
+import com.yihu.ehr.profile.feign.XCDADocumentClient;
+import com.yihu.ehr.profile.feign.XResourceClient;
+import com.yihu.ehr.util.rest.Envelop;
+>>>>>>> 107ca958bdcb6b3235b387397c742365c79b8d65
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

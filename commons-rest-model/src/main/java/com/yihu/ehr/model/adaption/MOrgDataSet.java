@@ -1,8 +1,5 @@
 package com.yihu.ehr.model.adaption;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
 import java.util.Date;
 
 /**

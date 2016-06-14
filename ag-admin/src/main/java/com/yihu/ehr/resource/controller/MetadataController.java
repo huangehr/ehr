@@ -9,8 +9,8 @@ import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.resource.client.MetadataClient;
 import com.yihu.ehr.resource.client.RsDictionaryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
-import com.yihu.ehr.util.Envelop;
-import com.yihu.ehr.util.controller.BaseController;
+import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.beans.Encoder;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;

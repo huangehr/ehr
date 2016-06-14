@@ -2,9 +2,7 @@ package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.specialdict.MHealthProblemDict;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
