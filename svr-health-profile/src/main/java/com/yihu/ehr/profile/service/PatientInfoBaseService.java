@@ -279,7 +279,7 @@ public class PatientInfoBaseService {
         }
 
         //获取门诊住院记录
-        Envelop resultMain = resource.getResources(BasisConstant.patientEvent, appId, q);
+        Envelop resultMain = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\""+q+"\"}");
         StringBuilder rowkeys = new StringBuilder();
 
         if (resultMain.getDetailModelList() != null && resultMain.getDetailModelList().size() > 0) {
@@ -344,7 +344,12 @@ public class PatientInfoBaseService {
             }
         }
 
-        queryParams = "{\"q\":\"(" + rowkeys.toString() + ") AND " + join + "\"}";
+
+        queryParams = "{\"q\":\"" + rowkeys.toString() + "\"}";
+        if(join.length()>0)
+        {
+            queryParams = "{\"q\":\"(" + rowkeys.toString() + ") AND " + join + "\"}";
+        }
 
         //获取相关门诊住院记录
         Envelop result = resource.getResources(BasisConstant.patientEvent, appId, queryParams);
