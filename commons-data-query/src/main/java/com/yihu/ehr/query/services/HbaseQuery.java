@@ -368,8 +368,7 @@ public class HbaseQuery {
 		long count = 0;
 		List<Map<String,Object>> data = new ArrayList<>();
 
-		if(rows < 0) rows = 10;
-		if(rows >100) rows = 100;
+		if(rows < 0) rows = 50;
 		if(page <0) page = 1;
 		long start= (page-1) * rows;
 
