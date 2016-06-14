@@ -4,9 +4,14 @@ package com.yihu.ehr.profile.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.data.hbase.HBaseDao;
+import com.yihu.ehr.data.hbase.ResultUtil;
+import com.yihu.ehr.data.hbase.TableBundle;
+import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.model.standard.MCdaDataSet;
+import com.yihu.ehr.profile.family.FileFamily;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.profile.feign.XTransformClient;
@@ -45,8 +50,13 @@ public class PatientInfoDetailService {
     @Autowired
     XTransformClient transform;
 
+    @Autowired
+    HBaseDao hBaseDao;
+
 
     String appId = "svr-health-profile";
+
+    public static final String Table = "RawFiles";
 
 
     //根据ProfileId或者EventNo查询CDA分类
@@ -344,46 +354,38 @@ public class PatientInfoDetailService {
     }
 
 
-    public JsonNode getDocument(String profileId,String version) throws Exception {
+    public JsonNode getDocument(String profileId,String version) throws Throwable {
 
         //主表记录
         Envelop profile = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}");
 
         LinkedHashMap<String, String> profileMap = (LinkedHashMap<String, String>) profile.getDetailModelList().get(0);
-//        Map<String,Object> map = transform.stdTransform(objectMapper.writeValueAsString(profileMap), version);
-//        String profileStr = objectMapper.writeValueAsString(map);
-        String profileStr = "\n" +
-                "  \"JDSC02_14_10\": \"44\",\n" +
-                "  \"HDSD00_15_001\": \"44\",\n" +
-                "  \"cda_version\": \"56395d75b854\",\n" +
-                "  \"client_id\": \"kHAbVppx44\",\n" +
-                "  \"HDSD00_01_575\": \"2016-04-01 15:48:55\",\n" +
-                "  \"event_type\": \"1\",\n" +
-                "  \"JDSC02_09_07\": \"A03.04\",\n" +
-                "  \"HDSD00_01_185\": \"2016-04-06 14:18:48\",\n" +
-                "  \"demographic_id\": \"422724195107296713\",\n" +
-                "  \"event_no\": \"ZY010000816319\",\n" +
-                "  \"patient_id\": \"0000786438\",\n" +
-                "  \"HDSD00_01_283\": \"心血管内科专业\",\n" +
-                "  \"HDSD00_16_053\": \"李品睿\",\n" +
-                "  \"HDSD00_16_031\": \"2016-04-01 15:48:55\",\n" +
-                "  \"event_date\": \"2016-04-01T15:48:55Z\",\n" +
-                "  \"HDSD00_01_539\": \"心血管内科专业\",\n" +
-                "  \"JDSC02_09_04\": \"A03.04\",\n" +
-                "  \"rowkey\": \"42017976-4_0000786438_ZY010000816319_1459496935000\",\n" +
-                "  \"HDSD00_16_004\": \"好转\",\n" +
-                "  \"org_code\": \"42017976-4\"\n" +
-                "";
+        String profileStr = objectMapper.writeValueAsString(profileMap);
+
+
+        String profileType = profileMap.get("profile_type");
+        if("1".equals(profileType)){
+            //结构化档案
+        }else if("2".equals(profileType)){
+            //非结构化档案
+        }
+
+        MStdTransformDto stdTransformDto = new MStdTransformDto();
+        stdTransformDto.setVersion(version);
+        stdTransformDto.setSource(profileStr);
+        Map<String,Object> map = transform.stdTransform(objectMapper.writeValueAsString(stdTransformDto));
+        profileStr = objectMapper.writeValueAsString(map).replace("{","").replace("}","");
+
 
         //从表记录
         Envelop dataSet = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}", null, null);
 
         List<LinkedHashMap<String, String>> dataSetList = (List<LinkedHashMap<String, String>>) dataSet.getDetailModelList();
+        String dataSetStr = objectMapper.writeValueAsString(dataSetList);
 
-        Map<String,Object> map1 = transform.stdTransform(objectMapper.writeValueAsString(dataSetList), version);
-        String dataSetStr = objectMapper.writeValueAsString(map1);
-
-
+        stdTransformDto.setSource(dataSetStr);
+        List<Map<String,Object>> list = transform.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
+        dataSetStr = objectMapper.writeValueAsString(list);
         JsonNode dataSetNode = objectMapper.readTree(dataSetStr);
 
         List<String> rowKeyList = new ArrayList<>();
@@ -398,22 +400,44 @@ public class PatientInfoDetailService {
         String dataSetJsonStr = "";
         for (int i = 0; i < rowKeyList.size(); i++) {
             String key = rowKeyList.get(i);
+            String json = "\"" + rowKeyList.get(i) +"\":[";
+            boolean flag=true;
             for (int j = 0; j < dataSetNode.size(); j++) {
                 ObjectNode dsNode = (ObjectNode) dataSetNode.get(j);
                 String[] rowKeyArray = dsNode.get("rowkey").asText().split("\\$");
                 if (key.equals(rowKeyArray[1])) {
-                    String json = "\"" + rowKeyList.get(i) + "$"+rowKeyArray[2]+"\":" + objectMapper.writeValueAsString(dsNode);
-                    if ("".equals(dataSetJsonStr)) {
-                        dataSetJsonStr += json;
+                    if (flag) {
+                        json += objectMapper.writeValueAsString(dsNode);
                     } else {
-                        dataSetJsonStr += "," + json;
+                        json += "," + objectMapper.writeValueAsString(dsNode);
                     }
+                    flag = false;
                 }
             }
+            json+="]";
+            if("".equals(dataSetJsonStr)){
+                dataSetJsonStr +=json;
+            }else {
+                dataSetJsonStr +=","+json;
+            }
+
         }
 
         dataSetJsonStr = "\"dataSets\":{" + dataSetJsonStr + "}";
         JsonNode tree = objectMapper.readTree("{" + profileStr + "," + dataSetJsonStr + "}");
+
+        //文件记录
+        String[] rowKeys = hBaseDao.findRowKeys(Table, "^" + profileId);
+        TableBundle bundle = new TableBundle();
+        bundle.addRows(rowKeys);
+        Object  results[] = hBaseDao.get("RawFiles", bundle);
+        for(Object result : results){
+            ResultUtil util= new ResultUtil(result);
+            String cda_document_id = util.getCellValue("d", "cda_document_id", "");
+            String file_list = util.getCellValue("d", "file_list", "");
+        }
+
+
         return tree;
     }
 

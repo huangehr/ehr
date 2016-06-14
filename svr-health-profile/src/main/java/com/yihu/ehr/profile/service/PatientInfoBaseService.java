@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
