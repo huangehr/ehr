@@ -54,8 +54,15 @@ public class SolrQuery {
 				}
 				break;
 			}
+			case Operation.NOTRANGE: {
+				if(keywords==null||keywords.length>=2)
+				{
+					s ="NOT "+ field + ":[" + keywords[0] + " TO " + keywords[1] + "]";
+				}
+				break;
+			}
 			case Operation.NE: {
-				s = field+":(NOT "+keyword+")";
+				s ="NOT(" +field+":"+keyword+")";
 				break;
 			}
 			case Operation.IN:
@@ -75,11 +82,58 @@ public class SolrQuery {
 						}
 					}
 				}
-				s = "("+in+")";
+				else if(keyword!=null) {
+					in = field+":"+keyword;
+				}
+				s = "( "+in+" )";
+				break;
+			}
+			case Operation.NIN:
+			{
+				String in = "";
+				if(keywords!=null && keywords.length>0)
+				{
+					for (Object key : keywords)
+					{
+						if(in!=null&&in.length()>0)
+						{
+							in+=" OR " +field+":"+key;
+						}
+						else
+						{
+							in = field+":"+key;
+						}
+					}
+				}
+				s = "NOT ("+in+")";
+				break;
+			}
+			case Operation.GT:
+			{
+				s = field+":{"+keyword+" TO *}";
+				break;
+			}
+			case Operation.GTE:
+			{
+				s = field+":["+keyword+" TO * ]";
+				break;
+			}
+			case Operation.LT:
+			{
+				s = field+":"+"{* TO "+keyword+" }";
+				break;
+			}
+			case Operation.LTE:
+			{
+				s = field+":"+"[* TO "+keyword+" ]";
+				break;
+			}
+			case Operation.EQ: {
+				s = field + ":" + keyword;
 				break;
 			}
 			default:
-				s = field+":"+keyword;
+				s="unknown operation";
 		}
 
 		return s;
