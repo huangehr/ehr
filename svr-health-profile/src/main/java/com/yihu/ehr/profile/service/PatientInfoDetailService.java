@@ -244,10 +244,42 @@ public class PatientInfoDetailService {
             }
         }
 
-        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
-        if (q.length() > 0) {
-            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //获取门诊住院记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
+            StringBuilder rowkeys = new StringBuilder();
+
+            for (Map<String, Object> event : eventList) {
+                if (rowkeys.length() > 0) {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append("profile_id:" + event.get("rowkey"));
+            }
+
+            if(rowkeys.length() > 0)
+            {
+                if (q.length() > 0) {
+                    q += " AND (" + rowkeys.toString() + ")";
+                } else {
+                    q = "(" + rowkeys.toString() + ")";
+                }
+            }
         }
+        else
+        {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("找不到此人相关记录");
+
+            return envelop;
+        }
+
+        String queryParams =  "{\"q\":\"" + q + "\"}";//"{\"join\":\"demographic_id:" + demographicId + "\"}";
+        //        if (q.length() > 0) {
+        //            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //        }
         return resource.getResources(resourceCode, appId, queryParams, page, size);
     }
 
@@ -301,11 +333,42 @@ public class PatientInfoDetailService {
             }
         }
 
+        //获取门诊住院记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
 
-        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
-        if (q.length() > 0) {
-            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
+            StringBuilder rowkeys = new StringBuilder();
+
+            for (Map<String, Object> event : eventList) {
+                if (rowkeys.length() > 0) {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append("profile_id:" + event.get("rowkey"));
+            }
+
+            if(rowkeys.length() > 0)
+            {
+                if (q.length() > 0) {
+                    q += " AND (" + rowkeys.toString() + ")";
+                } else {
+                    q = "(" + rowkeys.toString() + ")";
+                }
+            }
         }
+        else
+        {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("找不到此人相关记录");
+
+            return envelop;
+        }
+
+        String queryParams = "{\"q\":\"" + q + "\"}";//"{\"join\":\"demographic_id:" + demographicId + "\"}";
+        //        if (q.length() > 0) {
+        //            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //        }
         return resource.getResources(BasisConstant.laboratoryReport, appId, queryParams, page, size);
     }
 
@@ -325,10 +388,43 @@ public class PatientInfoDetailService {
             }
         }
 
-        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
-        if (q.length() > 0) {
-            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //获取门诊住院记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
+            StringBuilder rowkeys = new StringBuilder();
+
+            for (Map<String, Object> event : eventList) {
+                if (rowkeys.length() > 0) {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append("profile_id:" + event.get("rowkey"));
+            }
+
+            if(rowkeys.length() > 0)
+            {
+                if (q.length() > 0) {
+                    q += " AND (" + rowkeys.toString() + ")";
+                } else {
+                    q = "(" + rowkeys.toString() + ")";
+                }
+            }
         }
+        else
+        {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("找不到此人相关记录");
+
+            return envelop;
+        }
+
+        String queryParams = "{\"q\":\"" + q + "\"}";
+        //        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
+        //        if (q.length() > 0) {
+        //            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //        }
         return resource.getResources(BasisConstant.outpatientCost, appId, queryParams, page, size);
     }
 
@@ -348,10 +444,44 @@ public class PatientInfoDetailService {
             }
         }
 
-        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
-        if (q.length() > 0) {
-            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //获取门诊住院记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
+            StringBuilder rowkeys = new StringBuilder();
+
+            for (Map<String, Object> event : eventList) {
+                if (rowkeys.length() > 0) {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append("profile_id:" + event.get("rowkey"));
+            }
+
+            if(rowkeys.length() > 0)
+            {
+                if (q.length() > 0) {
+                    q += " AND (" + rowkeys.toString() + ")";
+                } else {
+                    q = "(" + rowkeys.toString() + ")";
+                }
+            }
         }
+        else
+        {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("找不到此人相关记录");
+
+            return envelop;
+        }
+
+        String queryParams = "{\"q\":\"" + q + "\"}";
+
+//        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
+//        if (q.length() > 0) {
+//            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+//        }
         return resource.getResources(BasisConstant.hospitalizedCost, appId, queryParams, page, size);
     }
 
@@ -442,6 +572,4 @@ public class PatientInfoDetailService {
 
         return tree;
     }
-
-
 }

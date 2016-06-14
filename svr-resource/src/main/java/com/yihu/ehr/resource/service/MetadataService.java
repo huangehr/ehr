@@ -4,6 +4,7 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.dao.intf.RsMetadataDao;
 import com.yihu.ehr.resource.model.RsMetadata;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -97,5 +98,57 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
         return metadataDao.findAll(pageable);
     }
 
+    /**
+     * 批量创建数据元
+     */
+    public List<RsMetadata> addMetaBatch(List<RsMetadata> metaLs)
+    {
+        StringBuilder sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, valid) VALUES ") ;
+        RsMetadata rsMetadata ;
+        SQLQuery query;
+        int total = 0;
+        for(int i=0; i<metaLs.size(); i++){
+            rsMetadata = metaLs.get(i);
+            sql.append("('"+ rsMetadata .getId() +"'");
+            sql.append(",'"+ rsMetadata .getDomain() +"'");
+            sql.append(",'"+ rsMetadata .getName() +"'");
+            sql.append(",'"+ rsMetadata .getStdCode() +"'");
+            sql.append(",'"+ rsMetadata .getDictCode() +"'");
+            sql.append(",'"+ rsMetadata .getColumnType() +"'");
+            sql.append(",'"+ rsMetadata .getNullAble() +"'");
+            sql.append(",'"+ rsMetadata .getDescription() +"'");
+            sql.append(",'1')");
 
+            if(i%100==0 || i+1 == metaLs.size()){
+                query = currentSession().createSQLQuery(sql.toString());
+                total += query.executeUpdate();
+                sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, valid) VALUES ") ;
+            }else
+                sql.append(",");
+
+        }
+        return metaLs;
+    }
+
+    /**
+     * 查询内部编码是否已存在， 返回已存在内部编码
+     */
+    public List stdCodeExist(String stdCodes)
+    {
+        String sql = "SELECT std_code FROM rs_metadata WHERE std_code in(:stdCodes) AND valid<>0";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("stdCodes", stdCodes.split(","));
+        return sqlQuery.list();
+    }
+
+    /**
+     * 查询资源标准编码是否已存在， 返回已存在资源标准编码
+     */
+    public List idExist(String ids)
+    {
+        String sql = "SELECT id FROM rs_metadata WHERE id in(:ids)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("ids", ids.split(","));
+        return sqlQuery.list();
+    }
 }
