@@ -7,8 +7,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.service.oauth2.EhrClientDetailsService;
 import com.yihu.ehr.service.oauth2.EhrTokenStoreService;
 import com.yihu.ehr.service.oauth2.EhrUserDetailsService;
-import com.yihu.ehr.util.encode.HashUtil;
-import com.yihu.ehr.util.token.TokenUtil;
+import com.yihu.ehr.util.hash.HashUtil;
+import com.yihu.ehr.util.oauth2.TokenUtil;
 import com.yihu.ehr.utils.BasicAuthorizationExtractor;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -167,7 +167,7 @@ public class AuthorizationsEndPoint {
         if (!basic.getKey().equals(userName)) throw new InvalidParameterException("Basic authorization user name MUST be same with url path.");
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-        if (userDetails == null || !HashUtil.hashStr(basic.getValue()).equals(userDetails.getPassword())) {
+        if (userDetails == null || !HashUtil.hash(basic.getValue()).equals(userDetails.getPassword())) {
             throw new InvalidParameterException("User name or password incorrect.");
         }
 
@@ -232,7 +232,7 @@ public class AuthorizationsEndPoint {
         tokenModel.setCreatedAt(new Date());
         tokenModel.setUpdatedAt(new Date());
         tokenModel.setFingerprint(fingerprint);
-        tokenModel.setTokenHash(HashUtil.hashStr(token));
+        tokenModel.setTokenHash(HashUtil.hash(token));
 
         return tokenModel;
     }

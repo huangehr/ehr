@@ -1,8 +1,7 @@
 package com.yihu.ehr.user.service;
 
-import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.util.encode.HashUtil;
+import com.yihu.ehr.util.hash.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +86,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     }
 
     public String hashPassword(String pwd) {
-        return HashUtil.hashStr(pwd);
+        return HashUtil.hash(pwd);
     }
 
     public boolean isPasswordRight(User user,String pwd) {

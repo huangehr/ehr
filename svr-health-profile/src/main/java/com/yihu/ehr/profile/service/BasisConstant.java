@@ -1,18 +1,6 @@
 package com.yihu.ehr.profile.service;
 
 
-import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.profile.feign.XOrganizationClient;
-import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.util.Envelop;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * 档案基础常量
  * @author hzp 2016-05-26

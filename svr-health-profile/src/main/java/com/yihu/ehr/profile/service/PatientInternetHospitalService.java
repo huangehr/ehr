@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

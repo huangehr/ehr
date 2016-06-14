@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.util.DateTimeUtils;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -215,7 +215,7 @@ public class BaseController extends AbstractController {
      */
     public Date StringToDate(String dateTime, String formatRule) {
         try {
-            return dateTime == null ? null : DateTimeUtils.utcDateTimeParse(dateTime);
+            return dateTime == null ? null : DateTimeUtil.utcDateTimeParse(dateTime);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -231,7 +231,7 @@ public class BaseController extends AbstractController {
      */
     public String DateToString(Date dateTime, String formatRule) {
         try {
-            return dateTime == null ? null : DateTimeUtils.utcDateTimeFormat(dateTime);
+            return dateTime == null ? null : DateTimeUtil.utcDateTimeFormat(dateTime);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -7,7 +7,7 @@ import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.util.datetime;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,7 +11,7 @@ import java.util.Date;
  * @version 1.0
  * @created 2015.08.26 8:49
  */
-public class DateTimeUtils {
+public class DateTimeUtil {
     public static final String simpleDateTimePattern = "yyyy-MM-dd HH:mm:ss";
     public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final String slashDateTimePattern = "yyyy/MM/dd HH:mm:ss";

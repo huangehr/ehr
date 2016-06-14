@@ -5,7 +5,7 @@ import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.agModel.dict.SystemDictModel;
 import com.yihu.ehr.systemdict.controller.ConventionalDictEntryController;
 import com.yihu.ehr.systemdict.controller.SystemDictController;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,12 +1,11 @@
 package com.yihu.ehr.esb.controller;
 
 import com.yihu.ehr.agModel.esb.HostReleaseModel;
-import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.esb.client.HosReleaseClient;
 import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
-import com.yihu.ehr.util.DateTimeUtils;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,7 +53,7 @@ public class HosReleaseController extends BaseController {
             HostReleaseModel  hostReleaseModel = new HostReleaseModel();
             BeanUtils.copyProperties(mHosEsbMiniRelease,hostReleaseModel);
             if(mHosEsbMiniRelease.getReleaseTime()!=null) {
-                hostReleaseModel.setReleaseDate(DateTimeUtils.simpleDateTimeFormat(mHosEsbMiniRelease.getReleaseTime()));
+                hostReleaseModel.setReleaseDate(DateTimeUtil.simpleDateTimeFormat(mHosEsbMiniRelease.getReleaseTime()));
             }
             hostReleaseModels.add(hostReleaseModel);
         }

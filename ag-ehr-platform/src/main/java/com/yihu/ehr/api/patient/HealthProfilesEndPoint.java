@@ -37,8 +37,8 @@ public class HealthProfilesEndPoint {
         return profileClient.getProfiles(demographicId,
                 organizations,
                 eventType,
-                DateTimeUtils.simpleDateFormat(since),
-                DateTimeUtils.simpleDateFormat(to),
+                DateTimeUtil.simpleDateFormat(since),
+                DateTimeUtil.simpleDateFormat(to),
                 loadStdDataSet,
                 loadOriginDataSet);
     }

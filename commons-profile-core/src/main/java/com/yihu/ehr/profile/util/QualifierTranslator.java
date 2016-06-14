@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.util;
 
-import com.yihu.ehr.util.StringBuilderUtil;
+import com.yihu.ehr.util.string.StringBuilderEx;
 
 /**
  * 标准化对象标识翻译工具。将数据集、数据元的名称进行适应性翻译。
@@ -20,7 +20,7 @@ public class QualifierTranslator {
      * @return
      */
     public static String hBaseQualifier(String metaData, String type){
-        return new StringBuilderUtil("%1_%2").arg(metaData).arg(type.substring(0, 1).toUpperCase()).toString();
+        return new StringBuilderEx("%1_%2").arg(metaData).arg(type.substring(0, 1).toUpperCase()).toString();
     }
 
     public static String[] splitMetaData(String innerCode){

@@ -9,7 +9,7 @@ import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgDataSetModel;
 import com.yihu.ehr.agModel.thirdpartystandard.OrgMetaDataDetailModel;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;

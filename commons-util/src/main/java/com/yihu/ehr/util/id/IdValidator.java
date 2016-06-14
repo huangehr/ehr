@@ -1,4 +1,4 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.util.id;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;

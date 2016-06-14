@@ -1,38 +1,38 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.util.string;
 
 /**
  * @author Sand
  * @version 1.0
  * @created 2015.09.10 13:37
  */
-public class StringBuilderUtil {
+public class StringBuilderEx {
     StringBuilder builder;
     int argIndex = 1;
 
-    public StringBuilderUtil(String string){
+    public StringBuilderEx(String string){
         this.builder = new StringBuilder(string);
     }
 
-    public StringBuilderUtil replace(String src, String dest){
+    public StringBuilderEx replace(String src, String dest){
         int index = builder.indexOf(src);
         builder.replace(index, index + src.length(), dest);
 
         return this;
     }
 
-    public StringBuilderUtil arg(String value){
+    public StringBuilderEx arg(String value){
         replace("%" + argIndex++, value);
 
         return this;
     }
 
-    public StringBuilderUtil arg(int value){
+    public StringBuilderEx arg(int value){
         replace("%" + argIndex++, Integer.toString(value));
 
         return this;
     }
 
-    public StringBuilderUtil arg(long value){
+    public StringBuilderEx arg(long value){
         replace("%" + argIndex++, Long.toString(value));
 
         return this;

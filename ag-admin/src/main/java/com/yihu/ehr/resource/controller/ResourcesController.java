@@ -9,7 +9,7 @@ import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.client.ResourcesCategoryClient;
 import com.yihu.ehr.resource.client.ResourcesClient;
 import com.yihu.ehr.resource.client.RsInterfaceClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.util.url;
 
 import org.apache.commons.lang3.StringUtils;
 

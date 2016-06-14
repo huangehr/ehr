@@ -1,7 +1,7 @@
 package com.yihu.ehr.adapter.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.util.validate.*;
 

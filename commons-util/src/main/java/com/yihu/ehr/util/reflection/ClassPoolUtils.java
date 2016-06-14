@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.classpool;
+package com.yihu.ehr.util.reflection;
 
 import javassist.ClassClassPath;
 import javassist.ClassPool;
@@ -23,14 +23,10 @@ import java.io.IOException;
  * @author lincl
  * @version 1.0
  * @created 2016/2/15
- *
  */
 public class ClassPoolUtils {
-
-
     /**
      * 运行时动态ORM表映射
-     *
      *
      * @param entityClassName   待映射的实体全限定类名
      * @param tableName         待映射的表名
@@ -43,6 +39,7 @@ public class ClassPoolUtils {
         if(StringUtils.isEmpty(entityClassName) || StringUtils.isEmpty(tableName)){
             throw new IllegalArgumentException("The mapping parameter is invalid!");
         }
+
         ClassPool classPool = ClassPool.getDefault();
         classPool.appendClassPath(new ClassClassPath(ClassPoolUtils.class));
 
@@ -52,7 +49,7 @@ public class ClassPoolUtils {
         ClassFile classFile = clazz.getClassFile();
         ConstPool constPool = classFile.getConstPool();
 
-        // set annootation property
+        // set annotation property
         AnnotationsAttribute attribute = (AnnotationsAttribute)classFile.getAttribute(AnnotationsAttribute.visibleTag);
         if(attribute==null)
             attribute = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
@@ -76,7 +73,7 @@ public class ClassPoolUtils {
         classFile.write(dataOutputStream);
         dataOutputStream.flush();
         dataOutputStream.close();
-        EntityClassLoader loader = new EntityClassLoader(ClassPoolUtils.class.getClassLoader());
+        ClassLoaderEx loader = new ClassLoaderEx(ClassPoolUtils.class.getClassLoader());
 
         return clazz.toClass(loader , null);
     }
@@ -95,22 +92,6 @@ public class ClassPoolUtils {
             file.delete();
         file.createNewFile();
         return file;
-    }
-
-    public static String classNameTofilePath(String clzName) {
-        String clzPath = System.getProperty("user.home") + "/ehr/std/";
-        File file = new File(clzPath);
-        boolean rs = file.exists();
-        System.err.println(rs);
-        if(!rs)
-            System.err.println(file.mkdir());
-
-        String path = ClassPoolUtils.class.getClassLoader().getResource("").getPath();
-        if(path.indexOf("test-classes")!=-1){
-            path = path.replace("test-classes", "classes");
-        }
-        return clzPath
-                + clzName.replace(".", "/") + ".class";
     }
 }
 

@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.encode;
+package com.yihu.ehr.util.hash;
 
 import com.yihu.ehr.util.log.LogService;
 
@@ -16,7 +16,7 @@ public class HashUtil {
      *
      * @param str
      */
-    public static String hashStr(String str) {
+    public static String hash(String str) {
         try{
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(str.getBytes());

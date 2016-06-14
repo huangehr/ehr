@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.profile.service.PatientInfoBaseService;
 import com.yihu.ehr.profile.service.PatientInfoDetailService;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

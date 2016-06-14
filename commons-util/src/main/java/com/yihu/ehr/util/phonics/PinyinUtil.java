@@ -1,4 +1,4 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.util.phonics;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
 

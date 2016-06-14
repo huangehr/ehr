@@ -1,14 +1,14 @@
-package com.yihu.ehr.util.classpool;
+package com.yihu.ehr.util.reflection;
 
 /**
  * @author lincl
  * @version 1.0
  * @created 2016/2/15
  */
-public class EntityClassLoader extends ClassLoader{
+public class ClassLoaderEx extends ClassLoader{
     private ClassLoader parent;
 
-    public EntityClassLoader(ClassLoader parent){
+    public ClassLoaderEx(ClassLoader parent){
         this.parent = parent;
     }
 

@@ -13,7 +13,7 @@ import com.yihu.ehr.model.adaption.MAdapterPlan;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.std.service.CDAVersionClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.util.validate.ValidateResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

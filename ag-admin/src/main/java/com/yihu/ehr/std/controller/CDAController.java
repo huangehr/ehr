@@ -9,7 +9,7 @@ import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.std.service.CDAClient;
 import com.yihu.ehr.std.service.CDAVersionClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

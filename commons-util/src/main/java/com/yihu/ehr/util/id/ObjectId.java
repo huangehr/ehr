@@ -1,4 +1,4 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.util.id;
 
 import com.yihu.ehr.constants.BizObject;
 

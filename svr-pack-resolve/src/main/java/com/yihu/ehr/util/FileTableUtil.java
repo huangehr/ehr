@@ -8,6 +8,7 @@ import com.yihu.ehr.service.resource.stage1.CdaDocument;
 import com.yihu.ehr.profile.family.FileFamily;
 import com.yihu.ehr.service.resource.stage1.OriginFile;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class FileTableUtil {
             subNode.put("mime", originFile.getMime());
             subNode.put("urls", originFile.getUrlsStr());
             subNode.put("url_score", originFile.getUrlScope().name());
-            subNode.put("expire_date", originFile.getExpireDate()==null?"":DateTimeUtils.utcDateTimeFormat(originFile.getExpireDate()));
+            subNode.put("expire_date", originFile.getExpireDate()==null?"": DateTimeUtil.utcDateTimeFormat(originFile.getExpireDate()));
 
             StringBuilder builder = new StringBuilder();
             for (String fileName : originFile.getFileUrls().keySet()){

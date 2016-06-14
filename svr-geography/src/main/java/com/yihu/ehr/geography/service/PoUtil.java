@@ -1,5 +1,4 @@
-package com.yihu.ehr.util.po;
-
+package com.yihu.ehr.geography.service;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,19 +9,6 @@ import java.util.List;
  * Created by Administrator on 2016/2/23.
  */
 public class PoUtil {
-
-
-
-//    public static void main(String[] args) throws Exception {
-//        User user = new User();
-//        user.setId("123");
-//        user.setName("testUser");
-//        user.setAddress("beijing");
-//        user.setPassword("123456");
-//        String sql = getHql(user,"name","address");
-//        System.out.printf(sql);
-//    }
-
     /**
      * 通过Bean对象获取查询语句
      * @param obj 对象
@@ -56,38 +42,4 @@ public class PoUtil {
         }
         return null;
     }
-
-    static class User {
-        String id;
-        String name;
-        String password;
-        String address;
-
-        public String getId() {
-            return id;
-        }
-        public void setId(String id) {
-            this.id = id;
-        }
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-        public String getPassword() {
-            return password;
-        }
-        public void setPassword(String password) {
-            this.password = password;
-        }
-        public String getAddress() {
-            return address;
-        }
-        public void setAddress(String address) {
-            this.address = address;
-        }
-    }
-
-
 }
