@@ -13,8 +13,10 @@ info:
 ---
 spring:
   profiles: dev
-  redis:
-      host: 192.168.1.220 # Redis server host.
+
+---
+spring:
+  profiles: alpha
 
 ---
 spring:

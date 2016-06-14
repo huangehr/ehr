@@ -10,10 +10,13 @@ info:
     description: Resource service.
     version: 1.0.0
 
-
 ---
 spring:
   profiles: dev
+
+---
+spring:
+  profiles: alpha
 
 ---
 spring:

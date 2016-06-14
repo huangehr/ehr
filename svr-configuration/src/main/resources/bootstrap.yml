@@ -15,6 +15,17 @@ spring:
 
 ---
 spring:
+  profiles: alpha
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: http://192.168.1.220:10080/EHR/ehr.config.git
+        default-label: dev
+
+---
+spring:
   profiles: test
 
   cloud:
