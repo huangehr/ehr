@@ -268,9 +268,9 @@ public class PatientInfoBaseService {
                 q += " AND event_type:" + eventType;
             } else if (eventType.equals("3")) //根据业务来区分数据
             {
-                join = " ";
+                join = "";
             } else if (eventType.equals("4")) {
-                join = " ";
+                join = "";
             }
         }
         //事件年份
@@ -345,53 +345,6 @@ public class PatientInfoBaseService {
         }
 
         queryParams = "{\"q\":\"(" + rowkeys.toString() + ") AND " + join + "\"}";
-
-//        //疾病ID
-//        if (diseaseId != null && diseaseId.length() > 0) {
-//            if (join.length() > 0) {
-//                join += " AND (" + BasisConstant.mzzd + ":" + diseaseId + " OR " + BasisConstant.zyzd + ":" + diseaseId + ")";
-//            } else {
-//                join = BasisConstant.mzzd + ":" + diseaseId + " OR " + BasisConstant.zyzd + ":" + diseaseId;
-//            }
-//            queryParams = "{\"q\":\"" + q + "\",\"join\":\"" + join + "\"}";
-//        } else {
-//            //健康问题
-//            if (hpId != null && hpId.length() > 0) {
-//                //健康问题->疾病ICD10代码
-//                List<MIcd10Dict> dictCodeList = dictService.getIcd10DictList(hpId);
-//                String hpJoin = "";
-//                if (dictCodeList != null && dictCodeList.size() > 0) {
-//                    String mzJoin = "";
-//                    String zyJoin = "";
-//                    //遍历疾病列表
-//                    for (MIcd10Dict ICD10 : dictCodeList) {
-//                        if (mzJoin.length() > 0) {
-//                            mzJoin += " OR " + BasisConstant.mzzd + ":" + ICD10.getCode();
-//                            zyJoin += " OR " + BasisConstant.zyzd + ":" + ICD10.getCode();
-//                        } else {
-//                            mzJoin = BasisConstant.mzzd + ":" + ICD10.getCode();
-//                            zyJoin = BasisConstant.zyzd + ":" + ICD10.getCode();
-//                        }
-//                    }
-//
-//                    if (mzJoin.length() > 0 && zyJoin.length() > 0) {
-//                        hpJoin = "(" + mzJoin + ") OR (" + zyJoin + ")";
-//                    } else {
-//                        if (mzJoin.length() > 0) {
-//                            hpJoin = "(" + mzJoin + ")";
-//                        } else if (zyJoin.length() > 0) {
-//                            hpJoin = "(" + zyJoin + ")";
-//                        }
-//                    }
-//                }
-//
-//                if (join.length() > 0) {
-//                    join += " AND " + hpJoin;
-//                } else {
-//                    join = hpJoin;
-//                }
-//            }
-//        }
 
         //获取相关门诊住院记录
         Envelop result = resource.getResources(BasisConstant.patientEvent, appId, queryParams);
