@@ -16,6 +16,7 @@ import javax.persistence.Table;
 @Table(name = "rs_dictionary_entry")
 public class RsDictionaryEntry {
     private String id;
+    private String dictId;
     private String dictCode;
     private String code;
     private String name;
@@ -31,6 +32,14 @@ public class RsDictionaryEntry {
     public void setId(String id)
     {
         this.id = id;
+    }
+
+    @Column(name = "dict_id")
+    public String getDictId() {
+        return dictId;
+    }
+    public void setDictId(String dictId) {
+        this.dictId = dictId;
     }
 
     @Column(name = "dict_code",nullable = false)

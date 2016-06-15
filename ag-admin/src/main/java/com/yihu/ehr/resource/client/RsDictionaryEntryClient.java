@@ -65,4 +65,10 @@ public interface RsDictionaryEntryClient {
     List<MRsDictionaryEntry> searchNoPageRsDictEntries(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value = ServiceApi.Resources.DictEntriesByDictCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据dict_code获取获取标准字典")
+    public List<MRsDictionaryEntry>  getRsDictionaryEntryByDictCode(
+            @ApiParam(name = "dict_code", value = "", defaultValue = "")
+            @PathVariable(value = "dict_code") String dict_code);
 }
