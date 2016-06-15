@@ -104,6 +104,16 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
         return convertToModel(dictionaryEntry, MRsDictionaryEntry.class);
     }
 
+    @RequestMapping(value = ServiceApi.Resources.DictEntriesByDictCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据dict_code获取获取标准字典")
+    public List<MRsDictionaryEntry>  getRsDictionaryEntryByDictCode(
+            @ApiParam(name = "dict_code", value = "", defaultValue = "")
+            @PathVariable(value = "dict_code") String dict_code)
+    {
+        List<RsDictionaryEntry> dictionaryEntries = rsDictionaryEntryService.findByDictCode(dict_code);
+        return (List<MRsDictionaryEntry>) convertToModels(dictionaryEntries, new ArrayList<MRsDictionaryEntry>(dictionaryEntries.size()), MRsDictionaryEntry.class,null);
+    }
+
     @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence,method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public boolean isExistence(

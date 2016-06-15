@@ -125,6 +125,23 @@ public class RsDictionaryEntryController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.DictEntriesByDictCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据dict_code获取获取标准字典")
+    public Envelop getRsDictionaryEntryByDictCode(
+            @ApiParam(name = "dict_code", value = "", defaultValue = "")
+            @PathVariable(value = "dict_code") String dict_code) {
+        Envelop envelop = new Envelop();
+        try{
+            List<MRsDictionaryEntry> rsDictionaryEntries = rsDictionaryEntryClient.getRsDictionaryEntryByDictCode(dict_code);
+            envelop.setObj(rsDictionaryEntries);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence, method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public Envelop isExistence(
