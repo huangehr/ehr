@@ -1,9 +1,7 @@
 package com.yihu.ehr.standard.cdatype.service;
-import com.yihu.ehr.util.ObjectVersion;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * CDA类型

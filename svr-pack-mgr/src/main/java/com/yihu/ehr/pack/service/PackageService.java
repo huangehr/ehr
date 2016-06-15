@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.util.ObjectId;
+import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.util.*;
 
 /**

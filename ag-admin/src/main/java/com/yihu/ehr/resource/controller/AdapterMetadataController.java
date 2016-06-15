@@ -9,7 +9,7 @@ import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.resource.client.AdapterMetadataClient;
 import com.yihu.ehr.resource.client.MetadataClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

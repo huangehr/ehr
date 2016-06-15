@@ -4,13 +4,17 @@ package com.yihu.ehr.profile.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yihu.ehr.data.hbase.HBaseDao;
+import com.yihu.ehr.data.hbase.ResultUtil;
+import com.yihu.ehr.data.hbase.TableBundle;
+import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.model.standard.MCdaDataSet;
-import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.profile.feign.XTransformClient;
+import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +46,16 @@ public class PatientInfoDetailService {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    XTransformClient transform;
+
+    @Autowired
+    HBaseDao hBaseDao;
+
 
     String appId = "svr-health-profile";
+
+    public static final String Table = "RawFiles";
 
 
     //根据ProfileId或者EventNo查询CDA分类
@@ -71,11 +83,42 @@ public class PatientInfoDetailService {
             List<Template> list = templateRepository.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
             //遍历模板
             if (list != null && list.size() > 0) {
+
+                //获取档案相关数据
+                List<String> datasetContains = new ArrayList<>();
+                Envelop data = resource.getEhrCenterSub("{\"q\":\"profile_id:"+profileId+"\"}", null, null);
+                if(data.getDetailModelList()!=null && data.getDetailModelList().size()>0)
+                {
+                    for(int i=0;i<data.getDetailModelList().size();i++)
+                    {
+                        Map<String,Object> map = (Map<String,Object>)data.getDetailModelList().get(i);
+                        String dsCode = String.valueOf(map.get("rowkey")).split("\\$")[1];
+                        if(!datasetContains.contains(dsCode))
+                        {
+                            datasetContains.add(dsCode);
+                        }
+                    }
+                }
+
                 for (Template template : list) {
                     String cdaDocumentId = template.getCdaDocumentId();
                     //获取CDA关联数据集
                     List<MCdaDataSet> datasetList = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
                     if (datasetList != null && datasetList.size() > 0) {
+                        for (MCdaDataSet dataset : datasetList) {
+                            String dsCode = dataset.getDataSetCode();
+                            if(datasetContains.contains(dsCode))
+                            {
+                                Map<String, String> item = new HashMap<>();
+                                item.put("profile_id", profileId);
+                                item.put("template_id", String.valueOf(template.getId()));
+                                item.put("template_name", template.getTitle());
+                                re.add(item);
+                                break;
+                            }
+                        }
+
+                        /* 修改方案，hbase细表数据查一次
                         String query = "";
                         for (MCdaDataSet dataset : datasetList) {
                             String datasetCode = dataset.getDataSetCode();
@@ -94,7 +137,7 @@ public class PatientInfoDetailService {
                             item.put("template_id", String.valueOf(template.getId()));
                             item.put("template_name", template.getTitle());
                             re.add(item);
-                        }
+                        }*/
                     }
                 }
             }
@@ -106,15 +149,24 @@ public class PatientInfoDetailService {
     }
 
     //根据模板获取病人CDA数据
-    public Map<String, List<Map<String, Object>>> getCDAData(String profileId, Integer templateId) throws Exception {
-        Map<String, List<Map<String, Object>>> re = new HashMap<>();
+    public Map<String, Object> getCDAData(String profileId, Integer templateId) throws Exception {
+        Map<String, Object> re = new HashMap<>();
         //主表记录
         Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}");
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            Map<String, Object> main = (Map<String, Object>) result.getDetailModelList().get(0);
+            String cdaVersion = main.get("cda_version").toString();
+            //转译主表数据
+            MStdTransformDto mainTransform = new MStdTransformDto();
+            mainTransform.setSource(objectMapper.writeValueAsString(main));
+            mainTransform.setVersion(cdaVersion);
+            re = transform.stdTransform(objectMapper.writeValueAsString(mainTransform));
+
+            //CDA数据
+            Map<String,List<Map<String, Object>>> cdaList = new HashMap<>();
             //通过模板获取cda信息
             Template template = templateService.getTemplate(templateId);
             if (template != null) {
-                String cdaVersion = ((Map<String, Object>) result.getDetailModelList().get(0)).get("cda_version").toString();
                 String cdaDocumentId = template.getCdaDocumentId();
                 //获取CDA关联数据集
                 List<MCdaDataSet> datasetList = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
@@ -122,20 +174,25 @@ public class PatientInfoDetailService {
                     for (MCdaDataSet dataset : datasetList) {
                         String datasetCode = dataset.getDataSetCode();
 
-                        String q = "{\"q\":\"rowkey:*" + datasetCode + "* AND profile_id:" + profileId + "\"}";
+                        String q = "{\"table\":\""+datasetCode+"\",\"q\":\"profile_id:" + profileId + "\"}";
                         //获取Hbase数据
                         Envelop data = resource.getEhrCenterSub(q, null, null);
 
                         if (data.getDetailModelList() != null && data.getDetailModelList().size() > 0) {
                             List<Map<String, Object>> table = data.getDetailModelList();
 
-                            //根据cdaVersion转译************
-                            List<Map<String, Object>> dataList = table;
-                            re.put(datasetCode, dataList);
+                            //根据cdaVersion转译
+                            MStdTransformDto stdTransformDto = new MStdTransformDto();
+                            stdTransformDto.setSource(objectMapper.writeValueAsString(table));
+                            stdTransformDto.setVersion(cdaVersion);
+                            List<Map<String, Object>> dataList = transform.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
+                            cdaList.put(datasetCode, dataList);
                         }
                     }
                 }
             }
+
+            re.put("dataSets",cdaList);
         } else {
             throw new Exception("未查到相关就诊住院记录！profileId:" + profileId);
         }
@@ -229,10 +286,42 @@ public class PatientInfoDetailService {
             }
         }
 
-        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
-        if (q.length() > 0) {
-            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //获取门诊住院记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
+            StringBuilder rowkeys = new StringBuilder();
+
+            for (Map<String, Object> event : eventList) {
+                if (rowkeys.length() > 0) {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append("profile_id:" + event.get("rowkey"));
+            }
+
+            if(rowkeys.length() > 0)
+            {
+                if (q.length() > 0) {
+                    q += " AND (" + rowkeys.toString() + ")";
+                } else {
+                    q = "(" + rowkeys.toString() + ")";
+                }
+            }
         }
+        else
+        {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("找不到此人相关记录");
+
+            return envelop;
+        }
+
+        String queryParams =  "{\"q\":\"" + q + "\"}";//"{\"join\":\"demographic_id:" + demographicId + "\"}";
+        //        if (q.length() > 0) {
+        //            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //        }
         return resource.getResources(resourceCode, appId, queryParams, page, size);
     }
 
@@ -286,11 +375,42 @@ public class PatientInfoDetailService {
             }
         }
 
+        //获取门诊住院记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
 
-        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
-        if (q.length() > 0) {
-            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
+            StringBuilder rowkeys = new StringBuilder();
+
+            for (Map<String, Object> event : eventList) {
+                if (rowkeys.length() > 0) {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append("profile_id:" + event.get("rowkey"));
+            }
+
+            if(rowkeys.length() > 0)
+            {
+                if (q.length() > 0) {
+                    q += " AND (" + rowkeys.toString() + ")";
+                } else {
+                    q = "(" + rowkeys.toString() + ")";
+                }
+            }
         }
+        else
+        {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("找不到此人相关记录");
+
+            return envelop;
+        }
+
+        String queryParams = "{\"q\":\"" + q + "\"}";//"{\"join\":\"demographic_id:" + demographicId + "\"}";
+        //        if (q.length() > 0) {
+        //            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //        }
         return resource.getResources(BasisConstant.laboratoryReport, appId, queryParams, page, size);
     }
 
@@ -310,10 +430,43 @@ public class PatientInfoDetailService {
             }
         }
 
-        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
-        if (q.length() > 0) {
-            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //获取门诊住院记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
+            StringBuilder rowkeys = new StringBuilder();
+
+            for (Map<String, Object> event : eventList) {
+                if (rowkeys.length() > 0) {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append("profile_id:" + event.get("rowkey"));
+            }
+
+            if(rowkeys.length() > 0)
+            {
+                if (q.length() > 0) {
+                    q += " AND (" + rowkeys.toString() + ")";
+                } else {
+                    q = "(" + rowkeys.toString() + ")";
+                }
+            }
         }
+        else
+        {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("找不到此人相关记录");
+
+            return envelop;
+        }
+
+        String queryParams = "{\"q\":\"" + q + "\"}";
+        //        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
+        //        if (q.length() > 0) {
+        //            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //        }
         return resource.getResources(BasisConstant.outpatientCost, appId, queryParams, page, size);
     }
 
@@ -333,41 +486,132 @@ public class PatientInfoDetailService {
             }
         }
 
-        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
-        if (q.length() > 0) {
-            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+        //获取门诊住院记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
+            StringBuilder rowkeys = new StringBuilder();
+
+            for (Map<String, Object> event : eventList) {
+                if (rowkeys.length() > 0) {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append("profile_id:" + event.get("rowkey"));
+            }
+
+            if(rowkeys.length() > 0)
+            {
+                if (q.length() > 0) {
+                    q += " AND (" + rowkeys.toString() + ")";
+                } else {
+                    q = "(" + rowkeys.toString() + ")";
+                }
+            }
         }
+        else
+        {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("找不到此人相关记录");
+
+            return envelop;
+        }
+
+        String queryParams = "{\"q\":\"" + q + "\"}";
+
+//        String queryParams = "{\"join\":\"demographic_id:" + demographicId + "\"}";
+//        if (q.length() > 0) {
+//            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
+//        }
         return resource.getResources(BasisConstant.hospitalizedCost, appId, queryParams, page, size);
     }
 
 
-    public List<Map<String,String>> getDocument(String profileId) throws Exception {
+    public JsonNode getDocument(String profileId,String version) throws Throwable {
 
-        Map<String, List<Map<String, Object>>> re = new HashMap<>();
         //主表记录
         Envelop profile = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}");
 
-        LinkedHashMap<String,String> profileMap = (LinkedHashMap<String, String>) profile.getDetailModelList().get(0);
+        LinkedHashMap<String, String> profileMap = (LinkedHashMap<String, String>) profile.getDetailModelList().get(0);
         String profileStr = objectMapper.writeValueAsString(profileMap);
-        JsonNode profileNode = objectMapper.readTree(profileStr);
 
-        Map<String, Object> map  = (Map<String, Object>) profile.getDetailModelList().get(0);
+
+        String profileType = profileMap.get("profile_type");
+        if("1".equals(profileType)){
+            //结构化档案
+        }else if("2".equals(profileType)){
+            //非结构化档案
+        }
+
+        MStdTransformDto stdTransformDto = new MStdTransformDto();
+        stdTransformDto.setVersion(version);
+        stdTransformDto.setSource(profileStr);
+        Map<String,Object> map = transform.stdTransform(objectMapper.writeValueAsString(stdTransformDto));
+        profileStr = objectMapper.writeValueAsString(map).replace("{","").replace("}","");
 
 
         //从表记录
-        Envelop dataSet = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}",null,null);
+        Envelop dataSet = resource.getEhrCenterSub("{\"q\":\"profile_id:" + profileId + "\"}", null, null);
 
-        List<LinkedHashMap<String,String>> dataSetList = (List<LinkedHashMap<String,String>>) dataSet.getDetailModelList();
+        List<LinkedHashMap<String, String>> dataSetList = (List<LinkedHashMap<String, String>>) dataSet.getDetailModelList();
         String dataSetStr = objectMapper.writeValueAsString(dataSetList);
+
+        stdTransformDto.setSource(dataSetStr);
+        List<Map<String,Object>> list = transform.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
+        dataSetStr = objectMapper.writeValueAsString(list);
         JsonNode dataSetNode = objectMapper.readTree(dataSetStr);
 
-        ObjectNode aa = (ObjectNode) dataSetNode.get(0);
+        List<String> rowKeyList = new ArrayList<>();
 
-//        for (ObjectNode objectNode : dataSetNode){
-//
-//        }
-        return null;
+        for (int j = 0; j < dataSetNode.size(); j++) {
+            ObjectNode dsNode = (ObjectNode) dataSetNode.get(j);
+            String rowKey = dsNode.get("rowkey").asText().split("\\$")[1];
+            if (!rowKeyList.contains(rowKey)) {
+                rowKeyList.add(rowKey);
+            }
+        }
+        String dataSetJsonStr = "";
+        for (int i = 0; i < rowKeyList.size(); i++) {
+            String key = rowKeyList.get(i);
+            String json = "\"" + rowKeyList.get(i) +"\":[";
+            boolean flag=true;
+            for (int j = 0; j < dataSetNode.size(); j++) {
+                ObjectNode dsNode = (ObjectNode) dataSetNode.get(j);
+                String[] rowKeyArray = dsNode.get("rowkey").asText().split("\\$");
+                if (key.equals(rowKeyArray[1])) {
+                    if (flag) {
+                        json += objectMapper.writeValueAsString(dsNode);
+                    } else {
+                        json += "," + objectMapper.writeValueAsString(dsNode);
+                    }
+                    flag = false;
+                }
+            }
+            json+="]";
+            if("".equals(dataSetJsonStr)){
+                dataSetJsonStr +=json;
+            }else {
+                dataSetJsonStr +=","+json;
+            }
+
+        }
+
+        dataSetJsonStr = "\"dataSets\":{" + dataSetJsonStr + "}";
+        JsonNode tree = objectMapper.readTree("{" + profileStr + "," + dataSetJsonStr + "}");
+
+        //文件记录
+        String[] rowKeys = hBaseDao.findRowKeys(Table, "^" + profileId);
+        TableBundle bundle = new TableBundle();
+        bundle.addRows(rowKeys);
+        Object  results[] = hBaseDao.get("RawFiles", bundle);
+        for(Object result : results){
+            ResultUtil util= new ResultUtil(result);
+            String cda_document_id = util.getCellValue("d", "cda_document_id", "");
+            String file_list = util.getCellValue("d", "file_list", "");
+        }
+
+
+        return tree;
     }
-
-
 }

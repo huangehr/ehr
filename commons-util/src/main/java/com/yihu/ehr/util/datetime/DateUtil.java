@@ -12,7 +12,7 @@
  * -------------------------------------------------------------------------
  * 1.0 �? 2010/07/12 �? tuchengye              New Making
  ***************************************************************************/
-package com.yihu.ehr.util.operator;
+package com.yihu.ehr.util.datetime;
 
 import org.apache.commons.lang3.StringUtils;
 

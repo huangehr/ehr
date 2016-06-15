@@ -1,4 +1,4 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.util.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +32,6 @@ public class RestEcho implements Serializable {
     }
 
     public RestEcho putResultToList(Object data) {
-        //root.with(ResultNode).put(fieldName, data.toString());
         this.root.put(ResultNode, data.toString());
         return this;
     }

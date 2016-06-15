@@ -1,10 +1,7 @@
 package com.yihu.ehr.util;
 
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import com.yihu.ehr.util.id.ObjectVersion;
 
 /**
  * @author lincl

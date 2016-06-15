@@ -1,11 +1,13 @@
 package com.yihu.ehr.profile.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.profile.service.PatientInfoBaseService;
 import com.yihu.ehr.profile.service.PatientInfoDetailService;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -53,7 +55,10 @@ public class ResourcesBrowseController {
         Map<String,Object> re = patient.getPatientInfo(demographicId);
         if(version!=null)
         {
-            return transform.stdTransform(mapper.writeValueAsString(re), version);
+            MStdTransformDto stdTransformDto = new MStdTransformDto();
+            stdTransformDto.setSource(mapper.writeValueAsString(re));
+            stdTransformDto.setVersion(version);
+            return transform.stdTransform(mapper.writeValueAsString(stdTransformDto));
         }
         else{
             return re;
@@ -102,7 +107,10 @@ public class ResourcesBrowseController {
         List<Map<String,Object>> re = patient.getMedicalEvents(demographicId,eventsType,year,area,hpId,diseaseId);
         if(version!=null)
         {
-            return transform.stdTransformList(mapper.writeValueAsString(re), version);
+            MStdTransformDto stdTransformDto = new MStdTransformDto();
+            stdTransformDto.setVersion(version);
+            stdTransformDto.setSource(mapper.writeValueAsString(re));
+            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
         }
         else{
             return re;
@@ -148,10 +156,10 @@ public class ResourcesBrowseController {
 
     @ApiOperation("档案详情 -- CDA数据")
     @RequestMapping(value = "/cda/getCDAData", method = RequestMethod.GET)
-    public Map<String,List<Map<String,Object>>> getCDAData(
+    public Map<String,Object> getCDAData(
             @ApiParam(name = "profileId", value = "档案ID",defaultValue="42017976-4_0000145400_ZY010000806438_1454115983000")
             @RequestParam(value = "profileId", required = true) String profileId,
-            @ApiParam(name = "templateId", value = "模板ID",defaultValue="186")
+            @ApiParam(name = "templateId", value = "模板ID",defaultValue="104")
             @RequestParam(value = "templateId", required = true) Integer templateId) throws Exception {
 
         return patientDetail.getCDAData(profileId, templateId);
@@ -160,17 +168,21 @@ public class ResourcesBrowseController {
 
     @ApiOperation("公众版门户 -- 档案详情")
     @RequestMapping(value = "/cda/getDocument", method = RequestMethod.GET)
-    public List<Map<String,String>> getDocument(
-            @ApiParam(name = "profileId", value = "档案ID")
-            @RequestParam(value = "profileId", required = false) String profileId) throws Exception {
-        return patientDetail.getDocument(profileId);
+    public JsonNode getDocument(
+            @ApiParam(name = "profileId", value = "档案ID",defaultValue="42017976-4_0000145400_ZY010000806438_1454115983000")
+            @RequestParam(value = "profileId", required = false) String profileId,
+            @ApiParam(name = "version", value = "cda版本",defaultValue="56395d75b854")
+            @RequestParam(value = "version", required = false) String version) throws Throwable {
+
+        JsonNode jsonNode =  patientDetail.getDocument(profileId,version);
+        return jsonNode;
     }
 
 
     @ApiOperation("档案详情 -- 通过事件号获取templateId")
     @RequestMapping(value = "/cda/getPatientCdaTemplate", method = RequestMethod.GET)
     public String getPatientCdaTemplate(
-            @ApiParam(name = "eventNo", value = "事件号",defaultValue="ZY010000805783") @RequestParam(value = "eventNo", required = true) String eventNo,
+            @ApiParam(name = "eventNo", value = "事件号",defaultValue="ZY010000806438") @RequestParam(value = "eventNo", required = true) String eventNo,
             @ApiParam(name = "cdaType", value = "模板类别",defaultValue="LSYZ") @RequestParam(value = "cdaType", required = true) String cdaType) throws Exception {
 
         return patientDetail.getCDATemplate(eventNo,cdaType);

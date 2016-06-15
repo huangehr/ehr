@@ -4,7 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsAdapterDictionary;
 import com.yihu.ehr.resource.client.RsAdapterDictionaryClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.utils.FeignExceptionUtils;
 import io.swagger.annotations.Api;

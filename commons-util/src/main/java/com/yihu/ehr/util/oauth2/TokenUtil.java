@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.token;
+package com.yihu.ehr.util.oauth2;
 
 import com.yihu.ehr.util.encrypt.DES;
 import com.yihu.ehr.util.encrypt.MD5;

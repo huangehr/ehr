@@ -15,7 +15,7 @@ import com.yihu.ehr.service.resource.stage1.*;
 import com.yihu.ehr.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.profile.util.QualifierTranslator;
 import com.yihu.ehr.schema.StdDataSetKeySchema;
-import com.yihu.ehr.util.DateTimeUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +72,8 @@ public class FilePackageResolver extends PackageResolver {
         profile.setEventType(EventType.create(eventType));
         profile.setOrgCode(orgCode);
         profile.setCdaVersion(cdaVersion);
-        profile.setCreateDate(DateTimeUtils.simpleDateParse(createDate));
-        profile.setEventDate(DateTimeUtils.simpleDateParse(eventDate));
+        profile.setCreateDate(DateTimeUtil.simpleDateParse(createDate));
+        profile.setEventDate(DateTimeUtil.simpleDateParse(eventDate));
 
         parseDataSets(profile, (ObjectNode) root.get("data_sets"));
         parseFiles(profile, (ArrayNode) root.get("files"), metaFile.getParent() + File.separator + PackModelFactory.DocumentFolder);
@@ -122,7 +122,7 @@ public class FilePackageResolver extends PackageResolver {
             String cdaDocumentId = objectNode.get("cda_doc_id").asText();
             Date expireDate = null;
             if(objectNode.get("expire_date")!=null){
-                expireDate = DateTimeUtils.simpleDateParse(objectNode.get("expire_date").asText());
+                expireDate = DateTimeUtil.simpleDateParse(objectNode.get("expire_date").asText());
             }
 
             // 解析过程中，使用cda文档id作为文档列表的主键，待解析完成后，统一更新为rowkey
@@ -145,7 +145,7 @@ public class FilePackageResolver extends PackageResolver {
                 OriginFile originFile = new OriginFile();
                 originFile.setMime(mine_type);
                 originFile.setExpireDate(expireDate);
-                originFile.setUrlScope(UrlScope.valueOf(url_scope));
+                originFile.setUrlScope(UrlScope.valueOf(Integer.parseInt(url_scope)));
                 originFile.setReportName(report_name);
                 if(file.get("name")!=null){
                     String fileList[] = file.get("name").asText().split(";");

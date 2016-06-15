@@ -83,7 +83,7 @@ public class ResourcesQueryDao {
         {
             page = defaultPage;
         }
-        //默认50行
+        //默认1000行
         if (size == null) {
             size = defaultSize;
         }

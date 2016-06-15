@@ -1,4 +1,4 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.util.rest;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,6 +14,7 @@ import java.util.List;
  * 信封对象的返回场景：
  * - API使用者确实无法访问返回头，即一些语言库无法处理HTTP的响应消息，这时候需要以这种形式提供返回值。
  * - API需要支持交叉域请求（通过JSONP）。
+ *
  * @author llh
  */
 public class Envelop implements Serializable{

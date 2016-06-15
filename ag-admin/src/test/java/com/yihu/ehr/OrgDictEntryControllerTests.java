@@ -5,7 +5,7 @@ import com.yihu.ehr.adapter.controller.AdapterOrgController;
 import com.yihu.ehr.adapter.controller.OrgDictEntryController;
 import com.yihu.ehr.agModel.thirdpartystandard.*;
 import com.yihu.ehr.adapter.controller.OrgDictController;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;

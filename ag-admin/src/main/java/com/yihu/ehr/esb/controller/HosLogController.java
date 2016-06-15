@@ -5,7 +5,7 @@ import com.yihu.ehr.esb.client.HosLogClient;
 import com.yihu.ehr.model.esb.MHosLog;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.organization.service.OrganizationClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

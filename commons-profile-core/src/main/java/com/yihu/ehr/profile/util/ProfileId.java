@@ -1,6 +1,6 @@
 package com.yihu.ehr.profile.util;
 
-import com.yihu.ehr.util.StringBuilderUtil;
+import com.yihu.ehr.util.string.StringBuilderEx;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -143,7 +143,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
 
     @Override
     public String toString() {
-        return new StringBuilderUtil("%1_%2_%3_%4")
+        return new StringBuilderEx("%1_%2_%3_%4")
                 .arg(orgCode)
                 .arg(patientId)
                 .arg(eventNo)

@@ -3,7 +3,7 @@ package com.yihu.ehr.resource.dao;
 
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
-import com.yihu.ehr.util.ObjectId;
+import com.yihu.ehr.util.id.ObjectId;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

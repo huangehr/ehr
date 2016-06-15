@@ -6,7 +6,7 @@ import com.yihu.ehr.agModel.patient.CardModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.patient.controller.CardController;
 import com.yihu.ehr.patient.controller.PatientController;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;

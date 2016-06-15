@@ -1,8 +1,8 @@
 package com.yihu.ehr.security.service;
 
 import com.yihu.ehr.security.feign.UserClient;
-import com.yihu.ehr.util.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +54,7 @@ public class KeyManager {
 
         Date currentDate = new Date();
         Date fromDate = currentDate;                                //生效时间默认为当前日期
-        Date expiryDate = DateUtil.add(currentDate, "y", 100);      //截止日期为生效日期往后推一百年
+        Date expiryDate = DateUtils.addYears(currentDate, 100);      //截止日期为生效日期往后推一百年
         Integer valid = 1;                                          //默认设置为生效状态
 
         key.setValid(valid);

@@ -57,7 +57,7 @@ public class FileResourceRepository {
                 OriginFile originFile = new OriginFile();
 
                 originFile.setMime(objectNode.get("mime").asText());
-                originFile.setExpireDate(DateTimeUtils.utcDateTimeParse(objectNode.get("expire_date").asText()));
+                originFile.setExpireDate(DateTimeUtil.utcDateTimeParse(objectNode.get("expire_date").asText()));
                 originFile.setOriginUrl(objectNode.get("origin_url").asText());
 
                 String files = objectNode.get("files").asText();

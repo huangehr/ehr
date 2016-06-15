@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,20 +50,13 @@ public class MetadataEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.MetadataBatch,method = RequestMethod.POST)
     @ApiOperation("批量创建数据元")
-    public Collection<MRsMetadata> createMetadataPatch(
+    public boolean createMetadataPatch(
             @ApiParam(name="metadatas",value="数据元JSON",defaultValue = "")
             @RequestParam(value="metadatas") String metadatas) throws Exception
     {
         RsMetadata[] metadataArray = toEntity(metadatas, RsMetadata[].class);
-
-        for(RsMetadata meta : metadataArray)
-        {
-            meta.setId(getObjectId(BizObject.RsMetadata));
-        }
-
-        List<RsMetadata>  metadataList = metadataService.saveMetadataBatch(metadataArray);
-
-        return convertToModels(metadataList,new ArrayList<MRsMetadata>(),MRsMetadata.class,"");
+        metadataService.addMetaBatch(Arrays.asList(metadataArray));
+        return true;
     }
 
     @RequestMapping(value = ServiceApi.Resources.MetadataList,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -113,6 +107,26 @@ public class MetadataEndPoint extends EnvelopRestEndPoint {
 
         List<RsMetadata> metadata = metadataService.search("",filters,"", 1, 1);
         return metadata!=null && metadata.size()>0;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.MetadataStdCodeExistence,method = RequestMethod.GET)
+    @ApiOperation("获取已存在内部编码")
+    public List stdCodeExistence(
+            @ApiParam(name="std_codes",value="std_codes",defaultValue = "")
+            @RequestParam(value="std_codes") String stdCodes) throws Exception {
+
+        List existCodes = metadataService.stdCodeExist(stdCodes);
+        return existCodes;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.MetadataIdExistence,method = RequestMethod.GET)
+    @ApiOperation("获取已存在资源标准编码")
+    public List idExistence(
+            @ApiParam(name="ids",value="ids",defaultValue = "")
+            @RequestParam(value="ids") String ids) throws Exception {
+
+        List existIds = metadataService.idExist(ids);
+        return existIds;
     }
 
     @RequestMapping(value = ServiceApi.Resources.MetadataList,method = RequestMethod.GET)

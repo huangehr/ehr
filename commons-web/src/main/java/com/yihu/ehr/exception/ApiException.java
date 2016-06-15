@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.lang.SpringContext;
-import com.yihu.ehr.util.StringBuilderUtil;
+import com.yihu.ehr.util.string.StringBuilderEx;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 
@@ -93,7 +93,7 @@ public class ApiException extends RuntimeException {
         message = errorCode == null ? message : environment.getProperty(errorCode.getErrorCode());
 
         if (null != message && null != errorArgs && errorArgs.length > 0){
-            StringBuilderUtil util = new StringBuilderUtil(message);
+            StringBuilderEx util = new StringBuilderEx(message);
             for (int i = 0; i < errorArgs.length; ++i){
                 util.replace("{" + i + "}", errorArgs[i]);
             }

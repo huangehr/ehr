@@ -9,7 +9,7 @@ import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.org.feign.SecurityClient;
 import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.org.service.Organization;
-import com.yihu.ehr.util.PinyinUtil;
+import com.yihu.ehr.util.phonics.PinyinUtil;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

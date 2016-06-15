@@ -1,8 +1,9 @@
 package com.yihu.ehr.resource.service;
 
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.query.common.model.QueryCondition;
-import com.yihu.ehr.query.common.model.QueryEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.resource.dao.ResourcesMetadataQueryDao;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
@@ -11,9 +12,7 @@ import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
 import com.yihu.ehr.resource.dao.intf.ResourceDefaultParamDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.*;
-import com.yihu.ehr.util.Envelop;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -49,6 +48,9 @@ public class ResourcesQueryService  {
 
     @Autowired
     AdapterMetadataDao adapterMetadataDao;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     //忽略字段
     private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","demographic_id", "patient_id","org_code","profile_id", "cda_version", "client_id"));//"profile_type",
@@ -89,6 +91,8 @@ public class ResourcesQueryService  {
     public Envelop getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception {
         //获取资源信息
         RsResources rs = resourcesDao.findByCode(resourcesCode);
+        Envelop re = new Envelop();
+
         if(rs!=null)
         {
             String methodName = rs.getRsInterface(); //执行函数
@@ -176,7 +180,6 @@ public class ResourcesQueryService  {
                 Method method = classType.getMethod(methodName, new Class[]{String.class,Integer.class,Integer.class});
                 Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
 
-                Envelop re = new Envelop();
                 if (result != null) {
                     re.setSuccessFlg(true);
                     re.setCurrPage(result.getNumber());
@@ -239,12 +242,11 @@ public class ResourcesQueryService  {
                 }else {
                     re.setSuccessFlg(false);
                 }
-                throw new Exception("未找到资源数据！");
+                return re;
             }
-            throw new Exception("未找到资源" + resourcesCode +"数据元配置！");
+            return re;
         }
-
-        throw new Exception("未找到资源" + resourcesCode +"！");
+        return re;
 
     }
 
@@ -253,7 +255,7 @@ public class ResourcesQueryService  {
      * 资源浏览 -- 资源数据元结构
      * @return
      */
-    public String getResourceMetadata(String resourcesCode) {
+    public String getResourceMetadata(String resourcesCode) throws Exception{
         Map<String, Object> mapParam = new HashMap<String, Object>();
         try {
             //获取资源信息
@@ -278,7 +280,7 @@ public class ResourcesQueryService  {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return JSONObject.fromObject(mapParam).toString();
+        return objectMapper.writeValueAsString(mapParam);
     }
 
     /**
@@ -295,19 +297,24 @@ public class ResourcesQueryService  {
 
             //设置参数
             if (!StringUtils.isEmpty(queryCondition) && !"{}".equals(queryCondition)) {
-                JSONArray ar = JSONArray.fromObject(queryCondition);
-                for (int i = 0; i < ar.size(); i++) {
-                    JSONObject jo = (JSONObject) ar.get(i);
-                    String andOr = String.valueOf(jo.get("andOr")).trim();
-                    String field = String.valueOf(jo.get("field")).trim();
-                    String cond = String.valueOf(jo.get("condition")).trim();
-                    String value = String.valueOf(jo.get("value"));
-                    if(value.indexOf(",")>0)
+                ObjectMapper mapper = new ObjectMapper();
+                JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Map.class);
+                List<Map<String,Object>> list = objectMapper.readValue(queryCondition,javaType);
+                if(list!=null && list.size()>0)
+                {
+                    for(Map<String,Object> item : list)
                     {
-                        ql.add(new QueryCondition(andOr, cond, field, value.split(",")));
-                    }
-                    else{
-                        ql.add(new QueryCondition(andOr, cond, field, value));
+                        String andOr = String.valueOf(item.get("andOr")).trim();
+                        String field = String.valueOf(item.get("field")).trim();
+                        String cond = String.valueOf(item.get("condition")).trim();
+                        String value = String.valueOf(item.get("value"));
+                        if(value.indexOf(",")>0)
+                        {
+                            ql.add(new QueryCondition(andOr, cond, field, value.split(",")));
+                        }
+                        else{
+                            ql.add(new QueryCondition(andOr, cond, field, value));
+                        }
                     }
                 }
             }

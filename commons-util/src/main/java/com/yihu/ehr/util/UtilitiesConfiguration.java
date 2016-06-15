@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
  * @created 2015.12.29 18:08
  */
 @Configuration
-public class UtilConfiguration {
+public class UtilitiesConfiguration {
 
     /**
      * 基于Jackson的对象映射工具，将对象与JSON之间进行转换。
@@ -30,6 +30,7 @@ public class UtilConfiguration {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'ZZ");
         objectMapper.setDateFormat(dateFormat);
+
         return objectMapper;
     }
 

@@ -18,7 +18,7 @@ import com.yihu.ehr.resource.client.ResourceMetadataClient;
 import com.yihu.ehr.resource.client.ResourcesGrantClient;
 import com.yihu.ehr.resource.client.RsDictionaryEntryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
-import com.yihu.ehr.util.Envelop;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
