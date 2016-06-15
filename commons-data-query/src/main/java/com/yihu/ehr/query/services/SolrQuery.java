@@ -105,6 +105,9 @@ public class SolrQuery {
 						}
 					}
 				}
+				else if(keyword!=null) {
+					in = field+":"+keyword;
+				}
 				s = "NOT ("+in+")";
 				break;
 			}
