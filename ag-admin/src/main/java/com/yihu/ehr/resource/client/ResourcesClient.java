@@ -57,4 +57,10 @@ public interface ResourcesClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
 
+
+    @ApiOperation("资源查询_不分页")
+    @RequestMapping(value = ServiceApi.Resources.NoPageResources, method = RequestMethod.GET)
+    List<MRsResources> queryNoPageResources(
+            @RequestParam(value = "filters", required = false) String filters);
+
 }
