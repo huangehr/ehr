@@ -4,6 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsResources;
+import com.yihu.ehr.resource.model.RsDictionary;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.ResourcesService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -120,5 +121,19 @@ public class ResourcesEndPoint extends EnvelopRestEndPoint {
 
         pagedResponse(request,response,total,page,size);
         return (List<MRsResources>)rsList;
+    }
+
+
+    @ApiOperation("资源查询_不分页")
+    @RequestMapping(value = ServiceApi.Resources.NoPageResources,method = RequestMethod.GET)
+    public List<MRsResources> queryNoPageResources(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception {
+        Collection<MRsResources> mrsList;
+
+        Collection<MRsResources> rsList = rsService.search(filters);
+        mrsList = convertToModels(rsList,new ArrayList<>(rsList.size()),MRsResources.class,"");
+
+        return (List<MRsResources>)mrsList;
     }
 }
