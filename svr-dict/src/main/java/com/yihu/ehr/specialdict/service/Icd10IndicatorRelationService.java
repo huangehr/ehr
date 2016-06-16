@@ -30,12 +30,12 @@ public class Icd10IndicatorRelationService extends BaseJpaService<Icd10Indicator
     @Autowired
     private XIcd10IndicatorRelationRepository icd10IndicatorRelaRepo;
 
-    public boolean isExist(String icd10Id,String indicatorId){
+    public boolean isExist(long icd10Id,long indicatorId){
         Icd10IndicatorRelation icd10IndicatorRelation = icd10IndicatorRelaRepo.findByIcd10IdAndIndicatorId(icd10Id, indicatorId);
         return  icd10IndicatorRelation != null;
     }
 
-    public List<Icd10IndicatorRelation> getIcd10IndicatorRelationListByIcd10Id(String icd10Id){
+    public List<Icd10IndicatorRelation> getIcd10IndicatorRelationListByIcd10Id(long icd10Id){
         List<Icd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelaRepo.findByIcd10Id(icd10Id);
         if(icd10IndicatorRelations.size() == 0){
             return null;
@@ -43,7 +43,7 @@ public class Icd10IndicatorRelationService extends BaseJpaService<Icd10Indicator
         return icd10IndicatorRelations;
     }
 
-    public boolean isUsage(String indicatorId){
+    public boolean isUsage(long indicatorId){
         List<Icd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelaRepo.findByIndicatorId(indicatorId);
         if(icd10IndicatorRelations.size() == 0){
             return false;
@@ -56,7 +56,7 @@ public class Icd10IndicatorRelationService extends BaseJpaService<Icd10Indicator
         return icd10IndicatorRelaRepo.findAll(pageable);
     }
 
-    public List<Icd10IndicatorRelation> getIcd10IndicatorRelationsByIcd10Ids(String[] icd10Ids) {
+    public List<Icd10IndicatorRelation> getIcd10IndicatorRelationsByIcd10Ids(long[] icd10Ids) {
         return icd10IndicatorRelaRepo.findByIcd10Ids(icd10Ids);
     }
 }

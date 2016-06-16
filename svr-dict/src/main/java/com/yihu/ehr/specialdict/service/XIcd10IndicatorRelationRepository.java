@@ -14,11 +14,11 @@ import java.util.List;
  */
 public interface XIcd10IndicatorRelationRepository extends PagingAndSortingRepository<Icd10IndicatorRelation, Long> {
 
-    List<Icd10IndicatorRelation> findByIcd10Id(String icd10Id);
-    List<Icd10IndicatorRelation> findByIndicatorId(String indicatorId);
+    List<Icd10IndicatorRelation> findByIcd10Id(long icd10Id);
+    List<Icd10IndicatorRelation> findByIndicatorId(long indicatorId);
 
-    Icd10IndicatorRelation findByIcd10IdAndIndicatorId(String icd10Id, String indicatorId);
+    Icd10IndicatorRelation findByIcd10IdAndIndicatorId(long icd10Id, long indicatorId);
 
     @Query("select icd10IndicatorRelation from Icd10IndicatorRelation icd10IndicatorRelation  where icd10IndicatorRelation.icd10Id in (:icd10Ids)")
-    List<Icd10IndicatorRelation> findByIcd10Ids(@Param("icd10Ids") String[] icd10Ids);
+    List<Icd10IndicatorRelation> findByIcd10Ids(@Param("icd10Ids") long[] icd10Ids);
 }

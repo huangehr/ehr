@@ -8,7 +8,7 @@ import java.util.Date;
  */
 public class MIcd10DiagnoseRelation implements Serializable {
     private Long id;
-    private String icd10Id;
+    private Long icd10Id;
     private String name;
     private String description;
     private String createUser;
@@ -23,10 +23,10 @@ public class MIcd10DiagnoseRelation implements Serializable {
         this.id = id;
     }
 
-    public String getIcd10Id() {
+    public Long getIcd10Id() {
         return icd10Id;
     }
-    public void setIcd10Id(String icd10Id) {
+    public void setIcd10Id(Long icd10Id) {
         this.icd10Id = icd10Id;
     }
 

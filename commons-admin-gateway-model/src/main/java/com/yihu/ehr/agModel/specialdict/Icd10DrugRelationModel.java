@@ -15,33 +15,33 @@ public class Icd10DrugRelationModel implements Serializable{
 	public Icd10DrugRelationModel() {
 	}
 
-	private String id;
-	private String icd10Id;
-	private String drugId;
+	private long id;
+	private long icd10Id;
+	private long drugId;
     private String createUser;
     private Date createDate;
 
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public String getIcd10Id() {
+	public long getIcd10Id() {
 		return icd10Id;
 	}
 
-	public void setIcd10Id(String icd10Id) {
+	public void setIcd10Id(long icd10Id) {
 		this.icd10Id = icd10Id;
 	}
 
-	public String getDrugId() {
+	public long getDrugId() {
 		return drugId;
 	}
 
-	public void setDrugId(String drugId) {
+	public void setDrugId(long drugId) {
 		this.drugId = drugId;
 	}
 

@@ -32,7 +32,7 @@ public interface HealthProblemDictClient {
     @ApiOperation(value = "根据id删除健康问题字典（含健康问题字典及与ICD10的关联关系。）")
     boolean deleteHpDict(
             @ApiParam(name = "id", value = "字典ID")
-            @PathVariable(value = "id") String id) ;
+            @PathVariable(value = "id") long id) ;
 
     @RequestMapping(value = "dict/hps", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据ids批量删除健康问题字典（含健康问题字典及与ICD10的关联关系。）")
@@ -50,7 +50,7 @@ public interface HealthProblemDictClient {
     @ApiOperation(value = "根据ID获取相应的健康问题字典信息。" )
     MHealthProblemDict getHpDict(
             @ApiParam(name = "id", value = "字典内码")
-            @PathVariable(value = "id") String id);
+            @PathVariable(value = "id") long id);
 
     @RequestMapping(value = "/dict/hps", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询相应的ICD10字典信息。" )
@@ -90,7 +90,7 @@ public interface HealthProblemDictClient {
     @ApiOperation(value = "为健康问题增加ICD10疾病关联,--批量增加关联。" )
     Collection<MIcd10HpRelation> createHpIcd10Relations(
             @ApiParam(name = "hp_id", value = "健康问题Id")
-            @RequestParam(value = "hp_id") String hpId,
+            @RequestParam(value = "hp_id") long hpId,
             @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")
             @RequestParam(value = "icd10_ids") String icd10Ids,
             @ApiParam(name = "create_user",value = "创建者")
@@ -106,7 +106,7 @@ public interface HealthProblemDictClient {
     @ApiOperation(value = "为健康问题删除ICD10疾病关联。" )
     boolean deleteHpIcd10Relation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
-            @RequestParam(value = "id", required = true) String id);
+            @RequestParam(value = "id", required = true) long id);
 
     @RequestMapping(value = "/dict/hp/icd10s", method = RequestMethod.DELETE)
     @ApiOperation(value = "为健康问题删除ICD10疾病关联,批量删除关联。" )
@@ -138,7 +138,7 @@ public interface HealthProblemDictClient {
     @ApiOperation(value = "判断健康问题与ICD10的关联关系在系统中是否已存在")
     boolean isHpIcd10RelaExist(
             @ApiParam(name = "hpId", value = "健康问题内码")
-            @RequestParam(value = "hpId", required = false) String hpId,
+            @RequestParam(value = "hpId", required = false) long hpId,
             @ApiParam(name = "icd10Id", value = "Icd10内码", defaultValue = "")
-            @RequestParam(value = "icd10Id", required = false) String icd10Id);
+            @RequestParam(value = "icd10Id", required = false) long icd10Id);
 }

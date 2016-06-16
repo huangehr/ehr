@@ -16,8 +16,8 @@ public class MIcd10IndicatorRelation implements Serializable{
 	}
 
 	private Long id;
-	private String icd10Id;
-	private String indicatorId;
+	private Long icd10Id;
+	private Long indicatorId;
     private String createUser;
     private Date createDate;
 
@@ -29,19 +29,19 @@ public class MIcd10IndicatorRelation implements Serializable{
 		this.id = id;
 	}
 
-	public String getIcd10Id() {
+	public Long getIcd10Id() {
 		return icd10Id;
 	}
 
-	public void setIcd10Id(String icd10Id) {
+	public void setIcd10Id(Long icd10Id) {
 		this.icd10Id = icd10Id;
 	}
 
-	public String getIndicatorId() {
+	public Long getIndicatorId() {
 		return indicatorId;
 	}
 
-	public void setIndicatorId(String indicatorId) {
+	public void setIndicatorId(Long indicatorId) {
 		this.indicatorId = indicatorId;
 	}
 

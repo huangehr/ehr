@@ -20,8 +20,8 @@ public class Icd10HpRelation implements Serializable{
     }
 
     private long id;
-    private String hpId;
-    private String icd10Id;
+    private long hpId;
+    private long icd10Id;
     private String createUser;
     private Date createDate;
 
@@ -36,18 +36,18 @@ public class Icd10HpRelation implements Serializable{
     }
 
     @Column(name = "hp_id", nullable = false)
-    public String getHpId() {
+    public long getHpId() {
         return hpId;
     }
-    public void setHpId(String hpId) {
+    public void setHpId(long hpId) {
         this.hpId = hpId;
     }
 
     @Column(name = "icd10_id", nullable = false)
-    public String getIcd10Id() {
+    public long getIcd10Id() {
         return icd10Id;
     }
-    public void setIcd10Id(String icd10Id) {
+    public void setIcd10Id(long icd10Id) {
         this.icd10Id = icd10Id;
     }
 

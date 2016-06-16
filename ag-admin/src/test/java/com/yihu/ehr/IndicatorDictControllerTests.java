@@ -41,8 +41,8 @@ public class IndicatorDictControllerTests {
     private ObjectMapper objectMapper;
 
 
-    public static String icd10Id;
-    public static String indicatorId;
+    public static Long icd10Id;
+    public static Long indicatorId;
     public static Envelop envelop = new Envelop();
 
     @Test
@@ -71,7 +71,7 @@ public class IndicatorDictControllerTests {
         String json_1 = objectMapper.writeValueAsString(retrieveMap_1);
 
         envelop = indicatorDictController.createIndicatorsDict(json_1);
-        indicatorId = ((IndicatorsDictModel)envelop.getObj()).getId().toString();
+        indicatorId = ((IndicatorsDictModel)envelop.getObj()).getId();
         assertTrue("字典新增失败", envelop.isSuccessFlg());
 
         envelop = indicatorDictController.getIndicatorsDict(indicatorId);
@@ -88,7 +88,7 @@ public class IndicatorDictControllerTests {
         String lowerLimit = "1度";
         String description = "指标字典新增测试。";
 
-        Map<String,String> retrieveMap_2 = new HashMap<>();
+        Map<String,Object> retrieveMap_2 = new HashMap<>();
         retrieveMap_2.put("id",indicatorId);
         retrieveMap_2.put("code",code);
         retrieveMap_2.put("name",name);
@@ -158,7 +158,7 @@ public class IndicatorDictControllerTests {
         Icd10DictModel icd10DictModel = (Icd10DictModel)envelop_icd10.getObj();
         icd10Id = icd10DictModel.getId();
 
-        Map<String,String> retrieveMap_4 = new HashMap<>();
+        Map<String,Object> retrieveMap_4 = new HashMap<>();
         retrieveMap_4.put("icd10Id",icd10Id);
         retrieveMap_4.put("indicatorId", indicatorId);
 
