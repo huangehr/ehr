@@ -1,11 +1,11 @@
 package com.yihu.ehr.config;
 
 
-import com.yihu.ehr.query.ExtJdbcTemplate;
 import com.yihu.ehr.standard.datasets.service.BaseDataSet;
-import com.yihu.ehr.util.reflection.ClassPoolUtils;
-import org.apache.commons.dbcp2.BasicDataSource;
+import com.yihu.ehr.util.ClassPoolUtils;
+import com.yihu.ehr.util.ExtJdbcTemplate;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
@@ -31,7 +31,11 @@ import java.util.Map;
  * @created 2016.2.19
  */
 @Configuration
-public class StdHibernateConfig extends HibernateConfig  {
+public class StdHibernateConfig {
+
+    @Autowired
+    DataSource dataSource;
+
     public static Map<String, String> vesionedEntitys = new HashMap<>();
     static{
         vesionedEntitys.put("com.yihu.ehr.standard.datasets.service.DataSet", "std_data_set_");
@@ -52,7 +56,7 @@ public class StdHibernateConfig extends HibernateConfig  {
     }
 
     @Bean
-    public StdSessionFactoryBean sessionFactory(BasicDataSource dataSource) throws Exception {
+    public StdSessionFactoryBean sessionFactory() throws Exception {
 
         List<Class> tableClass = createEntity(dataSource);
         StdSessionFactoryBean sessionFactory = new StdSessionFactoryBean();
@@ -69,7 +73,7 @@ public class StdHibernateConfig extends HibernateConfig  {
     }
 
     @Bean
-    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory, BasicDataSource dataSource){
+    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory){
         HibernateTransactionManager transactionManager = new HibernateTransactionManager();
         transactionManager.setSessionFactory(sessionFactory);
         transactionManager.setDataSource(dataSource);
@@ -78,7 +82,7 @@ public class StdHibernateConfig extends HibernateConfig  {
 
 
     @Bean
-    public ExtJdbcTemplate jdbcTemplate(BasicDataSource dataSource){
+    public ExtJdbcTemplate jdbcTemplate(){
 
         return  new ExtJdbcTemplate(dataSource);
     }

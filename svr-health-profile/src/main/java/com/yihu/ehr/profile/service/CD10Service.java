@@ -52,14 +52,14 @@ public class CD10Service {
         //获取ICD10id列表
         List<String> icd10Ids = new ArrayList<>();
         for (MIcd10HpRelation hpIcd10Relation : hpIcd10Relations){
-            icd10Ids.add(hpIcd10Relation.getIcd10Id());
+            icd10Ids.add(hpIcd10Relation.getIcd10Id().toString());
         }
         //获取药品和ICD10关系
         List<MIcd10DrugRelation> icd10DrugRelations = icd10DrugRelationClient.getIcd10DrugRelationsByIcd10Ids(icd10Ids);
         //获取药品id列表
         List<String> drugIds = new ArrayList<>();
         for (MIcd10DrugRelation icd10DrugRelation : icd10DrugRelations){
-            drugIds.add(icd10DrugRelation.getDrugId());
+            drugIds.add(icd10DrugRelation.getDrugId().toString());
         }
         //根据药品id列表或药品列表信息
         List<MDrugDict> drugDicts = drugDictClient.getDrugDictByIds(drugIds);
@@ -80,14 +80,14 @@ public class CD10Service {
         //获取ICD10id列表
         List<String> icd10Ids = new ArrayList<>();
         for (MIcd10HpRelation hpIcd10Relation : hpIcd10Relations){
-            icd10Ids.add(hpIcd10Relation.getIcd10Id());
+            icd10Ids.add(hpIcd10Relation.getIcd10Id().toString());
         }
         //获取指标和ICD10关系
         List<MIcd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelationClient.getIcd10IndicatorRelationsByIcd10Ids(icd10Ids);
         //获取指标id列表
         List<String> indicatorIds = new ArrayList<>();
         for (MIcd10IndicatorRelation icd10IndicatorRelation : icd10IndicatorRelations){
-            indicatorIds.add(icd10IndicatorRelation.getIndicatorId());
+            indicatorIds.add(icd10IndicatorRelation.getIndicatorId().toString());
         }
         //根据指标id列表或指标列表信息
         List<MIndicatorsDict> indicatorsDict = indicatorsDictClient.getIndicatorsDictByIds(indicatorIds);
@@ -107,7 +107,7 @@ public class CD10Service {
         //获取ICD10字典id列表
         List<String> icd10Ids = new ArrayList<>();
         for (MIcd10HpRelation h: hpIcd10RelationList){
-            icd10Ids.add(h.getIcd10Id());
+            icd10Ids.add(h.getIcd10Id().toString());
         }
         return icd10DictClient.getIcd10DictListByIds(icd10Ids);
     }
