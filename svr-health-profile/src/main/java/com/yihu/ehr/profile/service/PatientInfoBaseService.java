@@ -325,13 +325,11 @@ public class PatientInfoBaseService {
                 } else {
                     join = hpJoin;
                 }
-
-                queryParams = "{\"q\":\"" + q + "\",\"join\":\"" + join + "\"}";
             }
         }
 
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, queryParams.replace(' ','+'));
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, URLEncoder.encode(queryParams));
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             re = result.getDetailModelList();
 
