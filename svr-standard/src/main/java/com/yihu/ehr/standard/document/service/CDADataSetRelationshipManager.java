@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MCdaDataSet;
-import com.yihu.ehr.query.BaseHbmService;
+import com.yihu.ehr.util.BaseHbmService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;

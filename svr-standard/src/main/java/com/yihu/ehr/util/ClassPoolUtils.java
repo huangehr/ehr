@@ -1,5 +1,6 @@
-package com.yihu.ehr.util.reflection;
+package com.yihu.ehr.util;
 
+import com.yihu.ehr.util.reflection.ClassLoaderEx;
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
