@@ -62,4 +62,14 @@ public interface RsDictionaryClient {
     boolean isExistence(
             @ApiParam(name="filters",value="filters",defaultValue = "")
             @RequestParam(value="filters") String filters);
+
+    @RequestMapping(value = ServiceApi.Resources.DictEntryBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量创建标准字典以及字典项", notes = "批量创建标准字典以及字典项")
+    boolean createDictAndEntries(
+            @RequestBody String jsonData);
+
+    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.GET)
+    @ApiOperation("获取已存在字典编码")
+    List codeExistence(
+            @RequestParam("codes") String codes);
 }

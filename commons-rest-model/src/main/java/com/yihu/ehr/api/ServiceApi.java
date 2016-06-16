@@ -74,6 +74,8 @@ public class ServiceApi {
         public static final String DictBatch                    ="/resources/dict/batch";
         public static final String Dict                         ="/resources/dict/{id}";
         public static final String DictExistence                ="/resources/dict/existence";
+        public static final String DictEntryBatch               ="/resources/dict/entry/batch";
+        public static final String DictCodesExistence            ="/resources/dict/codes/existence";
 
         public static final String Params                       ="/resources/param";
         public static final String Param                        ="/resources/param/{id}";

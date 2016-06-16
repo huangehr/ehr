@@ -107,8 +107,8 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
         RsMetadata rsMetadata ;
         SQLQuery query;
         int total = 0;
-        for(int i=0; i<metaLs.size(); i++){
-            rsMetadata = metaLs.get(i);
+        for(int i=1; i<=metaLs.size(); i++){
+            rsMetadata = metaLs.get(i-1);
             sql.append("('"+ rsMetadata .getId() +"'");
             sql.append(",'"+ rsMetadata .getDomain() +"'");
             sql.append(",'"+ rsMetadata .getName() +"'");
@@ -119,7 +119,7 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
             sql.append(",'"+ rsMetadata .getDescription() +"'");
             sql.append(",'1')");
 
-            if(i%100==0 || i+1 == metaLs.size()){
+            if(i%100==0 || i == metaLs.size()){
                 query = currentSession().createSQLQuery(sql.toString());
                 total += query.executeUpdate();
                 sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, valid) VALUES ") ;
