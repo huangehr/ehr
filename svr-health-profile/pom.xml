@@ -193,5 +193,17 @@
             <artifactId>fastDFS</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
+        <!--html转图片工具类-->
+        <dependency>
+            <groupId>net.sf.cssbox</groupId>
+            <artifactId>cssbox</artifactId>
+            <version>4.11</version>
+        </dependency>
+        <!--模板工具类-->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.23</version>
+        </dependency>
     </dependencies>
 </project>
