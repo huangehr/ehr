@@ -1,6 +1,7 @@
 package com.yihu.ehr.query;
 
 import com.yihu.ehr.constants.PageArg;
+import com.yihu.ehr.lang.SpringContext;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -38,8 +39,7 @@ import java.util.List;
  */
 @Transactional(propagation = Propagation.SUPPORTS)
 public class BaseJpaService<T, R> {
-    @Autowired
-    R repo;
+    Class<R> repoClass;
 
     @PersistenceContext
     protected EntityManager entityManager;
@@ -138,11 +138,11 @@ public class BaseJpaService<T, R> {
     }
 
     public PagingAndSortingRepository getRepository() {
-        return (PagingAndSortingRepository) repo;
+        return (PagingAndSortingRepository) SpringContext.getService(repoClass);
     }
 
     public JpaRepository getJpaRepository(){
-        return (JpaRepository)repo;
+        return (JpaRepository) SpringContext.getService(repoClass);
     }
 
     public List<T> findByField(String field, Object value){
