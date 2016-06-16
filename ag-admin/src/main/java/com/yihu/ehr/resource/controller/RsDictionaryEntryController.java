@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,17 +43,16 @@ public class RsDictionaryEntryController extends BaseController {
             @RequestParam(value = "size", required = false) int size) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            ResponseEntity<List<MRsDictionaryEntry>> responseEntity = rsDictionaryEntryClient.searchRsDictionaryEntries(fields,filters,sorts,page,size);
+            ResponseEntity<List<MRsDictionaryEntry>> responseEntity = rsDictionaryEntryClient.searchRsDictionaryEntries(fields, filters, sorts, page, size);
             List<MRsDictionaryEntry> rsDictionaryEntries = responseEntity.getBody();
             envelop = getResult(rsDictionaryEntries, getTotalCount(responseEntity), page, size);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
         }
 
         return envelop;
     }
-
 
 
     @RequestMapping(value = ServiceApi.Resources.DictEntries, method = RequestMethod.POST)
@@ -61,11 +61,11 @@ public class RsDictionaryEntryController extends BaseController {
             @ApiParam(name = "model", value = "", defaultValue = "")
             @RequestParam(value = "model") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
-        try{
+        try {
             MRsDictionaryEntry rsDictionaryEntry = rsDictionaryEntryClient.createRsDictionaryEntry(jsonData);
             envelop.setObj(rsDictionaryEntry);
             envelop.setSuccessFlg(true);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
@@ -73,17 +73,17 @@ public class RsDictionaryEntryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value =ServiceApi.Resources.DictEntries, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.DictEntries, method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准字典项", notes = "修改标准字典项")
     public Envelop updateRsDictionaryEntry(
             @ApiParam(name = "json_data", value = "")
             @RequestParam(value = "model") String jsonData) throws Exception {
         Envelop envelop = new Envelop();
-        try{
+        try {
             MRsDictionaryEntry rsDictionaryEntry = rsDictionaryEntryClient.updateRsDictionaryEntry(jsonData);
             envelop.setObj(rsDictionaryEntry);
             envelop.setSuccessFlg(true);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
@@ -97,10 +97,10 @@ public class RsDictionaryEntryController extends BaseController {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
         Envelop envelop = new Envelop();
-        try{
+        try {
             rsDictionaryEntryClient.deleteRsDictionaryEntry(id);
             envelop.setSuccessFlg(true);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
@@ -114,9 +114,26 @@ public class RsDictionaryEntryController extends BaseController {
             @ApiParam(name = "id", value = "", defaultValue = "")
             @PathVariable(value = "id") String id) {
         Envelop envelop = new Envelop();
-        try{
+        try {
             MRsDictionaryEntry rsDictionaryEntry = rsDictionaryEntryClient.getRsDictionaryEntryById(id);
             envelop.setObj(rsDictionaryEntry);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.DictEntriesByDictCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据dict_code获取获取标准字典")
+    public Envelop getRsDictionaryEntryByDictCode(
+            @ApiParam(name = "dict_code", value = "", defaultValue = "")
+            @PathVariable(value = "dict_code") String dict_code) {
+        Envelop envelop = new Envelop();
+        try{
+            List<MRsDictionaryEntry> rsDictionaryEntries = rsDictionaryEntryClient.getRsDictionaryEntryByDictCode(dict_code);
+            envelop.setObj(rsDictionaryEntries);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
             e.printStackTrace();
@@ -125,17 +142,34 @@ public class RsDictionaryEntryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence, method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public Envelop isExistence(
-            @ApiParam(name="filters",value="filters",defaultValue = "")
-            @RequestParam(value="filters") String filters) {
+            @ApiParam(name = "filters", value = "filters", defaultValue = "")
+            @RequestParam(value = "filters") String filters) {
 
         try {
             return success(rsDictionaryEntryClient.isExistence(filters));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return failed("查询出错！");
         }
+    }
+
+    @RequestMapping(value = "/resources/noPageDictEntries", method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件获取标准字典项列表_不分页", notes = "根据查询条件获取标准字典项列表_不分页")
+    public Envelop searchNoPageRsDictEntries(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        List<MRsDictionaryEntry> dictionaryEntries = rsDictionaryEntryClient.searchNoPageRsDictEntries(filters);
+        if (dictionaryEntries.size() > 0) {
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(dictionaryEntries);
+        } else
+            envelop.setErrorMsg("字典查询失败");
+
+        return envelop;
     }
 }

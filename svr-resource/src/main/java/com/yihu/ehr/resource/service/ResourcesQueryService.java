@@ -320,12 +320,7 @@ public class ResourcesQueryService  {
             }
             queryParams = addParams(queryParams,"q",solr.conditionToString(ql));
 
-            //通过资源代码获取默认参数
-            List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
-            for(ResourceDefaultParam param:paramsList)
-            {
-                queryParams = addParams(queryParams,param.getParamKey(),param.getParamValue());
-            }
+
         }
         return getResources(resourcesCode,"JKZL",queryParams,page,size);
     }

@@ -104,6 +104,16 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
         return convertToModel(dictionaryEntry, MRsDictionaryEntry.class);
     }
 
+    @RequestMapping(value = ServiceApi.Resources.DictEntriesByDictCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据dict_code获取获取标准字典")
+    public List<MRsDictionaryEntry>  getRsDictionaryEntryByDictCode(
+            @ApiParam(name = "dict_code", value = "", defaultValue = "")
+            @PathVariable(value = "dict_code") String dict_code)
+    {
+        List<RsDictionaryEntry> dictionaryEntries = rsDictionaryEntryService.findByDictCode(dict_code);
+        return (List<MRsDictionaryEntry>) convertToModels(dictionaryEntries, new ArrayList<MRsDictionaryEntry>(dictionaryEntries.size()), MRsDictionaryEntry.class,null);
+    }
+
     @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence,method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public boolean isExistence(
@@ -116,5 +126,15 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
 
     public boolean isExistence(String dictCode,String code) {
         return rsDictionaryEntryService.findByFields(new String[]{"dictCode","code"},new String[]{dictCode,code}).size() != 0;
+    }
+
+
+    @RequestMapping(value = ServiceApi.Resources.NoPageDictEntries, method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件获取标准字典项列表_不分页", notes = "根据查询条件获取标准字典项列表_不分页")
+    public List<MRsDictionaryEntry> searchNoPageRsDictEntries(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<RsDictionaryEntry> dictionaryEntries = rsDictionaryEntryService.search(filters);
+        return (List<MRsDictionaryEntry>) convertToModels(dictionaryEntries, new ArrayList<MRsDictionaryEntry>(dictionaryEntries.size()), MRsDictionaryEntry.class, "");
     }
 }

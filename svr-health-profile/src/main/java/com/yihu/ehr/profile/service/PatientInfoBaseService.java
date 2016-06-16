@@ -9,6 +9,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -268,9 +269,9 @@ public class PatientInfoBaseService {
                 q += " AND event_type:" + eventType;
             } else if (eventType.equals("3")) //根据业务来区分数据
             {
-                join = "";
+                join = " ";
             } else if (eventType.equals("4")) {
-                join = "";
+                join = " ";
             }
         }
         //事件年份
@@ -278,33 +279,16 @@ public class PatientInfoBaseService {
             q += " AND event_date:[" + year + "-01-01T00:00:00Z TO " + year + "-12-31T23:59:59Z]";
         }
 
-        //获取门诊住院记录
-        Envelop resultMain = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\""+q+"\"}");
-        StringBuilder rowkeys = new StringBuilder();
-
-        if (resultMain.getDetailModelList() != null && resultMain.getDetailModelList().size() > 0) {
-            List<Map<String, Object>> eventList = (List<Map<String, Object>>) resultMain.getDetailModelList();
-
-            for (Map<String, Object> event : eventList) {
-                if (rowkeys.length() > 0) {
-                    rowkeys.append(" OR ");
-                }
-                rowkeys.append("profile_id:" + event.get("rowkey"));
-            }
-        }
-        else{
-            return re;
-        }
-
-        String queryParams = "";
+        String queryParams = "{\"q\":\"" + q + "\"}";
 
         //疾病ID
         if (diseaseId != null && diseaseId.length() > 0) {
             if (join.length() > 0) {
                 join += " AND (" + BasisConstant.mzzd + ":" + diseaseId + " OR " + BasisConstant.zyzd + ":" + diseaseId + ")";
             } else {
-                join = "(" + BasisConstant.mzzd + ":" + diseaseId + " OR " + BasisConstant.zyzd + ":" + diseaseId + ")";
+                join = BasisConstant.mzzd + ":" + diseaseId + " OR " + BasisConstant.zyzd + ":" + diseaseId;
             }
+            queryParams = "{\"q\":\"" + q + "\",\"join\":\"" + join + "\"}";
         } else {
             //健康问题
             if (hpId != null && hpId.length() > 0) {
@@ -341,18 +325,13 @@ public class PatientInfoBaseService {
                 } else {
                     join = hpJoin;
                 }
+
+                queryParams = "{\"q\":\"" + q + "\",\"join\":\"" + join + "\"}";
             }
         }
 
-
-        queryParams = "{\"q\":\"" + rowkeys.toString() + "\"}";
-        if(join.length()>0)
-        {
-            queryParams = "{\"q\":\"(" + rowkeys.toString() + ") AND " + join + "\"}";
-        }
-
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, queryParams);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, queryParams.replace(' ','+'));
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             re = result.getDetailModelList();
 

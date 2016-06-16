@@ -49,46 +49,46 @@ public class ResourceBrowseController extends BaseController {
     @Autowired
     private ResourceBrowseClient resourceBrowseClient;
 
-    @ApiOperation("获取资源数据元信息，column信息")
-    @RequestMapping(value = "/resources/ResourceBrowses", method = RequestMethod.GET)
-    public Envelop queryResources(
-            @ApiParam(name = "category_id", value = "返回字段", defaultValue = "")
-            @RequestParam(value = "category_id") String categoryId) throws Exception {
-
-        Envelop envelop = new Envelop();
-        List<RsResourceMetadataModel> rsMetadataModels = new ArrayList<>();
-
-        try {
-            //查询资源注册信息
-            ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "id=" + categoryId, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
-            List<MRsResources> rsResources = categoryResponseEntity.getBody();
-
-            //查询资源数据元信息
-            ResponseEntity<List<MRsResourceMetadata>> resourceMetadataResponseEntity = resourceMetadataClient.queryDimensions("", "resourcesId=" + rsResources.get(0).getId(), "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
-            List<MRsResourceMetadata> rsMetadatas = resourceMetadataResponseEntity.getBody();
-
-            //查询资源数据元详情
-            for (MRsResourceMetadata mrm : rsMetadatas) {
-                RsResourceMetadataModel rsMetadataModel = convertToModel(mrm, RsResourceMetadataModel.class);
-
-                ResponseEntity<List<MRsMetadata>> RsresponseEntity = metadataClient.getMetadata("", "id=" + rsMetadataModel.getMetadataId(), "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
-                List<MRsMetadata> mRsMetadataList = RsresponseEntity.getBody();
-
-                if (mRsMetadataList.size() > 0) {
-                    rsMetadataModel.setStdCode(mRsMetadataList.get(0).getStdCode());
-                    rsMetadataModel.setName(mRsMetadataList.get(0).getName());
-                    rsMetadataModel.setColumnType(mRsMetadataList.get(0).getColumnType());
-                    rsMetadataModel.setDictId(mRsMetadataList.get(0).getDictCode());
-                    rsMetadataModels.add(rsMetadataModel);
-                }
-            }
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(rsMetadataModels);
-        } catch (Exception e) {
-            envelop.setSuccessFlg(false);
-        }
-        return envelop;
-    }
+//    @ApiOperation("获取资源数据元信息，column信息")
+//    @RequestMapping(value = "/resources/ResourceBrowses", method = RequestMethod.GET)
+//    public Envelop queryResources(
+//            @ApiParam(name = "category_id", value = "返回字段", defaultValue = "")
+//            @RequestParam(value = "category_id") String categoryId) throws Exception {
+//
+//        Envelop envelop = new Envelop();
+//        List<RsResourceMetadataModel> rsMetadataModels = new ArrayList<>();
+//
+//        try {
+//            //查询资源注册信息
+//            ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "id=" + categoryId, "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
+//            List<MRsResources> rsResources = categoryResponseEntity.getBody();
+//
+//            //查询资源数据元信息
+//            ResponseEntity<List<MRsResourceMetadata>> resourceMetadataResponseEntity = resourceMetadataClient.queryDimensions("", "resourcesId=" + rsResources.get(0).getId(), "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
+//            List<MRsResourceMetadata> rsMetadatas = resourceMetadataResponseEntity.getBody();
+//
+//            //查询资源数据元详情
+//            for (MRsResourceMetadata mrm : rsMetadatas) {
+//                RsResourceMetadataModel rsMetadataModel = convertToModel(mrm, RsResourceMetadataModel.class);
+//
+//                ResponseEntity<List<MRsMetadata>> RsresponseEntity = metadataClient.getMetadata("", "id=" + rsMetadataModel.getMetadataId(), "", 1, 15);// TODO: 2016/5/30 测试数据15（无不分页查询）
+//                List<MRsMetadata> mRsMetadataList = RsresponseEntity.getBody();
+//
+//                if (mRsMetadataList.size() > 0) {
+//                    rsMetadataModel.setStdCode(mRsMetadataList.get(0).getStdCode());
+//                    rsMetadataModel.setName(mRsMetadataList.get(0).getName());
+//                    rsMetadataModel.setColumnType(mRsMetadataList.get(0).getColumnType());
+//                    rsMetadataModel.setDictId(mRsMetadataList.get(0).getDictCode());
+//                    rsMetadataModels.add(rsMetadataModel);
+//                }
+//            }
+//            envelop.setSuccessFlg(true);
+//            envelop.setDetailModelList(rsMetadataModels);
+//        } catch (Exception e) {
+//            envelop.setSuccessFlg(false);
+//        }
+//        return envelop;
+//    }
 
     @ApiOperation("查询资源分类")
     @RequestMapping(value = "/resources/ResourceBrowses/categories", method = RequestMethod.GET)
@@ -116,6 +116,8 @@ public class ResourceBrowseController extends BaseController {
 
                     ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999);// TODO: 2016/5/30 测试数据15（无不分页查询）
                     rsResources = categoryResponseEntity.getBody();
+//                    rsResources = resourcesClient.queryNoPageResources("categoryId=" + mRsCategory.getId());
+//
                     if (rsResources.size() > 0) {
                         List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
                         for (RsResourcesModel resourcesModel : resourcesModelList) {

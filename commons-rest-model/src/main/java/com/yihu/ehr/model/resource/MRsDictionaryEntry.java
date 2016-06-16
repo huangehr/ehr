@@ -5,6 +5,7 @@ package com.yihu.ehr.model.resource;
  */
 public class MRsDictionaryEntry {
     private String id;
+    private String dictId;
     private String dictCode;
     private String code;
     private String name;
@@ -16,6 +17,13 @@ public class MRsDictionaryEntry {
     public void setId(String id)
     {
         this.id = id;
+    }
+
+    public String getDictId() {
+        return dictId;
+    }
+    public void setDictId(String dictId) {
+        this.dictId = dictId;
     }
 
     public String getDictCode()
