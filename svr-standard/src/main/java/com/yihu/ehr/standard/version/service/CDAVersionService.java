@@ -4,7 +4,7 @@ import com.yihu.ehr.config.StdHibernateConfig;
 import com.yihu.ehr.config.StdSessionFactoryBean;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.CDAVersionUtil;
-import com.yihu.ehr.util.reflection.ClassPoolUtils;
+import com.yihu.ehr.util.ClassPoolUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
