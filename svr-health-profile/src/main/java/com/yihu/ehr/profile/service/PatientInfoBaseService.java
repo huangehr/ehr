@@ -6,6 +6,8 @@ import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import com.yihu.ehr.profile.feign.*;
 import com.yihu.ehr.util.rest.Envelop;
+import org.apache.avro.generic.GenericData;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author hzp 2016-05-26
@@ -365,6 +368,195 @@ public class PatientInfoBaseService {
         }
 
         return re;
+    }
+
+    /**
+     * 获取病人门诊住院事件
+     * @param demographicId 身份证ID
+     * @param eventType 事件类型
+     * @param year 事件年份
+     * @param area 事件地区
+     * @param hpId 健康问题
+     * @param diseaseId 疾病问题
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String,Object>> getPatientMzZyEvents(String demographicId, String eventType, String year, String area, String hpId, String diseaseId) throws Exception {
+        //门诊过滤参数
+        String mzQuery = "";
+        //住院过滤参数
+        String zyQuery = "";
+        //事件过滤参数
+        String query = "{\"q\":\"demographic_id:" + demographicId;
+        //病人事件纪录rowkey
+        String rowkeys = "";
+        //疾病事件纪录rowkey
+        List<String> returnRowkey = new ArrayList<String>();
+
+        //事件类型
+        if (!StringUtils.isBlank(eventType))
+        {
+            query += " AND event_type:" + eventType;
+        }
+        //事件年份
+        if (!StringUtils.isBlank(year))
+        {
+            query += " AND event_date:[" + year + "-01-01T00:00:00Z TO " + year + "-12-31T23:59:59Z]";
+        }
+        //地区
+        if(!StringUtils.isBlank(area))
+        {
+            char[] areaCodes = area.toCharArray();
+            int count = 0;
+
+            //获取结尾0的个数
+            for(int i = areaCodes.length - 1;i > -1;i--)
+            {
+                if(areaCodes[i] == 0)
+                {
+                    count++;
+                }
+            }
+
+            //结尾0截除
+            String areaSub = area.substring(0,area.length() - count -1);
+            //获取对应地区下机构
+            List<MOrganization> organizations = organization.getOrganizationByAreaCode(areaSub);
+
+            if(organizations != null && organizations.size() > 0)
+            {   //机构代码条件组合
+                StringBuilder orgQuery = new StringBuilder();
+
+                for(MOrganization org : organizations)
+                {
+                    if(orgQuery.length() > 0)
+                    {
+                        orgQuery.append(" OR ");
+                    }
+                    orgQuery.append("org_code:" + org.getOrgCode());
+                }
+
+                query += " AND (" + orgQuery.toString() + ")";
+            }
+            else
+            {   //地区不为空，地区下结构为空时返回空
+                return new ArrayList<Map<String,Object>>();
+            }
+        }
+
+        query += "\"}";
+
+        //门诊住院事件
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, URLEncoder.encode(query));
+        //事件集合
+        List<Map<String, Object>> eventList = new ArrayList<Map<String, Object>>();
+
+        //获取rowkey
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            eventList = (List<Map<String, Object>>) result.getDetailModelList();
+
+            for (Map<String, Object> event : eventList) {
+                if (rowkeys.length() > 0) {
+                    rowkeys += " OR ";
+                }
+                rowkeys += "profile_id:" + event.get("rowkey");
+            }
+        }
+        //健康问题
+        if (!StringUtils.isBlank(hpId)) {
+            //健康问题->疾病ICD10代码
+            List<MIcd10Dict> dictCodeList = dictService.getIcd10DictList(hpId);
+
+            if (dictCodeList != null && dictCodeList.size() > 0)
+            {
+                //遍历疾病列表
+                for (MIcd10Dict ICD10 : dictCodeList)
+                {
+                    if (mzQuery.length() > 0)
+                    {
+                        mzQuery += " OR " + BasisConstant.mzzd + ":" + ICD10.getCode();
+                        zyQuery += " OR " + BasisConstant.zyzd + ":" + ICD10.getCode();
+                    }
+                    else
+                    {
+                        mzQuery = BasisConstant.mzzd + ":" + ICD10.getCode();
+                        zyQuery = BasisConstant.zyzd + ":" + ICD10.getCode();
+                    }
+                }
+            }
+        }
+        //疾病
+        if (!StringUtils.isBlank(diseaseId))
+        {
+            if (mzQuery.length() > 0)
+            {
+                mzQuery += " OR " + BasisConstant.mzzd + ":" + diseaseId;
+                zyQuery += " OR " + BasisConstant.zyzd + ":" + diseaseId;
+            }
+            else
+            {
+                mzQuery = BasisConstant.mzzd + ":" + diseaseId;
+                zyQuery = BasisConstant.zyzd + ":" + diseaseId;
+            }
+        }
+        //过滤门诊纪录
+        if (!StringUtils.isBlank(mzQuery))
+        {
+            //门诊诊断纪录
+            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\""));
+
+            //获取疾病门诊事件纪录rowkey
+            if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
+            {
+                for(Map<String,Object> map : (List<Map<String, Object>>)resultMzzd.getDetailModelList())
+                {
+                    returnRowkey.add((String)map.get("profile_id"));
+                }
+            }
+        }
+        //过滤住院纪录
+        if(!StringUtils.isBlank(zyQuery))
+        {
+            //住院诊断纪录
+            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\""));
+
+            //获取疾病住院事件纪录rowkey
+            if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0)
+            {
+                for(Map<String,Object> map : (List<Map<String, Object>>)resultZyzd.getDetailModelList())
+                {
+                    returnRowkey.add((String)map.get("profile_id"));
+                }
+            }
+        }
+
+        if(StringUtils.isBlank(diseaseId) && StringUtils.isBlank(hpId))
+        {
+            //非疾病、健康问题时返回全部事件纪录
+            return eventList;
+        }
+        else
+        {
+            //返回疾病、健康问题的事件纪录
+            if(eventList == null)
+            {
+                return new ArrayList<Map<String,Object>>();
+            }
+            else
+            {
+                List<Map<String,Object>> returnList = new ArrayList<Map<String,Object>>();
+
+                for(Map<String,Object> map : eventList)
+                {
+                    if(returnRowkey.contains(map.get("rowkey")))
+                    {
+                        returnList.add(map);
+                    }
+                }
+
+                return returnList;
+            }
+        }
     }
 
     /**
