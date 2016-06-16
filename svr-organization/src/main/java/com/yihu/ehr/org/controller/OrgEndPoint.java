@@ -154,7 +154,8 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     public List<MOrganization> getOrgs(
             @ApiParam(name = "org_codes", value = "机构代码", defaultValue = "")
             @RequestParam(value = "org_codes") String[] orgCodes) throws Exception {
-        List<MOrganization> organizationList = orgService.findByOrgCodes(orgCodes);
+        List<String> orgCodeList = Arrays.asList(orgCodes);
+        List<Organization> organizationList = orgService.findByOrgCodes(orgCodeList);
         return (List<MOrganization>) convertToModels(organizationList, new ArrayList<MOrganization>(organizationList.size()), MOrganization.class, "");
     }
 

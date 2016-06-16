@@ -1,7 +1,5 @@
-package com.yihu.ehr.util;
+package com.yihu.ehr.query;
 
-import com.yihu.ehr.query.ReturnIdPstCreator;
-import com.yihu.ehr.query.UpdatePstCallback;
 import javafx.util.Pair;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.jdbc.core.JdbcTemplate;

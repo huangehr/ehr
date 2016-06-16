@@ -1,9 +1,9 @@
 package com.yihu.ehr.org.service;
 
-import com.yihu.ehr.model.org.MOrganization;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 /**
@@ -23,5 +23,5 @@ public interface XOrganizationRepository extends PagingAndSortingRepository<Orga
     List<Organization>findByOrgAdmin(@Param("orgCode")  String orgCode,@Param("adminLoginCode")  String adminLoginCode);
 
     @Query("select org from Organization org where org.orgCode in (:orgCodes)")
-    List<MOrganization> findByOrgCodes(@Param("orgCodes") String[] orgCodes);
+    List<Organization> findByOrgCodes(@Param("orgCodes") List<String> orgCodes);
 }
