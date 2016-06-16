@@ -1,7 +1,7 @@
 package com.yihu.ehr.standard.dispatch.service;
 
 
-import com.yihu.ehr.query.BaseHbmService;
+import com.yihu.ehr.util.BaseHbmService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.stereotype.Service;

@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.yihu.ehr</groupId>
-    <artifactId>ehr-parent-pom</artifactId>
+    <artifactId>ehr-cloud</artifactId>
     <version>1.1.0</version>
     <packaging>pom</packaging>
-    <name>ehr-parent-pom</name>
+    <name>ehr-cloud</name>
     <description>EHR parent pom for all</description>
     <url>http://ehr.yihu.com</url>
 
@@ -110,6 +110,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>${version.spring-framework}</spring.version>
         <version.commons-bean-utils>1.9.2</version.commons-bean-utils>
         <version.commons-codec>1.9</version.commons-codec>
         <version.commons-collections>3.2.1</version.commons-collections>

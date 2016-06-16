@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>ehr-parent-pom</artifactId>
+        <artifactId>ehr-cloud</artifactId>
         <version>1.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -37,8 +37,8 @@
         <!--module>../svr-special-dict</module-->
         <module>../svr-standard</module>
         <module>../svr-user</module>
-        <module>../ag-admin</module>
-        <module>../ag-ehr-platform</module>
+        <module>../ag-ehr-admin</module>
+        <module>../ag-ehr-cloud</module>
     </modules>
 
     <build>
