@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -41,7 +43,7 @@ public class ResourcesQueryEndPoint {
                                 @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                 @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return resourcesQueryService.getResources(resourcesCode, appId, queryParams, page, size);
+        return resourcesQueryService.getResources(resourcesCode, appId, URLDecoder.decode(queryParams), page, size);
     }
 
 

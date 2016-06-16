@@ -10,7 +10,7 @@
     </parent>
 
     <url>https://ehr.yihu.com</url>
-    <artifactId>ag-ehr</artifactId>
+    <artifactId>ag-ehr-cloud</artifactId>
     <packaging>${packaging.type}</packaging>
 
     <properties>
@@ -68,12 +68,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter</artifactId>
             <scope>${dependency.scope}</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>

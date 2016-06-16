@@ -18,13 +18,13 @@ EHR平台目前分为四种模块：
 
 其中，通用模块有两个特殊的对象，属于POM类型，定义工程管理模板。
 
-> ehr-parent-pom：通用POM模板，管理整个工程的依赖，通用模块并用于Maven Reactor编译
+> ehr-cloud：通用POM模板，管理整个工程的依赖，通用模块并用于Maven Reactor编译
 
 > ehr-ms-parent-pom：微服务应用POM模板，管理整个工程的Spring Boot模块，并用于Maven Reactor编译
 
 **注意：**对于每一个新增的模块
 
-- 如果是通用模块，请在ehr-parent-pom的pom.xml文件中增加对应的module节点
+- 如果是通用模块，请在ehr-cloud的pom.xml文件中增加对应的module节点
 - 如果是微服务应用，请在ehr-ms-parent-pom的pom.xml文件中增加对应的module节点
 
 按上述方式添加可以统一编译或安装指定的模块。
@@ -36,7 +36,7 @@ EHR平台目前分为四种模块：
 
 通用模块与微服务模块分开编译，因为通用模块编译之后还需要安装，而微服务模块不需要再安装。
 
-- 若要编译通用模块，请在IDE或Maven命令中使用install功能调用ehr-parent-pom模块即可编译好全部模块并安装到本地Maven库。
+- 若要编译通用模块，请在IDE或Maven命令中使用install功能调用ehr-cloud模块即可编译好全部模块并安装到本地Maven库。
 - 若要编译微服务应用模块，请在IDE或Maven命令中使用Compile调用ehr-ms-parent-pom模块即可编译好全部的模块到模块的Target目录中。
 
 文档
