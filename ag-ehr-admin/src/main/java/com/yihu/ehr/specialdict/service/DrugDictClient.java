@@ -32,7 +32,7 @@ public interface DrugDictClient {
     @RequestMapping(value = "dict/drug/{id}", method = RequestMethod.DELETE)
     boolean deleteDrugDict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id);
+            @PathVariable(value = "id") long id);
 
     @ApiOperation(value = "批量删除字典")
     @RequestMapping(value = "dict/drugs", method = RequestMethod.DELETE)
@@ -50,7 +50,7 @@ public interface DrugDictClient {
     @RequestMapping(value = "/dict/drug/{id}", method = RequestMethod.GET)
     MDrugDict getDrugDict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id);
+            @PathVariable(value = "id") long id);
 
     @ApiOperation(value = "获取字典列表")
     @RequestMapping(value = "/dict/drugs", method = RequestMethod.GET)
@@ -70,7 +70,7 @@ public interface DrugDictClient {
     @ApiOperation(value = "根据drug的ID判断是否与ICD10字典存在关联。")
     boolean isUsage(
             @ApiParam(name = "id", value = "药品字典代码")
-            @PathVariable( value = "id") String id);
+            @PathVariable( value = "id") long id);
 
     @ApiOperation(value = "判断提交的字典代码是否已经存在")
     @RequestMapping(value = "/dict/drug/existence/code/{code}" , method = RequestMethod.GET)

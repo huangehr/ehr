@@ -24,4 +24,7 @@ public interface XOrganizationRepository extends PagingAndSortingRepository<Orga
 
     @Query("select org from Organization org where org.orgCode in (:orgCodes)")
     List<Organization> findByOrgCodes(@Param("orgCodes") List<String> orgCodes);
+
+    @Query("select org from Organization org where org.administrativeDivision like ?1")
+    List<Organization> findByArea(String area);
 }

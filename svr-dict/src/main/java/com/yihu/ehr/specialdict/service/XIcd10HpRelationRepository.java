@@ -13,11 +13,11 @@ import java.util.List;
  */
 public interface XIcd10HpRelationRepository extends PagingAndSortingRepository<Icd10HpRelation, Long> {
 
-    List<Icd10HpRelation> findByIcd10Id(String icd10Id);
+    List<Icd10HpRelation> findByIcd10Id(long icd10Id);
 
-    List<Icd10HpRelation> findByHpId(String hpId);
+    List<Icd10HpRelation> findByHpId(long hpId);
 
-    Icd10HpRelation findByIcd10IdAndHpId(String icd10Id, String hpId);
+    Icd10HpRelation findByIcd10IdAndHpId(long icd10Id, long hpId);
 
     @Query("select icd10HpRelation from Icd10HpRelation icd10HpRelation where 1=1")
     List<Icd10HpRelation> findAllIcd10HpRelation();

@@ -72,4 +72,8 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     public List<Organization> findByOrgCodes(List<String> orgCodes) {
         return organizationRepository.findByOrgCodes(orgCodes);
     }
+
+    public List<Organization> findByOrgArea(String area) {
+        return organizationRepository.findByArea(area + "%");
+    }
 }

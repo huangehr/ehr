@@ -20,8 +20,8 @@ public class Icd10DrugRelation implements Serializable{
     }
 
     private long id;
-    private String icd10Id;
-    private String drugId;
+    private long icd10Id;
+    private long drugId;
     private String createUser;
     private Date createDate;
 
@@ -36,18 +36,18 @@ public class Icd10DrugRelation implements Serializable{
     }
 
     @Column(name = "icd10_id", nullable = false)
-    public String getIcd10Id() {
+    public long getIcd10Id() {
         return icd10Id;
     }
-    public void setIcd10Id(String icd10Id) {
+    public void setIcd10Id(long icd10Id) {
         this.icd10Id = icd10Id;
     }
 
     @Column(name = "drug_id", nullable = false)
-    public String getDrugId() {
+    public long getDrugId() {
         return drugId;
     }
-    public void setDrugId(String drugId) {
+    public void setDrugId(long drugId) {
         this.drugId = drugId;
     }
 

@@ -81,6 +81,11 @@
 			<artifactId>spring-cloud-starter-feign</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-actuator</artifactId>
+			<scope>${dependency.scope}</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.yihu.ehr</groupId>
 			<artifactId>commons-rest-model</artifactId>
 			<version>1.1.0</version>
@@ -94,6 +99,11 @@
 			<groupId>happy.fish</groupId>
 			<artifactId>fastDFS</artifactId>
 			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-actuator</artifactId>
+			<version>1.3.5.RELEASE</version>
 		</dependency>
 	</dependencies>
 </project>

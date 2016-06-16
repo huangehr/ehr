@@ -15,7 +15,7 @@ public class Icd10DictModel implements Serializable{
 	public Icd10DictModel() {
 	}
 
-	private String id;
+	private long id;
 	private String code;
 	private String name;
 	private String phoneticCode;
@@ -27,11 +27,11 @@ public class Icd10DictModel implements Serializable{
     private String updateUser;
     private Date updateDate;
 
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

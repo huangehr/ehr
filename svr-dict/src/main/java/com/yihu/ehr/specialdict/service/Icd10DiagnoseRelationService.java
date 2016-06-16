@@ -30,7 +30,7 @@ public class Icd10DiagnoseRelationService extends BaseJpaService<Icd10DiagnoseRe
         return icd10DiagnoseReRepo.findAll(pageable);
     }
 
-    public List<Icd10DiagnoseRelation> getIcd10DiagnoseRelationListByIcd10Id(String icd10Id){
+    public List<Icd10DiagnoseRelation> getIcd10DiagnoseRelationListByIcd10Id(long icd10Id){
         List<Icd10DiagnoseRelation> icd10DiagnoseRelations = icd10DiagnoseReRepo.findByIcd10Id(icd10Id);
         if(icd10DiagnoseRelations.size() == 0){
             return null;

@@ -52,7 +52,7 @@ public class HealthProblemDictEndPoint extends EnvelopRestEndPoint {
      @ApiOperation(value = "根据id删除健康问题字典（含健康问题字典及与ICD10的关联关系。）")
      public boolean deleteHpDict(
             @ApiParam(name = "id", value = "字典代码")
-            @PathVariable( value = "id") String id) {
+            @PathVariable( value = "id") long id) {
 
         List<Icd10HpRelation> icd10HpRelationList = icd10HpRelationService.getHpIcd10RelationListByHpId(id);
         if (icd10HpRelationList != null) {
@@ -71,9 +71,12 @@ public class HealthProblemDictEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "ids", value = "字典代码,多个以逗号隔开")
             @RequestParam( value = "ids") String ids) {
 
-        String[] hpIds = ids.split(",");
+        String[] hpStrIds = ids.split(",");
+        Long[] hpIds = new Long[hpStrIds.length];
         List<Long> relationIds = new ArrayList<>();
-        for(String hpId:hpIds){
+        for(int i=0; i<hpStrIds.length;i++){
+            long hpId = Long.parseLong(hpStrIds[i]);
+            hpIds[i] = hpId;
             List<Icd10HpRelation> icd10HpRelationList = icd10HpRelationService.getHpIcd10RelationListByHpId(hpId);
             if (icd10HpRelationList != null) {
                 for(Icd10HpRelation icd10HpRelation : icd10HpRelationList){
@@ -84,7 +87,7 @@ public class HealthProblemDictEndPoint extends EnvelopRestEndPoint {
         if (relationIds.size() != 0){
             icd10HpRelationService.delete(relationIds);
         }
-        hpDictService.delete(ids.split(","));
+        hpDictService.delete(hpIds);
         return true;
     }
 
@@ -105,7 +108,7 @@ public class HealthProblemDictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据ID获取相应的健康问题字典信息。" )
     public MHealthProblemDict getHpDict(
             @ApiParam(name = "id", value = "字典内码")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") long id) throws Exception {
 
         HealthProblemDict dict = hpDictService.retrieve(id);
         if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");

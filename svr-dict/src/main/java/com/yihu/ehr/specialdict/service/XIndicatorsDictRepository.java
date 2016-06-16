@@ -18,5 +18,5 @@ public interface XIndicatorsDictRepository extends PagingAndSortingRepository<In
     IndicatorsDict findByName(String name);
 
     @Query("select indicatorsDict from IndicatorsDict indicatorsDict  where indicatorsDict.id in (:ids)")
-    List<IndicatorsDict> findByIds(@Param("ids") String[] ids);
+    List<IndicatorsDict> findByIds(@Param("ids") long[] ids);
 }

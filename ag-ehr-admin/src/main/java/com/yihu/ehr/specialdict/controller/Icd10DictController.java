@@ -38,9 +38,11 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "创建新的ICD10字典" )
     public Envelop createIcd10Dict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson){
+            @RequestParam(value = "dictionary") String dictJson) throws Exception{
 
-        MIcd10Dict icd10Dict = icd10DictClient.createIcd10Dict(dictJson);
+        Icd10DictModel model = objectMapper.readValue(dictJson,Icd10DictModel.class);
+        MIcd10Dict icd10Dict = convertToModel(model,MIcd10Dict.class);
+                icd10Dict = icd10DictClient.createIcd10Dict(objectMapper.writeValueAsString(icd10Dict));
         Icd10DictModel icd10DictModel = changeToModel(icd10Dict);
 
         Envelop envelop = new Envelop();
@@ -58,7 +60,7 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "根据id删除icd10疾病字典(含与药品及指标的关联关系。)")
     public Envelop deleteIcd10Dict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @PathVariable(value = "id") long id) {
         Envelop envelop = new Envelop();
         boolean flag = icd10DictClient.icd10DictIsUsage(id);
         if(flag){
@@ -77,9 +79,10 @@ public class Icd10DictController extends BaseController {
             @ApiParam(name = "ids", value = "字典ID", defaultValue = "")
             @RequestParam(value = "ids") String ids) {
         Envelop envelop = new Envelop();
-        String[] icd10Ids = ids.split(",");
+        String[] icd10StrIds = ids.split(",");
         String relaCodes = "";
-        for (String icd10Id:icd10Ids){
+        for (String icd10StrId:icd10StrIds){
+            long icd10Id = Long.parseLong(icd10StrId);
             boolean flag = icd10DictClient.icd10DictIsUsage(icd10Id);
             if(flag){
                 MIcd10Dict icd10Dict = icd10DictClient.getIcd10Dict(icd10Id);
@@ -101,9 +104,10 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "更新ICD10字典" )
     public Envelop updateIcd10Dict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) {
-
-        MIcd10Dict icd10Dict = icd10DictClient.updateIcd10Dict(dictJson);
+            @RequestParam(value = "dictionary") String dictJson) throws Exception{
+        Icd10DictModel model = objectMapper.readValue(dictJson,Icd10DictModel.class);
+        MIcd10Dict icd10Dict = convertToModel(model,MIcd10Dict.class);
+        icd10Dict = icd10DictClient.updateIcd10Dict(objectMapper.writeValueAsString(icd10Dict));
         Icd10DictModel icd10DictModel = changeToModel(icd10Dict);
 
         Envelop envelop = new Envelop();
@@ -121,7 +125,7 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "根据ID获取相应的ICD10字典信息。" )
     public Envelop getIcd10Dict(
             @ApiParam(name = "id", value = "icd10字典内码")
-            @PathVariable(value = "id") String id){
+            @PathVariable(value = "id") long id){
 
         MIcd10Dict icd10Dict = icd10DictClient.getIcd10Dict(id);
         //Icd10DictModel icd10DictModel = changeToModel(icd10Dict);
@@ -169,7 +173,7 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "根据ICD10的ID判断是否与健康问题存在关联。")
     public Envelop isUsage(
             @ApiParam(name = "id", value = "药品字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id){
+            @PathVariable(value = "id") long id){
 
         Envelop envelop = new Envelop();
         boolean result = icd10DictClient.icd10DictIsUsage(id);
@@ -243,7 +247,7 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "为ICD10增加药品关联。----批量关联" )
     public Object createIcd10DrugRelations(
             @ApiParam(name = "icd10_id",value = "icd10字典id")
-            @RequestParam(value = "icd10_id") String icd10Id,
+            @RequestParam(value = "icd10_id") long icd10Id,
             @ApiParam(name = "drug_ids",value = "所关联的药品字典ids，多个以逗号分隔")
             @RequestParam(value = "drug_ids") String drugIds,
             @ApiParam(name = "create_user",value = "创建者")
@@ -287,7 +291,7 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "为ICD10删除药品关联。" )
     public Envelop deleteIcd10DrugRelation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
-            @RequestParam(value = "id", required = true) String id){
+            @RequestParam(value = "id", required = true) long id){
 
         Envelop envelop = new Envelop();
         boolean bo = icd10DictClient.deleteIcd10DrugRelation(id);
@@ -351,9 +355,9 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "判断ICD10与药品字典的关联关系在系统中是否已存在")
     public Envelop isIcd10DrugRelaExist(
             @ApiParam(name = "drugId", value = "药品字典内码")
-            @RequestParam(value = "drugId", required = false) String drugId,
+            @RequestParam(value = "drugId", required = false) long drugId,
             @ApiParam(name = "icd10Id", value = "Icd10内码", defaultValue = "")
-            @RequestParam(value = "icd10Id", required = false) String icd10Id){
+            @RequestParam(value = "icd10Id", required = false) long icd10Id){
 
         Envelop envelop = new Envelop();
         boolean result = icd10DictClient.isIcd10DrugRelaExist(drugId, icd10Id);
@@ -390,7 +394,7 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "为ICD10增加指标关联。---批量关联，" )
     public Envelop createIcd10IndicatorRelations(
             @ApiParam(name = "icd10_id", value = "健康问题Id")
-            @RequestParam(value = "icd10_id") String icd10Id,
+            @RequestParam(value = "icd10_id") long icd10Id,
             @ApiParam(name = "indicator_ids", value = "关联的指标字典ids,多个以逗号连接")
             @RequestParam(value = "indicator_ids") String indicatorIds,
             @ApiParam(name = "create_user",value = "创建者")
@@ -433,7 +437,7 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "为ICD10删除指标关联。" )
     public Envelop deleteIcd10IndicatorRelation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
-            @RequestParam(value = "id", required = true) String id){
+            @RequestParam(value = "id", required = true) long id){
 
         Envelop envelop = new Envelop();
         boolean bo = icd10DictClient.deleteIcd10IndicatorRelation(id);
@@ -497,9 +501,9 @@ public class Icd10DictController extends BaseController {
     @ApiOperation(value = "判断ICD10与指标字典的关联关系在系统中是否已存在")
     public Envelop isIcd10IndicatorsRelaExist(
             @ApiParam(name = "indicatorsId", value = "药品字典内码")
-            @RequestParam(value = "indicatorsId", required = false) String indicatorsId,
+            @RequestParam(value = "indicatorsId", required = false) long indicatorsId,
             @ApiParam(name = "icd10Id", value = "Icd10内码", defaultValue = "")
-            @RequestParam(value = "icd10Id", required = false) String icd10Id){
+            @RequestParam(value = "icd10Id", required = false) long icd10Id){
 
         Envelop envelop = new Envelop();
         boolean result = icd10DictClient.isIcd10IndicatorsRelaExist(indicatorsId, icd10Id);
