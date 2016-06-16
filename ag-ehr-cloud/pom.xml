@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -37,6 +37,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
@@ -126,6 +131,10 @@
                 <exclusion>
                     <groupId>com.yihu.ehr</groupId>
                     <artifactId>commons-data-redis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.yihu.ehr</groupId>
+                    <artifactId>commons-redis-keyschema</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
