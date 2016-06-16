@@ -34,9 +34,11 @@ public class IndicatorDictController extends BaseController {
     @RequestMapping(value = "/dict/indicator", method = RequestMethod.POST)
     public Envelop createIndicatorsDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson){
+            @RequestParam(value = "dictionary") String dictJson) throws Exception{
 
-        MIndicatorsDict indicatorsDict = indicatorDictClient.createIndicatorsDict(dictJson);
+        IndicatorsDictModel model = objectMapper.readValue(dictJson,IndicatorsDictModel.class);
+        MIndicatorsDict indicatorsDict = convertToModel(model,MIndicatorsDict.class);
+                indicatorsDict = indicatorDictClient.createIndicatorsDict(objectMapper.writeValueAsString(indicatorsDict));
         IndicatorsDictModel indicatorsDictModel = changeToModel(indicatorsDict);
 
         Envelop envelop = new Envelop();
@@ -54,7 +56,7 @@ public class IndicatorDictController extends BaseController {
     @ApiOperation(value = "根据id删除指标字典")
     public Envelop deleteIndicatorsDict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @PathVariable(value = "id") long id) {
         Envelop envelop = new Envelop();
         boolean flag = indicatorDictClient.indicatorIsUsage(id);
         if(flag){
@@ -73,9 +75,10 @@ public class IndicatorDictController extends BaseController {
             @ApiParam(name = "ids", value = "字典ID", defaultValue = "")
             @RequestParam(value = "ids") String ids) {
         Envelop envelop = new Envelop();
-        String[] indicatorIds = ids.split(",");
+        String[] indicatorStrIds = ids.split(",");
         String relaCodes = "";
-        for (String indicatorId:indicatorIds){
+        for (String indicatorStrId:indicatorStrIds){
+            long indicatorId = Long.parseLong(indicatorStrId);
             boolean flag = indicatorDictClient.indicatorIsUsage(indicatorId);
             if(flag){
                 MIndicatorsDict indicatorsDict = indicatorDictClient.getIndicatorsDict(indicatorId);
@@ -97,9 +100,10 @@ public class IndicatorDictController extends BaseController {
     @ApiOperation(value = "更新指标字典" )
     public Envelop updateIndicatorsDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) {
-
-        MIndicatorsDict indicatorsDict = indicatorDictClient.updateIndicatorsDict(dictJson);
+            @RequestParam(value = "dictionary") String dictJson) throws Exception{
+        IndicatorsDictModel model = objectMapper.readValue(dictJson,IndicatorsDictModel.class);
+        MIndicatorsDict indicatorsDict = convertToModel(model,MIndicatorsDict.class);
+        indicatorsDict = indicatorDictClient.updateIndicatorsDict(objectMapper.writeValueAsString(indicatorsDict));
         IndicatorsDictModel indicatorsDictModel = changeToModel(indicatorsDict);
 
         Envelop envelop = new Envelop();
@@ -117,7 +121,7 @@ public class IndicatorDictController extends BaseController {
     @ApiOperation(value = "根据ID获取相应的指标字典信息。" )
     public Envelop getIndicatorsDict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id){
+            @PathVariable(value = "id") long id){
 
         MIndicatorsDict indicatorsDict = indicatorDictClient.getIndicatorsDict(id);
         IndicatorsDictModel indicatorsDictModel =changeToModel(indicatorsDict);
@@ -164,7 +168,7 @@ public class IndicatorDictController extends BaseController {
         @ApiOperation(value = "根据指标的ID判断是否与ICD10字典存在关联。")
         public Envelop indicatorIsUsage(
                 @ApiParam(name = "id", value = "指标字典代码")
-                @PathVariable( value = "id") String id){
+                @PathVariable( value = "id") long id){
 
             Envelop envelop = new Envelop();
             boolean result = indicatorDictClient.indicatorIsUsage(id);

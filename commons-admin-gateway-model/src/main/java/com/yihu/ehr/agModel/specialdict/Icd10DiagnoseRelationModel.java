@@ -7,8 +7,8 @@ import java.util.Date;
  * Created by yww on 2016/5/6.
  */
 public class Icd10DiagnoseRelationModel implements Serializable{
-    private String id;
-    private String icd10Id;
+    private long id;
+    private long icd10Id;
     private String name;
     private String description;
     private String createUser;
@@ -16,17 +16,17 @@ public class Icd10DiagnoseRelationModel implements Serializable{
     private String updateUser;
     private Date updateDate;
 
-    public String getId() {
+    public long getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public String getIcd10Id() {
+    public long getIcd10Id() {
         return icd10Id;
     }
-    public void setIcd10Id(String icd10Id) {
+    public void setIcd10Id(long icd10Id) {
         this.icd10Id = icd10Id;
     }
 

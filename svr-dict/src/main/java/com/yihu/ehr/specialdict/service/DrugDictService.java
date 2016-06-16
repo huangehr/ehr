@@ -48,12 +48,12 @@ public class DrugDictService extends BaseJpaService<DrugDict, XDrugDictRepositor
         return dict;
     }
 
-    public boolean isUsage(String id){
+    public boolean isUsage(long id){
         boolean result = (icd10DrugReRepo.findByDrugId(id) != null);
         return result;
     }
 
-    public List<DrugDict> getDrugDictByIds(String[] ids) {
+    public List<DrugDict> getDrugDictByIds(long[] ids) {
         return drugDictRepo.findByIds(ids);
     }
 }

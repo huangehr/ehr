@@ -36,9 +36,11 @@ public class HealthProblemDictController extends BaseController {
     @ApiOperation(value = "创建新的健康问题字典" )
     public Envelop createHpDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson){
+            @RequestParam(value = "dictionary") String dictJson) throws Exception{
 
-        MHealthProblemDict hpDict = hpDictClient.createHpDict(dictJson);
+        HealthProblemDictModel healthProblemDictModel = objectMapper.readValue(dictJson,HealthProblemDictModel.class);
+        MHealthProblemDict hpDict = convertToModel(healthProblemDictModel, MHealthProblemDict.class);
+        hpDict = hpDictClient.createHpDict(objectMapper.writeValueAsString(hpDict));
         HealthProblemDictModel hpDictModel = convertToModel(hpDict,HealthProblemDictModel.class);
 
         Envelop envelop = new Envelop();
@@ -56,7 +58,7 @@ public class HealthProblemDictController extends BaseController {
     @ApiOperation(value = "根据id删除健康问题字典（含健康问题字典及与ICD10的关联关系。）")
     public Envelop deleteHpDict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @PathVariable(value = "id") long id) {
         Envelop envelop = new Envelop();
         boolean bo = hpDictClient.deleteHpDict(id);
         envelop.setSuccessFlg(bo);
@@ -78,9 +80,10 @@ public class HealthProblemDictController extends BaseController {
     @ApiOperation(value = "更新健康问题字典" )
     public Envelop updateHpDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) {
-
-        MHealthProblemDict hpDict = hpDictClient.updateHpDict(dictJson);
+            @RequestParam(value = "dictionary") String dictJson) throws Exception{
+        HealthProblemDictModel healthProblemDictModel = objectMapper.readValue(dictJson,HealthProblemDictModel.class);
+        MHealthProblemDict hpDict = convertToModel(healthProblemDictModel,MHealthProblemDict.class);
+        hpDict = hpDictClient.updateHpDict(objectMapper.writeValueAsString(hpDict));
         HealthProblemDictModel hpDictModel = convertToModel(hpDict,HealthProblemDictModel.class);
 
         Envelop envelop = new Envelop();
@@ -98,7 +101,7 @@ public class HealthProblemDictController extends BaseController {
     @ApiOperation(value = "根据ID获取相应的健康问题字典信息。" )
     public Envelop getHpDict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id){
+            @PathVariable(value = "id") long id){
 
         MHealthProblemDict hpDict = hpDictClient.getHpDict(id);
         HealthProblemDictModel hpDictModel = convertToModel(hpDict,HealthProblemDictModel.class);
@@ -212,7 +215,7 @@ public class HealthProblemDictController extends BaseController {
     @ApiOperation(value = "为健康问题增加ICD10疾病关联,--批量增加关联。" )
     public Envelop createHpIcd10Relations(
             @ApiParam(name = "hp_id", value = "健康问题Id")
-            @RequestParam(value = "hp_id") String hpId,
+            @RequestParam(value = "hp_id") long hpId,
             @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")
             @RequestParam(value = "icd10_ids") String icd10Ids,
             @ApiParam(name = "create_user",value = "创建者")
@@ -254,7 +257,7 @@ public class HealthProblemDictController extends BaseController {
     @ApiOperation(value = "为健康问题删除ICD10疾病关联。" )
     public Envelop deleteHpIcd10Relation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
-            @RequestParam(value = "id", required = true) String id){
+            @RequestParam(value = "id", required = true) long id){
 
         Envelop envelop = new Envelop();
         boolean bo = hpDictClient.deleteHpIcd10Relation(id);
@@ -321,9 +324,9 @@ public class HealthProblemDictController extends BaseController {
     @ApiOperation(value = "判断健康问题与ICD10的关联关系在系统中是否已存在")
     public Envelop isHpIcd10RelaExist(
             @ApiParam(name = "hpId", value = "健康问题内码")
-            @RequestParam(value = "hpId", required = false) String hpId,
+            @RequestParam(value = "hpId", required = false) long hpId,
             @ApiParam(name = "icd10Id", value = "Icd10内码", defaultValue = "")
-            @RequestParam(value = "icd10Id", required = false) String icd10Id){
+            @RequestParam(value = "icd10Id", required = false) long icd10Id){
 
         Envelop envelop = new Envelop();
         boolean result = hpDictClient.isHpIcd10RelaExist(hpId,icd10Id);

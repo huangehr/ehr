@@ -40,13 +40,13 @@ public class Icd10HpRelationCacheService {
      * 缓存单个
      * @param icd10Id
      */
-    public void cacheOne(String icd10Id) {
+    public void cacheOne(long icd10Id) {
         List<Icd10HpRelation> icd10HpRelations = icd10HpRelationRepository.findByIcd10Id(icd10Id);
 
         for (Icd10HpRelation icd10HpRelation : icd10HpRelations) {
-            String hpId = icd10HpRelation.getHpId();
-            Icd10Dict icd10Dict = icd10DictRepository.findOne(Long.parseLong(icd10Id));
-            HealthProblemDict healthProblemDict = healthProblemDictRepository.findOne(Long.parseLong(hpId));
+            long hpId = icd10HpRelation.getHpId();
+            Icd10Dict icd10Dict = icd10DictRepository.findOne(icd10Id);
+            HealthProblemDict healthProblemDict = healthProblemDictRepository.findOne(hpId);
             String redisKey = keySchema.icd10HpRelation(icd10Dict.getCode());
             redisClient.set(redisKey, healthProblemDict.getCode()+"__"+healthProblemDict.getName());
         }
@@ -60,10 +60,10 @@ public class Icd10HpRelationCacheService {
         if (force) clean();
         List<Icd10HpRelation> icd10HpRelations = icd10HpRelationRepository.findAllIcd10HpRelation();
         for (Icd10HpRelation icd10HpRelation : icd10HpRelations) {
-            String hpId = icd10HpRelation.getHpId();
-            String icd10Id = icd10HpRelation.getIcd10Id();
-            Icd10Dict icd10Dict = icd10DictRepository.findOne(Long.parseLong(icd10Id));
-            HealthProblemDict healthProblemDict = healthProblemDictRepository.findOne(Long.parseLong(hpId));
+            long hpId = icd10HpRelation.getHpId();
+            long icd10Id = icd10HpRelation.getIcd10Id();
+            Icd10Dict icd10Dict = icd10DictRepository.findOne(icd10Id);
+            HealthProblemDict healthProblemDict = healthProblemDictRepository.findOne(hpId);
             String redisKey = keySchema.icd10HpRelation(icd10Dict.getCode());
             redisClient.set(redisKey, healthProblemDict.getCode()+"__"+healthProblemDict.getName());
         }

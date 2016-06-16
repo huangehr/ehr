@@ -34,9 +34,11 @@ public class DrugDictController extends BaseController {
     @RequestMapping(value = "/dict/drug", method = RequestMethod.POST)
     public Envelop createDrugDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson){
+            @RequestParam(value = "dictionary") String dictJson) throws  Exception{
 
-        MDrugDict drugDict = drugDictClient.createDrugDict(dictJson);
+        DrugDictModel model = objectMapper.readValue(dictJson,DrugDictModel.class);
+        MDrugDict drugDict = convertToModel(model,MDrugDict.class);
+                drugDict= drugDictClient.createDrugDict(objectMapper.writeValueAsString(drugDict));
         DrugDictModel drugDictModel = changeToModel(drugDict);
 
         Envelop envelop = new Envelop();
@@ -54,7 +56,7 @@ public class DrugDictController extends BaseController {
     @RequestMapping(value = "/dict/drug/{id}", method = RequestMethod.DELETE)
     public Envelop deleteDrugDict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @PathVariable(value = "id") long id) {
         Envelop envelop = new Envelop();
         boolean flag = drugDictClient.isUsage(id);
         if(flag){
@@ -74,9 +76,10 @@ public class DrugDictController extends BaseController {
             @RequestParam(value = "ids") String ids) {
 
         Envelop envelop = new Envelop();
-        String[] drugIds = ids.split(",");
+        String[] drugStrIds = ids.split(",");
         String relaCodes = "";
-        for(String drugId:drugIds){
+        for(String drugStrId:drugStrIds){
+            long drugId = Long.parseLong(drugStrId);
             boolean flag = drugDictClient.isUsage(drugId);
             if(flag){
                 MDrugDict drugDict = drugDictClient.getDrugDict(drugId);
@@ -98,9 +101,10 @@ public class DrugDictController extends BaseController {
     @RequestMapping(value = "/dict/drug", method = RequestMethod.PUT)
     public Envelop updateDrugDict(
             @ApiParam(name = "dictionary", value = "字典JSON结构")
-            @RequestParam(value = "dictionary") String dictJson) {
-
-        MDrugDict drugDict = drugDictClient.updateDrugDict(dictJson);
+            @RequestParam(value = "dictionary") String dictJson) throws Exception{
+        DrugDictModel model = objectMapper.readValue(dictJson,DrugDictModel.class);
+        MDrugDict drugDict = convertToModel(model,MDrugDict.class);
+        drugDict= drugDictClient.updateDrugDict(objectMapper.writeValueAsString(drugDict));
         DrugDictModel drugDictModel = changeToModel(drugDict);
 
         Envelop envelop = new Envelop();
@@ -118,7 +122,7 @@ public class DrugDictController extends BaseController {
     @RequestMapping(value = "/dict/drug/{id}", method = RequestMethod.GET)
     public Envelop getDrugDict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id){
+            @PathVariable(value = "id") long id){
 
         MDrugDict drugDict = drugDictClient.getDrugDict(id);
         DrugDictModel drugDictModel = changeToModel(drugDict);
@@ -165,7 +169,7 @@ public class DrugDictController extends BaseController {
     @ApiOperation(value = "根据drug的ID判断是否与ICD10字典存在关联。")
     public Envelop isUsage(
             @ApiParam(name = "id", value = "药品字典ID", defaultValue = "")
-            @PathVariable(value = "id") String id){
+            @PathVariable(value = "id") long id){
 
         Envelop envelop = new Envelop();
         boolean result = drugDictClient.isUsage(id);
