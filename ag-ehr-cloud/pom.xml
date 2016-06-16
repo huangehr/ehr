@@ -99,14 +99,11 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
-<<<<<<< HEAD:ag-ehr-platform/pom.xml
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ehr-constants</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
-=======
->>>>>>> 6920c3162a048da9d9eea23f1f4c55c6aa154b5b:ag-ehr-cloud/pom.xml
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <scope>${dependency.scope}</scope>
@@ -135,8 +132,6 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-profile-core</artifactId>
             <scope>compile</scope>
-<<<<<<< HEAD:ag-ehr-platform/pom.xml
-=======
             <exclusions>
                 <exclusion>
                     <groupId>com.yihu.ehr</groupId>
@@ -147,12 +142,6 @@
                     <artifactId>commons-redis-keyschema</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-metrics</artifactId>
-            <scope>compile</scope>
->>>>>>> 6920c3162a048da9d9eea23f1f4c55c6aa154b5b:ag-ehr-cloud/pom.xml
         </dependency>
         <!--<dependency>-->
             <!--<groupId>com.yihu.ehr</groupId>-->
