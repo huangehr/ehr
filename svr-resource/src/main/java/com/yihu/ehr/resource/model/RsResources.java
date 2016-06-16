@@ -1,18 +1,8 @@
 package com.yihu.ehr.resource.model;
 
-import com.yihu.ehr.profile.annotation.*;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonProperty;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonRawValue;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.annotate.JsonSetter;
-import org.apache.htrace.fasterxml.jackson.annotation.JsonGetter;
-import org.apache.htrace.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
-import javax.persistence.Column;
-import javax.persistence.Table;
 
 /**
  * Created by hzp on 2016/4/21.

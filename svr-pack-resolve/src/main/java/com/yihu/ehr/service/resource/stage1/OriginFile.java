@@ -18,6 +18,8 @@ public class OriginFile {
     private Date expireDate;
     private UrlScope urlScope;
     private String reportName;
+    private String emrId;
+    private String emrName;
 
     // 文件索引，key为文件名
     private Map<String, String> fileUrls = new TreeMap<>();
@@ -69,5 +71,21 @@ public class OriginFile {
 
     public void setReportName(String reportName) {
         this.reportName = reportName;
+    }
+
+    public String getEmrId() {
+        return emrId;
+    }
+
+    public void setEmrId(String emrId) {
+        this.emrId = emrId;
+    }
+
+    public String getEmrName() {
+        return emrName;
+    }
+
+    public void setEmrName(String emrName) {
+        this.emrName = emrName;
     }
 }

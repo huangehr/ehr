@@ -79,32 +79,32 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ehr-constants</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-rest-model</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ui-swagger</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-admin-gateway-model</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

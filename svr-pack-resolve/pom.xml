@@ -169,11 +169,11 @@
             <artifactId>commons-redis-mq</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-metrics</artifactId>
-            <scope>compile</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.yihu.ehr</groupId>-->
+            <!--<artifactId>commons-metrics</artifactId>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>

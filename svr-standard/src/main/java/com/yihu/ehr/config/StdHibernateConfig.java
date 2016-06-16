@@ -1,9 +1,9 @@
 package com.yihu.ehr.config;
 
 
-import com.yihu.ehr.util.ExtJdbcTemplate;
+import com.yihu.ehr.query.ExtJdbcTemplate;
 import com.yihu.ehr.standard.datasets.service.BaseDataSet;
-import com.yihu.ehr.util.ClassPoolUtils;
+import com.yihu.ehr.util.reflection.ClassPoolUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
