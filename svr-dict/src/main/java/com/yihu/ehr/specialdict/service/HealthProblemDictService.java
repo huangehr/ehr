@@ -52,7 +52,7 @@ public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, 
         return dict;
     }
 
-    public boolean isUsage(String id){
+    public boolean isUsage(long id){
         boolean result = (hpIcd10ReRepo.findByHpId(id) != null);
         return result;
     }

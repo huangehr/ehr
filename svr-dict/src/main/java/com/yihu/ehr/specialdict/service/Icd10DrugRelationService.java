@@ -30,12 +30,12 @@ public class Icd10DrugRelationService extends BaseJpaService<Icd10DrugRelation, 
     @Autowired
     private XIcd10DrugRelationRepository icd10DrugRelaRepo;
 
-    public boolean isExist(String icd10Id,String drugId){
+    public boolean isExist(long icd10Id,long drugId){
         Icd10DrugRelation icd10DrugRelation = icd10DrugRelaRepo.findByIcd10IdAndDrugId(icd10Id, drugId);
         return icd10DrugRelation != null;
     }
 
-    public List<Icd10DrugRelation> getIcd10DrugRelationListByIcd10Id(String icd10Id){
+    public List<Icd10DrugRelation> getIcd10DrugRelationListByIcd10Id(long icd10Id){
 
         List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelaRepo.findByIcd10Id(icd10Id);
         if(icd10DrugRelations.size() == 0){
@@ -44,7 +44,7 @@ public class Icd10DrugRelationService extends BaseJpaService<Icd10DrugRelation, 
         return icd10DrugRelations;
     }
 
-    public boolean isUsage(String drugId){
+    public boolean isUsage(long drugId){
         List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelaRepo.findByDrugId(drugId);
         if(icd10DrugRelations.size() == 0){
             return false;
@@ -57,7 +57,7 @@ public class Icd10DrugRelationService extends BaseJpaService<Icd10DrugRelation, 
         return icd10DrugRelaRepo.findAll(pageable);
     }
 
-    public List<Icd10DrugRelation> getIcd10DrugRelationsByIcd10Ids(String[] icd10Ids) {
+    public List<Icd10DrugRelation> getIcd10DrugRelationsByIcd10Ids(long[] icd10Ids) {
         return icd10DrugRelaRepo.findByIcd10Ids(icd10Ids);
     }
 }

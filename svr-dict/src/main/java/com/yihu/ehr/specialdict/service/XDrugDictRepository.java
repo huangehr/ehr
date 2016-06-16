@@ -18,6 +18,6 @@ public interface XDrugDictRepository extends PagingAndSortingRepository<DrugDict
     DrugDict findByName(String name);
 
     @Query("select drugDict from DrugDict drugDict  where drugDict.id in (:ids)")
-    List<DrugDict> findByIds(@Param("ids") String[] ids);
+    List<DrugDict> findByIds(@Param("ids") long[] ids);
 
 }

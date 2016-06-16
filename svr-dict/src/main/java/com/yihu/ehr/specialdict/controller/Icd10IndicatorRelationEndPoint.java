@@ -51,7 +51,7 @@ public class Icd10IndicatorRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "为ICD10增加指标关联。---批量关联，" )
     public Collection<MIcd10IndicatorRelation> createIcd10IndicatorRelations(
             @ApiParam(name = "icd10_id", value = "健康问题Id")
-            @RequestParam(value = "icd10_id") String icd10Id,
+            @RequestParam(value = "icd10_id") long icd10Id,
             @ApiParam(name = "indicator_ids", value = "关联的指标字典ids,多个以逗号连接")
             @RequestParam(value = "indicator_ids") String indicatorIds,
             @ApiParam(name = "create_user",value = "创建者")
@@ -63,7 +63,7 @@ public class Icd10IndicatorRelationEndPoint extends EnvelopRestEndPoint {
             relation.setCreateUser(createUser);
             relation.setCreateDate(new Date());
             relation.setIcd10Id(icd10Id);
-            relation.setIndicatorId(indicatorId);
+            relation.setIndicatorId(Long.parseLong(indicatorId));
             icd10IndicatorRelationService.save(relation);
             relations.add(relation);
         }
@@ -86,7 +86,7 @@ public class Icd10IndicatorRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "为ICD10删除指标关联。" )
     public boolean deleteIcd10IndicatorRelation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
-            @RequestParam(value = "id", required = true) String id) throws Exception{
+            @RequestParam(value = "id", required = true) long id) throws Exception{
 
         icd10IndicatorRelationService.delete(id);
 
@@ -99,7 +99,12 @@ public class Icd10IndicatorRelationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
             @RequestParam(value = "ids", required = true) String ids) throws Exception{
 
-        icd10IndicatorRelationService.delete(ids.split(","));
+        String[] strIds = ids.split(",");
+        Long[] longIds = new Long[strIds.length];
+        for(int i=0; i<strIds.length;i++){
+            longIds[i] = Long.parseLong(strIds[i]);
+        }
+        icd10IndicatorRelationService.delete(longIds);
 
         return true;
     }
@@ -146,9 +151,9 @@ public class Icd10IndicatorRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "判断ICD10与指标字典的关联关系在系统中是否已存在")
     public boolean isIcd10IndicatorsRelationExist(
             @ApiParam(name = "indicatorsId", value = "药品字典内码")
-            @RequestParam(value = "indicatorsId", required = false) String indicatorsId,
+            @RequestParam(value = "indicatorsId", required = false) long indicatorsId,
             @ApiParam(name = "icd10Id", value = "Icd10内码", defaultValue = "")
-            @RequestParam(value = "icd10Id", required = false) String icd10Id) throws Exception {
+            @RequestParam(value = "icd10Id", required = false) long icd10Id) throws Exception {
 
         return icd10IndicatorRelationService.isExist(icd10Id,indicatorsId);
     }
@@ -158,7 +163,11 @@ public class Icd10IndicatorRelationEndPoint extends EnvelopRestEndPoint {
     public List<MIcd10IndicatorRelation> getIcd10IndicatorRelationsByIcd10Ids(
             @ApiParam(name = "icd10_ids", value = "icd10_ids", defaultValue = "")
             @RequestParam(value = "icd10_ids", required = false) String[] icd10Ids) throws Exception {
-        List<Icd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelationService.getIcd10IndicatorRelationsByIcd10Ids(icd10Ids);
+        long[] longIds = new long[icd10Ids.length];
+        for(int i=0; i<icd10Ids.length;i++){
+            longIds[i] = Long.parseLong(icd10Ids[i]);
+        }
+        List<Icd10IndicatorRelation> icd10IndicatorRelations = icd10IndicatorRelationService.getIcd10IndicatorRelationsByIcd10Ids(longIds);
         return ( List<MIcd10IndicatorRelation>)convertToModels(icd10IndicatorRelations,new ArrayList<MIcd10IndicatorRelation>(icd10IndicatorRelations.size()),MIcd10IndicatorRelation.class,"");
     }
 }

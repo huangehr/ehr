@@ -34,7 +34,7 @@ public class ZIcd10HpRelationCacheController {
     @ApiOperation(value = "缓存单个")
     public void cacheOne(
             @ApiParam(name = "icd10_id", value = "icd10_id")
-            @RequestParam(value = "icd10_id") String icd10Id) {
+            @RequestParam(value = "icd10_id") long icd10Id) {
         icd10HpRelationCacheService.cacheOne(icd10Id);
     }
 

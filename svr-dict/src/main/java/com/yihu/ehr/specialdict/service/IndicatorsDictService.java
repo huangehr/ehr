@@ -46,7 +46,7 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
         return indicatorsDict != null;
     }
 
-    public boolean isUsage(String id){
+    public boolean isUsage(long id){
         boolean result = (icd10IndicatorReRepo.findByIndicatorId(id) != null);
         return result;
     }
@@ -61,7 +61,7 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
         return indicatorsDictRepo.findByCode(code);
     }
 
-    public List<IndicatorsDict> getIndicatorsDictByIds(String[] ids) {
+    public List<IndicatorsDict> getIndicatorsDictByIds(long[] ids) {
         return indicatorsDictRepo.findByIds(ids);
     }
 }

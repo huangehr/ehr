@@ -61,7 +61,7 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据id删除icd10疾病字典(含与药品及指标的关联关系，同时删除关联的诊断。)")
     public boolean deleteIcd10Dict(
             @ApiParam(name = "id", value = "icd10字典代码")
-            @PathVariable( value = "id") String id) {
+            @PathVariable( value = "id") long id) {
 
         long drugRelationId;
         List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelationService.getIcd10DrugRelationListByIcd10Id(id);
@@ -89,10 +89,13 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
     public boolean deleteIcd10Dicts(
             @ApiParam(name = "ids", value = "icd10字典代码,多个以逗号隔开")
             @RequestParam( value = "ids") String ids) {
-        String[] icd10Ids = ids.split(",");
+        String[] strIds = ids.split(",");
+        Long[] longIds = new Long[strIds.length];
         List<Long> drugRelationIds = new ArrayList<>();
         List<Long> indicationRelationIds = new ArrayList<>();
-        for(String icd10Id:icd10Ids){
+        for(int i =0;i<strIds.length;i++){
+            long icd10Id = Long.parseLong(strIds[i]);
+            longIds[i] = icd10Id;
             List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelationService.getIcd10DrugRelationListByIcd10Id(icd10Id);
             if (icd10DrugRelations != null) {
                 for(Icd10DrugRelation icd10DrugRelation : icd10DrugRelations ){
@@ -112,7 +115,7 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
         if(indicationRelationIds.size() != 0){
             icd10IndicatorRelationService.delete(indicationRelationIds);
         }
-        icd10DictService.delete(icd10Ids);
+        icd10DictService.delete(longIds);
         return true;
     }
 
@@ -133,7 +136,7 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据ID获取相应的ICD10字典信息。" )
     public MIcd10Dict getIcd10Dict(
             @ApiParam(name = "id", value = "icd10字典内码")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") long id) throws Exception {
 
         Icd10Dict dict = icd10DictService.retrieve(id);
         if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
@@ -173,7 +176,7 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据ICD10的ID判断是否与健康问题存在关联。")
     public boolean icd10DictIsUsage(
             @ApiParam(name = "id", value = "icd10字典代码")
-            @PathVariable( value = "id") String id) {
+            @PathVariable( value = "id") long id) {
 
         return icd10HpRelationService.isUsage(id);
     }
@@ -199,7 +202,11 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
     public List<MIcd10Dict> getIcd10DictListByIds(
             @ApiParam(name = "ids", value = "字典代码")
             @RequestParam(value = "ids") String[] ids) throws Exception {
-        List<MIcd10Dict> icd10DictList = icd10DictService.findByIds(ids);
+        long[] longIds = new long[ids.length];
+        for(int i=0; i<ids.length;i++){
+            longIds[i] = Long.parseLong(ids[i]);
+        }
+        List<Icd10Dict> icd10DictList = icd10DictService.findByIds(longIds);
         return (List<MIcd10Dict>)convertToModels(icd10DictList, new ArrayList<>(icd10DictList.size()), MIcd10Dict.class, "");
     }
 

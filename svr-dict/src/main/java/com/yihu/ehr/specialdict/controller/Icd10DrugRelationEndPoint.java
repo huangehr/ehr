@@ -51,7 +51,7 @@ public class Icd10DrugRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "为ICD10增加药品关联。--批量关联" )
     public Collection<MIcd10DrugRelation> createIcd10DrugRelations(
             @ApiParam(name = "icd10_id", value = "健康问题Id")
-            @RequestParam(value = "icd10_id") String icd10Id,
+            @RequestParam(value = "icd10_id") long icd10Id,
             @ApiParam(name = "drug_ids", value = "关联的药品字典ids,多个以逗号连接")
             @RequestParam(value = "drug_ids") String drugIds,
             @ApiParam(name = "create_user",value = "创建者")
@@ -62,7 +62,7 @@ public class Icd10DrugRelationEndPoint extends EnvelopRestEndPoint {
             icd10DrugRelation.setCreateUser(createUser);
             icd10DrugRelation.setCreateDate(new Date());
             icd10DrugRelation.setIcd10Id(icd10Id);
-            icd10DrugRelation.setDrugId(drugId);
+            icd10DrugRelation.setDrugId(Long.parseLong(drugId));
             icd10DrugRelationService.save(icd10DrugRelation);
             icd10DrugRelations.add(icd10DrugRelation);
         }
@@ -85,7 +85,7 @@ public class Icd10DrugRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "为ICD10删除药品关联。" )
     public boolean deleteIcd10DrugRelation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
-            @RequestParam(value = "id", required = true) String id) throws Exception{
+            @RequestParam(value = "id", required = true) long id) throws Exception{
 
         icd10DrugRelationService.delete(id);
 
@@ -97,7 +97,13 @@ public class Icd10DrugRelationEndPoint extends EnvelopRestEndPoint {
     public boolean deleteIcd10DrugRelations(
             @ApiParam(name = "ids", value = "关联IDs", defaultValue = "")
             @RequestParam(value = "ids", required = true) String ids) throws Exception{
-        icd10DrugRelationService.delete(ids.split(","));
+
+        String[] strIds = ids.split(",");
+        Long[] longIds = new Long[strIds.length];
+        for(int i=0; i<strIds.length;i++){
+            longIds[i] = Long.parseLong(strIds[i]);
+        }
+        icd10DrugRelationService.delete(longIds);
         return true;
     }
 
@@ -143,9 +149,9 @@ public class Icd10DrugRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "判断ICD10与药品字典的关联关系在系统中是否已存在")
     public boolean isIcd10DrugRelationExist(
             @ApiParam(name = "drugId", value = "药品字典内码")
-            @RequestParam(value = "drugId", required = false) String drugId,
+            @RequestParam(value = "drugId", required = false) long drugId,
             @ApiParam(name = "icd10Id", value = "Icd10内码", defaultValue = "")
-            @RequestParam(value = "icd10Id", required = false) String icd10Id) throws Exception {
+            @RequestParam(value = "icd10Id", required = false) long icd10Id) throws Exception {
         return icd10DrugRelationService.isExist(icd10Id,drugId);
     }
 
@@ -154,7 +160,11 @@ public class Icd10DrugRelationEndPoint extends EnvelopRestEndPoint {
     public List<MIcd10DrugRelation> getIcd10DrugRelationsByIcd10Ids(
             @ApiParam(name = "icd10_ids", value = "icd10_ids", defaultValue = "")
             @RequestParam(value = "icd10_ids", required = false) String[] icd10Ids) throws Exception {
-        List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelationService.getIcd10DrugRelationsByIcd10Ids(icd10Ids);
+        long[] longIds = new long[icd10Ids.length];
+        for(int i=0; i<icd10Ids.length;i++){
+            longIds[i] = Long.parseLong(icd10Ids[i]);
+        }
+        List<Icd10DrugRelation> icd10DrugRelations = icd10DrugRelationService.getIcd10DrugRelationsByIcd10Ids(longIds);
         return ( List<MIcd10DrugRelation>)convertToModels(icd10DrugRelations,new ArrayList<MIcd10DrugRelation>(icd10DrugRelations.size()),MIcd10DrugRelation.class,"");
     }
 }
