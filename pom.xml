@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.yihu.ehr</groupId>
-    <artifactId>ehr-parent-pom</artifactId>
+    <artifactId>ehr-cloud</artifactId>
     <version>1.1.0</version>
     <packaging>pom</packaging>
-    <name>ehr-parent-pom</name>
+    <name>ehr-cloud</name>
     <description>EHR parent pom for all</description>
     <url>http://ehr.yihu.com</url>
 
