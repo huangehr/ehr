@@ -414,11 +414,11 @@
                 <artifactId>commons-redis-mq</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-metrics</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.yihu.ehr</groupId>-->
+                <!--<artifactId>commons-metrics</artifactId>-->
+                <!--<version>${version.ehr}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-admin-gateway-model</artifactId>
