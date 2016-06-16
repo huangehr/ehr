@@ -15,7 +15,7 @@ public class IndicatorsDictModel implements Serializable{
 	public IndicatorsDictModel() {
 	}
 
-	private String id;
+	private long id;
 	private String code;
 	private String name;
 	private String phoneticCode;
@@ -30,11 +30,11 @@ public class IndicatorsDictModel implements Serializable{
     private String updateUser;
     private Date updateDate;
 
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

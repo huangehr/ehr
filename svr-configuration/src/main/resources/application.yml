@@ -25,6 +25,15 @@ eureka:
 
 ---
 spring:
+  profiles: alpha
+
+eureka:
+  instance:
+    ip-address: 172.19.103.11:8761
+    prefer-ip-address: false
+
+---
+spring:
   profiles: test
 
 eureka:

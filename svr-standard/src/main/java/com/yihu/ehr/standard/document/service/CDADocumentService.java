@@ -2,7 +2,7 @@ package com.yihu.ehr.standard.document.service;
 
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.query.BaseHbmService;
+import com.yihu.ehr.util.BaseHbmService;
 import com.yihu.ehr.standard.datasets.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

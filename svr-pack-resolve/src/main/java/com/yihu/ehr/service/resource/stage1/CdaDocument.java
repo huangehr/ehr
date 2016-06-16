@@ -53,6 +53,8 @@ public class CdaDocument {
             objectNode.put("url_scope", originFile.getUrlScope().name());
             objectNode.put("expireDate", originFile.getExpireDate()==null ? null: DateTimeUtil.simpleDateFormat(originFile.getExpireDate()));
             objectNode.put("report_name",originFile.getReportName());
+            objectNode.put("emr_id",originFile.getEmrId());
+            objectNode.put("emr_name",originFile.getEmrName());
             ObjectNode listNode = objectNode.putObject("files");
             Map<String, String> files = originFile.getFileUrls();
             for (String fileName : files.keySet()){

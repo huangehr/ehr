@@ -1,0 +1,21 @@
+server:
+  port: ${ag-ehr-cloud.server.port}
+
+management:
+  port: ${server.port}
+
+---
+spring:
+  profiles: dev
+
+---
+spring:
+  profiles: alpha
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod

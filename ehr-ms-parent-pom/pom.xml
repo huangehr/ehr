@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yihu.ehr</groupId>
-        <artifactId>ehr-parent-pom</artifactId>
+        <artifactId>ehr-cloud</artifactId>
         <version>1.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -32,13 +32,13 @@
         <module>../svr-pack-mgr</module>
         <module>../svr-pack-resolve</module>
         <module>../svr-patient</module>
-        <!--<module>../svr-resource</module>-->
+        <module>../svr-resource</module>
         <module>../svr-security</module>
         <!--module>../svr-special-dict</module-->
         <module>../svr-standard</module>
         <module>../svr-user</module>
-        <module>../ag-admin</module>
-        <module>../ag-ehr-platform</module>
+        <module>../ag-ehr-admin</module>
+        <module>../ag-ehr-cloud</module>
     </modules>
 
     <build>
@@ -414,11 +414,11 @@
                 <artifactId>commons-redis-mq</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-metrics</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.yihu.ehr</groupId>-->
+                <!--<artifactId>commons-metrics</artifactId>-->
+                <!--<version>${version.ehr}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-admin-gateway-model</artifactId>
@@ -450,12 +450,11 @@
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-web</artifactId>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-starter-logging</artifactId>
-                        </exclusion>
-                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>${dependency.scope}</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>

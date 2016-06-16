@@ -34,9 +34,13 @@ public class ServiceApi {
 
     }
 
+    /**
+     * 资源管理中心接口
+     */
     public static class Resources{
         public static final String Resources                         = "/resources";
         public static final String Resource                          = "/resources/{id}";
+        public static final String NoPageResources                   = "/NoPageResources";
 
         public static final String ResourceMetadataList              = "/resources/rs_metadata";
         public static final String ResourceMetadataBatch             = "/resources/rs_metadata/batch";
@@ -78,7 +82,9 @@ public class ServiceApi {
 
 
         public static final String DictEntries                   ="/resources/dict_entries";
+        public static final String NoPageDictEntries             ="/resources/noPage_dict_entries";
         public static final String DictEntry                     ="/resources/dict_entries/{id}";
+        public static final String DictEntriesByDictCode       ="/resources/dict_entries/{dict_code}";
         public static final String DictEntriesExistence          ="/resources/dict_entries/existence";
 
         public static final String SystemDictList               ="/resources/system_dict";
@@ -101,6 +107,55 @@ public class ServiceApi {
         public static final String AdapterDicts                         ="/resources/adapter/dict";
         public static final String AdapterDictsBatch                    ="/resources/adapter/dict/batch";
         public static final String AdapterDict                          ="/resources/adapter/dict/{id}";
+    }
+
+    /**
+     * 档案查询接口
+     */
+    public static class Profiles{
+        public static final String ProfileInfo         = "/{demographic_id}/profile/info"; //基本信息
+        public static final String ProfileHistory      = "/{demographic_id}/profile/history"; //患病史
+        public static final String HealthProblem       = "/{demographic_id}/profile/health_problem"; //主要健康问题
+        public static final String MedicalDisease      = "/{demographic_id}/profile/medical_disease"; //就诊过疾病
+        public static final String MedicalArea         = "/{demographic_id}/profile/medical_area"; //就诊过区域
+        public static final String MedicalYear         = "/{demographic_id}/profile/medical_year"; //就诊过年份
+        public static final String MedicalEvents       = "/{demographic_id}/profile/medical_events"; //门诊/住院事件(时间轴)
+
+        public static final String DrugMaster          = "/{demographic_id}/drug/stat"; //处方主表
+        public static final String DrugSign            = "/{demographic_id}/drug/sign"; //处方签图片
+        public static final String DrugDetailChinese   = "/{demographic_id}/drug/detail/chinese"; //中药处方
+        public static final String DrugDetailWestern   = "/{demographic_id}/drug/detail/western"; //西药处方
+        public static final String DrugStat            = "/{demographic_id}/drug/stat"; //用药统计
+
+        public static final String OutpatientDiagnosis = "/{demographic_id}/outpatient/diagnosis"; //门诊诊断
+        public static final String OutpatientSymptom   = "/{demographic_id}/outpatient/symptom"; //门诊症状
+        public static final String OutpatientCostMaster= "/{demographic_id}/outpatient/cost/master"; //门诊费用汇总
+        public static final String OutpatientCostDetail= "/{demographic_id}/outpatient/cost/detail"; //门诊费用明细
+
+
+        public static final String HospitalizedDiagnosis       = "/{demographic_id}/hospitalized/diagnosis"; //住院诊断
+        public static final String HospitalizedSymptom         = "/{demographic_id}/hospitalized/symptom"; //住院症状
+        public static final String HospitalizedCostMaster      = "/{demographic_id}/hospitalized/cost/master"; //住院费用汇总
+        public static final String HospitalizedCostDetail      = "/{demographic_id}/hospitalized/cost/detail"; //住院费用明细
+        public static final String HospitalizedOrdersTemporary = "/{demographic_id}/hospitalized/orders/temporary"; //住院临时医嘱
+        public static final String HospitalizedOrdersLongtime  = "/{demographic_id}/hospitalized/orders/longtime"; //住院长期医嘱
+        public static final String HospitalizedDeath           = "/{demographic_id}/hospitalized/death"; //住院死亡记录
+
+        public static final String CDAClass            = "/profile/{profile_id}/cda_class"; //cda分类
+        public static final String CDAData             = "/profile/{profile_id}/cda_data"; //cda数据
+        public static final String CDATemplate         = "/profile/cda_template"; //cda模板（通过event_no + cda_type）
+        public static final String CDADocument         = "/profile/{profile_id}/cda_document"; //完整CDA文档（非结构化）
+
+
+        public static final String ExaminationReport           = "/{demographic_id}/examination"; //检查报告单
+
+
+        public static final String LaboratoryReport            = "/{demographic_id}/laboratory"; //检验报告单
+        public static final String LaboratoryProject           = "/{demographic_id}/laboratory/project"; //检验报告单项目
+
+        public static final String Surgery                     = "/{demographic_id}/surgery";//手术-手术记录
+
+
     }
 
     public static class Families{

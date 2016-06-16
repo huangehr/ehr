@@ -27,8 +27,9 @@ fast-dfs:
 spring:
   profiles: dev
 
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
+---
+spring:
+  profiles: alpha
 
 ---
 spring:

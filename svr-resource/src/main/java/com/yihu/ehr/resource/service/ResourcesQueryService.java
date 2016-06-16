@@ -91,6 +91,8 @@ public class ResourcesQueryService  {
     public Envelop getResources(String resourcesCode,String appId,String queryParams,Integer page,Integer size) throws Exception {
         //获取资源信息
         RsResources rs = resourcesDao.findByCode(resourcesCode);
+        Envelop re = new Envelop();
+
         if(rs!=null)
         {
             String methodName = rs.getRsInterface(); //执行函数
@@ -178,7 +180,6 @@ public class ResourcesQueryService  {
                 Method method = classType.getMethod(methodName, new Class[]{String.class,Integer.class,Integer.class});
                 Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
 
-                Envelop re = new Envelop();
                 if (result != null) {
                     re.setSuccessFlg(true);
                     re.setCurrPage(result.getNumber());
@@ -241,12 +242,11 @@ public class ResourcesQueryService  {
                 }else {
                     re.setSuccessFlg(false);
                 }
-                throw new Exception("未找到资源数据！");
+                return re;
             }
-            throw new Exception("未找到资源" + resourcesCode +"数据元配置！");
+            return re;
         }
-
-        throw new Exception("未找到资源" + resourcesCode +"！");
+        return re;
 
     }
 
@@ -320,12 +320,7 @@ public class ResourcesQueryService  {
             }
             queryParams = addParams(queryParams,"q",solr.conditionToString(ql));
 
-            //通过资源代码获取默认参数
-            List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
-            for(ResourceDefaultParam param:paramsList)
-            {
-                queryParams = addParams(queryParams,param.getParamKey(),param.getParamValue());
-            }
+
         }
         return getResources(resourcesCode,"JKZL",queryParams,page,size);
     }
