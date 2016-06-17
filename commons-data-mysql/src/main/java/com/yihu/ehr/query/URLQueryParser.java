@@ -164,7 +164,14 @@ public class URLQueryParser<T> {
 //                tokens = filter.split(" ");
 //            }
             tokens = filter.split(" ");
-            if (tokens.length > 2) throw new IllegalArgumentException("无效过滤参数");
+            if (tokens.length > 2){
+                for(int j=0; j<tokens.length; j++){
+                    if(j==tokens.length-1)
+                        tokens[1] = tokens[j];
+                    else
+                        tokens[0] += tokens[j] ;
+                }
+            }
 
             String group = null;
             if (tokens.length == 2) group = tokens[1];

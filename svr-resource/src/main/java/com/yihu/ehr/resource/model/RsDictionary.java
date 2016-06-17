@@ -2,11 +2,7 @@ package com.yihu.ehr.resource.model;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * 资源字典
@@ -16,13 +12,22 @@ import javax.persistence.Table;
 @Entity
 @Table(name="rs_dictionary")
 public class RsDictionary {
+    private int id;
     private String code;
     private String name;
     private String description;
 
     @Id
     @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @GenericGenerator(name = "Generator", strategy = "increment")
+    @Column(name = "id",nullable = false)
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Column(name = "code",nullable = false)
     public String getCode()
     {

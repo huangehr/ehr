@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 public class RsMetaMsgModel {
     @Ignore
     Pattern codePtn = Pattern.compile("[0-9A-Za-z_.]{1,50}");
+    @Ignore
+    Pattern idPtn = Pattern.compile("EHR_[0-9]{6}");
 
     private String id;
     private String domain;
@@ -25,7 +27,7 @@ public class RsMetaMsgModel {
     private String nullAble;
     private String dictCode;
     private String description;
-    private String valid = "1";
+    private int dictId;
 
     private int seq = 0;
 
@@ -55,6 +57,13 @@ public class RsMetaMsgModel {
 
     private String nullToSpace(String str){
         return str ==null? "" : str;
+    }
+
+    public int getDictId() {
+        return dictId;
+    }
+    public void setDictId(int dictId) {
+        this.dictId = dictId;
     }
 
     public String getId() {
@@ -145,14 +154,6 @@ public class RsMetaMsgModel {
         this.description = description;
     }
 
-    public String getValid() {
-        return this.valid;
-    }
-
-    public void setValid(String valid) {
-        this.valid = valid;
-    }
-
     public Map<String, String> getErrMsg() {
         return errMsg==null? new HashMap<>() : errMsg;
     }
@@ -198,8 +199,8 @@ public class RsMetaMsgModel {
         }
 
         validateStr = nullToSpace(getId());
-        if(!codePtn.matcher(validateStr).matches()){
-            errMsg.put("id", "只允许输入数字、英文、小数点与下划线！");
+        if(!idPtn.matcher(validateStr).matches()){
+            errMsg.put("id", "请输入以 EHR_ 开头，后面跟着6位数字的字符串，如：EHR_000001！");
             valid = false;
         }
 
@@ -219,6 +220,13 @@ public class RsMetaMsgModel {
         return valid;
     }
 
+    public void addErrorMsg(String field, String msg){
+        this.errMsg.put(field, msg);
+    }
+
+    public String findErrorMsg(String field){
+        return this.errMsg.get(field);
+    }
     @Override
     public boolean equals(Object obj) {
         RsMetaMsgModel target = (RsMetaMsgModel) obj;

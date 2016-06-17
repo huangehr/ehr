@@ -17,6 +17,7 @@ public class RsMetadataModel {
     private String dictName;
     private String description;
     private String valid = "1";
+    private int dictId;
 
     public String getId() {
         return id;
@@ -110,5 +111,12 @@ public class RsMetadataModel {
 
     public void setDictName(String dictName) {
         this.dictName = dictName;
+    }
+
+    public int getDictId() {
+        return dictId;
+    }
+    public void setDictId(int dictId) {
+        this.dictId = dictId;
     }
 }

@@ -136,8 +136,18 @@ public class URLHqlQueryParser<T> {
         String[] filterArray = filters.split(";");
         List<Criterion> groupCriterion = new ArrayList<>();
         for (int i = 0; i < filterArray.length; ++i) {
+
             String[] tokens = filterArray[i].split(" ");
-            if (tokens.length > 2) throw new IllegalArgumentException("无效过滤参数");
+            if (tokens.length > 2){
+                for(int j=0; j<tokens.length; j++){
+                    if(j==tokens.length-1)
+                        tokens[1] = tokens[j];
+                    else
+                        tokens[0] += tokens[j] ;
+                }
+            }
+
+//            if (tokens.length > 2) throw new IllegalArgumentException("无效过滤参数");
 
             String group = null;
             if (tokens.length == 2) group = tokens[1];

@@ -184,7 +184,7 @@ public class MetadataController extends BaseController {
         try{
             MRsMetadata rsMetadata = metadataClient.getMetadataById(id);
             RsMetadataModel model = convertToModel(rsMetadata, RsMetadataModel.class);
-            model.setDictName(getDictName(model.getDictCode()));
+            model.setDictName(getDictName(model.getDictId()));
             envelop.setObj(model);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
@@ -247,16 +247,16 @@ public class MetadataController extends BaseController {
                 model = convertToModel(mRsMetadata, RsMetadataModel.class);
                 model.setDomainName(nullToSpace(domain.get(model.getDomain())));
                 model.setColumnTypeName(nullToSpace(columnType.get(model.getColumnType())));
-                model.setDictName(getDictName(URLEncoder.encode(mRsMetadata.getDictCode(), "UTF-8")));
+                model.setDictName(getDictName(mRsMetadata.getDictId()));
                 rs.add(model);
             }
         }
         return rs;
     }
 
-    private String getDictName(String dictCode){
-        if(!StringUtils.isEmpty(dictCode)){
-            MRsDictionary dictionary = rsDictionaryClient.getRsDictionaryById(dictCode);
+    private String getDictName(int dictId){
+        if(dictId != 0){
+            MRsDictionary dictionary = rsDictionaryClient.getRsDictionaryById(dictId);
             return dictionary!=null ? dictionary.getName() : "";
         }
         return "";

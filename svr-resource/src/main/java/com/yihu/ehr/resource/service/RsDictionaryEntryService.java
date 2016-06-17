@@ -20,11 +20,16 @@ public class RsDictionaryEntryService extends BaseJpaService<RsDictionaryEntry, 
     @Autowired
     private RsDictionaryEntryDao dictionaryEntryDao;
 
-    public RsDictionaryEntry findById(String id) {
+    public RsDictionaryEntry findById(int id) {
         return dictionaryEntryDao.findOne(id);
     }
 
     public List<RsDictionaryEntry> findByDictCode(String code) {
         return dictionaryEntryDao.findByDictCode(code);
+    }
+
+    public int countByDictId(int dictId) {
+
+        return dictionaryEntryDao.countByDictId(dictId);
     }
 }
