@@ -40,7 +40,7 @@ public class CdaDocument {
     }
 
     public ObjectNode toJson(){
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
         ObjectNode parent = objectMapper.createObjectNode();
         parent.put("id", id);
         parent.put("name", name);

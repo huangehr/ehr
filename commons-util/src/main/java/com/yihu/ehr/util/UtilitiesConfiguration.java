@@ -3,9 +3,11 @@ package com.yihu.ehr.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.util.compress.Zipper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 
 /**
@@ -17,6 +19,8 @@ import java.text.SimpleDateFormat;
  */
 @Configuration
 public class UtilitiesConfiguration {
+    @Autowired
+    ObjectMapper objectMapper;
 
     /**
      * 基于Jackson的对象映射工具，将对象与JSON之间进行转换。
@@ -25,13 +29,10 @@ public class UtilitiesConfiguration {
      *
      * @return
      */
-    @Bean
-    ObjectMapper objectMapper() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
+    @PostConstruct
+    protected void objectMapperConfig() throws JsonProcessingException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'ZZ");
         objectMapper.setDateFormat(dateFormat);
-
-        return objectMapper;
     }
 
     /**

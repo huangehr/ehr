@@ -20,7 +20,7 @@ public class ApiErrorEcho implements Serializable {
     }
 
     public ApiErrorEcho(String message, String documentationUrl) {
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
 
         root = objectMapper.createObjectNode();
         root.put(MESSAGE_NODE, message);
