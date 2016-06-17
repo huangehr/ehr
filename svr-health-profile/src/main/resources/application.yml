@@ -19,7 +19,7 @@ hystrix:
 #          enabled: false
         isolation:
           thread:
-            timeoutInMilliseconds: 30000
+            timeoutInMilliseconds: 120000
 ---
 spring:
   profiles: dev

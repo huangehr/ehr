@@ -42,7 +42,7 @@ public class PatientInternetHospitalService {
      * @return List<Map<String,Object>>
      * @throws Exception
      */
-    public List<Map<String,Object>> getEhrResourceVersion(String resource_code,String query,boolean isSub,String version) throws Exception
+    public List<Map<String,Object>> getEhrResourceVersion(String resource_code,String query,boolean isSub,String version,String dataset) throws Exception
     {
         //获取EHR资源
         List<Map<String,Object>> result = getEhrResource(resource_code,query,isSub);
@@ -52,8 +52,10 @@ public class PatientInternetHospitalService {
             if(!StringUtils.isBlank(version))
             {   //按版本转换标准代码
                 MStdTransformDto stdTransformDto = new MStdTransformDto();
+
                 stdTransformDto.setSource(mapper.writeValueAsString(result));
                 stdTransformDto.setVersion(version);
+                stdTransformDto.setDataset(dataset);
 
                 return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
             }
@@ -82,7 +84,7 @@ public class PatientInternetHospitalService {
         if(isSub)
         {
             //根据查询参数查询主表
-            Envelop result = resource.getResources(BasisConstant.patientEvent,APP_ID,query);
+            Envelop result = resource.getResources(BasisConstant.patientEvent,APP_ID,URLEncoder.encode(query));
             //主表rowkey条件
             StringBuilder rowkeys = new StringBuilder();
 
@@ -99,7 +101,7 @@ public class PatientInternetHospitalService {
                 }
 
                 //根据主表rowkey查询细表资源
-                Envelop resultSub = resource.getResources(resource_code,APP_ID ,URLEncoder.encode("{\"q\":\"(" + rowkeys.toString() + ")\"}"));
+                Envelop resultSub = resource.getResources(resource_code,APP_ID ,URLEncoder.encode("{\"q\":\"" + rowkeys.toString() + "\"}"));
 
                 if(resultSub.getDetailModelList() != null && resultSub.getDetailModelList().size() > 0)
                 {
@@ -110,7 +112,7 @@ public class PatientInternetHospitalService {
         else
         {
             //查询主表资源
-            Envelop result = resource.getResources(resource_code,APP_ID,query);
+            Envelop result = resource.getResources(resource_code,APP_ID,URLEncoder.encode(query));
 
             if(result.getDetailModelList() != null && result.getDetailModelList().size() > 0)
             {

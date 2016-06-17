@@ -1,6 +1,5 @@
 package com.yihu.ehr.profile.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.XTransformClient;
@@ -42,13 +41,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
             String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.patientInfo,query,false,version);
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.patientInfo,query,false,version,dataset);
 
             return getSuccessString("data",resource.size() > 0 ? resource.get(0) : new HashMap<String, Object>());
         }
@@ -68,13 +69,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
-            String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.patientEvent,query,true,version);
+            String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + " AND event_type:0\"}";
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.patientEvent,query,false,version,dataset);
 
             return getSuccessString("data",resource.size() > 0 ? resource.get(0) : new HashMap<String, Object>());
         }
@@ -95,13 +98,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
             String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientDiagnosis,query,true,version);
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientDiagnosis,query,true,version,dataset);
 
             return getSuccessString("data",resource.size() > 0 ? resource.get(0) : new HashMap<String, Object>());
         }
@@ -121,13 +126,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
             String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientDiagnosis,query,true,version);
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientDiagnosis,query,true,version,dataset);
 
             return getSuccessString("data",resource.size() > 0 ? resource.get(0) : new HashMap<String, Object>());
         }
@@ -147,13 +154,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
             String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientDiagnosis,query,true,version);
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientDiagnosis,query,true,version,dataset);
 
             return getSuccessString("data",resource.size() > 0 ? resource.get(0) : new HashMap<String, Object>());
         }
@@ -173,13 +182,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
             String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.medicationWestern,query,true,version);
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.medicationWestern,query,true,version,dataset);
 
             return getSuccessString("data",resource);
         }
@@ -199,13 +210,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
             String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.medicationChinese,query,true,version);
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.medicationChinese,query,true,version,dataset);
 
             return getSuccessString("data",resource);
         }
@@ -225,13 +238,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
             String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.medicationChinese,query,true,version);
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.medicationChinese,query,true,version,dataset);
 
             return getSuccessString("data",resource);
         }
@@ -251,13 +266,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
             String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientCost,query,true,version);
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientCost,query,true,version,dataset);
 
             return getSuccessString("data",resource.size() > 0 ? resource.get(0) : new HashMap<String, Object>());
         }
@@ -277,13 +294,15 @@ public class PatientInternetHospitalEndPoint extends BaseRestEndPoint {
             @PathVariable(value="patient_id") String patient_id,
             @ApiParam(name="event_no",value="事件代码",required = true)
             @RequestParam(value="event_no",required = true) String event_no,
-            @ApiParam(name="version",value="标准版本")
-            @RequestParam(value="version") String version) throws Exception
+            @ApiParam(name="version",value="标准版本",required = false)
+            @RequestParam(value="version",required = false) String version,
+            @ApiParam(name="dataset",value="数据集",required = false)
+            @RequestParam(value="dataset",required = false) String dataset) throws Exception
     {
         try
         {
             String query = "{\"q\":\"org_code:" + org_code + " AND patient_id:" + patient_id + " AND event_no:"+ event_no + "\"}";
-            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientCost,query,true,version);
+            List<Map<String,Object>> resource = patientServie.getEhrResourceVersion(BasisConstant.outpatientCost,query,true,version,dataset);
 
             return getSuccessString("data",resource);
         }
