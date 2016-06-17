@@ -119,7 +119,7 @@ public class PackageDataSet {
     }
 
     public JsonNode toJson() {
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
 
         return dataSetBody(dataSetHeader(objectMapper));
     }

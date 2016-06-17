@@ -84,7 +84,7 @@ public class SanofiEndPoint {
 
         if (profiles.size() == 0) return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
 
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
         ArrayNode document = objectMapper.createArrayNode();
         for (MemoryProfile profile : profiles) {
             ObjectNode section = objectMapper.createObjectNode();

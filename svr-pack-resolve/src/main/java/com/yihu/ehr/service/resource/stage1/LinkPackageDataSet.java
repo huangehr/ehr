@@ -24,7 +24,7 @@ public class LinkPackageDataSet extends PackageDataSet {
     }
 
     public JsonNode toJson() {
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
 
         ObjectNode root = dataSetHeader(objectMapper);
         return dataSetBody(root);

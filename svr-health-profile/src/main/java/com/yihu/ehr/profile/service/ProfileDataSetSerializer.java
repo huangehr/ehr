@@ -24,7 +24,6 @@ import java.util.Map;
  * @created 2016.04.13 9:38
  */
 @Component
-@DependsOn("objectMapper")
 public class ProfileDataSetSerializer extends JsonSerializer<MDataSet> {
     @Autowired
     ObjectMapper objectMapper;

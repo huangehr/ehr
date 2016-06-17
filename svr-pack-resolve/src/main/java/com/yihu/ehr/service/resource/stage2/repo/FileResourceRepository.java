@@ -51,7 +51,7 @@ public class FileResourceRepository {
             cdaDocument.setName(result.getCellValue(FileFamily.Resource, FileFamily.FileColumns.CdaDocumentName, ""));
 
             String list = result.getCellValue(FileFamily.Resource, FileFamily.FileColumns.FileList, "");
-            ArrayNode root = (ArrayNode) ((ObjectMapper) SpringContext.getService("objectMapper")).readTree(list);
+            ArrayNode root = (ArrayNode) ((ObjectMapper) SpringContext.getService(ObjectMapper.class)).readTree(list);
             for (int i = 0; i < root.size(); ++i){
                 ObjectNode objectNode = (ObjectNode) root.get(i);
                 OriginFile originFile = new OriginFile();

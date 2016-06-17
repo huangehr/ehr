@@ -45,7 +45,7 @@ public class MDataSet {
     }
 
     public String toString(){
-        ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
         ObjectNode objectNode = objectMapper.createObjectNode();
         for (String key : records.keySet()){
             ObjectNode cells = objectNode.putObject(key);

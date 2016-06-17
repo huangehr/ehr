@@ -15,6 +15,7 @@ import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.util.ResourceStorageUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
 import java.util.*;
@@ -27,7 +28,8 @@ import java.util.*;
  */
 @Table(ResourceStorageUtil.MasterTable)
 public class StandardPackage {
-    protected ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     private ProfileId profileId;                        // 档案ID
     private String cardId;                              // 就诊时用的就诊卡ID
