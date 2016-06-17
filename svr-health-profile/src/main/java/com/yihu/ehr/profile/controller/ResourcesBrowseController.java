@@ -33,7 +33,7 @@ import java.util.Map;
 public class ResourcesBrowseController {
 
     @Autowired
-    ObjectMapper mapper;
+    ObjectMapper objectMapper;
 
     @Autowired
     PatientInfoBaseService patient;
@@ -56,9 +56,9 @@ public class ResourcesBrowseController {
         if(version!=null)
         {
             MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
+            stdTransformDto.setSource(objectMapper.writeValueAsString(re));
             stdTransformDto.setVersion(version);
-            return transform.stdTransform(mapper.writeValueAsString(stdTransformDto));
+            return transform.stdTransform(objectMapper.writeValueAsString(stdTransformDto));
         }
         else{
             return re;
@@ -109,8 +109,8 @@ public class ResourcesBrowseController {
         {
             MStdTransformDto stdTransformDto = new MStdTransformDto();
             stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
+            stdTransformDto.setSource(objectMapper.writeValueAsString(re));
+            return transform.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
         }
         else{
             return re;

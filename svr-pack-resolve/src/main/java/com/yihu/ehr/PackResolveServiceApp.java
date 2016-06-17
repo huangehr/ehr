@@ -24,7 +24,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         ManagementWebSecurityAutoConfiguration.class,
         DataSourceAutoConfiguration.class,
         HibernateJpaAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class})
+        DataSourceTransactionManagerAutoConfiguration.class,
+        MetricExportAutoConfiguration.class})
 @ComponentScan
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)
