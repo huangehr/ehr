@@ -113,19 +113,21 @@ public class ServiceApi {
      * 档案查询接口
      */
     public static class Profiles{
-        public static final String ProfileInfo         = "/{demographic_id}/profile/info"; //基本信息
-        public static final String ProfileHistory      = "/{demographic_id}/profile/history"; //患病史
-        public static final String HealthProblem       = "/{demographic_id}/profile/health_problem"; //主要健康问题
-        public static final String MedicalDisease      = "/{demographic_id}/profile/medical_disease"; //就诊过疾病
-        public static final String MedicalArea         = "/{demographic_id}/profile/medical_area"; //就诊过区域
-        public static final String MedicalYear         = "/{demographic_id}/profile/medical_year"; //就诊过年份
-        public static final String MedicalEvents       = "/{demographic_id}/profile/medical_events"; //门诊/住院事件(时间轴)
+        public static final String ProfileInfo         = "/rs/browse/home/getPatientInfo";//"/{demographic_id}/profile/info"; //基本信息
+        public static final String ProfileHistory      = "/rs/browse/home/getDiseaseHistory";//"/{demographic_id}/profile/history"; //患病史
+        public static final String HealthProblem       = "/rs/browse/home/getHealthProblem";//"/{demographic_id}/profile/health_problem"; //主要健康问题
+        public static final String MedicalDisease      = "/rs/browse/home/getPatientDisease";//"/{demographic_id}/profile/medical_disease"; //就诊过疾病
+        public static final String MedicalArea         = "/rs/browse/home/getPatientArea";//"/{demographic_id}/profile/medical_area"; //就诊过区域
+        public static final String MedicalYear         = "/rs/browse/home/getPatientYear";//"/{demographic_id}/profile/medical_year"; //就诊过年份
+        public static final String MedicalEvents       = "/rs/browse/home/getMedicalEvents";//"/{demographic_id}/profile/medical_events"; //门诊/住院事件(时间轴)
+        public static final String MedicalEvent        = "/{profile_id}/info"; //某次住院/门诊事件信息
+        public static final String DrugStat            = "/{demographic_id}/profile/drug_stat"; //个人用药统计
 
-        public static final String DrugMaster          = "/{demographic_id}/drug/stat"; //处方主表
-        public static final String DrugSign            = "/{demographic_id}/drug/sign"; //处方签图片
-        public static final String DrugDetailChinese   = "/{demographic_id}/drug/detail/chinese"; //中药处方
-        public static final String DrugDetailWestern   = "/{demographic_id}/drug/detail/western"; //西药处方
-        public static final String DrugStat            = "/{demographic_id}/drug/stat"; //用药统计
+        public static final String DrugMaster          = "/profile/drug/master"; //处方主表
+        public static final String DrugSign            = "/profile/drug/sign"; //处方笺
+        public static final String DrugDetailChinese   = "/profile/drug/detail/chinese"; //中药处方
+        public static final String DrugDetailWestern   = "/profile/drug/detail/western"; //西药处方
+
 
         public static final String OutpatientDiagnosis = "/{demographic_id}/outpatient/diagnosis"; //门诊诊断
         public static final String OutpatientSymptom   = "/{demographic_id}/outpatient/symptom"; //门诊症状
@@ -141,10 +143,11 @@ public class ServiceApi {
         public static final String HospitalizedOrdersLongtime  = "/{demographic_id}/hospitalized/orders/longtime"; //住院长期医嘱
         public static final String HospitalizedDeath           = "/{demographic_id}/hospitalized/death"; //住院死亡记录
 
-        public static final String CDAClass            = "/profile/{profile_id}/cda_class"; //cda分类
-        public static final String CDAData             = "/profile/{profile_id}/cda_data"; //cda数据
-        public static final String CDATemplate         = "/profile/cda_template"; //cda模板（通过event_no + cda_type）
-        public static final String CDADocument         = "/profile/{profile_id}/cda_document"; //完整CDA文档（非结构化）
+
+        public static final String CDADocumentId         = "/rs/browse/cda/getPatientCdaTemplate";//"/profile/cda/document_id"; //cda模板（通过event_no + cda_type）
+        public static final String CDAClass            = "/rs/browse/cda/getCDAClass";//"/{profile_id}/cda_class"; //cda分类
+        public static final String CDAData             = "/rs/browse/cda/getCDAData";//"/{profile_id}/cda_data"; //cda数据
+        public static final String CDADocument         =  "/rs/browse/cda/getDocument";//"/{profile_id}/cda_document"; //完整CDA文档
 
 
         public static final String ExaminationReport           = "/{demographic_id}/examination"; //检查报告单
@@ -273,6 +276,7 @@ public class ServiceApi {
         public static final String DocumentCreateFile               = "/std/documents/{id}/file/create";
         public static final String DocumentGetFile                  = "/std/documents/{id}/file";
 
+        public static final String DocumentDataSet                  = "/std/documents/data_set";
         public static final String DataSetRelationships             = "/std/documents/data_set_relationships";
         public static final String DataSetRelationship              = "/std/documents/data_set_relationships/{id}";
 

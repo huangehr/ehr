@@ -26,7 +26,7 @@ public class Template {
     private String organizationCode;
     private String pcTplURL;
     private String mobileTplURL;
-    private String cdaType;
+    private String cdaCode;
     private Date createTime = new Date();
 
     final static String UrlSeparator = ";";
@@ -43,7 +43,7 @@ public class Template {
         this.id = id;
     }
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     public String getTitle() {
         return title;
     }
@@ -52,7 +52,7 @@ public class Template {
         this.title = name;
     }
 
-    @Column(name = "cda_version", nullable = false)
+    @Column(name = "cda_version")
     public String getCdaVersion() {
         return cdaVersion;
     }
@@ -61,7 +61,7 @@ public class Template {
         this.cdaVersion = version;
     }
 
-    @Column(name = "cda_document_id", nullable = false)
+    @Column(name = "cda_document_id")
     public String getCdaDocumentId() {
         return cdaDocumentId;
     }
@@ -70,7 +70,7 @@ public class Template {
         this.cdaDocumentId = cdaDocumentId;
     }
 
-    @Column(name = "pc_template", nullable = false)
+    @Column(name = "pc_template")
     public String getPcTplURL() throws Exception {
         return pcTplURL;
     }
@@ -79,7 +79,7 @@ public class Template {
         pcTplURL = url;
     }
 
-    @Column(name = "mobile_template", nullable = false)
+    @Column(name = "mobile_template")
     public String getMobileTplURL() {
         return mobileTplURL;
     }
@@ -106,13 +106,13 @@ public class Template {
         this.organizationCode = organizationCode;
     }
 
-    @Column(name = "cda_type")
-    public String getCdaType() {
-        return cdaType;
+    @Column(name = "cda_code")
+    public String getCdaCode() {
+        return cdaCode;
     }
 
-    public void setCdaType(String cdaType) {
-        this.cdaType = cdaType;
+    public void setCdaCode(String cdaCode) {
+        this.cdaCode = cdaCode;
     }
 
     /**

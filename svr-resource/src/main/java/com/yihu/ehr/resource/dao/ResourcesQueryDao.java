@@ -40,6 +40,7 @@ public class ResourcesQueryDao {
     private String subCore = "HealthProfileSub";
     private String mainJoinCore = "HealthProfile_shard1_replica1";
     private String subJoinCore = "HealthProfileSub_shard1_replica1";
+    private String rawFilesCore = "RawFiles";
 
     /**
      * 获取Hbase主表
@@ -315,5 +316,47 @@ public class ResourcesQueryDao {
 
     }
 
+    /**
+     * 获取非结构化档案
+     * @return
+     */
+    public Page<Map<String,Object>> getRawFiles(String queryParams, Integer page, Integer size) throws Exception {
+        String core = rawFilesCore;
+        String q = "";
+        String fq = "";
+        String sort = "";
+        if (queryParams != null && queryParams.length() > 0) {
+            if (queryParams.startsWith("{") && queryParams.endsWith("}")) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> obj = objectMapper.readValue(queryParams, Map.class);
+                if (obj.containsKey("q")) {
+                    q = obj.get("q");
+                }
+                if (obj.containsKey("sort")) {
+                    sort = obj.get("sort");
+                }
+
+                //join操作
+                if (obj.containsKey("join")) {
+                    String join = obj.get("join");
+                    fq = q;
+                    q = "{!join fromIndex=" + mainJoinCore + " from=rowkey to=profile_id}" + join;
+                }
+
+            } else {
+                q = queryParams;
+            }
+        }
+
+        //默认第一页
+        if (page == null) {
+            page = defaultPage;
+        }
+        //默认50行
+        if (size == null) {
+            size = defaultSize;
+        }
+        return hbase.queryBySolr(core, q, sort, page, size, fq);
+    }
 
 }

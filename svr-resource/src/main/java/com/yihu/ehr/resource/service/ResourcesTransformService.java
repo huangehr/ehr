@@ -127,4 +127,33 @@ public class ResourcesTransformService {
 
         return returnMap;
     }
+
+    /**
+     * EHR主表数据分解（未完成）
+     */
+    public Map<String,Object> stdMasterTransform(Map<String,Object> resource,String dataset,String version)
+    {
+        //返回资源
+        Map<String,Object> returnRs =  new HashMap<>();
+        //适配方案
+        List<RsAdapterScheme> schemeList = adapterSchemeDao.findByAdapterVersion(version);
+
+        if ((resource != null && resource.size() > 0) || (schemeList != null && schemeList.size() > 0))
+        {
+            //适配方案对应数据元
+            List<RsAdapterMetadata> metadataList = adapterMetadataDao.findByDataset(schemeList.get(0).getId(), dataset);
+            for(RsAdapterMetadata metadata : metadataList)
+            {
+                String srcMetadataCode = metadata.getSrcMetadataCode();
+                String metadataId = metadata.getMetadataId();
+
+                if(resource.containsKey(metadataId))
+                {
+                    returnRs.put(srcMetadataCode,resource.get(metadataId));
+                }
+            }
+        }
+
+        return returnRs;
+    }
 }

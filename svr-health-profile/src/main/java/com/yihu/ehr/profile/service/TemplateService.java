@@ -2,7 +2,6 @@ package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
-import com.yihu.ehr.profile.feign.XCDAVersionClient;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,8 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class TemplateService extends BaseJpaService<Template, XTemplateRepository> {
-    @Autowired
-    XCDAVersionClient cdaVersionClient;
+
 
     @Autowired
     XCDADocumentClient cdaDocumentClient;
@@ -71,7 +69,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
      * @param cdaType
      * @return
      */
-    public Map<Template, MCDADocument> getOrganizationTemplates(String orgCode, String cdaVersion, String cdaType) {
+    public Map<Template, MCDADocument> getOrganizationTemplates(String orgCode, String cdaVersion, String cdaType) throws Exception{
         List<Template> templates = getRepo().findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
         List<String> cdaDocumentIdList = new ArrayList<>(templates.size());
         cdaDocumentIdList.addAll(templates.stream().map(template -> template.getCdaDocumentId()).collect(Collectors.toList()));
@@ -102,7 +100,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
         return cdaDocumentMap;
     }
 
-    public Pair<Template, MCDADocument> getOrganizationTemplate(String orgCode, String cdaVersion, String cdaType, String cdaDocumentId) {
+    public Pair<Template, MCDADocument> getOrganizationTemplate(String orgCode, String cdaVersion, String cdaType, String cdaDocumentId) throws Exception {
         Template template = getRepo().findByOrganizationCodeAndCdaVersionAndCdaDocumentId(orgCode, cdaVersion, cdaDocumentId);
         if (template == null) return null;
 
@@ -122,4 +120,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
     private XTemplateRepository getRepo() {
         return (XTemplateRepository) getRepository();
     }
+
 }
+
+

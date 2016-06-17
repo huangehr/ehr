@@ -2,6 +2,7 @@ package com.yihu.ehr.profile.feign;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,5 +30,9 @@ public interface XTransformClient {
 
     @RequestMapping(value = "/rs/transform/stdTransform", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     Map<String, Object> stdTransform(
+            @RequestBody String stdTransformDtoJson);
+
+    @RequestMapping(value = "/rs/transform/stdMasterTransform", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    Map<String, Object> stdMasterTransform(
             @RequestBody String stdTransformDtoJson);
 }

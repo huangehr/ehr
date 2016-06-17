@@ -65,22 +65,18 @@ public class ResourcesTransformEndPoint {
 
 
 
-//    @RequestMapping(value="/stdTransform",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-//    public Map<String,Object> stdTransformList(
-//            @ApiParam(name="stdTransformDtoJson",value="资源数据模型",required = true)
-//            @RequestBody String stdTransformDtoJson) throws Exception {
-//        MStdTransformDto stdTransformDto = objectMapper.readValue(stdTransformDtoJson,MStdTransformDto.class);
-//        String resource =  stdTransformDto.getSource();
-//        String version = stdTransformDto.getVersion();
-//
-//        List<Map<String, Object>> list = objectMapper.readValue(resource, List.class);
-//
-//        Map<String,Object> mapAll = new HashMap<>();
-//        for(Map<String, Object> map:list){
-//            Map mapOne = resourcesTransformService.displayCodeConvert(map,version);
-//            mapAll.putAll(mapOne);
-//        }
-//        return mapAll;
-//    }
+    @ApiOperation("EHR主表数据分解")
+    @RequestMapping(value = "/stdMasterTransform", method = RequestMethod.POST)
+    public Map<String,Object> stdMasterTransform(
+            @ApiParam(name="stdTransformDtoJson",value="资源数据模型",required = true)
+            @RequestBody String stdTransformDtoJson) throws Exception {
+        MStdTransformDto stdTransformDto = objectMapper.readValue(stdTransformDtoJson,MStdTransformDto.class);
+        String resource =  stdTransformDto.getSource();
+        String version = stdTransformDto.getVersion();
+        String dataset = stdTransformDto.getDataset();
+        Map<String, Object> map = objectMapper.readValue(resource, Map.class);
+
+        return resourcesTransformService.stdMasterTransform(map, dataset, version);
+    }
 
 }
