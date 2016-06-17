@@ -18,6 +18,22 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 @EnableFeignClients
 @EnableDiscoveryClient
+/*@Import({
+        EmbeddedServletContainerAutoConfiguration.class,
+        HttpMessageConvertersAutoConfiguration.class,
+        UtilAutoConfiguration.class,
+        ServerPropertiesAutoConfiguration.class,
+        EurekaClientAutoConfiguration.class,
+        WebMvcAutoConfiguration.class,
+        JpaRepositoriesAutoConfiguration.class,
+        HibernateJpaAutoConfiguration.class,
+        DataSourceAutoConfiguration.class,
+        DataSourceTransactionManagerAutoConfiguration.class,
+})
+@Configuration
+@EntityScan
+@EnableJpaRepositories
+@ComponentScan(basePackages = "com.yihu.ehr")*/
 public class AppMgrSvrApp extends SpringBootServletInitializer{
 
 	public static void main(String[] args) {

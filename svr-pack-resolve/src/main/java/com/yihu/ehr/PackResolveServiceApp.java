@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableAutoConfiguration(exclude = {
+        MetricExportAutoConfiguration.class,
         SecurityAutoConfiguration.class,
         ManagementWebSecurityAutoConfiguration.class,
         DataSourceAutoConfiguration.class,

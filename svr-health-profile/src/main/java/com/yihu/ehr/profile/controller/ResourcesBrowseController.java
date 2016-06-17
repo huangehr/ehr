@@ -100,7 +100,7 @@ public class ResourcesBrowseController {
             @RequestParam(value = "diseaseId", required = false) String diseaseId,
             @RequestParam(value = "version", required = false) String version) throws Exception {
 
-        List<Map<String,Object>> re = patient.getMedicalEvents(demographicId,eventsType,year,area,hpId,diseaseId);
+        List<Map<String,Object>> re = patient.getPatientMzZyEvents(demographicId,eventsType,year,area,hpId,diseaseId);
         if(version!=null)
         {
             MStdTransformDto stdTransformDto = new MStdTransformDto();
