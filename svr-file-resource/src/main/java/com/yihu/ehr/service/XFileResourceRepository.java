@@ -11,4 +11,6 @@ import java.util.List;
 public interface XFileResourceRepository extends PagingAndSortingRepository<FileResource, String> {
 
     List<FileResource> findByObjectId(String objectId);
+
+    List<FileResource> findByStoragePath(String storagePath);
 }

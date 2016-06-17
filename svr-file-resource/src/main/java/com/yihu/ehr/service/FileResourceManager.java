@@ -46,6 +46,10 @@ public class FileResourceManager extends BaseJpaService<FileResource, XFileResou
         return resourceRepository.findByObjectId(objectId);
     }
 
+    public List<FileResource> findByStoragePath(String storagePath) {
+        return resourceRepository.findByStoragePath(storagePath);
+    }
+
     public boolean deleteFileResource(List<FileResource> fileResources) throws Exception {
         for(FileResource fileResource : fileResources){
             //删除表数据
