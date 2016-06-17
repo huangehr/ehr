@@ -23,17 +23,17 @@ public class FeignExceptionUtils {
             return String.valueOf(toEntity(msg[1], Map.class).get("message"));
         }catch (Exception e1){
             e1.printStackTrace();
-            return "系统出错！";
+            return "Error, see the log for stack trace.";
         }
     }
 
     public static <T> T toEntity(String json, Class<T> entityCls) {
         try {
-            ObjectMapper objectMapper = SpringContext.getService("objectMapper");
+            ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
             T entity = objectMapper.readValue(json, entityCls);
             return entity;
         } catch (IOException ex) {
-            throw new ApiException(ErrorCode.SystemError, "无法转换json, " + ex.getMessage());
+            throw new ApiException(ErrorCode.SystemError, "Convert JSON to entity failed, " + ex.getMessage());
         }
     }
 }
