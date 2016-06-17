@@ -22,4 +22,6 @@ public interface AdapterMetadataDao extends PagingAndSortingRepository<RsAdapter
     @Modifying
     @Query("delete from RsAdapterMetadata where schemaId = ?1")
     void deleteBySchemaId(String schemaId);
+
+    List<RsAdapterMetadata> findBySchemaIdAndSrcDatasetCode(String schemaId,String srcDatasetCode);
 }

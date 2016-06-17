@@ -315,14 +315,18 @@ public class PatientInfoBaseService {
             //获取结尾0的个数
             for(int i = areaCodes.length - 1;i > -1;i--)
             {
-                if(areaCodes[i] == 0)
+                if(areaCodes[i] == '0')
                 {
                     count++;
+                }
+                else
+                {
+                    break;
                 }
             }
 
             //结尾0截除
-            String areaSub = area.substring(0,area.length() - count -1);
+            String areaSub = area.substring(0,area.length() - count);
             //获取对应地区下机构
             List<MOrganization> organizations = organization.getOrganizationByAreaCode(areaSub);
 
@@ -342,7 +346,7 @@ public class PatientInfoBaseService {
                 query += " AND (" + orgQuery.toString() + ")";
             }
             else
-            {   //地区不为空，地区下结构为空时返回空
+            {   //地区不为空，地区下机构为空时返回空
                 return new ArrayList<Map<String,Object>>();
             }
         }
