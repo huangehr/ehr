@@ -3,7 +3,9 @@ package com.yihu.ehr;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -14,7 +16,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableAutoConfiguration(exclude = {
         SecurityAutoConfiguration.class,
-        ManagementWebSecurityAutoConfiguration.class})
+        ManagementWebSecurityAutoConfiguration.class,
+        HypermediaAutoConfiguration.class,
+        WebMvcAutoConfiguration.class})
 @ComponentScan
 @EnableDiscoveryClient
 @EnableFeignClients

@@ -1,7 +1,6 @@
 package com.yihu.ehr.profile.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.XTransformClient;
@@ -33,9 +32,6 @@ import java.util.Map;
 public class ResourcesBrowseController {
 
     @Autowired
-    ObjectMapper mapper;
-
-    @Autowired
     PatientInfoBaseService patient;
 
     @Autowired
@@ -56,9 +52,9 @@ public class ResourcesBrowseController {
         if(version!=null)
         {
             MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
+            stdTransformDto.setSource(new ObjectMapper().writeValueAsString(re));
             stdTransformDto.setVersion(version);
-            return transform.stdTransform(mapper.writeValueAsString(stdTransformDto));
+            return transform.stdTransform(new ObjectMapper().writeValueAsString(stdTransformDto));
         }
         else{
             return re;
@@ -109,8 +105,8 @@ public class ResourcesBrowseController {
         {
             MStdTransformDto stdTransformDto = new MStdTransformDto();
             stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
+            stdTransformDto.setSource(new ObjectMapper().writeValueAsString(re));
+            return transform.stdTransformList(new ObjectMapper().writeValueAsString(stdTransformDto));
         }
         else{
             return re;

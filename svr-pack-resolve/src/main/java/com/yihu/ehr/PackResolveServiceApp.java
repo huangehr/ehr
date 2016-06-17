@@ -2,6 +2,7 @@ package com.yihu.ehr;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.MetricExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -22,7 +23,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         ManagementWebSecurityAutoConfiguration.class,
         DataSourceAutoConfiguration.class,
         HibernateJpaAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class})
+        DataSourceTransactionManagerAutoConfiguration.class,
+        MetricExportAutoConfiguration.class})
 @ComponentScan
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy(proxyTargetClass = true)

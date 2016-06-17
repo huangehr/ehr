@@ -134,5 +134,9 @@
             <artifactId>commons-web</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-mysql</artifactId>
+        </dependency>
     </dependencies>
 </project>
