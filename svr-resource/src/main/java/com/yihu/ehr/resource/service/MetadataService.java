@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -103,7 +104,7 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
      */
     public List<RsMetadata> addMetaBatch(List<RsMetadata> metaLs)
     {
-        StringBuilder sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, valid) VALUES ") ;
+        StringBuilder sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, dict_id, valid) VALUES ") ;
         RsMetadata rsMetadata ;
         SQLQuery query;
         int total = 0;
@@ -117,6 +118,7 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
             sql.append(",'"+ rsMetadata .getColumnType() +"'");
             sql.append(",'"+ rsMetadata .getNullAble() +"'");
             sql.append(",'"+ rsMetadata .getDescription() +"'");
+            sql.append(","+ rsMetadata.getDictId() );
             sql.append(",'1')");
 
             if(i%100==0 || i == metaLs.size()){

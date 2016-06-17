@@ -21,7 +21,7 @@ import java.util.List;
  * @created 2016.05.23 17:11
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0)
+@RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "dictionaries", description = "标准字典服务接口")
 public class RsDictionaryController extends BaseController {
 
@@ -29,7 +29,7 @@ public class RsDictionaryController extends BaseController {
     private RsDictionaryClient rsDictionaryClient;
 
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.DictList, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取标准字典列表", notes = "根据查询条件获取标准字典列表")
     public Envelop searchRsDictionaries(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -55,7 +55,7 @@ public class RsDictionaryController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.DictList, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.DictList, method = RequestMethod.POST)
     @ApiOperation(value = "创建标准字典", notes = "创建标准字典")
     public Envelop createRsDictionary(
             @ApiParam(name = "model", value = "", defaultValue = "")
@@ -73,7 +73,7 @@ public class RsDictionaryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dict, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.Dict, method = RequestMethod.PUT)
     @ApiOperation(value = "修改标准字典", notes = "修改标准字典")
     public Envelop updateRsDictionary(
             @ApiParam(name = "model", value = "")
@@ -91,11 +91,11 @@ public class RsDictionaryController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dict, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Resources.Dict, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除标准字典", notes = "删除标准字典")
     public Envelop deleteRsDictionary(
             @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") int id) throws Exception {
         Envelop envelop = new Envelop();
         try{
             rsDictionaryClient.deleteRsDictionary(id);
@@ -108,11 +108,11 @@ public class RsDictionaryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.Dict, method = RequestMethod.GET)
+    @RequestMapping(value =  ServiceApi.Resources.Dict, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取标准字典")
     public Envelop getRsDictionaryById(
             @ApiParam(name = "id", value = "", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @PathVariable(value = "id") int id) {
         Envelop envelop = new Envelop();
         try{
             MRsDictionary rsDictionary = rsDictionaryClient.getRsDictionaryById(id);
@@ -125,7 +125,7 @@ public class RsDictionaryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.DictBatch, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.DictBatch, method = RequestMethod.POST)
     @ApiOperation(value = "批量创建标准字典", notes = "批量创建标准字典")
     public Envelop createRsDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
@@ -141,7 +141,7 @@ public class RsDictionaryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value =  "/admin" + ServiceApi.Resources.DictExistence,method = RequestMethod.GET)
+    @RequestMapping(value =  ServiceApi.Resources.DictExistence,method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public Envelop isExistence(
             @ApiParam(name="filters",value="filters",defaultValue = "")
@@ -155,7 +155,7 @@ public class RsDictionaryController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.DictEntryBatch, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.DictEntryBatch, method = RequestMethod.POST)
     @ApiOperation(value = "批量创建标准字典以及字典项", notes = "批量创建标准字典以及字典项")
     public Envelop createDictAndEntries(
             @ApiParam(name = "model", value = "", defaultValue = "")
@@ -166,7 +166,7 @@ public class RsDictionaryController extends BaseController {
         return failed("新增出错！");
     }
 
-    @RequestMapping(value = "/admin" + ServiceApi.Resources.DictCodesExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.GET)
     @ApiOperation("获取已存在字典编码")
     public List idExistence(
             @ApiParam(name = "codes", value = "", defaultValue = "")

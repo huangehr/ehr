@@ -14,6 +14,7 @@ public class MRsMetadata {
     private String dictCode;
     private String description;
     private String valid;
+    private int dictId;
 
     public String getId() {
         return id;
@@ -83,5 +84,12 @@ public class MRsMetadata {
     }
     public void setValid(String valid) {
         this.valid = valid;
+    }
+
+    public int getDictId() {
+        return dictId;
+    }
+    public void setDictId(int dictId) {
+        this.dictId = dictId;
     }
 }

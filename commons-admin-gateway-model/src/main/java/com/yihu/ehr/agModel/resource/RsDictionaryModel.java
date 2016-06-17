@@ -4,15 +4,15 @@ package com.yihu.ehr.agModel.resource;
  * Created by lyr on 2016/5/16.
  */
 public class RsDictionaryModel {
-    private String id;
+    private int id;
     private String code;
     private String name;
     private String description;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
-    public void setId(String id)
+    public void setId(int id)
     {
         this.id = id;
     }

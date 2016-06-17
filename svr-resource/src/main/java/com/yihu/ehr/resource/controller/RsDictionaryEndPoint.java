@@ -93,9 +93,8 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除标准字典", notes = "删除标准字典")
     public boolean deleteRsDictionary(
             @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") int id) throws Exception {
 
-        id = URLDecoder.decode(id, "UTF-8");
         RsDictionary dictionary = dictionaryService.findById(id);
         hasChild(dictionary);
         dictionaryService.delete(id);
@@ -106,9 +105,9 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据id获取获取标准字典")
     public MRsDictionary getRsDictionaryById(
             @ApiParam(name = "id", value = "", defaultValue = "")
-            @PathVariable(value = "id") String id) throws UnsupportedEncodingException {
+            @PathVariable(value = "id") int id) throws UnsupportedEncodingException {
 
-        RsDictionary dictionary = dictionaryService.findById(URLDecoder.decode(id, "UTF-8"));
+        RsDictionary dictionary = dictionaryService.findById(id);
         return convertToModel(dictionary, MRsDictionary.class);
     }
 
@@ -157,9 +156,7 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     }
 
     private void hasChild(RsDictionary dictionary) throws Exception {
-        String code = dictionary.getCode();
-        List<RsDictionaryEntry> dictionaryEntries = dictionaryEntryService.findByDictCode(code);
-        if(dictionaryEntries!=null && dictionaryEntries.size()!=0){
+        if(dictionaryEntryService.countByDictId(dictionary.getId())!=0){
             throw new Exception("该字典包含字典项，不可删除");
         }
     }

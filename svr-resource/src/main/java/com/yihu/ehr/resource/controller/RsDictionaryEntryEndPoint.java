@@ -57,13 +57,13 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
     public MRsDictionaryEntry createRsDictionaryEntry(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
+
         RsDictionaryEntry dictionaryEntry = toEntity(jsonData, RsDictionaryEntry.class);
         String code = dictionaryEntry.getCode();
         String dictCode = dictionaryEntry.getDictCode();
         if(isExistence(dictCode,code)){
             throw new Exception("字典项代码不能重复");
         }
-        dictionaryEntry.setId(getObjectId(BizObject.RsDictionaryEntry));
         rsDictionaryEntryService.save(dictionaryEntry);
         return convertToModel(dictionaryEntry, MRsDictionaryEntry.class, null);
 
@@ -74,9 +74,9 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
     public MRsDictionaryEntry updateRsDictionaryEntry(
             @ApiParam(name = "json_data", value = "")
             @RequestBody String jsonData) throws Exception {
+
         RsDictionaryEntry dictionaryEntry = toEntity(jsonData, RsDictionaryEntry.class);
-        String id = dictionaryEntry.getId();
-        RsDictionaryEntry d = rsDictionaryEntryService.findById(id);
+        RsDictionaryEntry d = rsDictionaryEntryService.findById(dictionaryEntry.getId());
         String code = dictionaryEntry.getCode();
         String dictCode = dictionaryEntry.getDictCode();
         if(!d.getCode().equals(code) && isExistence(dictCode,code)){
@@ -90,7 +90,7 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除标准字典项", notes = "删除标准字典项")
     public boolean deleteRsDictionaryEntry(
             @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") int id) throws Exception {
         rsDictionaryEntryService.delete(id);
         return true;
     }
@@ -99,7 +99,7 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据id获取获取标准字典")
     public MRsDictionaryEntry getRsDictionaryEntryById(
             @ApiParam(name = "id", value = "", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @PathVariable(value = "id") int id) {
         RsDictionaryEntry dictionaryEntry = rsDictionaryEntryService.findById(id);
         return convertToModel(dictionaryEntry, MRsDictionaryEntry.class);
     }
@@ -108,10 +108,10 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据dict_code获取获取标准字典")
     public List<MRsDictionaryEntry>  getRsDictionaryEntryByDictCode(
             @ApiParam(name = "dict_code", value = "", defaultValue = "")
-            @PathVariable(value = "dict_code") String dict_code)
+            @RequestParam(value = "dict_code") String dict_code)
     {
         List<RsDictionaryEntry> dictionaryEntries = rsDictionaryEntryService.findByDictCode(dict_code);
-        return (List<MRsDictionaryEntry>) convertToModels(dictionaryEntries, new ArrayList<MRsDictionaryEntry>(dictionaryEntries.size()), MRsDictionaryEntry.class,null);
+        return (List<MRsDictionaryEntry>) convertToModels(dictionaryEntries, new ArrayList<>(dictionaryEntries.size()), MRsDictionaryEntry.class,null);
     }
 
     @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence,method = RequestMethod.GET)
@@ -135,6 +135,6 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List<RsDictionaryEntry> dictionaryEntries = rsDictionaryEntryService.search(filters);
-        return (List<MRsDictionaryEntry>) convertToModels(dictionaryEntries, new ArrayList<MRsDictionaryEntry>(dictionaryEntries.size()), MRsDictionaryEntry.class, "");
+        return (List<MRsDictionaryEntry>) convertToModels(dictionaryEntries, new ArrayList<>(dictionaryEntries.size()), MRsDictionaryEntry.class, "");
     }
 }

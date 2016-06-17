@@ -27,7 +27,7 @@ public class RsDictionaryQueryDao {
 
     public void batchInsertDictionaries(RsDictionary[] dictionaries) {
         final RsDictionary[] tempDictionaries = dictionaries;
-        String sql = "insert into rs_dictionary(id,code,name,description) values(?,?,?)";
+        String sql = "insert into rs_dictionary(code,name,description) values(?,?,?)";
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 String code = tempDictionaries[i].getCode();

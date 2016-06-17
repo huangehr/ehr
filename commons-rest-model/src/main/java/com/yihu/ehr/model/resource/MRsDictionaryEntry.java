@@ -4,25 +4,25 @@ package com.yihu.ehr.model.resource;
  * Created by lyr on 2016/5/16.
  */
 public class MRsDictionaryEntry {
-    private String id;
-    private String dictId;
+    private int id;
+    private int dictId;
     private String dictCode;
     private String code;
     private String name;
     private String description;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
-    public void setId(String id)
-    {
+
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getDictId() {
+    public int getDictId() {
         return dictId;
     }
-    public void setDictId(String dictId) {
+    public void setDictId(int dictId) {
         this.dictId = dictId;
     }
 

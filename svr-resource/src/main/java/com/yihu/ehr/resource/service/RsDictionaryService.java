@@ -36,7 +36,7 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
     @Autowired
     private RsDictionaryQueryDao dictionaryQueryDao;
 
-    public RsDictionary findById(String id) {
+    public RsDictionary findById(int id) {
         return dictionaryDao.findOne(id);
     }
 
@@ -98,7 +98,7 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
             session.close();
 
             //更新字典项关联字典字段
-            sql = new StringBuilder("UPDATE rs_dictionary_entry e,rs_dictionary d SET e.dict_id =d.id WHERE e.dict_code=d.code AND e.dict_id IS NULL");
+            sql = new StringBuilder("UPDATE rs_dictionary_entry e,rs_dictionary d SET e.dict_id =d.id WHERE e.dict_code=d.code AND e.dict_id=0");
             connection = dataSource.getConnection();
             connection.prepareStatement(sql.toString()).executeUpdate();
             connection.close();

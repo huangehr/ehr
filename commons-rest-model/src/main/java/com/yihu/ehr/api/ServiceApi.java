@@ -84,7 +84,7 @@ public class ServiceApi {
         public static final String DictEntries                   ="/resources/dict_entries";
         public static final String NoPageDictEntries             ="/resources/noPage_dict_entries";
         public static final String DictEntry                     ="/resources/dict_entries/{id}";
-        public static final String DictEntriesByDictCode       ="/resources/dict_entries/{dict_code}";
+        public static final String DictEntriesByDictCode       ="/resources/dict/code/dict_entries";
         public static final String DictEntriesExistence          ="/resources/dict_entries/existence";
 
         public static final String SystemDictList               ="/resources/system_dict";

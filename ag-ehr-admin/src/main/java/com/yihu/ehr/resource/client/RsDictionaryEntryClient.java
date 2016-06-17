@@ -48,12 +48,12 @@ public interface RsDictionaryEntryClient {
     @RequestMapping(value = ServiceApi.Resources.DictEntry, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除标准字典项", notes = "删除标准字典项")
     boolean deleteRsDictionaryEntry(
-            @PathVariable(value = "id") String id);
+            @PathVariable(value = "id") int id);
 
     @RequestMapping(value = ServiceApi.Resources.DictEntry, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取标准字典")
     MRsDictionaryEntry getRsDictionaryEntryById(
-            @PathVariable(value = "id") String id);
+            @PathVariable(value = "id") int id);
 
     @RequestMapping(value = ServiceApi.Resources.DictEntriesExistence,method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
@@ -68,7 +68,7 @@ public interface RsDictionaryEntryClient {
 
     @RequestMapping(value = ServiceApi.Resources.DictEntriesByDictCode, method = RequestMethod.GET)
     @ApiOperation(value = "根据dict_code获取获取标准字典")
-    public List<MRsDictionaryEntry>  getRsDictionaryEntryByDictCode(
+    List<MRsDictionaryEntry>  getRsDictionaryEntryByDictCode(
             @ApiParam(name = "dict_code", value = "", defaultValue = "")
-            @PathVariable(value = "dict_code") String dict_code);
+            @RequestParam(value = "dict_code") String dict_code);
 }
