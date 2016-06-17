@@ -16,8 +16,8 @@ public class MIcd10HpRelation implements Serializable{
 	}
 
 	private Long id;
-	private String hpId;
-	private String icd10Id;
+	private Long hpId;
+	private Long icd10Id;
     private String createUser;
     private Date createDate;
 
@@ -29,19 +29,19 @@ public class MIcd10HpRelation implements Serializable{
 		this.id = id;
 	}
 
-	public String getHpId() {
+	public Long getHpId() {
 		return hpId;
 	}
 
-	public void setHpId(String hpId) {
+	public void setHpId(Long hpId) {
 		this.hpId = hpId;
 	}
 
-	public String getIcd10Id() {
+	public Long getIcd10Id() {
 		return icd10Id;
 	}
 
-	public void setIcd10Id(String icd10Id) {
+	public void setIcd10Id(Long icd10Id) {
 		this.icd10Id = icd10Id;
 	}
 

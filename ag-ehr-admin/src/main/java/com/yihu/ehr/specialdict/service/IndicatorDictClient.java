@@ -33,7 +33,7 @@ public interface IndicatorDictClient {
     @ApiOperation(value = "根据id删除指标字典")
     boolean deleteIndicatorsDict(
             @ApiParam(name = "id", value = "指标字典代码")
-            @PathVariable( value = "id") String id);
+            @PathVariable( value = "id") long id);
 
     @RequestMapping(value = "dict/indicators", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据ids批量删除指标字典")
@@ -51,7 +51,7 @@ public interface IndicatorDictClient {
     @ApiOperation(value = "根据ID获取相应的指标字典信息。" )
     MIndicatorsDict getIndicatorsDict(
             @ApiParam(name = "id", value = "字典内码")
-            @PathVariable(value = "id") String id);
+            @PathVariable(value = "id") long id);
 
     @RequestMapping(value = "/dict/indicators", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询相应的指标字典信息。" )
@@ -71,7 +71,7 @@ public interface IndicatorDictClient {
     @ApiOperation(value = "根据指标的ID判断是否与ICD10字典存在关联。")
     boolean indicatorIsUsage(
             @ApiParam(name = "id", value = "指标字典代码")
-            @PathVariable( value = "id") String id);
+            @PathVariable( value = "id") long id);
 
     @RequestMapping(value = "/dict/indicator/existence/name" , method = RequestMethod.GET)
     @ApiOperation(value = "判断提交的字典名称是否已经存在")

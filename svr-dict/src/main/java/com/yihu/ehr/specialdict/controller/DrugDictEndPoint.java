@@ -52,7 +52,7 @@ public class DrugDictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据id删除药品字典")
     public boolean deleteDrugDict(
             @ApiParam(name = "id", value = "药品字典代码")
-            @PathVariable( value = "id") String id) throws Exception {
+            @PathVariable( value = "id") long id) throws Exception {
 
         drugDictService.delete(id);
         return true;
@@ -63,8 +63,12 @@ public class DrugDictEndPoint extends EnvelopRestEndPoint {
     public boolean deleteDrugDicts(
             @ApiParam(name = "ids", value = "药品字典代码")
             @RequestParam( value = "ids") String ids) throws Exception {
-
-        drugDictService.delete(ids.split(","));
+        String[] strIds = ids.split(",");
+        Long[] longIds = new Long[strIds.length];
+        for(int i=0; i<strIds.length;i++){
+            longIds[i] = Long.parseLong(strIds[i]);
+        }
+        drugDictService.delete(longIds);
         return true;
     }
 
@@ -85,7 +89,7 @@ public class DrugDictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据ID获取相应的药品字典信息。" )
     public MDrugDict getDrugDict(
             @ApiParam(name = "id", value = "字典内码")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") long id) throws Exception {
 
         DrugDict dict = drugDictService.retrieve(id);
         if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
@@ -125,7 +129,7 @@ public class DrugDictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据drug的ID判断是否与ICD10字典存在关联。")
     public boolean isUsage(
             @ApiParam(name = "id", value = "药品字典代码")
-            @PathVariable( value = "id") String id) throws Exception {
+            @PathVariable( value = "id") long id) throws Exception {
 
         return icd10DrugRelationService.isUsage(id);
     }
@@ -151,7 +155,11 @@ public class DrugDictEndPoint extends EnvelopRestEndPoint {
     public List<MDrugDict> getDrugDictByIds(
             @ApiParam(name = "ids", value = "字典内码")
             @RequestParam(value = "ids") String[] ids) throws Exception {
-        List<DrugDict> drugDictList = drugDictService.getDrugDictByIds(ids);
+        long[] longIds = new long[ids.length];
+        for(int i=0; i<ids.length;i++){
+            longIds[i] = Long.parseLong(ids[i]);
+        }
+        List<DrugDict> drugDictList = drugDictService.getDrugDictByIds(longIds);
         return (List<MDrugDict>)convertToModels(drugDictList, new ArrayList<>(drugDictList.size()), MDrugDict.class, "");
     }
 }

@@ -16,8 +16,8 @@ public class MIcd10DrugRelation implements Serializable{
 	}
 
 	private Long id;
-	private String icd10Id;
-	private String drugId;
+	private Long icd10Id;
+	private Long drugId;
     private String createUser;
     private Date createDate;
 
@@ -29,19 +29,19 @@ public class MIcd10DrugRelation implements Serializable{
 		this.id = id;
 	}
 
-	public String getIcd10Id() {
+	public Long getIcd10Id() {
 		return icd10Id;
 	}
 
-	public void setIcd10Id(String icd10Id) {
+	public void setIcd10Id(Long icd10Id) {
 		this.icd10Id = icd10Id;
 	}
 
-	public String getDrugId() {
+	public Long getDrugId() {
 		return drugId;
 	}
 
-	public void setDrugId(String drugId) {
+	public void setDrugId(Long drugId) {
 		this.drugId = drugId;
 	}
 

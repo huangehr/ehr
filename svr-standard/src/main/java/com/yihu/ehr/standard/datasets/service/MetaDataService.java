@@ -2,7 +2,7 @@ package com.yihu.ehr.standard.datasets.service;
 
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.query.BaseHbmService;
+import com.yihu.ehr.util.BaseHbmService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Criteria;
 import org.hibernate.Query;

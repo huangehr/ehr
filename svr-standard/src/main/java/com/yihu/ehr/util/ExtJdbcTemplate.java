@@ -1,5 +1,7 @@
-package com.yihu.ehr.query;
+package com.yihu.ehr.util;
 
+import com.yihu.ehr.query.ReturnIdPstCreator;
+import com.yihu.ehr.query.UpdatePstCallback;
 import javafx.util.Pair;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -8,8 +10,6 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.sql.DataSource;
-import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;

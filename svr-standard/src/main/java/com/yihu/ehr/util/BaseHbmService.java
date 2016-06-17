@@ -1,6 +1,7 @@
-package com.yihu.ehr.query;
+package com.yihu.ehr.util;
 
 import com.yihu.ehr.config.StdSessionFactoryBean;
+import com.yihu.ehr.query.URLHqlQueryParser;
 import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;

@@ -18,32 +18,64 @@ import java.util.*;
 @Access(value = AccessType.FIELD)
 public class Organization  {
 
+
     @Id
     @GeneratedValue(generator = "Generator")
     @GenericGenerator(name = "Generator", strategy = "assigned")
     @Column(name = "org_code", unique = true, nullable = false)
     private String orgCode;         // 机构代码,对医院编码属性需要调研
+
+    @Column(name = "admin",  nullable = true)
     private String admin;            // 机构管理员
+
+    @Column(name = "settled",  nullable = true)
     private boolean settled;        // 是否已接入,对第三方平台有效.
+
+    @Column(name = "settled_way",  nullable = true)
     private String settledWay;    // 接入方式：直连/平台接入
+
+    @Column(name = "full_name",  nullable = true)
     private String fullName;        // 全名
+
+    @Column(name = "org_type",  nullable = true)
     private String orgType;        // 机构类型,如:行政\科研等
+
+    @Column(name = "py_code",  nullable = true)
     private String pyCode;            // 拼音码
+
+    @Column(name = "short_name",  nullable = true)
     private String shortName;        // 简称
     //private Set<String> tags;        // 标签
+
+    @Column(name = "tel",  nullable = true)
     private String tel;                // 机构电话
+
+    @Column(name = "create_date",  nullable = true)
     private Date createDate;        // 创建日期
+
+    @Column(name = "location",  nullable = true)
     private String location;        // 地址
+
+    @Column(name = "activity_flag", unique = true, nullable = true)
     private int activityFlag;
+
+    @Column(name = "tags",  nullable = true)
     private String tags;
 
+
+    @Column(name = "img_remote_path",nullable = true)
     private String imgRemotePath;
+
+    @Column(name = "img_local_path",nullable = true)
     private String imgLocalPath;
+
+    @Column(name = "administrative_division",nullable = true)
     private int administrativeDivision;
 
     public Organization() {
         //tags = new HashSet<>();
     }
+
 
 
     public String getOrgCode() {
@@ -53,7 +85,7 @@ public class Organization  {
         this.orgCode = orgCode;
     }
 
-    @Column(name = "admin",  nullable = true)
+
     public String getAdmin() {
         return admin;
     }
@@ -61,7 +93,7 @@ public class Organization  {
         this.admin = admin;
     }
 
-    @Column(name = "create_date",  nullable = true)
+
     public Date getCreateDate() {
         return createDate;
     }
@@ -69,7 +101,7 @@ public class Organization  {
         this.createDate = createDate;
     }
 
-    @Column(name = "full_name",  nullable = true)
+
     public String getFullName() {
         return fullName;
     }
@@ -77,7 +109,7 @@ public class Organization  {
         this.fullName = fullName;
     }
 
-    @Column(name = "location",  nullable = true)
+
     public String getLocation() {
         return location;
     }
@@ -85,7 +117,7 @@ public class Organization  {
         this.location = location;
     }
 
-    @Column(name = "py_code",  nullable = true)
+
     public String getPyCode() {
         return pyCode;
     }
@@ -93,7 +125,7 @@ public class Organization  {
         this.pyCode = pyCode;
     }
 
-    @Column(name = "settled_way",  nullable = true)
+
     public String getSettledWay() {
         return settledWay;
     }
@@ -103,7 +135,7 @@ public class Organization  {
     }
 
 
-    @Column(name = "short_name",  nullable = true)
+
     public String getShortName() {
         return shortName;
     }
@@ -112,7 +144,7 @@ public class Organization  {
     }
 
 
-    @Column(name = "tel",  nullable = true)
+
     public String getTel() {
         return tel;
     }
@@ -120,7 +152,7 @@ public class Organization  {
         this.tel = tel;
     }
 
-    @Column(name = "org_type",  nullable = true)
+
     public String getOrgType() {
         return orgType;
     }
@@ -128,7 +160,7 @@ public class Organization  {
         this.orgType = orgType;
     }
 
-    @Column(name = "settled",  nullable = true)
+
     public boolean isSettled() {
         return settled;
     }
@@ -136,7 +168,7 @@ public class Organization  {
         this.settled = settled;
     }
 
-    @Column(name = "activity_flag", unique = true, nullable = true)
+
     public int getActivityFlag() {
         return activityFlag;
     }
@@ -144,7 +176,7 @@ public class Organization  {
         this.activityFlag = activityFlag;
     }
 
-    @Column(name = "img_remote_path",nullable = true)
+
     public String getImgRemotePath() {
         return imgRemotePath;
     }
@@ -160,7 +192,7 @@ public class Organization  {
         this.imgLocalPath = imgLocalPath;
     }
 
-    @Column(name = "administrative_division",nullable = true)
+
     public int getAdministrativeDivision() {
         return administrativeDivision;
     }
@@ -168,7 +200,7 @@ public class Organization  {
         this.administrativeDivision = administrativeDivision;
     }
 
-    @Column(name = "tags",  nullable = true)
+
     public List<String> getTags() {
         List<String> list = new ArrayList<>();
         if(org.springframework.util.StringUtils.isEmpty(tags)){

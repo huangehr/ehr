@@ -154,4 +154,25 @@ public class RsDictionaryController extends BaseController {
             return failed("查询出错！");
         }
     }
+
+    @RequestMapping(value = "/admin" + ServiceApi.Resources.DictEntryBatch, method = RequestMethod.POST)
+    @ApiOperation(value = "批量创建标准字典以及字典项", notes = "批量创建标准字典以及字典项")
+    public Envelop createDictAndEntries(
+            @ApiParam(name = "model", value = "", defaultValue = "")
+            @RequestParam("model") String model) throws Exception {
+
+        if(rsDictionaryClient.createDictAndEntries(model))
+            return success("");
+        return failed("新增出错！");
+    }
+
+    @RequestMapping(value = "/admin" + ServiceApi.Resources.DictCodesExistence,method = RequestMethod.GET)
+    @ApiOperation("获取已存在字典编码")
+    public List idExistence(
+            @ApiParam(name = "codes", value = "", defaultValue = "")
+            @RequestParam("codes") String codes) throws Exception {
+
+        List existCodes = rsDictionaryClient.codeExistence(codes);
+        return existCodes;
+    }
 }

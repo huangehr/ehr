@@ -15,7 +15,7 @@ public class HealthProblemDictModel implements Serializable{
 	public HealthProblemDictModel() {
 	}
 
-	private String id;
+	private long id;
 	private String code;
 	private String name;
 	private String description;
@@ -33,11 +33,11 @@ public class HealthProblemDictModel implements Serializable{
         this.icd10Name = icd10Name;
     }
 
-    public String getId() {
+    public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

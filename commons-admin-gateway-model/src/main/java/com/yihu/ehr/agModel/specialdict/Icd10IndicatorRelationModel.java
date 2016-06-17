@@ -15,33 +15,33 @@ public class Icd10IndicatorRelationModel implements Serializable{
 	public Icd10IndicatorRelationModel() {
 	}
 
-	private String id;
-	private String icd10Id;
-	private String indicatorId;
+	private long id;
+	private long icd10Id;
+	private long indicatorId;
     private String createUser;
     private Date createDate;
 
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public String getIcd10Id() {
+	public long getIcd10Id() {
 		return icd10Id;
 	}
 
-	public void setIcd10Id(String icd10Id) {
+	public void setIcd10Id(long icd10Id) {
 		this.icd10Id = icd10Id;
 	}
 
-	public String getIndicatorId() {
+	public long getIndicatorId() {
 		return indicatorId;
 	}
 
-	public void setIndicatorId(String indicatorId) {
+	public void setIndicatorId(long indicatorId) {
 		this.indicatorId = indicatorId;
 	}
 

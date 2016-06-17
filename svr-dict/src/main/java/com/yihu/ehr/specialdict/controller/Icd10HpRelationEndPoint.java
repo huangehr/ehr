@@ -51,13 +51,15 @@ public class Icd10HpRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "为健康问题增加ICD10疾病关联,--批量增加关联。" )
     public Collection<MIcd10HpRelation> createHpIcd10Relations(
             @ApiParam(name = "hp_id", value = "健康问题Id")
-            @RequestParam(value = "hp_id") String hpId,
+            @RequestParam(value = "hp_id") long hpId,
             @ApiParam(name = "icd10_ids", value = "关联的icd10字典ids,多个以逗号连接")
             @RequestParam(value = "icd10_ids") String icd10Ids,
             @ApiParam(name = "create_user",value = "创建者")
             @RequestParam(value = "create_user") String createUser) throws Exception {
         Collection<MIcd10HpRelation> mIcd10HpRelations = new ArrayList<>();
-        for(String icd10Id : icd10Ids.split(",")){
+
+        for(String icd10StrId : icd10Ids.split(",")){
+            long icd10Id = Long.parseLong(icd10StrId);
             Icd10HpRelation relation = new Icd10HpRelation();
             relation.setCreateUser(createUser);
             relation.setCreateDate(new Date());
@@ -85,7 +87,7 @@ public class Icd10HpRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "为健康问题删除ICD10疾病关联。" )
     public boolean deleteHpIcd10Relation(
             @ApiParam(name = "id", value = "关联ID", defaultValue = "")
-            @RequestParam(value = "id", required = true) String id) throws Exception{
+            @RequestParam(value = "id", required = true) long id) throws Exception{
 
         icd10HpRelationService.delete(id);
 
@@ -97,7 +99,13 @@ public class Icd10HpRelationEndPoint extends EnvelopRestEndPoint {
     public boolean deleteHpIcd10Relations(
             @ApiParam(name = "ids", value = "关联关系ids", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception {
-        icd10HpRelationService.delete(ids.split(","));
+        String[] hpIcd10StrIds = ids.split(",");
+        Long[] hpIcdIds = new Long[hpIcd10StrIds.length];
+        for(int i=0; i<hpIcd10StrIds.length;i++){
+            long hpId = Long.parseLong(hpIcd10StrIds[i]);
+            hpIcdIds[i] = hpId;
+        }
+        icd10HpRelationService.delete(hpIcdIds);
         return true;
     }
 
@@ -144,9 +152,9 @@ public class Icd10HpRelationEndPoint extends EnvelopRestEndPoint {
     public boolean isHpIcd10RelaExist(
 
             @ApiParam(name = "icd10Id", value = "Icd10内码", defaultValue = "")
-            @RequestParam(value = "icd10Id", required = false) String icd10Id,
+            @RequestParam(value = "icd10Id", required = false) long icd10Id,
             @ApiParam(name = "hpId", value = "健康问题内码")
-            @RequestParam(value = "hpId", required = false) String hpId) throws Exception {
+            @RequestParam(value = "hpId", required = false) long hpId) throws Exception {
 
         return icd10HpRelationService.isExist(icd10Id,hpId);
     }
@@ -155,7 +163,7 @@ public class Icd10HpRelationEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根基健康问题id获取健康问题与ICD10的关联")
     public List<MIcd10HpRelation> getHpIcd10RelationByHpId(
             @ApiParam(name = "hp_id", value = "健康问题内码")
-            @RequestParam(value = "hp_id", required = false) String hpId) throws Exception {
+            @RequestParam(value = "hp_id", required = false) long hpId) throws Exception {
         List<Icd10HpRelation> icd10HpRelations = icd10HpRelationService.getHpIcd10RelationByHpId(hpId);
         return (List<MIcd10HpRelation>)convertToModels(icd10HpRelations, new ArrayList<>(icd10HpRelations.size()), MIcd10HpRelation.class, "");
     }

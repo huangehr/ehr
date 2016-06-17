@@ -13,7 +13,7 @@ import java.util.Date;
 public class Icd10DiagnoseRelation implements Serializable {
     public Icd10DiagnoseRelation (){}
     private long id;
-    private String icd10Id;
+    private long icd10Id;
     private String name;
     private String description;
     private String createUser;
@@ -32,10 +32,10 @@ public class Icd10DiagnoseRelation implements Serializable {
     }
 
     @Column(name = "icd10_id",nullable = false)
-    public String getIcd10Id() {
+    public long getIcd10Id() {
         return icd10Id;
     }
-    public void setIcd10Id(String icd10Id) {
+    public void setIcd10Id(long icd10Id) {
         this.icd10Id = icd10Id;
     }
 

@@ -37,8 +37,8 @@
         <!--module>../svr-special-dict</module-->
         <module>../svr-standard</module>
         <module>../svr-user</module>
-        <module>../ag-admin</module>
-        <module>../ag-ehr-platform</module>
+        <module>../ag-ehr-admin</module>
+        <module>../ag-ehr-cloud</module>
     </modules>
 
     <build>
@@ -277,10 +277,10 @@
                     <excludes>
                         <exclude>**/Abstract*.java</exclude>
                     </excludes>
-                    <systemPropertyVariables>
-                        <java.security.egd>file:/dev/./urandom</java.security.egd>
-                        <java.awt.headless>true</java.awt.headless>
-                    </systemPropertyVariables>
+                    <!--<systemPropertyVariables>-->
+                        <!--<java.security.egd>file:/dev/./urandom</java.security.egd>-->
+                        <!--<java.awt.headless>true</java.awt.headless>-->
+                    <!--</systemPropertyVariables>-->
                     <argLine>-Xmx1024m</argLine>
                 </configuration>
             </plugin>
@@ -414,11 +414,11 @@
                 <artifactId>commons-redis-mq</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
-            <dependency>
-                <groupId>com.yihu.ehr</groupId>
-                <artifactId>commons-metrics</artifactId>
-                <version>${version.ehr}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.yihu.ehr</groupId>-->
+                <!--<artifactId>commons-metrics</artifactId>-->
+                <!--<version>${version.ehr}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-admin-gateway-model</artifactId>

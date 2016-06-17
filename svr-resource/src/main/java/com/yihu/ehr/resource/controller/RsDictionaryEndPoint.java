@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -22,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author linaz
@@ -128,6 +130,26 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
 
         List ls = dictionaryService.search("",filters,"", 1, 1);
         return ls!=null && ls.size()>0;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.DictEntryBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量创建标准字典以及字典项", notes = "批量创建标准字典以及字典项")
+    public boolean createDictAndEntries(
+            @RequestBody String jsonData) throws Exception {
+
+        List models = objectMapper.readValue(jsonData, new TypeReference<List>() {});
+        dictionaryService.batchInsertDictsAndEntry(models);
+        return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.GET)
+    @ApiOperation("获取已存在字典编码")
+    public List codeExistence(
+            @ApiParam(name = "codes", value = "", defaultValue = "")
+            @RequestParam("codes") String codes) throws Exception {
+
+        List existCodes = dictionaryService.codeExist(toEntity(codes, String[].class));
+        return existCodes;
     }
 
     private boolean isExistence(String code) {

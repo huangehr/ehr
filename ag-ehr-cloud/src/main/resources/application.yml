@@ -1,5 +1,5 @@
 server:
-  port: ${ag-ehr-platform.server.port}
+  port: ${ag-ehr-cloud.server.port}
 
 management:
   port: ${server.port}
@@ -7,6 +7,10 @@ management:
 ---
 spring:
   profiles: dev
+
+---
+spring:
+  profiles: alpha
 
 ---
 spring:

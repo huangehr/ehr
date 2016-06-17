@@ -154,7 +154,8 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     public List<MOrganization> getOrgs(
             @ApiParam(name = "org_codes", value = "机构代码", defaultValue = "")
             @RequestParam(value = "org_codes") String[] orgCodes) throws Exception {
-        List<MOrganization> organizationList = orgService.findByOrgCodes(orgCodes);
+        List<String> orgCodeList = Arrays.asList(orgCodes);
+        List<Organization> organizationList = orgService.findByOrgCodes(orgCodeList);
         return (List<MOrganization>) convertToModels(organizationList, new ArrayList<MOrganization>(organizationList.size()), MOrganization.class, "");
     }
 
@@ -191,6 +192,15 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         return orgCodes;
     }
 
+    @ApiOperation(value = "根据地区代码获取机构列表")
+    @RequestMapping(value = "/organizations/areas/{area}", method = RequestMethod.GET)
+    public List<MOrganization> getOrganizationByAreaCode(
+            @ApiParam(name = "area", value = "地区代码", defaultValue = "")
+            @PathVariable(value = "area") String area)
+    {
+        List<Organization> organizationList = orgService.findByOrgArea(area);
+        return (List<MOrganization>) convertToModels(organizationList, new ArrayList<MOrganization>(organizationList.size()), MOrganization.class, "");
+    }
 
     /**
      * 跟新机构激活状态

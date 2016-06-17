@@ -20,8 +20,8 @@ public class Icd10IndicatorRelation implements Serializable{
     }
 
     private long id;
-    private String icd10Id;
-    private String indicatorId;
+    private long icd10Id;
+    private long indicatorId;
     private String createUser;
     private Date createDate;
 
@@ -36,18 +36,18 @@ public class Icd10IndicatorRelation implements Serializable{
     }
 
     @Column(name = "icd10_id", nullable = false)
-    public String getIcd10Id() {
+    public long getIcd10Id() {
         return icd10Id;
     }
-    public void setIcd10Id(String icd10Id) {
+    public void setIcd10Id(long icd10Id) {
         this.icd10Id = icd10Id;
     }
 
     @Column(name = "indicator_id", nullable = false)
-    public String getIndicatorId() {
+    public long getIndicatorId() {
         return indicatorId;
     }
-    public void setIndicatorId(String indicatorId) {
+    public void setIndicatorId(long indicatorId) {
         this.indicatorId = indicatorId;
     }
 

@@ -15,33 +15,33 @@ public class HpIcd10RelationModel implements Serializable{
 	public HpIcd10RelationModel() {
 	}
 
-	private String id;
-	private String hpId;
-	private String icd10Id;
+	private long id;
+	private long hpId;
+	private long icd10Id;
     private String createUser;
     private Date createDate;
 
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public String getHpId() {
+	public long getHpId() {
 		return hpId;
 	}
 
-	public void setHpId(String hpId) {
+	public void setHpId(long hpId) {
 		this.hpId = hpId;
 	}
 
-	public String getIcd10Id() {
+	public long getIcd10Id() {
 		return icd10Id;
 	}
 
-	public void setIcd10Id(String icd10Id) {
+	public void setIcd10Id(long icd10Id) {
 		this.icd10Id = icd10Id;
 	}
 

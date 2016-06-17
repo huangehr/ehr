@@ -49,7 +49,7 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据id删除指标字典")
     public boolean deleteIndicatorDict(
             @ApiParam(name = "id", value = "指标字典代码")
-            @PathVariable( value = "id") String id) {
+            @PathVariable( value = "id") long id) {
         indicatorsDictService.delete(id);
         return true;
     }
@@ -59,7 +59,13 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
     public boolean deleteIndicatorsDict(
             @ApiParam(name = "ids", value = "指标字典代码,多个以逗号分隔")
             @RequestParam( value = "ids") String ids) {
-        indicatorsDictService.delete(ids.split(","));
+
+        String[] strIds = ids.split(",");
+        Long[] longIds = new Long[strIds.length];
+        for(int i=0; i<strIds.length;i++){
+            longIds[i] = Long.parseLong(strIds[i]);
+        }
+        indicatorsDictService.delete(longIds);
         return true;
     }
 
@@ -80,7 +86,7 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据ID获取相应的指标字典信息。" )
     public MIndicatorsDict getIndicatorsDict(
             @ApiParam(name = "id", value = "字典内码")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") long id) throws Exception {
 
         IndicatorsDict dict = indicatorsDictService.retrieve(id);
         if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
@@ -120,7 +126,7 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据指标的ID判断是否与ICD10字典存在关联。")
     public boolean indicatorIsUsage(
             @ApiParam(name = "id", value = "指标字典代码")
-            @PathVariable( value = "id") String id) {
+            @PathVariable( value = "id") long id) {
 
         return icd10IndicatorRelationService.isUsage(id);
     }
@@ -156,7 +162,11 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
     public List<MIndicatorsDict> getIndicatorsDictByIds(
             @ApiParam(name = "ids", value = "指标代码")
             @RequestParam(value = "ids") String[] ids) throws Exception {
-        List<IndicatorsDict> indicatorsDicts = indicatorsDictService.getIndicatorsDictByIds(ids);
+        long[] longIds = new long[ids.length];
+        for(int i=0; i<ids.length;i++){
+            longIds[i] = Long.parseLong(ids[i]);
+        }
+        List<IndicatorsDict> indicatorsDicts = indicatorsDictService.getIndicatorsDictByIds(longIds);
         return (List<MIndicatorsDict>)convertToModels(indicatorsDicts, new ArrayList<>(indicatorsDicts.size()), MIndicatorsDict.class, "");
     }
 }

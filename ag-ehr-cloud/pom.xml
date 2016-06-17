@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -37,6 +37,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
@@ -96,7 +101,7 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ehr-constants</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -105,33 +110,48 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-ehr-constants</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ui-swagger</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-rest-model</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-profile-core</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.yihu.ehr</groupId>
+                    <artifactId>commons-data-redis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.yihu.ehr</groupId>
+                    <artifactId>commons-redis-keyschema</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-metrics</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.yihu.ehr</groupId>-->
+            <!--<artifactId>commons-metrics</artifactId>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>
-            <scope>${dependency.scope}</scope>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
     <build>

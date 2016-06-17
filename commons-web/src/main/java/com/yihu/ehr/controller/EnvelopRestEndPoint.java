@@ -1,13 +1,11 @@
 package com.yihu.ehr.controller;
 
 import com.yihu.ehr.constants.BizObject;
-import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.util.id.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.EntityManager;
-import java.util.*;
+import java.util.List;
 
 /**
  * REST风格控控制器基类。此控制器用于对API进行校验，并处理平台根层级的业务，如API参数校验，错误及返回码设定等。
@@ -23,9 +21,6 @@ import java.util.*;
 public class EnvelopRestEndPoint extends BaseRestEndPoint {
     @Value("${deploy.region}")
     Short deployRegion = 3502;
-
-    @Autowired
-    protected EntityManager entityManager;
 
     /**
      * 返回一个信封对象。信封对象的返回场景参见 Envelop.

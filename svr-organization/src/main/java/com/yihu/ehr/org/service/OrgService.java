@@ -1,6 +1,5 @@
 package com.yihu.ehr.org.service;
 
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.org.feign.GeographyClient;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +69,11 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     }
 
 
-    public List<MOrganization> findByOrgCodes(String[] orgCodes) {
+    public List<Organization> findByOrgCodes(List<String> orgCodes) {
         return organizationRepository.findByOrgCodes(orgCodes);
+    }
+
+    public List<Organization> findByOrgArea(String area) {
+        return organizationRepository.findByArea(area + "%");
     }
 }

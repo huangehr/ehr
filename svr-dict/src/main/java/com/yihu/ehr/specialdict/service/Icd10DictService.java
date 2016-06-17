@@ -54,12 +54,12 @@ public class Icd10DictService extends BaseJpaService<Icd10Dict, XIcd10DictReposi
         return icd10DictRepo.findAll(pageable);
     }
 
-    public boolean isUsage(String id){
+    public boolean isUsage(long id){
         boolean result = ((hpIcd10ReRepo.findByIcd10Id(id) != null)||(icd10DrugReRepo.findByIcd10Id(id) != null)||(icd10IndicatorReRepo.findByIcd10Id(id) != null));
         return result;
     }
 
-    public List<MIcd10Dict> findByIds(String[] ids) {
+    public List<Icd10Dict> findByIds(long[] ids) {
         return  icd10DictRepo.findByIds(ids);
     }
 }

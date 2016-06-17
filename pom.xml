@@ -110,6 +110,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>${version.spring-framework}</spring.version>
         <version.commons-bean-utils>1.9.2</version.commons-bean-utils>
         <version.commons-codec>1.9</version.commons-codec>
         <version.commons-collections>3.2.1</version.commons-collections>
@@ -661,6 +662,12 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${version.spring-boot}</version>
+                <scope>${dependency.scope}</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-actuator</artifactId>
                 <version>${version.spring-boot}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
