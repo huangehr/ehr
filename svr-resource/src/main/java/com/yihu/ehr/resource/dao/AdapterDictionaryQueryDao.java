@@ -3,13 +3,13 @@ package com.yihu.ehr.resource.dao;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.resource.model.RsAdapterDictionary;
 import com.yihu.ehr.util.id.ObjectId;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.sql.*;
 
 
@@ -27,7 +27,7 @@ public class AdapterDictionaryQueryDao {
     Short deployRegion = 3502;
 
     @Autowired
-    protected BasicDataSource basicDataSource;
+    protected DataSource basicDataSource;
 
     public void batchInsertAdapterDictionaries(RsAdapterDictionary[] adapterDictionaries) throws SQLException {
         Connection connection =  basicDataSource.getConnection();
