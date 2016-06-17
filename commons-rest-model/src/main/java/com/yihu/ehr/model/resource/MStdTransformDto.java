@@ -7,6 +7,7 @@ package com.yihu.ehr.model.resource;
 public class MStdTransformDto {
     private String version;
     private String source;
+    private String dataset;
 
     public String getVersion() {
         return version;
@@ -22,5 +23,13 @@ public class MStdTransformDto {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public String getDataset() {
+        return dataset;
+    }
+
+    public void setDataset(String dataset) {
+        this.dataset = dataset;
     }
 }
