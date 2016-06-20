@@ -12,6 +12,7 @@ import com.yihu.ehr.patient.service.PatientClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -68,7 +69,8 @@ public class PatientController extends BaseController {
             for (MDemographicInfo patientInfo : demographicInfos) {
 
                 PatientModel patient = convertToModel(patientInfo, PatientModel.class);
-                patient.setRegisterTime(DateToString(patientInfo.getRegisterTime(), AgAdminConstants.DateTimeFormat));
+                //patient.setRegisterTime(DateToString(patientInfo.getRegisterTime(), AgAdminConstants.DateTimeFormat));
+                patient.setRegisterTime(patientInfo.getRegisterTime()==null?"": DateTimeUtil.simpleDateTimeFormat(patientInfo.getRegisterTime()));
                 //获取家庭地址信息
                 String homeAddressId = patientInfo.getHomeAddress();
                 if (StringUtils.isNotEmpty(homeAddressId)) {
@@ -311,7 +313,7 @@ public class PatientController extends BaseController {
 
         //修改人口信息
         MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
-        info.setBirthday(StringToDate(detailModel.getBirthday(), AgAdminConstants.DateFormat));
+        info.setBirthday(DateTimeUtil.simpleDateTimeParse(detailModel.getBirthday()));
         info = patientClient.updatePatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");
@@ -359,7 +361,8 @@ public class PatientController extends BaseController {
         }
 
         PatientDetailModel detailModel = convertToModel(demographicInfo, PatientDetailModel.class);
-        detailModel.setBirthday(DateToString(demographicInfo.getBirthday(), AgAdminConstants.DateFormat));
+//        detailModel.setBirthday(DateToString(demographicInfo.getBirthday(), AgAdminConstants.DateFormat));
+        detailModel.setBirthday(demographicInfo.getBirthday()==null?"": DateTimeUtil.simpleDateFormat(demographicInfo.getBirthday()));
         MConventionalDict dict = null;
         if (StringUtils.isNotEmpty(detailModel.getMartialStatus())) {
             dict = conventionalDictClient.getMartialStatus(detailModel.getMartialStatus());

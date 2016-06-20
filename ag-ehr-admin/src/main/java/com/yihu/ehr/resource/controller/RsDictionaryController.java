@@ -166,7 +166,7 @@ public class RsDictionaryController extends BaseController {
         return failed("新增出错！");
     }
 
-    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.POST)
     @ApiOperation("获取已存在字典编码")
     public List idExistence(
             @ApiParam(name = "codes", value = "", defaultValue = "")

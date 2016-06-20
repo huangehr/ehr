@@ -1,6 +1,5 @@
 package com.yihu.ehr.resource.controller;
 
-import com.yihu.ehr.agModel.resource.RsMetaMsgModel;
 import com.yihu.ehr.agModel.resource.RsMetadataModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
@@ -66,54 +65,11 @@ public class MetadataController extends BaseController {
             @ApiParam(name = "metadatas", value = "数据元JSON", defaultValue = "")
             @RequestParam(value = "metadatas") String metadatas) throws Exception {
 
+
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         try{
-            RsMetaMsgModel[] metadataArray = toEntity(metadatas, RsMetaMsgModel[].class);
-            if(metadataArray.length==0)
-                return envelop;
-
-            Map<String, RsMetaMsgModel> stdmap = new HashMap<>(), idMap = new HashMap<>(), errMap = new HashMap<>();
-
-            //验证stdcode是否唯一
-            String code = "";
-            String ids = "";
-            for(RsMetaMsgModel meta : metadataArray){
-                code += "," + meta.getStdCode();
-                ids += "," + meta.getId();
-                stdmap.put(meta.getStdCode(), meta);
-                idMap.put(meta.getId(), meta);
-            }
-
-            RsMetaMsgModel m;
-            List<String> ls = metadataClient.stdCodeExistence(code.substring(1));
-            for(String k : ls){
-                if((m = stdmap.get(k))!=null){
-                    m.addStdCodeMsg("该内部编码已存在！");
-                    errMap.put(m.getId(), m);
-                }
-            }
-
-            //验证id是否唯一
-            ls = metadataClient.idExistence(ids.substring(1));
-            for(String k : ls){
-                if((m = idMap.get(k))!=null){
-                    m.addIdMsg("该资源标准编码已存在！");
-                    errMap.put(m.getId(), m);
-                }
-            }
-
-            Set<RsMetaMsgModel> values = new HashSet<>(stdmap.values());
-            values.removeAll(errMap.values());
-
-            //保存验证通过的数据
-            boolean rs = metadataClient.createMetadataPatch(
-                    toJson(convertToModels(values, new ArrayList<>(), MRsMetadata.class, null)));
-            if(rs!=true)
-                throw new Exception("保存错误！");
-
-            //返回验证不通过的数据
-            envelop.setDetailModelList(Arrays.asList(errMap.values().toArray()));
+            metadataClient.createMetadataPatch(metadatas);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -235,6 +191,16 @@ public class MetadataController extends BaseController {
             envelop.setSuccessFlg(false);
             return envelop;
         }
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.MetadataIdExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在数据元编码")
+    public List idExistence(
+            @ApiParam(name = "ids", value = "", defaultValue = "")
+            @RequestParam("ids") String ids) throws Exception {
+
+        List existIds = metadataClient.idExistence(ids);
+        return existIds;
     }
 
     private List<RsMetadataModel> coverModelLs(List<MRsMetadata> rsMetadatas) throws UnsupportedEncodingException {

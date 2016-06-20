@@ -85,7 +85,7 @@ public class StdSourceEndPoint extends ExtendEndPoint<MStdSource> {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception {
 
-        StandardSource standardSourceModel = jsonToObj(model, StandardSource.class);
+        StandardSource standardSourceModel = toEntity(model, StandardSource.class);
         StandardSource standardSource = stdSourceService.retrieve(id);
         if (standardSource == null)
             throw errNotFound("标准来源", standardSourceModel.getId());
@@ -102,7 +102,7 @@ public class StdSourceEndPoint extends ExtendEndPoint<MStdSource> {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception {
 
-        StandardSource standardSource = jsonToObj(model, StandardSource.class);
+        StandardSource standardSource = toEntity(model, StandardSource.class);
         if (stdSourceService.isSourceCodeExist(standardSource.getCode()))
             throw errRepeatCode();
         standardSource.setCreateDate(new Date());

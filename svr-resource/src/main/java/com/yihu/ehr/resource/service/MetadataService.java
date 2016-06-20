@@ -10,11 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 数据源服务
@@ -102,23 +102,23 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
     /**
      * 批量创建数据元
      */
-    public List<RsMetadata> addMetaBatch(List<RsMetadata> metaLs)
+    public boolean addMetaBatch(List<Map<String, Object>> metaLs)
     {
         StringBuilder sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, dict_id, valid) VALUES ") ;
-        RsMetadata rsMetadata ;
+        Map<String, Object> map;
         SQLQuery query;
         int total = 0;
         for(int i=1; i<=metaLs.size(); i++){
-            rsMetadata = metaLs.get(i-1);
-            sql.append("('"+ rsMetadata .getId() +"'");
-            sql.append(",'"+ rsMetadata .getDomain() +"'");
-            sql.append(",'"+ rsMetadata .getName() +"'");
-            sql.append(",'"+ rsMetadata .getStdCode() +"'");
-            sql.append(",'"+ rsMetadata .getDictCode() +"'");
-            sql.append(",'"+ rsMetadata .getColumnType() +"'");
-            sql.append(",'"+ rsMetadata .getNullAble() +"'");
-            sql.append(",'"+ rsMetadata .getDescription() +"'");
-            sql.append(","+ rsMetadata.getDictId() );
+            map = metaLs.get(i-1);
+            sql.append("('"+ map .get("id") +"'");
+            sql.append(",'"+ map .get("domain") +"'");
+            sql.append(",'"+ map .get("name") +"'");
+            sql.append(",'"+ map .get("stdCode") +"'");
+            sql.append(",'"+ null2Space(map .get("dictCode")) +"'");
+            sql.append(",'"+ map .get("columnType") +"'");
+            sql.append(",'"+ map .get("nullAble") +"'");
+            sql.append(",'"+ map .get("description") +"'");
+            sql.append(","+ map.get("dictId") );
             sql.append(",'1')");
 
             if(i%100==0 || i == metaLs.size()){
@@ -127,11 +127,13 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
                 sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, valid) VALUES ") ;
             }else
                 sql.append(",");
-
         }
-        return metaLs;
+        return true;
     }
 
+    private Object null2Space(Object o){
+        return o==null? "" : o;
+    }
     /**
      * 查询内部编码是否已存在， 返回已存在内部编码
      */
@@ -146,11 +148,11 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
     /**
      * 查询资源标准编码是否已存在， 返回已存在资源标准编码
      */
-    public List idExist(String ids)
+    public List idExist( String[] ids)
     {
         String sql = "SELECT id FROM rs_metadata WHERE id in(:ids)";
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
-        sqlQuery.setParameterList("ids", ids.split(","));
+        sqlQuery.setParameterList("ids", ids);
         return sqlQuery.list();
     }
 }

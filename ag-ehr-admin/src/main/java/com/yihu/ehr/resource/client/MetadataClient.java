@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,7 +30,7 @@ public interface MetadataClient {
     @RequestMapping(value = ServiceApi.Resources.MetadataBatch, method = RequestMethod.POST)
     @ApiOperation("批量创建数据元")
     boolean createMetadataPatch(
-            @RequestParam(value = "metadatas") String metadatas);
+            @RequestBody String metadatas);
 
     @RequestMapping(value = ServiceApi.Resources.MetadataList, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("更新数据元")
@@ -73,8 +72,8 @@ public interface MetadataClient {
     List stdCodeExistence(
             @RequestParam(value="std_codes") String stdCodes);
 
-    @RequestMapping(value = ServiceApi.Resources.MetadataIdExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.MetadataIdExistence,method = RequestMethod.POST)
     @ApiOperation("获取已存在资源标准编码")
     List idExistence(
-            @RequestParam(value="ids") String ids);
+            @RequestBody String ids);
 }
