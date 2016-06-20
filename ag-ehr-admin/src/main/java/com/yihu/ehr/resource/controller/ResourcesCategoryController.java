@@ -97,9 +97,7 @@ public class ResourcesCategoryController extends BaseController {
             @PathVariable(value = "id") String id) throws Exception {
         Envelop envelop = new Envelop();
         try{
-            ObjectNode obj  = resourcesCategoryClient.deleteResourceCategory(id);
-            envelop.setSuccessFlg(obj.get("successFlg").asBoolean());
-            envelop.setErrorMsg(String.valueOf(obj.get("msg")));
+             envelop  = resourcesCategoryClient.deleteResourceCategory(id);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
