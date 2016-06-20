@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
@@ -52,10 +53,10 @@ public class MetadataEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("批量创建数据元")
     public boolean createMetadataPatch(
             @ApiParam(name="metadatas",value="数据元JSON",defaultValue = "")
-            @RequestParam(value="metadatas") String metadatas) throws Exception
+            @RequestBody String metadatas) throws Exception
     {
-        RsMetadata[] metadataArray = toEntity(metadatas, RsMetadata[].class);
-        metadataService.addMetaBatch(Arrays.asList(metadataArray));
+        List models = objectMapper.readValue(metadatas, new TypeReference<List>() {});
+        metadataService.addMetaBatch(models);
         return true;
     }
 
@@ -119,13 +120,13 @@ public class MetadataEndPoint extends EnvelopRestEndPoint {
         return existCodes;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.MetadataIdExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.MetadataIdExistence,method = RequestMethod.POST)
     @ApiOperation("获取已存在资源标准编码")
     public List idExistence(
             @ApiParam(name="ids",value="ids",defaultValue = "")
-            @RequestParam(value="ids") String ids) throws Exception {
+            @RequestBody String ids) throws Exception {
 
-        List existIds = metadataService.idExist(ids);
+        List existIds = metadataService.idExist(toEntity(ids, String[].class));
         return existIds;
     }
 

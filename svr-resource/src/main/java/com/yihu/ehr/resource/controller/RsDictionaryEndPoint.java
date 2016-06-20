@@ -6,13 +6,11 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.resource.MRsDictionary;
 import com.yihu.ehr.resource.model.RsDictionary;
-import com.yihu.ehr.resource.model.RsDictionaryEntry;
 import com.yihu.ehr.resource.service.RsDictionaryEntryService;
 import com.yihu.ehr.resource.service.RsDictionaryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author linaz
@@ -137,15 +134,16 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
             @RequestBody String jsonData) throws Exception {
 
         List models = objectMapper.readValue(jsonData, new TypeReference<List>() {});
+        long s = new Date().getTime();
         dictionaryService.batchInsertDictsAndEntry(models);
+        System.err.println( new Date().getTime() - s );
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.POST)
     @ApiOperation("获取已存在字典编码")
     public List codeExistence(
-            @ApiParam(name = "codes", value = "", defaultValue = "")
-            @RequestParam("codes") String codes) throws Exception {
+            @RequestBody String codes) throws Exception {
 
         List existCodes = dictionaryService.codeExist(toEntity(codes, String[].class));
         return existCodes;
