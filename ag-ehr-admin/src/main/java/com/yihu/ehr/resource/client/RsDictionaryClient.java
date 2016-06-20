@@ -68,8 +68,8 @@ public interface RsDictionaryClient {
     boolean createDictAndEntries(
             @RequestBody String jsonData);
 
-    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在字典编码")
     List codeExistence(
-            @RequestParam("codes") String codes);
+            @RequestBody String codes);
 }

@@ -8,6 +8,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ import java.util.Map;
 public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictionaryDao>  {
 
     @Autowired
-    DataSource dataSource;
+    JdbcTemplate jdbcTemplate;
 
     @Autowired
     private RsDictionaryDao dictionaryDao;
@@ -55,15 +56,13 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
 
             String title = "INSERT INTO rs_dictionary(code, name, description) VALUES ";
             StringBuilder sql = new StringBuilder(title);
-            Map<String, Object> modelMap;
             int i = 1;
             List<Map<String, Object>> dictEntry = new ArrayList<>();
             //插入字典
             for(Map<String, Object> map: models){
-                modelMap = (Map<String, Object>) map.get("key");
-                sql.append("('"+ modelMap.get("code") +"'");
-                sql.append(",'"+  modelMap.get("name") +"'");
-                sql.append(",'"+  modelMap.get("description") +"')");
+                sql.append("('"+  map.get("code") +"'");
+                sql.append(",'"+  map.get("name") +"'");
+                sql.append(",'"+  null2Space(map.get("description")) +"')");
 
                 if(i%100==0 || i == models.size()){
                     session.createSQLQuery(sql.toString()).executeUpdate();
@@ -72,7 +71,7 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
                 else
                     sql.append(",");
 
-                dictEntry.addAll((List)map.get("value"));
+                dictEntry.addAll((List)map.get("children"));
                 i++;
             }
 
@@ -84,7 +83,7 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
                 sql.append("('"+ map.get("dictCode") +"'");
                 sql.append(",'"+  map.get("code") +"'");
                 sql.append(",'"+  map.get("name") +"'");
-                sql.append(",'"+  map.get("description") +"')");
+                sql.append(",'"+  null2Space(map.get("description")) +"')");
 
                 if(i%100==0 || i == dictEntry.size()){
                     session.createSQLQuery(sql.toString()).executeUpdate();
@@ -99,9 +98,7 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
 
             //更新字典项关联字典字段
             sql = new StringBuilder("UPDATE rs_dictionary_entry e,rs_dictionary d SET e.dict_id =d.id WHERE e.dict_code=d.code AND e.dict_id=0");
-            connection = dataSource.getConnection();
-            connection.prepareStatement(sql.toString()).executeUpdate();
-            connection.close();
+            jdbcTemplate.execute(sql.toString());
         } catch (Exception e){
             if(transaction!=null)transaction.rollback();
             if(session!=null) session.close();
@@ -110,6 +107,9 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
         }
     }
 
+    public Object null2Space(Object str){
+        return str==null? "" : str;
+    }
     /**
      * 查询编码是否已存在， 返回已存在资源标准编码
      */
