@@ -1,6 +1,5 @@
 package com.yihu.ehr.resource.model;
 
-import org.hibernate.annotations.GeneratorType;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -22,6 +21,7 @@ public class RsMetadata {
     private String dictCode;
     private String description;
     private String valid;
+    private int dictId;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -32,6 +32,14 @@ public class RsMetadata {
     }
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Column(name = "dict_id")
+    public int getDictId() {
+        return dictId;
+    }
+    public void setDictId(int dictId) {
+        this.dictId = dictId;
     }
 
     @Column(name="domain",nullable = false)

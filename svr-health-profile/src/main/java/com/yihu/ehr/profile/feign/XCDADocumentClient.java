@@ -20,9 +20,10 @@ import java.util.List;
  * @created 2016.04.11 9:03
  */
 @ApiIgnore
+@RequestMapping(ApiVersion.Version1_0)
 @FeignClient(MicroServices.Standard)
 public interface XCDADocumentClient {
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Standards.Documents, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Documents, method = RequestMethod.GET)
     List<MCDADocument> getCDADocumentByIds(@RequestParam(value = "fields") String fields,
                                                     @RequestParam(value = "filters") String filters,
                                                     @RequestParam(value = "sorts") String sorts,
@@ -30,13 +31,11 @@ public interface XCDADocumentClient {
                                                     @RequestParam(value = "page") int page,
                                                     @RequestParam(value = "version") String version);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/std/cda_data_set_relationships/cda_id", method = RequestMethod.GET)
-    List<MCdaDataSetRelationship> getCDADataSetRelationshipByCDAId(
-            @RequestParam(value = "version") String version,
-            @RequestParam(value = "document_Id") String cdaDocumentId);
+    @RequestMapping(value = ServiceApi.Standards.Document, method = RequestMethod.GET)
+    MCDADocument getCDADocuments(@RequestParam(value = "version") String version,
+                                           @RequestParam(value = "id") String id);
 
-
-    @RequestMapping(value = ApiVersion.Version1_0 + "/std/cda_data_set/cda_id", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DocumentDataSet, method = RequestMethod.GET)
     List<MCdaDataSet> getCDADataSetByCDAId(
             @RequestParam(value = "version") String version,
             @RequestParam(value = "document_Id") String cdaDocumentId);

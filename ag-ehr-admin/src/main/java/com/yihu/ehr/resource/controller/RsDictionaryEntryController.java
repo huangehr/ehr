@@ -2,10 +2,10 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.resource.MRsDictionaryEntry;
 import com.yihu.ehr.resource.client.RsDictionaryEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.utils.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -95,7 +94,7 @@ public class RsDictionaryEntryController extends BaseController {
     @ApiOperation(value = "删除标准字典项", notes = "删除标准字典项")
     public Envelop deleteRsDictionaryEntry(
             @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") int id) throws Exception {
         Envelop envelop = new Envelop();
         try {
             rsDictionaryEntryClient.deleteRsDictionaryEntry(id);
@@ -112,7 +111,7 @@ public class RsDictionaryEntryController extends BaseController {
     @ApiOperation(value = "根据id获取获取标准字典")
     public Envelop getRsDictionaryEntryById(
             @ApiParam(name = "id", value = "", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @PathVariable(value = "id") int id) {
         Envelop envelop = new Envelop();
         try {
             MRsDictionaryEntry rsDictionaryEntry = rsDictionaryEntryClient.getRsDictionaryEntryById(id);

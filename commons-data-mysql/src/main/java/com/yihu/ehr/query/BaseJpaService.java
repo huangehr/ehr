@@ -44,6 +44,16 @@ public class BaseJpaService<T, R> {
     @PersistenceContext
     protected EntityManager entityManager;
 
+    public BaseJpaService(){
+        Type genType = getClass().getGenericSuperclass();
+        if ((genType instanceof ParameterizedType)) {
+            Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+            if (params.length==2) {
+                repoClass = (Class) params[1];
+            }
+        }
+    }
+
     public T save(T entity) {
         return (T) getRepository().save(entity);
     }

@@ -22,6 +22,8 @@ public class FileResource {
     private Date updateDate;
     private String updateUser;
 
+
+
     @Id
     @Column(name = "id", unique = true, nullable = false)
     public String getId() {

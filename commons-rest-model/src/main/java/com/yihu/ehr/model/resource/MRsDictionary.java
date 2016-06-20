@@ -4,6 +4,7 @@ package com.yihu.ehr.model.resource;
  * Created by lyr on 2016/5/16.
  */
 public class MRsDictionary {
+    private int id;
     private String code;
     private String name;
     private String description;
@@ -30,5 +31,12 @@ public class MRsDictionary {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 }
