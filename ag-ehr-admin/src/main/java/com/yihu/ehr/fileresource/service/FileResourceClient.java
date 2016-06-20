@@ -4,9 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,10 +15,10 @@ import java.util.List;
 @FeignClient(name=MicroServices.FileResource)
 public interface FileResourceClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/files", method = RequestMethod.POST)
+    @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload", method = RequestMethod.POST)
     @ApiOperation(value = "上次图片")
     String fileUpload(
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);
 
@@ -29,9 +27,25 @@ public interface FileResourceClient {
     boolean filesDelete(
             @RequestParam(value = "object_id") String objectId);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/files", method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + "/files_download", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
     List<String> filesDownload(
             @RequestParam(value = "object_id") String objectId);
+
+    @RequestMapping(value = ApiVersion.Version1_0 + "/image_view/{storagePath}", method = RequestMethod.GET)
+    @ApiOperation(value = "查看图片")
+    String imageView(@PathVariable(value = "storagePath") String storagePath);
+
+    @RequestMapping(value = ApiVersion.Version1_0 + "/files_path", method = RequestMethod.GET)
+    @ApiOperation(value = "下载文件路径")
+    List<String> filesPath(
+            @RequestParam(value = "object_id") String objectId);
+
+    @RequestMapping(value = ApiVersion.Version1_0 + "/image_delete", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除资源表对应关系，并且删除fastdfs相对应当文件")
+    boolean filesDeleteByPath(
+            @RequestParam(value = "storagePath") String storagePath);
+
+
 
 }

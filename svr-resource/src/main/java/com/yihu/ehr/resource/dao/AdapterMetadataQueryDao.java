@@ -1,14 +1,12 @@
+
 package com.yihu.ehr.resource.dao;
 
 
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
-import com.yihu.ehr.util.id.ObjectId;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -22,10 +20,7 @@ import java.sql.Statement;
 public class AdapterMetadataQueryDao {
 
     @Autowired
-    protected BasicDataSource basicDataSource;
-
-    @Value("${deploy.region}")
-    Short deployRegion = 3502;
+    protected DataSource basicDataSource;
 
     public void batchAdapterMetadata(RsAdapterMetadata[] adapterMetadata) throws Exception {
         Connection connection =  basicDataSource.getConnection();
@@ -41,7 +36,6 @@ public class AdapterMetadataQueryDao {
             String metadataDomain = adapterMetadata[i].getMetadataDomain();
             srcMetadataName = srcMetadataName == null ? srcMetadataName:srcMetadataName.replace("\'","\\\'");
             stmt.execute("insert into rs_adapter_metadata(id,schema_id,metadata_id,src_dataset_code,src_metadata_code,src_metadata_name,metadata_domain) values(" +
-                    "'"+new ObjectId(deployRegion, BizObject.RsAdapterDictionary).toString()+"'," +
                     "'"+schemaId+"'," +
                     "'"+metadataId+"'," +
                     "'"+srcDataSetCode+"'," +

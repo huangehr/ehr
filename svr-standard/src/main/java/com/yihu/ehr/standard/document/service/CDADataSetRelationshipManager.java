@@ -292,7 +292,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
 
     public List<MCdaDataSet> getCDADataSetByCDAId(String version, String cdaId) {
         String sql = "SELECT " +
-                " scdsr.id id,scdsr.cda_id cdaId,scdsr.dataset_id dataSetId, sds.CODE dataSetCode " +
+                " scdsr.id id,scdsr.cda_id cdaId,scdsr.dataset_id dataSetId, sds.CODE dataSetCode,sds.multi_record multiRecord " +
                 "FROM " +
                 " std_cda_data_set_relationship_"+version+" scdsr, " +
                 " std_data_set_"+version+" sds " +

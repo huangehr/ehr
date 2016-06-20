@@ -36,4 +36,9 @@ public class EHRPlatformGatewayApp extends SpringBootServletInitializer {
     public static void main(String[] args) throws SocketException {
 		SpringApplication.run(EHRPlatformGatewayApp.class, args);
 	}
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(EHRPlatformGatewayApp.class);
+    }
 }

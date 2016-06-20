@@ -186,7 +186,7 @@ public class StdProfileConverter {
      * <p>
      * 定制的CDA文档列表根据档案类别，从而获取这份档案的CDA类别。此CDA类别包含与文档相关的模板，CDA文档。
      */
-    protected Map<Template, MCDADocument> getCustomizedCDADocuments(String cdaVersion, String orgCode, EventType eventType) {
+    protected Map<Template, MCDADocument> getCustomizedCDADocuments(String cdaVersion, String orgCode, EventType eventType) throws Exception {
         // 使用事件-CDA类别映射，取得与此档案相关联的CDA类别ID
         String cdaType = cdaDocumentTypeOptions.getCdaDocumentTypeId(Integer.toString(eventType.getType()));
 
@@ -209,7 +209,7 @@ public class StdProfileConverter {
         return cdaDocuments;
     }
 
-    protected Pair<Template, MCDADocument> getCustomizedCDADocument(String cdaVersion, String orgCode, EventType eventType, String cdaDocumentId){
+    protected Pair<Template, MCDADocument> getCustomizedCDADocument(String cdaVersion, String orgCode, EventType eventType, String cdaDocumentId) throws Exception{
         String cdaType = cdaDocumentTypeOptions.getCdaDocumentTypeId(Integer.toString(eventType.getType()));
 
         if (StringUtils.isEmpty(cdaType)) {

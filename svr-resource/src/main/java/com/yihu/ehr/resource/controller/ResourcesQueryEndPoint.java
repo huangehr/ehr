@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -43,7 +41,7 @@ public class ResourcesQueryEndPoint {
                                 @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                 @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return resourcesQueryService.getResources(resourcesCode, appId, URLDecoder.decode(queryParams), page, size);
+        return resourcesQueryService.getResources(resourcesCode, appId, queryParams, page, size);
     }
 
 
@@ -68,12 +66,16 @@ public class ResourcesQueryEndPoint {
         return resourcesQueryService.getResourceData(resourcesCode, queryCondition, page, size);
     }
 
-    @ApiOperation("内部--Hbase主表")
-    @RequestMapping(value = "/getEhrCenter", method = RequestMethod.GET)
-    public Page<Map<String, Object>> getEhrCenter(@ApiParam(name = "queryParams", defaultValue = "{\"q\":\"demographic_id:420521195812172917\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                                  @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                                  @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourcesQueryDao.getEhrCenter(queryParams, page, size);
+    /**
+     * 获取非结构化数据
+     */
+    @ApiOperation("获取非结构化数据")
+    @RequestMapping(value = "/getRawFiles", method = RequestMethod.GET)
+    public Envelop getRawFiles(@ApiParam("profileId") @RequestParam(value = "profileId", required = false) String profileId,
+                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+
+        return resourcesQueryService.getRawFiles(profileId,page,size);
     }
 
     @ApiOperation("Hbase从表")
@@ -90,6 +92,14 @@ public class ResourcesQueryEndPoint {
         re.setTotalCount(new Long(result.getTotalElements()).intValue());
         re.setDetailModelList(result.getContent());
         return re;
+    }
+
+    @ApiOperation("内部--Hbase主表")
+    @RequestMapping(value = "/getEhrCenter", method = RequestMethod.GET)
+    public Page<Map<String, Object>> getEhrCenter(@ApiParam(name = "queryParams", defaultValue = "{\"q\":\"demographic_id:420521195812172917\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
+                                                  @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+                                                  @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+        return resourcesQueryDao.getEhrCenter(queryParams, page, size);
     }
 
     @ApiOperation("内部--Hbase主表统计")

@@ -30,7 +30,7 @@ public class FileTableUtil {
     }
 
     public static Map<String, String> getFileFamilyCellMap(CdaDocument cdaDocument) {
-        ArrayNode root = ((ObjectMapper) SpringContext.getService("objectMapper")).createArrayNode();
+        ArrayNode root = ((ObjectMapper) SpringContext.getService(ObjectMapper.class)).createArrayNode();
         for (OriginFile originFile : cdaDocument.getOriginFiles()) {
             ObjectNode subNode = root.addObject();
             subNode.put("mime", originFile.getMime());

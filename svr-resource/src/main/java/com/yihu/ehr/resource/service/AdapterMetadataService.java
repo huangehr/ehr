@@ -1,7 +1,6 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.AdapterMetadataQueryDao;
 import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,8 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
     @Autowired
     private AdapterMetadataDao adMetadataDao;
 
-    @Autowired
-    private AdapterMetadataQueryDao adapterMetadataQueryDao;
+//    @Autowired
+//    private AdapterMetadataQueryDao adapterMetadataQueryDao;
 
 
     /**
@@ -82,7 +81,8 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
     }
 
     public void batchInsertAdapterMetadata(RsAdapterMetadata[] adapterMetadata) throws Exception {
-        adapterMetadataQueryDao.batchAdapterMetadata(adapterMetadata);
+        //// TODO: 2016/6/16
+//        adapterMetadataQueryDao.batchAdapterMetadata(adapterMetadata);
     }
 
     public void deleteBySchemaId(String id) {

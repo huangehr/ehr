@@ -15,15 +15,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * @version 1.0
  */
 @ApiIgnore
+@RequestMapping(ApiVersion.Version1_0)
 @FeignClient(value = MicroServices.Resource)
 public interface XResourceClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0+ "/rs/query/getResources", method = GET)
-    Envelop getResources(@RequestParam(value = "resourcesCode", required = true) String resourcesCode,
-                        @RequestParam(value = "appId", required = true) String appId,
-                        @RequestParam(value = "queryParams", required = false) String queryParams) throws Exception;
 
-    @RequestMapping(value = ApiVersion.Version1_0+ "/rs/query/getResources", method = GET)
+    @RequestMapping(value = "/rs/query/getResources", method = GET)
     Envelop getResources(@RequestParam(value = "resourcesCode", required = true) String resourcesCode,
                                           @RequestParam(value = "appId", required = true) String appId,
                                           @RequestParam(value = "queryParams", required = false) String queryParams,
@@ -31,8 +28,13 @@ public interface XResourceClient {
                                           @RequestParam(value = "size", required = false) Integer size) throws Exception;
 
     //不通过资源代码查询细表数据
-    @RequestMapping(value = ApiVersion.Version1_0+ "/rs/query/getEhrCenterSub", method = GET)
+    @RequestMapping(value = "/rs/query/getEhrCenterSub", method = GET)
     Envelop getEhrCenterSub(@RequestParam(value = "queryParams", required = true) String queryParams,
+                         @RequestParam(value = "page", required = false) Integer page,
+                         @RequestParam(value = "size", required = false) Integer size) throws Exception;
+
+    @RequestMapping(value = "/rs/query/getRawFiles", method = GET)
+    Envelop getRawFiles(@RequestParam(value = "profileId", required = false) String profileId,
                          @RequestParam(value = "page", required = false) Integer page,
                          @RequestParam(value = "size", required = false) Integer size) throws Exception;
 }

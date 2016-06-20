@@ -1,5 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.JsonObject;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
@@ -7,6 +9,7 @@ import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.resource.model.RsCategory;
 import com.yihu.ehr.resource.service.ResourcesCategoryService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -60,11 +63,18 @@ public class ResourcesCategoryEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.Category, method = RequestMethod.DELETE)
     @ApiOperation("删除资源类别")
-    public boolean deleteResourceCategory(
+    public Envelop deleteResourceCategory(
             @ApiParam(name = "id", value = "资源类别ID", defaultValue = "string")
             @PathVariable(value = "id") String id) throws Exception {
-        rsCategoryService.deleteRsCategory(id);
-        return true;
+        Envelop json = new Envelop();
+        try{
+            rsCategoryService.deleteRsCategory(id);
+            json.setSuccessFlg(true);
+        }catch (Exception e){
+            json.setSuccessFlg(false);
+            json.setErrorMsg(e.getMessage());
+        }
+        return json;
     }
 
     @RequestMapping(value = ServiceApi.Resources.Category, method = RequestMethod.GET)

@@ -53,7 +53,7 @@ public class PatientInfoBaseService {
      */
     public Map<String, Object> getPatientInfo(String demographicId) throws Exception {
         //时间排序
-        Envelop result = resource.getResources(BasisConstant.patientInfo, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+        Envelop result = resource.getResources(BasisConstant.patientInfo, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             List<Map<String, Object>> list = result.getDetailModelList();
             if (list.size() == 1) {
@@ -92,7 +92,7 @@ public class PatientInfoBaseService {
     public List<Map<String, Object>> getHealthProblem(String demographicId) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
             //健康问题+相关门诊记录
@@ -111,7 +111,7 @@ public class PatientInfoBaseService {
             }
 
             //门诊诊断
-            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\"" + rowkeys.toString() + "\"}");///"{\"join\":\"demographic_id:" + demographicId + "\"}");
+            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\"" + rowkeys.toString() + "\"}",1,1000);///"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (outpatient.getDetailModelList() != null && outpatient.getDetailModelList().size() > 0) {
                 for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
@@ -137,7 +137,7 @@ public class PatientInfoBaseService {
             }
 
             //住院诊断
-            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId,"{\"q\":\"" + rowkeys.toString() + "\"}"); //"{\"join\":\"demographic_id:" + demographicId + "\"}");
+            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId,"{\"q\":\"" + rowkeys.toString() + "\"}",1,1000); //"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (hospitalized.getDetailModelList() != null && hospitalized.getDetailModelList().size() > 0) {
                 for (int i = 0; i < hospitalized.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
@@ -253,120 +253,23 @@ public class PatientInfoBaseService {
                 }
             }
 
-            //健康问题用药统计（另外获取）
-
         }
 
         return re;
     }
 
-    //@（疾病模型）患者 -> 门诊住院记录
-    public List<Map<String, Object>> getMedicalEvents(String demographicId, String eventType, String year, String area, String hpId, String diseaseId) throws Exception {
-        List<Map<String, Object>> re = new ArrayList<>();
-        //患者事件列表
-        String q = "demographic_id:" + demographicId;
-        String join = "";
-        //事件类型
-        if (eventType != null && eventType.length() > 0) {
-            if (eventType.equals("1") || eventType.equals("2")) {
-                q += " AND event_type:" + eventType;
-            } else if (eventType.equals("3")) //根据业务来区分数据
-            {
-                join = " ";
-            } else if (eventType.equals("4")) {
-                join = " ";
-            }
-        }
-        //事件年份
-        if (year != null && year.length() > 0) {
-            q += " AND event_date:[" + year + "-01-01T00:00:00Z TO " + year + "-12-31T23:59:59Z]";
-        }
-
-        String queryParams = "{\"q\":\"" + q + "\"}";
-
-        //疾病ID
-        if (diseaseId != null && diseaseId.length() > 0) {
-            if (join.length() > 0) {
-                join += " AND (" + BasisConstant.mzzd + ":" + diseaseId + " OR " + BasisConstant.zyzd + ":" + diseaseId + ")";
-            } else {
-                join = BasisConstant.mzzd + ":" + diseaseId + " OR " + BasisConstant.zyzd + ":" + diseaseId;
-            }
-            queryParams = "{\"q\":\"" + q + "\",\"join\":\"" + join + "\"}";
-        } else {
-            //健康问题
-            if (hpId != null && hpId.length() > 0) {
-                //健康问题->疾病ICD10代码
-                List<MIcd10Dict> dictCodeList = dictService.getIcd10DictList(hpId);
-                String hpJoin = "";
-                if (dictCodeList != null && dictCodeList.size() > 0) {
-                    String mzJoin = "";
-                    String zyJoin = "";
-                    //遍历疾病列表
-                    for (MIcd10Dict ICD10 : dictCodeList) {
-                        if (mzJoin.length() > 0) {
-                            mzJoin += " OR " + BasisConstant.mzzd + ":" + ICD10.getCode();
-                            zyJoin += " OR " + BasisConstant.zyzd + ":" + ICD10.getCode();
-                        } else {
-                            mzJoin = BasisConstant.mzzd + ":" + ICD10.getCode();
-                            zyJoin = BasisConstant.zyzd + ":" + ICD10.getCode();
-                        }
-                    }
-
-                    if (mzJoin.length() > 0 && zyJoin.length() > 0) {
-                        hpJoin = "(" + mzJoin + ") OR (" + zyJoin + ")";
-                    } else {
-                        if (mzJoin.length() > 0) {
-                            hpJoin = "(" + mzJoin + ")";
-                        } else if (zyJoin.length() > 0) {
-                            hpJoin = "(" + zyJoin + ")";
-                        }
-                    }
-                }
-
-                if (join.length() > 0) {
-                    join += " AND " + hpJoin;
-                } else {
-                    join = hpJoin;
-                }
-            }
-        }
-
+    //某次门诊住院记录
+    public Map<String, Object> getMedicalEvent(String profileId) throws Exception {
+        Map<String, Object> re = new HashMap<>();
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, URLEncoder.encode(queryParams));
-        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
-            re = result.getDetailModelList();
-
-            if (area != null && area.length() > 0) {
-                //通过机构代码列表获取地区列表
-                List<String> orgCodelist = new ArrayList<>();
-                for (int i = 0; i < result.getDetailModelList().size(); i++) {
-                    Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(i);
-                    String orgCode = obj.get("org_code").toString();
-
-                    if (!orgCodelist.contains(orgCode)) {
-                        orgCodelist.add(orgCode);
-                    }
-                }
-                List<MOrganization> orglist = organization.getOrgs(orgCodelist);
-
-                //判断是否属于区域
-                for (int i = re.size() - 1; i >= 0; i--) {
-                    Map<String, Object> obj = re.get(i);
-                    String orgCode = obj.get("org_code").toString();
-
-                    for (MOrganization org : orglist) {
-                        if (orgCode.equals(org.getOrgCode())) {
-                            String areaCode = new Integer(org.getAdministrativeDivision()).toString();
-                            areaCode = areaCode.substring(0, areaCode.length() - 2) + "00";
-                            if (areaCode.equals(area)) {
-                                re.remove(i);
-                            }
-                        }
-                    }
-                }
-            }
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}",1,1);
+        if(result.getDetailModelList()!=null&& result.getDetailModelList().size()>0)
+        {
+            re = (Map<String, Object>)result.getDetailModelList().get(0);
         }
-
+        else{
+            throw new Exception("不存在该档案信息！（profileId:"+profileId+"）");
+        }
         return re;
     }
 
@@ -412,14 +315,18 @@ public class PatientInfoBaseService {
             //获取结尾0的个数
             for(int i = areaCodes.length - 1;i > -1;i--)
             {
-                if(areaCodes[i] == 0)
+                if(areaCodes[i] == '0')
                 {
                     count++;
+                }
+                else
+                {
+                    break;
                 }
             }
 
             //结尾0截除
-            String areaSub = area.substring(0,area.length() - count -1);
+            String areaSub = area.substring(0,area.length() - count);
             //获取对应地区下机构
             List<MOrganization> organizations = organization.getOrganizationByAreaCode(areaSub);
 
@@ -439,7 +346,7 @@ public class PatientInfoBaseService {
                 query += " AND (" + orgQuery.toString() + ")";
             }
             else
-            {   //地区不为空，地区下结构为空时返回空
+            {   //地区不为空，地区下机构为空时返回空
                 return new ArrayList<Map<String,Object>>();
             }
         }
@@ -447,7 +354,7 @@ public class PatientInfoBaseService {
         query += "\"}";
 
         //门诊住院事件
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, URLEncoder.encode(query));
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, query.replace(' ','+'),1,1000);
         //事件集合
         List<Map<String, Object>> eventList = new ArrayList<Map<String, Object>>();
 
@@ -503,7 +410,7 @@ public class PatientInfoBaseService {
         if (!StringUtils.isBlank(mzQuery))
         {
             //门诊诊断纪录
-            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\""));
+            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\""),1,1000);
 
             //获取疾病门诊事件纪录rowkey
             if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
@@ -518,7 +425,7 @@ public class PatientInfoBaseService {
         if(!StringUtils.isBlank(zyQuery))
         {
             //住院诊断纪录
-            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\""));
+            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\""),1,1000);
 
             //获取疾病住院事件纪录rowkey
             if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0)
@@ -582,7 +489,7 @@ public class PatientInfoBaseService {
     //@患者就诊过的疾病
     public List<Map<String, String>> getPatientDisease(String demographicId) throws Exception {
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
         StringBuilder rowkeys = new StringBuilder();
 
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
@@ -601,7 +508,7 @@ public class PatientInfoBaseService {
         List<String> list = new ArrayList<>();
         List<Map<String, String>> healthProblemDictMapList = new ArrayList<>();
         //门诊诊断
-        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\""+ rowkeys.toString() +"\"}");//"{\"join\":\"demographic_id:" + demographicId + "\"}");
+        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\""+ rowkeys.toString() +"\"}",1,1000);//"{\"join\":\"demographic_id:" + demographicId + "\"}");
         if (outpatient.getDetailModelList() != null && outpatient.getDetailModelList().size() > 0) {
             for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
@@ -612,7 +519,7 @@ public class PatientInfoBaseService {
             }
         }
         //住院诊断
-        Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId, "{\"q\":\""+ rowkeys.toString() +"\"}");//"{\"join\":\"demographic_id:" + demographicId + "\"}");
+        Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId, "{\"q\":\""+ rowkeys.toString() +"\"}",1,1000);//"{\"join\":\"demographic_id:" + demographicId + "\"}");
         if (hospitalized.getDetailModelList() != null && hospitalized.getDetailModelList().size() > 0) {
             for (int i = 0; i < hospitalized.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
@@ -630,7 +537,7 @@ public class PatientInfoBaseService {
     public List<String> getPatientYear(String demographicId) throws Exception {
         List<String> list = new ArrayList<>();
         //患者事件列表
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             for (int i = 0; i < result.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(i);
@@ -651,7 +558,7 @@ public class PatientInfoBaseService {
 
         //患者事件列表
         List<String> orgCodeList = new ArrayList<>();
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}");
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             for (int i = 0; i < result.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(i);
