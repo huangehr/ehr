@@ -209,7 +209,8 @@ public class ProfileCDAService {
     /**
      * 通过事件号获取CDADocumentId
      */
-    public String getCDADocumentId(String eventNo, String cdaCode) throws Exception {
+    public Map<String, Object> getCDADocumentId(String eventNo, String cdaCode) throws Exception {
+        Map<String, Object> re = new HashMap<>();
         Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"event_no:" + eventNo + "\"}", null, null);
 
         //是否有数据
@@ -220,7 +221,9 @@ public class ProfileCDAService {
             //获取模板ID
             Template template = templateRepository.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
             if (template != null) {
-                return String.valueOf(template.getCdaDocumentId());
+                re.put("template_id",template.getId());
+                re.put("cda_document_id",template.getCdaDocumentId());
+                return re;
             }
         }
 

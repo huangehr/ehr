@@ -84,43 +84,56 @@ public class ResourcesTransformService {
 
             if(metadataList != null && metadataList.size() > 0)
             {
-                if(StringUtils.isBlank(dataset))
+                //数据元Map,便于对应查找
+                Map<String, List<String>> adapterMap = new HashMap<>();
+
+                //数据元放入Map
+                for (RsAdapterMetadata meta : metadataList)
                 {
-                    //数据元Map,便于对应查找
-                    Map<String, String> adapterMap = new HashMap<String, String>();
-
-                    //数据元放入Map
-                    for (RsAdapterMetadata meta : metadataList)
+                    String key = meta.getMetadataId();
+                    List<String> values = new ArrayList<>();
+                    if(adapterMap.containsKey(key))
                     {
-                        adapterMap.put(meta.getMetadataId(), meta.getSrcMetadataCode());
+                        values = adapterMap.get(key);
                     }
+                    values.add(meta.getSrcMetadataCode());
+                    adapterMap.put(key, values);
+                }
 
-                    //数据元代码转换
-                    for (String key : resource.keySet())
+                //数据元代码转换
+                for (String key : resource.keySet())
+                {
+                    Object value = resource.get(key);
+                    //字典数据
+                    if(key.lastIndexOf("_VALUE")>0)
                     {
+                        String srcKey = key.substring(0,key.indexOf("_VALUE"));
+                        if (adapterMap.containsKey(srcKey))
+                        {
+                            List<String> adpaterKeys = adapterMap.get(srcKey);
+                            for(String adpaterKey:adpaterKeys)
+                            {
+                                returnMap.put(adpaterKey+"_VALUE", value);
+                            }
+                        }
+                        else{
+                            returnMap.put(key, value);
+                        }
+                    }
+                    else{
                         if (adapterMap.containsKey(key))
                         {
-                            returnMap.put(adapterMap.get(key), resource.get(key));
-                        } else
-                        {
-                            returnMap.put(key, resource.get(key));
+                            List<String> adpaterKeys = adapterMap.get(key);
+                            for(String adpaterKey:adpaterKeys)
+                            {
+                                returnMap.put(adpaterKey, value);
+                            }
+                        }
+                        else{
+                            returnMap.put(key, value);
                         }
                     }
-                }
-                else
-                {
-                    for (RsAdapterMetadata metadata : metadataList)
-                    {
-                        if(resource.containsKey(metadata.getMetadataId()))
-                        {
-                            Object val = resource.get(metadata.getMetadataId());
-                            returnMap.put(metadata.getSrcMetadataCode(),val != null?val:"");
-                        }
-                        else
-                        {
-                            returnMap.put(metadata.getSrcMetadataCode(),"");
-                        }
-                    }
+
                 }
             }
         }
@@ -129,7 +142,7 @@ public class ResourcesTransformService {
     }
 
     /**
-     * EHR主表数据分解（未完成）
+     * EHR主表数据分解
      */
     public Map<String,Object> stdMasterTransform(Map<String,Object> resource,String dataset,String version)
     {

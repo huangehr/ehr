@@ -55,7 +55,36 @@ public class PatientInfoDetailService {
 
     String appId = "svr-health-profile";
 
+    /**
+     * 通过身份证获取相关rowkeys
+     * @return
+     */
+    private String getProfileIds(String demographicId) throws Exception
+    {
+        String re = "";
+        //获取相关门诊住院记录
+        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1);
+        if(main.getDetailModelList() != null && main.getDetailModelList().size() > 0)
+        {
+            //主表rowkey条件
+            StringBuilder rowkeys = new StringBuilder();
+            for(Map<String,Object> map : (List<Map<String,Object>>)main.getDetailModelList())
+            {
+                if(rowkeys.length() > 0)
+                {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append(BasisConstant.profileId + ":" + map.get("rowkey").toString());
+            }
 
+            re = "(" + rowkeys.toString() +")";
+        }
+        else{
+            re = BasisConstant.profileId+":(NOT *)";
+        }
+
+        return re;
+    }
 
     /******************************* 用药信息 ***********************************************************/
     /*
@@ -68,6 +97,7 @@ public class PatientInfoDetailService {
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
 
         }
+        //西药统计
 
         return re;
     }
@@ -78,6 +108,12 @@ public class PatientInfoDetailService {
      */
     public List<Map<String, Object>> getMedicationDetail(String prescriptionNo, String type) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
+        String queryParams = BasisConstant.cfbh + ":"+prescriptionNo;
+        String resourceCode = BasisConstant.medicationWestern;
+        if(type!=null && type.equals("2")) //默认西药
+        {
+            resourceCode = BasisConstant.medicationChinese;
+        }
 
         return re;
     }
@@ -86,9 +122,25 @@ public class PatientInfoDetailService {
      * 处方主表记录
      */
     public List<Map<String, Object>> getMedicationMaster(String demographicId, String profileId,String prescriptionNo) throws Exception {
-        List<Map<String, Object>> re = new ArrayList<>();
+        String queryParams = "";
+        if(prescriptionNo!=null&&prescriptionNo.length()>0)
+        {
+            queryParams = BasisConstant.cfbh + ":"+prescriptionNo;
+        }
+        else{
+            if(profileId!=null&&profileId.length()>0)
+            {
+                queryParams = BasisConstant.profileId + ":"+profileId;
+            }
+            else{
+                queryParams = getProfileIds(demographicId);
+            }
+        }
 
-        return re;
+        //获取数据
+        Envelop result = resource.getResources(BasisConstant.medicationMaster, appId, "{\"q\":\"" + queryParams + "\"}", null, null);
+
+        return result.getDetailModelList();
     }
 
 
@@ -98,6 +150,11 @@ public class PatientInfoDetailService {
      */
     public String getMedicationPrescription(String profileId,String prescriptionNo) throws Exception
     {
+        //判断是否存在
+
+        //不存在则新增图片
+
+
         return "";
     }
 
@@ -156,26 +213,13 @@ public class PatientInfoDetailService {
         }
 
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
-
-        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
-            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
-            StringBuilder rowkeys = new StringBuilder();
-
-            for (Map<String, Object> event : eventList) {
-                if (rowkeys.length() > 0) {
-                    rowkeys.append(" OR ");
-                }
-                rowkeys.append("profile_id:" + event.get("rowkey"));
-            }
-
-            if(rowkeys.length() > 0)
-            {
-                if (q.length() > 0) {
-                    q += " AND (" + rowkeys.toString() + ")";
-                } else {
-                    q = "(" + rowkeys.toString() + ")";
-                }
+        String rowkeys = getProfileIds(demographicId);
+        if(rowkeys.length() > 0)
+        {
+            if (q.length() > 0) {
+                q += " AND (" + rowkeys.toString() + ")";
+            } else {
+                q = "(" + rowkeys.toString() + ")";
             }
         }
         else
@@ -187,10 +231,7 @@ public class PatientInfoDetailService {
             return envelop;
         }
 
-        String queryParams =  "{\"q\":\"" + q + "\"}";//"{\"join\":\"demographic_id:" + demographicId + "\"}";
-        //        if (q.length() > 0) {
-        //            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
-        //        }
+        String queryParams =  "{\"q\":\"" + q + "\"}";
         return resource.getResources(resourceCode, appId, queryParams, page, size);
     }
 
@@ -289,7 +330,7 @@ public class PatientInfoDetailService {
 
 
 
-    /*************************  查细表数据，简单公用方法 *************************************************/
+    /*************************  分页查细表数据，简单公用方法 *************************************************/
     /**
      * 处方主表、处方细表、处方笺
      * 门诊诊断、门诊症状、门诊费用汇总、门诊费用明细
@@ -325,24 +366,7 @@ public class PatientInfoDetailService {
                 }
             }
             else{
-                //获取相关门诊住院记录
-                Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1);
-                if(main.getDetailModelList() != null && main.getDetailModelList().size() > 0)
-                {
-                    //主表rowkey条件
-                    StringBuilder rowkeys = new StringBuilder();
-                    for(Map<String,Object> map : (List<Map<String,Object>>)main.getDetailModelList())
-                    {
-                        if(rowkeys.length() > 0)
-                        {
-                            rowkeys.append(" OR ");
-                        }
-                        rowkeys.append("profile_id:" + (String)map.get("rowkey"));
-                    }
-
-                    queryParams = "(" + rowkeys.toString() +")";
-                }
-
+                queryParams = getProfileIds(demographicId);
             }
         }
         return resource.getResources(resourceCode, appId, "{\"q\":\""+queryParams+"\"}", page, size);

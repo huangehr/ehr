@@ -202,11 +202,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
     @ApiOperation("获取cda_document_idOK")
     @RequestMapping(value = ServiceApi.Profiles.CDADocumentId, method = RequestMethod.GET)
-    public String CDADocumentId(
+    public Map<String, Object> CDADocumentId(
             @ApiParam(name = "event_no", value = "事件号",defaultValue="ZY010000806438") @RequestParam(value = "event_no", required = true) String event_no,
             @ApiParam(name = "cda_code", value = "模板类别",defaultValue="HSDC02.02") @RequestParam(value = "cda_code", required = true) String cda_code) throws Exception {
-        String id = profileCDAService.getCDADocumentId(event_no, cda_code);
-        return id;
+        return profileCDAService.getCDADocumentId(event_no, cda_code);
     }
 
     /******************************** 处方 ***********************************************************/

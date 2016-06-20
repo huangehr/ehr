@@ -43,6 +43,8 @@ public class BasisConstant {
     public static String profileId = "profile_id";//细表外键profile_id
     public static String mzzd = "EHR_000109";//门诊诊断代码
     public static String zyzd = "EHR_000293";//住院诊断代码
+    public static String cfbh = "EHR_000086";//处方编号
+
     public static String xybm = "EHR_000099";//西药编码
     public static String xysj = "EHR_000090";//西药处方时间
     public static String xymc = "EHR_000100";//西药名称

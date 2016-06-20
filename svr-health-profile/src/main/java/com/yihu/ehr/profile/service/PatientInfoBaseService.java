@@ -47,6 +47,37 @@ public class PatientInfoBaseService {
     String appId = "svr-health-profile";
 
     /**
+     * 通过身份证获取相关rowkeys
+     * @return
+     */
+    private String getProfileIds(String demographicId) throws Exception
+    {
+        String re = "";
+        //获取相关门诊住院记录
+        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1);
+        if(main.getDetailModelList() != null && main.getDetailModelList().size() > 0)
+        {
+            //主表rowkey条件
+            StringBuilder rowkeys = new StringBuilder();
+            for(Map<String,Object> map : (List<Map<String,Object>>)main.getDetailModelList())
+            {
+                if(rowkeys.length() > 0)
+                {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append(BasisConstant.profileId + ":" + map.get("rowkey").toString());
+            }
+
+            re = "(" + rowkeys.toString() +")";
+        }
+        else{
+            re = BasisConstant.profileId+":(NOT *)";
+        }
+
+        return re;
+    }
+
+    /**
      * @return
      * @throws Exception
      * @获取患者档案基本信息
