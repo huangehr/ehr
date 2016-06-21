@@ -4,6 +4,8 @@ package com.yihu.ehr.agModel.resource;
  * Created by lyr on 2016/5/16.
  */
 public class RsDictionaryEntryModel {
+    private int id;
+    private int dictId;
     private String dictCode;
     private String code;
     private String name;
@@ -43,5 +45,21 @@ public class RsDictionaryEntryModel {
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getDictId() {
+        return dictId;
+    }
+
+    public void setDictId(int dictId) {
+        this.dictId = dictId;
     }
 }

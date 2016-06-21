@@ -24,7 +24,6 @@ public class BasisConstant {
     public static String signsData = "RS_SIGNS_DATA";//患者体征记录
 
 
-
     /********** 数据元 *******************/
     public static String profileId = "profile_id";//细表外键profile_id
     public static String mzzd = "EHR_000109";//门诊诊断代码

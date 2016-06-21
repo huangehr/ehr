@@ -10,6 +10,7 @@ public class MCdaDataSet {
 	private String cdaId;
 	private String dataSetId;
 	private String dataSetCode;
+	private String multiRecord;
 
 	public String getDataSetId() {
 		return dataSetId;
@@ -41,5 +42,13 @@ public class MCdaDataSet {
 
 	public void setDataSetCode(String dataSetCode) {
 		this.dataSetCode = dataSetCode;
+	}
+
+	public String getMultiRecord() {
+		return multiRecord;
+	}
+
+	public void setMultiRecord(String multiRecord) {
+		this.multiRecord = multiRecord;
 	}
 }

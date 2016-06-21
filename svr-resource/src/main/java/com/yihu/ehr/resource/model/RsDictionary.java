@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="rs_dictionary")
 public class RsDictionary {
-    private String id;
+    private int id;
     private String code;
     private String name;
     private String description;
@@ -19,10 +19,10 @@ public class RsDictionary {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
+    public int getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

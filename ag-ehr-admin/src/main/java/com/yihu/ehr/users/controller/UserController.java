@@ -15,6 +15,7 @@ import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.UserClient;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -125,7 +126,8 @@ public class UserController extends BaseController {
         List<UsersModel> usersModels = new ArrayList<>();
         for (MUser mUser : mUsers) {
             UsersModel usersModel = convertToModel(mUser, UsersModel.class);
-            usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
+            //usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
+            usersModel.setLastLoginTime(mUser.getLastLoginTime() == null?"":DateTimeUtil.simpleDateTimeFormat(mUser.getLastLoginTime()));
             //获取用户类别字典
             if(StringUtils.isNotEmpty(mUser.getUserType())) {
                 MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());

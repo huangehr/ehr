@@ -203,7 +203,7 @@ public class StandardSourceController extends BaseController {
         }
 
         MStdSource mStdSource = convertToMStdSource(sourceDetailModel);
-        mStdSource.setCreateDate(new Date());
+        //mStdSource.setCreateDate(new Date());
         String jsonData = objectMapper.writeValueAsString(mStdSource);
         mStdSource = stdSourcrClient.addStdSource(jsonData);
         if (mStdSource == null) {

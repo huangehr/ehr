@@ -196,7 +196,7 @@ public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
     }
 
 
-    @RequestMapping(value = "/std/cda_data_set/cda_id", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.DocumentDataSet, method = RequestMethod.GET)
     @ApiOperation(value = "根据cda_id获取cda和数据集关系列表（包含数据集code）")
     public Collection<MCdaDataSet> getCDADataSetByCDAId(
             @ApiParam(name = "version", value = "版本号")
@@ -206,9 +206,6 @@ public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
         List<MCdaDataSet> list =  cdaDatasetRelationshipManager.getCDADataSetByCDAId(version, cdaId);
         return list;
     }
-
-
-
 
 
     /**

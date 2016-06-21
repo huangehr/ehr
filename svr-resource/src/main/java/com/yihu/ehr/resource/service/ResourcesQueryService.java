@@ -325,4 +325,27 @@ public class ResourcesQueryService  {
         return getResources(resourcesCode,"JKZL",queryParams,page,size);
     }
 
+
+    /**
+     * 获取非结构化数据
+     * @return
+     * @throws Exception
+     */
+    public Envelop getRawFiles(String profileId,Integer page,Integer size) throws Exception{
+        Envelop re = new Envelop();
+
+        Page<Map<String,Object>> result = resourcesQueryDao.getRawFiles("{\"q\":\"rowkey:"+profileId+"*\"}",page,size);
+        if (result != null) {
+            re.setSuccessFlg(true);
+            re.setCurrPage(result.getNumber());
+            re.setPageSize(result.getSize());
+            re.setTotalCount(new Long(result.getTotalElements()).intValue());
+            re.setDetailModelList(result.getContent());
+        }
+        else{
+            re.setSuccessFlg(false);
+        }
+
+        return re;
+    }
 }

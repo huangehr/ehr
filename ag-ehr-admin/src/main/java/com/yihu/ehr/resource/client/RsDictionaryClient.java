@@ -45,12 +45,12 @@ public interface RsDictionaryClient {
     @RequestMapping(value = ServiceApi.Resources.Dict, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除标准字典", notes = "删除标准字典")
     boolean deleteRsDictionary(
-            @PathVariable(value = "id") String id);
+            @PathVariable(value = "id") int id);
 
     @RequestMapping(value = ServiceApi.Resources.Dict, method = RequestMethod.GET)
     @ApiOperation(value = "根据id获取获取标准字典")
     MRsDictionary getRsDictionaryById(
-            @PathVariable(value = "id") String id);
+            @PathVariable(value = "id") int id);
 
     @RequestMapping(value = ServiceApi.Resources.DictBatch, method = RequestMethod.POST , consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量创建标准字典", notes = "批量创建标准字典")
@@ -68,8 +68,8 @@ public interface RsDictionaryClient {
     boolean createDictAndEntries(
             @RequestBody String jsonData);
 
-    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.DictCodesExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在字典编码")
     List codeExistence(
-            @RequestParam("codes") String codes);
+            @RequestBody String codes);
 }

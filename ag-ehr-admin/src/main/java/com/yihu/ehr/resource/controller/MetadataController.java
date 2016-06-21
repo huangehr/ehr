@@ -1,6 +1,5 @@
 package com.yihu.ehr.resource.controller;
 
-import com.yihu.ehr.agModel.resource.RsMetaMsgModel;
 import com.yihu.ehr.agModel.resource.RsMetadataModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
@@ -66,54 +65,11 @@ public class MetadataController extends BaseController {
             @ApiParam(name = "metadatas", value = "数据元JSON", defaultValue = "")
             @RequestParam(value = "metadatas") String metadatas) throws Exception {
 
+
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         try{
-            RsMetaMsgModel[] metadataArray = toEntity(metadatas, RsMetaMsgModel[].class);
-            if(metadataArray.length==0)
-                return envelop;
-
-            Map<String, RsMetaMsgModel> stdmap = new HashMap<>(), idMap = new HashMap<>(), errMap = new HashMap<>();
-
-            //验证stdcode是否唯一
-            String code = "";
-            String ids = "";
-            for(RsMetaMsgModel meta : metadataArray){
-                code += "," + meta.getStdCode();
-                ids += "," + meta.getId();
-                stdmap.put(meta.getStdCode(), meta);
-                idMap.put(meta.getId(), meta);
-            }
-
-            RsMetaMsgModel m;
-            List<String> ls = metadataClient.stdCodeExistence(code.substring(1));
-            for(String k : ls){
-                if((m = stdmap.get(k))!=null){
-                    m.addStdCodeMsg("该内部编码已存在！");
-                    errMap.put(m.getId(), m);
-                }
-            }
-
-            //验证id是否唯一
-            ls = metadataClient.idExistence(ids.substring(1));
-            for(String k : ls){
-                if((m = idMap.get(k))!=null){
-                    m.addIdMsg("该资源标准编码已存在！");
-                    errMap.put(m.getId(), m);
-                }
-            }
-
-            Set<RsMetaMsgModel> values = new HashSet<>(stdmap.values());
-            values.removeAll(errMap.values());
-
-            //保存验证通过的数据
-            boolean rs = metadataClient.createMetadataPatch(
-                    toJson(convertToModels(values, new ArrayList<>(), MRsMetadata.class, null)));
-            if(rs!=true)
-                throw new Exception("保存错误！");
-
-            //返回验证不通过的数据
-            envelop.setDetailModelList(Arrays.asList(errMap.values().toArray()));
+            metadataClient.createMetadataPatch(metadatas);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -184,7 +140,7 @@ public class MetadataController extends BaseController {
         try{
             MRsMetadata rsMetadata = metadataClient.getMetadataById(id);
             RsMetadataModel model = convertToModel(rsMetadata, RsMetadataModel.class);
-            model.setDictName(getDictName(model.getDictCode()));
+            model.setDictName(getDictName(model.getDictId()));
             envelop.setObj(model);
             envelop.setSuccessFlg(true);
         }catch (Exception e){
@@ -237,6 +193,16 @@ public class MetadataController extends BaseController {
         }
     }
 
+    @RequestMapping(value = ServiceApi.Resources.MetadataIdExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在数据元编码")
+    public List idExistence(
+            @ApiParam(name = "ids", value = "", defaultValue = "")
+            @RequestParam("ids") String ids) throws Exception {
+
+        List existIds = metadataClient.idExistence(ids);
+        return existIds;
+    }
+
     private List<RsMetadataModel> coverModelLs(List<MRsMetadata> rsMetadatas) throws UnsupportedEncodingException {
         List<RsMetadataModel> rs = new ArrayList<>();
         if(!isEmpty(rsMetadatas)){
@@ -247,16 +213,16 @@ public class MetadataController extends BaseController {
                 model = convertToModel(mRsMetadata, RsMetadataModel.class);
                 model.setDomainName(nullToSpace(domain.get(model.getDomain())));
                 model.setColumnTypeName(nullToSpace(columnType.get(model.getColumnType())));
-                model.setDictName(getDictName(URLEncoder.encode(mRsMetadata.getDictCode(), "UTF-8")));
+                model.setDictName(getDictName(mRsMetadata.getDictId()));
                 rs.add(model);
             }
         }
         return rs;
     }
 
-    private String getDictName(String dictCode){
-        if(!StringUtils.isEmpty(dictCode)){
-            MRsDictionary dictionary = rsDictionaryClient.getRsDictionaryById(dictCode);
+    private String getDictName(int dictId){
+        if(dictId != 0){
+            MRsDictionary dictionary = rsDictionaryClient.getRsDictionaryById(dictId);
             return dictionary!=null ? dictionary.getName() : "";
         }
         return "";
