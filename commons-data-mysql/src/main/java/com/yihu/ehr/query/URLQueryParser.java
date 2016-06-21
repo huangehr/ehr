@@ -165,16 +165,16 @@ public class URLQueryParser<T> {
 //            }
             tokens = filter.split(" ");
             if (tokens.length > 2){
-                for(int j=0; j<tokens.length; j++){
+                for(int j=1; j<tokens.length; j++){
                     if(j==tokens.length-1)
                         tokens[1] = tokens[j];
                     else
-                        tokens[0] += tokens[j] ;
+                        tokens[0] += " " +tokens[j] ;
                 }
             }
 
             String group = null;
-            if (tokens.length == 2) group = tokens[1];
+            if (tokens.length >= 2) group = tokens[1];
 
             Predicate predicate = splitFilter(tokens[0], criteriaBuilder, root);
 

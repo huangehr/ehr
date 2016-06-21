@@ -10,8 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -102,9 +104,11 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
     /**
      * 批量创建数据元
      */
+    @Transactional(propagation = Propagation.REQUIRED)
     public boolean addMetaBatch(List<Map<String, Object>> metaLs)
     {
-        StringBuilder sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, dict_id, valid) VALUES ") ;
+        String header = "INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, dict_id, valid) VALUES \n";
+        StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
         int total = 0;
@@ -119,12 +123,12 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
             sql.append(",'"+ map .get("nullAble") +"'");
             sql.append(",'"+ map .get("description") +"'");
             sql.append(","+ map.get("dictId") );
-            sql.append(",'1')");
+            sql.append(",'1')\n");
 
             if(i%100==0 || i == metaLs.size()){
                 query = currentSession().createSQLQuery(sql.toString());
                 total += query.executeUpdate();
-                sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, valid) VALUES ") ;
+                sql = new StringBuilder(header) ;
             }else
                 sql.append(",");
         }

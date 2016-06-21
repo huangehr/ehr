@@ -89,6 +89,12 @@ public interface DictClient {
             @RequestParam(value = "version") String version);
 
 
+    @RequestMapping(value = ServiceApi.Standards.DictionaryCode, method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典详细信息")
+     MStdDict getDictByCode(
+            @RequestParam(value = "code") String code,
+            @RequestParam(value = "version") String version) ;
+
     @RequestMapping(value = ServiceApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典map集")
     Map getDictMapByIds(
