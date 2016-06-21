@@ -113,8 +113,8 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     public boolean createRsDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        RsDictionary[] dictionaries = toEntity(jsonData,RsDictionary[].class);
-        dictionaryService.batchInsertDictionaries(dictionaries);
+        List<RsDictionary> dictionaries = toEntity(jsonData,List.class);
+        dictionaryService.batchInsert(dictionaries);
         return true;
     }
 
@@ -148,6 +148,17 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
         List existCodes = dictionaryService.codeExist(toEntity(codes, String[].class));
         return existCodes;
     }
+
+    @RequestMapping(value = ServiceApi.Resources.DictCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据code获取获取标准字典")
+    public MRsDictionary getRsDictionaryByCode(
+            @ApiParam(name = "code", value = "", defaultValue = "")
+            @RequestParam(value = "code") String code) throws Exception {
+
+        List<RsDictionary> ls = dictionaryService.findByField("code", code);
+        return ls.size()>0? convertToModel(ls.get(0), MRsDictionary.class) : null;
+    }
+
 
     private boolean isExistence(String code) {
         return dictionaryService.findByField("code",code).size() != 0;

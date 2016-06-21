@@ -32,11 +32,11 @@ public class RsDictionaryController extends BaseController {
     @RequestMapping(value = ServiceApi.Resources.DictList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取标准字典列表", notes = "根据查询条件获取标准字典列表")
     public Envelop searchRsDictionaries(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
@@ -174,5 +174,19 @@ public class RsDictionaryController extends BaseController {
 
         List existCodes = rsDictionaryClient.codeExistence(codes);
         return existCodes;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.DictCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据code获取获取标准字典")
+    public Envelop getRsDictionaryByCode(
+            @ApiParam(name = "code", value = "", defaultValue = "")
+            @RequestParam(value = "code") String code) throws Exception {
+
+        try{
+            return success(rsDictionaryClient.getRsDictionaryByCode(code));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询错误");
+        }
     }
 }

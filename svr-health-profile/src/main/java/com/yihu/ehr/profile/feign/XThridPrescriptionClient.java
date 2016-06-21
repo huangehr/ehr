@@ -22,8 +22,13 @@ import java.util.Map;
 @FeignClient(value ="svr-prescription")
 public interface XThridPrescriptionClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0+"/prescriptioToImage/htmlToImage", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ApiVersion.Version1_0+"/prescriptioToImage/htmlToImage", method = RequestMethod.GET)
     String prescriptioToImage(
             @ApiParam(value = "eventNo" ) @RequestParam String eventNo,
-            @ApiParam(value = "orgId") @RequestParam String orgId);
+            @ApiParam(value = "处方ID" ) @RequestParam String prescriptoId,
+            @ApiParam(value = "orgId") @RequestParam(required=false) String orgId,
+            @ApiParam(value = "cdaType") @RequestParam(required=false) String cdaType,
+            @ApiParam(value = "version") @RequestParam(required=false) String version,
+            @ApiParam(value = "height(默认600)") @RequestParam(required=false,defaultValue = "600") int height,
+            @ApiParam(value = "width(默认400)") @RequestParam(required=false,defaultValue = "400") int width);
 }

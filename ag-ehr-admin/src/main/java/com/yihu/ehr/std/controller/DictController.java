@@ -116,6 +116,25 @@ public class DictController extends BaseController {
     }
 
 
+    @RequestMapping(value = "/dict/code", method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典详细信息")
+    public Envelop getDictByCode(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "version", value = "版本编号", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception{
+
+        MStdDict mStdDict = dictClient.getDictByCode(code, version);
+        DictModel dictModel = convertToModel(mStdDict, DictModel.class);
+
+        if (dictModel == null) {
+            return failed("数据获取失败!");
+        }
+        MCDAVersion mcdaVersion = versionClient.getVersion(version);
+        dictModel.setInStage(mcdaVersion.isInStage()?0:1);
+        return success(dictModel);
+    }
+
     @RequestMapping(value = "/save_dict", method = RequestMethod.POST)
     public Envelop saveDict(
             @ApiParam(name = "version_code", value = "版本号")

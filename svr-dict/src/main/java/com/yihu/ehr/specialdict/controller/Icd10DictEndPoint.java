@@ -146,7 +146,7 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dict/icd10s", method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询相应的ICD10字典信息。" )
     public Collection<MIcd10Dict> getIcd10DictList(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,code,name,chronicFlag,infectiousFlag,description")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,

@@ -96,13 +96,15 @@ public class RsAdapterDictionaryEndPoint extends EnvelopRestEndPoint {
         return convertToModel(adapterDictionary, MRsAdapterDictionary.class);
     }
 
+
+
     @RequestMapping(value = ServiceApi.Resources.AdapterDictsBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量创建适配字典", notes = "批量创建适配字典")
     public boolean createRsAdapterDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        RsAdapterDictionary[] dictionaries = toEntity(jsonData,RsAdapterDictionary[].class);
-        adapterDictionaryService.batchInsertAdapterDictionaries(dictionaries);
+        List<RsAdapterDictionary> dictionaries = toEntity(jsonData,List.class);
+        adapterDictionaryService.batchInsert(dictionaries);
         return true;
     }
 

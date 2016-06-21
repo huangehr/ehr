@@ -1,17 +1,22 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.dao.intf.RsMetadataDao;
 import com.yihu.ehr.resource.model.RsMetadata;
+import com.yihu.ehr.schema.ResourceMetadataSchema;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +32,12 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
 
     @Autowired
     private RsMetadataDao metadataDao;
+
+    @Autowired
+    private ResourceMetadataSchema keySchema;
+
+    @Autowired
+    private RedisClient redisClient;
 
     /**
      * 删除数据元
@@ -102,9 +113,11 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
     /**
      * 批量创建数据元
      */
+    @Transactional(propagation = Propagation.REQUIRED)
     public boolean addMetaBatch(List<Map<String, Object>> metaLs)
     {
-        StringBuilder sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, dict_id, valid) VALUES ") ;
+        String header = "INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, dict_id, valid) VALUES \n";
+        StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
         int total = 0;
@@ -119,12 +132,12 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
             sql.append(",'"+ map .get("nullAble") +"'");
             sql.append(",'"+ map .get("description") +"'");
             sql.append(","+ map.get("dictId") );
-            sql.append(",'1')");
+            sql.append(",'1')\n");
 
             if(i%100==0 || i == metaLs.size()){
                 query = currentSession().createSQLQuery(sql.toString());
                 total += query.executeUpdate();
-                sql = new StringBuilder("INSERT INTO rs_metadata(id, domain, name, std_code, dict_code, column_type, null_able, description, valid) VALUES ") ;
+                sql = new StringBuilder(header) ;
             }else
                 sql.append(",");
         }
@@ -154,5 +167,24 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
         sqlQuery.setParameterList("ids", ids);
         return sqlQuery.list();
+    }
+
+    /**
+     * 数据元缓存
+     */
+    public void metadataCache()
+    {
+        Iterable<RsMetadata> metadatas = metadataDao.findMetadataExistDictCode();
+
+        for(RsMetadata meta : metadatas)
+        {
+            if(StringUtils.isEmpty(meta.getDictCode().trim()))
+            {
+                continue;
+            }
+
+            String redisKey = keySchema.metaData(meta.getId());
+            redisClient.set(redisKey,meta.getDictCode());
+        }
     }
 }

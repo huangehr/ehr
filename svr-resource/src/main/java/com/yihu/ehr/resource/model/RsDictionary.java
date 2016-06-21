@@ -1,7 +1,5 @@
 package com.yihu.ehr.resource.model;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 
 /**
@@ -17,10 +15,10 @@ public class RsDictionary {
     private String name;
     private String description;
 
+
     @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "increment")
-    @Column(name = "id",nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", unique = true, nullable = false)
     public int getId() {
         return id;
     }

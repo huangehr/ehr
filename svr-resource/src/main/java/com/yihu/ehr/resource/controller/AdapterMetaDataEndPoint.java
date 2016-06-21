@@ -126,8 +126,8 @@ public class AdapterMetaDataEndPoint extends EnvelopRestEndPoint {
     public boolean createRsMetaDataBatch(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        RsAdapterMetadata[] adapterMetadata = toEntity(jsonData,RsAdapterMetadata[].class);
-        metadataService.batchInsertAdapterMetadata(adapterMetadata);
+        List<RsAdapterMetadata> adapterMetadata = toEntity(jsonData,List.class);
+        metadataService.batchInsert(adapterMetadata);
         return true;
     }
 }
