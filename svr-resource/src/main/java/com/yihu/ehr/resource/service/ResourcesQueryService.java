@@ -134,10 +134,7 @@ public class ResourcesQueryService  {
                 //遍历资源数据元，获取分组/统计字段
                 for(DtoResourceMetadata metadada : metadataList) {
                     String key = metadada.getId();
-                    if(metadada.getDictCode()!=null&& metadada.getDictCode().length()>0&&!metadada.getDictCode().equals("0"))
-                    {
-                        key += "_CODE";
-                    }
+
                     String groupType = metadada.getGroupType();
                     String groupData =  metadada.getGroupData();
 
@@ -204,22 +201,15 @@ public class ResourcesQueryService  {
                                 if(oldObj.containsKey(key))
                                 {
                                     newObj.put(metadada.getId(),oldObj.get(key));
-                                }
-                                else{
                                     if(metadada.getDictCode()!=null&& metadada.getDictCode().length()>0&&!metadada.getDictCode().equals("0"))
                                     {
-                                        if(oldObj.containsKey(key+"_CODE"))
-                                        {
-                                            newObj.put(metadada.getId(),oldObj.get(key+"_CODE"));
-                                        }
                                         if(oldObj.containsKey(key+"_VALUE"))
                                         {
-                                            newObj.put(metadada.getId(),oldObj.get(key+"_VALUE"));
+                                            newObj.put(metadada.getId()+"_VALUE",oldObj.get(key+"_VALUE"));
                                         }
                                     }
                                 }
                             }
-
 
 
                             for(String key : oldObj.keySet())

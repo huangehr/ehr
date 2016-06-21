@@ -47,13 +47,44 @@ public class PatientInfoBaseService {
     String appId = "svr-health-profile";
 
     /**
+     * 通过身份证获取相关rowkeys
+     * @return
+     */
+    private String getProfileIds(String demographicId) throws Exception
+    {
+        String re = "";
+        //获取相关门诊住院记录
+        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1);
+        if(main.getDetailModelList() != null && main.getDetailModelList().size() > 0)
+        {
+            //主表rowkey条件
+            StringBuilder rowkeys = new StringBuilder();
+            for(Map<String,Object> map : (List<Map<String,Object>>)main.getDetailModelList())
+            {
+                if(rowkeys.length() > 0)
+                {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append(BasisConstant.profileId + ":" + map.get("rowkey").toString());
+            }
+
+            re = "(" + rowkeys.toString() +")";
+        }
+        else{
+            re = BasisConstant.profileId+":(NOT *)";
+        }
+
+        return re;
+    }
+
+    /**
      * @return
      * @throws Exception
      * @获取患者档案基本信息
      */
     public Map<String, Object> getPatientInfo(String demographicId) throws Exception {
         //时间排序
-        Envelop result = resource.getResources(BasisConstant.patientInfo, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
+        Envelop result = resource.getResources(BasisConstant.patientInfo, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             List<Map<String, Object>> list = result.getDetailModelList();
             if (list.size() == 1) {
@@ -79,20 +110,11 @@ public class PatientInfoBaseService {
 
     /*
      * @根据患者住院门诊记录做健康问题统计
-     *"healthProblemCode":"健康问题代码",
-    "healthProblemName":"高血压",
-    "visitTimes":"3",
-    "hospitalizationTimes":"3",
-    "lastVisitDate":"2015-08-03",
-    "lastVisitOrg":"厦门市第一医院",
-    "vlastVisitRecord":"最新就诊档案ID",
-    "medicine": "胺碘酮、奎尼丁、美西律、普罗帕酮、丙吡胺、莫雷西嗪",
-    "recentEvent": "2015-08 就诊 厦门市第一医院"
      */
     public List<Map<String, Object>> getHealthProblem(String demographicId) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
             //健康问题+相关门诊记录
@@ -258,17 +280,19 @@ public class PatientInfoBaseService {
         return re;
     }
 
-    //某次门诊住院记录
-    public Map<String, Object> getMedicalEvent(String profileId) throws Exception {
+    /*
+     * 通过eventNo获取某次门诊住院记录
+     */
+    public Map<String, Object> getMedicalEvent(String eventNo) throws Exception {
         Map<String, Object> re = new HashMap<>();
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}",1,1);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"event_no:" + eventNo + "\"}",1,1);
         if(result.getDetailModelList()!=null&& result.getDetailModelList().size()>0)
         {
             re = (Map<String, Object>)result.getDetailModelList().get(0);
         }
         else{
-            throw new Exception("不存在该档案信息！（profileId:"+profileId+"）");
+            throw new Exception("不存在该档案信息！（event_no:"+eventNo+"）");
         }
         return re;
     }
@@ -354,7 +378,7 @@ public class PatientInfoBaseService {
         query += "\"}";
 
         //门诊住院事件
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, query.replace(' ','+'),1,1000);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, query.replace(' ','+'), null, null);
         //事件集合
         List<Map<String, Object>> eventList = new ArrayList<Map<String, Object>>();
 
@@ -410,7 +434,7 @@ public class PatientInfoBaseService {
         if (!StringUtils.isBlank(mzQuery))
         {
             //门诊诊断纪录
-            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\""),1,1000);
+            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\""), null, null);
 
             //获取疾病门诊事件纪录rowkey
             if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
@@ -425,7 +449,7 @@ public class PatientInfoBaseService {
         if(!StringUtils.isBlank(zyQuery))
         {
             //住院诊断纪录
-            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\""),1,1000);
+            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\""), null, null);
 
             //获取疾病住院事件纪录rowkey
             if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0)
@@ -489,7 +513,7 @@ public class PatientInfoBaseService {
     //@患者就诊过的疾病
     public List<Map<String, String>> getPatientDisease(String demographicId) throws Exception {
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
         StringBuilder rowkeys = new StringBuilder();
 
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
@@ -508,7 +532,7 @@ public class PatientInfoBaseService {
         List<String> list = new ArrayList<>();
         List<Map<String, String>> healthProblemDictMapList = new ArrayList<>();
         //门诊诊断
-        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\""+ rowkeys.toString() +"\"}",1,1000);//"{\"join\":\"demographic_id:" + demographicId + "\"}");
+        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\""+ rowkeys.toString() +"\"}", null, null);//"{\"join\":\"demographic_id:" + demographicId + "\"}");
         if (outpatient.getDetailModelList() != null && outpatient.getDetailModelList().size() > 0) {
             for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
@@ -537,7 +561,7 @@ public class PatientInfoBaseService {
     public List<String> getPatientYear(String demographicId) throws Exception {
         List<String> list = new ArrayList<>();
         //患者事件列表
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             for (int i = 0; i < result.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(i);
@@ -558,7 +582,7 @@ public class PatientInfoBaseService {
 
         //患者事件列表
         List<String> orgCodeList = new ArrayList<>();
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1000);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             for (int i = 0; i < result.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(i);
