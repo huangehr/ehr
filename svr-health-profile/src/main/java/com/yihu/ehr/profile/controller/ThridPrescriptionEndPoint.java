@@ -27,19 +27,19 @@ public class ThridPrescriptionEndPoint extends BaseRestEndPoint {
     private ThridPrescriptionService thridPrescriptionService;
 
     @ApiOperation(value = "处方模板转图片")
-    @RequestMapping(value = "/prescriptioToImage", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST)
+    @RequestMapping(value = "/prescriptioToImage", method = RequestMethod.GET)
     public String prescriptioToImage(@ApiParam(value = "eventNo" ) @RequestParam String eventNo,
-                                     @ApiParam(value = "处方ID" ) @RequestParam String prescriptoId,
                                      @ApiParam(value = "orgId") @RequestParam(required=false) String orgId,
                                      @ApiParam(value = "cdaType") @RequestParam(required=false) String cdaType,
                                      @ApiParam(value = "version") @RequestParam(required=false) String version,
                                      @ApiParam(value = "height(默认600)") @RequestParam(required=false,defaultValue = "600") int height,
                                      @ApiParam(value = "width(默认400)") @RequestParam(required=false,defaultValue = "400") int width) {
+        String filePath="";
         try{
-            String filePath= thridPrescriptionService.prescriptioToImage(eventNo,prescriptoId,orgId,cdaType,version,height,width);
+             filePath= thridPrescriptionService.prescriptioToImage(eventNo,orgId,cdaType,version,height,width);
         }catch (Exception e){
             e.printStackTrace();
         }
-        return "";
+        return filePath;
     }
 }
