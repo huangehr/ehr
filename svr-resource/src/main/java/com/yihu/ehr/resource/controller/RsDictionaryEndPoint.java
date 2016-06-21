@@ -113,8 +113,8 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
     public boolean createRsDictionaries(
             @ApiParam(name = "json_data", value = "", defaultValue = "")
             @RequestBody String jsonData) throws Exception {
-        RsDictionary[] dictionaries = toEntity(jsonData,RsDictionary[].class);
-        dictionaryService.batchInsertDictionaries(dictionaries);
+        List<RsDictionary> dictionaries = toEntity(jsonData,List.class);
+        dictionaryService.batchInsert(dictionaries);
         return true;
     }
 

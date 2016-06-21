@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLException;
-
 /**
  * @author linaz
  * @created 2016.05.17 16:33
@@ -20,15 +18,9 @@ public class RsAdapterDictionaryService extends BaseJpaService<RsAdapterDictiona
     @Autowired
     private RsAdapterDictionaryDao adapterDictionaryDao;
 
-//    @Autowired
-//    private AdapterDictionaryQueryDao adapterDictionaryQueryDao;
-
     public RsAdapterDictionary findById(String id) {
         return adapterDictionaryDao.findOne(id);
     }
 
-    public void batchInsertAdapterDictionaries(RsAdapterDictionary[] AdapterDictionaries) throws SQLException {
-        // TODO: 2016/6/16
-//        adapterDictionaryQueryDao.batchInsertAdapterDictionaries(AdapterDictionaries);
-    }
+
 }

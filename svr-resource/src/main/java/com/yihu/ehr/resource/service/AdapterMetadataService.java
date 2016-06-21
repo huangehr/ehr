@@ -80,11 +80,6 @@ public class AdapterMetadataService extends BaseJpaService<RsAdapterMetadata,Ada
         return adMetadataDao.findOne(id);
     }
 
-    public void batchInsertAdapterMetadata(RsAdapterMetadata[] adapterMetadata) throws Exception {
-        //// TODO: 2016/6/16
-//        adapterMetadataQueryDao.batchAdapterMetadata(adapterMetadata);
-    }
-
     public void deleteBySchemaId(String id) {
 
     }
