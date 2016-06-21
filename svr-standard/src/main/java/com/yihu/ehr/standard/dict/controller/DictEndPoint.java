@@ -149,6 +149,19 @@ public class DictEndPoint extends ExtendEndPoint<MStdDict> {
     }
 
 
+    @RequestMapping(value = ServiceApi.Standards.DictionaryCode, method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典详细信息")
+    public MStdDict getDictByCode(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "version", value = "版本编号", defaultValue = "")
+            @RequestParam(value = "version") String version) throws Exception{
+
+        BaseDict baseDict = dictService.getByCode(code, version);
+        return baseDict==null? null : getModel(baseDict);
+    }
+
+
     @RequestMapping(value = ServiceApi.Standards.MetaDataWithDict, method = RequestMethod.GET)
     @ApiOperation(value = "获取字典 map集")
     public Map getDictMapByIds(

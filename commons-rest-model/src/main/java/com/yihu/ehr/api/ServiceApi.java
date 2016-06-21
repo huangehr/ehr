@@ -73,6 +73,7 @@ public class ServiceApi {
         public static final String DictList                     ="/resources/dict";
         public static final String DictBatch                    ="/resources/dict/batch";
         public static final String Dict                         ="/resources/dict/{id}";
+        public static final String DictCode                         ="/resources/dict/code";
         public static final String DictExistence                ="/resources/dict/existence";
         public static final String DictEntryBatch               ="/resources/dict/entry/batch";
         public static final String DictCodesExistence            ="/resources/dict/codes/existence";
@@ -286,6 +287,7 @@ public class ServiceApi {
         public static final String Dictionaries                     = "/std/dictionaries";
         public static final String NoPageDictionaries               = "/std/dictionaries/no_paging";
         public static final String Dictionary                       = "/std/dictionaries/{id}";
+        public static final String DictionaryCode                    = "/std/dictionaries/code";
         public static final String MetaDataWithDict                 = "/std/data_set/{data_set_id}/meta_datas/{meta_data_id}/dictionaries";
         public static final String DictCodeIsExist                  = "/std/dictionaries/is_exist/code";
         public static final String DictOther                        = "/std/dictionaries/{id}/other";
