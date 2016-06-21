@@ -44,6 +44,17 @@ public class DictService extends BaseHbmService<BaseDict> {
     }
 
     @Transactional(propagation= Propagation.REQUIRED)
+    public BaseDict getByCode(String code, String version){
+        String hql = "select e from " + getServiceEntity(version).getName() + " e where code=:code";
+
+        Query query = currentSession().createQuery(hql);
+        query.setParameter("code", code);
+        List<BaseDict> ls = query.list();
+        return ls.size()>0? ls.get(0) : null;
+    }
+
+
+    @Transactional(propagation= Propagation.REQUIRED)
     public boolean add(BaseDict dict, String version){
         String sql =
                 "INSERT INTO " + getTaleName(version) +

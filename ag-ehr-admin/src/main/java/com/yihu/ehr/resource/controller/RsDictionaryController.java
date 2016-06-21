@@ -175,4 +175,18 @@ public class RsDictionaryController extends BaseController {
         List existCodes = rsDictionaryClient.codeExistence(codes);
         return existCodes;
     }
+
+    @RequestMapping(value = ServiceApi.Resources.DictCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据code获取获取标准字典")
+    public Envelop getRsDictionaryByCode(
+            @ApiParam(name = "code", value = "", defaultValue = "")
+            @RequestParam(value = "code") String code) throws Exception {
+
+        try{
+            return success(rsDictionaryClient.getRsDictionaryByCode(code));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询错误");
+        }
+    }
 }

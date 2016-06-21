@@ -29,6 +29,7 @@ public class ServiceApi {
 
 
         public static final String RsAdapterDictionaries          ="/adaptions/adapter/dictionaries";
+        public static final String RsAdapterDictionariesCache    ="/adaptions/adapter/dictionaries/{schemaId}/cache";
         public static final String RsAdapterDictionary            ="/adaptions/adapter/dictionaries/{id}";
 
 
@@ -66,6 +67,7 @@ public class ServiceApi {
         public static final String MetadataList                 ="/resources/metadata";
         public static final String MetadataBatch                ="/resources/metadata/batch";
         public static final String Metadata                     ="/resources/metadata/{id}";
+        public static final String MetadataCache                ="/resources/metadata/cache";
         public static final String MetadataExistence            ="/resources/metadata/existence";
         public static final String MetadataStdCodeExistence    ="/resources/metadata/std_code/existence";
         public static final String MetadataIdExistence           ="/resources/metadata/id/existence";
@@ -73,6 +75,7 @@ public class ServiceApi {
         public static final String DictList                     ="/resources/dict";
         public static final String DictBatch                    ="/resources/dict/batch";
         public static final String Dict                         ="/resources/dict/{id}";
+        public static final String DictCode                         ="/resources/dict/code";
         public static final String DictExistence                ="/resources/dict/existence";
         public static final String DictEntryBatch               ="/resources/dict/entry/batch";
         public static final String DictCodesExistence            ="/resources/dict/codes/existence";
@@ -113,6 +116,7 @@ public class ServiceApi {
      * 档案查询接口
      */
     public static class Profiles{
+        public static final String ProfileLucene       = "/profile/lucene"; //全文检索
         public static final String ProfileInfo         = "/{demographic_id}/profile/info"; //基本信息
         public static final String ProfileHistory      = "/{demographic_id}/profile/history"; //患病史
         public static final String HealthProblem       = "/{demographic_id}/profile/health_problem"; //主要健康问题
@@ -143,7 +147,7 @@ public class ServiceApi {
         public static final String HospitalizedCostDetail      = "/{demographic_id}/hospitalized/cost/detail"; //住院费用明细
         public static final String HospitalizedOrdersTemporary = "/{demographic_id}/hospitalized/orders/temporary"; //住院临时医嘱
         public static final String HospitalizedOrdersLongtime  = "/{demographic_id}/hospitalized/orders/longtime"; //住院长期医嘱
-        public static final String HospitalizedDeath           = "/{demographic_id}/hospitalized/death"; //住院死亡记录
+        public static final String HospitalizedDeath           = "/{demographic_id}/hospitalized/death"; //住院死因链情况
 
 
         public static final String CDADocumentId         = "/profile/cda/document_id"; //cda模板（通过event_no + cda_type）
@@ -157,6 +161,7 @@ public class ServiceApi {
 
 
         public static final String LaboratoryReport            = "/{demographic_id}/laboratory"; //检验报告单
+        public static final String LaboratoryImg            = "/{demographic_id}/laboratory/img"; //检验报告单图片
         public static final String LaboratoryProject           = "/{demographic_id}/laboratory/project"; //检验报告单项目
         public static final String LaboratoryAllergy           = "/{demographic_id}/laboratory/allergy"; //检验药敏
 
@@ -286,6 +291,7 @@ public class ServiceApi {
         public static final String Dictionaries                     = "/std/dictionaries";
         public static final String NoPageDictionaries               = "/std/dictionaries/no_paging";
         public static final String Dictionary                       = "/std/dictionaries/{id}";
+        public static final String DictionaryCode                    = "/std/dictionaries/code";
         public static final String MetaDataWithDict                 = "/std/data_set/{data_set_id}/meta_datas/{meta_data_id}/dictionaries";
         public static final String DictCodeIsExist                  = "/std/dictionaries/is_exist/code";
         public static final String DictOther                        = "/std/dictionaries/{id}/other";

@@ -72,4 +72,9 @@ public interface RsDictionaryClient {
     @ApiOperation("获取已存在字典编码")
     List codeExistence(
             @RequestBody String codes);
+
+    @RequestMapping(value = ServiceApi.Resources.DictCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据code获取获取标准字典")
+    MRsDictionary getRsDictionaryByCode(
+            @RequestParam(value = "code") String code);
 }

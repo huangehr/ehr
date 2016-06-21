@@ -10,6 +10,16 @@ info:
     description: EHR platform package resolve service.
     version: 1.1.0
 
+hystrix:
+  command:
+    default:
+      execution:
+#        timeout:
+#          enabled: false
+        isolation:
+          thread:
+            timeoutInMilliseconds: 120000
+
 ---
 spring:
   profiles: dev

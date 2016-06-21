@@ -139,7 +139,7 @@ public class URLHqlQueryParser<T> {
 
             String[] tokens = filterArray[i].split(" ");
             if (tokens.length > 2){
-                for(int j=0; j<tokens.length; j++){
+                for(int j=1; j<tokens.length; j++){
                     if(j==tokens.length-1)
                         tokens[1] = tokens[j];
                     else
@@ -150,7 +150,7 @@ public class URLHqlQueryParser<T> {
 //            if (tokens.length > 2) throw new IllegalArgumentException("无效过滤参数");
 
             String group = null;
-            if (tokens.length == 2) group = tokens[1];
+            if (tokens.length >= 2) group = tokens[1];
 
             Criterion criterion = splitFilter(tokens[0], classMetadata);
 

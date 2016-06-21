@@ -96,6 +96,8 @@ public class RsAdapterDictionaryEndPoint extends EnvelopRestEndPoint {
         return convertToModel(adapterDictionary, MRsAdapterDictionary.class);
     }
 
+
+
     @RequestMapping(value = ServiceApi.Resources.AdapterDictsBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量创建适配字典", notes = "批量创建适配字典")
     public boolean createRsAdapterDictionaries(
