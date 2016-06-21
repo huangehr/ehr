@@ -67,6 +67,7 @@ public class ServiceApi {
         public static final String MetadataList                 ="/resources/metadata";
         public static final String MetadataBatch                ="/resources/metadata/batch";
         public static final String Metadata                     ="/resources/metadata/{id}";
+        public static final String MetadataCache                ="/resources/metadata/cache";
         public static final String MetadataExistence            ="/resources/metadata/existence";
         public static final String MetadataStdCodeExistence    ="/resources/metadata/std_code/existence";
         public static final String MetadataIdExistence           ="/resources/metadata/id/existence";
