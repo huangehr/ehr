@@ -29,6 +29,7 @@ public class ServiceApi {
 
 
         public static final String RsAdapterDictionaries          ="/adaptions/adapter/dictionaries";
+        public static final String RsAdapterDictionariesCache    ="/adaptions/adapter/dictionaries/{schemaId}/cache";
         public static final String RsAdapterDictionary            ="/adaptions/adapter/dictionaries/{id}";
 
 
