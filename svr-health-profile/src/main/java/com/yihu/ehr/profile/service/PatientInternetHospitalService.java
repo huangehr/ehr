@@ -82,7 +82,7 @@ public class PatientInternetHospitalService {
         if(isSub)
         {
             //根据查询参数查询主表
-            Envelop result = resource.getResources(BasisConstant.patientEvent,APP_ID,query);
+            Envelop result = resource.getResources(BasisConstant.patientEvent,APP_ID,query,null,null);
             //主表rowkey条件
             StringBuilder rowkeys = new StringBuilder();
 
@@ -99,7 +99,7 @@ public class PatientInternetHospitalService {
                 }
 
                 //根据主表rowkey查询细表资源
-                Envelop resultSub = resource.getResources(resource_code,APP_ID ,URLEncoder.encode("{\"q\":\"(" + rowkeys.toString() + ")\"}"));
+                Envelop resultSub = resource.getResources(resource_code,APP_ID ,URLEncoder.encode("{\"q\":\"(" + rowkeys.toString() + ")\"}"),null,null);
 
                 if(resultSub.getDetailModelList() != null && resultSub.getDetailModelList().size() > 0)
                 {
@@ -110,7 +110,7 @@ public class PatientInternetHospitalService {
         else
         {
             //查询主表资源
-            Envelop result = resource.getResources(resource_code,APP_ID,query);
+            Envelop result = resource.getResources(resource_code,APP_ID,query,null,null);
 
             if(result.getDetailModelList() != null && result.getDetailModelList().size() > 0)
             {
