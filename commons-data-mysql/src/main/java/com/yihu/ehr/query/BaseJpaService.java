@@ -188,4 +188,14 @@ public class BaseJpaService<T, R> {
         query.setParameterList("ids", ids);
         return query.executeUpdate();
     }
+
+    public void batchInsert(List list) {
+        for (int i = 0; i < list.size(); i++) {
+            entityManager.persist(list.get(i));
+            if (i % 30 == 0) {
+                entityManager.flush();
+                entityManager.clear();
+            }
+        }
+    }
 }

@@ -24,9 +24,9 @@ public interface AppClient {
     ResponseEntity<List<MApp>> getApps(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "id,name,secret,url,createTime")
+            @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "sort", required = false) String sort,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
