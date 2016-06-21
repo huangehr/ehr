@@ -213,7 +213,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Profiles.MedicationMaster, method = RequestMethod.GET)
     public List<Map<String,Object>> DrugMaster(
             @ApiParam(name = "demographic_id", value = "身份证号")
-            @RequestParam(value = "demographic_id", required = false) String demographic_id,
+            @RequestParam(value = "demographic_id", required = false,defaultValue = "422428197704250025") String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "prescription_no", value = "处方编号")
@@ -337,7 +337,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     /******************************** 门诊 ***********************************************************/
-    @ApiOperation("门诊诊断")
+    @ApiOperation("门诊诊断NON")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientDiagnosis, method = RequestMethod.GET)
     public Envelop OutpatientDiagnosis(
             @ApiParam(name = "demographic_id", value = "身份证号")
@@ -365,7 +365,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("门诊症状")
+    @ApiOperation("门诊症状NON")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientSymptom, method = RequestMethod.GET)
     public Envelop OutpatientSymptom(
             @ApiParam(name = "demographic_id", value = "身份证号")
@@ -393,7 +393,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("门诊费用汇总")
+    @ApiOperation("门诊费用汇总NON")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientCostMaster, method = RequestMethod.GET)
     public Envelop OutpatientCostMaster(
             @ApiParam(name = "demographic_id", value = "身份证号")
@@ -421,7 +421,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("门诊费用明细")
+    @ApiOperation("门诊费用明细NON")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientCostDetail, method = RequestMethod.GET)
     public Envelop OutpatientCostDetail(
             @ApiParam(name = "demographic_id", value = "身份证号")
@@ -450,13 +450,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     /******************************** 住院 ***********************************************************/
-    @ApiOperation("住院诊断")
+    @ApiOperation("住院诊断OK")
     @RequestMapping(value = ServiceApi.Profiles.HospitalizedDiagnosis, method = RequestMethod.GET)
     public Envelop HospitalizedDiagnosis(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false) String profile_id,
+            @RequestParam(value = "profile_id", required = false,defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000") String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -478,13 +478,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("住院症状")
+    @ApiOperation("住院症状OK")
     @RequestMapping(value = ServiceApi.Profiles.HospitalizedSymptom, method = RequestMethod.GET)
     public Envelop HospitalizedSymptom(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false) String profile_id,
+            @RequestParam(value = "profile_id", required = false,defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000") String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -506,12 +506,12 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("住院费用汇总")
+    @ApiOperation("住院费用汇总OK")
     @RequestMapping(value = ServiceApi.Profiles.HospitalizedCostMaster, method = RequestMethod.GET)
     public Envelop HospitalizedCostMaster(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
@@ -534,7 +534,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("住院费用明细")
+    @ApiOperation("住院费用明细NON")
     @RequestMapping(value = ServiceApi.Profiles.HospitalizedCostDetail, method = RequestMethod.GET)
     public Envelop HospitalizedCostDetail(
             @ApiParam(name = "demographic_id", value = "身份证号")
@@ -562,13 +562,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("住院临时医嘱")
+    @ApiOperation("住院临时医嘱OK")
     @RequestMapping(value = ServiceApi.Profiles.HospitalizedOrdersTemporary, method = RequestMethod.GET)
     public Envelop HospitalizedOrdersTemporary(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false) String profile_id,
+            @RequestParam(value = "profile_id", required = false,defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000") String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -590,13 +590,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("住院长期医嘱")
+    @ApiOperation("住院长期医嘱OK")
     @RequestMapping(value = ServiceApi.Profiles.HospitalizedOrdersLongtime, method = RequestMethod.GET)
     public Envelop HospitalizedOrdersLongtime(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false) String profile_id,
+            @RequestParam(value = "profile_id", required = false,defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000") String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -618,13 +618,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("住院死亡记录??")
+    @ApiOperation("住院死因链情况OK")
     @RequestMapping(value = ServiceApi.Profiles.HospitalizedDeath, method = RequestMethod.GET)
     public Envelop HospitalizedDeath(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false) String profile_id,
+            @RequestParam(value = "profile_id", required = false,defaultValue = "jkzl_1004192_888888_1435514514000") String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -647,7 +647,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     /********************** 检查检验 ***********************************************/
-    @ApiOperation("检查报告单")
+    @ApiOperation("检查报告单NON")
     @RequestMapping(value = ServiceApi.Profiles.ExaminationReport, method = RequestMethod.GET)
     public Envelop ExaminationReport(
             @ApiParam(name = "demographic_id", value = "身份证号")
@@ -675,13 +675,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("检查报告单图片")
+    @ApiOperation("检查报告单图片OK")
     @RequestMapping(value = ServiceApi.Profiles.ExaminationImg, method = RequestMethod.GET)
     public Envelop ExaminationImg(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false) String profile_id,
+            @RequestParam(value = "profile_id", required = false,defaultValue = "jkzl_1004192_888888_1435514514000") String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -703,7 +703,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("检验报告单")
+    @ApiOperation("检验报告单NON")
     @RequestMapping(value = ServiceApi.Profiles.LaboratoryReport, method = RequestMethod.GET)
     public Envelop LaboratoryReport(
             @ApiParam(name = "demographic_id", value = "身份证号")
@@ -731,13 +731,41 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("检验报告项目")
+    @ApiOperation("检验报告单图片OK")
+    @RequestMapping(value = ServiceApi.Profiles.LaboratoryImg, method = RequestMethod.GET)
+    public Envelop LaboratoryImg(
+            @ApiParam(name = "demographic_id", value = "身份证号")
+            @RequestParam(value = "demographic_id", required = false) String demographic_id,
+            @ApiParam(name = "profile_id", value = "档案ID")
+            @RequestParam(value = "profile_id", required = false,defaultValue = "jkzl_1004192_888888_1435514514000") String profile_id,
+            @ApiParam(name = "event_no", value = "事件号")
+            @RequestParam(value = "event_no", required = false) String event_no,
+            @ApiParam(name = "page", value = "第几页")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "每页几行")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
+        Envelop re = patientDetail.getProfileSub(BasisConstant.laboratoryImg, demographic_id, profile_id,event_no, page,size);
+        /************** 适配转换 *************************/
+        if(version!=null)
+        {
+            MStdTransformDto stdTransformDto = new MStdTransformDto();
+            stdTransformDto.setVersion(version);
+            stdTransformDto.setSource(mapper.writeValueAsString(re));
+            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
+        }
+
+        return re;
+    }
+
+    @ApiOperation("检验报告项目OK")
     @RequestMapping(value = ServiceApi.Profiles.LaboratoryProject, method = RequestMethod.GET)
     public Envelop LaboratoryProject(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false) String profile_id,
+            @RequestParam(value = "profile_id", required = false,defaultValue = "jkzl_1004192_888888_1435514514000") String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -759,12 +787,12 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("检验药敏")
+    @ApiOperation("检验药敏OK")
     @RequestMapping(value = ServiceApi.Profiles.LaboratoryAllergy, method = RequestMethod.GET)
     public Envelop LaboratoryAllergy(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "jkzl_1004192_888888_1435514514000")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
@@ -787,12 +815,12 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("手术记录")
+    @ApiOperation("手术记录OK")
     @RequestMapping(value = ServiceApi.Profiles.Surgery, method = RequestMethod.GET)
     public Envelop Surgery(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
