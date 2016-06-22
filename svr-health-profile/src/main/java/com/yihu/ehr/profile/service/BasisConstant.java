@@ -64,4 +64,8 @@ public class BasisConstant {
     public static String zyfysj="EHR_000183";//门诊费用时间
 
 
+    //处方签模板标识
+    public static String xycd = "HSDC01.04"; //西药CDA_CODE
+    public static String zycd = "HSDC01.05"; //中药CDA_CODE
+
 }

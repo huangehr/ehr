@@ -151,6 +151,7 @@ public class PackMill {
         if(!org.apache.commons.lang.StringUtils.isBlank(dictCode) && !org.apache.commons.lang.StringUtils.isBlank(value))
         {   //内部EHR数据元字典不为空情况，查找对应的字典数据
             String[] dict = getDict(cdaVersion,dictCode,value);
+
             if(dict != null && dict.length > 1)
             {   //对应字典不为空情况下，STD字典代码转换为内部EHR字典代码保存
                 dataRecord.addResource(metadataId, dict[0]);

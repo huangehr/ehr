@@ -36,7 +36,11 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
     @Value("${returnurl}")
     private String returnUrl;
 
+    @Autowired
+    ProfileCDAService cdaService;
 
+    @Autowired
+    TemplateService tempService;
 
     /**
      * 把html转图片存fastdfs上并且返回fdfs的路径
@@ -74,27 +78,35 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
         return objectMapper.writeValueAsString(params);
     }
 
-    /**
-     * 根据eventNo找到CDA数据 然后根据orgCode,cdaType,version得到模板，把数据填充模板转成图片上传到fdfs返回fdfs上的路径,
-     * 此方法是公共方法
-     * @param eventNo 事件号
-     * @param orgCode 机构code
-     * @param cdaType cda类别
-     * @param version 模板版本
-     * @param width 生成的图片宽度
-     * @param height 生成图片高度
-     * @return
-     * @throws Exception
-     */
-    private String CDAToImage(String eventNo, String orgCode,String cdaType,String version,int width,int height) throws Exception {
+
+    public String CDAToImage(String profileId,String orgCode, String cdaVersion,String cdaCode,int width,int height) throws Exception {
         String filePath="";
         try{
-            //根据机构ID,CDA类别，版本得到模板
-            String fileString="";
+            //获取CDA模板信息
+            Template temp = tempService.getPresriptionTemplate(orgCode,cdaVersion,cdaCode);
+            //模板路径
+            String fileString = temp.getPcTplURL();
+
+            if(temp == null)
+            {
+                throw new Exception("html转图片失败");
+            }
+            else
+            {
+                //模板fastdfs信息
+                String[]  pathInfo = temp.getPcTplURL().split(";");
+                //fastdfs工具类
+                FastDFSUtil fdfs= FastDFSConfig.fastDFSUtil();
+                //下载模板文件
+                String localFileName = fdfs.download(pathInfo[0],pathInfo[1],ThridPrescriptionService.class.getResource("/").getPath());
+                //模板路径
+                fileString = ThridPrescriptionService.class.getResource("/").getPath() + localFileName;
+            }
+
             //根据事件号和机构ID得到处方数据,数据格式是CDA格式
-            Object model="";
+            Object model = cdaService.getCDAData(profileId,temp.getCdaDocumentId());
             //把数据和模板结合
-            String html=fillTemplate(fileString,model);
+            String html = fillTemplate(fileString,model);
             //网页转图片 并且保存到fastdfs
             filePath = htmlToImage(html,width,height);
             return filePath;
@@ -107,7 +119,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
      * @return
      * @throws Exception
      */
-    private String htmlToImage(String html,Integer width,Integer height) throws Exception {
+    public String htmlToImage(String html,Integer width,Integer height) throws Exception {
         try{
             //把模板保存成文件
             String fileTempName= UUID.randomUUID().toString();
@@ -152,7 +164,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
      * @return
      * @throws Exception
      */
-    private String fillTemplate(String fileString,Object model) throws Exception{
+    public String fillTemplate(String fileString,Object model) throws Exception{
         try{
             Configuration cfg = new Configuration();
             // 在哪个文件夹下找ftl模板文件 // 在哪个文件夹下找ftl模板文件

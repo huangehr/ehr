@@ -41,6 +41,11 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
         return template;
     }
 
+    public Template getPresriptionTemplate(String orgCode, String cdaVersion, String cdaCode) {
+        Template template = getRepo().findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
+        return template;
+    }
+
     public List<Template> searchTemplate(String fields, String filters, String sorts, int page, int size) throws ParseException {
         return search(fields, filters, sorts, page, size);
     }
