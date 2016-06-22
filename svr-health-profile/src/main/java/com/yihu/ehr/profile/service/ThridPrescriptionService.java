@@ -140,16 +140,17 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
      */
     public String htmlToImage(String html,Integer width,Integer height) throws Exception {
         try{
+            String rootPath = ThridPrescriptionService.class.getResource("/").getPath();
             //把模板保存成文件
             String fileTempName= UUID.randomUUID().toString();
-            String url =ThridPrescriptionService.class.getResource("/").getPath()+fileTempName+".html";
+            String url = rootPath + fileTempName+".html";
             File fileTmep=new File(url);//临时文件保存模板文件
             fileTmep.createNewFile();
             FileUtils.writeStringToFile(fileTmep,html);
 
             //随机生成图片名字ID
             String fileName= UUID.randomUUID().toString();
-            File file=new File(fileName+".png");//临时文件保存图片
+            File file=new File(rootPath + fileName+".png");//临时文件保存图片
             file.createNewFile();
             FileUtils.writeStringToFile(file,html);
             ImageRenderer render = new ImageRenderer();
