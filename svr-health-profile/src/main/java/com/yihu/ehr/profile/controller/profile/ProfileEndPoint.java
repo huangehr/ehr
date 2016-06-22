@@ -293,7 +293,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getMedicationList("1", demographic_id, hp_id, start_time, end_time, page,size);
+        Envelop re = patientDetail.getMedicationList("2", demographic_id, hp_id, start_time, end_time, page,size);
         /************** 适配转换 *************************/
         if(version!=null)
         {
@@ -323,7 +323,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getMedicationList("2", demographic_id, hp_id, start_time, end_time, page,size);
+        Envelop re = patientDetail.getMedicationList("1", demographic_id, hp_id, start_time, end_time, page,size);
         /************** 适配转换 *************************/
         if(version!=null)
         {
