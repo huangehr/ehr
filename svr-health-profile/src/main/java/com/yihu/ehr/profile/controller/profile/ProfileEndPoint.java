@@ -14,6 +14,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.aspectj.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -268,12 +270,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
     @ApiOperation("处方笺")
     @RequestMapping(value = ServiceApi.Profiles.MedicationPrescription, method = RequestMethod.GET)
-    public String DrugPrescription(
+    public List<Map<String,Object>> DrugPrescription(
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "prescription_no", value = "处方编号")
-            @RequestParam(value = "prescription_no", required = false) String prescription_no) throws Exception {
-        return patientDetail.getMedicationPrescription(profile_id, prescription_no);
+            @RequestParam(value = "prescription_no", required = false) String prescription_no) throws Exception
+    {
+        return patientDetail.getPrescription(profile_id,prescription_no);
     }
 
     @ApiOperation("中药处方")
