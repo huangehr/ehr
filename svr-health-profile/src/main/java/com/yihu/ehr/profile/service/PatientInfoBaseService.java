@@ -78,8 +78,6 @@ public class PatientInfoBaseService {
     }
 
     /**
-     * @return
-     * @throws Exception
      * @获取患者档案基本信息
      */
     public Map<String, Object> getPatientInfo(String demographicId) throws Exception {
@@ -510,7 +508,9 @@ public class PatientInfoBaseService {
         return map;
     }
 
-    //@患者就诊过的疾病
+    /*
+     * @患者就诊过的疾病
+     */
     public List<Map<String, String>> getPatientDisease(String demographicId) throws Exception {
         //获取门诊住院记录
         Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
@@ -557,7 +557,9 @@ public class PatientInfoBaseService {
     }
 
 
-    //@患者就诊过的年份
+    /*
+     * @患者就诊过的年份
+     */
     public List<String> getPatientYear(String demographicId) throws Exception {
         List<String> list = new ArrayList<>();
         //患者事件列表
@@ -576,7 +578,9 @@ public class PatientInfoBaseService {
     }
 
 
-    //@患者就诊过的地区
+    /*
+     * @患者就诊过的地区
+     */
     public List<Map<String, String>> getPatientArea(String demographicId) throws Exception {
         List<Map<String, String>> organizationMapList = new ArrayList<>();
 
@@ -620,4 +624,29 @@ public class PatientInfoBaseService {
         return organizationMapList;
     }
 
+
+    /**
+     * 全文检索
+     */
+    public Envelop getProfileLucene(String startTime,String endTime,List<String> lucene) throws Exception
+    {
+        String queryParams = "";
+        if(startTime!=null && startTime.length()>0 && endTime!=null && endTime.length()>0)
+        {
+            queryParams = BasisConstant.eventDate+":["+startTime+" TO "+endTime+"]";
+        }
+        else {
+            if(startTime!=null && startTime.length()>0)
+            {
+                queryParams = BasisConstant.eventDate+":["+startTime+" TO *]";
+            }
+            else if(endTime!=null && endTime.length()>0){
+                queryParams = BasisConstant.eventDate+":[* TO "+endTime+"]";
+            }
+        }
+
+        //全文检索
+        Envelop re = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\""+queryParams+"\"}", null, null);
+        return re;
+    }
 }
