@@ -42,7 +42,7 @@ public interface AuthenticationClient {
     @RequestMapping(value = ServiceApi.Patients.Authentications, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改认证申请")
     MAuthentication update(
-            @RequestBody String model);
+            @RequestBody MAuthentication model);
 
     @RequestMapping(value = ServiceApi.Patients.Authentication, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除认证申请")

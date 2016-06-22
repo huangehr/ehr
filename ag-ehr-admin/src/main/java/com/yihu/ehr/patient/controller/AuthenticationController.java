@@ -4,18 +4,24 @@ import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.patient.AuthenticationModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.patient.MAuthentication;
 import com.yihu.ehr.patient.service.AuthenticationClient;
+import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.utils.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincl
@@ -24,11 +30,13 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(protocols = "https", value = "人口身份认证", description = "人口身份认证")
+@Api(protocols = "https", value = "Authentication", description = "人口身份认证", tags = {"人口身份认证"})
 public class AuthenticationController extends ExtendController<AuthenticationModel> {
 
     @Autowired
     AuthenticationClient authenticationClient;
+    @Autowired
+    SystemDictClient systemDictClient;
 
     @RequestMapping(value = ServiceApi.Patients.Authentications, method = RequestMethod.GET)
     @ApiOperation(value = "人口身份认证申请列表")
@@ -45,8 +53,7 @@ public class AuthenticationController extends ExtendController<AuthenticationMod
             @RequestParam(value = "page", required = false) int page){
 
         ResponseEntity<List<MAuthentication>> responseEntity = authenticationClient.search(fields, filters, sorts, size, page);
-        List ls = (List) convertToModels(responseEntity.getBody(), new ArrayList<>(), AuthenticationModel.class, null);
-        return getResult(ls, getTotalCount(responseEntity), page, size);
+        return getResult(convertModels(responseEntity.getBody()), getTotalCount(responseEntity), page, size);
     }
 
 
@@ -57,10 +64,10 @@ public class AuthenticationController extends ExtendController<AuthenticationMod
             @RequestParam("model") String model) {
 
         try {
-            return success(getModel(authenticationClient.add(model)) );
+            return success(convertModel(authenticationClient.add(model)) );
         }catch (Exception e){
             e.printStackTrace();
-            return failed("新增出错！");
+            return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
 
@@ -71,21 +78,30 @@ public class AuthenticationController extends ExtendController<AuthenticationMod
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
         try {
-            return success(getModel(authenticationClient.update(model)) );
+            MAuthentication authentication = toEntity(model, MAuthentication.class);
+            if(authentication.getId()==0)
+                return failed("编号不能为空");
+
+            return success(convertModel(authenticationClient.update(authentication)) );
         }catch (Exception e){
             e.printStackTrace();
-            return failed("新增出错！");
+            return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
 
     @RequestMapping(value = ServiceApi.Patients.Authentication, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除认证申请")
-    public boolean delete(
+    public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @PathVariable(value = "id") int id) {
 
-        authenticationClient.delete(id);
-        return true;
+        try {
+            authenticationClient.delete(id);
+            return success("");
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed(FeignExceptionUtils.getErrorMsg(e));
+        }
     }
 
     @RequestMapping(value = ServiceApi.Patients.Authentications, method = RequestMethod.DELETE)
@@ -104,12 +120,51 @@ public class AuthenticationController extends ExtendController<AuthenticationMod
             @PathVariable(value = "id") int id) {
 
         try {
-            return success(getModel(authenticationClient.getInfo(id)) );
+            MAuthentication authentication = authenticationClient.getInfo(id);
+            if(authentication == null)
+                return failed("没有找到该认证申请信息！");
+            return success(convertModel(authentication));
         }catch (Exception e){
             e.printStackTrace();
             return failed("获取信息出错！");
         }
     }
 
+    private AuthenticationModel convertModel(MAuthentication authentication){
+        AuthenticationModel model = getModel(authentication);
+        if(!StringUtils.isEmpty(model.getStatus())){
+            MDictionaryEntry statusDicts = systemDictClient.getDictEntry(36, model.getStatus());
+            if(statusDicts!=null)
+                model.setStatusName(statusDicts.getValue());
+        }
+
+        if(!StringUtils.isEmpty(model.getMedicalCardType())){
+            MDictionaryEntry statusDicts = systemDictClient.getDictEntry(10, model.getMedicalCardType());
+            if(statusDicts!=null)
+                model.setMedicalCardTypeName(statusDicts.getValue());
+        }
+        model.setApplyDate(dt2Str(authentication.getApplyDate()));
+        model.setAuditDate(dt2Str(authentication.getAuditDate()));
+        return model;
+    }
+
+    private List convertModels(List<MAuthentication> authentications){
+        List<MDictionaryEntry> statusDicts = systemDictClient.getDictEntries("", "dictId=36", "", 10, 1).getBody();
+        Map<String, String> statusMap = new HashMap<>();
+        for(MDictionaryEntry entry : statusDicts){
+            statusMap.put(entry.getCode(), entry.getValue());
+        }
+
+        List ls = new ArrayList<>();
+        AuthenticationModel model;
+        for(MAuthentication authentication : authentications){
+            model = getModel(authentication);
+            model.setStatusName(statusMap.get(authentication.getStatus()));
+            model.setApplyDate(dt2Str(authentication.getApplyDate()));
+            model.setAuditDate(dt2Str(authentication.getAuditDate()));
+            ls.add(model);
+        }
+        return ls;
+    }
 
 }

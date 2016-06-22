@@ -7,6 +7,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.patient.MArRelation;
 import com.yihu.ehr.patient.service.ArRelationClient;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.utils.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,7 +25,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(protocols = "https", value = "档案关联", description = "档案关联")
+@Api(protocols = "https", value = "archive_relation", description = "档案关联", tags = {"档案关联"})
 public class ArRelationController extends ExtendController<ArRelationModel> {
 
     @Autowired
@@ -72,7 +73,11 @@ public class ArRelationController extends ExtendController<ArRelationModel> {
             @RequestParam("model") String model) {
 
         try {
-            return success(getModel(arRelationClient.update(model)) );
+            MArRelation arRelation = toEntity(model, MArRelation.class);
+            if(arRelation.getId()==0)
+                return failed("编号不能为空");
+
+            return success(getModel(arRelationClient.update(arRelation)) );
         }catch (Exception e){
             e.printStackTrace();
             return failed("新增出错！");
@@ -107,10 +112,27 @@ public class ArRelationController extends ExtendController<ArRelationModel> {
             @PathVariable(value = "id") int id) {
 
         try {
-            return success(getModel(arRelationClient.getInfo(id)) );
+            MArRelation arRelation = arRelationClient.getInfo(id);
+            if(arRelation==null)
+                return failed("查无数据！");
+            return success(getModel(arRelation));
         }catch (Exception e){
             e.printStackTrace();
             return failed("获取数据错误！");
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.ArRelationsExistence, method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public Envelop isExistenceFilters(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        try {
+            return success(arRelationClient.isExistenceFilters(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
 }

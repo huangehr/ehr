@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.patient;
 
-import java.util.Date;
-
 /**
  * @author lincl
  * @version 1.0
@@ -14,7 +12,7 @@ public class ArRelationModel {
     private int arApplyId;   //档案申请编号
     private String archiveId;  //档案编号
     private String status;     //关联状态
-    private Date relationDate;//关联时间
+    private String relationDate;//关联时间
 
     public int getId() {
         return id;
@@ -56,11 +54,11 @@ public class ArRelationModel {
         this.status = status;
     }
 
-    public Date getRelationDate() {
+    public String getRelationDate() {
         return relationDate;
     }
 
-    public void setRelationDate(Date relationDate) {
+    public void setRelationDate(String relationDate) {
         this.relationDate = relationDate;
     }
 }

@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.patient;
 
-import java.util.Date;
-
 /**
  * @author lincl
  * @version 1.0
@@ -12,10 +10,10 @@ public class AuthenticationModel {
     private int id;                       //编号
     private String name;                 //  申请人姓名
     private String idCard;                // 申请人身份证号
-    private Date applyDate;               // 申请时间
+    private String applyDate;               // 申请时间
 
     private String status;                   // 审核状态
-    private Date auditDate;              //审核时间
+    private String auditDate;              //审核时间
     private String auditReason;           //不通过原因
     private String auditor;              //审核人
 
@@ -23,6 +21,9 @@ public class AuthenticationModel {
     private String telephone;                //电话
     private String medicalCardType;       //医疗卡类型
     private String medicalCardNo;          //医疗卡卡号
+
+    private String statusName;        //审批状态名称
+    private String medicalCardTypeName;       //医疗卡类型名称
 
     public int getId() {
         return id;
@@ -48,11 +49,11 @@ public class AuthenticationModel {
         this.idCard = idCard;
     }
 
-    public Date getApplyDate() {
+    public String getApplyDate() {
         return applyDate;
     }
 
-    public void setApplyDate(Date applyDate) {
+    public void setApplyDate(String applyDate) {
         this.applyDate = applyDate;
     }
 
@@ -64,11 +65,11 @@ public class AuthenticationModel {
         this.status = status;
     }
 
-    public Date getAuditDate() {
+    public String getAuditDate() {
         return auditDate;
     }
 
-    public void setAuditDate(Date auditDate) {
+    public void setAuditDate(String auditDate) {
         this.auditDate = auditDate;
     }
 
@@ -118,5 +119,21 @@ public class AuthenticationModel {
 
     public void setIdCardEffective(String idCardEffective) {
         this.idCardEffective = idCardEffective;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public String getMedicalCardTypeName() {
+        return medicalCardTypeName;
+    }
+
+    public void setMedicalCardTypeName(String medicalCardTypeName) {
+        this.medicalCardTypeName = medicalCardTypeName;
     }
 }

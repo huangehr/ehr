@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -59,6 +60,7 @@ public class ArApplyEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody ArApply model) throws Exception{
 
+        model.setApplyDate(new Date());
         return getModel( arApplyService.save(model) );
     }
 

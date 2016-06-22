@@ -239,6 +239,21 @@ public class BaseController extends AbstractController {
     }
 
     /**
+     * 将日期转为字符串
+     *
+     * @param dateTime   日期
+     * @return 日期字符串
+     */
+    public String dt2Str(Date dateTime) {
+        try {
+            return dateTime == null ? null : DateTimeUtil.simpleDateTimeFormat(dateTime);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * 计算出生日期
      *
      * @param birthday

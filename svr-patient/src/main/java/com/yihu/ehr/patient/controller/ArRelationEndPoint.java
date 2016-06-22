@@ -59,7 +59,7 @@ public class ArRelationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody ArRelation model) throws Exception{
 
-        return getModel( arRelationService.save(model) );
+        return getModel( arRelationService.saveModel(model) );
     }
 
     @RequestMapping(value = ServiceApi.Patients.ArRelations, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -68,7 +68,7 @@ public class ArRelationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody ArRelation model) throws Exception{
 
-        return getModel(arRelationService.save(model));
+        return getModel(arRelationService.saveModel(model));
     }
 
     @RequestMapping(value = ServiceApi.Patients.ArRelation, method = RequestMethod.DELETE)
@@ -97,6 +97,15 @@ public class ArRelationEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") int id) throws Exception{
 
         return getModel(arRelationService.retrieve(id));
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.ArRelationsExistence, method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean isExistenceFilters(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        return arRelationService.getCount(filters)>0;
     }
 
     protected MArRelation getModel(ArRelation o){
