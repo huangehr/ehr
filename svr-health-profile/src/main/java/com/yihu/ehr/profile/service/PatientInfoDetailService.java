@@ -114,7 +114,8 @@ public class PatientInfoDetailService {
         {
             resourceCode = BasisConstant.medicationChinese;
         }
-
+        Envelop result = resource.getResources(resourceCode, appId, "{\"q\":\"" + queryParams + "\"}", null, null);
+        re=result.getDetailModelList();
         return re;
     }
 
@@ -134,6 +135,13 @@ public class PatientInfoDetailService {
             }
             else{
                 queryParams = getProfileIds(demographicId);
+                if(("profile_id:(NOT *)").equals(demographicId) && demographicId!=null){
+                    Envelop envelop = new Envelop();
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("找不到此人相关记录");
+
+                    return envelop.getDetailModelList();
+                }
             }
         }
 
@@ -213,8 +221,10 @@ public class PatientInfoDetailService {
         }
 
         //获取门诊住院记录
-        String rowkeys = getProfileIds(demographicId);
-        if(rowkeys.length() > 0)
+        String rowkeys="";
+        if(demographicId!=null && demographicId!="")
+             rowkeys = getProfileIds(demographicId);
+        if(!("profile_id:(NOT *)").equals(rowkeys) && rowkeys!="")
         {
             if (q.length() > 0) {
                 q += " AND (" + rowkeys.toString() + ")";
@@ -222,7 +232,7 @@ public class PatientInfoDetailService {
                 q = "(" + rowkeys.toString() + ")";
             }
         }
-        else
+        else  if(("profile_id:(NOT *)").equals(rowkeys) && demographicId!=null)
         {
             Envelop envelop = new Envelop();
             envelop.setSuccessFlg(false);
@@ -230,7 +240,8 @@ public class PatientInfoDetailService {
 
             return envelop;
         }
-
+        if(q=="")
+            q="*:*";
         String queryParams =  "{\"q\":\"" + q + "\"}";
         return resource.getResources(resourceCode, appId, queryParams, page, size);
     }
