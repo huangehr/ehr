@@ -148,18 +148,22 @@ public class PackMill {
         //查询对应内部EHR字段是否有对应字典
         String dictCode = getMetadataDict(metadataId);
 
+        //内部EHR数据元字典不为空情况
         if(!org.apache.commons.lang.StringUtils.isBlank(dictCode) && !org.apache.commons.lang.StringUtils.isBlank(value))
-        {   //内部EHR数据元字典不为空情况，查找对应的字典数据
+        {
+            //查找对应的字典数据
             String[] dict = getDict(cdaVersion,dictCode,value);
 
+            //对应字典不为空情况下，转换EHR内部字典，并保存字典对应值，为空则不处理
             if(dict != null && dict.length > 1)
-            {   //对应字典不为空情况下，STD字典代码转换为内部EHR字典代码保存
+            {
+                //STD字典代码转换为内部EHR字典代码保存
                 dataRecord.addResource(metadataId, dict[0]);
                 //添加内部EHR字典代码对应中文作为单独字段保存
                 dataRecord.addResource(metadataId + "_VALUE", dict[1]);
             }
             else
-            {   //字典不存在不处理
+            {
                 dataRecord.addResource(metadataId, value);
             }
         }
