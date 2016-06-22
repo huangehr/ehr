@@ -79,13 +79,26 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
     }
 
 
+    /**
+     * 图片生成
+     * @param profileId 事件rowkey
+     * @param orgCode 机构代码
+     * @param cdaVersion cda版本
+     * @param cdaCode cda文档模板代码
+     * @param width 图片宽度
+     * @param height 图片高度
+     * @return
+     * @throws Exception
+     */
     public String CDAToImage(String profileId,String orgCode, String cdaVersion,String cdaCode,int width,int height) throws Exception {
-        String filePath="";
-        try{
+        try
+        {
+            //返回文件路径
+            String filePath="";
             //获取CDA模板信息
             Template temp = tempService.getPresriptionTemplate(orgCode,cdaVersion,cdaCode);
             //模板路径
-            String fileString = temp.getPcTplURL();
+            String fileString = "";
 
             if(temp == null)
             {
@@ -103,14 +116,20 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
                 fileString = ThridPrescriptionService.class.getResource("/").getPath() + localFileName;
             }
 
-            //根据事件号和机构ID得到处方数据,数据格式是CDA格式
+            //根据事件rowkey和cda文档ID得到cda数据
             Object model = cdaService.getCDAData(profileId,temp.getCdaDocumentId());
-            //把数据和模板结合
+            //把数据和模板结合生成html
             String html = fillTemplate(fileString,model);
+            //转换处理完成模板文件删除
+            File fileTemp = new File(fileString);
+            fileTemp.delete();
             //网页转图片 并且保存到fastdfs
             filePath = htmlToImage(html,width,height);
+
             return filePath;
-        }catch (Exception e){
+        }
+        catch (Exception e)
+        {
             throw new Exception("html转图片失败");
         }
     }
@@ -142,7 +161,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
             //保存到fastdfs
             InputStream in = new FileInputStream(file);
             FastDFSUtil fdfs= FastDFSConfig.fastDFSUtil();
-            ObjectNode jsonResult = fdfs.upload(in, "zip", "");
+            ObjectNode jsonResult = fdfs.upload(in, "png", "");
             String filePath = jsonResult.get("fid").textValue();
 
             out.close();
