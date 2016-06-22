@@ -41,7 +41,7 @@ public interface ArRelationClient {
     @RequestMapping(value = ServiceApi.Patients.ArRelations, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改档案关联")
     MArRelation update(
-            @RequestBody String model);
+            @RequestBody MArRelation model);
 
     @RequestMapping(value = ServiceApi.Patients.ArRelation, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除档案关联")
@@ -58,4 +58,8 @@ public interface ArRelationClient {
     MArRelation getInfo(
             @PathVariable(value = "id") int id);
 
+    @RequestMapping(value = ServiceApi.Patients.ArRelationsExistence, method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    boolean isExistenceFilters(
+            @RequestParam(value="filters") String filters) ;
 }

@@ -4,18 +4,26 @@ import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.patient.ArApplyModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.patient.MArApply;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.patient.service.ArApplyClient;
+import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.utils.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincl
@@ -24,11 +32,15 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(protocols = "https", value = "档案申请", description = "档案申请")
+@Api(protocols = "https", value = "archive_apply", description = "档案申请" , tags = {"档案申请"})
 public class ArApplyController extends ExtendController<ArApplyModel> {
 
     @Autowired
     ArApplyClient arApplyClient;
+    @Autowired
+    SystemDictClient systemDictClient;
+    @Autowired
+    OrganizationClient organizationClient;
 
     @RequestMapping(value = ServiceApi.Patients.ArApplications, method = RequestMethod.GET)
     @ApiOperation(value = "档案关联申请列表")
@@ -45,8 +57,7 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
             @RequestParam(value = "page", required = false) int page) {
 
         ResponseEntity<List<MArApply>> responseEntity = arApplyClient.search(fields, filters, sorts, size, page);
-        List ls = (List) convertToModels(responseEntity.getBody(), new ArrayList<>(), ArApplyModel.class, null);
-        return getResult(ls, getTotalCount(responseEntity), page, size);
+        return getResult(convertModels(responseEntity.getBody()), getTotalCount(responseEntity), page, size);
     }
 
 
@@ -57,7 +68,7 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
             @RequestParam("model") String model) {
 
         try {
-            return success(getModel(arApplyClient.add(model)) );
+            return success(convertModel(arApplyClient.add(model)) );
         }catch (Exception e){
             e.printStackTrace();
             return failed("新增出错！");
@@ -71,10 +82,14 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
             @RequestParam("model") String model) {
 
         try {
-            return success(getModel(arApplyClient.update(model)));
+            MArApply arApply = toEntity(model, MArApply.class);
+            if(arApply.getId()==0)
+                return failed("编号不能为空");
+
+            return success(convertModel(arApplyClient.update(arApply)));
         }catch (Exception e){
             e.printStackTrace();
-            return failed("修改出错！");
+            return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
 
@@ -104,11 +119,75 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
             @PathVariable(value = "id") int id) {
 
         try {
-            return success(getModel(arApplyClient.getInfo(id)) );
+            MArApply arApply = arApplyClient.getInfo(id);
+            if(arApply==null)
+                return failed("查无数据！");
+            return success(convertModel(arApply));
         }catch (Exception e){
             e.printStackTrace();
             return failed("获取信息出错！");
         }
     }
 
+
+    @RequestMapping(value = "/archive/applications/{id}/audit", method = RequestMethod.GET)
+    @ApiOperation(value = "档案申请审核")
+    public Envelop audit(
+            @ApiParam(name = "id", value = "档案关联申请编号", defaultValue = "")
+            @PathVariable(value = "id") int id) {
+
+        try {
+            MArApply arApply = arApplyClient.getInfo(id);
+            Envelop envelop = success(getModel(arApply));
+
+//            envelop.setDetailModelList();
+            return envelop;
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("获取信息出错！");
+        }
+    }
+
+
+
+
+
+
+    private ArApplyModel convertModel(MArApply arApply){
+        ArApplyModel model = getModel(arApply);
+        if(!StringUtils.isEmpty(model.getStatus())){
+            MDictionaryEntry statusDicts = systemDictClient.getDictEntry(36, model.getStatus());
+            if(statusDicts!=null)
+                model.setStatusName(statusDicts.getValue());
+        }
+
+        if(!StringUtils.isEmpty(model.getVisOrg())){
+            MOrganization org = organizationClient.getOrg(model.getVisOrg());
+            if(org!=null)
+                model.setStatusName(org.getFullName());
+        }
+
+        model.setApplyDate(dt2Str(arApply.getApplyDate()));
+        model.setAuditDate(dt2Str(arApply.getAuditDate()));
+
+        return model;
+    }
+
+    private List convertModels(List<MArApply> arApplies){
+        List<MDictionaryEntry> statusDicts = systemDictClient.getDictEntries("", "dictId=36", "", 10, 1).getBody();
+        Map<String, String> statusMap = new HashMap<>();
+        for(MDictionaryEntry entry : statusDicts){
+            statusMap.put(entry.getCode(), entry.getValue());
+        }
+        List ls = new ArrayList<>();
+        ArApplyModel model;
+        for(MArApply arApply : arApplies){
+            model = getModel(arApply);
+            model.setStatusName(statusMap.get(arApply.getStatus()));
+            model.setApplyDate(dt2Str(arApply.getApplyDate()));
+            model.setAuditDate(dt2Str(arApply.getAuditDate()));
+            ls.add(model);
+        }
+        return ls;
+    }
 }

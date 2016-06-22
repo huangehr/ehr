@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.patient;
 
-import java.util.Date;
-
 /**
  * @author lincl
  * @version 1.0
@@ -12,12 +10,12 @@ public class ArApplyModel {
     private int id;                       //编号
     private String name;                 // 申请时间
     private String idCard;                //申请人姓名
-    private Date applyDate;               //申请人身份证号
+    private String applyDate;               //申请人身份证号
     private String status;                   // 审核状态
-    private Date auditDate;              //审核时间
+    private String auditDate;              //审核时间
     private String auditReason;           //不通过原因
     private String auditor;              //审核人
-    private Date visDate;                //就诊时间
+    private String visDate;                //就诊时间
     private String visOrg;                //就诊机构
     private String visDoctor;           //就诊医生
     private String cardNo;                //卡号
@@ -25,6 +23,9 @@ public class ArApplyModel {
     private String diagnosedProject;  //检查项目
     private String medicines;          //诊断开药
     private String memo;                //备注
+
+    private String statusName;            // 审核状态
+    private String visOrgName;           //就诊机构名称
 
     public int getId() {
         return id;
@@ -50,11 +51,11 @@ public class ArApplyModel {
         this.idCard = idCard;
     }
 
-    public Date getApplyDate() {
+    public String getApplyDate() {
         return applyDate;
     }
 
-    public void setApplyDate(Date applyDate) {
+    public void setApplyDate(String applyDate) {
         this.applyDate = applyDate;
     }
 
@@ -66,11 +67,11 @@ public class ArApplyModel {
         this.status = status;
     }
 
-    public Date getAuditDate() {
+    public String getAuditDate() {
         return auditDate;
     }
 
-    public void setAuditDate(Date auditDate) {
+    public void setAuditDate(String auditDate) {
         this.auditDate = auditDate;
     }
 
@@ -90,11 +91,11 @@ public class ArApplyModel {
         this.auditor = auditor;
     }
 
-    public Date getVisDate() {
+    public String getVisDate() {
         return visDate;
     }
 
-    public void setVisDate(Date visDate) {
+    public void setVisDate(String visDate) {
         this.visDate = visDate;
     }
 
@@ -152,5 +153,21 @@ public class ArApplyModel {
 
     public void setMemo(String memo) {
         this.memo = memo;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public String getVisOrgName() {
+        return visOrgName;
+    }
+
+    public void setVisOrgName(String visOrgName) {
+        this.visOrgName = visOrgName;
     }
 }

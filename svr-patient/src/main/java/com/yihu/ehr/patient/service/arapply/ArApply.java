@@ -22,7 +22,7 @@ public class ArApply {
     private Date auditDate;              //审核时间
     private String auditReason;           //不通过原因
     private String auditor;              //审核人
-    private Date visDate;                //就诊时间
+    private String visDate;                //就诊时间
     private String visOrg;                //就诊机构
     private String visDoctor;           //就诊医生
     private String cardNo;                //卡号
@@ -107,11 +107,11 @@ public class ArApply {
     }
 
     @Column(name = "vis_date", nullable = true)
-    public Date getVisDate() {
+    public String getVisDate() {
         return visDate;
     }
 
-    public void setVisDate(Date visDate) {
+    public void setVisDate(String visDate) {
         this.visDate = visDate;
     }
 

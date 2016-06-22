@@ -45,7 +45,7 @@ public interface ArApplyClient {
     @ApiOperation(value = "修改档案关联申请")
     MArApply update(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestBody String model);
+            @RequestBody MArApply model);
 
     @RequestMapping(value = ServiceApi.Patients.ArApplication, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除档案关联申请")
