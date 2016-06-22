@@ -42,4 +42,14 @@ public class ThridPrescriptionEndPoint extends BaseRestEndPoint {
         }
         return filePath;
     }
+
+    @ApiOperation(value = "imagetest")
+    @RequestMapping(value = "/imagetest", method = RequestMethod.GET)
+    public boolean test() throws Exception
+    {
+        thridPrescriptionService.htmlToImage("<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"Generator\" content=\"EditPlus®\">" +
+                "<meta name=\"Author\" content=\"\"><meta name=\"Keywords\" content=\"\"><meta name=\"Description\" content=\"\"><title>Document</title>" +
+                " </head><body>Hellow World!</body></html>",800,600);
+        return true;
+    }
 }

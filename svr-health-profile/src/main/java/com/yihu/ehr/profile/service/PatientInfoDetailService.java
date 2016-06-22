@@ -162,7 +162,7 @@ public class PatientInfoDetailService {
 
 
     /**
-     * 查询某个事件的处方笺信息
+     * 查询某个事件或某个处方处方笺信息
      * @param profileId 主表rowkey
      * @param prescriptionNo 处方编号
      * @return
@@ -245,7 +245,8 @@ public class PatientInfoDetailService {
                 }
 
                 //查询处方笺
-                Envelop prescription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:" + profileId + "\"}",null,null);
+                Envelop prescription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:" + profileId
+                        + (!StringUtils.isBlank(prescriptionNo) ? ("+AND+EHR_000086:" + prescriptionNo) : "")+ "\"}",null,null);
 
                 if(prescription.getDetailModelList() != null && prescription.getDetailModelList().size() > 0)
                 {
