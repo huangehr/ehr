@@ -511,4 +511,15 @@ public class ConventionalDictEntryController extends BaseController{
         return envelop;
     }
 
+    @RequestMapping(value = "/dictionaries/record_data_source", method = RequestMethod.GET)
+    @ApiOperation(value = "获取档案数据来源", response = MConventionalDict.class)
+    public Envelop getRecordDataSource(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        Envelop envelop = new Envelop();
+        MConventionalDict mConventionalDict = dictEntryClient.getRecordDataSource(code);
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
+        envelop.setObj(systemDictEntryModel);
+        return envelop;
+    }
 }
