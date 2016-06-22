@@ -2,8 +2,10 @@ package com.yihu.ehr.service.resource.stage2;
 
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.redis.RedisClient;
+import com.yihu.ehr.schema.ResourceAdaptionDictSchema;
 import com.yihu.ehr.schema.ResourceAdaptionKeySchema;
 import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.schema.ResourceMetadataSchema;
 import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.service.resource.stage1.FilePackage;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
@@ -31,6 +33,12 @@ public class PackMill {
     private RedisClient redisClient;
 
     @Autowired
+    private ResourceMetadataSchema metadataSchema;
+
+    @Autowired
+    private ResourceAdaptionDictSchema dictSchema;
+
+    @Autowired
     private ResourceAdaptionKeySchema resAdaptionKeySchema;
 
     @Autowired
@@ -42,7 +50,7 @@ public class PackMill {
      * @param stdPack
      * @return
      */
-    public ResourceBucket grindingPackModel(StandardPackage stdPack){
+    public ResourceBucket grindingPackModel(StandardPackage stdPack) throws  Exception{
         ResourceBucket resourceBucket = new ResourceBucket();
         BeanUtils.copyProperties(stdPack, resourceBucket);
 
@@ -61,7 +69,8 @@ public class PackMill {
                         String resourceMetaData = resourceMetaData(stdPack.getCdaVersion(), dataSet.getCode(), metaDataCode);
                         if (StringUtils.isEmpty(resourceMetaData)) continue;
 
-                        masterRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
+                        //masterRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
+                        dictTransform(masterRecord,stdPack.getCdaVersion(),resourceMetaData,metaDataRecord.getMetaData(metaDataCode));
                     }
 
                     // 仅一条记录
@@ -80,7 +89,8 @@ public class PackMill {
                         String resourceMetaData = resourceMetaData(stdPack.getCdaVersion(), dataSet.getCode(), metaDataCode);
                         if (StringUtils.isEmpty(resourceMetaData)) continue;
 
-                        subRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
+                        //subRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
+                        dictTransform(subRecord,stdPack.getCdaVersion(),resourceMetaData,metaDataRecord.getMetaData(metaDataCode));
                     }
 
                     if(subRecord.getDataGroup().size() > 0) subRecords.addRecord(subRecord);
@@ -124,4 +134,72 @@ public class PackMill {
 
          return resMetaData;
      }
+
+    /**
+     * STD字典转内部EHR字典
+     * @param dataRecord 数据
+     * @param cdaVersion 版本号
+     * @param metadataId EHR数据源ID
+     * @param value 原值
+     * @throws Exception
+     */
+    protected  void dictTransform(ResourceRecord dataRecord,String cdaVersion,String metadataId,String value) throws Exception
+    {
+        //查询对应内部EHR字段是否有对应字典
+        String dictCode = getMetadataDict(metadataId);
+
+        if(!org.apache.commons.lang.StringUtils.isBlank(dictCode) && !org.apache.commons.lang.StringUtils.isBlank(value))
+        {   //内部EHR数据元字典不为空情况，查找对应的字典数据
+            String[] dict = getDict(cdaVersion,dictCode,value);
+            if(dict != null && dict.length > 1)
+            {   //对应字典不为空情况下，STD字典代码转换为内部EHR字典代码保存
+                dataRecord.addResource(metadataId, dict[0]);
+                //添加内部EHR字典代码对应中文作为单独字段保存
+                dataRecord.addResource(metadataId + "_VALUE", dict[1]);
+            }
+            else
+            {   //字典不存在不处理
+                dataRecord.addResource(metadataId, value);
+            }
+        }
+        else
+        {   //内部EHR数据元为空不处理
+            dataRecord.addResource(metadataId, value);
+        }
+    }
+
+    /**
+     * 获取数据元对应字典缓存
+     * @param metadataId 数据元ID
+     * @return
+     */
+    public String getMetadataDict(String metadataId)
+    {
+        String key = metadataSchema.metaData(metadataId);
+        String dictCode = redisClient.get(key);
+
+        return dictCode;
+    }
+
+    /**
+     * 获取对应字典缓存信息
+     * @param version cda版本
+     * @param dictCode EHR内部字典代码
+     * @param srcDictEntryCode STD字典项代码
+     * @return
+     */
+    public String[] getDict(String version,String dictCode,String srcDictEntryCode)
+    {
+        String key = dictSchema.metaData(version,dictCode,srcDictEntryCode);
+        String dict = redisClient.get(key);
+
+        if(dict != null)
+        {
+            return dict.split("&");
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

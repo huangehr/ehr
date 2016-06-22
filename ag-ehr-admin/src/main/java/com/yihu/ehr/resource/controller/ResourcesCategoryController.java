@@ -80,6 +80,29 @@ public class ResourcesCategoryController extends BaseController {
             @RequestParam(value = "resourceCategory") String resourceCategory) throws Exception {
         Envelop envelop = new Envelop();
         try{
+            MRsCategory detailModel = objectMapper.readValue(resourceCategory,MRsCategory.class);
+            if(StringUtils.isNotBlank(detailModel.getPid())){
+                List<MRsCategory> mRsCategories =  resourcesCategoryClient.getAllCategories("pid=" + detailModel.getPid() + ";name=" + detailModel.getName()+";id<>"+detailModel.getId());
+                if(mRsCategories.size()>0){
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("同级分类下已经存在名称为【"+detailModel.getName()+"】的分类，请修改！");
+                    return envelop;
+                }
+            }else {
+                List<MRsCategory> mRsCategories = resourcesCategoryClient.getRsCategoryByPid("");
+                Boolean isExit = false;
+                for(MRsCategory mRsCategory: mRsCategories){
+                    if(mRsCategory.getName().equals(detailModel.getName())&&!mRsCategory.getId().equals(detailModel.getId())){
+                        isExit  =true;
+                        break;
+                    }
+                }
+                if(isExit){
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("顶级分类下已经存在名称为【" + detailModel.getName() + "】的分类，请修改！");
+                    return envelop;
+                }
+            }
             MRsCategory rsCategory = resourcesCategoryClient.updateRsCategory(resourceCategory);
             envelop.setObj(rsCategory);
             envelop.setSuccessFlg(true);
