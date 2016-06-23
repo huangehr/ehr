@@ -11,6 +11,7 @@ import feign.Param;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -104,8 +105,15 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "下载文件")
     public List<String> filesDownload(
             @ApiParam(name = "object_id", value = "文件字符串")
-            @RequestParam(value = "object_id") String objectId) throws Exception {
-        List<FileResource> fileResources = fileResourceManager.findByObjectId(objectId);
+            @RequestParam(value = "object_id") String objectId,
+            @ApiParam(name = "mime", value = "所有者")
+            @RequestParam(value = "mime", required = false) String mime) throws Exception {
+        List<FileResource> fileResources;
+        if(StringUtils.isEmpty(mime))
+            fileResources = fileResourceManager.findByObjectId(objectId);
+        else
+            fileResources = fileResourceManager.findByObjectIdAndMime(objectId, mime);
+
         List<String> filesStrs = new ArrayList<>();
         for (FileResource fileResource : fileResources) {
             String storagePath = fileResource.getStoragePath();
