@@ -30,7 +30,8 @@ public interface FileResourceClient {
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_download", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
     List<String> filesDownload(
-            @RequestParam(value = "object_id") String objectId);
+            @RequestParam(value = "object_id") String objectId,
+            @RequestParam(value = "mime", required = false) String mime);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/image_view/{storagePath}", method = RequestMethod.GET)
     @ApiOperation(value = "查看图片")

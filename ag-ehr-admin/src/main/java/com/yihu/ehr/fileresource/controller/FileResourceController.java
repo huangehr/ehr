@@ -57,8 +57,10 @@ public class FileResourceController {
     @ApiOperation(value = "下载文件")
     public Envelop fileDownload(
             @ApiParam(name = "object_id", value = "文件字符串")
-            @RequestParam(value = "object_id") String objectId) throws Exception {
-        List<String> filesStr = fileResourceClient.filesDownload(objectId);
+            @RequestParam(value = "object_id") String objectId,
+            @ApiParam(name = "mime", value = "所有者")
+            @RequestParam(value = "mime", required = false) String mime) throws Exception {
+        List<String> filesStr = fileResourceClient.filesDownload(objectId, mime);
         Envelop envelop = new Envelop();
         envelop.setDetailModelList(filesStr);
         return envelop;
