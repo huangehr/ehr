@@ -10,6 +10,7 @@ public class MasterResourceFamily extends ResourceFamily {
     public static class BasicColumns {
         public static final String CardId = "card_id";
         public static final String OrgCode = "org_code";
+        public static final String OrgName = "org_name";
         public static final String PatientId = "patient_id";
         public static final String EventNo = "event_no";
         public static final String EventDate = "event_date";

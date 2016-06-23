@@ -32,6 +32,7 @@ public class ResourceStorageUtil {
         if (family.equals(MasterResourceFamily.Basic)){
             map.put(MasterResourceFamily.BasicColumns.CardId, profile.getCardId());
             map.put(MasterResourceFamily.BasicColumns.OrgCode, profile.getOrgCode());
+            map.put(MasterResourceFamily.BasicColumns.OrgName, profile.getOrgName());
             map.put(MasterResourceFamily.BasicColumns.PatientId, profile.getPatientId());
             map.put(MasterResourceFamily.BasicColumns.EventNo, profile.getEventNo());
             map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(profile.getEventDate()));
