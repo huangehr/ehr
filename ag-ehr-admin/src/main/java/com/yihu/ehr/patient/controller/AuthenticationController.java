@@ -78,7 +78,8 @@ public class AuthenticationController extends ExtendController<AuthenticationMod
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
         try {
-            MAuthentication authentication = toEntity(model, MAuthentication.class);
+            AuthenticationModel authenticationModel = toEntity(model,AuthenticationModel.class);
+            MAuthentication authentication = convertToMModel(authenticationModel, MAuthentication.class);
             if(authentication.getId()==0)
                 return failed("编号不能为空");
 

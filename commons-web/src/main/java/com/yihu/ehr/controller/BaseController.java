@@ -320,7 +320,7 @@ public class BaseController extends AbstractController {
             if (type == java.util.Date.class) {
                 Field sourceField = source.getClass().getDeclaredField(name);
                 sourceField.setAccessible(true);
-                targetField.set(target, StringToDate(sourceField.get(source).toString(), AgAdminConstants.DateTimeFormat));
+                targetField.set(target, StringToDate(sourceField.get(source)==null?null:sourceField.get(source).toString(), AgAdminConstants.DateTimeFormat));
             }
         }
         return target;
