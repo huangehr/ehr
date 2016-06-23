@@ -97,7 +97,7 @@ public class PatientInfoDetailService {
 
     /******************************* 用药信息 ***********************************************************/
     /*
-     * 患者历史用药统计
+     * 常用药物
      */
     public List<Map<String, Object>> getMedicationStat(String demographicId, String hpId) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();

@@ -41,6 +41,7 @@ public class BasisConstant {
 
     /********** 数据元 *******************/
     public static String profileId = "profile_id";//细表外键profile_id
+    public static String eventDate = "event_date";//细表外键profile_id
     public static String mzzd = "EHR_000109";//门诊诊断代码
     public static String zyzd = "EHR_000293";//住院诊断代码
     public static String cfbh = "EHR_000086";//处方编号

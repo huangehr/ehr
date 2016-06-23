@@ -138,7 +138,7 @@ public class ResourcesQueryService  {
                     String groupType = metadada.getGroupType();
                     String groupData =  metadada.getGroupData();
 
-                    if(groupType!=null)
+                    if(groupType!=null&&groupType.length()>0)
                     {
                         if(grantType.equals("0")) //分组字段
                         {
