@@ -140,6 +140,7 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
             MArApply arApply = arApplyClient.getInfo(id);
             Envelop envelop = success(getModel(arApply));
 
+            //todo 通过申请的信息检索档案列表， 将检索出的信息放在DetailModelList中
 //            envelop.setDetailModelList();
             return envelop;
         }catch (Exception e){
@@ -148,7 +149,24 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
         }
     }
 
+    @RequestMapping(value = "/archive/applications/{id}/archive_info", method = RequestMethod.GET)
+    @ApiOperation(value = "获取档案申请信息以及档案信息")
+    public Envelop getApplyInfoWithArchiveInfo(
+            @ApiParam(name = "id", value = "档案关联申请编号", defaultValue = "")
+            @PathVariable(value = "id") int id) {
 
+        try {
+            MArApply arApply = arApplyClient.getInfo(id);
+            Envelop envelop = success(getModel(arApply));
+
+            //todo 通过申请id获取关联的档案编号， 取得档案信息， 将信息放到DetailModelList中
+//            envelop.setDetailModelList();
+            return envelop;
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("获取信息出错！");
+        }
+    }
 
 
 

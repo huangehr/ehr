@@ -46,6 +46,10 @@ public class FileResourceManager extends BaseJpaService<FileResource, XFileResou
         return resourceRepository.findByObjectId(objectId);
     }
 
+    public List<FileResource> findByObjectIdAndMime(String objectId, String mime) {
+        return resourceRepository.findByObjectIdAndMime(objectId, mime);
+    }
+
     public List<FileResource> findByStoragePath(String storagePath) {
         return resourceRepository.findByStoragePath(storagePath);
     }
