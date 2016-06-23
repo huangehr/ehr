@@ -130,8 +130,8 @@ public class DictController extends BaseController {
         if (dictModel == null) {
             return failed("数据获取失败!");
         }
-        MCDAVersion mcdaVersion = versionClient.getVersion(version);
-        dictModel.setInStage(mcdaVersion.isInStage()?0:1);
+        //MCDAVersion mcdaVersion = versionClient.getVersion(version);
+        //dictModel.setInStage(mcdaVersion.isInStage()?0:1);
         return success(dictModel);
     }
 
