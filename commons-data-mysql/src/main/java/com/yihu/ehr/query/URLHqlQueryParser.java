@@ -143,7 +143,7 @@ public class URLHqlQueryParser<T> {
                     if(j==tokens.length-1)
                         tokens[1] = tokens[j];
                     else
-                        tokens[0] += tokens[j] ;
+                        tokens[0] += " " + tokens[j] ;
                 }
             }
 
