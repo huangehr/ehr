@@ -38,10 +38,14 @@ public class BasisConstant {
     public static String laboratoryAllergy = "RS_LABORATORY_ALLERGY";	//患者检验药敏
     public static String surgery = "RS_SURGERY";	//患者手术记录
 
+    public static String healthIndicators = "RS_HEALTH_INDICATORS"; //健康指标
 
     /********** 数据元 *******************/
+    public static String demographicId = "demographic_id";//身份证号
     public static String profileId = "profile_id";//细表外键profile_id
-    public static String eventDate = "event_date";//细表外键profile_id
+    public static String eventDate = "event_date";//事件时间
+    public static String eventType = "event_type";//事件类型
+
     public static String mzzd = "EHR_000109";//门诊诊断代码
     public static String zyzd = "EHR_000293";//住院诊断代码
     public static String cfbh = "EHR_000086";//处方编号

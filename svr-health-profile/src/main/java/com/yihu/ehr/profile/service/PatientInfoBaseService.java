@@ -54,7 +54,7 @@ public class PatientInfoBaseService {
     {
         String re = "";
         //获取相关门诊住院记录
-        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1);
+        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",null,null);
         if(main.getDetailModelList() != null && main.getDetailModelList().size() > 0)
         {
             //主表rowkey条件
@@ -306,7 +306,7 @@ public class PatientInfoBaseService {
      * @return
      * @throws Exception
      */
-    public List<Map<String,Object>> getPatientMzZyEvents(String demographicId, String eventType, String year, String area, String hpId, String diseaseId) throws Exception {
+    public List<Map<String,Object>> getPatientEvents(String demographicId, String eventType, String year, String area, String hpId, String diseaseId) throws Exception {
         //门诊过滤参数
         String mzQuery = "";
         //住院过滤参数
@@ -321,7 +321,17 @@ public class PatientInfoBaseService {
         //事件类型
         if (!StringUtils.isBlank(eventType))
         {
-            query += " AND event_type:" + eventType;
+            //0门诊 1住院 2体检
+            if(eventType.equals("0") || eventType.equals("1") || eventType.equals("2"))
+            {
+                query += " AND event_type:" + eventType;
+            }
+            else if(eventType.equals("3")){
+
+            }
+            else if(eventType.equals("4")){
+
+            }
         }
         //事件年份
         if (!StringUtils.isBlank(year))
@@ -432,7 +442,7 @@ public class PatientInfoBaseService {
         if (!StringUtils.isBlank(mzQuery))
         {
             //门诊诊断纪录
-            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\""), null, null);
+            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\"".replace(' ','+'), null, null);
 
             //获取疾病门诊事件纪录rowkey
             if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
@@ -447,7 +457,7 @@ public class PatientInfoBaseService {
         if(!StringUtils.isBlank(zyQuery))
         {
             //住院诊断纪录
-            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,URLEncoder.encode("{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\""), null, null);
+            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\"".replace(' ','+'), null, null);
 
             //获取疾病住院事件纪录rowkey
             if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0)
@@ -628,7 +638,7 @@ public class PatientInfoBaseService {
     /**
      * 全文检索
      */
-    public Envelop getProfileLucene(String startTime,String endTime,List<String> lucene) throws Exception
+    public Envelop getProfileLucene(String startTime,String endTime,List<String> lucene,Integer page,Integer size) throws Exception
     {
         String queryParams = "";
         if(startTime!=null && startTime.length()>0 && endTime!=null && endTime.length()>0)
@@ -646,7 +656,7 @@ public class PatientInfoBaseService {
         }
 
         //全文检索
-        Envelop re = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\""+queryParams+"\"}", null, null);
+        Envelop re = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\""+queryParams+"\"}", page, size);
         return re;
     }
 }

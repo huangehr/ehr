@@ -72,7 +72,7 @@ public class PatientInfoDetailService {
     {
         String re = "";
         //获取相关门诊住院记录
-        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1);
+        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",null,null);
         if(main.getDetailModelList() != null && main.getDetailModelList().size() > 0)
         {
             //主表rowkey条件
@@ -92,7 +92,7 @@ public class PatientInfoDetailService {
             re = BasisConstant.profileId+":(NOT *)";
         }
 
-        return re;
+        return re.replace(" ","+");
     }
 
     /******************************* 用药信息 ***********************************************************/
