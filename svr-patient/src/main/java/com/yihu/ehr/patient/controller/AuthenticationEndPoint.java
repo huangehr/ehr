@@ -71,6 +71,7 @@ public class AuthenticationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody Authentication model) throws Exception{
 
+        model.setAuditDate(new Date());
         return getModel(authenticationService.save(model));
     }
 
