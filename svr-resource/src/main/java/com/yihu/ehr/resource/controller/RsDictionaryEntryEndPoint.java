@@ -2,11 +2,10 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.resource.MRsDictionaryEntry;
 import com.yihu.ehr.resource.model.RsDictionaryEntry;
 import com.yihu.ehr.resource.service.RsDictionaryEntryService;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -64,7 +63,7 @@ public class RsDictionaryEntryEndPoint extends EnvelopRestEndPoint {
         if(isExistence(dictCode,code)){
             throw new Exception("字典项代码不能重复");
         }
-        rsDictionaryEntryService.save(dictionaryEntry);
+        rsDictionaryEntryService.insert(dictionaryEntry);
         return convertToModel(dictionaryEntry, MRsDictionaryEntry.class, null);
 
     }

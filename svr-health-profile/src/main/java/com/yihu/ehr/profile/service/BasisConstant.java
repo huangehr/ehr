@@ -15,7 +15,8 @@ public class BasisConstant {
     public static String medicationPrescription = "RS_MEDICATION_PRESCRIPTION";//处方笺
     public static String medicationChinese = "RS_MEDICATION_CHINESE";//患者用中药药历史记录资源
     public static String medicationWestern = "RS_MEDICATION_WESTERN";//患者用西药药历史记录资源
-    public static String medicationStat = "RS_MEDICATION_STAT";//患者用药统计资源
+    public static String medicationWesternStat = "RS_MEDICATION_WESTERN_STAT";//患者西药用药统计资源
+    public static String medicationChineseStat = "RS_MEDICATION_CHINESE_STAT";//患者中药用药统计资源
 
     public static String outpatientDiagnosis = "RS_OUTPATIENT_DIAGNOSIS";//门诊诊断
     public static String outpatientSymptom = "RS_OUTPATIENT_SYMPTOM";//门诊症状
@@ -38,10 +39,14 @@ public class BasisConstant {
     public static String laboratoryAllergy = "RS_LABORATORY_ALLERGY";	//患者检验药敏
     public static String surgery = "RS_SURGERY";	//患者手术记录
 
+    public static String healthIndicators = "RS_HEALTH_INDICATORS"; //健康指标
 
     /********** 数据元 *******************/
+    public static String demographicId = "demographic_id";//身份证号
     public static String profileId = "profile_id";//细表外键profile_id
-    public static String eventDate = "event_date";//细表外键profile_id
+    public static String eventDate = "event_date";//事件时间
+    public static String eventType = "event_type";//事件类型
+
     public static String mzzd = "EHR_000109";//门诊诊断代码
     public static String zyzd = "EHR_000293";//住院诊断代码
     public static String cfbh = "EHR_000086";//处方编号

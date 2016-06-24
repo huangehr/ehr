@@ -70,7 +70,7 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
         if(isExistence(code)){
             throw new Exception("字典代码不能重复");
         }
-        dictionaryService.save(rsDictionary);
+        dictionaryService.insert(rsDictionary);
         return convertToModel(rsDictionary, MRsDictionary.class, null);
 
     }
@@ -134,9 +134,7 @@ public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
             @RequestBody String jsonData) throws Exception {
 
         List models = objectMapper.readValue(jsonData, new TypeReference<List>() {});
-        long s = new Date().getTime();
         dictionaryService.batchInsertDictsAndEntry(models);
-        System.err.println( new Date().getTime() - s );
         return true;
     }
 
