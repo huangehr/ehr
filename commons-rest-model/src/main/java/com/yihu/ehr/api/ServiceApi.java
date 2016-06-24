@@ -124,7 +124,8 @@ public class ServiceApi {
         public static final String MedicalArea         = "/{demographic_id}/profile/medical_area"; //就诊过区域
         public static final String MedicalYear         = "/{demographic_id}/profile/medical_year"; //就诊过年份
         public static final String MedicalEvents       = "/{demographic_id}/profile/medical_events"; //门诊/住院事件(时间轴)
-        public static final String MedicationStat      = "/{demographic_id}/profile/medication_stat"; //个人用药统计
+        public static final String MedicationStat      = "/{demographic_id}/profile/medication_stat"; //患者用药清单
+        public static final String MedicationUsed      = "/{demographic_id}/profile/medication_used"; //患者常用药（按次数）
         public static final String MedicalEvent        = "/{event_no}/info"; //某次住院/门诊事件信息
 
 
