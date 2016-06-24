@@ -82,10 +82,10 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
             @RequestParam("model") String model) {
 
         try {
-            MArApply arApply = toEntity(model, MArApply.class);
+            ArApplyModel arApplyModel = toEntity(model, ArApplyModel.class);
+            MArApply arApply = convertToMModel(arApplyModel, MArApply.class);
             if(arApply.getId()==0)
                 return failed("编号不能为空");
-
             return success(convertModel(arApplyClient.update(arApply)));
         }catch (Exception e){
             e.printStackTrace();
@@ -157,7 +157,7 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
 
         try {
             MArApply arApply = arApplyClient.getInfo(id);
-            Envelop envelop = success(getModel(arApply));
+            Envelop envelop = success(convertModel(arApply));
 
             //todo 通过申请id获取关联的档案编号， 取得档案信息， 将信息放到DetailModelList中
 //            envelop.setDetailModelList();
