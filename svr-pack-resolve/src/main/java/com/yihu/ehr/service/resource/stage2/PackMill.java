@@ -2,11 +2,8 @@ package com.yihu.ehr.service.resource.stage2;
 
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.redis.RedisClient;
-import com.yihu.ehr.schema.ResourceAdaptionDictSchema;
-import com.yihu.ehr.schema.ResourceAdaptionKeySchema;
+import com.yihu.ehr.schema.*;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.schema.ResourceMetadataSchema;
-import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.service.resource.stage1.FilePackage;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.profile.util.MetaDataRecord;
@@ -44,6 +41,9 @@ public class PackMill {
     @Autowired
     StdDataSetKeySchema dataSetKeySchema;
 
+    @Autowired
+    OrgKeySchema orgKeySchema;
+
     /**
      * 将解析好的档案拆解成资源。
      *
@@ -53,6 +53,20 @@ public class PackMill {
     public ResourceBucket grindingPackModel(StandardPackage stdPack) throws  Exception{
         ResourceBucket resourceBucket = new ResourceBucket();
         BeanUtils.copyProperties(stdPack, resourceBucket);
+
+        if(!StringUtils.isBlank(resourceBucket.getOrgCode()))
+        {
+            String orgName = redisClient.get(orgKeySchema.name(resourceBucket.getOrgCode()));
+
+            if(!StringUtils.isBlank(orgName))
+            {
+                resourceBucket.setOrgName(orgName);
+            }
+            else
+            {
+                resourceBucket.setOrgName("");
+            }
+        }
 
         Collection<PackageDataSet> packageDataSets = stdPack.getDataSets();
         for (PackageDataSet dataSet : packageDataSets){
@@ -148,17 +162,22 @@ public class PackMill {
         //查询对应内部EHR字段是否有对应字典
         String dictCode = getMetadataDict(metadataId);
 
+        //内部EHR数据元字典不为空情况
         if(!org.apache.commons.lang.StringUtils.isBlank(dictCode) && !org.apache.commons.lang.StringUtils.isBlank(value))
-        {   //内部EHR数据元字典不为空情况，查找对应的字典数据
+        {
+            //查找对应的字典数据
             String[] dict = getDict(cdaVersion,dictCode,value);
+
+            //对应字典不为空情况下，转换EHR内部字典，并保存字典对应值，为空则不处理
             if(dict != null && dict.length > 1)
-            {   //对应字典不为空情况下，STD字典代码转换为内部EHR字典代码保存
+            {
+                //STD字典代码转换为内部EHR字典代码保存
                 dataRecord.addResource(metadataId, dict[0]);
                 //添加内部EHR字典代码对应中文作为单独字段保存
                 dataRecord.addResource(metadataId + "_VALUE", dict[1]);
             }
             else
-            {   //字典不存在不处理
+            {
                 dataRecord.addResource(metadataId, value);
             }
         }

@@ -28,8 +28,8 @@ import java.util.*;
  */
 @Table(ResourceStorageUtil.MasterTable)
 public class StandardPackage {
-    @Autowired
-    protected ObjectMapper objectMapper;
+
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
     private ProfileId profileId;                        // 档案ID
     private String cardId;                              // 就诊时用的就诊卡ID

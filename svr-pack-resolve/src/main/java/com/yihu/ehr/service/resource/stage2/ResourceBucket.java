@@ -18,6 +18,7 @@ public class ResourceBucket {
     private String id;                                  // 档案ID
     private String cardId;                              // 就诊时用的就诊卡ID
     private String orgCode;                             // 机构代码
+    private String orgName;                             // 机构名称
     private String clientId;                            // 应用来源
     private String patientId;                           // 身份证号
     private String eventNo;                             // 事件号
@@ -68,6 +69,14 @@ public class ResourceBucket {
 
     public void setOrgCode(String orgCode) {
         this.orgCode = orgCode;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     public String getClientId() {

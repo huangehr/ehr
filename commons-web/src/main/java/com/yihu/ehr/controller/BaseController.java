@@ -239,6 +239,21 @@ public class BaseController extends AbstractController {
     }
 
     /**
+     * 将日期转为字符串
+     *
+     * @param dateTime   日期
+     * @return 日期字符串
+     */
+    public String dt2Str(Date dateTime) {
+        try {
+            return dateTime == null ? null : DateTimeUtil.simpleDateTimeFormat(dateTime);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * 计算出生日期
      *
      * @param birthday
@@ -305,7 +320,7 @@ public class BaseController extends AbstractController {
             if (type == java.util.Date.class) {
                 Field sourceField = source.getClass().getDeclaredField(name);
                 sourceField.setAccessible(true);
-                targetField.set(target, StringToDate(sourceField.get(source).toString(), AgAdminConstants.DateTimeFormat));
+                targetField.set(target, StringToDate(sourceField.get(source)==null?null:sourceField.get(source).toString(), AgAdminConstants.DateTimeFormat));
             }
         }
         return target;

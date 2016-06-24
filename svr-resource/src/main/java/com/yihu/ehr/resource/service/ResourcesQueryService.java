@@ -53,7 +53,7 @@ public class ResourcesQueryService  {
     ObjectMapper objectMapper;
 
     //忽略字段
-    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","demographic_id", "patient_id","org_code","profile_id", "cda_version", "client_id"));//"profile_type",
+    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","demographic_id", "patient_id","org_code","org_name","profile_id", "cda_version", "client_id"));//"profile_type",
 
     /**
      * 新增参数
@@ -138,7 +138,7 @@ public class ResourcesQueryService  {
                     String groupType = metadada.getGroupType();
                     String groupData =  metadada.getGroupData();
 
-                    if(groupType!=null)
+                    if(groupType!=null&&groupType.length()>0)
                     {
                         if(grantType.equals("0")) //分组字段
                         {

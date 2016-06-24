@@ -35,7 +35,14 @@ public class EventExtractor extends KeyDataExtractor {
                     for (String metaDataCode : metaData) {
                         if (StringUtils.isNotEmpty(record.getMetaData(metaDataCode))) {
                             String value = record.getMetaData(metaDataCode);
-                            return DateTimeUtil.simpleDateTimeParse(value);
+                            if(value.contains("T") && value.contains("Z"))
+                            {
+                                return DateTimeUtil.utcDateTimeParse(value);
+                            }
+                            else
+                            {
+                                return DateTimeUtil.simpleDateTimeParse(value);
+                            }
                         }
                     }
                 }

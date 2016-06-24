@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Date;
 
 /**
@@ -41,5 +42,23 @@ public class ThridPrescriptionEndPoint extends BaseRestEndPoint {
             e.printStackTrace();
         }
         return filePath;
+    }
+
+    @ApiOperation(value = "imagetest")
+    @RequestMapping(value = "/imagetest", method = RequestMethod.GET)
+    public boolean test() throws Exception
+    {
+        File file=new File("E:/1.html");
+        FileInputStream fis=new FileInputStream(file);
+        byte[] buf = new byte[1024];
+        StringBuffer sb=new StringBuffer();
+
+        while((fis.read(buf))!=-1) {
+            sb.append(new String(buf));
+            buf = new byte[1024];//重新生成，避免和上次读取的数据重复
+        }
+
+        thridPrescriptionService.htmlToImage(sb.toString(),800,600);
+        return true;
     }
 }

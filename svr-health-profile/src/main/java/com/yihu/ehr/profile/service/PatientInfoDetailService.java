@@ -15,7 +15,10 @@ import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.util.rest.Envelop;
+import org.apache.avro.generic.GenericData;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -51,6 +54,12 @@ public class PatientInfoDetailService {
 
     @Autowired
     HBaseDao hBaseDao;
+
+    @Autowired
+    ThridPrescriptionService thridPrescriptionService;
+
+    @Autowired
+    PrescriptionPersistService presPersistService;
 
 
     String appId = "svr-health-profile";
@@ -88,7 +97,7 @@ public class PatientInfoDetailService {
 
     /******************************* 用药信息 ***********************************************************/
     /*
-     * 患者历史用药统计
+     * 常用药物
      */
     public List<Map<String, Object>> getMedicationStat(String demographicId, String hpId) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
@@ -114,7 +123,8 @@ public class PatientInfoDetailService {
         {
             resourceCode = BasisConstant.medicationChinese;
         }
-
+        Envelop result = resource.getResources(resourceCode, appId, "{\"q\":\"" + queryParams + "\"}", null, null);
+        re=result.getDetailModelList();
         return re;
     }
 
@@ -134,6 +144,13 @@ public class PatientInfoDetailService {
             }
             else{
                 queryParams = getProfileIds(demographicId);
+                if(("profile_id:(NOT *)").equals(demographicId) && demographicId!=null){
+                    Envelop envelop = new Envelop();
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("找不到此人相关记录");
+
+                    return envelop.getDetailModelList();
+                }
             }
         }
 
@@ -145,19 +162,101 @@ public class PatientInfoDetailService {
 
 
     /**
-     * 处方笺
+     * 查询某个事件或某个处方处方笺信息
+     * @param profileId 主表rowkey
+     * @param prescriptionNo 处方编号
      * @return
+     * @throws Exception
      */
-    public String getMedicationPrescription(String profileId,String prescriptionNo) throws Exception
+    public List<Map<String,Object>> getPrescription(String profileId,String prescriptionNo) throws Exception
     {
-        //判断是否存在
+        //处方笺数据
+        List<Map<String,Object>> returnMap =  new ArrayList<Map<String,Object>>();
 
-        //不存在则新增图片
+        //profile_id为空返回null，不为空则返回处方笺信息
+        if(!StringUtils.isBlank(profileId))
+        {
+            Map<String,Object> mainEvent = new HashMap<String,Object>();
+            //根据rowkey查询门诊事件
+            Envelop envelop = resource.getResources(BasisConstant.patientEvent,appId,"{\"q\":\"rowkey:" + profileId + "\"}",null,null);
 
+            //门诊事件为空返回null，不为空获取事件信息
+            if(envelop.getDetailModelList() == null || envelop.getDetailModelList().size() < 1)
+            {
+                return returnMap;
+            }
+            else
+            {
+                mainEvent = (Map<String,Object>)envelop.getDetailModelList().get(0);
+            }
 
-        return "";
+            //查询事件对应主处方信息
+            Envelop mainPres = resource.getResources(BasisConstant.medicationMaster,appId,"{\"q\":\"profile_id:" + profileId
+                    + (!StringUtils.isBlank(prescriptionNo) ? ("+AND+EHR_000086:" + prescriptionNo) : "")+ "\"}",null,null);
+
+            //主处方存在查询对应处方笺是否存在，不存在则根据处方信息生成处方笺
+            if(mainPres.getDetailModelList() != null && mainPres.getDetailModelList().size() > 0)
+            {
+                //主处方列表
+                List<Map<String,Object>> mainList = mainPres.getDetailModelList();
+                //待入库处方笺数据列表
+                List<Map<String,String>> dataList = new ArrayList<Map<String,String>>();
+
+                for(Map<String,Object> main : mainList)
+                {
+                    //查询处方对应处方笺
+                    Envelop presription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"EHR_000086:"
+                            + main.get("EHR_000086").toString() + "\"}",null,null);
+
+                    //判断对应处方笺是否存在
+                    if(presription.getDetailModelList() == null || presription.getDetailModelList().size() < 1)
+                    {
+                        //处方笺数据
+                        Map<String,String> data = new HashMap<String,String>();
+                        //处方笺不存在则生成保存
+                        String picPath = thridPrescriptionService.CDAToImage(profileId,mainEvent.get("org_code").toString(),mainEvent.get("cda_version").toString(),
+                                main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd ,800,600);
+
+                        //处方笺文件类型
+                        data.put("EHR_001194","png");
+                        //处方编码
+                        data.put("EHR_000086",main.get("EHR_000086").toString());
+                        //处方笺图片
+                        data.put("EHR_001195",picPath);
+
+                        dataList.add(data);
+                    }
+                }
+
+                //新生成的处方笺保存到HBASE
+                if(dataList.size() > 0)
+                {
+                    //查询已存在处方笺
+                    Envelop prescription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:" + profileId + "\"}",null,null);
+                    //已存在处方笺数
+                    int existed = 0;
+
+                    if(prescription.getDetailModelList() != null && prescription.getDetailModelList().size() > 0)
+                    {
+                        existed = prescription.getDetailModelList().size();
+                    }
+                    //处方笺保存到HBASE
+                    presPersistService.savePrescription(profileId,dataList,existed);
+                }
+
+                //查询处方笺
+                Envelop prescription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:" + profileId
+                        + (!StringUtils.isBlank(prescriptionNo) ? ("+AND+EHR_000086:" + prescriptionNo) : "")+ "\"}",null,null);
+
+                if(prescription.getDetailModelList() != null && prescription.getDetailModelList().size() > 0)
+                {
+                    returnMap = prescription.getDetailModelList();
+                }
+            }
+        }
+
+        return returnMap;
     }
-
 
     /**
      * 患者中药处方（可分页）
@@ -213,8 +312,10 @@ public class PatientInfoDetailService {
         }
 
         //获取门诊住院记录
-        String rowkeys = getProfileIds(demographicId);
-        if(rowkeys.length() > 0)
+        String rowkeys="";
+        if(demographicId!=null && demographicId!="")
+             rowkeys = getProfileIds(demographicId);
+        if(!("profile_id:(NOT *)").equals(rowkeys) && rowkeys!="")
         {
             if (q.length() > 0) {
                 q += " AND (" + rowkeys.toString() + ")";
@@ -222,7 +323,7 @@ public class PatientInfoDetailService {
                 q = "(" + rowkeys.toString() + ")";
             }
         }
-        else
+        else  if(("profile_id:(NOT *)").equals(rowkeys) && demographicId!=null)
         {
             Envelop envelop = new Envelop();
             envelop.setSuccessFlg(false);
@@ -230,7 +331,8 @@ public class PatientInfoDetailService {
 
             return envelop;
         }
-
+        if(q=="")
+            q="*:*";
         String queryParams =  "{\"q\":\"" + q + "\"}";
         return resource.getResources(resourceCode, appId, queryParams, page, size);
     }
