@@ -197,13 +197,24 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return patient.getMedicalEvent(event_no);
     }
 
-    @ApiOperation("患者常用药物")
+    @ApiOperation("患者常用药物OK")
+    @RequestMapping(value = ServiceApi.Profiles.MedicationUsed, method = RequestMethod.GET)
+    public List<Map<String, Object>> MedicationUsed(
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
+            @RequestParam(value = "demographic_id", required = true) String demographic_id,
+            @ApiParam(name = "hp_id", value = "健康问题")
+            @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception {
+
+        return patientDetail.getMedicationUsed(demographic_id, hp_id);
+    }
+
+    @ApiOperation("患者用药清单")
     @RequestMapping(value = ServiceApi.Profiles.MedicationStat, method = RequestMethod.GET)
     public List<Map<String,Object>> MedicalStat(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420521195812172917")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
-            @RequestParam(value = "hp_id", required = true) String hp_id) throws Exception {
+            @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception {
 
         return patientDetail.getMedicationStat(demographic_id, hp_id);
     }

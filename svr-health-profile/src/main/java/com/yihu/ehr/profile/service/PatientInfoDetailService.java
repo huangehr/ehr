@@ -96,13 +96,69 @@ public class PatientInfoDetailService {
     }
 
     /******************************* 用药信息 ***********************************************************/
+
     /*
-     * 常用药物
+     * 患者常用药（根据次数）
+     */
+    public List<Map<String, Object>> getMedicationUsed(String demographicId, String hpId) throws Exception {
+        List<Map<String, Object>> re = new ArrayList<>();
+        String rowkeys = getProfileIds(demographicId);
+
+        if(hpId!=null && hpId.length()>0)
+        {
+
+        }
+
+        String queryParams = "{\"q\":\""+rowkeys+"\"}";
+
+        //西药统计
+        Envelop resultWestern = resource.getResources(BasisConstant.medicationWesternStat,appId,queryParams,null,null);
+        if(resultWestern.getDetailModelList()!=null && resultWestern.getDetailModelList().size()>0)
+        {
+            List<Map<String, Object>> list = resultWestern.getDetailModelList();
+            for(Map<String, Object> map:list)
+            {
+                Map<String, Object> item = new HashMap<>();
+                item.put("name",map.get(BasisConstant.xymc));
+                item.put("count",map.get("$count"));
+                re.add(item);
+            }
+        }
+        //中药统计
+        Envelop resultChinese = resource.getResources(BasisConstant.medicationChineseStat,appId,queryParams,null,null);
+        if(resultChinese.getDetailModelList()!=null && resultChinese.getDetailModelList().size()>0)
+        {
+            List<Map<String, Object>> list = resultChinese.getDetailModelList();
+            for(Map<String, Object> map:list)
+            {
+                Map<String, Object> item = new HashMap<>();
+                item.put("name",map.get(BasisConstant.zymc));
+                item.put("count",map.get("$count"));
+                re.add(item);
+            }
+        }
+
+        //自定义排序规则，进行排序
+        Collections.sort(re, new Comparator<Map<String, Object>>()
+        {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2)
+            {
+                Integer d1 = (Integer)o1.get("count");
+                Integer d2 = (Integer)o2.get("count");
+                return d1.compareTo(d2);
+            }
+        });
+        return re;
+    }
+
+    /*
+     * 患者用药清单（根据数量，近三个月/近六个月）
      */
     public List<Map<String, Object>> getMedicationStat(String demographicId, String hpId) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
         //中药统计
-        Envelop result = resource.getResources(BasisConstant.medicationStat, appId, "{\"join\":\"demographic_id:" + demographicId + "\"}", null, null);
+        Envelop result = resource.getResources(BasisConstant.medicationWesternStat, appId, "{\"join\":\"demographic_id:" + demographicId + "\"}", null, null);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
 
         }

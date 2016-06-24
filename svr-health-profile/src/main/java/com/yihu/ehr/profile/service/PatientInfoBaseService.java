@@ -324,7 +324,7 @@ public class PatientInfoBaseService {
             //0门诊 1住院 2体检
             if(eventType.equals("0") || eventType.equals("1") || eventType.equals("2"))
             {
-                query += " AND event_type:" + eventType;
+                query += " AND "+BasisConstant.eventType+":" + eventType;
             }
             else if(eventType.equals("3")){
 

@@ -15,7 +15,8 @@ public class BasisConstant {
     public static String medicationPrescription = "RS_MEDICATION_PRESCRIPTION";//处方笺
     public static String medicationChinese = "RS_MEDICATION_CHINESE";//患者用中药药历史记录资源
     public static String medicationWestern = "RS_MEDICATION_WESTERN";//患者用西药药历史记录资源
-    public static String medicationStat = "RS_MEDICATION_STAT";//患者用药统计资源
+    public static String medicationWesternStat = "RS_MEDICATION_WESTERN_STAT";//患者西药用药统计资源
+    public static String medicationChineseStat = "RS_MEDICATION_CHINESE_STAT";//患者中药用药统计资源
 
     public static String outpatientDiagnosis = "RS_OUTPATIENT_DIAGNOSIS";//门诊诊断
     public static String outpatientSymptom = "RS_OUTPATIENT_SYMPTOM";//门诊症状
