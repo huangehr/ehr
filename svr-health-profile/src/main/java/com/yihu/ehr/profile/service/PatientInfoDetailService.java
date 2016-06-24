@@ -209,7 +209,7 @@ public class PatientInfoDetailService {
                             + main.get("EHR_000086").toString() + "\"}",null,null);
 
                     //判断对应处方笺是否存在
-                    if(presription.getDetailModelList() != null && presription.getDetailModelList().size() > 0)
+                    if(presription.getDetailModelList() == null || presription.getDetailModelList().size() < 1)
                     {
                         //处方笺数据
                         Map<String,String> data = new HashMap<String,String>();
