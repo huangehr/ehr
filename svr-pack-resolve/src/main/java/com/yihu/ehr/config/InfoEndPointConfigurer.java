@@ -40,5 +40,6 @@ public class InfoEndPointConfigurer extends WebMvcConfigurerAdapter {
         //registry.addInterceptor(getYourInterceptor());
     }
 
-    public static class InfoInterceptor
+    public static class InfoInterceptor{
+    }
 }
