@@ -170,7 +170,7 @@ public class ResourcesGrantController extends BaseController {
             String existMetaApp;
             if(!StringUtils.isEmpty(deleteIds) && !StringUtils.isEmpty((existMetaApp= appMetaExistence(deleteIds)))) {
                 envelop.setSuccessFlg(false);
-                envelop.setErrorMsg(existMetaApp.substring(1) + "等应用已存在授权数据，不可取消！");
+                envelop.setErrorMsg(existMetaApp.substring(1) + "已存在授权数据，不可取消！");
                 return envelop;
             }
 
