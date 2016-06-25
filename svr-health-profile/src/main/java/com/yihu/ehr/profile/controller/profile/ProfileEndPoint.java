@@ -53,14 +53,65 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @Autowired
     XTransformClient transform;
 
-    private String file2String(String path) throws IOException {
-        String folder=System.getProperty("java.io.tmpdir");
-        String filePath = folder+path;
-        File file = new File(filePath);
-        return FileUtil.readAsString(file);
+    /**
+     * 单条记录转适配
+     * @return
+     */
+    private Map<String,Object> adapterOne(String version,Map<String,Object> obj) throws Exception
+    {
+        if(version!=null)
+        {
+            MStdTransformDto stdTransformDto = new MStdTransformDto();
+            stdTransformDto.setSource(mapper.writeValueAsString(obj));
+            stdTransformDto.setVersion(version);
+            return transform.stdTransform(mapper.writeValueAsString(stdTransformDto));
+        }
+        else{
+            return obj;
+        }
     }
 
-    @ApiOperation("用户基本信息OK")
+    /**
+     * 多条记录转适配
+     * @return
+     */
+    private List<Map<String,Object>> adapterBatch(String version,List<Map<String,Object>> list) throws Exception
+    {
+        if(version!=null)
+        {
+            MStdTransformDto stdTransformDto = new MStdTransformDto();
+            stdTransformDto.setVersion(version);
+            stdTransformDto.setSource(mapper.writeValueAsString(list));
+            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
+        }
+        else{
+            return list;
+        }
+    }
+
+
+    @ApiOperation("全文检索")
+    @RequestMapping(value = ServiceApi.Profiles.ProfileLucene, method = RequestMethod.GET)
+    public Envelop ProfileLucene(
+            @ApiParam(name = "startTime", value = "开始时间")
+            @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(name = "endTime", value = "结束时间")
+            @RequestParam(value = "endTime", required = false) String endTime,
+            @ApiParam(name = "lucene", value = "全文检索内容")
+            @RequestParam(value = "lucene", required = false) List<String> lucene,
+            @ApiParam(name = "page", value = "第几页")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "每页几行")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "version", value = "版本号",defaultValue="56395d75b854")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
+
+        Envelop re = patient.getProfileLucene(startTime,endTime,lucene,page,size);
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
+        return re;
+    }
+
+    @ApiOperation("患者基本信息OK")
     @RequestMapping(value = ServiceApi.Profiles.ProfileInfo, method = RequestMethod.GET)
     public Map<String,Object> profileInfo(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422428197704250025")
@@ -69,25 +120,19 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "version", required = false) String version) throws Exception {
 
         Map<String,Object> re = patient.getPatientInfo(demographic_id);
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            stdTransformDto.setVersion(version);
-            return transform.stdTransform(mapper.writeValueAsString(stdTransformDto));
-        }
-        else{
-            return re;
-        }
+        return adapterOne(version,re);
     }
 
-    @ApiOperation("用户患病史")
+    @ApiOperation("患者患病史JSON")
     @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
     public String ProfileHistory(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422428197704250025")
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
 
-        return file2String("/json/pastHistory.json");
+        return "[{\"pastHistoryType\":\"家族病史\",\"pastHistoryContents\":\"也就是医学中常常提到的家族史，也指某一种病的患者的家族成员（较大范围的家族成员，不仅限于祖孙等直系亲属）中发病情况。家族病史分为阴性跟阳性。 1)阴性（即没有发现同样病的患者）。临床上无家族史 2)阳性（即发现有同样病的患者）。比如：临床上讲糖尿病家族史、高血压病家族史、遗传型疾病家族史等。\"},\n" +
+                "  {\"pastHistoryType\":\"传染史\",\"pastHistoryContents\":\"传染史..\"},\n" +
+                "  {\"pastHistoryType\":\"家族史\",\"pastHistoryContents\":\"家族史..\"},\n" +
+                "  {\"pastHistoryType\":\"手术史\",\"pastHistoryContents\":\"手术史..\"}]";
     }
 
     @ApiOperation("主要健康问题OK")
@@ -140,17 +185,8 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
 
-        List<Map<String,Object>> re = patient.getPatientMzZyEvents(demographic_id, events_type, year, area, hp_id, disease_id);
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
-        }
-        else{
-            return re;
-        }
+        List<Map<String,Object>> re = patient.getPatientEvents(demographic_id, events_type, year, area, hp_id, disease_id);
+        return adapterBatch(version,re);
     }
 
     @ApiOperation("某次就诊事件OK")
@@ -161,13 +197,25 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return patient.getMedicalEvent(event_no);
     }
 
-    @ApiOperation("个人用药统计")
+    @ApiOperation("患者常用药物OK")
+    @RequestMapping(value = ServiceApi.Profiles.MedicationUsed, method = RequestMethod.GET)
+    public List<Map<String, Object>> MedicationUsed(
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
+            @RequestParam(value = "demographic_id", required = true) String demographic_id,
+            @ApiParam(name = "hp_id", value = "健康问题")
+            @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception {
+
+        return patientDetail.getMedicationUsed(demographic_id, hp_id);
+    }
+
+    @ApiOperation("患者用药清单")
     @RequestMapping(value = ServiceApi.Profiles.MedicationStat, method = RequestMethod.GET)
     public List<Map<String,Object>> MedicalStat(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420521195812172917")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
-            @RequestParam(value = "hp_id", required = true) String hp_id) throws Exception {
+            @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception {
+
         return patientDetail.getMedicationStat(demographic_id, hp_id);
     }
 
@@ -211,11 +259,11 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     /******************************** 处方 ***********************************************************/
-    @ApiOperation("处方主表")
+    @ApiOperation("处方主表OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationMaster, method = RequestMethod.GET)
     public List<Map<String,Object>> DrugMaster(
             @ApiParam(name = "demographic_id", value = "身份证号")
-            @RequestParam(value = "demographic_id", required = false,defaultValue = "422428197704250025") String demographic_id,
+            @RequestParam(value = "demographic_id", required = false,defaultValue = "422724197105101686") String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "prescription_no", value = "处方编号")
@@ -230,42 +278,22 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
         List<Map<String,Object>> re = patientDetail.getMedicationMaster(demographic_id, profile_id, prescription_no);
 
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
-        }
-        else{
-            return re;
-        }
+        return adapterBatch(version,re);
     }
 
     //1.西药处方；2.中药处方
-    @ApiOperation("根据处方编号获取处方细表数据")
+    @ApiOperation("根据处方编号获取处方细表数据OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationDetail, method = RequestMethod.GET)
     public List<Map<String,Object>> DrugDetail(
-            @ApiParam(name = "prescription_no", value = "处方编号")
+            @ApiParam(name = "prescription_no", value = "处方编号",defaultValue = "00000002")
             @RequestParam(value = "prescription_no", required = true) String prescription_no,
-            @ApiParam(name = "type", value = "类型")
+            @ApiParam(name = "type", value = "类型",defaultValue = "2")
             @RequestParam(value = "type", required = true) String type,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         List<Map<String,Object>> re = patientDetail.getMedicationDetail(prescription_no, type);
 
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
-        }
-        else{
-            return re;
-        }
+        return adapterBatch(version,re);
     }
 
     @ApiOperation("处方笺")
@@ -279,10 +307,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return patientDetail.getPrescription(profile_id,prescription_no);
     }
 
-    @ApiOperation("中药处方")
+    @ApiOperation("中药处方OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationDetailChinese, method = RequestMethod.GET)
     public Envelop DrugDetailChinese(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
             @RequestParam(value = "hp_id", required = false) String hp_id,
@@ -297,22 +325,14 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getMedicationList("2", demographic_id, hp_id, start_time, end_time, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
-    @ApiOperation("西药处方")
+    @ApiOperation("西药处方OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationDetailWestern, method = RequestMethod.GET)
     public Envelop DrugDetailWestern(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
             @RequestParam(value = "hp_id", required = false) String hp_id,
@@ -327,15 +347,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getMedicationList("1", demographic_id, hp_id, start_time, end_time, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -356,15 +368,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.outpatientDiagnosis, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -384,15 +388,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.outpatientSymptom, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -412,15 +408,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.outpatientCost, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -440,15 +428,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.outpatientCostDetail, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -469,15 +449,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedDiagnosis, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -497,15 +469,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedSymptom, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -525,15 +489,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedCost, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -553,15 +509,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedCostDetail, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -581,15 +529,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedOrdersTemporary, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -609,15 +549,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedOrdersLongtime, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -637,15 +569,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedDeath, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -666,15 +590,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.examinationReport, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -694,15 +610,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.examinationImg, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -722,15 +630,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.laboratoryReport, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -750,15 +650,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.laboratoryImg, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -778,15 +670,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.laboratoryProject, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -806,15 +690,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.laboratoryAllergy, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 
@@ -834,15 +710,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.surgery, demographic_id, profile_id,event_no, page,size);
-        /************** 适配转换 *************************/
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(re));
-            re.setDetailModelList(transform.stdTransformList(mapper.writeValueAsString(stdTransformDto)));
-        }
-
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
 }

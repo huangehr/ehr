@@ -120,7 +120,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
             @RequestBody String orgJsonData) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        Organization org = objectMapper.readValue(orgJsonData, Organization.class);
+        Organization org = toEntity(orgJsonData, Organization.class);
         org.setPyCode(PinyinUtil.getPinYinHeadChar(org.getFullName(), false));
         orgService.save(org);
         return convertToModel(org, MOrganization.class);

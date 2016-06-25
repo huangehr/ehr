@@ -33,7 +33,7 @@ public interface ResourcesCategoryClient {
     @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("资源类别更新")
     MRsCategory updateRsCategory(
-            @RequestBody String resourceCategory);
+                @RequestBody String resourceCategory);
 
     @RequestMapping(value = ServiceApi.Resources.Category, method = RequestMethod.DELETE)
     @ApiOperation("删除资源类别")

@@ -8,13 +8,17 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -114,4 +118,22 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
         return sqlQuery.list();
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public RsDictionary insert(RsDictionary model) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement pst = connection.prepareStatement(
+                        "INSERT INTO rs_dictionary(code, name, description) VALUES(?,?,?)",
+                        Statement.RETURN_GENERATED_KEYS);
+                pst.setString(1, model.getCode());
+                pst.setString(2, model.getName());
+                pst.setString(3, model.getDescription());
+                return pst;
+            }
+        }, keyHolder);
+        model.setId(keyHolder.getKey().intValue());
+        return model;
+    }
 }

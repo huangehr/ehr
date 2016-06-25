@@ -1,10 +1,12 @@
 package com.yihu.ehr.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.PageArg;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -57,6 +60,7 @@ public class BaseRestEndPoint extends AbstractController {
 
     public <T> T toEntity(String json, Class<T> entityCls) {
         try {
+            objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
             T entity = objectMapper.readValue(json, entityCls);
             return entity;
         } catch (IOException ex) {
