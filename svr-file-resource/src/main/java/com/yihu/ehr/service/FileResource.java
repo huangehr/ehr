@@ -22,7 +22,9 @@ public class FileResource {
     private Date updateDate;
     private String updateUser;
 
-
+    public static  final String MINE_ORG ="org";
+    public static  final String MINE_USER ="user";
+    public static  final String MINE_PATIENT ="patient";
 
     @Id
     @Column(name = "id", unique = true, nullable = false)
