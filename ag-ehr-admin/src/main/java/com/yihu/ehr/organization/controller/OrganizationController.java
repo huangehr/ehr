@@ -88,8 +88,23 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) {
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "province", value = "省", defaultValue = "")
+            @RequestParam(value = "province",required=false) String province,
+            @ApiParam(name = "city", value = "市", defaultValue = "")
+            @RequestParam(value = "city",required=false) String city,
+            @ApiParam(name = "district", value = "县", defaultValue = "")
+            @RequestParam(value = "district",required=false) String district) {
         try {
+            String address = "";
+            if(StringUtils.isNotBlank(province)){
+              List<String> addressList = addressClient.search(province, city, district);
+                String[] addrIdsArrays = addressList.toArray(new String[addressList.size()]);
+                address = String.join(",", addrIdsArrays);
+            }
+            if(StringUtils.isNotBlank(address)){
+                filters = StringUtils.isNotBlank(filters)?(filters+";location="+address):"location="+address;
+            }
             List<OrgModel> orgModelList = new ArrayList<>();
             ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);
             List<MOrganization> organizations = responseEntity.getBody();
