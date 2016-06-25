@@ -1,5 +1,6 @@
 package com.yihu.ehr.organization.controller;
 
+import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.adapter.service.PlanClient;
@@ -71,6 +72,9 @@ public class OrganizationController extends BaseController {
 
     @Autowired
     private TemplateClient templateClient;
+
+    @Autowired
+    private FileResourceClient fileResourceClient;
 
     @RequestMapping(value = "/organizations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询机构列表")
@@ -218,6 +222,11 @@ public class OrganizationController extends BaseController {
 
             if (!orgClient.deleteOrg(orgCode)) {
                 return failed("删除失败!");
+            }
+            try {
+               fileResourceClient.filesDelete(orgCode);
+            }catch (Exception e){
+                return success("数据删除成功！图片删除失败！");
             }
             return success(null);
         }
