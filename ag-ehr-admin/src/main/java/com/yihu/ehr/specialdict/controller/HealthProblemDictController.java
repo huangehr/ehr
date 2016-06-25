@@ -38,7 +38,7 @@ public class HealthProblemDictController extends BaseController {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestParam(value = "dictionary") String dictJson) throws Exception{
 
-        HealthProblemDictModel healthProblemDictModel = objectMapper.readValue(dictJson,HealthProblemDictModel.class);
+        HealthProblemDictModel healthProblemDictModel = toEntity(dictJson,HealthProblemDictModel.class);
         MHealthProblemDict hpDict = convertToModel(healthProblemDictModel, MHealthProblemDict.class);
         hpDict = hpDictClient.createHpDict(objectMapper.writeValueAsString(hpDict));
         HealthProblemDictModel hpDictModel = convertToModel(hpDict,HealthProblemDictModel.class);

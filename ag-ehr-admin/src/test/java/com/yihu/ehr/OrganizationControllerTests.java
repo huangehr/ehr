@@ -97,7 +97,7 @@ public class OrganizationControllerTests {
         String sorts = "";
         int size = 2;
         int page = 1;
-        envelop = orgController.searchOrgs(fields,filters,sorts,size,page);
+        envelop = orgController.searchOrgs(fields,filters,sorts,size,page,"","","");
         assertNotEquals("机构列表数据获取失败！", envelop.isSuccessFlg(), false);
 
         //根据机构的code查询机构------------------------4ok
