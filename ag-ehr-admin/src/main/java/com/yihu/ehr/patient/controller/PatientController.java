@@ -243,7 +243,7 @@ public class PatientController extends BaseController {
 
         //新增人口信息
         MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
-        info.setBirthday(StringToDate(detailModel.getBirthday(), AgAdminConstants.DateFormat));
+        info.setBirthday(DateTimeUtil.simpleDateTimeParse(detailModel.getBirthday()));
         info = patientClient.createPatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");

@@ -390,6 +390,25 @@ public class ConventionalDictEntryController extends BaseController{
         return envelop;
     }
 
+    @RequestMapping(value = "/dictionaries/record_data_sources", method = RequestMethod.GET)
+    @ApiOperation(value = "获取档案数据来源", response = MConventionalDict.class, produces = "application/json")
+    public Envelop getRecordDataSourceList() {
+
+        Envelop envelop = new Envelop();
+        List<SystemDictEntryModel> systemDictEntryModelList = new ArrayList<>();
+
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getRecordDataSourceList();
+
+        for (MConventionalDict mConventionalDict: mConventionalDicts){
+            SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
+            systemDictEntryModelList.add(systemDictEntryModel);
+        }
+
+        envelop.setDetailModelList(systemDictEntryModelList);
+
+        return envelop;
+    }
+
     @RequestMapping(value = "/dictionaries/drug_flag", method = RequestMethod.GET)
     @ApiOperation(value = "获取字典处方标识", response = MConventionalDict.class, produces = "application/json")
     public Envelop getDrugFlag(
