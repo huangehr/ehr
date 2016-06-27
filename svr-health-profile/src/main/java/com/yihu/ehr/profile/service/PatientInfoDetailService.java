@@ -652,10 +652,11 @@ public class PatientInfoDetailService {
         //rowkey集合
         List<String> rowkeys = new ArrayList<String>();
 
-        for(Map<String,String> data : dataList)
+        for(int i = 0; i < dataList.size(); i++)
         {
+            int dataCount = existed + i;
             //行主健
-            String rowkey = profileId + "$HDSC01_16$" + existed;
+            String rowkey = profileId + "$HDSC01_16$" + dataCount;
             rowkeys.add(rowkey);
         }
 
@@ -666,7 +667,8 @@ public class PatientInfoDetailService {
             hBaseDao.delete("HealthProfileSub", bundle);
         }
 
-        for (Map<String,String> data : dataList){
+        for (Map<String,String> data : dataList)
+        {
             //返回保存数据
             Map<String,Object> returnMap = new HashMap<String,Object>();
             //行主健
