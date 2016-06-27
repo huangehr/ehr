@@ -20,8 +20,8 @@ public class ResourceDefaultParam {
     private String paramValue;
 
     @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    //@GenericGenerator(name = "Generator",strategy = "assigned")
     @Column(name = "id",nullable = false)
     public String getId() {
         return id;

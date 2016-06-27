@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author linaz
  * @created 2016.05.17 16:33
@@ -20,6 +22,12 @@ public class ResourceDefaultParamService extends BaseJpaService<ResourceDefaultP
 
     public ResourceDefaultParam findById(String id) {
         return resourceDefaultParamDao.findOne(id);
+    }
+    public List<ResourceDefaultParam> findByResourcesIdOrResourcesCodeWithParamKey(String resourcesId,String resourcesCode,String paramKey){
+        return resourceDefaultParamDao.findByResourcesIdOrResourcesCodeWithParamKey(resourcesId, resourcesCode, paramKey);
+    }
+    public List<ResourceDefaultParam> findByResourcesIdOrResourcesCode(String resourcesId,String resourcesCode){
+        return resourceDefaultParamDao.findByResourcesIdOrResourcesCode(resourcesId, resourcesCode);
     }
 
 }
