@@ -153,7 +153,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
             FileUtils.writeStringToFile(file,html);
             ImageRenderer render = new ImageRenderer();
             FileOutputStream out = new FileOutputStream(file);
-            if(width == 0 || height == 0)
+            if(width != 0 || height != 0)
             {
                 Dimension d = new Dimension();
                 d.setSize(width, height);//设置图片大小
