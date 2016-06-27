@@ -6,10 +6,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.XTransformClient;
-import com.yihu.ehr.profile.service.BasisConstant;
-import com.yihu.ehr.profile.service.PatientInfoBaseService;
-import com.yihu.ehr.profile.service.PatientInfoDetailService;
-import com.yihu.ehr.profile.service.ProfileCDAService;
+import com.yihu.ehr.profile.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,6 +49,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
 
     @Autowired
     XTransformClient transform;
+
+    @Autowired
+    IndicatorsService indicatorsService;
 
     /**
      * 单条记录转适配
@@ -193,8 +193,11 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvent, method = RequestMethod.GET)
     public Map<String,Object> MedicalEvent(
             @ApiParam(name = "event_no", value = "档案ID",defaultValue="ZY010000806438")
-            @RequestParam(value = "event_no", required = true) String event_no) throws Exception {
-        return patient.getMedicalEvent(event_no);
+            @RequestParam(value = "event_no", required = true) String event_no,
+            @ApiParam(name = "version", value = "版本号",defaultValue="57623f01b2d9")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
+        Map<String,Object> re = patient.getMedicalEvent(event_no);
+        return adapterOne(version,re);
     }
 
     @ApiOperation("患者常用药物OK")
@@ -262,13 +265,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("处方主表OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationMaster, method = RequestMethod.GET)
     public List<Map<String,Object>> DrugMaster(
-            @ApiParam(name = "demographic_id", value = "身份证号")
-            @RequestParam(value = "demographic_id", required = false,defaultValue = "422724197105101686") String demographic_id,
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
+            @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "prescription_no", value = "处方编号")
             @RequestParam(value = "prescription_no", required = false) String prescription_no,
-            @ApiParam(name = "version", value = "版本号")
+            @ApiParam(name = "version", value = "版本号",defaultValue = "57623f01b2d9")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         if(demographic_id==null&&profile_id==null&&prescription_no==null)
         {
@@ -710,6 +713,43 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.surgery, demographic_id, profile_id,event_no, page,size);
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
+        return re;
+    }
+
+    /***************************** 指标 ***************************************************/
+    @ApiOperation("获取某个健康问题指标，可根据指标类别过滤")
+    @RequestMapping(value = ServiceApi.Profiles.IndicatorsClass, method = RequestMethod.GET)
+    public List<Map<String,Object>> IndicatorsClass(
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "420521195812172917")
+            @RequestParam(value = "demographic_id", required = true) String demographic_id,
+            @ApiParam(name = "hp_id", value = "健康问题")
+            @RequestParam(value = "hp_id", required = true) String hp_id,
+            @ApiParam(name = "indicator_type", value = "指标类别")
+            @RequestParam(value = "indicator_type", required = false) String indicator_type) throws Exception{
+
+        return indicatorsService.getIndicatorsClass(demographic_id,hp_id,indicator_type);
+    }
+
+    @ApiOperation("获取指标数据")
+    @RequestMapping(value = ServiceApi.Profiles.IndicatorsData, method = RequestMethod.GET)
+    public Envelop IndicatorsData(
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "420521195812172917")
+            @RequestParam(value = "demographic_id", required = true) String demographic_id,
+            @ApiParam(name = "indicator_code", value = "指标代码")
+            @RequestParam(value = "indicator_code", required = false) String indicator_code,
+            @ApiParam(name = "date_from", value = "指标开始时间")
+            @RequestParam(value = "date_from", required = false) String date_from,
+            @ApiParam(name = "date_end", value = "指标结束时间")
+            @RequestParam(value = "date_end", required = false) String date_end,
+            @ApiParam(name = "page", value = "第几页")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "每页几行")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version", required = false) String version) throws Exception{
+
+        Envelop re = indicatorsService.getIndicatorsData(demographic_id,indicator_code,date_from,date_end,page,size);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
