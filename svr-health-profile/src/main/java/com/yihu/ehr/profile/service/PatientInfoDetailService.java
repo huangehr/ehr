@@ -59,6 +59,7 @@ public class PatientInfoDetailService {
     @Autowired
     ThridPrescriptionService thridPrescriptionService;
 
+    @Autowired
     TemplateService tempService;
 
 
