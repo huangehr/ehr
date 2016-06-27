@@ -19,6 +19,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +62,12 @@ public class PatientInfoDetailService {
 
     @Autowired
     TemplateService tempService;
+
+    /**
+     * fastDfs服务器地址
+     */
+    @Value("${fast-dfs.public-server}")
+    private String fastDfsUrl;
 
 
     String appId = "svr-health-profile";
@@ -292,7 +299,7 @@ public class PatientInfoDetailService {
                                 ,main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd);
                         Map<String,Object> model = getCDAData(profileId,temp.getCdaDocumentId());
                         //处方笺不存在则生成保存
-                        String picPath = thridPrescriptionService.CDAToImage(temp,model,800,600);
+                        String picPath = thridPrescriptionService.CDAToImage(temp,model,0,0);
 
                         //处方笺文件类型
                         data.put("EHR_001194","png");
@@ -316,6 +323,16 @@ public class PatientInfoDetailService {
                     List<Map<String,Object>> savedDataList = savePrescription(profileId,dataList,returnMap.size());
                     returnMap.addAll(savedDataList);
                 }
+            }
+        }
+
+        //返回处方笺的图片完整地址
+        if(returnMap.size() > 0)
+        {
+            for(Map<String,Object> map : returnMap)
+            {
+                String fileUrl = fastDfsUrl+ "/" + map.get("EHR_001195").toString();
+                map.put("EHR_001195",fileUrl);
             }
         }
 
