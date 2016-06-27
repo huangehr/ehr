@@ -11,7 +11,6 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Configuration;
-import gui.ava.html.image.generator.HtmlImageGenerator;
 import org.apache.commons.io.FileUtils;
 import org.fit.cssbox.demo.ImageRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
