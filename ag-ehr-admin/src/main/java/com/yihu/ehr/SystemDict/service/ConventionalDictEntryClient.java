@@ -157,6 +157,10 @@ public interface ConventionalDictEntryClient {
     @ApiOperation(value = "获取标签字典项", response = MConventionalDict.class, produces = "application/json")
     Collection<MConventionalDict> getTagsList();
 
+    @RequestMapping(value = "/dictionaries/record_data_sources", method = RequestMethod.GET)
+    @ApiOperation(value = "获取档案数据来源", response = MConventionalDict.class, produces = "application/json")
+    Collection<MConventionalDict> getRecordDataSourceList();
+
     @RequestMapping(value = "/dictionaries/drug_flag", method = RequestMethod.GET)
     @ApiOperation(value = "获取字典处方标识", response = MConventionalDict.class, produces = "application/json")
     MConventionalDict getDrugFlag(

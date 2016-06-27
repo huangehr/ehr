@@ -16,7 +16,8 @@ import org.fit.cssbox.demo.ImageRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ExceptionDepthComparator;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.*;
@@ -28,10 +29,10 @@ import java.util.List;
  * Created by Administrator on 2016/6/14.
  */
 @Service
-@Transactional
 public class ThridPrescriptionService extends BaseJpaService<Template, XTemplateRepository> {
     @Autowired
     private FastDFSConfig FastDFSConfig;
+
     //返回图片的ip地址
     @Value("${returnurl}")
     private String returnUrl;
@@ -90,13 +91,11 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
      * @return
      * @throws Exception
      */
-    public String CDAToImage(String profileId,String orgCode, String cdaVersion,String cdaCode,int width,int height) throws Exception {
+    public String CDAToImage(Template temp,Map<String,Object> model,int width,int height) throws Exception {
         try
         {
             //返回文件路径
             String filePath="";
-            //获取CDA模板信息
-            Template temp = tempService.getPresriptionTemplate(orgCode,cdaVersion,cdaCode);
             //模板路径
             String fileString = "";
 
@@ -113,11 +112,9 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
                 //下载模板文件
                 String localFileName = fdfs.download(pathInfo[0],pathInfo[1],ThridPrescriptionService.class.getResource("/").getPath());
                 //模板路径
-                fileString = ThridPrescriptionService.class.getResource("/").getPath() + localFileName;
+                fileString = localFileName;
             }
 
-            //根据事件rowkey和cda文档ID得到cda数据
-            Object model = cdaService.getCDAData(profileId,temp.getCdaDocumentId());
             //把数据和模板结合生成html
             String html = fillTemplate(fileString,model);
             //转换处理完成模板文件删除
@@ -141,6 +138,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
     public String htmlToImage(String html,Integer width,Integer height) throws Exception {
         try{
             String rootPath = ThridPrescriptionService.class.getResource("/").getPath();
+            rootPath = rootPath.substring(0,rootPath.indexOf("classes"));
             //把模板保存成文件
             String fileTempName= UUID.randomUUID().toString();
             String url = rootPath + fileTempName+".html";
@@ -150,7 +148,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
 
             //随机生成图片名字ID
             String fileName= UUID.randomUUID().toString();
-            File file=new File(rootPath + fileName+".png");//临时文件保存图片
+            File file=new File(rootPath + fileName + ".png");//临时文件保存图片
             file.createNewFile();
             FileUtils.writeStringToFile(file,html);
             ImageRenderer render = new ImageRenderer();
@@ -158,7 +156,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
             Dimension d = new Dimension();
             d.setSize(width,height);//设置图片大小
             render.setWindowSize(d,false);//false 超出图片设置的大小是自适应
-            render.renderURL("file://"+url, out, ImageRenderer.Type.PNG);
+            render.renderURL("file:///" + url, out, ImageRenderer.Type.PNG);
             //保存到fastdfs
             InputStream in = new FileInputStream(file);
             FastDFSUtil fdfs= FastDFSConfig.fastDFSUtil();
@@ -172,7 +170,10 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
             //删除临时html文件
             fileTmep.delete();
             return filePath;
-        }catch (Exception e){
+        }
+        catch (Exception e)
+        {
+
             throw new Exception("html转图片失败");
         }
     }
@@ -185,20 +186,23 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
      * @throws Exception
      */
     public String fillTemplate(String fileString,Object model) throws Exception{
-        try{
+        try
+        {
+            //模板加载配置
             Configuration cfg = new Configuration();
-            // 在哪个文件夹下找ftl模板文件 // 在哪个文件夹下找ftl模板文件
-            StringTemplateLoader t=new StringTemplateLoader();
-            t.putTemplate("test",fileString);
-            cfg.setTemplateLoader(t);
-            // 加载ftl文件
-            freemarker.template.Template temp = cfg.getTemplate("test");
-            cfg.setTemplateLoader(t);
-            // 加载ftl文件
-            Writer out = new StringWriter(2048);
+            //模板路径配置
+            cfg.setDirectoryForTemplateLoading(new File(ThridPrescriptionService.class.getResource("/").getPath()));
+            //加载ftl文件
+            freemarker.template.Template temp = cfg.getTemplate(new File(fileString).getName());
+            //模板解析输出流
+            Writer out = new StringWriter();
+            //模板解析
             temp.process(model, out);
+            //返回解析后HTML
             return out.toString();
-        }catch (Exception e){
+        }
+        catch (Exception e)
+        {
             throw new Exception("填充模板失败");
         }
     }

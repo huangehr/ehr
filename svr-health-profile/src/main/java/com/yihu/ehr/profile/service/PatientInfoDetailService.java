@@ -10,6 +10,7 @@ import com.yihu.ehr.data.hbase.TableBundle;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
+import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
@@ -59,7 +60,7 @@ public class PatientInfoDetailService {
     ThridPrescriptionService thridPrescriptionService;
 
     @Autowired
-    PrescriptionPersistService presPersistService;
+    TemplateService tempService;
 
 
     String appId = "svr-health-profile";
@@ -269,9 +270,12 @@ public class PatientInfoDetailService {
                     {
                         //处方笺数据
                         Map<String,String> data = new HashMap<String,String>();
+                        //获取CDA模板信息
+                        Template temp = tempService.getPresriptionTemplate(mainEvent.get("org_code").toString(),mainEvent.get("cda_version").toString()
+                                ,main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd);
+                        Map<String,Object> model = getCDAData(profileId,temp.getCdaDocumentId());
                         //处方笺不存在则生成保存
-                        String picPath = thridPrescriptionService.CDAToImage(profileId,mainEvent.get("org_code").toString(),mainEvent.get("cda_version").toString(),
-                                main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd ,800,600);
+                        String picPath = thridPrescriptionService.CDAToImage(temp,model,800,600);
 
                         //处方笺文件类型
                         data.put("EHR_001194","png");
@@ -297,7 +301,7 @@ public class PatientInfoDetailService {
                         existed = prescription.getDetailModelList().size();
                     }
                     //处方笺保存到HBASE
-                    presPersistService.savePrescription(profileId,dataList,existed);
+                    savePrescription(profileId,dataList,existed);
                 }
 
                 //查询处方笺
@@ -528,5 +532,125 @@ public class PatientInfoDetailService {
             }
         }
         return resource.getResources(resourceCode, appId, "{\"q\":\""+queryParams+"\"}", page, size);
+    }
+
+    /**
+     * 获取某个CDA文档数据
+     * @return
+     */
+    public Map<String, Object> getCDAData(String profileId, String cdaDocumentId) throws Exception
+    {
+        Map<String, Object> re = new HashMap<>();
+        //主表记录
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}", null, null);
+        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+            Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(0);
+            String cdaVersion = obj.get("cda_version").toString();
+            String orgCode = obj.get("org_code").toString();
+
+            //获取CDA关联数据集
+            Map<String,List<Map<String, Object>>> datasetList = new HashMap<>();
+            List<MCdaDataSet> CDADataset = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
+            if (CDADataset != null && CDADataset.size() > 0) {
+                for (MCdaDataSet dataset : CDADataset) {
+                    String datasetCode = dataset.getDataSetCode();
+                    String multiRecord = dataset.getMultiRecord();
+
+                    //单条数据
+                    if(multiRecord.equals("0")){
+                        List<Map<String, Object>> dataList = new ArrayList<>();
+                        MStdTransformDto stdTransformDto = new MStdTransformDto();
+                        stdTransformDto.setSource(objectMapper.writeValueAsString(obj));
+                        stdTransformDto.setVersion(cdaVersion);
+                        stdTransformDto.setDataset(datasetCode);
+                        Map<String, Object> map = transform.stdMasterTransform(objectMapper.writeValueAsString(stdTransformDto));
+                        dataList.add(map);
+                        datasetList.put(datasetCode, dataList);
+                    }
+                    else{
+                        //获取Hbase细表数据
+                        String q = "{\"table\":\""+datasetCode+"\",\"q\":\"profile_id:" + profileId + "\"}";
+                        Envelop data = resource.getEhrCenterSub(q, null, null);
+
+                        if (data.getDetailModelList() != null && data.getDetailModelList().size() > 0) {
+                            List<Map<String, Object>> table = data.getDetailModelList();
+
+                            //根据cdaVersion转译
+                            MStdTransformDto stdTransformDto = new MStdTransformDto();
+                            stdTransformDto.setSource(objectMapper.writeValueAsString(table));
+                            stdTransformDto.setVersion(cdaVersion);
+                            List<Map<String, Object>> dataList = transform.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
+                            datasetList.put(datasetCode, dataList);
+                        }
+                    }
+                }
+            }
+
+            //获取cda document数据
+            MCDADocument cda = cdaService.getCDADocuments(cdaVersion,cdaDocumentId);
+            re.put("cda_version",cdaVersion);
+            re.put("cda_document_id",cdaDocumentId);
+            re.put("cda_document_name",cda.getName());
+            re.put("data_sets",datasetList);
+
+
+            //是否非结构化档案
+            if(obj.containsKey("profile_type") && obj.get("profile_type").toString().equals("2"))
+            {
+                Envelop rawFiles = resource.getRawFiles(profileId,null,null);
+                if(rawFiles.getDetailModelList()!=null && rawFiles.getDetailModelList().size()>0)
+                {
+                    re.put("files",rawFiles.getDetailModelList());
+                }
+            }
+        } else {
+            throw new Exception("未查到相关记录！");
+        }
+
+        return re;
+    }
+
+    /**
+     * 保存处方笺到HABSE
+     * @param profileId 主表rowkey
+     * @param data 处方笺数据
+     * @return
+     * @throws Exception
+     */
+    public boolean savePrescription(String profileId,List<Map<String,String>> dataList,int existed) throws Exception
+    {
+        //表数据
+        TableBundle bundle = new TableBundle();
+        //basic列族数据
+        Map<String,String> basicFamily = new HashMap<String,String>();
+
+        //basic列族添加profile_id
+        basicFamily.put("profile_id",profileId);
+        //rowkey集合
+        List<String> rowkeys = new ArrayList<String>();
+
+        for (Map<String,String> data : dataList){
+            //行主健
+            String rowkey = profileId + "$HDSC01_16$" + existed;
+            rowkeys.add(rowkey);
+            //添加basic列族数据
+            bundle.addValues(rowkey, "basic", basicFamily);
+            //添加data列族数据
+            bundle.addValues(rowkey, "d", data);
+
+            existed++;
+        }
+
+        //删除已有数据
+        if(rowkeys.size() > 0)
+        {
+            bundle.addRows(rowkeys.toArray(new String[rowkeys.size()]));
+            hBaseDao.delete("HealthProfileSub", bundle);
+        }
+
+        //保存数据到HBASE
+        hBaseDao.save("HealthProfileSub", bundle);
+
+        return true;
     }
 }

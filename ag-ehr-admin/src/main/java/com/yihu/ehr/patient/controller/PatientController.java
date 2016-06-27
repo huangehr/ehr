@@ -1,6 +1,7 @@
 package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
@@ -46,6 +47,9 @@ public class PatientController extends BaseController {
 
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+
+    @Autowired
+    private FileResourceClient fileResourceClient;
 
     @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
@@ -126,6 +130,11 @@ public class PatientController extends BaseController {
         boolean result = patientClient.deletePatient(idCardNo);
         if (!result) {
             return failed("删除失败!");
+        }
+        try{
+            fileResourceClient.filesDelete(idCardNo);
+        }catch (Exception e){
+            return success("数据删除成功！头像图片删除失败！");
         }
         return success(null);
     }
@@ -234,7 +243,7 @@ public class PatientController extends BaseController {
 
         //新增人口信息
         MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
-        info.setBirthday(StringToDate(detailModel.getBirthday(), AgAdminConstants.DateFormat));
+        info.setBirthday(DateTimeUtil.simpleDateTimeParse(detailModel.getBirthday()));
         info = patientClient.createPatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");
