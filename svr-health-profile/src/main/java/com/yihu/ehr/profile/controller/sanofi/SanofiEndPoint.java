@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.lang.SpringContext;
-/*import com.yihu.ehr.service.memory.intermediate.MetaDataRecord;
-import com.yihu.ehr.service.memory.intermediate.MemoryProfile;
-import com.yihu.ehr.service.memory.intermediate.PackageDataSet;
-import com.yihu.ehr.profile.persist.ProfileIndices;
-import com.yihu.ehr.profile.persist.ProfileIndicesService;
-import com.yihu.ehr.profile.persist.ProfileService;
-import com.yihu.ehr.service.resource.stage2.repo.DataSetRepository;*/
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.MetaDataRecord;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.MemoryProfile;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.StdDataSet;
+import com.yihu.ehr.profile.legacy.sanofi.persist.ProfileIndices;
+import com.yihu.ehr.profile.legacy.sanofi.persist.ProfileIndicesService;
+import com.yihu.ehr.profile.legacy.sanofi.persist.ProfileService;
+import com.yihu.ehr.profile.legacy.sanofi.persist.repo.DataSetRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -45,7 +45,7 @@ import java.util.*;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "赛诺菲数据服务", description = "赛诺菲项目体征数据提取服务")
 public class SanofiEndPoint {
-    /*@Autowired
+    @Autowired
     private ProfileService profileService;
 
     @Autowired
@@ -67,9 +67,9 @@ public class SanofiEndPoint {
             @RequestParam(value = "gender", required = false) String gender,
             @ApiParam(value = "出生日期")
             @RequestParam(value = "birthday", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date birthday,
-            @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
+            @ApiParam(value = "起始日期", defaultValue = "2015-01-01T00:00:00Z")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
-            @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
+            @ApiParam(value = "结束日期", defaultValue = "2016-01-01T00:00:00Z")
             @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws Exception {
         Pageable pageable = new PageRequest(0, 20);
         Page<ProfileIndices> profileIndices = indicesService.findByDemographic(demographicId, null, name, telephone, gender, birthday, since, to, pageable);
@@ -78,7 +78,7 @@ public class SanofiEndPoint {
 
         List<MemoryProfile> profiles = new ArrayList<>();
         for (ProfileIndices indices : profileIndices.getContent()) {
-            MemoryProfile memoryProfile = profileService.getProfile(indices.getProfileId(), false, false);
+            MemoryProfile memoryProfile = profileService.getProfile(indices.getProfileId());
             profiles.add(memoryProfile);
         }
 
@@ -93,12 +93,12 @@ public class SanofiEndPoint {
             if (section.size() > 1) document.addPOJO(section);
         }
 
-        return new ResponseEntity<>(document.toString(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(document.toString(), HttpStatus.OK);
     }
 
     private void convert(ObjectNode document, MemoryProfile profile) throws IOException {
         JsonNode section;
-        PackageDataSet dataSet;
+        StdDataSet dataSet;
         String[] innerCodes;
 
         // 人口学信息
@@ -106,10 +106,11 @@ public class SanofiEndPoint {
         if (dataSet.getRecordKeys().size() > 0){
             section = document.with("demographic_info");
             innerCodes = new String[]{
-                    "HDSA00_01_009",
-                    "HDSA00_01_011",
-                    "HDSA00_01_012",
-                    "HDSA00_01_017"};
+                    "HDSA00_01_012",                   //生日
+                    "HDSA00_01_011_CODE",              //性别代码，男1，女2
+                    "HDSA00_01_011_VALUE",             //性别文字描述
+                    "HDSA00_01_017",                   //身份证号
+                    "HDSA00_01_009"};                  //姓名
 
             mergeData(section, profile, dataSet, innerCodes);
         }
@@ -171,8 +172,9 @@ public class SanofiEndPoint {
         }
     }
 
-    private void mergeData(JsonNode section, MemoryProfile profile, PackageDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
-        PackageDataSet dataSet = dataSetRepo.findOne(profile.getCdaVersion(),
+    private void mergeData(JsonNode section, MemoryProfile profile, StdDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
+        StdDataSet dataSet = dataSetRepo.findOne(profile.getCdaVersion(),
                 emptyDataSet.getCode(),
                 profile.getProfileType(),
                 emptyDataSet.getRecordKeys(),
@@ -181,23 +183,31 @@ public class SanofiEndPoint {
         if (section.isArray()) {
             ArrayNode array = (ArrayNode) section;
             for (String recordKey : dataSet.getRecordKeys()) {
-                ObjectNode arrayNode = array.addObject();
+                ObjectNode arrayNode = objectMapper.createObjectNode();
                 MetaDataRecord record = dataSet.getRecord(recordKey);
+                boolean flag = false;
                 for (String metaDataCode : metaDataCodes) {
                     String value = record.getMetaData(metaDataCode);
+                    if(!StringUtils.isEmpty(value)){
+                        flag=true;
+                    }
                     arrayNode.put(metaDataCode, StringUtils.isEmpty(value) ? "" : value);
+                }
+                if (flag){
+                    array.addPOJO(arrayNode);
                 }
             }
         } else if (section.isObject()) {
             ObjectNode objectNode = (ObjectNode) section;
             for (String recordKey : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(recordKey);
-                for (String metaDataCode : record.getMetaDataCodes()) {
-                    objectNode.put(metaDataCode, record.getMetaData(metaDataCode));
+                for (String metaDataCode : metaDataCodes) {
+                    String value = record.getMetaData(metaDataCode);
+                    objectNode.put(metaDataCode, StringUtils.isEmpty(value) ? "" : value);
                 }
 
                 break;  // 就一行
             }
         }
-    }*/
+    }
 }

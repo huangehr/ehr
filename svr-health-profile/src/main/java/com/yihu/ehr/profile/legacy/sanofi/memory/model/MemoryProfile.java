@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.resource.stage1;
+package com.yihu.ehr.profile.legacy.sanofi.memory.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -7,30 +7,30 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.annotation.Column;
 import com.yihu.ehr.profile.annotation.Table;
-import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.service.resource.stage1.extractor.EventExtractor;
-import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
-import com.yihu.ehr.profile.util.ProfileId;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.util.ResourceStorageUtil;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.profile.legacy.sanofi.memory.extractor.EventExtractor;
+import com.yihu.ehr.profile.legacy.sanofi.memory.extractor.KeyDataExtractor;
+import com.yihu.ehr.profile.util.ProfileId;
 import org.apache.commons.lang3.StringUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
 import java.util.*;
 
 /**
- * 在内存中构建一个标准档案包结构，将档案包的数据解析进去之后，再使用资源化工具入库。
+ * 健康档案，在内存中构建一个临时的档案结构，将档案包的数据解析进去之后，再使用资源化工具入库。
  *
  * @author Sand
  * @created 2015.08.16 10:44
  */
-@Table(ResourceStorageUtil.MasterTable)
-public class StandardPackage {
-    protected ObjectMapper objectMapper =  SpringContext.getApplicationContext().getBean(ObjectMapper.class);
+@Table("HealthProfile")
+public class MemoryProfile {
 
-    private ProfileId profileId;                        // 档案ID
+    @Autowired
+    ObjectMapper objectMapper;
+
+    private ProfileId profileId;                        // 健康档案ID
     private String cardId;                              // 就诊时用的就诊卡ID
     private String orgCode;                             // 机构代码
     private String clientId;                            // 应用来源
@@ -43,9 +43,9 @@ public class StandardPackage {
     private ProfileType profileType;
     private EventType eventType;
 
-    protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
+    protected Map<String, StdDataSet> dataSets = new TreeMap<>();
 
-    public StandardPackage() {
+    public MemoryProfile() {
         cardId = "";
         orgCode = "";
         patientId = "";
@@ -170,15 +170,15 @@ public class StandardPackage {
         this.createDate = createDate;
     }
 
-    public void insertDataSet(String dataSetCode, PackageDataSet dataSet) {
+    public void insertDataSet(String dataSetCode, StdDataSet dataSet) {
         this.dataSets.put(dataSetCode, dataSet);
     }
 
-    public PackageDataSet getDataSet(String dataSetCode) {
+    public StdDataSet getDataSet(String dataSetCode) {
         return this.dataSets.get(dataSetCode);
     }
 
-    public Collection<PackageDataSet> getDataSets() {
+    public Collection<StdDataSet> getDataSets() {
         return dataSets.values();
     }
 
@@ -202,8 +202,7 @@ public class StandardPackage {
     }
 
     public String toJson() {
-        ObjectNode node = jsonFormat();
-        return node.toString();
+        return jsonFormat().toString();
     }
 
     protected ObjectNode jsonFormat() {
@@ -215,14 +214,14 @@ public class StandardPackage {
         root.put("eventNo", this.getEventNo());
         root.put("cdaVersion", this.getCdaVersion());
         root.put("clientId", this.getClientId());
-        root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventDate()));
-        root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
+        root.put("eventDate", DateTimeUtil.utcDateTimeFormat(this.getEventDate()));
+        root.put("createDate", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
         root.put("eventType", this.getEventType().toString());
         root.put("profileType", this.getProfileType().toString());
 
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {
-            PackageDataSet dataSet = dataSets.get(dataSetCode);
+            StdDataSet dataSet = dataSets.get(dataSetCode);
             dataSetsNode.putPOJO(dataSetCode, dataSet.toJson());
         }
 
@@ -231,7 +230,7 @@ public class StandardPackage {
 
     public void regularRowKey() {
         for (String dataSetCode : dataSets.keySet()) {
-            PackageDataSet dataSet = dataSets.get(dataSetCode);
+            StdDataSet dataSet = dataSets.get(dataSetCode);
 
             int rowIndex = 0;
             String sortFormat = dataSet.getRecordCount() > 10 ? "%s$%03d" : "%s$%1d";
@@ -247,7 +246,7 @@ public class StandardPackage {
 
         EventExtractor eventExtractor = SpringContext.getService(EventExtractor.class);
         for (String dataSetCode : dataSets.keySet()) {
-            PackageDataSet dataSet = dataSets.get(dataSetCode);
+            StdDataSet dataSet = dataSets.get(dataSetCode);
             EventType eventType = (EventType) eventExtractor.extract(dataSet, KeyDataExtractor.Filter.EventType);
             if (eventType != null) {
                 setEventType(eventType);

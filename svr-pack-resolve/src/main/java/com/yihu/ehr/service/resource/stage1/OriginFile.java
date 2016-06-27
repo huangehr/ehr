@@ -17,7 +17,6 @@ public class OriginFile {
     private String mime;
     private Date expireDate;
     private UrlScope urlScope;
-    private String reportName;
     private String emrId;
     private String emrName;
 
@@ -63,14 +62,6 @@ public class OriginFile {
             urls+=object.toString();
         }
         return urls;
-    }
-
-    public String getReportName() {
-        return reportName;
-    }
-
-    public void setReportName(String reportName) {
-        this.reportName = reportName;
     }
 
     public String getEmrId() {
