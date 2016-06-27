@@ -5,6 +5,7 @@ import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
@@ -58,6 +59,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private FileResourceClient fileResourceClient;
 
     private String resetFilter(String filters) {
 
@@ -180,6 +184,11 @@ public class UserController extends BaseController {
             if (!result) {
                 return failed("删除失败!");
             }
+            try{
+             fileResourceClient.filesDelete(userId);
+            }catch (Exception e){
+                return success("数据删除成功！头像图片删除失败！");
+            }
             return success(null);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -276,7 +285,7 @@ public class UserController extends BaseController {
                 return failed("账户已存在!");
             }
 
-            if (!mUser.getIdCardNo().equals(detailModel.getIdCardNo())
+            if (mUser.getIdCardNo()!=null&&!mUser.getIdCardNo().equals(detailModel.getIdCardNo())
                     && userClient.isIdCardExists(detailModel.getIdCardNo())) {
                 return failed("身份证号已存在!");
             }
@@ -566,7 +575,7 @@ public class UserController extends BaseController {
         if(StringUtils.isNotEmpty(orgCode)) {
             MOrganization orgModel = orgClient.getOrg(orgCode);
             detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
-            if(StringUtils.isNotEmpty(orgModel.getLocation())) {
+            if(orgModel!=null&&StringUtils.isNotEmpty(orgModel.getLocation())) {
                 MGeography mGeography = addressClient.getAddressById(orgModel.getLocation());
                 detailModel.setProvince(mGeography==null?"":mGeography.getProvince());
                 detailModel.setCity(mGeography==null?"":mGeography.getCity());
