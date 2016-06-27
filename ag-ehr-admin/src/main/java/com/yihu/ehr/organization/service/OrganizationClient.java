@@ -23,13 +23,13 @@ import java.util.Map;
 @ApiIgnore
 public interface OrganizationClient {
 
-    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations/list", method = RequestMethod.POST)
     @ApiOperation(value = "根据条件查询机构列表")
     ResponseEntity<List<MOrganization>> searchOrgs(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
+            @RequestBody(required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")

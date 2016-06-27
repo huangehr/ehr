@@ -454,11 +454,15 @@ public class OrganizationController extends BaseController {
         org.setCreateDate(DateToString(mOrg.getCreateDate(), AgAdminConstants.DateTimeFormat));
 
         //获取机构类别字典值
-        MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
-        org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
+        if(StringUtils.isNotBlank(mOrg.getOrgType())){
+          MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
+          org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
+        }
         //获取接入方式字典字典值
-        MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
-        org.setSettledWayName(settledWayDict == null ? "" : settledWayDict.getValue());
+        if(StringUtils.isNotBlank(mOrg.getSettledWay())){
+            MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
+            org.setSettledWayName(settledWayDict == null ? "" : settledWayDict.getValue());
+        }
         //org.setTags(mOrg.getTags());
         //获取地址字典值明细
         MGeography addr = addressClient.getAddressById(mOrg.getLocation());
