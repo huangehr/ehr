@@ -45,7 +45,7 @@ public class MetadataEndPoint extends EnvelopRestEndPoint {
     {
         RsMetadata rsMetadata = toEntity(metadata,RsMetadata.class);
         rsMetadata.setId(getObjectId(BizObject.RsMetadata));
-        rsMetadata = metadataService.saveMetadata(rsMetadata);
+        rsMetadata = metadataService.save(rsMetadata);
         return convertToModel(rsMetadata,MRsMetadata.class);
     }
 
@@ -67,7 +67,7 @@ public class MetadataEndPoint extends EnvelopRestEndPoint {
             @RequestBody String metadata) throws Exception
     {
         RsMetadata rsMetadata = toEntity(metadata,RsMetadata.class);
-        rsMetadata = metadataService.saveMetadata(rsMetadata);
+        rsMetadata = metadataService.save(rsMetadata);
         return convertToModel(rsMetadata,MRsMetadata.class);
     }
 

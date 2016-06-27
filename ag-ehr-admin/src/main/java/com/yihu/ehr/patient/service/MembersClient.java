@@ -21,7 +21,7 @@ import java.util.Collection;
 @ApiIgnore
 public interface MembersClient {
 
-    @RequestMapping(value = "/members", method = RequestMethod.GET)
+    @RequestMapping(value = "/families/members", method = RequestMethod.GET)
     @ApiOperation(value = "获取家庭成员列表")
     ResponseEntity<Collection<MMembers>> searchMembers(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")

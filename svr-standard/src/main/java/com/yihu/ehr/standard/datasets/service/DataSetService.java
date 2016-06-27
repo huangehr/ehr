@@ -99,7 +99,7 @@ public class DataSetService extends BaseHbmService<BaseDataSet> {
 
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public Map<Integer, String> getDataSetMapByIds(Object[] ids, String versionid) {
+    public Map<Long, String> getDataSetMapByIds(Object[] ids, String versionid) {
         Session session = currentSession();
         String dataSetTable = CDAVersionUtil.getDataSetTableName(versionid);
         String sql = "select id, name from " + dataSetTable;
@@ -109,14 +109,12 @@ public class DataSetService extends BaseHbmService<BaseDataSet> {
         if (ids.length > 0)
             query.setParameterList("ids", ids);
         List<Object> records = query.list();
-        Map<Integer, String> rs = new HashMap<>();
+        Map<Long, String> rs = new HashMap<>();
         for (int i = 0; i < records.size(); ++i) {
             Object[] record = (Object[]) records.get(i);
-            rs.put((Integer) record[0], (String) record[1]);
+            rs.put(((Integer) record[0]).longValue(), (String) record[1]);
         }
         return rs;
     }
-
-    //TODO: 从excel导入数据集、数据元
 
 }

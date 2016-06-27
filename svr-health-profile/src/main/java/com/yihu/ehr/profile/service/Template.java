@@ -126,7 +126,7 @@ public class Template {
             return null;
         }
 
-        String[] tokens = pcTplURL.split(UrlSeparator);
+        String[] tokens = url.split(UrlSeparator);
         byte[] bytes = fastDFSUtil().download(tokens[0], tokens[1]);
 
         return bytes;

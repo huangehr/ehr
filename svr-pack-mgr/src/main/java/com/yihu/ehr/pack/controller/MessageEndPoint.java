@@ -45,7 +45,7 @@ public class MessageEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "发送档案包解析消息", notes = "发送档案包解析消息")
     @RequestMapping(value = ServiceApi.Packages.ResolveMessage, method = RequestMethod.PUT)
     public Map<String, String> sendResolveMessage(
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "receiveDate>2016-03-01,archiveStatus=Received,Acquired,Finished")
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "receiveDate>2016-06-02T03:00:24Z+0800,archiveStatus=Received,Acquired,Finished")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+receiveDate")
             @RequestParam(value = "sorts", required = false) String sorts,

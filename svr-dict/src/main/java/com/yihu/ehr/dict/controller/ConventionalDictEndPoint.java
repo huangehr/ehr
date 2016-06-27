@@ -251,6 +251,14 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
         return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class, null);
     }
 
+    @RequestMapping(value = "/dictionaries/record_data_sources", method = RequestMethod.GET)
+    @ApiOperation(value = "获取档案数据来源", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getRecordDataSourceList() {
+        List<SystemDictEntry> list = dictEntryService.getDictEntries(35, null);
+
+        return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class, null);
+    }
+
     @RequestMapping(value = "/dictionaries/indicator_type", method = RequestMethod.GET)
     @ApiOperation(value = "获取指标类型", response = MConventionalDict.class)
     public MConventionalDict getIndicatorType(
