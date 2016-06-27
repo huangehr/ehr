@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.legacy.memory.model;
+package com.yihu.ehr.profile.legacy.sanofi.memory.model;
 
 /**
  * 数据集表列族。

@@ -1,12 +1,12 @@
-package com.yihu.ehr.profile.legacy.persist.repo;
+package com.yihu.ehr.profile.legacy.sanofi.persist.repo;
 
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.ResultUtil;
 import com.yihu.ehr.data.hbase.TableBundle;
-import com.yihu.ehr.profile.legacy.memory.model.MetaDataRecord;
-import com.yihu.ehr.profile.legacy.memory.model.StdDataSet;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.MetaDataRecord;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.StdDataSet;
 import com.yihu.ehr.profile.util.QualifierTranslator;
 import com.yihu.ehr.schema.StdKeySchema;
 import org.apache.commons.lang3.tuple.ImmutablePair;

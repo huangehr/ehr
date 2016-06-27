@@ -1,12 +1,12 @@
-package com.yihu.ehr.profile.legacy.memory.util;
+package com.yihu.ehr.profile.legacy.sanofi.memory.util;
 
 //import com.yihu.ehr.profile.core.DataSetFamily;
 //import com.yihu.ehr.profile.core.LinkDataSet;
 //import com.yihu.ehr.profile.core.StdDataSet;
 //import com.yihu.ehr.util.DateTimeUtils;
 
-import com.yihu.ehr.profile.legacy.memory.model.DataSetFamily;
-import com.yihu.ehr.profile.legacy.memory.model.StdDataSet;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.DataSetFamily;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.StdDataSet;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 
 import java.util.Date;

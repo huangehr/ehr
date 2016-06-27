@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.legacy.memory.model;
+package com.yihu.ehr.profile.legacy.sanofi.memory.model;
 
 /**
  * HBase数据库中健康档案表选项. 如列族名称等.

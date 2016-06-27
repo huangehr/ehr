@@ -1,6 +1,6 @@
-package com.yihu.ehr.profile.legacy.persist.repo;
+package com.yihu.ehr.profile.legacy.sanofi.persist.repo;
 
-import com.yihu.ehr.profile.legacy.persist.ProfileIndices;
+import com.yihu.ehr.profile.legacy.sanofi.persist.ProfileIndices;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

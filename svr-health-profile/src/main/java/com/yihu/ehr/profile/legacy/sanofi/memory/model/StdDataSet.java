@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.legacy.memory.model;
+package com.yihu.ehr.profile.legacy.sanofi.memory.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
