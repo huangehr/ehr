@@ -269,6 +269,7 @@ public class PatientInfoDetailService {
                     boolean existedFlag = false;
                     Map<String,Object> currentPres = new HashMap<String,Object>();
 
+                    //判断对应处方笺是否存在
                     if(presriptions != null)
                     {
                         for(Map<String,Object> map : presriptions)
@@ -281,7 +282,7 @@ public class PatientInfoDetailService {
                         }
                     }
 
-                    //判断对应处方笺是否存在
+                    //对应处方笺不存在则根据处方对应CDA数据生成处方笺图片
                     if(!existedFlag)
                     {
                         //处方笺数据
