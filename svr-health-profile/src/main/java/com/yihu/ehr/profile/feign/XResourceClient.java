@@ -21,20 +21,21 @@ public interface XResourceClient {
 
 
     @RequestMapping(value = "/rs/query/getResources", method = GET)
-    Envelop getResources(@RequestParam(value = "resourcesCode", required = true) String resourcesCode,
-                                          @RequestParam(value = "appId", required = true) String appId,
-                                          @RequestParam(value = "queryParams", required = false) String queryParams,
-                                          @RequestParam(value = "page", required = false) Integer page,
-                                          @RequestParam(value = "size", required = false) Integer size) throws Exception;
+    Envelop getResources(
+            @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
+            @RequestParam(value = "appId", required = true) String appId,
+            @RequestParam(value = "queryParams", required = false) String queryParams,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size) throws Exception;
 
     //不通过资源代码查询细表数据
     @RequestMapping(value = "/rs/query/getEhrCenterSub", method = GET)
     Envelop getEhrCenterSub(@RequestParam(value = "queryParams", required = true) String queryParams,
-                         @RequestParam(value = "page", required = false) Integer page,
-                         @RequestParam(value = "size", required = false) Integer size) throws Exception;
+                            @RequestParam(value = "page", required = false) Integer page,
+                            @RequestParam(value = "size", required = false) Integer size) throws Exception;
 
     @RequestMapping(value = "/rs/query/getRawFiles", method = GET)
     Envelop getRawFiles(@RequestParam(value = "profileId", required = false) String profileId,
-                         @RequestParam(value = "page", required = false) Integer page,
-                         @RequestParam(value = "size", required = false) Integer size) throws Exception;
+                        @RequestParam(value = "page", required = false) Integer page,
+                        @RequestParam(value = "size", required = false) Integer size) throws Exception;
 }
