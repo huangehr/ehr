@@ -258,15 +258,31 @@ public class PatientInfoDetailService {
                 List<Map<String,Object>> mainList = mainPres.getDetailModelList();
                 //待入库处方笺数据列表
                 List<Map<String,String>> dataList = new ArrayList<Map<String,String>>();
+                //查询处方对应处方笺
+                Envelop presription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:"
+                        + profileId + "\"}",null,null);
+                //处方笺List
+                List<Map<String,Object>> presriptions = presription.getDetailModelList();
 
                 for(Map<String,Object> main : mainList)
                 {
-                    //查询处方对应处方笺
-                    Envelop presription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"EHR_000086:"
-                            + main.get("EHR_000086").toString() + "\"}",null,null);
+                    boolean existedFlag = false;
+                    Map<String,Object> currentPres = new HashMap<String,Object>();
+
+                    if(presriptions != null)
+                    {
+                        for(Map<String,Object> map : presriptions)
+                        {
+                            if(map.containsKey("EHR_000086") && map.get("EHR_000086").toString().equals(main.get("EHR_000086").toString()))
+                            {
+                                existedFlag = true;
+                                currentPres = map;
+                            }
+                        }
+                    }
 
                     //判断对应处方笺是否存在
-                    if(presription.getDetailModelList() == null || presription.getDetailModelList().size() < 1)
+                    if(!existedFlag)
                     {
                         //处方笺数据
                         Map<String,String> data = new HashMap<String,String>();
@@ -286,31 +302,18 @@ public class PatientInfoDetailService {
 
                         dataList.add(data);
                     }
+                    else
+                    {
+                        returnMap.add(currentPres);
+                    }
                 }
 
                 //新生成的处方笺保存到HBASE
                 if(dataList.size() > 0)
                 {
-                    //查询已存在处方笺
-                    Envelop prescription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:" + profileId + "\"}",null,null);
-                    //已存在处方笺数
-                    int existed = 0;
-
-                    if(prescription.getDetailModelList() != null && prescription.getDetailModelList().size() > 0)
-                    {
-                        existed = prescription.getDetailModelList().size();
-                    }
                     //处方笺保存到HBASE
-                    savePrescription(profileId,dataList,existed);
-                }
-
-                //查询处方笺
-                Envelop prescription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:" + profileId
-                        + (!StringUtils.isBlank(prescriptionNo) ? ("+AND+EHR_000086:" + prescriptionNo) : "")+ "\"}",null,null);
-
-                if(prescription.getDetailModelList() != null && prescription.getDetailModelList().size() > 0)
-                {
-                    returnMap = prescription.getDetailModelList();
+                    List<Map<String,Object>> savedDataList = savePrescription(profileId,dataList,returnMap.size());
+                    returnMap.addAll(savedDataList);
                 }
             }
         }
@@ -617,28 +620,25 @@ public class PatientInfoDetailService {
      * @return
      * @throws Exception
      */
-    public boolean savePrescription(String profileId,List<Map<String,String>> dataList,int existed) throws Exception
+    public List<Map<String,Object>>  savePrescription(String profileId,List<Map<String,String>> dataList,int existed) throws Exception
     {
         //表数据
         TableBundle bundle = new TableBundle();
         //basic列族数据
         Map<String,String> basicFamily = new HashMap<String,String>();
+        //返回保存成功数据
+        List<Map<String,Object>> returnMapList = new ArrayList<Map<String,Object>>();
 
         //basic列族添加profile_id
         basicFamily.put("profile_id",profileId);
         //rowkey集合
         List<String> rowkeys = new ArrayList<String>();
 
-        for (Map<String,String> data : dataList){
+        for(Map<String,String> data : dataList)
+        {
             //行主健
             String rowkey = profileId + "$HDSC01_16$" + existed;
             rowkeys.add(rowkey);
-            //添加basic列族数据
-            bundle.addValues(rowkey, "basic", basicFamily);
-            //添加data列族数据
-            bundle.addValues(rowkey, "d", data);
-
-            existed++;
         }
 
         //删除已有数据
@@ -648,9 +648,28 @@ public class PatientInfoDetailService {
             hBaseDao.delete("HealthProfileSub", bundle);
         }
 
+        for (Map<String,String> data : dataList){
+            //返回保存数据
+            Map<String,Object> returnMap = new HashMap<String,Object>();
+            //行主健
+            String rowkey = profileId + "$HDSC01_16$" + existed;
+            //添加basic列族数据
+            bundle.addValues(rowkey, "basic", basicFamily);
+            //添加data列族数据
+            bundle.addValues(rowkey, "d", data);
+
+            //返回保存数据
+            returnMap.put("rowkey",rowkey);
+            returnMap.put("profile_id",profileId);
+            returnMap.putAll(data);
+            returnMapList.add(returnMap);
+
+            existed++;
+        }
+
         //保存数据到HBASE
         hBaseDao.save("HealthProfileSub", bundle);
 
-        return true;
+        return returnMapList;
     }
 }
