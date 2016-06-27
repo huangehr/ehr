@@ -93,8 +93,9 @@ public class ResourcesGrantController extends BaseController {
                 mapping.put(appResource.getAppId(), appResource.getId());
             }
             List<MApp> apps = searchApp("", "id=" + ids.substring(1), "+org", 1, 500);
+            ids = "";
             for(MApp app: apps){
-                if(ids.indexOf(app.getOrg())==-1)
+                if(app.getOrg()!=null && ids.indexOf(app.getOrg())==-1)
                     ids += ","+ app.getOrg();
             }
             List<MOrganization> orgs = searchOrgs("", "orgCode=" + ids.substring(1), "+orgCode", 1, 500);
@@ -169,7 +170,7 @@ public class ResourcesGrantController extends BaseController {
             String existMetaApp;
             if(!StringUtils.isEmpty(deleteIds) && !StringUtils.isEmpty((existMetaApp= appMetaExistence(deleteIds)))) {
                 envelop.setSuccessFlg(false);
-                envelop.setErrorMsg(existMetaApp.substring(1) + "等应用已存在授权数据，不可取消！");
+                envelop.setErrorMsg(existMetaApp.substring(1) + "已存在授权数据，不可取消！");
                 return envelop;
             }
 
