@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.legacy.sanofi.persist;
 
 import com.yihu.ehr.profile.legacy.sanofi.persist.repo.ProfileIndicesRepository;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +62,17 @@ public class ProfileIndicesService {
             return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
         }
 
+
         if (StringUtils.isNotEmpty(name)) {
             criteria = new Criteria(Demographic.LegacyName).contains(name).or(new Criteria(Demographic.Name).contains(name));
-
+            //开始时间和结束时间缩小范围
+            if (since!=null & to!=null) {
+                String rowKeys[] = eventDateFilter(since,to);
+                if(rowKeys.length>0){
+                    criteria.contains(rowKeys);
+                }
+                return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
+            }
             if (StringUtils.isNotEmpty(telephone)) {
                 criteria = criteria.connect();
                 criteria.and(new Criteria(Demographic.LegacyTelephone).contains(telephone).or(new Criteria(Demographic.Telephone).contains(telephone)));
@@ -73,22 +82,40 @@ public class ProfileIndicesService {
 
                 criteria = criteria.connect();
                 criteria = criteria.and(new Criteria(Demographic.Birthday).between(DateUtils.addDays(birthday, -3), DateUtils.addDays(birthday, 3)));
+                return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
             }
         }
 
-        if (criteria == null) return null;
-
-        Page<Demographic> demographics = indicesRepo.query(Demographic.DemographicCore, criteria, Demographic.class);
-        if (demographics.getContent().size() == 0) return null;
-
-        String rowkeys[] = new String[demographics.getContent().size()];
-        for (int i = 0; i < rowkeys.length; ++i) {
-            rowkeys[i] = demographics.getContent().get(i).getProfileId();
-        }
-
-        criteria = new Criteria("rowkey").contains(rowkeys);
         return indicesRepo.query(ProfileCore, criteria, ProfileIndices.class);
+
+
+//        if (criteria == null) return null;
+//
+//        Page<Demographic> demographics = indicesRepo.query(Demographic.DemographicCore, criteria, Demographic.class);
+//        if (demographics.getContent().size() == 0) return null;
+//
+//        String rowkeys[] = new String[demographics.getContent().size()];
+//        for (int i = 0; i < rowkeys.length; ++i) {
+//            rowkeys[i] = demographics.getContent().get(i).getProfileId();
+//        }
+//
+//        criteria = new Criteria("rowkey").contains(rowkeys);
+
+//        return indicesRepo.query(ProfileCore, criteria, ProfileIndices.class);
+
     }
+
+
+    private String[] eventDateFilter(Date since,Date to){
+        Criteria eventDateCriteria = new Criteria("event_date").between(DateTimeUtil.utcDateTimeFormat(since),DateTimeUtil.utcDateTimeFormat(to));
+        Page<Demographic> demographics = indicesRepo.query(ProfileCore, eventDateCriteria, Demographic.class);
+        String rowKeys[] = new String[demographics.getContent().size()];
+        for (int i = 0; i < rowKeys.length; ++i) {
+            rowKeys[i] = demographics.getContent().get(i).rowkey;
+        }
+        return rowKeys;
+    }
+
 
 
 }

@@ -67,9 +67,9 @@ public class SanofiEndPoint {
             @RequestParam(value = "gender", required = false) String gender,
             @ApiParam(value = "出生日期")
             @RequestParam(value = "birthday", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date birthday,
-            @ApiParam(value = "起始日期", defaultValue = "2015-10-01")
+            @ApiParam(value = "起始日期", defaultValue = "2015-01-01T00:00:00Z")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
-            @ApiParam(value = "结束日期", defaultValue = "2016-10-01")
+            @ApiParam(value = "结束日期", defaultValue = "2016-01-01T00:00:00Z")
             @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws Exception {
         Pageable pageable = new PageRequest(0, 20);
         Page<ProfileIndices> profileIndices = indicesService.findByDemographic(demographicId, null, name, telephone, gender, birthday, since, to, pageable);
