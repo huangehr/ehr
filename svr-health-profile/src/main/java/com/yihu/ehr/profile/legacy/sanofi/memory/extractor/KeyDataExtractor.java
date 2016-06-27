@@ -1,6 +1,6 @@
-package com.yihu.ehr.profile.legacy.memory.extractor;
+package com.yihu.ehr.profile.legacy.sanofi.memory.extractor;
 
-import com.yihu.ehr.profile.legacy.memory.model.StdDataSet;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.StdDataSet;
 
 import java.text.ParseException;
 

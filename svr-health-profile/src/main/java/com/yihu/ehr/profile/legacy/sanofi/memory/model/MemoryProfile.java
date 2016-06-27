@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.legacy.memory.model;
+package com.yihu.ehr.profile.legacy.sanofi.memory.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,8 +8,8 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.annotation.Column;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.legacy.memory.extractor.EventExtractor;
-import com.yihu.ehr.profile.legacy.memory.extractor.KeyDataExtractor;
+import com.yihu.ehr.profile.legacy.sanofi.memory.extractor.EventExtractor;
+import com.yihu.ehr.profile.legacy.sanofi.memory.extractor.KeyDataExtractor;
 import com.yihu.ehr.profile.util.ProfileId;
 import org.apache.commons.lang3.StringUtils;
 import com.yihu.ehr.util.datetime.DateTimeUtil;

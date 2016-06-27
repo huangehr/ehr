@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.legacy.memory.util;
+package com.yihu.ehr.profile.legacy.sanofi.memory.util;
 
 import java.util.HashMap;
 import java.util.Map;

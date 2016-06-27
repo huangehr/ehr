@@ -1,6 +1,6 @@
-package com.yihu.ehr.profile.legacy.memory.model;
+package com.yihu.ehr.profile.legacy.sanofi.memory.model;
 
-import com.yihu.ehr.profile.legacy.memory.util.ResourceRecord;
+import com.yihu.ehr.profile.legacy.sanofi.memory.util.ResourceRecord;
 
 /**
  * 档案资源主记录。

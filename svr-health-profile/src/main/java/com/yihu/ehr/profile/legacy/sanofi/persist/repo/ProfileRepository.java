@@ -1,12 +1,12 @@
-package com.yihu.ehr.profile.legacy.persist.repo;
+package com.yihu.ehr.profile.legacy.sanofi.persist.repo;
 
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.ResultUtil;
 import com.yihu.ehr.data.hbase.TableBundle;
-import com.yihu.ehr.profile.legacy.memory.model.MemoryProfile;
-import com.yihu.ehr.profile.legacy.memory.model.ProfileFamily;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.MemoryProfile;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.ProfileFamily;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

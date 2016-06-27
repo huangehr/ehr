@@ -1,9 +1,9 @@
-package com.yihu.ehr.profile.legacy.memory.util;
+package com.yihu.ehr.profile.legacy.sanofi.memory.util;
 
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.profile.legacy.memory.model.MasterRecord;
-import com.yihu.ehr.profile.legacy.memory.model.SubRecords;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.MasterRecord;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.SubRecords;
 
 import java.util.Date;
 

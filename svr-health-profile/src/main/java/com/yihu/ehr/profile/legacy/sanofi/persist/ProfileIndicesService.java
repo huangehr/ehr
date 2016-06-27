@@ -1,6 +1,6 @@
-package com.yihu.ehr.profile.legacy.persist;
+package com.yihu.ehr.profile.legacy.sanofi.persist;
 
-import com.yihu.ehr.profile.legacy.persist.repo.ProfileIndicesRepository;
+import com.yihu.ehr.profile.legacy.sanofi.persist.repo.ProfileIndicesRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;

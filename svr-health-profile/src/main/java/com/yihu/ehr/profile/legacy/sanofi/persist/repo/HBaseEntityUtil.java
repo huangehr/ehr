@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.legacy.persist.repo;
+package com.yihu.ehr.profile.legacy.sanofi.persist.repo;
 
 import com.yihu.ehr.data.hbase.ResultUtil;
 import com.yihu.ehr.profile.annotation.Column;

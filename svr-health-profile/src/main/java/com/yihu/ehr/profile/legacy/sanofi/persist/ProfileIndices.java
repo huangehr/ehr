@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.legacy.persist;
+package com.yihu.ehr.profile.legacy.sanofi.persist;
 
 import org.apache.solr.client.solrj.beans.Field;
 import org.springframework.data.solr.core.mapping.SolrDocument;

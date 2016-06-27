@@ -1,11 +1,11 @@
-package com.yihu.ehr.profile.legacy.persist;
+package com.yihu.ehr.profile.legacy.sanofi.persist;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.profile.legacy.memory.model.MemoryProfile;
-import com.yihu.ehr.profile.legacy.memory.model.StdDataSet;
-import com.yihu.ehr.profile.legacy.persist.repo.DataSetRepository;
-import com.yihu.ehr.profile.legacy.persist.repo.ProfileRepository;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.MemoryProfile;
+import com.yihu.ehr.profile.legacy.sanofi.memory.model.StdDataSet;
+import com.yihu.ehr.profile.legacy.sanofi.persist.repo.DataSetRepository;
+import com.yihu.ehr.profile.legacy.sanofi.persist.repo.ProfileRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
