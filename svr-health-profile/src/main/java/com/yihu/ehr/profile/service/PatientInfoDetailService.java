@@ -292,7 +292,7 @@ public class PatientInfoDetailService {
                                 ,main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd);
                         Map<String,Object> model = getCDAData(profileId,temp.getCdaDocumentId());
                         //处方笺不存在则生成保存
-                        String picPath = thridPrescriptionService.CDAToImage(temp,model,800,600);
+                        String picPath = thridPrescriptionService.CDAToImage(temp,model,0,0);
 
                         //处方笺文件类型
                         data.put("EHR_001194","png");
