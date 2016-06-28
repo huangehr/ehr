@@ -151,23 +151,25 @@ public class ServiceApi {
         public static final String HospitalizedDeath           = "/{demographic_id}/hospitalized/death"; //住院死因链情况
 
 
-        public static final String CDADocumentId         = "/profile/cda/document_id"; //cda模板（通过event_no + cda_type）
-        public static final String CDAClass            = "/{profile_id}/cda_class"; //cda分类
-        public static final String CDAData             = "/{profile_id}/cda_data"; //cda数据
-        public static final String CDADocument         =  "/{profile_id}/cda_document"; //完整CDA文档
+        public static final String CDADocumentId               = "/profile/cda/document_id"; //cda模板（通过event_no + cda_type）
+        public static final String CDAClass                    = "/{profile_id}/cda_class"; //cda分类
+        public static final String CDAData                     = "/{profile_id}/cda_data"; //cda数据
+        public static final String CDADocument                 =  "/{profile_id}/cda_document"; //完整CDA文档
 
 
         public static final String ExaminationReport           = "/{demographic_id}/examination"; //检查报告单
-        public static final String ExaminationImg           = "/{demographic_id}/examination/img"; //检查报告单图片
+        public static final String ExaminationImg              = "/{demographic_id}/examination/img"; //检查报告单图片
 
 
         public static final String LaboratoryReport            = "/{demographic_id}/laboratory"; //检验报告单
-        public static final String LaboratoryImg            = "/{demographic_id}/laboratory/img"; //检验报告单图片
+        public static final String LaboratoryImg               = "/{demographic_id}/laboratory/img"; //检验报告单图片
         public static final String LaboratoryProject           = "/{demographic_id}/laboratory/project"; //检验报告单项目
         public static final String LaboratoryAllergy           = "/{demographic_id}/laboratory/allergy"; //检验药敏
 
         public static final String Surgery                     = "/{demographic_id}/surgery";//手术-手术记录
 
+        public static final String IndicatorsClass             = "/{demographic_id}/indicators/class"; //获取某个健康问题指标
+        public static final String IndicatorsData              = "/{demographic_id}/indicators/data"; //获取指标数据
     }
 
     public static class Families{
