@@ -94,7 +94,7 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
             session.close();
 
             //更新字典项关联字典字段
-            sql = new StringBuilder("UPDATE rs_dictionary_entry e,rs_dictionary d SET e.dict_id =d.id WHERE e.dict_code=d.code AND e.dict_id=0");
+            sql = new StringBuilder("UPDATE rs_dictionary_entry e,rs_dictionary d SET e.dict_id =d.id WHERE e.dict_code=d.code AND (e.dict_id=0 OR e.dict_id IS NULL)");
             jdbcTemplate.execute(sql.toString());
         } catch (Exception e){
             if(transaction!=null)transaction.rollback();
