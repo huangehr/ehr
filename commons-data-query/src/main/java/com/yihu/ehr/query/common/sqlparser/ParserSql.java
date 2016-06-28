@@ -49,7 +49,7 @@ public class ParserSql {
      * 转换成获取count的sql语句
      */
     public String getCountSql(String sql){
-        return "select count(1) from ("+sql+")";
+        return "select count(1) from ("+sql+") tc";
     }
 
     /**

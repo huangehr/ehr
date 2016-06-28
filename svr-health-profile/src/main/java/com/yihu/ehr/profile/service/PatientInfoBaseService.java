@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
@@ -30,6 +31,9 @@ public class PatientInfoBaseService {
     @Autowired
     XOrganizationClient organization; //机构信息服务
 
+    @Autowired
+    XDictClient dictClient;
+
     //特殊字典信息服务
     @Autowired
     CD10Service dictService;
@@ -37,9 +41,6 @@ public class PatientInfoBaseService {
     //ICD10缓存服务
     @Autowired
     XIcd10DictClient ict10Dict;
-
-    @Autowired
-    private XHealthProblemDictClient healthProblemDictClient;
 
     @Autowired
     private XGeographyClient addressClient;
@@ -275,6 +276,8 @@ public class PatientInfoBaseService {
 
         }
 
+        //未完成，病龄和机构代码转换*************
+
         return re;
     }
 
@@ -327,10 +330,10 @@ public class PatientInfoBaseService {
                 query += " AND "+BasisConstant.eventType+":" + eventType;
             }
             else if(eventType.equals("3")){
-
+                query += " AND "+BasisConstant.eventType+":" + eventType;
             }
             else if(eventType.equals("4")){
-
+                query += " AND "+BasisConstant.eventType+":" + eventType;
             }
         }
         //事件年份
@@ -469,22 +472,19 @@ public class PatientInfoBaseService {
             }
         }
 
+
+
+        List<Map<String,Object>> returnList = new ArrayList<Map<String,Object>>();
         if(StringUtils.isBlank(diseaseId) && StringUtils.isBlank(hpId))
         {
             //非疾病、健康问题时返回全部事件纪录
-            return eventList;
+            returnList = eventList;
         }
         else
         {
             //返回疾病、健康问题的事件纪录
-            if(eventList == null)
+            if(eventList != null)
             {
-                return new ArrayList<Map<String,Object>>();
-            }
-            else
-            {
-                List<Map<String,Object>> returnList = new ArrayList<Map<String,Object>>();
-
                 for(Map<String,Object> map : eventList)
                 {
                     if(returnRowkey.contains(map.get("rowkey")))
@@ -492,10 +492,30 @@ public class PatientInfoBaseService {
                         returnList.add(map);
                     }
                 }
-
-                return returnList;
             }
         }
+
+        //通过client_id获取数据来源
+        if(returnList!=null && returnList.size()>0)
+        {
+            //获取所有client_id->client_type数据来源
+            List<MConventionalDict> clientList = dictClient.getRecordDataSourceList();
+            for(Map<String,Object> map : returnList)
+            {
+                map.put("data_from","");
+                String clientId = map.get("client_id").toString();
+                for(MConventionalDict client:clientList)
+                {
+                    if(client.getCode().equals(clientId))
+                    {
+                        map.put("data_from",client.getValue());
+                        break;
+                    }
+                }
+            }
+        }
+
+        return returnList;
     }
 
     /**

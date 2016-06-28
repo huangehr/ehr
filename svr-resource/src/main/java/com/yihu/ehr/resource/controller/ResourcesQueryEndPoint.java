@@ -34,7 +34,7 @@ public class ResourcesQueryEndPoint {
      * 获取资源数据
      */
     @ApiOperation("获取资源数据")
-    @RequestMapping(value = "/getResources", method = RequestMethod.GET)
+    @RequestMapping(value = "/getResources", method = RequestMethod.POST)
     public Envelop getResources(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
                                 @ApiParam("appId") @RequestParam(value = "appId", required = true) String appId,
                                 @ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,

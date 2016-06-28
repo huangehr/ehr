@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -20,7 +21,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public interface XResourceClient {
 
 
-    @RequestMapping(value = "/rs/query/getResources", method = GET)
+    @RequestMapping(value = "/rs/query/getResources", method = RequestMethod.POST)
     Envelop getResources(
             @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
             @RequestParam(value = "appId", required = true) String appId,

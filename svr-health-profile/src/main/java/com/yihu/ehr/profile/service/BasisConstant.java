@@ -51,12 +51,10 @@ public class BasisConstant {
     public static String zyzd = "EHR_000293";//住院诊断代码
     public static String cfbh = "EHR_000086";//处方编号
 
-    public static String xybm = "EHR_000099";//西药编码
     public static String xysj = "EHR_000090";//西药处方时间
     public static String xymc = "EHR_000100";//西药名称
     public static String xysl = "EHR_000104";//西药数量
 
-    public static String zybm = "EHR_000130";//中药编码
     public static String zysj = "EHR_000120";//中药处方时间
     public static String zymc = "EHR_000131";//中药名称
     public static String zysl = "EHR_000139";//中药数量
