@@ -12,6 +12,7 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.service.FamiliesClient;
 import com.yihu.ehr.patient.service.MembersClient;
 import com.yihu.ehr.patient.service.PatientClient;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -159,7 +160,8 @@ public class HomeRelationshipController extends BaseController {
             relationshipModel.setName(info==null?"0":info.getName());
         }
 
-        relationshipModel.setRelationTime(DateToString(mMembers.getCreateDate(), AgAdminConstants.DateFormat));
+//        relationshipModel.setRelationTime(DateToString(mMembers.getCreateDate(), AgAdminConstants.DateFormat));
+        relationshipModel.setRelationTime(DateTimeUtil.simpleDateTimeFormat(mMembers.getCreateDate()));
         //TODO：获取关系字典信息
 
 

@@ -345,24 +345,24 @@ public class PatientInfoDetailService {
      */
     public Envelop getMedicationList(String type, String demographicId, String hpId, String startTime, String endTime, Integer page, Integer size) throws Exception {
         String q = "";
-        String sj = BasisConstant.xysj;
-        String bm = BasisConstant.xybm;
+        String date = BasisConstant.xysj;
+        String name = BasisConstant.xymc;
         String resourceCode = BasisConstant.medicationWestern;
         if (type != null && type.equals("2")) //默认查询西药
         {
-            sj = BasisConstant.zysj;
-            bm = BasisConstant.zybm;
+            date = BasisConstant.zysj;
+            name = BasisConstant.zymc;
             resourceCode = BasisConstant.medicationChinese;
         }
 
         //时间范围
         if (startTime != null && startTime.length() > 0 && endTime != null && endTime.length() > 0) {
-            q = sj + ":[" + startTime + " TO " + endTime + "]";
+            q = date + ":[" + startTime + " TO " + endTime + "]";
         } else {
             if (startTime != null && startTime.length() > 0) {
-                q = sj + ":[" + startTime + " TO *]";
+                q = date + ":[" + startTime + " TO *]";
             } else if (endTime != null && endTime.length() > 0) {
-                q = sj + ":[* TO " + endTime + "]";
+                q = date + ":[* TO " + endTime + "]";
             }
         }
 
@@ -376,9 +376,9 @@ public class PatientInfoDetailService {
                 for (MDrugDict drug : drugList) {
                     String dictCode = drug.getCode();
                     if (ypQuery.length() > 0) {
-                        ypQuery += " OR " + bm + ":" + dictCode;
+                        ypQuery += " OR " + name + ":" + dictCode;
                     } else {
-                        ypQuery = bm + ":" + dictCode;
+                        ypQuery = name + ":" + dictCode;
                     }
                 }
             }
@@ -395,7 +395,7 @@ public class PatientInfoDetailService {
         //获取门诊住院记录
         String rowkeys="";
         if(demographicId!=null && demographicId!="")
-             rowkeys = getProfileIds(demographicId);
+            rowkeys = getProfileIds(demographicId);
         if(!("profile_id:(NOT *)").equals(rowkeys) && rowkeys!="")
         {
             if (q.length() > 0) {
@@ -634,7 +634,6 @@ public class PatientInfoDetailService {
     /**
      * 保存处方笺到HABSE
      * @param profileId 主表rowkey
-     * @param data 处方笺数据
      * @return
      * @throws Exception
      */
@@ -652,10 +651,11 @@ public class PatientInfoDetailService {
         //rowkey集合
         List<String> rowkeys = new ArrayList<String>();
 
-        for(Map<String,String> data : dataList)
+        for(int i = 0; i < dataList.size(); i++)
         {
+            int dataCount = existed + i;
             //行主健
-            String rowkey = profileId + "$HDSC01_16$" + existed;
+            String rowkey = profileId + "$HDSC01_16$" + dataCount;
             rowkeys.add(rowkey);
         }
 
@@ -666,7 +666,8 @@ public class PatientInfoDetailService {
             hBaseDao.delete("HealthProfileSub", bundle);
         }
 
-        for (Map<String,String> data : dataList){
+        for (Map<String,String> data : dataList)
+        {
             //返回保存数据
             Map<String,Object> returnMap = new HashMap<String,Object>();
             //行主健
