@@ -19,6 +19,7 @@ import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -84,6 +85,7 @@ public class BaseController extends AbstractController {
 
     public <T> T toEntity(String json, Class<T> entityCls) {
         try {
+            objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
             T entity = objectMapper.readValue(json, entityCls);
             return entity;
         } catch (IOException ex) {
