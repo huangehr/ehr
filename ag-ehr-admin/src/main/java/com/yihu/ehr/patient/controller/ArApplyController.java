@@ -243,13 +243,23 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
                         }
                     }
                 }
-                //检验项目
-                tmp = resource.getResources("RS_LABORATORY_PROJECT", appId, re, null, null);
+                //检验报告单
+                tmp = resource.getResources("RS_LABORATORY_REPORT", appId, re, null, null);
                 if(tmp.getDetailModelList()!=null && tmp.getDetailModelList().size()>0){
                     for(Map<String,Object> map : (List<Map<String,Object>>)tmp.getDetailModelList()) {
                         if((arApplyModel = arApplyModels.get(map.get("profile_id"))) != null){
                             arApplyModel.setDiagnosedResult(
-                                    (StringUtils.isEmpty(arApplyModel.getDiagnosedResult()) ? "" : ",") + map.get("EHR_000394") );
+                                    (StringUtils.isEmpty(arApplyModel.getDiagnosedResult()) ? "" : ",") + map.get("EHR_000352") );
+                        }
+                    }
+                }
+                //检查报告单
+                tmp = resource.getResources("RS_EXAMINATION_REPORT", appId, re, null, null);
+                if(tmp.getDetailModelList()!=null && tmp.getDetailModelList().size()>0){
+                    for(Map<String,Object> map : (List<Map<String,Object>>)tmp.getDetailModelList()) {
+                        if((arApplyModel = arApplyModels.get(map.get("profile_id"))) != null){
+                            arApplyModel.setDiagnosedResult(
+                                    (StringUtils.isEmpty(arApplyModel.getDiagnosedResult()) ? "" : ",") + map.get("EHR_000317") );
                         }
                     }
                 }
