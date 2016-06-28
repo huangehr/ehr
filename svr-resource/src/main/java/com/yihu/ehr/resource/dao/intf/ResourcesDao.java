@@ -11,7 +11,7 @@ import java.util.List;
 public interface ResourcesDao extends PagingAndSortingRepository<RsResources,String> {
 
     RsResources findByCode(String code);
-
+    RsResources findById(String id);
     long countByCategoryId(String categoryId);
 
     List<RsResources> findByCategoryId(String categoryId);

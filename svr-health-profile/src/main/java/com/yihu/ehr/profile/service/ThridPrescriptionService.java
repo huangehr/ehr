@@ -153,9 +153,12 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
             FileUtils.writeStringToFile(file,html);
             ImageRenderer render = new ImageRenderer();
             FileOutputStream out = new FileOutputStream(file);
-            Dimension d = new Dimension();
-            d.setSize(width,height);//设置图片大小
-            render.setWindowSize(d,false);//false 超出图片设置的大小是自适应
+            if(width != 0 || height != 0)
+            {
+                Dimension d = new Dimension();
+                d.setSize(width, height);//设置图片大小
+                render.setWindowSize(d, false);//false 超出图片设置的大小是自适应
+            }
             render.renderURL("file:///" + url, out, ImageRenderer.Type.PNG);
             //保存到fastdfs
             InputStream in = new FileInputStream(file);
