@@ -718,12 +718,12 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     /***************************** 指标 ***************************************************/
-    @ApiOperation("获取某个健康问题指标，可根据指标类别过滤")
+    @ApiOperation("获取某个健康问题指标OK")
     @RequestMapping(value = ServiceApi.Profiles.IndicatorsClass, method = RequestMethod.GET)
     public List<Map<String,Object>> IndicatorsClass(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "420521195812172917")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
-            @ApiParam(name = "hp_id", value = "健康问题")
+            @ApiParam(name = "hp_id", value = "健康问题",defaultValue = "BXB")
             @RequestParam(value = "hp_id", required = true) String hp_id,
             @ApiParam(name = "indicator_type", value = "指标类别")
             @RequestParam(value = "indicator_type", required = false) String indicator_type) throws Exception{
@@ -731,7 +731,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return indicatorsService.getIndicatorsClass(demographic_id,hp_id,indicator_type);
     }
 
-    @ApiOperation("获取指标数据")
+    @ApiOperation("获取指标数据OK")
     @RequestMapping(value = ServiceApi.Profiles.IndicatorsData, method = RequestMethod.GET)
     public Envelop IndicatorsData(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "420521195812172917")

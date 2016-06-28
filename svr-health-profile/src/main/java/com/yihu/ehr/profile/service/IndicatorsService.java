@@ -58,6 +58,7 @@ public class IndicatorsService {
                     item.put("type",resultItem.get("ETL_INDICATORS_TYPE"));
                     item.put("code",resultItem.get("ETL_INDICATORS_CODE"));
                     item.put("name",resultItem.get("ETL_INDICATORS_NAME"));
+                    re.add(item);
                 }
             }
 
