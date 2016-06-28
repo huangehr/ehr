@@ -12,12 +12,10 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -207,6 +205,19 @@ public class PatientInfoBaseService {
                             obj.put("lastVisitRecord", profileId);
                             obj.put("recentEvent", "就诊");
                             obj.put("profileId", profileId);
+                            SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
+                            String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
+                            String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
+                            String ageOfDisease="";
+                            if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
+                                ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1)+"年"
+                                        +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth))+"月";
+                            }
+                            else{
+                                ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear))+"年"
+                                        +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth))+"月";
+                            }
+                            obj.put("ageOfDisease",ageOfDisease);
                             re.add(obj);
                             breaked = true;
                             break;
@@ -244,6 +255,21 @@ public class PatientInfoBaseService {
                                         obj.put("recentEvent", "住院");
                                         obj.put("profileId", profileId);
                                     }
+                                    else{
+                                        SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
+                                        String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
+                                        String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
+                                        String ageOfDisease="";
+                                        if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
+                                            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1)+"年"
+                                                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth))+"月";
+                                        }
+                                        else{
+                                            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear))+"年"
+                                                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth))+"月";
+                                        }
+                                        obj.put("ageOfDisease",ageOfDisease);
+                                    }
                                 }
                             }
 
@@ -262,6 +288,19 @@ public class PatientInfoBaseService {
                                 obj.put("lastVisitRecord", profileId);
                                 obj.put("recentEvent", "住院");
                                 obj.put("profileId", profileId);
+                                SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
+                                String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
+                                String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
+                                String ageOfDisease="";
+                                if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
+                                    ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1)+"年"
+                                        +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth))+"月";
+                                }
+                                else{
+                                    ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear))+"年"
+                                            +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth))+"月";
+                                }
+                                        obj.put("ageOfDisease",ageOfDisease);
                                 re.add(obj);
                                 breaked = true;
                                 break;
@@ -273,7 +312,6 @@ public class PatientInfoBaseService {
                     }
                 }
             }
-
         }
 
         //未完成，病龄和机构代码转换*************
