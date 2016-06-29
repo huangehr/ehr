@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.resource.MRsAdapterSchema;
+import com.yihu.ehr.resource.client.AdapterSchemaClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
@@ -43,6 +45,9 @@ public class AdapterOrgController extends BaseController {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private AdapterSchemaClient adapterSchemaClient;
 
     @RequestMapping(value = "/orgs", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")
@@ -185,6 +190,11 @@ public class AdapterOrgController extends BaseController {
             @RequestParam(value = "codes") String codes) {
         try {
             codes = trimEnd(codes, ",");
+            ResponseEntity<List<MRsAdapterSchema>> responseEntity = adapterSchemaClient.getSchema("", "adapterVersion=" + codes + ";type=2", "", 1, 1);
+            List<MRsAdapterSchema> mRsAdapterSchemas =  responseEntity.getBody();
+            if(mRsAdapterSchemas!=null&&mRsAdapterSchemas.size()>0){
+                return failed("删除失败，第三方标准已经被资源适配!");
+            }
             if (StringUtils.isEmpty(codes)) {
                 return failed("请选择需要删除的内容!");
             }
