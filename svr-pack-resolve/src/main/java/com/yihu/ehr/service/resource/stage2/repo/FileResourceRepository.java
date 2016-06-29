@@ -27,6 +27,14 @@ public class FileResourceRepository {
             TableBundle bundle = new TableBundle();
 
             Map<String, CdaDocument> cdaDocuments = resBucket.getCdaDocuments();
+
+            for(String rowkey : cdaDocuments.keySet())
+            {
+                bundle.addRows(rowkey);
+            }
+
+            hbaseDao.delete(FileTableUtil.Table,bundle);
+
             for (String rowkey : cdaDocuments.keySet()){
                 CdaDocument cdaDocument = cdaDocuments.get(rowkey);
                 bundle.addValues(rowkey, FileFamily.Basic, FileTableUtil.getBasicFamilyCellMap(resBucket));

@@ -178,7 +178,8 @@ public class HomeRelationshipController extends BaseController {
             MDemographicInfo info =patientClient.getPatient(mFamilies.getHouseholderIdCardNo());
             groupModel.setName(info==null?"0":info.getName());
         }
-        groupModel.setCreateTime(DateToString(mFamilies.getCreateDate(), AgAdminConstants.DateFormat));
+//        groupModel.setCreateTime(DateToString(mFamilies.getCreateDate(), AgAdminConstants.DateFormat));
+        groupModel.setCreateTime(DateTimeUtil.simpleDateTimeFormat(mFamilies.getCreateDate()));
         String filters="familyId="+mFamilies.getId()+";idCardNo="+idCardNo;
         List<MMembers> mMemberses = (List<MMembers>)membersClient.searchMembers("", filters, "", 15, 1).getBody();
         if(mMemberses!=null && mMemberses.size()>0)
