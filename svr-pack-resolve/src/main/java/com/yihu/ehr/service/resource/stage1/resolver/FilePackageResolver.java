@@ -102,10 +102,10 @@ public class FilePackageResolver extends PackageResolver {
                 Iterator<Map.Entry<String, JsonNode>> filedIterator = jsonRecord.fields();
                 while (filedIterator.hasNext()) {
                     Map.Entry<String, JsonNode> field = filedIterator.next();
-                    String metaData = translateMetaDataCode(profile.getCdaVersion(), dataSetCode, field.getKey());
+                    //String metaData = translateMetaDataCode(profile.getCdaVersion(), dataSetCode, field.getKey());
                     String value = field.getValue().asText();
-                    if(metaData!=null){
-                        record.putMetaData(metaData, value);
+                    if(field.getKey()!=null){
+                        record.putMetaData(field.getKey(), value);
                     }
                 }
 
