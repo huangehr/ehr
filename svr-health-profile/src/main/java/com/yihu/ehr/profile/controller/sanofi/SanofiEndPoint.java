@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.LisEntry;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.legacy.sanofi.memory.model.MetaDataRecord;
 import com.yihu.ehr.profile.legacy.sanofi.memory.model.MemoryProfile;
@@ -103,7 +104,7 @@ public class SanofiEndPoint {
 
         // 人口学信息
         dataSet = profile.getDataSet("HDSA00_01");
-        if (dataSet.getRecordKeys().size() > 0){
+        if (dataSet.getRecordKeys().size() > 0) {
             section = document.with("demographic_info");
             innerCodes = new String[]{
                     "HDSA00_01_012",                   //生日
@@ -112,12 +113,13 @@ public class SanofiEndPoint {
                     "HDSA00_01_017",                   //身份证号
                     "HDSA00_01_009"};                  //姓名
 
-            mergeData(section, profile, dataSet, innerCodes);
+            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
+            mergeData(section, profile, stdDataSet, innerCodes);
         }
 
         // 生命体征：住院护理体征记录
         dataSet = profile.getDataSet("HDSD00_08");
-        if (dataSet != null && dataSet.getRecordKeys().size() > 0){
+        if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
             section = document.withArray("vitals");
             innerCodes = new String[]{
                     "HDSD00_08_025",
@@ -126,12 +128,13 @@ public class SanofiEndPoint {
                     "HDSD00_08_060",
                     "HDSD00_08_068"};
 
-            mergeData(section, profile, dataSet, innerCodes);
+            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
+            mergeData(section, profile, stdDataSet, innerCodes);
         }
 
         // 检验
         dataSet = profile.getDataSet("HDSD02_03");
-        if (dataSet != null && dataSet.getRecordKeys().size() > 0){
+        if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
             section = document.withArray("lis");
             innerCodes = new String[]{
                     "JDSD02_03_13", // 中文名
@@ -143,24 +146,38 @@ public class SanofiEndPoint {
                     "JDSD02_03_07", // 参考值下限
             };
 
-            mergeData(section, profile, dataSet, innerCodes);
+            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
+            Set<String> keys = stdDataSet.getRecordKeys();
+            List<String> listKeys = new ArrayList<String> ();
+            listKeys.addAll(keys);
+            for (String recordKey : listKeys) {
+                MetaDataRecord record = stdDataSet.getRecord(recordKey);
+                String entryName = record.getDataGroup().get("JDSD02_03_14");
+                String[] entryNames = LisEntry.ENTRY_NAME;
+                List<String> entryNameList = Arrays.asList(entryNames);
+                if (!entryNameList.contains(entryName)) {
+                    stdDataSet.removeRecord(recordKey,record);
+                }
+            }
+            mergeData(section, profile, stdDataSet, innerCodes);
         }
 
         // 临时医嘱
         dataSet = profile.getDataSet("HDSC02_11");
-        if (dataSet != null && dataSet.getRecordKeys().size() > 0){
+        if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
             section = document.withArray("stat_order");
             innerCodes = new String[]{
                     "HDSD00_15_020",
                     "HDSD00_15_028"
             };
 
-            mergeData(section, profile, dataSet, innerCodes);
+            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
+            mergeData(section, profile, stdDataSet, innerCodes);
         }
 
         // 长期医嘱
         dataSet = profile.getDataSet("HDSC02_12");
-        if (dataSet != null && dataSet.getRecordKeys().size() > 0){
+        if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
             section = document.withArray("stand_order");
             innerCodes = new String[]{
                     "HDSD00_15_020",
@@ -168,39 +185,26 @@ public class SanofiEndPoint {
                     "HDSD00_15_028"
             };
 
-            mergeData(section, profile, dataSet, innerCodes);
+            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
+            mergeData(section, profile, stdDataSet, innerCodes);
         }
     }
 
-    private void mergeData(JsonNode section, MemoryProfile profile, StdDataSet emptyDataSet, String[] metaDataCodes) throws IOException {
-        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
-        StdDataSet dataSet = dataSetRepo.findOne(profile.getCdaVersion(),
-                emptyDataSet.getCode(),
-                profile.getProfileType(),
-                emptyDataSet.getRecordKeys(),
-                metaDataCodes).getRight();
-
+    private void mergeData(JsonNode section, MemoryProfile profile, StdDataSet stdDataSet, String[] metaDataCodes) throws IOException {
         if (section.isArray()) {
             ArrayNode array = (ArrayNode) section;
-            for (String recordKey : dataSet.getRecordKeys()) {
-                ObjectNode arrayNode = objectMapper.createObjectNode();
-                MetaDataRecord record = dataSet.getRecord(recordKey);
-                boolean flag = false;
+            for (String recordKey : stdDataSet.getRecordKeys()) {
+                ObjectNode arrayNode = array.addObject();
+                MetaDataRecord record = stdDataSet.getRecord(recordKey);
                 for (String metaDataCode : metaDataCodes) {
                     String value = record.getMetaData(metaDataCode);
-                    if(!StringUtils.isEmpty(value)){
-                        flag=true;
-                    }
                     arrayNode.put(metaDataCode, StringUtils.isEmpty(value) ? "" : value);
-                }
-                if (flag){
-                    array.addPOJO(arrayNode);
                 }
             }
         } else if (section.isObject()) {
             ObjectNode objectNode = (ObjectNode) section;
-            for (String recordKey : dataSet.getRecordKeys()) {
-                MetaDataRecord record = dataSet.getRecord(recordKey);
+            for (String recordKey : stdDataSet.getRecordKeys()) {
+                MetaDataRecord record = stdDataSet.getRecord(recordKey);
                 for (String metaDataCode : metaDataCodes) {
                     String value = record.getMetaData(metaDataCode);
                     objectNode.put(metaDataCode, StringUtils.isEmpty(value) ? "" : value);
@@ -210,4 +214,17 @@ public class SanofiEndPoint {
             }
         }
     }
+
+    private StdDataSet getStdDataSet(MemoryProfile profile,StdDataSet dataSet,String[] innerCodes) throws IOException {
+        StdDataSet stdDataSet = dataSetRepo.findOne(
+                profile.getCdaVersion(),
+                dataSet.getCode(),
+                profile.getProfileType(),
+                dataSet.getRecordKeys(),
+                innerCodes
+        ).getRight();
+        return stdDataSet;
+    }
+
+
 }

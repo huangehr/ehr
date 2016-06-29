@@ -71,22 +71,23 @@ public class ProfileIndicesService {
                 if(rowKeys.length>0){
                     criteria.contains(rowKeys);
                 }
-                return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
             }
             if (StringUtils.isNotEmpty(telephone)) {
                 criteria = criteria.connect();
                 criteria.and(new Criteria(Demographic.LegacyTelephone).contains(telephone).or(new Criteria(Demographic.Telephone).contains(telephone)));
+                return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
             } else if (StringUtils.isNotEmpty(gender) && birthday != null) {
                 criteria = criteria.connect();
                 criteria = criteria.and(new Criteria(Demographic.LegacyGender).contains(gender).or(new Criteria(Demographic.Gender).contains(gender)));
 
                 criteria = criteria.connect();
-                criteria = criteria.and(new Criteria(Demographic.Birthday).between(DateUtils.addDays(birthday, -3), DateUtils.addDays(birthday, 3)));
+//                criteria = criteria.and(new Criteria(Demographic.Birthday).between(DateTimeUtil.utcDateTimeFormat(DateUtils.addDays(birthday, -3)), DateTimeUtil.utcDateTimeFormat(DateUtils.addDays(birthday, 3))));
+                criteria = criteria.and(new Criteria(Demographic.Birthday).between(DateTimeUtil.utcDateTimeFormat(birthday), DateTimeUtil.utcDateTimeFormat(birthday)));
                 return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
             }
         }
 
-        return indicesRepo.query(ProfileCore, criteria, ProfileIndices.class);
+        return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
 
 
 //        if (criteria == null) return null;
