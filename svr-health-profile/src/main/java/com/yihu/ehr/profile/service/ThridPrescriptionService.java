@@ -43,6 +43,9 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
     @Autowired
     TemplateService tempService;
 
+    @Autowired
+    ProfileCDAService profileCDAService;
+
     /**
      * 把html转图片存fastdfs上并且返回fdfs的路径
      * @param eventNo
@@ -79,6 +82,33 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
         return objectMapper.writeValueAsString(params);
     }
 
+    /**
+     * 转换图片并保存到fastdfs
+     * @param profileId rowkey
+     * @param orgCode 机构代码
+     * @param cdaVersion cda版本号
+     * @param cdaCode cda代码
+     * @param width 宽度
+     * @param height 高度
+     * @return
+     * @throws Exception
+     */
+    public String transformImage(String profileId,String orgCode,String cdaVersion,String cdaCode,int width,int height) throws Exception
+    {
+        //获取CDA模板信息
+        Template temp = tempService.getPresriptionTemplate(orgCode,cdaVersion,cdaCode);
+
+        if(temp == null)
+        {
+            throw new Exception("找不到对应CDA模板信息");
+        }
+
+        //获取CDA数据
+        Map<String,Object> model = profileCDAService.getCDAData(profileId,temp.getCdaDocumentId());
+
+        return CDAToImage(temp,model,width,height);
+    }
+
 
     /**
      * 图片生成
@@ -98,22 +128,14 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
             String filePath="";
             //模板路径
             String fileString = "";
-
-            if(temp == null)
-            {
-                throw new Exception("html转图片失败");
-            }
-            else
-            {
-                //模板fastdfs信息
-                String[]  pathInfo = temp.getPcTplURL().split(";");
-                //fastdfs工具类
-                FastDFSUtil fdfs= FastDFSConfig.fastDFSUtil();
-                //下载模板文件
-                String localFileName = fdfs.download(pathInfo[0],pathInfo[1],ThridPrescriptionService.class.getResource("/").getPath());
-                //模板路径
-                fileString = localFileName;
-            }
+            //模板fastdfs信息
+            String[]  pathInfo = temp.getPcTplURL().split(";");
+            //fastdfs工具类
+            FastDFSUtil fdfs= FastDFSConfig.fastDFSUtil();
+            //下载模板文件
+            String localFileName = fdfs.download(pathInfo[0],pathInfo[1],ThridPrescriptionService.class.getResource("/").getPath());
+            //模板路径
+            fileString = localFileName;
 
             //把数据和模板结合生成html
             String html = fillTemplate(fileString,model);
