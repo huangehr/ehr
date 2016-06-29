@@ -130,7 +130,7 @@ public class PatientInfoBaseService {
             }
 
             //门诊诊断
-            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\"" + rowkeys.toString() + "\"}",1,1000);///"{\"join\":\"demographic_id:" + demographicId + "\"}");
+            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\"" + rowkeys.toString().replace(" ","+") + "\"}",1,1000);///"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (outpatient.getDetailModelList() != null && outpatient.getDetailModelList().size() > 0) {
                 for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
@@ -156,7 +156,7 @@ public class PatientInfoBaseService {
             }
 
             //住院诊断
-            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId,"{\"q\":\"" + rowkeys.toString() + "\"}",1,1000); //"{\"join\":\"demographic_id:" + demographicId + "\"}");
+            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId,"{\"q\":\"" + rowkeys.toString().replace(" ","+")  + "\"}",1,1000); //"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (hospitalized.getDetailModelList() != null && hospitalized.getDetailModelList().size() > 0) {
                 for (int i = 0; i < hospitalized.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);

@@ -27,4 +27,10 @@ public interface XIndicatorsDictClient {
     List<MIndicatorsDict> getIndicatorsDictByIds(
             @ApiParam(name = "ids", value = "指标代码")
             @RequestParam(value = "ids") List<String> ids);
+
+    @RequestMapping(value = "/indicators/code", method = RequestMethod.GET)
+    @ApiOperation(value = "根据Code获取相应的指标字典信息" )
+    MIndicatorsDict getIndicatorsDictByCode(
+            @ApiParam(name = "code", value = "指标代码")
+            @RequestParam(value = "code") String code);
 }

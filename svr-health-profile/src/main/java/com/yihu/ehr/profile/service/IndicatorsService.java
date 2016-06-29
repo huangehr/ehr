@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
+import com.yihu.ehr.profile.feign.XIndicatorsDictClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class IndicatorsService {
 
     @Autowired
     private CD10Service dictService;
+
+    @Autowired
+    XIndicatorsDictClient IndicatorsDictClient;
 
     @Autowired
     XResourceClient resource; //资源服务
@@ -57,6 +61,12 @@ public class IndicatorsService {
                     Map<String,Object> item = new HashMap<>();
                     item.put("type",resultItem.get("ETL_INDICATORS_TYPE"));
                     item.put("code",resultItem.get("ETL_INDICATORS_CODE"));
+
+                    MIndicatorsDict detailInformationFromCode = IndicatorsDictClient.getIndicatorsDictByCode(resultItem.get("ETL_INDICATORS_CODE").toString());
+                    item.put("unit",detailInformationFromCode.getUnit());
+                    item.put("upper_limit",detailInformationFromCode.getUpperLimit());
+                    item.put("lower_limit",detailInformationFromCode.getLowerLimit());
+                    item.put("description",detailInformationFromCode.getDescription());
                     item.put("name",resultItem.get("ETL_INDICATORS_NAME"));
                     re.add(item);
                 }
