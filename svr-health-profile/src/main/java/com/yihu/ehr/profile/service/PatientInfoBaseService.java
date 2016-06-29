@@ -348,6 +348,7 @@ public class PatientInfoBaseService {
      * @throws Exception
      */
     public List<Map<String,Object>> getPatientEvents(String demographicId, String eventType, String year, String area, String hpId, String diseaseId) throws Exception {
+        List<Map<String,Object>> returnList = new ArrayList<Map<String,Object>>();
         //门诊过滤参数
         String mzQuery = "";
         //住院过滤参数
@@ -362,12 +363,13 @@ public class PatientInfoBaseService {
         //事件类型
         if (!StringUtils.isBlank(eventType))
         {
-            //0门诊 1住院 2体检
+            //0门诊 1住院 2体检 3处方 4医嘱 5检查检验
             if(eventType.equals("0") || eventType.equals("1") || eventType.equals("2"))
             {
                 query += " AND "+BasisConstant.eventType+":" + eventType;
             }
             else if(eventType.equals("3")){
+
                 query += " AND "+BasisConstant.eventType+":" + eventType;
             }
             else if(eventType.equals("4")){
@@ -420,7 +422,7 @@ public class PatientInfoBaseService {
             }
             else
             {   //地区不为空，地区下机构为空时返回空
-                return new ArrayList<Map<String,Object>>();
+                return returnList;
             }
         }
 
@@ -512,7 +514,7 @@ public class PatientInfoBaseService {
 
 
 
-        List<Map<String,Object>> returnList = new ArrayList<Map<String,Object>>();
+
         if(StringUtils.isBlank(diseaseId) && StringUtils.isBlank(hpId))
         {
             //非疾病、健康问题时返回全部事件纪录
