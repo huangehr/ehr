@@ -59,7 +59,7 @@ public class DataSetParser {
                 while (iterator.hasNext()) {
                     Map.Entry<String, JsonNode> item = iterator.next();
                     String metaData = item.getKey();
-                    if (metaData.equals("PATIENT_ID") || metaData.equals("EVENT_NO")) continue;
+                    if (metaData.equals("EVENT_NO")) continue; //metaData.equals("PATIENT_ID") ||
 
                     /*String[] qualifiedMetaData = translateMetaData(
                             version, dataSetCode, metaData,

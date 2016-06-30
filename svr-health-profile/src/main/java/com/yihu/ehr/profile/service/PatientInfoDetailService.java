@@ -100,7 +100,7 @@ public class PatientInfoDetailService {
             re = BasisConstant.profileId+":(NOT *)";
         }
 
-        return re.replace(" ","+");
+        return re;
     }
 
     /******************************* 用药信息 ***********************************************************/
@@ -112,15 +112,30 @@ public class PatientInfoDetailService {
         List<Map<String, Object>> re = new ArrayList<>();
         String rowkeys = getProfileIds(demographicId);
 
+        String xyQueryParams = "{\"q\":\""+rowkeys+"\"}";
+        String zyQueryParams = "{\"q\":\""+rowkeys+"\"}";
         if(hpId!=null && hpId.length()>0)
         {
-
+            List<MDrugDict> drugList = dictService.getDrugDictList(hpId);
+            if(drugList!=null && drugList.size()>0)
+            {
+                String drugQuery = "";
+                for(MDrugDict drug : drugList){
+                    if(drugQuery.length()==0)
+                    {
+                        drugQuery = "{key}:"+drug.getName();
+                    }
+                    else{
+                        drugQuery = " OR {key}:"+drug.getName();
+                    }
+                }
+                xyQueryParams = "{\"q\":\""+rowkeys+" AND ("+ drugQuery.replace("{key}",BasisConstant.xymc) +")\"}";
+                zyQueryParams = "{\"q\":\""+rowkeys+" AND ("+ drugQuery.replace("{key}",BasisConstant.zymc) +")\"}";
+            }
         }
 
-        String queryParams = "{\"q\":\""+rowkeys+"\"}";
-
         //西药统计
-        Envelop resultWestern = resource.getResources(BasisConstant.medicationWesternStat,appId,queryParams,null,null);
+        Envelop resultWestern = resource.getResources(BasisConstant.medicationWesternStat, appId, xyQueryParams.replace(" ","+"),null,null);
         if(resultWestern.getDetailModelList()!=null && resultWestern.getDetailModelList().size()>0)
         {
             List<Map<String, Object>> list = resultWestern.getDetailModelList();
@@ -133,7 +148,7 @@ public class PatientInfoDetailService {
             }
         }
         //中药统计
-        Envelop resultChinese = resource.getResources(BasisConstant.medicationChineseStat,appId,queryParams,null,null);
+        Envelop resultChinese = resource.getResources(BasisConstant.medicationChineseStat,appId,zyQueryParams.replace(" ","+"),null,null);
         if(resultChinese.getDetailModelList()!=null && resultChinese.getDetailModelList().size()>0)
         {
             List<Map<String, Object>> list = resultChinese.getDetailModelList();

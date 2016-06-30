@@ -1,7 +1,13 @@
 package com.yihu.ehr.specialdict.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.model.specialdict.MHealthProblemDict;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.redis.RedisClient;
+import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
 import com.yihu.ehr.specialdict.model.HealthProblemDict;
+import com.yihu.ehr.specialdict.model.Icd10HpRelation;
+import com.yihu.ehr.specialdict.model.IndicatorsDict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -30,6 +40,9 @@ public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, 
     private XHealthProblemDictRepository hpDictRepo;
     @Autowired
     private XIcd10HpRelationRepository hpIcd10ReRepo;
+
+    @Autowired
+    private IndicatorsDictService indicatorsDictService;
 
     public Page<HealthProblemDict> getDictList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
