@@ -100,8 +100,10 @@ public class PackMill {
 
                     MetaDataRecord metaDataRecord = dataSet.getRecord(key);
                     for (String metaDataCode : metaDataRecord.getMetaDataCodes()){
+                        if(metaDataCode.equals("PATIENT_ID")) continue;;
+
                         String resourceMetaData = resourceMetaData(stdPack.getCdaVersion(), dataSet.getCode(), metaDataCode);
-                        if (StringUtils.isEmpty(resourceMetaData)) continue;
+                        if (StringUtils.isEmpty(resourceMetaData) ) continue;
 
                         //subRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
                         dictTransform(subRecord,stdPack.getCdaVersion(),resourceMetaData,metaDataRecord.getMetaData(metaDataCode));
