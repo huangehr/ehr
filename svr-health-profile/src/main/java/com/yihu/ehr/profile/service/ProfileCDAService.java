@@ -74,7 +74,7 @@ public class ProfileCDAService {
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(0);
             String cdaVersion = obj.get("cda_version").toString();
-            String orgCode = obj.get("org_code").toString();
+            String eventType = obj.get("event_type").toString();
 
             //获取CDA关联数据集
             Map<String,List<Map<String, Object>>> datasetList = new HashMap<>();
@@ -119,18 +119,19 @@ public class ProfileCDAService {
             re.put("cda_version",cdaVersion);
             re.put("cda_document_id",cdaDocumentId);
             re.put("cda_document_name",cda.getName());
+            re.put("event_type",eventType);
             re.put("data_sets",datasetList);
 
 
             //是否非结构化档案
-            if(obj.containsKey("profile_type") && obj.get("profile_type").toString().equals("2"))
-            {
+            /*if(obj.containsKey("profile_type") && obj.get("profile_type").toString().equals("2"))
+            {*/
                 Envelop rawFiles = resource.getRawFiles(profileId,null,null);
                 if(rawFiles.getDetailModelList()!=null && rawFiles.getDetailModelList().size()>0)
                 {
                     re.put("files",rawFiles.getDetailModelList());
                 }
-            }
+            //}
         } else {
             throw new Exception("未查到相关记录！");
         }
@@ -240,6 +241,7 @@ public class ProfileCDAService {
         Envelop profile = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}", null, null);
         if (profile.getDetailModelList() != null && profile.getDetailModelList().size() > 0) {
             Map<String, Object> profileMap = (Map<String, Object>) profile.getDetailModelList().get(0);
+            re.put("event_type",profileMap.get("event_type"));
             String version = profileMap.get("cda_version").toString();
             String orgCode = profileMap.get("org_code").toString();
             String eventType = profileMap.get("event_type").toString();
