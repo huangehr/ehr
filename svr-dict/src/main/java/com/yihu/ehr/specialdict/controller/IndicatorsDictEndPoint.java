@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
@@ -168,5 +165,20 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
         }
         List<IndicatorsDict> indicatorsDicts = indicatorsDictService.getIndicatorsDictByIds(longIds);
         return (List<MIndicatorsDict>)convertToModels(indicatorsDicts, new ArrayList<>(indicatorsDicts.size()), MIndicatorsDict.class, "");
+    }
+
+    @RequestMapping(value = "/indicators/CacheIndicatorsDict" , method = RequestMethod.POST)
+    @ApiOperation(value = "缓存健康问题字典/redis缓存")
+    public void CacheHpDictByCodes(){
+
+        indicatorsDictService.CacheIndicatorsDict();
+    }
+
+    @RequestMapping(value = "/indicators/getIndicatorsDictByCode" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据字典代码获取缓存的健康问题字典/redis缓存")
+    public HashMap getHpDictByCodes(
+            @ApiParam(name = "code", value = "code", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        return indicatorsDictService.getIndicatorsDictByCode(code);
     }
 }
