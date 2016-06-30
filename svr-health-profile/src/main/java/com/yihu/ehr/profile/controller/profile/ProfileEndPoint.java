@@ -236,9 +236,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("CDA数据OK")
     @RequestMapping(value = ServiceApi.Profiles.CDAData, method = RequestMethod.GET)
     public Map<String,Object> CDAData(
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="42017976-4_0000145400_ZY010000806438_1454115983000")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_420521195812172917_41872607-91467252853480_1465920000000")
             @RequestParam(value = "profile_id", required = true) String profile_id,
-            @ApiParam(name = "cda_document_id", value = "模板ID",defaultValue="0dae000656b2e9480dc3568e6a372b59")
+            @ApiParam(name = "cda_document_id", value = "模板ID",defaultValue="0dae0006568a12c80dc35654490ab373")
             @RequestParam(value = "cda_document_id", required = true) String cda_document_id) throws Exception {
 
         return profileCDAService.getCDAData(profile_id, cda_document_id);
