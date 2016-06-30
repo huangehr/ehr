@@ -130,7 +130,7 @@ public class PatientInfoBaseService {
             }
 
             //门诊诊断
-            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\"" + rowkeys.toString() + "\"}",1,1000);///"{\"join\":\"demographic_id:" + demographicId + "\"}");
+            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\"" + rowkeys.toString().replace(" ","+") + "\"}",1,1000);///"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (outpatient.getDetailModelList() != null && outpatient.getDetailModelList().size() > 0) {
                 for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
@@ -156,7 +156,7 @@ public class PatientInfoBaseService {
             }
 
             //住院诊断
-            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId,"{\"q\":\"" + rowkeys.toString() + "\"}",1,1000); //"{\"join\":\"demographic_id:" + demographicId + "\"}");
+            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId,"{\"q\":\"" + rowkeys.toString().replace(" ","+")  + "\"}",1,1000); //"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (hospitalized.getDetailModelList() != null && hospitalized.getDetailModelList().size() > 0) {
                 for (int i = 0; i < hospitalized.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
@@ -205,19 +205,7 @@ public class PatientInfoBaseService {
                             obj.put("lastVisitRecord", profileId);
                             obj.put("recentEvent", "就诊");
                             obj.put("profileId", profileId);
-                            SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
-                            String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
-                            String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
-                            String ageOfDisease="";
-                            if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
-                                ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1)+"年"
-                                        +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth))+"月";
-                            }
-                            else{
-                                ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear))+"年"
-                                        +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth))+"月";
-                            }
-                            obj.put("ageOfDisease",ageOfDisease);
+                            obj.put("ageOfDisease",getAgeOfDisease(eventData));
                             re.add(obj);
                             breaked = true;
                             break;
@@ -255,20 +243,8 @@ public class PatientInfoBaseService {
                                         obj.put("recentEvent", "住院");
                                         obj.put("profileId", profileId);
                                     }
-                                    else{
-                                        SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
-                                        String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
-                                        String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
-                                        String ageOfDisease="";
-                                        if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
-                                            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1)+"年"
-                                                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth))+"月";
-                                        }
-                                        else{
-                                            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear))+"年"
-                                                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth))+"月";
-                                        }
-                                        obj.put("ageOfDisease",ageOfDisease);
+                                    else if(sdf.parse(eventData.toString()).getTime()  < sdf.parse(obj.get("ageOfDisease").toString()).getTime()){
+                                        obj.put("ageOfDisease",getAgeOfDisease(eventData));
                                     }
                                 }
                             }
@@ -288,19 +264,7 @@ public class PatientInfoBaseService {
                                 obj.put("lastVisitRecord", profileId);
                                 obj.put("recentEvent", "住院");
                                 obj.put("profileId", profileId);
-                                SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
-                                String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
-                                String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
-                                String ageOfDisease="";
-                                if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
-                                    ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1)+"年"
-                                        +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth))+"月";
-                                }
-                                else{
-                                    ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear))+"年"
-                                            +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth))+"月";
-                                }
-                                        obj.put("ageOfDisease",ageOfDisease);
+                                obj.put("ageOfDisease",getAgeOfDisease(eventData));
                                 re.add(obj);
                                 breaked = true;
                                 break;
@@ -717,4 +681,21 @@ public class PatientInfoBaseService {
         Envelop re = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\""+queryParams+"\"}", page, size);
         return re;
     }
+
+    public String getAgeOfDisease(Object eventData){
+        SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
+        String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
+        String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
+        String ageOfDisease="";
+        if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
+            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1)+"年"
+                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth))+"月";
+        }
+        else{
+            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear))+"年"
+                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth))+"月";
+        }
+        return ageOfDisease;
+    }
+
 }
