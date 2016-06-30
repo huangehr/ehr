@@ -37,6 +37,7 @@ public interface XResourceClient {
 
     @RequestMapping(value = "/rs/query/getRawFiles", method = GET)
     Envelop getRawFiles(@RequestParam(value = "profileId", required = false) String profileId,
+                        @RequestParam(value = "cdaDocumentId", required = false) String cdaDocumentId,
                         @RequestParam(value = "page", required = false) Integer page,
                         @RequestParam(value = "size", required = false) Integer size) throws Exception;
 }
