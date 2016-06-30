@@ -126,7 +126,7 @@ public class PatientInfoDetailService {
                         drugQuery = "{key}:"+drug.getName();
                     }
                     else{
-                        drugQuery = " OR {key}:"+drug.getName();
+                        drugQuery += " OR {key}:"+drug.getName();
                     }
                 }
                 xyQueryParams = "{\"q\":\""+rowkeys+" AND ("+ drugQuery.replace("{key}",BasisConstant.xymc) +")\"}";
@@ -180,6 +180,29 @@ public class PatientInfoDetailService {
      */
     public List<Map<String, Object>> getMedicationStat(String demographicId, String hpId) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
+        String rowkeys = getProfileIds(demographicId);
+
+        String xyQueryParams = "{\"q\":\""+rowkeys+"\"}";
+        String zyQueryParams = "{\"q\":\""+rowkeys+"\"}";
+        if(hpId!=null && hpId.length()>0)
+        {
+            List<MDrugDict> drugList = dictService.getDrugDictList(hpId);
+            if(drugList!=null && drugList.size()>0)
+            {
+                String drugQuery = "";
+                for(MDrugDict drug : drugList){
+                    if(drugQuery.length()==0)
+                    {
+                        drugQuery = "{key}:"+drug.getName();
+                    }
+                    else{
+                        drugQuery = " OR {key}:"+drug.getName();
+                    }
+                }
+                xyQueryParams = "{\"q\":\""+rowkeys+" AND ("+ drugQuery.replace("{key}",BasisConstant.xymc) +")\"}";
+                zyQueryParams = "{\"q\":\""+rowkeys+" AND ("+ drugQuery.replace("{key}",BasisConstant.zymc) +")\"}";
+            }
+        }
         //中药统计
         Envelop result = resource.getResources(BasisConstant.medicationWesternStat, appId, "{\"join\":\"demographic_id:" + demographicId + "\"}", null, null);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
@@ -223,18 +246,12 @@ public class PatientInfoDetailService {
             }
             else{
                 queryParams = getProfileIds(demographicId);
-                if(("profile_id:(NOT *)").equals(demographicId) && demographicId!=null){
-                    Envelop envelop = new Envelop();
-                    envelop.setSuccessFlg(false);
-                    envelop.setErrorMsg("找不到此人相关记录");
-
-                    return envelop.getDetailModelList();
-                }
             }
         }
 
+        queryParams =  "{\"q\":\"" + queryParams + "\"}";
         //获取数据
-        Envelop result = resource.getResources(BasisConstant.medicationMaster, appId, "{\"q\":\"" + queryParams + "\"}", null, null);
+        Envelop result = resource.getResources(BasisConstant.medicationMaster, appId, queryParams.replace(" ","+"), null, null);
 
         return result.getDetailModelList();
     }
@@ -426,100 +443,7 @@ public class PatientInfoDetailService {
         if(q=="")
             q="*:*";
         String queryParams =  "{\"q\":\"" + q + "\"}";
-        return resource.getResources(resourceCode, appId, queryParams, page, size);
-    }
-
-
-
-
-    /*************************** 指标 **********************************************/
-    /**
-     * 检验指标（可分页）
-     */
-    public Envelop getHealthIndicators(String demographicId, String hpId, String medicalIndexId, String startTime, String endTime, Integer page, Integer size) throws Exception {
-        String q = "";
-        //时间范围
-        if (startTime != null && startTime.length() > 0 && endTime != null && endTime.length() > 0) {
-            q = BasisConstant.jysj + ":[" + startTime + " TO " + endTime + "]";
-        } else {
-            if (startTime != null && startTime.length() > 0) {
-                q = BasisConstant.jysj + ":[" + startTime + " TO *]";
-            } else if (endTime != null && endTime.length() > 0) {
-                q = BasisConstant.jysj + ":[* TO " + endTime + "]";
-            }
-        }
-
-        //指标ID不为空
-        if (medicalIndexId != null && medicalIndexId.length() > 0) {
-            if (q.length() > 0) {
-                q += " AND " + BasisConstant.jyzb + ":" + medicalIndexId;
-            } else {
-                q = BasisConstant.jyzb + ":" + medicalIndexId;
-            }
-        } else {
-            //健康问题
-            if (hpId != null && hpId.length() > 0) {
-                //健康问题->指标代码
-                List<MIndicatorsDict> indicatorsList = dictService.getIndicatorsDictList(hpId);
-                String jyzbQuery = "";
-                if (indicatorsList != null && indicatorsList.size() > 0) {
-                    //遍历指标列表
-                    for (MIndicatorsDict indicators : indicatorsList) {
-                        if (jyzbQuery.length() > 0) {
-                            jyzbQuery += " OR " + BasisConstant.jyzb + ":" + indicators.getCode();
-                        } else {
-                            jyzbQuery = BasisConstant.jyzb + ":" + indicators.getCode();
-                        }
-                    }
-                }
-
-                if (jyzbQuery.length() > 0) {
-                    if (q.length() > 0) {
-                        q += " AND (" + jyzbQuery + ")";
-                    } else {
-                        q = "(" + jyzbQuery + ")";
-                    }
-                }
-            }
-        }
-
-        //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
-
-        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
-            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
-            StringBuilder rowkeys = new StringBuilder();
-
-            for (Map<String, Object> event : eventList) {
-                if (rowkeys.length() > 0) {
-                    rowkeys.append(" OR ");
-                }
-                rowkeys.append("profile_id:" + event.get("rowkey"));
-            }
-
-            if(rowkeys.length() > 0)
-            {
-                if (q.length() > 0) {
-                    q += " AND (" + rowkeys.toString() + ")";
-                } else {
-                    q = "(" + rowkeys.toString() + ")";
-                }
-            }
-        }
-        else
-        {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("找不到此人相关记录");
-
-            return envelop;
-        }
-
-        String queryParams = "{\"q\":\"" + q + "\"}";//"{\"join\":\"demographic_id:" + demographicId + "\"}";
-        //        if (q.length() > 0) {
-        //            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
-        //        }
-        return resource.getResources(BasisConstant.laboratoryReport, appId, queryParams, page, size);
+        return resource.getResources(resourceCode, appId, queryParams.replace(" ","+"), page, size);
     }
 
 
@@ -563,6 +487,6 @@ public class PatientInfoDetailService {
                 queryParams = getProfileIds(demographicId);
             }
         }
-        return resource.getResources(resourceCode, appId, "{\"q\":\""+queryParams+"\"}", page, size);
+        return resource.getResources(resourceCode, appId, "{\"q\":\""+queryParams.replace(' ','+')+"\"}", page, size);
     }
 }

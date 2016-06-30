@@ -1,6 +1,7 @@
 package com.yihu.ehr.specialdict.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.specialdict.model.HealthProblemDict;
 import com.yihu.ehr.specialdict.service.Icd10HpRelationCacheService;
 import io.swagger.annotations.Api;
@@ -21,7 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "Icd10HpRelationCache", description = "健康问题和ICD10缓存管理接口")
-public class ZIcd10HpRelationCacheController {
+public class Icd10HpRelationCacheEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private Icd10HpRelationCacheService icd10HpRelationCacheService;
@@ -69,6 +70,7 @@ public class ZIcd10HpRelationCacheController {
     @RequestMapping(value = "/hp_icd10_relation_cache/all", method = RequestMethod.GET)
     @ApiOperation(value = "获取所有缓存")
     public List<HealthProblemDict> healthProblemDictList(){
+        //icd10HpRelationCacheService.cacheAll(true);
         return icd10HpRelationCacheService.healthProblemDictList();
     }
 

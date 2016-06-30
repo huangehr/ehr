@@ -553,7 +553,7 @@ public class PatientInfoBaseService {
     }
 
     /**
-     * 通过代码获取疾病名称
+     * 通过代码获取疾病名称!!!!!!!!!!!
      * @return
      */
     private Map<String, String> getDiseaseMap(String code)

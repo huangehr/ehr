@@ -77,10 +77,13 @@ public class Icd10HpRelationCacheService {
      */
     public HealthProblemDict healthProblemDict(String icd10Id) {
         //Icd10Dict icd10Dict = icd10DictRepository.findOne(Long.parseLong(icd10Id));
-        String codeAndName = redisClient.get(keySchema.icd10HpRelation(icd10Id));
+
         HealthProblemDict healthProblemDict = new HealthProblemDict();
-        healthProblemDict.setCode(codeAndName.split("__")[0]);
-        healthProblemDict.setName(codeAndName.split("__")[1]);
+        String codeAndName = redisClient.get(keySchema.icd10HpRelation(icd10Id));
+        if(codeAndName!=null && codeAndName.contains("__")){
+            healthProblemDict.setCode(codeAndName.split("__")[0]);
+            healthProblemDict.setName(codeAndName.split("__")[1]);
+        }
         return healthProblemDict;
     }
 
@@ -95,10 +98,13 @@ public class Icd10HpRelationCacheService {
         for (String key : keys){
             HealthProblemDict healthProblemDict = new HealthProblemDict();
             healthProblemDict.setCode(key.split(":")[1]);
-            String codeAndName = redisClient.get(key);
-            healthProblemDict.setCode(codeAndName.split("__")[0]);
-            healthProblemDict.setName(codeAndName.split("__")[1]);
-            healthProblemDictList.add(healthProblemDict);
+            String codeAndName = redisClient.get(key).toString();
+            if(codeAndName!=null && codeAndName.contains("__"))
+            {
+                healthProblemDict.setCode(codeAndName.split("__")[0]);
+                healthProblemDict.setName(codeAndName.split("__")[1]);
+                healthProblemDictList.add(healthProblemDict);
+            }
         }
         return healthProblemDictList;
     }
