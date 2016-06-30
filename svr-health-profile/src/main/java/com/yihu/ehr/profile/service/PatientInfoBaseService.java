@@ -77,6 +77,29 @@ public class PatientInfoBaseService {
     }
 
     /**
+     * 根据时间获取病龄
+     * @param eventData
+     * @return
+     */
+    private String getAgeOfDisease(Object eventData){
+        SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
+        String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
+        String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
+        String ageOfDisease="";
+
+
+        if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
+            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1)+"年"
+                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth))+"月";
+        }
+        else{
+            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear))+"年"
+                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth))+"月";
+        }
+        return ageOfDisease;
+    }
+
+    /**
      * @获取患者档案基本信息
      */
     public Map<String, Object> getPatientInfo(String demographicId) throws Exception {
@@ -129,8 +152,9 @@ public class PatientInfoBaseService {
                 rowkeys.append("profile_id:" + event.get("rowkey"));
             }
 
+            String queryParams = "{\"q\":\"" + rowkeys.toString() + "\"}";
             //门诊诊断
-            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\"" + rowkeys.toString().replace(" ","+") + "\"}",1,1000);///"{\"join\":\"demographic_id:" + demographicId + "\"}");
+            Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, queryParams.replace(' ','+'),1,1000);///"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (outpatient.getDetailModelList() != null && outpatient.getDetailModelList().size() > 0) {
                 for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
@@ -156,7 +180,7 @@ public class PatientInfoBaseService {
             }
 
             //住院诊断
-            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId,"{\"q\":\"" + rowkeys.toString().replace(" ","+")  + "\"}",1,1000); //"{\"join\":\"demographic_id:" + demographicId + "\"}");
+            Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId, queryParams.replace(' ','+'),1,1000); //"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (hospitalized.getDetailModelList() != null && hospitalized.getDetailModelList().size() > 0) {
                 for (int i = 0; i < hospitalized.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
@@ -278,7 +302,6 @@ public class PatientInfoBaseService {
             }
         }
 
-        //未完成，病龄和机构代码转换*************
 
         return re;
     }
@@ -338,6 +361,12 @@ public class PatientInfoBaseService {
             }
             else if(eventType.equals("4")){
                 query += " AND "+BasisConstant.eventType+":" + eventType;
+            }
+            else if(eventType.equals("5")){
+                query += " AND "+BasisConstant.eventType+":" + eventType;
+            }
+            else{
+                return returnList;
             }
         }
         //事件年份
@@ -448,8 +477,9 @@ public class PatientInfoBaseService {
         //过滤门诊纪录
         if (!StringUtils.isBlank(mzQuery))
         {
+            String queryParams = "{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\"";
             //门诊诊断纪录
-            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis,appId,"{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\"".replace(' ','+'), null, null);
+            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, appId, queryParams.replace(' ', '+'), null, null);
 
             //获取疾病门诊事件纪录rowkey
             if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
@@ -463,20 +493,20 @@ public class PatientInfoBaseService {
         //过滤住院纪录
         if(!StringUtils.isBlank(zyQuery))
         {
+            String queryParams = "{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\"";
+            //门诊诊断纪录
             //住院诊断纪录
-            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,"{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\"".replace(' ','+'), null, null);
+            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,queryParams.replace(' ', '+'), null, null);
 
             //获取疾病住院事件纪录rowkey
             if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0)
             {
-                for(Map<String,Object> map : (List<Map<String, Object>>)resultZyzd.getDetailModelList())
+                for (Map<String, Object> map : (List<Map<String, Object>>)resultZyzd.getDetailModelList())
                 {
                     returnRowkey.add((String)map.get("profile_id"));
                 }
             }
         }
-
-
 
 
         if(StringUtils.isBlank(diseaseId) && StringUtils.isBlank(hpId))
@@ -547,26 +577,12 @@ public class PatientInfoBaseService {
      */
     public List<Map<String, String>> getPatientDisease(String demographicId) throws Exception {
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
-        StringBuilder rowkeys = new StringBuilder();
+        String rowkeys = getProfileIds(demographicId);
+        String queryParams = "{\"q\":\""+ rowkeys +"\"}";
 
-        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
-            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
-
-            for(Map<String,Object> event : eventList)
-            {
-                if(rowkeys.length() > 0)
-                {
-                    rowkeys.append(" OR ");
-                }
-                rowkeys.append("profile_id:" + event.get("rowkey"));
-            }
-        }
-
-        List<String> list = new ArrayList<>();
         List<Map<String, String>> healthProblemDictMapList = new ArrayList<>();
         //门诊诊断
-        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, "{\"q\":\""+ rowkeys.toString() +"\"}", null, null);//"{\"join\":\"demographic_id:" + demographicId + "\"}");
+        Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, queryParams.replace(' ','+'), null, null);//"{\"join\":\"demographic_id:" + demographicId + "\"}");
         if (outpatient.getDetailModelList() != null && outpatient.getDetailModelList().size() > 0) {
             for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
@@ -577,7 +593,7 @@ public class PatientInfoBaseService {
             }
         }
         //住院诊断
-        Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId, "{\"q\":\""+ rowkeys.toString() +"\"}",1,1000);//"{\"join\":\"demographic_id:" + demographicId + "\"}");
+        Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId, queryParams.replace(' ','+'),1,1000);//"{\"join\":\"demographic_id:" + demographicId + "\"}");
         if (hospitalized.getDetailModelList() != null && hospitalized.getDetailModelList().size() > 0) {
             for (int i = 0; i < hospitalized.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
@@ -680,24 +696,7 @@ public class PatientInfoBaseService {
         }
 
         //全文检索
-        Envelop re = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\""+queryParams+"\"}", page, size);
+        Envelop re = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\""+queryParams.replace(' ','+')+"\"}", page, size);
         return re;
     }
-
-    public String getAgeOfDisease(Object eventData){
-        SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
-        String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
-        String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
-        String ageOfDisease="";
-        if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
-            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1)+"年"
-                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth))+"月";
-        }
-        else{
-            ageOfDisease=String.valueOf(Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear))+"年"
-                    +String.valueOf(Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth))+"月";
-        }
-        return ageOfDisease;
-    }
-
 }

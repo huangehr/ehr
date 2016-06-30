@@ -71,11 +71,12 @@ public class ResourcesQueryEndPoint {
      */
     @ApiOperation("获取非结构化数据")
     @RequestMapping(value = "/getRawFiles", method = RequestMethod.GET)
-    public Envelop getRawFiles(@ApiParam("profileId") @RequestParam(value = "profileId", required = false) String profileId,
+    public Envelop getRawFiles(@ApiParam("profileId") @RequestParam(value = "profileId", required = true) String profileId,
+                               @ApiParam("cdaDocumentId") @RequestParam(value = "cdaDocumentId", required = false) String cdaDocumentId,
                                 @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                 @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return resourcesQueryService.getRawFiles(profileId,page,size);
+        return resourcesQueryService.getRawFiles(profileId,cdaDocumentId,page,size);
     }
 
     @ApiOperation("Hbase从表")
