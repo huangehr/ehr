@@ -321,10 +321,15 @@ public class ResourcesQueryService  {
      * @return
      * @throws Exception
      */
-    public Envelop getRawFiles(String profileId,Integer page,Integer size) throws Exception{
+    public Envelop getRawFiles(String profileId,String cdaDocumentId,Integer page,Integer size) throws Exception{
         Envelop re = new Envelop();
+        String queryParams = "{\"q\":\"rowkey:"+profileId+"*\"}";
+        if(cdaDocumentId!=null && cdaDocumentId.length()>0)
+        {
+            queryParams = "{\"q\":\"rowkey:"+profileId+"* AND cda_document_id:"+cdaDocumentId+"\"}";
+        }
 
-        Page<Map<String,Object>> result = resourcesQueryDao.getRawFiles("{\"q\":\"rowkey:"+profileId+"*\"}",page,size);
+        Page<Map<String,Object>> result = resourcesQueryDao.getRawFiles(queryParams,page,size);
         if (result != null) {
             re.setSuccessFlg(true);
             re.setCurrPage(result.getNumber());

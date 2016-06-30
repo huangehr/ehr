@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -123,15 +124,16 @@ public class ProfileCDAService {
             re.put("data_sets",datasetList);
 
 
-            //是否非结构化档案
-            /*if(obj.containsKey("profile_type") && obj.get("profile_type").toString().equals("2"))
-            {*/
-                Envelop rawFiles = resource.getRawFiles(profileId,null,null);
-                if(rawFiles.getDetailModelList()!=null && rawFiles.getDetailModelList().size()>0)
-                {
-                    re.put("files",rawFiles.getDetailModelList());
-                }
-            //}
+
+            Envelop rawFiles = resource.getRawFiles(profileId,cdaDocumentId,null,null);
+            if(rawFiles.getDetailModelList()!=null && rawFiles.getDetailModelList().size()>0)
+            {
+                Map<String,Object> rawFile = (Map<String,Object>)rawFiles.getDetailModelList().get(0);
+                String fileString  = rawFile.get("file_list").toString();
+                JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, Map.class);
+                List<Map<String, Object>> fileList = objectMapper.readValue(fileString, javaType);
+                re.put("file_list",fileList);
+            }
         } else {
             throw new Exception("未查到相关记录！");
         }
