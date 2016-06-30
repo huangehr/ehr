@@ -3,6 +3,8 @@ package com.yihu.ehr.specialdict.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
+import com.yihu.ehr.schema.IndicatorsDictKeySchema;
+import com.yihu.ehr.schema.KeySchema;
 import com.yihu.ehr.specialdict.model.IndicatorsDict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +27,7 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndicatorsDictRepository> {
+public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndicatorsDictRepository>{
 
     @PersistenceContext
     protected EntityManager entityManager;
@@ -36,7 +38,8 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
     @Autowired
     private RedisClient redisClient;
     @Autowired
-    private Icd10HpRelationKeySchema keySchema;
+    private IndicatorsDictKeySchema indicatorsDictKeySchema;
+
     public Page<IndicatorsDict> getDictList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return indicatorsDictRepo.findAll(pageable);
@@ -78,8 +81,7 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
     public void CacheIndicatorsDict() {
         try {
             for (IndicatorsDict m :findAllIndicatorsDict()) {
-
-                String redisKey = keySchema.icd10HpRelation(m.getCode());
+                String redisKey = indicatorsDictKeySchema.KeySchemaFormCode(m.getCode());
                 HashMap<String,String> map=new HashMap<>();
                 map.put("id",String.valueOf(m.getId()));
                 map.put("code",m.getCode());
@@ -101,6 +103,6 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
 
     public HashMap<String,String> getIndicatorsDictByCode(String code) {
 
-        return  redisClient.get(keySchema.icd10HpRelation(code));
+        return  redisClient.get(indicatorsDictKeySchema.KeySchemaFormCode(code));
     }
 }
