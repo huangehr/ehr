@@ -299,10 +299,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return adapterBatch(version,re);
     }
 
-    @ApiOperation("处方笺")
+    @ApiOperation("处方笺OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationPrescription, method = RequestMethod.GET)
     public List<Map<String,Object>> DrugPrescription(
-            @ApiParam(name = "profile_id", value = "档案ID")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "41872607-9_1000000_20000002_1465894742000")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "prescription_no", value = "处方编号")
             @RequestParam(value = "prescription_no", required = false) String prescription_no) throws Exception
