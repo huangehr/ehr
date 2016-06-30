@@ -15,6 +15,7 @@ import com.yihu.ehr.profile.legacy.sanofi.persist.ProfileIndices;
 import com.yihu.ehr.profile.legacy.sanofi.persist.ProfileIndicesService;
 import com.yihu.ehr.profile.legacy.sanofi.persist.ProfileService;
 import com.yihu.ehr.profile.legacy.sanofi.persist.repo.DataSetRepository;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,7 +31,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 康赛（赛诺菲）项目患者体征数据提取API。体征数据包括：
@@ -68,9 +72,9 @@ public class SanofiEndPoint {
             @RequestParam(value = "gender", required = false) String gender,
             @ApiParam(value = "出生日期")
             @RequestParam(value = "birthday", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date birthday,
-            @ApiParam(value = "起始日期", defaultValue = "2015-01-01T00:00:00Z")
+            @ApiParam(value = "起始日期", defaultValue = "2015-01-01")
             @RequestParam("since") @DateTimeFormat(pattern = "yyyy-MM-dd") Date since,
-            @ApiParam(value = "结束日期", defaultValue = "2016-01-01T00:00:00Z")
+            @ApiParam(value = "结束日期", defaultValue = "2016-01-01")
             @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) throws Exception {
         Pageable pageable = new PageRequest(0, 20);
         Page<ProfileIndices> profileIndices = indicesService.findByDemographic(demographicId, null, name, telephone, gender, birthday, since, to, pageable);
@@ -89,7 +93,7 @@ public class SanofiEndPoint {
         ArrayNode document = objectMapper.createArrayNode();
         for (MemoryProfile profile : profiles) {
             ObjectNode section = objectMapper.createObjectNode();
-            convert(section, profile);
+            convert(section, profile ,since, to);
 
             if (section.size() > 1) document.addPOJO(section);
         }
@@ -97,7 +101,7 @@ public class SanofiEndPoint {
         return new ResponseEntity<>(document.toString(), HttpStatus.OK);
     }
 
-    private void convert(ObjectNode document, MemoryProfile profile) throws IOException {
+    private void convert(ObjectNode document, MemoryProfile profile ,Date since, Date to) throws IOException, ParseException {
         JsonNode section;
         StdDataSet dataSet;
         String[] innerCodes;
@@ -113,23 +117,24 @@ public class SanofiEndPoint {
                     "HDSA00_01_017",                   //身份证号
                     "HDSA00_01_009"};                  //姓名
 
-            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
-            mergeData(section, profile, stdDataSet, innerCodes);
+            StdDataSet stdDataSet = getStdDataSet(profile, dataSet, innerCodes);
+            mergeData(section, stdDataSet, innerCodes);
         }
 
         // 生命体征：住院护理体征记录
         dataSet = profile.getDataSet("HDSD00_08");
+        innerCodes = new String[]{
+                "HDSD00_08_025",   // 呼吸频率（次/min）
+                "HDSD00_08_075",   // 体温
+                "HDSD00_08_041",   // 脉率（次/min）
+                "HDSD00_08_060",   // 收缩压（mmHg）
+                "HDSD00_08_068",   // 舒张压（mmHg）
+//                "HDSD00_08_036"    // 记录日期时间
+        };
         if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
-            section = document.withArray("vitals");
-            innerCodes = new String[]{
-                    "HDSD00_08_025",
-                    "HDSD00_08_075",
-                    "HDSD00_08_041",
-                    "HDSD00_08_060",
-                    "HDSD00_08_068"};
-
-            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
-            mergeData(section, profile, stdDataSet, innerCodes);
+            section = document.withArray("physical_exam");
+            String checkDate = "HDSD00_08_036";
+            TimeFilter(section,dataSet,profile,innerCodes,since,to,checkDate);
         }
 
         // 检验
@@ -144,61 +149,74 @@ public class SanofiEndPoint {
                     "HDSD00_01_547",// 单位
                     "JDSD02_03_06", // 参考值上限
                     "JDSD02_03_07", // 参考值下限
+//                    "JDSD02_03_10"  // 创建时间
             };
 
-            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
+            if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
+                String checkDate = "JDSD02_03_10";
+                TimeFilter(section,dataSet,profile,innerCodes,since,to,checkDate);
+            }
+            //检验项目过滤 符合要求的项目有{"PRO", "CREA", "GLU", "TCHO", "HDL-C", "TG", "K", "HbAc1", "GLU(2h)", "cTnI", "PRO", "UTP"}
+            StdDataSet stdDataSet = getStdDataSet(profile, dataSet, innerCodes);
             Set<String> keys = stdDataSet.getRecordKeys();
-            List<String> listKeys = new ArrayList<String> ();
+            List<String> listKeys = new ArrayList<String>();
             listKeys.addAll(keys);
             for (String recordKey : listKeys) {
                 MetaDataRecord record = stdDataSet.getRecord(recordKey);
-                String entryName = record.getDataGroup().get("JDSD02_03_14");
+                String JDSD02_03_14 = record.getDataGroup().get("JDSD02_03_14");
+                String JDSD02_03_04 = record.getDataGroup().get("JDSD02_03_04");
                 String[] entryNames = LisEntry.ENTRY_NAME;
                 List<String> entryNameList = Arrays.asList(entryNames);
-                if (!entryNameList.contains(entryName)) {
-                    stdDataSet.removeRecord(recordKey,record);
+                if (!entryNameList.contains(JDSD02_03_14)|| StringUtils.isEmpty(JDSD02_03_04)) {
+                    stdDataSet.removeRecord(recordKey, record);
                 }
             }
-            mergeData(section, profile, stdDataSet, innerCodes);
+            mergeData(section, stdDataSet, innerCodes);
         }
 
         // 临时医嘱
         dataSet = profile.getDataSet("HDSC02_11");
+        innerCodes = new String[]{
+                "HDSD00_15_020",  //医嘱下嘱时间
+                "HDSD00_15_028"   //医嘱名称
+        };
         if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
+            String checkDate = "HDSD00_15_020";
             section = document.withArray("stat_order");
-            innerCodes = new String[]{
-                    "HDSD00_15_020",
-                    "HDSD00_15_028"
-            };
-
-            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
-            mergeData(section, profile, stdDataSet, innerCodes);
+            TimeFilter(section,dataSet,profile,innerCodes,since,to,checkDate);
         }
 
         // 长期医嘱
         dataSet = profile.getDataSet("HDSC02_12");
+        innerCodes = new String[]{
+                "HDSD00_15_020",  //医嘱下嘱时间
+                "HDSD00_15_026",  //医嘱停嘱时间
+                "HDSD00_15_028"   //医嘱名称
+        };
         if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
+            String checkDate = "HDSD00_15_020";
             section = document.withArray("stand_order");
-            innerCodes = new String[]{
-                    "HDSD00_15_020",
-                    "HDSD00_15_026",
-                    "HDSD00_15_028"
-            };
-
-            StdDataSet stdDataSet = getStdDataSet(profile,dataSet,innerCodes);
-            mergeData(section, profile, stdDataSet, innerCodes);
+            TimeFilter(section,dataSet,profile,innerCodes,since,to,checkDate);
         }
     }
 
-    private void mergeData(JsonNode section, MemoryProfile profile, StdDataSet stdDataSet, String[] metaDataCodes) throws IOException {
+    private void mergeData(JsonNode section, StdDataSet stdDataSet, String[] metaDataCodes) throws IOException {
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
         if (section.isArray()) {
             ArrayNode array = (ArrayNode) section;
             for (String recordKey : stdDataSet.getRecordKeys()) {
-                ObjectNode arrayNode = array.addObject();
+                ObjectNode arrayNode = objectMapper.createObjectNode();
                 MetaDataRecord record = stdDataSet.getRecord(recordKey);
+                boolean flag = false;
                 for (String metaDataCode : metaDataCodes) {
                     String value = record.getMetaData(metaDataCode);
+                    if (!StringUtils.isEmpty(value)) {
+                        flag = true;
+                    }
                     arrayNode.put(metaDataCode, StringUtils.isEmpty(value) ? "" : value);
+                }
+                if (flag) {
+                    array.addPOJO(arrayNode);
                 }
             }
         } else if (section.isObject()) {
@@ -215,7 +233,7 @@ public class SanofiEndPoint {
         }
     }
 
-    private StdDataSet getStdDataSet(MemoryProfile profile,StdDataSet dataSet,String[] innerCodes) throws IOException {
+    private StdDataSet getStdDataSet(MemoryProfile profile, StdDataSet dataSet, String[] innerCodes) throws IOException {
         StdDataSet stdDataSet = dataSetRepo.findOne(
                 profile.getCdaVersion(),
                 dataSet.getCode(),
@@ -225,6 +243,54 @@ public class SanofiEndPoint {
         ).getRight();
         return stdDataSet;
     }
+
+    /**
+     * 档案时间过滤
+     */
+    private void TimeFilter(JsonNode section,StdDataSet dataSet ,MemoryProfile profile,String[] innerCodes,Date sinceDate ,Date toDate,String checkDate) throws ParseException, IOException {
+        StdDataSet stdDataSet = getStdDataSet(profile, dataSet, innerCodes);
+        Set<String> keys = stdDataSet.getRecordKeys();
+        List<String> listKeys = new ArrayList<String>();
+        listKeys.addAll(keys);
+        for (String recordKey : listKeys) {
+            MetaDataRecord record = stdDataSet.getRecord(recordKey);
+            if(record.getDataGroup().get(checkDate)!=null){
+                String checkDateStr = record.getDataGroup().get(checkDate); //要检查的时间
+                String generalDateEL = "[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}";
+                String utcDateEL = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z";
+                Matcher m;
+
+                Pattern pGeneral = Pattern.compile(generalDateEL);
+                m = pGeneral.matcher(checkDateStr);
+
+                String sinceDateStr="";
+                String toDateStr="";
+                if(m.matches()){
+                    //普通日期格式
+                    sinceDateStr = DateTimeUtil.simpleDateTimeFormat(sinceDate);
+                    toDateStr = DateTimeUtil.simpleDateTimeFormat(toDate);
+                }
+                Pattern pUtc = Pattern.compile(utcDateEL);
+                m = pUtc.matcher(checkDateStr);
+                if(m.matches()){
+                    //utc日期格式
+                    sinceDateStr = DateTimeUtil.utcDateTimeFormat(sinceDate);
+                    toDateStr = DateTimeUtil.utcDateTimeFormat(toDate);
+                }
+                if (sinceDateStr.compareTo(checkDateStr)>0 || checkDateStr.compareTo(toDateStr)>0 ) {
+                    //删除不合格的记录
+                    stdDataSet.removeRecord(recordKey, record);
+                }
+            }else {
+                //删除不合格的记录
+                stdDataSet.removeRecord(recordKey, record);
+            }
+
+        }
+        mergeData(section, stdDataSet, innerCodes);
+    }
+
+
 
 
 }

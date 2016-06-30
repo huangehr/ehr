@@ -66,12 +66,12 @@ public class ProfileIndicesService {
         if (StringUtils.isNotEmpty(name)) {
             criteria = new Criteria(Demographic.LegacyName).contains(name).or(new Criteria(Demographic.Name).contains(name));
             //开始时间和结束时间缩小范围
-            if (since!=null & to!=null) {
-                String rowKeys[] = eventDateFilter(since,to);
-                if(rowKeys.length>0){
-                    criteria.contains(rowKeys);
-                }
-            }
+//            if (since!=null & to!=null) {
+//                String rowKeys[] = eventDateFilter(since,to);
+//                if(rowKeys.length>0){
+//                    criteria.contains(rowKeys);
+//                }
+//            }
             if (StringUtils.isNotEmpty(telephone)) {
                 criteria = criteria.connect();
                 criteria.and(new Criteria(Demographic.LegacyTelephone).contains(telephone).or(new Criteria(Demographic.Telephone).contains(telephone)));
