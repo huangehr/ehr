@@ -215,8 +215,8 @@ public class PatientInfoBaseService {
                 boolean breaked = false;
                 for (Map<String, Object> event : eventList) {
                     String rowkey = event.get("rowkey").toString();
-                    Object eventData = event.get("event_data");
-                    String orgCode = event.get("orgCode").toString();
+                    Object eventData = event.get("event_date");
+                    String orgCode = event.get("org_code").toString();
                     for (String profileId : profileList) {
                         if (profileId.equals(rowkey)) {
                             Map<String, Object> obj = new HashMap<>();
