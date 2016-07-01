@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by AndyCai on 2016/1/25.
@@ -424,5 +422,43 @@ public class DataSetController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/data_set/codes/existence", method = RequestMethod.GET)
+    @ApiOperation(value = "查询数据元")
+    public Object getExistenceDataSet(
+            @ApiParam(name = "codes", value = "数据编码集", defaultValue = "")
+            @RequestParam(value = "codes") String codes,
+            @ApiParam(name = "version", value = "版本", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "size", value = "查询数量", defaultValue = "")
+            @RequestParam(value = "size") int size) {
+        try{
+            Collection<MStdDataSet> stdDataSets =
+                    dataSetClient.searchDataSets("", "code=" + codes + " g1", "", size, 1, version).getBody();
+            Set<String> set = new HashSet<>();
+            for (MStdDataSet m : stdDataSets){
+                set.add(m.getCode());
+            }
+            return set;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return "false";
+        }
+    }
+
+    @RequestMapping(value = "/data_set/batch", method = RequestMethod.POST)
+    @ApiOperation("批量创建数据元")
+    public Object createDataSetPatch(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "models", value = "数据集模型", defaultValue = "")
+            @RequestParam(value = "models") String models) throws Exception {
+
+        try{
+            return dataSetClient.createDictAndEntries(version, models);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "系统出错！";
+        }
+    }
 
 }
