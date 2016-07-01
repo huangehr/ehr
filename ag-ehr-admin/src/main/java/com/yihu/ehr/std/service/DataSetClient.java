@@ -210,4 +210,10 @@ public interface DataSetClient {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "version", value = "版本", defaultValue = "")
             @RequestParam(value = "version") String version);
+
+    @RequestMapping(value = ServiceApi.Standards.DataSetsBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量创建标准数据集以及数据元", notes = "批量创建标准数据集以及数据元")
+    boolean createDictAndEntries(
+            @RequestParam(value = "version") String version,
+            @RequestBody String jsonData) ;
 }  
