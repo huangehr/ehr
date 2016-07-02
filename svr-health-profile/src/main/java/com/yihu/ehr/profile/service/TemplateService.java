@@ -2,6 +2,7 @@ package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
+import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

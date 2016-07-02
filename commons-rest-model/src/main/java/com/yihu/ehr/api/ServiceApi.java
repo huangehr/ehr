@@ -39,6 +39,19 @@ public class ServiceApi {
      * 资源管理中心接口
      */
     public static class Resources{
+        //资源查询接口(命名先按原有路径，不规范)
+        public static final String ResourceViewMetadata = "/rs/query/getResourceMetadata"; //资源浏览获取结构
+        public static final String ResourceViewData = "/rs/query/getResourceData"; //资源浏览获取数据
+        public static final String ResourcesQuery = "/resources/query"; //资源查询接口
+        public static final String ResourcesQueryTransform = "/resources/query/transform"; //资源查询接口+转译
+        public static final String ResourcesRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
+        public static final String ResourcesMasterData = "/resources/query/master_data"; //主表资源查询接口
+        public static final String ResourcesSubData = "/resources/query/sub_data"; //细表资源查询接口
+        public static final String ResourcesMasterStat = "/resources/query/master_stat"; //主表资源统计接口
+        public static final String ResourcesSubStat = "/resources/query/sub_stat"; //细表资源查询接口
+        public static final String ResourcesMysql = "/resources/query/mysql"; //mysql资源查询接口
+
+
         public static final String Resources                         = "/resources";
         public static final String Resource                          = "/resources/{id}";
         public static final String NoPageResources                   = "/NoPageResources";
