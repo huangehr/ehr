@@ -225,6 +225,7 @@ public class ProfileCDAService {
             Template template = templateRepository.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
             if (template != null) {
                 re.put("template_id",template.getId());
+                re.put("profile_id",obj.get("rowkey"));
                 re.put("cda_document_id",template.getCdaDocumentId());
                 return re;
             }
