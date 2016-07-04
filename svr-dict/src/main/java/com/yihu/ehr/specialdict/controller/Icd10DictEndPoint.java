@@ -57,7 +57,7 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
         return convertToModel(icd10Dict, MIcd10Dict.class, null);
     }
 
-    @RequestMapping(value = "dict/icd10/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/dict/icd10/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除icd10疾病字典(含与药品及指标的关联关系，同时删除关联的诊断。)")
     public boolean deleteIcd10Dict(
             @ApiParam(name = "id", value = "icd10字典代码")
@@ -84,7 +84,7 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = "dict/icd10s", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/dict/icd10s", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据ids批量删除删除icd10疾病字典(含与药品及指标的关联关系，同时删除关联的诊断。)")
     public boolean deleteIcd10Dicts(
             @ApiParam(name = "ids", value = "icd10字典代码,多个以逗号隔开")
@@ -172,7 +172,7 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "dict/icd10/hp/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/icd10/hp/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据ICD10的ID判断是否与健康问题存在关联。")
     public boolean icd10DictIsUsage(
             @ApiParam(name = "id", value = "icd10字典代码")
@@ -197,10 +197,19 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
         return icd10DictService.isCodeExist(code);
     }
 
-    @RequestMapping(value = "/icd10_dict/ids" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/icd10/code/{code}" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据code获取ICD10字典信息")
+    public MIcd10Dict findByCode(@ApiParam(name = "code", value = "icd10_code")
+                                     @PathVariable(value = "code") String code) throws Exception{
+        Icd10Dict dict = icd10DictService.findByCode(code);
+        if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        return convertToModel(dict, MIcd10Dict.class);
+    }
+
+    @RequestMapping(value = "/dict/icd10/ids" , method = RequestMethod.GET)
     @ApiOperation(value = "根据id列表获取ICD10字典信息")
     public List<MIcd10Dict> getIcd10DictListByIds(
-            @ApiParam(name = "ids", value = "字典代码")
+            @ApiParam(name = "ids", value = "id列表")
             @RequestParam(value = "ids") String[] ids) throws Exception {
         long[] longIds = new long[ids.length];
         for(int i=0; i<ids.length;i++){

@@ -13,8 +13,10 @@ import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
+import com.yihu.ehr.profile.feign.XDictClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.profile.feign.XTransformClient;
+import com.yihu.ehr.profile.model.MedicationStat;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.lang.StringUtils;
@@ -33,13 +35,12 @@ public class PatientInfoDetailService {
     @Autowired
     XResourceClient resource;
 
-    //特殊字典信息服务
+    //字典信息服务
     @Autowired
-    CD10Service dictService;
+    XDictClient dictService;
 
-    //模板服务
     @Autowired
-    XTemplateRepository templateRepository;
+    MedicationStatService medicationStatService;
 
     @Autowired
     TemplateService templateService;
@@ -106,21 +107,22 @@ public class PatientInfoDetailService {
     /******************************* 用药信息 ***********************************************************/
 
     /*
-     * 患者常用药（根据次数）
+     * 患者常用药（根据处方中次数）
      */
-    public List<Map<String, Object>> getMedicationUsed(String demographicId, String hpId) throws Exception {
+    public List<Map<String, Object>> getMedicationUsed(String demographicId, String hpCode) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
         String rowkeys = getProfileIds(demographicId);
 
         String xyQueryParams = "{\"q\":\""+rowkeys+"\"}";
         String zyQueryParams = "{\"q\":\""+rowkeys+"\"}";
-        if(hpId!=null && hpId.length()>0)
+        if(hpCode!=null && hpCode.length()>0)
         {
-            List<MDrugDict> drugList = dictService.getDrugDictList(hpId);
+            List<MDrugDict> drugList = dictService.getDrugDictListByHpCode(hpCode);
             if(drugList!=null && drugList.size()>0)
             {
                 String drugQuery = "";
                 for(MDrugDict drug : drugList){
+                    //drug.getType()是否需要药品类型判断***************
                     if(drugQuery.length()==0)
                     {
                         drugQuery = "{key}:"+drug.getName();
@@ -175,42 +177,12 @@ public class PatientInfoDetailService {
         return re;
     }
 
+
     /*
      * 患者用药清单（根据数量，近三个月/近六个月）
      */
-    public List<Map<String, Object>> getMedicationStat(String demographicId, String hpId) throws Exception {
-        List<Map<String, Object>> re = new ArrayList<>();
-        String rowkeys = getProfileIds(demographicId);
-
-        String xyQueryParams = "{\"q\":\""+rowkeys+"\"}";
-        String zyQueryParams = "{\"q\":\""+rowkeys+"\"}";
-        if(hpId!=null && hpId.length()>0)
-        {
-            List<MDrugDict> drugList = dictService.getDrugDictList(hpId);
-            if(drugList!=null && drugList.size()>0)
-            {
-                String drugQuery = "";
-                for(MDrugDict drug : drugList){
-                    if(drugQuery.length()==0)
-                    {
-                        drugQuery = "{key}:"+drug.getName();
-                    }
-                    else{
-                        drugQuery = " OR {key}:"+drug.getName();
-                    }
-                }
-                xyQueryParams = "{\"q\":\""+rowkeys+" AND ("+ drugQuery.replace("{key}",BasisConstant.xymc) +")\"}";
-                zyQueryParams = "{\"q\":\""+rowkeys+" AND ("+ drugQuery.replace("{key}",BasisConstant.zymc) +")\"}";
-            }
-        }
-        //中药统计
-        Envelop result = resource.getResources(BasisConstant.medicationWesternStat, appId, "{\"join\":\"demographic_id:" + demographicId + "\"}", null, null);
-        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
-
-        }
-        //西药统计
-
-        return re;
+    public List<MedicationStat> getMedicationStat(String demographicId, String hpCode) throws Exception {
+        return medicationStatService.getMedicationStat(demographicId);
     }
 
     /*
@@ -371,7 +343,7 @@ public class PatientInfoDetailService {
      * 患者中药处方（可分页）
      * 1.西药处方；2.中药处方
      */
-    public Envelop getMedicationList(String type, String demographicId, String hpId, String startTime, String endTime, Integer page, Integer size) throws Exception {
+    public Envelop getMedicationList(String type, String demographicId, String hpCode, String startTime, String endTime, Integer page, Integer size) throws Exception {
         String q = "";
         String date = BasisConstant.xysj;
         String name = BasisConstant.xymc;
@@ -395,9 +367,9 @@ public class PatientInfoDetailService {
         }
 
         //健康问题
-        if (hpId != null && hpId.length() > 0) {
+        if (hpCode != null && hpCode.length() > 0) {
             //健康问题->药品代码
-            List<MDrugDict> drugList = dictService.getDrugDictList(hpId);
+            List<MDrugDict> drugList = dictService.getDrugDictListByHpCode(hpCode);
             String ypQuery = "";
             if (drugList != null && drugList.size() > 0) {
                 //遍历药品列表
@@ -445,7 +417,6 @@ public class PatientInfoDetailService {
         String queryParams =  "{\"q\":\"" + q + "\"}";
         return resource.getResources(resourceCode, appId, queryParams.replace(" ","+"), page, size);
     }
-
 
 
     /*************************  分页查细表数据，简单公用方法 *************************************************/

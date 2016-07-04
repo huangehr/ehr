@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.service;
 
+import com.yihu.ehr.profile.model.Template;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 

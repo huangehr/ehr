@@ -1,5 +1,6 @@
 package com.yihu.ehr.standard.dict.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDict;
@@ -218,6 +219,24 @@ public class DictEndPoint extends ExtendEndPoint<MStdDict> {
             }
         }
         return childrenIds;
+    }
+
+    @RequestMapping(value = ServiceApi.Standards.DictEntryBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量创建标准字典以及字典项", notes = "批量创建标准字典以及字典项")
+    public boolean createDictAndEntries(
+            @RequestBody String jsonData,@RequestParam(value = "version")String version) throws Exception {
+
+        List models = objectMapper.readValue(jsonData, new TypeReference<List>() {});
+        dictService.batchInsertDictsAndEntry(models,version);
+        return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Standards.DictCodesExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在字典编码")
+    public List codeExistence(
+            @RequestBody String codes,@RequestParam(value = "version")String version) throws Exception {
+        List existCodes = dictService.codeExist(toEntity(codes, String[].class),version);
+        return existCodes;
     }
 
 }
