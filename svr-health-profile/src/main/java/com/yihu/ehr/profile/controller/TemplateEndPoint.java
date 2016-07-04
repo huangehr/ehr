@@ -5,7 +5,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.profile.MTemplate;
-import com.yihu.ehr.profile.service.Template;
+import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.controller.BaseRestEndPoint;

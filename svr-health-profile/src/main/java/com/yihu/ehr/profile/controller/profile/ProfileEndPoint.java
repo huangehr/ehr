@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.XTransformClient;
+import com.yihu.ehr.profile.model.MedicationStat;
 import com.yihu.ehr.profile.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -135,7 +136,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
                 "  {\"pastHistoryType\":\"手术史\",\"pastHistoryContents\":\"手术史..\"}]";
     }
 
-    @ApiOperation("主要健康问题NO")
+    @ApiOperation("主要健康问题OK")
     @RequestMapping(value = ServiceApi.Profiles.HealthProblem, method = RequestMethod.GET)
     public List<Map<String,Object>> HealthProblem(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
@@ -143,7 +144,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return patient.getHealthProblem(demographic_id);
     }
 
-    @ApiOperation("就诊过的疾病NO")
+    @ApiOperation("就诊过的疾病OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalDisease, method = RequestMethod.GET)
     public List<Map<String,String>> MedicalDisease(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
@@ -192,11 +193,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("某次就诊事件OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvent, method = RequestMethod.GET)
     public Map<String,Object> MedicalEvent(
+            @ApiParam(name = "org_code", value = "机构代码",defaultValue="41872607-9")
+            @RequestParam(value = "org_code", required = true) String org_code,
             @ApiParam(name = "event_no", value = "档案ID",defaultValue="30000001")
             @RequestParam(value = "event_no", required = true) String event_no,
             @ApiParam(name = "version", value = "版本号",defaultValue="57623f01b2d9")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Map<String,Object> re = patient.getMedicalEvent(event_no);
+        Map<String,Object> re = patient.getMedicalEvent(org_code,event_no);
         return adapterOne(version,re);
     }
 
@@ -211,9 +214,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return patientDetail.getMedicationUsed(demographic_id, hp_id);
     }
 
-    @ApiOperation("患者用药清单NO")
+    @ApiOperation("患者用药清单OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationStat, method = RequestMethod.GET)
-    public List<Map<String,Object>> MedicalStat(
+    public List<MedicationStat> MedicalStat(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
@@ -256,9 +259,13 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("获取cda_document_idOK")
     @RequestMapping(value = ServiceApi.Profiles.CDADocumentId, method = RequestMethod.GET)
     public Map<String, Object> CDADocumentId(
-            @ApiParam(name = "event_no", value = "事件号",defaultValue="30000001") @RequestParam(value = "event_no", required = true) String event_no,
-            @ApiParam(name = "cda_code", value = "模板类别",defaultValue="HSDC01.04") @RequestParam(value = "cda_code", required = true) String cda_code) throws Exception {
-        return profileCDAService.getCDADocumentId(event_no, cda_code);
+            @ApiParam(name = "org_code", value = "机构代码",defaultValue="41872607-9")
+            @RequestParam(value = "org_code", required = true) String org_code,
+            @ApiParam(name = "event_no", value = "事件号",defaultValue="30000001")
+            @RequestParam(value = "event_no", required = true) String event_no,
+            @ApiParam(name = "cda_code", value = "模板类别",defaultValue="HSDC01.04")
+            @RequestParam(value = "cda_code", required = true) String cda_code) throws Exception {
+        return profileCDAService.getCDADocumentId(org_code,event_no, cda_code);
     }
 
     /******************************** 处方 ***********************************************************/
@@ -277,7 +284,6 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         {
             throw new Exception("非法传参！");
         }
-
 
         List<Map<String,Object>> re = patientDetail.getMedicationMaster(demographic_id, profile_id, prescription_no);
 
