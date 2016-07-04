@@ -106,7 +106,7 @@ public class HosReleaseEndPoint extends EnvelopRestEndPoint {
     }
 
     private void deleteFile(String filePath) throws Exception {
-        String groupName = filePath.split("/")[0];
+        String groupName = filePath.split(":")[0];
         String remoteFileName = filePath.substring(groupName.length()+1,filePath.length());
         fastDFSUtil.delete(groupName,remoteFileName);
     }

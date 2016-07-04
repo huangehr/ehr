@@ -94,10 +94,10 @@ public class IndicatorsDict implements Serializable{
         this.upperLimit = upperLimit;
     }
 
-    @Column(name = "lower_limit",  nullable = true)
     public String getLowerLimit() {
         return lowerLimit;
     }
+    @Column(name = "lower_limit",  nullable = true)
     public void setLowerLimit(String lowerLimit) {
         this.lowerLimit = lowerLimit;
     }

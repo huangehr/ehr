@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -178,4 +179,14 @@ public interface DictClient {
     ResponseEntity<Collection<DictModel>> search(
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "version") String version);
+
+    @RequestMapping(value = ServiceApi.Standards.DictCodesExistence, method = RequestMethod.POST)
+    @ApiOperation("获取已存在字典编码")
+    List codeExistence(
+            @RequestBody String codes,@RequestParam(value = "version")String version);
+
+    @RequestMapping(value = ServiceApi.Standards.DictEntryBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量创建标准字典以及字典项", notes = "批量创建标准字典以及字典项")
+    boolean createDictAndEntries(
+            @RequestBody String jsonData,@RequestParam(value = "version")String version);
 }
