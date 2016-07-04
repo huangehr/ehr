@@ -321,6 +321,8 @@ public class ServiceApi {
         public static final String DictCodeIsExist                  = "/std/dictionaries/is_exist/code";
         public static final String DictOther                        = "/std/dictionaries/{id}/other";
         public static final String DictParent                        = "/std/dictionaries/{id}/parent";
+        public static final String DictCodesExistence               =  "/dict/codes/existence";
+        public static final String DictEntryBatch                    ="/dict/entry/batch";
 
         public static final String Entry                            = "/std/dictionaries/entries/{id}";
         public static final String Entries                          = "/std/dictionaries/entries";
