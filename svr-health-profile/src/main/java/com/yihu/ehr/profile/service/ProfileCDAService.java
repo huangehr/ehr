@@ -194,6 +194,7 @@ public class ProfileCDAService {
                                 item.put("template_id", String.valueOf(template.getId()));
                                 item.put("cda_document_id", template.getCdaDocumentId());
                                 item.put("template_name", template.getTitle());
+                                item.put("cda_code", template.getCdaCode());
                                 item.put("pc_template", template.getPcTplURL());
                                 item.put("mobile_template", template.getMobileTplURL());
                                 re.add(item);
