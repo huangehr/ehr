@@ -3,6 +3,7 @@ package com.yihu.ehr.std.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.standard.dict.DictEntryModel;
 import com.yihu.ehr.agModel.standard.dict.DictModel;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.*;
@@ -528,4 +529,22 @@ public class DictController extends BaseController {
         return dictClient.isExistEntryCode(dictId,code,versionCode);
     }
 
+    @RequestMapping(value = ServiceApi.Standards.DictCodesExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在字典编码")
+    public List idExistence(
+            @ApiParam(name = "codes", value = "", defaultValue = "")
+            @RequestParam("codes") String codes,@RequestParam("version") String version) throws Exception {
+        List existCodes = dictClient.codeExistence(codes,version);
+        return existCodes;
+    }
+
+    @RequestMapping(value = ServiceApi.Standards.DictEntryBatch, method = RequestMethod.POST)
+    @ApiOperation(value = "批量创建标准字典以及字典项", notes = "批量创建标准字典以及字典项")
+    public Envelop createDictAndEntries(
+            @ApiParam(name = "model", value = "", defaultValue = "")
+            @RequestParam("model") String model,@RequestParam("version") String version) throws Exception {
+        if(dictClient.createDictAndEntries(model,version))
+            return success("");
+        return failed("新增出错！");
+    }
 }
