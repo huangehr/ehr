@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -127,17 +128,18 @@ public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, 
 
     public boolean CacheIcd10ByHpCode() {
         Session session = currentSession();
-        String sql = "select i.* \n" +
+        String sql = "select i.*,h.code hp_code \n" +
                 "from hp_icd10_relation r,icd10_dict i,health_problem_dict h\n" +
                 "where r.hp_id=h.id \n" +
                 "and r.icd10_id=i.id\n" ;
 
         SQLQuery query = session.createSQLQuery(sql);
         query.addEntity(Icd10Dict.class);
-        List<Icd10Dict> list = query.list();
-        for(Icd10Dict icd10Dict:list){
-            String redisKey = healthProblemDictKeySchema.HpCodeToIcd10KeySchema(icd10Dict.getCode());
-            redisClient.set(redisKey,icd10Dict.getCode());
+        List<Map<String,Object>> list = query.list();
+        for(Map<String,Object> map:list){
+
+            String redisKey = healthProblemDictKeySchema.HpCodeToIcd10KeySchema(map.get("hp_code").toString());
+            redisClient.set(redisKey,map.get("code").toString());
         }
         return true;
     }
