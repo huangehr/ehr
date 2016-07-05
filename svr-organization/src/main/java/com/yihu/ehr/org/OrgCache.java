@@ -66,7 +66,7 @@ public class OrgCache {
         Session session = entityManager.unwrap(Session.class);
 
         try {
-            Query query = session.createSQLQuery("select org_code, full_name, from organizations");
+            Query query = session.createSQLQuery("select org_code, full_name from organizations");
             List<Object[]> orgList = query.list();
             for (Object[] record : orgList) {
                 String code = (String) record[0];
