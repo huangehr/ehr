@@ -33,7 +33,7 @@ public interface HosReleaseClient {
             @RequestParam(value = "page", required = false) int page);
 
     @RequestMapping(value = "/deleteHosEsbMiniRelease/{id}", method = RequestMethod.DELETE)
-    boolean deleteHosEsbMiniRelease(
+    String deleteHosEsbMiniRelease(
             @PathVariable(value = "id") String id);
 
     @RequestMapping(value = "/createHosEsbMiniRelease", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
