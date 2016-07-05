@@ -41,6 +41,13 @@ public class OrgCacheEndPoint {
         orgCache.cacheData(reload);
     }
 
+    @ApiOperation("缓存机构区域代码")
+    @RequestMapping(value = ServiceApi.Caches.OrganizationsArea, method = RequestMethod.PUT)
+    public void CacheAreaCode(@ApiParam(value = "reload", defaultValue = "true")
+                              @RequestParam("reload") boolean reload) {
+        orgCache.CacheAreaCode(reload);
+    }
+
     @ApiOperation("获取缓存机构列表")
     @RequestMapping(value = ServiceApi.Caches.Organizations, method = RequestMethod.GET)
     public ResponseEntity<List<MOrganization>> organizations() {
@@ -53,5 +60,13 @@ public class OrgCacheEndPoint {
                                                       @RequestParam("org_code") String orgCode) {
         MOrganization organization = orgCache.organization(orgCode);
         return new ResponseEntity<>(organization, organization == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+    }
+
+    @ApiOperation("获取缓存机构区域")
+    @RequestMapping(value = ServiceApi.Caches.GetOrganizationsArea, method = RequestMethod.GET)
+    public List<MOrganization> GetOrganizationArea(@ApiParam(value = "org_code", defaultValue = "")
+                                                      @RequestParam("org_code") String orgCode) {
+
+        return  orgCache.GetOrganizationArea(orgCode);
     }
 }

@@ -11,6 +11,8 @@ package com.yihu.ehr.api;
 public class ServiceApi {
     public static class Caches{
         public static final String Organizations                   = "/caches/organizations";
+        public static final String OrganizationsArea                   = "/caches/OrganizationsArea";
+        public static final String GetOrganizationsArea                   = "/caches/organizationsArea/{orgs_code}";
         public static final String Organization                    = "/caches/organizations/{org_code}";
         public static final String Versions                        = "/caches/standards/versions";
         public static final String Version                         = "/caches/standards/versions/{version}";
@@ -373,6 +375,11 @@ public class ServiceApi {
 
         public static final String Organizations                    = "/organizations";
         public static final String Organization                     = "/organizations/{id}";
+
+        public static final String DemographicIdToProfileIdCache    = "/Redis/DemographicIdToProfileId";
+        public static final String GetDemographicIdToProfileIdCache = "/Redis/GetDemographicIdToProfileIdCache/{demographic_id}";
+        public static final String TreatmentAreaCache               = "/Redis/TreatmentAreaCache";
+        public static final String GetTreatmentAreaCache            = "/Redis/GetTreatmentAreaCache/{demographic_id}";
     }
 
     public static class HealthProfile{

@@ -1,6 +1,9 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.redis.RedisClient;
+import com.yihu.ehr.schema.AddressDictKeySchema;
+import com.yihu.ehr.schema.HealthProblemDictKeySchema;
 import com.yihu.ehr.specialdict.model.DrugDict;
 import com.yihu.ehr.specialdict.model.HealthProblemDict;
 import com.yihu.ehr.specialdict.model.Icd10Dict;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -33,6 +37,10 @@ public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, 
     private XHealthProblemDictRepository hpDictRepo;
     @Autowired
     private XIcd10HpRelationRepository hpIcd10ReRepo;
+    @Autowired
+    private RedisClient redisClient;
+    @Autowired
+    private HealthProblemDictKeySchema healthProblemDictKeySchema;
 
     public Page<HealthProblemDict> getDictList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
@@ -116,5 +124,27 @@ public class HealthProblemDictService extends BaseJpaService<HealthProblemDict, 
         List<Icd10Dict> list = query.list();
 
         return list;
+    }
+
+    public boolean CacheIcd10ByHpCode() {
+        Session session = currentSession();
+        String sql = "select i.*,h.code hp_code \n" +
+                "from hp_icd10_relation r,icd10_dict i,health_problem_dict h\n" +
+                "where r.hp_id=h.id \n" +
+                "and r.icd10_id=i.id\n" ;
+
+        SQLQuery query = session.createSQLQuery(sql);
+        query.addEntity(Icd10Dict.class);
+        List<Map<String,Object>> list = query.list();
+        for(Map<String,Object> map:list){
+
+            String redisKey = healthProblemDictKeySchema.HpCodeToIcd10KeySchema(map.get("hp_code").toString());
+            redisClient.set(redisKey,map.get("code").toString());
+        }
+        return true;
+    }
+    public String GetIcd10ByHpCodeCache(String code) {
+
+        return  redisClient.get(healthProblemDictKeySchema.HpCodeToIcd10KeySchema(code));
     }
 }
