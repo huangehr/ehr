@@ -4,7 +4,10 @@ import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.profile.feign.XDictClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.map.ObjectMapper;
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.type.JavaType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -96,7 +99,17 @@ public class IndicatorsService {
         }
 
         //获取指标数据
-        return resource.getResources(BasisConstant.healthIndicators,appId,sql,page,size);
+
+        Envelop e= resource.getResources(BasisConstant.healthIndicators,appId,sql,page,size);
+        for(int i=0;i<e.getDetailModelList().size();i++){
+            Map<String, String> map=(Map<String, String>)(e.getDetailModelList().get(i));
+            MIndicatorsDict detailInformationFromCode = dictService.getIndicatorsDictByCode(map.get("ETL_INDICATORS_CODE"));
+            map.put("unit", detailInformationFromCode.getUnit());
+            map.put("upper_limit", detailInformationFromCode.getUpperLimit());
+            map.put("lower_limit", detailInformationFromCode.getLowerLimit());
+            map.put("description", detailInformationFromCode.getDescription());
+        }
+        return e;
     }
 
 }
