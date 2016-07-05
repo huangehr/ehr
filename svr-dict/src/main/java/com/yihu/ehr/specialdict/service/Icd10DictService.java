@@ -62,4 +62,8 @@ public class Icd10DictService extends BaseJpaService<Icd10Dict, XIcd10DictReposi
     public List<Icd10Dict> findByIds(long[] ids) {
         return  icd10DictRepo.findByIds(ids);
     }
+
+    public Icd10Dict findByCode(String code) {
+        return  icd10DictRepo.findByCode(code);
+    }
 }

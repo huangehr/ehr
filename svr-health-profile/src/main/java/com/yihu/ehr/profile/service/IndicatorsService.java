@@ -1,10 +1,13 @@
 package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
-import com.yihu.ehr.profile.feign.XIndicatorsDictClient;
+import com.yihu.ehr.profile.feign.XDictClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.map.ObjectMapper;
+import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.type.JavaType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,10 +24,7 @@ import java.util.Map;
 public class IndicatorsService {
 
     @Autowired
-    private CD10Service dictService;
-
-    @Autowired
-    XIndicatorsDictClient IndicatorsDictClient;
+    XDictClient dictService;
 
     @Autowired
     XResourceClient resource; //资源服务
@@ -34,10 +34,10 @@ public class IndicatorsService {
     /**
      * 获取某个健康问题指标
      */
-    public List<Map<String,Object>> getIndicatorsClass(String demographicId,String hpId,String indicatorType) throws  Exception{
+    public List<Map<String,Object>> getIndicatorsClass(String demographicId,String hpCode,String indicatorType) throws  Exception{
         List<Map<String,Object>> re = new ArrayList<>();
         //某个健康问题所有指标
-        List<MIndicatorsDict> indicatorsList = dictService.getIndicatorsDictList(hpId);
+        List<MIndicatorsDict> indicatorsList = dictService.getIndicatorsByHpCode(hpCode);
         if(indicatorsList!=null &&indicatorsList.size()>0)
         {
             String sql = "select distinct ETL_INDICATORS_TYPE,ETL_INDICATORS_CODE,ETL_INDICATORS_NAME from ETL_INDICATORS where demographic_id='"+demographicId+"'";
@@ -62,7 +62,7 @@ public class IndicatorsService {
                     item.put("type",resultItem.get("ETL_INDICATORS_TYPE"));
                     item.put("code",resultItem.get("ETL_INDICATORS_CODE"));
 
-                    MIndicatorsDict detailInformationFromCode = IndicatorsDictClient.getIndicatorsDictByCode(resultItem.get("ETL_INDICATORS_CODE").toString());
+                    MIndicatorsDict detailInformationFromCode = dictService.getIndicatorsDictByCode(resultItem.get("ETL_INDICATORS_CODE").toString());
                     item.put("unit",detailInformationFromCode.getUnit());
                     item.put("upper_limit",detailInformationFromCode.getUpperLimit());
                     item.put("lower_limit",detailInformationFromCode.getLowerLimit());
@@ -99,7 +99,17 @@ public class IndicatorsService {
         }
 
         //获取指标数据
-        return resource.getResources(BasisConstant.healthIndicators,appId,sql,page,size);
+
+        Envelop e= resource.getResources(BasisConstant.healthIndicators,appId,sql,page,size);
+        for(int i=0;i<e.getDetailModelList().size();i++){
+            Map<String, String> map=(Map<String, String>)(e.getDetailModelList().get(i));
+            MIndicatorsDict detailInformationFromCode = dictService.getIndicatorsDictByCode(map.get("ETL_INDICATORS_CODE"));
+            map.put("unit", detailInformationFromCode.getUnit());
+            map.put("upper_limit", detailInformationFromCode.getUpperLimit());
+            map.put("lower_limit", detailInformationFromCode.getLowerLimit());
+            map.put("description", detailInformationFromCode.getDescription());
+        }
+        return e;
     }
 
 }

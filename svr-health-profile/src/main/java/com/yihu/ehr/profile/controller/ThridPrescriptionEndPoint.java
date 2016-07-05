@@ -1,20 +1,16 @@
 package com.yihu.ehr.profile.controller;
 
-import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.profile.service.Template;
 import com.yihu.ehr.profile.service.ThridPrescriptionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Date;
 
 /**
  * Created by cwd on 2016/6/14.

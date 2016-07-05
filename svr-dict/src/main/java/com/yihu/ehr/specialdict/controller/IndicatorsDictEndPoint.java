@@ -42,7 +42,7 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
         return convertToModel(indicatorsDict, MIndicatorsDict.class, null);
     }
 
-    @RequestMapping(value = "dict/indicator/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/dict/indicator/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除指标字典")
     public boolean deleteIndicatorDict(
             @ApiParam(name = "id", value = "指标字典代码")
@@ -51,7 +51,7 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = "dict/indicators", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/dict/indicators", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据ids批量删除指标字典")
     public boolean deleteIndicatorsDict(
             @ApiParam(name = "ids", value = "指标字典代码,多个以逗号分隔")
@@ -119,7 +119,7 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "dict/indicator/icd10/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/indicator/icd10/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据指标的ID判断是否与ICD10字典存在关联。")
     public boolean indicatorIsUsage(
             @ApiParam(name = "id", value = "指标字典代码")
@@ -144,7 +144,7 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
         return indicatorsDictService.isCodeExist(code);
     }
 
-    @RequestMapping(value = "/indicators/code", method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/indicators/code", method = RequestMethod.GET)
     @ApiOperation(value = "根据code获取相应的指标字典信息" )
     public MIndicatorsDict getIndicatorsDictByCode(
             @ApiParam(name = "code", value = "指标代码")
@@ -154,7 +154,7 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
         return convertToModel(dict, MIndicatorsDict.class);
     }
 
-    @RequestMapping(value = "/indicators/ids", method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/indicators/ids", method = RequestMethod.GET)
     @ApiOperation(value = "根据ids获取相应的指标字典信息" )
     public List<MIndicatorsDict> getIndicatorsDictByIds(
             @ApiParam(name = "ids", value = "指标代码")
@@ -167,14 +167,14 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
         return (List<MIndicatorsDict>)convertToModels(indicatorsDicts, new ArrayList<>(indicatorsDicts.size()), MIndicatorsDict.class, "");
     }
 
-    @RequestMapping(value = "/indicators/CacheIndicatorsDict" , method = RequestMethod.POST)
+    @RequestMapping(value = "/dict/indicators/CacheIndicatorsDict" , method = RequestMethod.GET)
     @ApiOperation(value = "缓存健康问题字典/redis缓存")
     public void CacheHpDictByCodes(){
 
         indicatorsDictService.CacheIndicatorsDict();
     }
 
-    @RequestMapping(value = "/indicators/getIndicatorsDictByCode" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/indicators/getIndicatorsDictByCode" , method = RequestMethod.GET)
     @ApiOperation(value = "根据字典代码获取缓存的健康问题字典/redis缓存")
     public HashMap getHpDictByCodes(
             @ApiParam(name = "code", value = "code", defaultValue = "")

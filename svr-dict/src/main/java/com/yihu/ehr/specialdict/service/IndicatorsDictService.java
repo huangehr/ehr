@@ -2,9 +2,7 @@ package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.RedisClient;
-import com.yihu.ehr.schema.Icd10HpRelationKeySchema;
 import com.yihu.ehr.schema.IndicatorsDictKeySchema;
-import com.yihu.ehr.schema.KeySchema;
 import com.yihu.ehr.specialdict.model.IndicatorsDict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
