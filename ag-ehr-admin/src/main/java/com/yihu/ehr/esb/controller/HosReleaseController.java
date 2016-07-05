@@ -65,10 +65,15 @@ public class HosReleaseController extends BaseController {
 
     @RequestMapping(value = "/deleteHosEsbMiniRelease/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除程序版本发布信息", notes = "删除程序版本发布信息")
-    public boolean deleteHosEsbMiniRelease(
+    public Envelop  deleteHosEsbMiniRelease(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
-        return hosReleaseClient.deleteHosEsbMiniRelease(id);
+            String result =  hosReleaseClient.deleteHosEsbMiniRelease(id);
+            if(result!="success"&&!"success".equals(result)){
+                return failed(result);
+            }else{
+                return success("删除成功!");
+            }
     }
 
     @RequestMapping(value = "/saveReleaseInfo", method = RequestMethod.POST)
