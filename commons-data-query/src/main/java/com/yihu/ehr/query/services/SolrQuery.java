@@ -148,10 +148,11 @@ public class SolrQuery {
 	public String conditionToString(List<QueryCondition> conditions)
 	{
 		String re ="";
+		String NOT="";
 		if(conditions!=null && conditions.size()>0)
 		{
 			for(QueryCondition condition:conditions){
-				if(!re.equals(""))
+				if(!re.equals("") || !NOT.equals(""))
 				{
 					switch (condition.getLogical())
 					{
@@ -159,21 +160,44 @@ public class SolrQuery {
 							re+=" AND ";
 							break;
 						case Logical.OR:
-							re+=" OR ";
+							re+=" OR  ";
 							break;
 						case Logical.NOT:
 							re+=" NOT ";
 							break;
 					}
+					if(conditionToString(condition).indexOf("NOT")==0){
+						if(NOT.equals("")){
+							NOT=" NOT("+conditionToString(condition).substring(3);
+							re = re.substring(0, re.length() - 5);
+						}
+						else {
+							NOT += re.substring(re.length() - 5) + conditionToString(condition).substring(3, conditionToString(condition).length());
+							re = re.substring(0, re.length() - 5);
+						}
+					}
+					else {
+						re += conditionToString(condition);
+						re = "(" + re + ")";
+					}
 				}
+				else {
+					re += conditionToString(condition);
+					if(conditionToString(condition).indexOf("NOT")==0){
+						NOT="NOT("+re.substring(3);
+						re="";
 
-				re += conditionToString(condition);
+					}
+				}
 			}
 		}
 		else {
 			re ="*:* ";
 		}
-		return re;
+		if(NOT.equals(""))
+			return re;
+		else
+			return re+NOT+")";
 	}
 
 	/******************************** Count方法 ******************************************************/

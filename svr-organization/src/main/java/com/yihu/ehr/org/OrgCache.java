@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -78,6 +79,40 @@ public class OrgCache {
         }
     }
 
+
+    public void CacheAreaCode(boolean force){
+        if (force) clean();
+
+        Session session = entityManager.unwrap(Session.class);
+
+        try {
+            Query query = session.createSQLQuery("select org_code, administrative_division from organizations");
+            List<Object[]> orgList = query.list();
+            for (Object[] record : orgList) {
+                String code = (String) record[0];
+                String administrative_division = (String) record[1];
+                redisClient.set(keySchema.name("Code_Area:"+code), administrative_division);
+            }
+        } finally {
+            if(null != session) session.close();
+        }
+
+    }
+
+    public  List<MOrganization> GetOrganizationArea(String orgCodeList){
+        List<MOrganization> organizations=new ArrayList<>();
+        List<String> orgCodes = Arrays.asList(orgCodeList);
+        for(String orgCode:orgCodes) {
+            String name = redisClient.get(keySchema.name("Code_Area:" + orgCode));
+            if (StringUtils.isEmpty(name)) return null;
+
+            MOrganization organization = new MOrganization();
+            organization.setOrgCode(orgCode);
+            organization.setAdministrativeDivision(Integer.parseInt(name));
+            organizations.add(organization);
+        }
+        return organizations;
+    }
     public void clean() {
         redisClient.delete(keySchema.name("*"));
     }
