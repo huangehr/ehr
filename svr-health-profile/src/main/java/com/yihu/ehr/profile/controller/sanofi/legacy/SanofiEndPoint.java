@@ -63,7 +63,7 @@
 //    private ProfileIndicesService indicesService;
 //
 //    @ApiOperation(value = "获取体征数据", notes = "获取体征数据")
-//    @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.GET)
+//    @RequestMapping(value = "/legacy"+ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.GET)
 //    public ResponseEntity<String> getBodySigns(
 //            @ApiParam(value = "身份证号", defaultValue = "412726195111306268")
 //            @RequestParam(value = "demographic_id", required = false) String demographicId,
@@ -138,7 +138,7 @@
 //        if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
 //            section = document.withArray("physical_exam");
 //            String checkDate = "HDSD00_08_036";
-//            TimeFilter(section,dataSet,profile,innerCodes,since,to,checkDate,profileCreateDate);
+//            Filter(section,dataSet,profile,innerCodes,since,to,checkDate,profileCreateDate);
 //        }
 //
 //        // 检验
@@ -158,7 +158,7 @@
 //
 //            if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
 //                String checkDate = "JDSD02_03_10";
-//                TimeFilter(section,dataSet,profile,innerCodes,since,to,checkDate,null);
+//                Filter(section,dataSet,profile,innerCodes,since,to,checkDate,null);
 //            }
 //            //检验项目过滤 符合要求的项目有{"PRO", "CREA", "GLU", "TCHO", "HDL-C", "TG", "K", "HbAc1", "GLU(2h)", "cTnI", "PRO", "UTP"}
 //            StdDataSet stdDataSet = getStdDataSet(profile, dataSet, innerCodes);
@@ -187,7 +187,7 @@
 //        if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
 //            String checkDate = "HDSD00_15_020";
 //            section = document.withArray("stat_order");
-//            TimeFilter(section,dataSet,profile,innerCodes,since,to,checkDate,null);
+//            Filter(section,dataSet,profile,innerCodes,since,to,checkDate,null);
 //        }
 //
 //        // 长期医嘱
@@ -200,7 +200,7 @@
 //        if (dataSet != null && dataSet.getRecordKeys().size() > 0) {
 //            String checkDate = "HDSD00_15_020";
 //            section = document.withArray("stand_order");
-//            TimeFilter(section,dataSet,profile,innerCodes,since,to,checkDate,null);
+//            Filter(section,dataSet,profile,innerCodes,since,to,checkDate,null);
 //        }
 //    }
 //
@@ -251,7 +251,7 @@
 //    /**
 //     * 档案时间过滤
 //     */
-//    private void TimeFilter(JsonNode section,StdDataSet dataSet ,MemoryProfile profile,String[] innerCodes,Date sinceDate ,Date toDate,String checkDate,Date profileCreateDate) throws ParseException, IOException {
+//    private void Filter(JsonNode section,StdDataSet dataSet ,MemoryProfile profile,String[] innerCodes,Date sinceDate ,Date toDate,String checkDate,Date profileCreateDate) throws ParseException, IOException {
 //        StdDataSet stdDataSet = getStdDataSet(profile, dataSet, innerCodes);
 //        Set<String> keys = stdDataSet.getRecordKeys();
 //        List<String> listKeys = new ArrayList<String>();
