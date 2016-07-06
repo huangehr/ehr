@@ -5,12 +5,9 @@ import com.yihu.ehr.profile.feign.XDictClient;
 import com.yihu.ehr.profile.feign.XGeographyClient;
 import com.yihu.ehr.profile.feign.XOrganizationClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.profile.legacy.sanofi.persist.Demographic;
-import com.yihu.ehr.profile.legacy.sanofi.persist.ProfileIndices;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

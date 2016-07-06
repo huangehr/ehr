@@ -131,7 +131,7 @@ public class SanofiEndPoint {
 //        for (String profileId : profileIds) {
 //            section = document.withArray("physical_exam");
 //            query = "{\"q\":\"profile_id:" + profileIds.get(0);
-//            query += " AND EHR_000384:[" + DateTimeUtil.simpleDateTimeFormat(since)+" TO " + DateTimeUtil.simpleDateTimeFormat(since) + "]\"}".replace(" ","+");
+//            query += " AND EHR_000384:[" + DateTimeUtil.utcDateTimeFormat(since)+" TO " + DateTimeUtil.utcDateTimeFormat(since) + "]\"}".replace(" ","+");
 //            dataSetList = sanofiService.getDataSet("生命体征", query);
 //            stdTransformDto.setVersion("56395d75b854");
 //            stdTransformDto.setSource(objectMapper.writeValueAsString(dataSetList));
@@ -153,8 +153,9 @@ public class SanofiEndPoint {
         for (String profileId : profileIds) {
             section = document.withArray("lis");
             query = "{\"q\":\"profile_id:" + profileId;
-            query += " AND EHR_000384:[" + DateTimeUtil.simpleDateTimeFormat(since) + " TO " + DateTimeUtil.simpleDateTimeFormat(to) + "]";
-            query += "\"}".replace(" ", "+");
+//            query += " AND EHR_000384:[" + DateTimeUtil.utcDateTimeFormat(since) + " TO " + DateTimeUtil.utcDateTimeFormat(to) + "]";
+            query += "\"}";
+            query = query.replace(" ", "+");
             dataSetList = sanofiService.getDataSet(BasisConstant.laboratoryProject, query);
             stdTransformDto.setVersion("56395d75b854");
             stdTransformDto.setSource(objectMapper.writeValueAsString(dataSetList));
@@ -189,8 +190,9 @@ public class SanofiEndPoint {
         for (String profileId : profileIds) {
             section = document.withArray("stat_order");
             query = "{\"q\":\"profile_id:" + profileId;
-            query += " AND EHR_000213:[" + DateTimeUtil.simpleDateTimeFormat(since) + " TO " + DateTimeUtil.simpleDateTimeFormat(to) + "]";
-            query += "\"}".replace(" ", "+");
+            query += " AND EHR_000207:[" + DateTimeUtil.utcDateTimeFormat(since) + " TO " + DateTimeUtil.utcDateTimeFormat(to) + "]";
+            query += "\"}";
+            query = query.replace(" ", "+");
             dataSetList = sanofiService.getDataSet(BasisConstant.hospitalizedOrdersTemporary, query);
             stdTransformDto.setVersion("56395d75b854");
             stdTransformDto.setSource(objectMapper.writeValueAsString(dataSetList));
@@ -209,8 +211,9 @@ public class SanofiEndPoint {
         for (String profileId : profileIds) {
             section = document.withArray("stand_order");
             query = "{\"q\":\"profile_id:" + profileId;
-            query += " AND EHR_000213:[" + DateTimeUtil.simpleDateTimeFormat(since) + " TO " + DateTimeUtil.simpleDateTimeFormat(to) + "]";
-            query += "\"}".replace(" ", "+");
+            query += " AND EHR_000207:[" + DateTimeUtil.utcDateTimeFormat(since) + " TO " + DateTimeUtil.utcDateTimeFormat(to) + "]";
+            query += "\"}";
+            query = query.replace(" ", "+");
             dataSetList = sanofiService.getDataSet(BasisConstant.hospitalizedOrdersLongtime, query);
             stdTransformDto.setVersion("56395d75b854");
             stdTransformDto.setSource(objectMapper.writeValueAsString(dataSetList));
