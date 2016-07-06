@@ -172,10 +172,14 @@ public class DictService extends BaseHbmService<BaseDict> {
                 dict.setDescription(null2Space(map.get("description"))+"");
                 dict.setStdVersion(version);
                 dict.setCreateDate(new Date());
-                dict.setHashCode(map.get("code").hashCode());
+                dict.setHashCode((map.get("code") + "").hashCode());
                 this.save(dict);
-                hashMap.put(map.get("code")+"",dict);
-                dictEntry.addAll((List)map.get("children"));
+                hashMap.put(map.get("code") + "", dict);
+                if(map.get("children")==null){
+                    continue;
+                }else{
+                     dictEntry.addAll((List)map.get("children"));
+                }
                 //sql.append("('"+  map.get("code") +"'");
                 //sql.append(",'"+  map.get("name") +"'");
                 //sql.append(",'"+  null2Space(map.get("description")) +"'");
@@ -206,11 +210,15 @@ public class DictService extends BaseHbmService<BaseDict> {
                 if(dict==null||!map.get("dictCode").equals(dict.getCode())){
                     dict = hashMap.get(map.get("dictCode")+"");
                 }
-                sql.append("('"+ dict.getId() +"'");
+                String name =  map.get("name")+"";
+                if(name.indexOf("'")>0){
+                    name = name.replaceAll("'","\'");
+                }
+                sql.append("('" + dict.getId() +"'");
                 sql.append(",'" + map.get("code") +"'");
-                sql.append(",'" + map.get("name") +"'");
+                sql.append(",'" + name +"'");
                 sql.append(",'"+  null2Space(map.get("description")) +"'");
-                sql.append(",'"+  map.get("code").hashCode() +"')");
+                sql.append(",'"+  (map.get("code")+"").hashCode() +"')");
                 if(i%100==0 || i == dictEntry.size()){
                     session.createSQLQuery(sql.toString()).executeUpdate();
                     sql = new StringBuilder(title) ;
@@ -246,4 +254,6 @@ public class DictService extends BaseHbmService<BaseDict> {
         sqlQuery.setParameterList("codes", codes);
         return sqlQuery.list();
     }
+
+
 }
