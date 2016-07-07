@@ -154,6 +154,22 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
         return convertToModel(dict, MIndicatorsDict.class);
     }
 
+    @RequestMapping(value = "/dict/indicators/codeList", method = RequestMethod.POST)
+    @ApiOperation(value = "根据code获取相应的指标字典信息" )
+    public List<MIndicatorsDict> getIndicatorsDictByCodeList(
+            @ApiParam(name = "code", value = "指标代码List")
+            @RequestParam(value = "codeList") List<String> codeList) throws Exception {
+        List<MIndicatorsDict> result=new ArrayList<>();
+        for(int i=0;i<codeList.size();i++){
+            IndicatorsDict dict = indicatorsDictService.findByCode(codeList.get(i));
+            if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, codeList.get(i)+"的字典不存在");
+            result.add(convertToModel(dict, MIndicatorsDict.class));
+        }
+      return result;
+    }
+
+
+
     @RequestMapping(value = "/dict/indicators/ids", method = RequestMethod.GET)
     @ApiOperation(value = "根据ids获取相应的指标字典信息" )
     public List<MIndicatorsDict> getIndicatorsDictByIds(
