@@ -55,7 +55,7 @@ public class ProfileCDAService {
     /**
      * 获取CDA文档数据片段
      */
-    private Map<String, Object> getCDAPartData(Map<String, Object> obj, String cdaDocumentId,boolean isPart) throws Exception
+    private Map<String, Object> getCDAPartData(Map<String, Object> obj,boolean isPart,String...cdaDocumentIdList) throws Exception
     {
         String profileId = obj.get("rowkey").toString();
         Map<String, Object> re = new HashMap<>();
@@ -65,7 +65,7 @@ public class ProfileCDAService {
         List<String>multiDatasetCodeList=new ArrayList<>();
         //获取CDA关联数据集
         Map<String,Object> datasetList = new HashMap<>();
-        List<MCdaDataSet> CDADataset = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
+        Map<String,List<MCdaDataSet>> CDADatasetList = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentIdList);
         if (CDADataset != null && CDADataset.size() > 0) {
             for (MCdaDataSet dataset : CDADataset) {
                 String datasetCode = dataset.getDataSetCode();
@@ -250,11 +250,13 @@ public class ProfileCDAService {
             //遍历所有CDA Document
             Map<Template, MCDADocument> CDAList = templateService.getOrganizationTemplates(orgCode,version,cdaDocumentTypeOptions.getCdaDocumentTypeId(eventType));
             List<Map<String, Object>> CDADataList = new ArrayList<>();
+            List<String>cdaDocumentIdList=new ArrayList<>();
             for (MCDADocument cda : CDAList.values()) {
                 String cdaDocumentId = cda.getId();
-                Map<String, Object> CDAData = getCDAPartData(profileMap, cdaDocumentId, false);
-                CDADataList.add(CDAData);
+                cdaDocumentIdList.add(cdaDocumentId);
             }
+            Map<String, Object> CDAData = getCDAPartData(profileMap, false,(String[])cdaDocumentIdList.toArray());
+            CDADataList.add(CDAData);
             re.put("cda_documents",CDADataList);
         }
         else{
