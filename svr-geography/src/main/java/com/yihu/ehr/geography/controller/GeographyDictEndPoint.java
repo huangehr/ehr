@@ -1,12 +1,10 @@
 package com.yihu.ehr.geography.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.geography.service.Geography;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.geography.service.GeographyDict;
 import com.yihu.ehr.geography.service.GeographyDictService;
-import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
