@@ -127,7 +127,7 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.GET)
     @ApiOperation(value = "存在性校验")
     Envelop isExitAppFeature(
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
