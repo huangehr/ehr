@@ -52,6 +52,7 @@ public class AppFeatureController extends BaseController {
         for(MAppFeature mAppFeature: mAppFeatureList){
             AppFeatureModel appFeatureModel  = new AppFeatureModel();
             BeanUtils.copyProperties(mAppFeature,appFeatureModel);
+            createDictName(appFeatureModel);
             appFeatureModels.add(appFeatureModel);
         }
         Integer totalCount = getTotalCount(responseEntity);
@@ -62,10 +63,10 @@ public class AppFeatureController extends BaseController {
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建AppFeature")
     public Envelop createAppFeature(
-            @ApiParam(name = "appFeature", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
-            @RequestParam(value = "appFeature", required = false) String appFeature){
+            @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
+            @RequestParam(value = "model", required = false) String model){
         Envelop envelop = new Envelop();
-        MAppFeature mAppFeature =  appFeatureClient.createAppFeature(appFeature);
+        MAppFeature mAppFeature =  appFeatureClient.createAppFeature(model);
         if(mAppFeature==null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败！");
@@ -73,6 +74,7 @@ public class AppFeatureController extends BaseController {
         }
         AppFeatureModel appFeatureModel = new AppFeatureModel();
         BeanUtils.copyProperties(mAppFeature,appFeatureModel);
+        createDictName(appFeatureModel);
         envelop.setSuccessFlg(true);
         envelop.setObj(appFeatureModel);
         return envelop;
@@ -100,8 +102,8 @@ public class AppFeatureController extends BaseController {
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新AppFeature")
     public Envelop updateAppFeature(
-            @ApiParam(name = "AppFeature", value = "对象JSON结构体", allowMultiple = true)
-            @RequestParam(value = "appFeature", required = false) String appFeature){
+            @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
+            @RequestParam(value = "model", required = false) String appFeature){
         Envelop envelop = new Envelop();
         MAppFeature mAppFeature =  appFeatureClient.createAppFeature(appFeature);
         AppFeatureModel appFeatureModel = new AppFeatureModel();
@@ -111,6 +113,7 @@ public class AppFeatureController extends BaseController {
             return envelop;
         }
         BeanUtils.copyProperties(mAppFeature,appFeatureModel);
+        createDictName(appFeatureModel);
         envelop.setSuccessFlg(true);
         envelop.setObj(appFeatureModel);
         return envelop;
@@ -127,15 +130,28 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.GET)
     @ApiOperation(value = "存在性校验")
     Envelop isExitAppFeature(
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
-            @PathVariable(value = "filters") String filters){
+            @RequestParam(value = "filters", required = false) String filters){
         Envelop envelop = new Envelop();
-        Boolean isExit  = appFeatureClient.isExitAppFeature(filters);
-        envelop.setSuccessFlg(isExit);
+        try{
+         Boolean isExit  = appFeatureClient.isExitAppFeature(filters);
+         envelop.setSuccessFlg(true);
+         envelop.setObj(isExit);
+        }catch (Exception e){
+         envelop.setSuccessFlg(false);
+        }
         return envelop;
+    }
+
+    /**
+     * 格式化字典数据
+     * @param appFeatureModel
+     */
+    private void createDictName(AppFeatureModel appFeatureModel){
+
     }
 
 }

@@ -3,7 +3,7 @@ package com.yihu.ehr.apps.service;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.app.MAppFeature;
+import com.yihu.ehr.model.app.MAppApi;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -17,11 +17,11 @@ import java.util.List;
  * Created by linz on 2016年7月8日11:30:03.
  */
 @FeignClient(name=MicroServices.Application)
-public interface AppFeatureClient {
+public interface AppApiClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.GET)
-    @ApiOperation(value = "获取AppFeature列表")
-    ResponseEntity<List<MAppFeature>> getAppFeatures(
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppApi列表")
+    ResponseEntity<List<MAppApi>> getAppApis(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "")
@@ -33,34 +33,27 @@ public interface AppFeatureClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "创建AppFeature")
-    MAppFeature createAppFeature(
-            @ApiParam(name = "appFeature", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
-            @RequestBody String appFeatureJson);
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApis, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "创建AppApi")
+    MAppApi createAppApi(
+            @ApiParam(name = "AppApi", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
+            @RequestBody String AppApiJson);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeature, method = RequestMethod.GET)
-    @ApiOperation(value = "获取AppFeature")
-    MAppFeature getAppFeature(
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApi, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppApi")
+    MAppApi getAppApi(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "更新AppFeature")
-    MAppFeature updateAppFeature(
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApis, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "更新AppApi")
+    MAppApi updateAppApi(
             @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeature, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApi, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除AppFeature")
-    boolean deleteAppFeature(
+    boolean deleteAppApi(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id);
-
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.GET)
-    @ApiOperation(value = "存在性校验")
-    boolean isExitAppFeature(
-            @ApiParam(name = "filters", value = "filters", defaultValue = "")
-            @RequestParam(value = "filters") String filters);
-
 }

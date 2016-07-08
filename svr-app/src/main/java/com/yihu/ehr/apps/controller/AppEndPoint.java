@@ -134,4 +134,14 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "app_name") String appName) {
         return appService.isAppNameExists(appName);
     }
+
+    @RequestMapping(value = ServiceApi.Apps.FilterList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取过滤App列表")
+    public Boolean getAppFilter(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters
+    ) throws Exception {
+        Long count = appService.getCount(filters);
+        return count>0?true:false;
+    }
 }
