@@ -202,7 +202,7 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
     public MIcd10Dict findByCode(@ApiParam(name = "code", value = "icd10_code")
                                      @PathVariable(value = "code") String code) throws Exception{
         Icd10Dict dict = icd10DictService.findByCode(code);
-        if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        if (dict == null) return null;
         return convertToModel(dict, MIcd10Dict.class);
     }
 

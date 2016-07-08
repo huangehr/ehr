@@ -167,8 +167,14 @@ public class SolrQuery {
 							break;
 					}
 					if(conditionToString(condition).indexOf("NOT")==0){
-						NOT+=re.substring(re.length()-5)+conditionToString(condition).substring(3,conditionToString(condition).length());
-						re=re.substring(0,re.length()-5);
+						if(NOT.equals("")){
+							NOT=" NOT("+conditionToString(condition).substring(3);
+							re = re.substring(0, re.length() - 5);
+						}
+						else {
+							NOT += re.substring(re.length() - 5) + conditionToString(condition).substring(3, conditionToString(condition).length());
+							re = re.substring(0, re.length() - 5);
+						}
 					}
 					else {
 						re += conditionToString(condition);
@@ -188,7 +194,10 @@ public class SolrQuery {
 		else {
 			re ="*:* ";
 		}
-		return re+NOT+")";
+		if(NOT.equals(""))
+			return re;
+		else
+			return re+NOT+")";
 	}
 
 	/******************************** Count方法 ******************************************************/

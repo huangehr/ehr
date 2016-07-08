@@ -98,6 +98,10 @@ public class StdDataSet {
         this.records.put(recordKey, record);
     }
 
+    public void removeRecord(String recordKey, MetaDataRecord record) {
+        this.records.remove(recordKey,record);
+    }
+
     public MetaDataRecord getRecord(String recordKey) {
         return this.records.get(recordKey);
     }

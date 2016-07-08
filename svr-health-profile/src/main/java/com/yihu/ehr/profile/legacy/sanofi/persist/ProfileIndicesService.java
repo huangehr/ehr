@@ -3,7 +3,6 @@ package com.yihu.ehr.profile.legacy.sanofi.persist;
 import com.yihu.ehr.profile.legacy.sanofi.persist.repo.ProfileIndicesRepository;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +23,7 @@ public class ProfileIndicesService {
     @Autowired
     ProfileIndicesRepository indicesRepo;
 
-    private final static String ProfileCore = "HealthArchives";
+//    private final static String ProfileCore = "HealthArchives";
 
 
     /**
@@ -66,27 +65,28 @@ public class ProfileIndicesService {
         if (StringUtils.isNotEmpty(name)) {
             criteria = new Criteria(Demographic.LegacyName).contains(name).or(new Criteria(Demographic.Name).contains(name));
             //开始时间和结束时间缩小范围
-            if (since!=null & to!=null) {
-                String rowKeys[] = eventDateFilter(since,to);
-                if(rowKeys.length>0){
-                    criteria.contains(rowKeys);
-                }
-                return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
-            }
+//            if (since!=null & to!=null) {
+//                String rowKeys[] = eventDateFilter(since,to);
+//                if(rowKeys.length>0){
+//                    criteria.contains(rowKeys);
+//                }
+//            }
             if (StringUtils.isNotEmpty(telephone)) {
                 criteria = criteria.connect();
                 criteria.and(new Criteria(Demographic.LegacyTelephone).contains(telephone).or(new Criteria(Demographic.Telephone).contains(telephone)));
+                return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
             } else if (StringUtils.isNotEmpty(gender) && birthday != null) {
                 criteria = criteria.connect();
                 criteria = criteria.and(new Criteria(Demographic.LegacyGender).contains(gender).or(new Criteria(Demographic.Gender).contains(gender)));
 
                 criteria = criteria.connect();
-                criteria = criteria.and(new Criteria(Demographic.Birthday).between(DateUtils.addDays(birthday, -3), DateUtils.addDays(birthday, 3)));
+//                criteria = criteria.and(new Criteria(Demographic.Birthday).between(DateTimeUtil.utcDateTimeFormat(DateUtils.addDays(birthday, -3)), DateTimeUtil.utcDateTimeFormat(DateUtils.addDays(birthday, 3))));
+                criteria = criteria.and(new Criteria(Demographic.Birthday).between(DateTimeUtil.utcDateTimeFormat(birthday), DateTimeUtil.utcDateTimeFormat(birthday)));
                 return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
             }
         }
 
-        return indicesRepo.query(ProfileCore, criteria, ProfileIndices.class);
+        return indicesRepo.query(Demographic.DemographicCore, criteria, ProfileIndices.class);
 
 
 //        if (criteria == null) return null;
@@ -106,15 +106,15 @@ public class ProfileIndicesService {
     }
 
 
-    private String[] eventDateFilter(Date since,Date to){
-        Criteria eventDateCriteria = new Criteria("event_date").between(DateTimeUtil.utcDateTimeFormat(since),DateTimeUtil.utcDateTimeFormat(to));
-        Page<Demographic> demographics = indicesRepo.query(ProfileCore, eventDateCriteria, Demographic.class);
-        String rowKeys[] = new String[demographics.getContent().size()];
-        for (int i = 0; i < rowKeys.length; ++i) {
-            rowKeys[i] = demographics.getContent().get(i).rowkey;
-        }
-        return rowKeys;
-    }
+//    private String[] eventDateFilter(Date since,Date to){
+//        Criteria eventDateCriteria = new Criteria("event_date").between(DateTimeUtil.utcDateTimeFormat(since),DateTimeUtil.utcDateTimeFormat(to));
+//        Page<Demographic> demographics = indicesRepo.query(ProfileCore, eventDateCriteria, Demographic.class);
+//        String rowKeys[] = new String[demographics.getContent().size()];
+//        for (int i = 0; i < rowKeys.length; ++i) {
+//            rowKeys[i] = demographics.getContent().get(i).rowkey;
+//        }
+//        return rowKeys;
+//    }
 
 
 
