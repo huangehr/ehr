@@ -55,21 +55,25 @@ public class IndicatorsService {
             Envelop result = resource.getResources(BasisConstant.healthIndicators,appId,sql,null,null);
             if(result.getDetailModelList()!=null&&result.getDetailModelList().size()>0)
             {
+                List<String>ETL_INDICATORS_CODE_LIST=new ArrayList<>();
                 for(int i=0;i<result.getDetailModelList().size();i++)
                 {
-                    Map<String,Object> resultItem = (Map<String,Object>)result.getDetailModelList().get(i);
-                    Map<String,Object> item = new HashMap<>();
-                    item.put("type",resultItem.get("ETL_INDICATORS_TYPE"));
-                    item.put("code",resultItem.get("ETL_INDICATORS_CODE"));
-
-                    MIndicatorsDict detailInformationFromCode = dictService.getIndicatorsDictByCode(resultItem.get("ETL_INDICATORS_CODE").toString());
-                    item.put("unit",detailInformationFromCode.getUnit());
-                    item.put("upper_limit",detailInformationFromCode.getUpperLimit());
-                    item.put("lower_limit",detailInformationFromCode.getLowerLimit());
-                    item.put("description",detailInformationFromCode.getDescription());
-                    item.put("name",resultItem.get("ETL_INDICATORS_NAME"));
+                    ETL_INDICATORS_CODE_LIST.add(((Map<String, Object>) result.getDetailModelList().get(i)).get("ETL_INDICATORS_CODE").toString());
+                }
+                List<MIndicatorsDict> detailInformationFromCodeList = dictService.getIndicatorsDictByCodeList(ETL_INDICATORS_CODE_LIST);
+                for(int i=0;i<detailInformationFromCodeList.size();i++) {
+                    Map<String, Object> resultItem = (Map<String, Object>) result.getDetailModelList().get(i);
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("type", resultItem.get("ETL_INDICATORS_TYPE"));
+                    item.put("code", resultItem.get("ETL_INDICATORS_CODE"));
+                    item.put("unit", detailInformationFromCodeList.get(i).getUnit());
+                    item.put("upper_limit", detailInformationFromCodeList.get(i).getUpperLimit());
+                    item.put("lower_limit", detailInformationFromCodeList.get(i).getLowerLimit());
+                    item.put("description", detailInformationFromCodeList.get(i).getDescription());
+                    item.put("name", resultItem.get("ETL_INDICATORS_NAME"));
                     re.add(item);
                 }
+
             }
 
         }

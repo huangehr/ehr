@@ -49,6 +49,7 @@ public class ServiceApi {
         public static final String ResourcesRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourcesMasterData = "/resources/query/master_data"; //主表资源查询接口
         public static final String ResourcesSubData = "/resources/query/sub_data"; //细表资源查询接口
+        public static final String getCDAData = "/resources/query/getCDAData";//获取cda data
         public static final String ResourcesMasterStat = "/resources/query/master_stat"; //主表资源统计接口
         public static final String ResourcesSubStat = "/resources/query/sub_stat"; //细表资源查询接口
         public static final String ResourcesMysql = "/resources/query/mysql"; //mysql资源查询接口
