@@ -268,7 +268,7 @@ public class ProfileCDAService {
                 String cdaDocumentId = cda.getId();
                 cdaDocumentIdList.add(cdaDocumentId);
             }
-            Map<String, Object> CDAData = getCDAPartData(profileMap, false,(String[])cdaDocumentIdList.toArray());
+            Map<String, Object> CDAData = getCDAPartData(profileMap, false,(String[])cdaDocumentIdList.toArray(new String[cdaDocumentIdList.size()]));
             for(String key :CDAData.keySet()){
 
                 CDADataList.add((Map<String, Object>)CDAData.get(key));
