@@ -5,6 +5,11 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        td div{
+            padding-left: 10px;
+        }
+    </style>
 </head>
 <body style="margin:0;padding:0;font: 14px \5b8b\4f53,Sim sun,宋体; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; ">
 
@@ -41,11 +46,11 @@
           <#list data_sets.HDSC01_04 as item>
               <tr style="line-height: 20px;">
                   <td>${item_index+1}、${item.HDSD00_04_023}</td>
-                  <td>${item.HDSD00_04_027}</td>
+                  <td>${item.HDSD00_04_022}</td>
+                  <td>${item.HDSD00_04_021}</td>
                   <td>${item.HDSD00_04_028}</td>
-                  <td>${item.HDSD00_04_025}</td>
+                  <td>${item.HDSD00_04_027}</td>
                   <td>${item.HDSD00_04_024}</td>
-                  <td>${item.HDSD00_04_026}</td>
               </tr>
           </#list>
           </table>
