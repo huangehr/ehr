@@ -1,6 +1,6 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.apps.model.AppApiFeature;
+import com.yihu.ehr.apps.model.AppFeature;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @version 1.0
  * @created 2016年7月7日21:05:13
  */
-public interface XAppApiFeatureRepository extends JpaRepository<AppApiFeature, String> {
+public interface XAppApiFeatureRepository extends JpaRepository<AppFeature, String> {
 
 }

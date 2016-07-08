@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @created 2016年7月7日17:45:30
  */
 
-public class MAppApiFeature implements Serializable {
+public class MAppFeature implements Serializable {
 
     private int id;
     private String code;

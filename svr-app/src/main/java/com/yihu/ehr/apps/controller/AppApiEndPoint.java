@@ -93,7 +93,7 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取AppApi")
     public MAppApi getAppApi(
             @ApiParam(name = "id", value = "id")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") int id) throws Exception {
         AppApi appApi = appApiService.retrieve(id);
         return convertToModel(appApi, MAppApi.class);
     }
@@ -102,7 +102,7 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除AppApi")
     public boolean deleteAppApi(
             @ApiParam(name = "id", value = "id")
-            @PathVariable(value = "id") String id) throws Exception {
+            @PathVariable(value = "id") int id) throws Exception {
         appApiService.delete(id);
         return true;
     }

@@ -33,7 +33,7 @@ import java.util.List;
 @Api(value = "AppApiParameter", description = "API应用请求参数", tags = {"平台应用"})
 public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
     @Autowired
-    private AppApiParameterService AppApiParameterService;
+    private AppApiParameterService appApiParameterService;
 
     @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameters, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建AppApiParameter")
@@ -41,7 +41,7 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "AppApiParameter", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String AppApiParameterJson) throws Exception {
         AppApiParameter AppApiParameter = toEntity(AppApiParameterJson, AppApiParameter.class);
-        AppApiParameter = AppApiParameterService.createAppApiParameter(AppApiParameter);
+        AppApiParameter = appApiParameterService.createAppApiParameter(AppApiParameter);
         return convertToModel(AppApiParameter, MAppApiParameter.class);
     }
 
@@ -63,14 +63,14 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
         page = reducePage(page);
 
         if (StringUtils.isEmpty(filters)) {
-            Page<AppApiParameter> appPages = AppApiParameterService.getAppApiParameterList(sorts, page, size);
+            Page<AppApiParameter> appPages = appApiParameterService.getAppApiParameterList(sorts, page, size);
 
             pagedResponse(request, response, appPages.getTotalElements(), page, size);
             return convertToModels(appPages.getContent(), new ArrayList<>(appPages.getNumber()), MAppApiParameter.class, fields);
         } else {
-            List<AppApiParameter> AppApiParameterList = AppApiParameterService.search(fields, filters, sorts, page, size);
+            List<AppApiParameter> AppApiParameterList = appApiParameterService.search(fields, filters, sorts, page, size);
 
-            pagedResponse(request, response, AppApiParameterService.getCount(filters), page, size);
+            pagedResponse(request, response, appApiParameterService.getCount(filters), page, size);
             return convertToModels(AppApiParameterList, new ArrayList<>(AppApiParameterList.size()), MAppApiParameter.class, fields);
         }
     }
@@ -81,8 +81,8 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "AppApiParameter", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson) throws Exception {
         AppApiParameter AppApiParameter = toEntity(appJson, AppApiParameter.class);
-        if (AppApiParameterService.retrieve(AppApiParameter.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
-        AppApiParameterService.save(AppApiParameter);
+        if (appApiParameterService.retrieve(AppApiParameter.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        appApiParameterService.save(AppApiParameter);
         return convertToModel(AppApiParameter, MAppApiParameter.class);
     }
 
@@ -90,8 +90,8 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取AppApiParameter")
     public MAppApiParameter getAppApiParameter(
             @ApiParam(name = "id", value = "id")
-            @PathVariable(value = "id") String id) throws Exception {
-        AppApiParameter AppApiParameter = AppApiParameterService.retrieve(id);
+            @PathVariable(value = "id") int id) throws Exception {
+        AppApiParameter AppApiParameter = appApiParameterService.retrieve(id);
         return convertToModel(AppApiParameter, MAppApiParameter.class);
     }
 
@@ -99,8 +99,8 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除AppApiParameter")
     public boolean deleteAppApiParameter(
             @ApiParam(name = "id", value = "id")
-            @PathVariable(value = "id") String id) throws Exception {
-        AppApiParameterService.delete(id);
+            @PathVariable(value = "id") int id) throws Exception {
+        appApiParameterService.delete(id);
         return true;
     }
 }
