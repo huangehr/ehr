@@ -284,4 +284,22 @@ public class AppController extends BaseController {
 
         return mApp;
     }
+
+    @RequestMapping(value = ApiVersion.Version1_0 + "/apps/filterList", method = RequestMethod.GET)
+    @ApiOperation(value = "存在性校验")
+    Envelop isExitAppFeature(
+            @ApiParam(name = "filters", value = "filters", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters){
+        Envelop envelop = new Envelop();
+        try{
+            Boolean isExit  = appClient.isExitApp(filters);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(isExit);
+        }catch (Exception e){
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+
 }
