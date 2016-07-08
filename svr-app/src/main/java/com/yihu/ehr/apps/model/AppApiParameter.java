@@ -3,7 +3,7 @@ package com.yihu.ehr.apps.model;
 import javax.persistence.*;
 
 /**
- * APP_api对象。
+ * apps_api_parameter对象。
  *
  * @author linzhuo
  * @version 1.0

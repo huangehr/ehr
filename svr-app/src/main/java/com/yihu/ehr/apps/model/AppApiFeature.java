@@ -3,7 +3,7 @@ package com.yihu.ehr.apps.model;
 import javax.persistence.*;
 
 /**
- * APP_api对象。
+ * apps_api_feature对象。
  *
  * @author linzhuo
  * @version 1.0
@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 
 @Entity
-@Table(name = "apps_api_response")
+@Table(name = "apps_api_feature")
 public class AppApiFeature {
 
     private int id;
