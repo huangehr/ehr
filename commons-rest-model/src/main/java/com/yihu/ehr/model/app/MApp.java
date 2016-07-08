@@ -28,7 +28,7 @@ public class MApp implements Serializable {
     private String tags;
     private String org;
     private String code;
-    private String sourceType;
+    private int sourceType;
 
     public String getCode() {
         return code;
@@ -38,11 +38,11 @@ public class MApp implements Serializable {
         this.code = code;
     }
 
-    public String getSourceType() {
+    public int getSourceType() {
         return sourceType;
     }
 
-    public void setSourceType(String sourceType) {
+    public void setSourceType(int sourceType) {
         this.sourceType = sourceType;
     }
 
