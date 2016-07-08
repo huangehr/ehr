@@ -3,7 +3,7 @@ package com.yihu.ehr.model.app;
 import java.io.Serializable;
 
 /**
- * APP_api对象。
+ * MAppApiFeature对象。
  *
  * @author linzhuo
  * @version 1.0
@@ -111,4 +111,6 @@ public class MAppApiFeature implements Serializable {
     public void setAppId(String appId) {
         this.appId = appId;
     }
+
+
 }

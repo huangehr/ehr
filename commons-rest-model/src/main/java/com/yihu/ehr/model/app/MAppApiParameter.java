@@ -3,7 +3,7 @@ package com.yihu.ehr.model.app;
 import java.io.Serializable;
 
 /**
- * APP_api对象。
+ * MAppApiParameter对象。
  *
  * @author linzhuo
  * @version 1.0
