@@ -137,7 +137,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Apps.FilterList, method = RequestMethod.GET)
     @ApiOperation(value = "获取过滤App列表")
-    public Boolean getAppFeaturesFilter(
+    public Boolean getAppFilter(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters
     ) throws Exception {
