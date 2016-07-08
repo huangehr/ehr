@@ -1,7 +1,7 @@
 package com.yihu.ehr.agModel.app;
 
 /**
- * APP_api对象。
+ * AppApiResponse对象。
  *
  * @author linzhuo
  * @version 1.0
