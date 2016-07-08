@@ -385,6 +385,28 @@ public class ServiceApi {
         public static final String UserEmailNoExistence             = "/user/email/existence";
     }
 
+    public static class Roles{
+        public static final String Role                             = "/roles/role";
+        public static final String RoleId                           = "/roles/role/{id}";
+        public static final String Roles                            = "/roles/roles";
+        public static final String RolesNoPage                      = "/roles/roles/no_paging";
+
+        public static final String RoleUser                         = "/roles/role_user";
+        public static final String RoleUserId                       = "/roles/role_user/{id}";
+        public static final String RoleUsers                        = "/roles/role_users";
+        public static final String RoleUserNoPage                   = "/roles/role_users/no_paging";
+
+        public static final String RoleFeature                      = "/roles/role_feature";
+        public static final String RoleFeatureId                    = "/roles/role_feature/{id}";
+        public static final String RoleFeatures                     = "/roles/role_features";
+        public static final String RoleFeaturesNoPage               = "/roles/role_features/no_paging";
+
+        public static final String RoleApp                          = "/roles/role_app";
+        public static final String RoleAppId                        = "/roles/role_app/{id}";
+        public static final String RoleApps                         = "/roles/role_apps";
+        public static final String RoleAppsNopage                   = "/roles/role_appd/no_paging";
+    }
+
     public static class Redis{
         public static final String StandardVersions                 = "/std/versions";
         public static final String StandardDataSetsCount            = "/std/data_sets/count";
