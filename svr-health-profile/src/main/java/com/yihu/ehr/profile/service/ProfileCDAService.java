@@ -61,9 +61,10 @@ public class ProfileCDAService {
         Map<String, Object> re = new HashMap<>();
 
         String cdaVersion = obj.get("cda_version").toString();
-
+        List<String>SingleDatasetCodeList=new ArrayList<>();
+        List<String>multiDatasetCodeList=new ArrayList<>();
         //获取CDA关联数据集
-        Map<String,List<Map<String, Object>>> datasetList = new HashMap<>();
+        Map<String,Object> datasetList = new HashMap<>();
         List<MCdaDataSet> CDADataset = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
         if (CDADataset != null && CDADataset.size() > 0) {
             for (MCdaDataSet dataset : CDADataset) {
@@ -72,23 +73,16 @@ public class ProfileCDAService {
 
                 //单条数据
                 if(multiRecord.equals("0")){
-                    List<Map<String, Object>> dataList = new ArrayList<>();
-                    MStdTransformDto stdTransformDto = new MStdTransformDto();
-                    stdTransformDto.setSource(objectMapper.writeValueAsString(obj));
-                    stdTransformDto.setVersion(cdaVersion);
-                    stdTransformDto.setDataset(datasetCode);
-                    Map<String, Object> map = transform.stdMasterTransform(objectMapper.writeValueAsString(stdTransformDto));
-                    dataList.add(map);
-                    datasetList.put(datasetCode, dataList);
+                    SingleDatasetCodeList.add(datasetCode);
                 }
                 else{
                     //获取Hbase细表数据
-                    String q = "{\"table\":\""+datasetCode+"\",\"q\":\"profile_id:" + profileId + "\"}";
-                    Envelop data = resource.getSubData(q, null, null,cdaVersion);
-                    datasetList.put(datasetCode, data.getDetailModelList());
+                    multiDatasetCodeList.add(datasetCode);
                 }
             }
+            datasetList=resource.getCDAData(java.net.URLEncoder.encode(objectMapper.writeValueAsString(obj)),SingleDatasetCodeList,multiDatasetCodeList);
         }
+
 
         //获取cda document数据
         MCDADocument cda = cdaService.getCDADocuments(cdaVersion,cdaDocumentId);
@@ -99,7 +93,7 @@ public class ProfileCDAService {
 
 
         //非结构化数据
-        Envelop rawFiles = resource.getRawFiles(profileId,cdaDocumentId,null,null);
+        Envelop rawFiles = resource.getRawFiles(profileId, cdaDocumentId, null, null);
         if(rawFiles.getDetailModelList()!=null && rawFiles.getDetailModelList().size()>0)
         {
             Map<String,Object> rawFile = (Map<String,Object>)rawFiles.getDetailModelList().get(0);
@@ -137,7 +131,7 @@ public class ProfileCDAService {
         if(profile.getDetailModelList()!=null && profile.getDetailModelList().size()>0)
         {
             Map<String, Object> obj = (Map<String, Object>) profile.getDetailModelList().get(0);
-            re = getCDAPartData(obj,cdaDocumentId,true);
+            re = getCDAPartData(obj, cdaDocumentId, true);
         }
         return re;
     }
@@ -194,7 +188,6 @@ public class ProfileCDAService {
                                 item.put("template_id", String.valueOf(template.getId()));
                                 item.put("cda_document_id", template.getCdaDocumentId());
                                 item.put("template_name", template.getTitle());
-                                item.put("cda_code", template.getCdaCode());
                                 item.put("pc_template", template.getPcTplURL());
                                 item.put("mobile_template", template.getMobileTplURL());
                                 re.add(item);
@@ -259,7 +252,7 @@ public class ProfileCDAService {
             List<Map<String, Object>> CDADataList = new ArrayList<>();
             for (MCDADocument cda : CDAList.values()) {
                 String cdaDocumentId = cda.getId();
-                Map<String, Object> CDAData = getCDAPartData(profileMap,cdaDocumentId,false);
+                Map<String, Object> CDAData = getCDAPartData(profileMap, cdaDocumentId, false);
                 CDADataList.add(CDAData);
             }
             re.put("cda_documents",CDADataList);

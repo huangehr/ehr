@@ -1,4 +1,4 @@
-package com.yihu.ehr.apps.service;
+package com.yihu.ehr.apps.model;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
@@ -38,6 +38,25 @@ public class App {
     private String description;
     private String tags;
     private String org;
+    private String code;
+    private String sourceType;
+
+    @Column(name = "source_type", nullable = true)
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+    @Column(name = "code", nullable = true)
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     public App() {
     }

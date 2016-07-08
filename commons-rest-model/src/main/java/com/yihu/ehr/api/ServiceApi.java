@@ -49,6 +49,7 @@ public class ServiceApi {
         public static final String ResourcesRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourcesMasterData = "/resources/query/master_data"; //主表资源查询接口
         public static final String ResourcesSubData = "/resources/query/sub_data"; //细表资源查询接口
+        public static final String getCDAData = "/resources/query/getCDAData";//获取cda data
         public static final String ResourcesMasterStat = "/resources/query/master_stat"; //主表资源统计接口
         public static final String ResourcesSubStat = "/resources/query/sub_stat"; //细表资源查询接口
         public static final String ResourcesMysql = "/resources/query/mysql"; //mysql资源查询接口
@@ -207,6 +208,24 @@ public class ServiceApi {
         public static final String AppExistence                    = "/apps/{app_id}/existence";
         public static final String AppStatus                       = "/apps/{app_id}/status";
         public static final String AppNameExistence                = "/app/{app_name}/existence";
+    }
+
+    public static class AppApi{
+        public static final String AppApis                            = "/appApi";
+        public static final String AppApi                             = "/appApi/{id}";
+    }
+    public static class AppFeature{
+        public static final String AppFeatures                           = "/appFeature";
+        public static final String FilterFeatureList                    = "/filterFeatureList";
+        public static final String AppFeature                            = "/appFeature/{id}";
+    }
+    public static class AppApiParameter{
+        public static final String AppApiParameters                            = "/appApiParameter";
+        public static final String AppApiParameter                     = "/appApiParameter/{id}";
+    }
+    public static class AppApiResponse{
+        public static final String AppApiResponses                            = "/appApiResponse";
+        public static final String AppApiResponse                    = "/appApiResponse/{id}";
     }
 
     public static class Dictionaries{
