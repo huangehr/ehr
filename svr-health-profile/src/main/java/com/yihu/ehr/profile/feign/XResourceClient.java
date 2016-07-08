@@ -62,8 +62,8 @@ public interface XResourceClient {
     //cda数据
     @RequestMapping(value = ServiceApi.Resources.getCDAData, method = GET)
     Map<String,Object> getCDAData(  @RequestParam(value = "masterJson", required = true) String masterJson,
-                                    @RequestParam(value = "masterDatasetCodeList",required = true) List<String> masterDatasetCodeList,
-                                    @RequestParam(value = "multiDatasetCodeList",required = true) List<String> multiDatasetCodeList) throws Exception;
+                                    @RequestParam(value = "masterDatasetCodeList",required = true) String masterDatasetCodeList,
+                                    @RequestParam(value = "multiDatasetCodeList",required = true) String multiDatasetCodeList) throws Exception;
 
     //查询主表统计数据
     @RequestMapping(value = ServiceApi.Resources.ResourcesMasterStat, method = GET)
@@ -82,4 +82,8 @@ public interface XResourceClient {
                         @RequestParam(value = "cdaDocumentId", required = false) String cdaDocumentId,
                         @RequestParam(value = "page", required = false) Integer page,
                         @RequestParam(value = "size", required = false) Integer size) throws Exception;
+
+    @RequestMapping(value = ServiceApi.Resources.ResourcesRawFilesList, method = GET)
+    Map<String,Envelop> getRawFilesList(@RequestParam(value = "profileId", required = true) String profileId,
+                        @RequestParam(value = "cdaDocumentId", required = true) String[] cdaDocumentIdList) throws Exception;
 }

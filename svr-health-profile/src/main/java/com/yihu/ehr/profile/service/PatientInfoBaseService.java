@@ -263,7 +263,11 @@ public class PatientInfoBaseService {
                 List<MHealthProblemDict> hpList = dictClient.getHealthProblemListByIcd10List(codeList);
                 if(hpList!=null){
                     for(int i=0;i<hpList.size();i++) {
-                        String healthProblem = hpList.get(i).getCode() + "__" + hpList.get(i).getName();
+                        String healthProblem = codeList.get(i) + "__" + codeList.get(i);
+                        if(hpList.get(i).getCode()!=null && hpList.get(i).getName()!=null) {
+                            healthProblem = hpList.get(i).getCode() + "__" + hpList.get(i).getName();
+                        }
+
                         List<String> profileList = new ArrayList<>();
                         if (outpatientMap.containsKey(healthProblem)) {
                             profileList = outpatientMap.get(healthProblem);
