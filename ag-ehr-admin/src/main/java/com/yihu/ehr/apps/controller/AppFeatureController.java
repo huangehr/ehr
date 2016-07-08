@@ -52,6 +52,7 @@ public class AppFeatureController extends BaseController {
         for(MAppFeature mAppFeature: mAppFeatureList){
             AppFeatureModel appFeatureModel  = new AppFeatureModel();
             BeanUtils.copyProperties(mAppFeature,appFeatureModel);
+            createDictName(appFeatureModel);
             appFeatureModels.add(appFeatureModel);
         }
         Integer totalCount = getTotalCount(responseEntity);
@@ -73,6 +74,7 @@ public class AppFeatureController extends BaseController {
         }
         AppFeatureModel appFeatureModel = new AppFeatureModel();
         BeanUtils.copyProperties(mAppFeature,appFeatureModel);
+        createDictName(appFeatureModel);
         envelop.setSuccessFlg(true);
         envelop.setObj(appFeatureModel);
         return envelop;
@@ -111,6 +113,7 @@ public class AppFeatureController extends BaseController {
             return envelop;
         }
         BeanUtils.copyProperties(mAppFeature,appFeatureModel);
+        createDictName(appFeatureModel);
         envelop.setSuccessFlg(true);
         envelop.setObj(appFeatureModel);
         return envelop;
@@ -141,6 +144,14 @@ public class AppFeatureController extends BaseController {
          envelop.setSuccessFlg(false);
         }
         return envelop;
+    }
+
+    /**
+     * 格式化字典数据
+     * @param appFeatureModel
+     */
+    private void createDictName(AppFeatureModel appFeatureModel){
+
     }
 
 }
