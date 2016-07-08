@@ -15,17 +15,17 @@ public class AppModel {
     private String org;
     private String orgName;
     private String resourceNames;
-    private String sourceType;
+    private int sourceType;
 
     private String sourceTypeName;
 
     private String code;
 
-    public String getSourceType() {
+    public int getSourceType() {
         return sourceType;
     }
 
-    public void setSourceType(String sourceType) {
+    public void setSourceType(int sourceType) {
         this.sourceType = sourceType;
     }
 
