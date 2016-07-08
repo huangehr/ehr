@@ -74,6 +74,16 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
         }
     }
 
+    @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.GET)
+    @ApiOperation(value = "获取过滤AppFeature列表")
+    public Boolean getAppFeaturesFilter(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters
+           ) throws Exception {
+        Long count = appFeatureService.getCount(filters);
+        return count>0?true:false;
+    }
+
     @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新AppFeature")
     public MAppFeature updateAppFeature(

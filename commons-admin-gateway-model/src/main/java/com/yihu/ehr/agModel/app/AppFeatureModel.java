@@ -8,7 +8,7 @@ package com.yihu.ehr.agModel.app;
  * @created 2016年7月7日17:45:30
  */
 
-public class AppFeature {
+public class AppFeatureModel {
 
     private int id;
     private String code;

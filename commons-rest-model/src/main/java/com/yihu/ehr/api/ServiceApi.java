@@ -216,7 +216,8 @@ public class ServiceApi {
     }
     public static class AppFeature{
         public static final String AppFeatures                           = "/appFeature";
-        public static final String AppFeature                    = "/appFeature/{id}";
+        public static final String FilterFeatureList                    = "/filterFeatureList";
+        public static final String AppFeature                            = "/appFeature/{id}";
     }
     public static class AppApiParameter{
         public static final String AppApiParameters                            = "/appApiParameter";
