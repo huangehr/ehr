@@ -3,7 +3,7 @@ package com.yihu.ehr.agModel.user;
 /**
  * Created by yww on 2016/7/7.
  */
-public class RoleModel {
+public class RolesModel {
     private long id;
     private String code;
     private String name;
@@ -11,7 +11,7 @@ public class RoleModel {
     private String appId;
     private String type;
 
-    public RoleModel() {
+    public RolesModel() {
     }
 
     public long getId() {
@@ -61,4 +61,6 @@ public class RoleModel {
     public void setType(String type) {
         this.type = type;
     }
+
+
 }
