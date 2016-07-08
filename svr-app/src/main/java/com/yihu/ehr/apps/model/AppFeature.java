@@ -11,8 +11,8 @@ import javax.persistence.*;
  */
 
 @Entity
-@Table(name = "apps_api_feature")
-public class AppApiFeature {
+@Table(name = "apps_feature")
+public class AppFeature {
 
     private int id;
     private String code;
@@ -63,6 +63,7 @@ public class AppApiFeature {
     public void setCode(String code) {
         this.code = code;
     }
+
     @Column(name = "type", nullable = true)
     public String getType() {
         return type;
@@ -72,7 +73,7 @@ public class AppApiFeature {
         this.type = type;
     }
 
-    @Column(name = "parentId", nullable = true)
+    @Column(name = "parent_id", nullable = true)
     public int getParentId() {
         return parentId;
     }
@@ -117,11 +118,12 @@ public class AppApiFeature {
         this.openLevel = openLevel;
     }
 
+    @Column(name = "app_id", nullable = true)
     public String getAppId() {
         return appId;
     }
 
-    @Column(name = "app_id", nullable = true)
+
     public void setAppId(String appId) {
         this.appId = appId;
     }

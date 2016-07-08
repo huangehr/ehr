@@ -212,15 +212,16 @@ public class ServiceApi {
 
     public static class AppApi{
         public static final String AppApis                            = "/appApi";
-        public static final String AppApi                     = "/appApi/{app_api_id}";
+        public static final String AppApi                             = "/appApi/{id}";
     }
-    public static class AppApiFeature{
-        public static final String AppApiFeatures                           = "/appApiFeature";
-        public static final String AppApiFeature                    = "/appApiFeature/{id}";
+    public static class AppFeature{
+        public static final String AppFeatures                           = "/appFeature";
+        public static final String FilterFeatureList                    = "/filterFeatureList";
+        public static final String AppFeature                            = "/appFeature/{id}";
     }
     public static class AppApiParameter{
         public static final String AppApiParameters                            = "/appApiParameter";
-        public static final String AppApiParameter                     = "/appApi/{id}";
+        public static final String AppApiParameter                     = "/appApiParameter/{id}";
     }
     public static class AppApiResponse{
         public static final String AppApiResponses                            = "/appApiResponse";
