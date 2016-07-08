@@ -1,6 +1,5 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.apps.model.App;
 import com.yihu.ehr.apps.model.AppApiParameter;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
