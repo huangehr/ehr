@@ -208,6 +208,7 @@ public class ServiceApi {
         public static final String AppExistence                    = "/apps/{app_id}/existence";
         public static final String AppStatus                       = "/apps/{app_id}/status";
         public static final String AppNameExistence                = "/app/{app_name}/existence";
+        public static final String FilterList                        ="/apps/filterList";
     }
 
     public static class AppApi{
