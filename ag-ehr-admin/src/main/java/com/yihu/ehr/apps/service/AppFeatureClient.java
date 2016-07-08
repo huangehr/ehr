@@ -57,10 +57,10 @@ public interface AppFeatureClient {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.GET)
     @ApiOperation(value = "存在性校验")
     boolean isExitAppFeature(
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
-            @PathVariable(value = "filters") String filters);
+            @RequestParam(value = "filters") String filters);
 
 }
