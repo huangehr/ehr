@@ -8,6 +8,8 @@
     <style type="text/css">
         td div{
             padding-left: 10px;
+            height:20px;
+            line-height: 20px;
         }
     </style>
 </head>
@@ -19,21 +21,21 @@
 
           <table style="width:100%;line-height: 20px;">
               <tr>
-                  <td style="padding-left: 85px; position:relative;"><span style="position: absolute;left:0;">门诊/住院号：</span><div style="border-bottom: 1px solid #232323;">${event_no}</div></td>
-                  <td style="padding-left: 40px; position:relative;"><span style="position: absolute;left:0;">科室：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSC01_09[0].HDSD00_04_005}</div></td>
-                  <td style="padding-left: 70px; position:relative;"><span style="position: absolute;left:0;">开方时间：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSC01_09[0].HDSD00_04_006}</div></td>
+                  <td style="padding-left: 85px; position:relative;"><span style="position: absolute;left:0;">门诊/住院号：</span><div style="border-bottom: 1px solid #232323;">${(event_no)!}</div></td>
+                  <td style="padding-left: 40px; position:relative;"><span style="position: absolute;left:0;">科室：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSC01_09[0].HDSD00_04_005)!}</div></td>
+                  <td style="padding-left: 70px; position:relative;"><span style="position: absolute;left:0;">开方时间：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSC01_09[0].HDSD00_04_006)!}</div></td>
               </tr>
               <tr>
-                  <td style="padding-left: 40px; position:relative;"><span style="position: absolute;left:0;">姓名：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSA00_01[0].HDSD00_01_002}</div></td>
-                  <td style="padding-left: 40px; position:relative;"><span style="position: absolute;left:0;">性别：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSA00_01[0].HDSA00_01_011}</div></td>
-                  <td style="padding-left: 40px; position:relative;"><span style="position: absolute;left:0;">年龄：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSA00_01[0].HDSA00_01_012}</div></td>
+                  <td style="padding-left: 40px; position:relative;"><span style="position: absolute;left:0;">姓名：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSA00_01[0].HDSD00_01_002)!}</div></td>
+                  <td style="padding-left: 40px; position:relative;"><span style="position: absolute;left:0;">性别：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSA00_01[0].HDSA00_01_011)!}</div></td>
+                  <td style="padding-left: 40px; position:relative;"><span style="position: absolute;left:0;">年龄：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSA00_01[0].HDSA00_01_012)!}</div></td>
               </tr>
               <tr>
                   <td style="padding-left: 70px; position:relative;"><span style="position: absolute;left:0;">就诊类型：</span><div style="border-bottom: 1px solid #232323;">初</div></td>
-                  <td style="padding-left: 75px; position:relative;" colspan="2"><span style="position: absolute;left:0;">地址/电话：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSA00_01[0].JDSA00_01_000}/${data_sets.HDSA00_01[0].HDSD00_01_008}</div></td>
+                  <td style="padding-left: 75px; position:relative;" colspan="2"><span style="position: absolute;left:0;">地址/电话：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSA00_01[0].JDSA00_01_000)!}/${(data_sets.HDSA00_01[0].HDSD00_01_008)!}</div></td>
               </tr>
               <tr>
-                  <td style="padding-left: 70px; position:relative;" colspan="3"><span style="position: absolute;left:0;">临床诊断：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSC01_03[0].HDSD00_01_549}</div></td>
+                  <td style="padding-left: 70px; position:relative;" colspan="3"><span style="position: absolute;left:0;">临床诊断：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSC01_03[0].HDSD00_01_549)!}</div></td>
               </tr>
           </table>
       </div>
@@ -45,12 +47,12 @@
           <table style="width: 100%;">
           <#list data_sets.HDSC01_08 as item>
               <tr style="line-height: 20px;">
-                  <td>${item_index+1}、${item.HDSD00_04_023}</td>
-                  <td>${item.HDSD00_04_022}</td>
-                  <td>${item.HDSD00_04_021}</td>
-                  <td>${item.HDSD00_04_032}</td>
-                  <td>${item.HDSD00_04_034}</td>
-                  <td>${item.HDSD00_04_025}</td>
+                  <td>${item_index+1}、${(item.HDSD00_04_023)!}</td>
+                  <td>${(item.HDSD00_04_022)!}</td>
+                  <td>${(item.HDSD00_04_021)!}</td>
+                  <td>${(item.HDSD00_04_032)!}</td>
+                  <td>${(item.HDSD00_04_034)!}</td>
+                  <td>${(item.HDSD00_04_025)!}</td>
               </tr>
           </#list>
           </table>
@@ -59,14 +61,14 @@
       <div style="padding: 20px 10px;">
           <table style="width:100%;line-height: 20px;">
               <tr>
-                  <td style="padding-left: 70px; position:relative;"><span style="position: absolute;left:0;">医师签名：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSC01_09[0].HDSD00_04_007}</div></td>
+                  <td style="padding-left: 70px; position:relative;"><span style="position: absolute;left:0;">医师签名：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSC01_09[0].HDSD00_04_007)!}</div></td>
                   <td style="padding-left: 40px; position:relative;">&nbsp;</td>
-                  <td style="padding-left: 100px; position:relative;"><span style="position: absolute;left:0;">审核调配药师：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSC01_09[0].HDSD00_04_009}</div></td>
+                  <td style="padding-left: 100px; position:relative;"><span style="position: absolute;left:0;">审核调配药师：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSC01_09[0].HDSD00_04_009)!}</div></td>
               </tr>
               <tr>
                   <td style="padding-left: 85px; position:relative;">&nbsp;</td>
                   <td style="padding-left: 40px; position:relative;">&nbsp;</td>
-                  <td style="padding-left: 100px; position:relative;"><span style="position: absolute;left:0;">复核发药药师：</span><div style="border-bottom: 1px solid #232323;">${data_sets.HDSC01_09[0].HDSD00_04_003}</div></td>
+                  <td style="padding-left: 100px; position:relative;"><span style="position: absolute;left:0;">复核发药药师：</span><div style="border-bottom: 1px solid #232323;">${(data_sets.HDSC01_09[0].HDSD00_04_003)!}</div></td>
               </tr>
           </table>
       </div>
