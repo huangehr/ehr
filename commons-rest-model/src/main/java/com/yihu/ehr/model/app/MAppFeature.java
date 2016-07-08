@@ -1,35 +1,28 @@
-package com.yihu.ehr.agModel.app;
+package com.yihu.ehr.model.app;
+
+import java.io.Serializable;
 
 /**
- * AppFeature对象。
+ * MAppApiFeature对象。
  *
  * @author linzhuo
  * @version 1.0
  * @created 2016年7月7日17:45:30
  */
 
-public class AppFeature {
+public class MAppFeature implements Serializable {
 
     private int id;
     private String code;
     private String name;
     private String description;
     private String type;
-    private String typeName;
     private int parentId;
     private String url;
     private String iconUrl;
     private String auditLevel;
     private String openLevel;
     private String appId;
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
 
     public int getId() {
         return id;
@@ -118,4 +111,6 @@ public class AppFeature {
     public void setAppId(String appId) {
         this.appId = appId;
     }
+
+
 }

@@ -7,6 +7,7 @@ public class RoleFeatureRelationModel {
     private long id;
     private long roleId;
     private long featureId;
+    private String featureName;
 
     public RoleFeatureRelationModel() {
     }
@@ -33,5 +34,13 @@ public class RoleFeatureRelationModel {
 
     public void setFeatureId(long featureId) {
         this.featureId = featureId;
+    }
+
+    public String getFeatureName() {
+        return featureName;
+    }
+
+    public void setFeatureName(String featureName) {
+        this.featureName = featureName;
     }
 }

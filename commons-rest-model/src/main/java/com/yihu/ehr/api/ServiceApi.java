@@ -208,19 +208,21 @@ public class ServiceApi {
         public static final String AppExistence                    = "/apps/{app_id}/existence";
         public static final String AppStatus                       = "/apps/{app_id}/status";
         public static final String AppNameExistence                = "/app/{app_name}/existence";
+        public static final String FilterList                        ="/apps/filterList";
     }
 
     public static class AppApi{
         public static final String AppApis                            = "/appApi";
-        public static final String AppApi                     = "/appApi/{app_api_id}";
+        public static final String AppApi                             = "/appApi/{id}";
     }
-    public static class AppApiFeature{
-        public static final String AppApiFeatures                           = "/appApiFeature";
-        public static final String AppApiFeature                    = "/appApiFeature/{id}";
+    public static class AppFeature{
+        public static final String AppFeatures                           = "/appFeature";
+        public static final String FilterFeatureList                    = "/filterFeatureList";
+        public static final String AppFeature                            = "/appFeature/{id}";
     }
     public static class AppApiParameter{
         public static final String AppApiParameters                            = "/appApiParameter";
-        public static final String AppApiParameter                     = "/appApi/{id}";
+        public static final String AppApiParameter                     = "/appApiParameter/{id}";
     }
     public static class AppApiResponse{
         public static final String AppApiResponses                            = "/appApiResponse";
@@ -382,6 +384,28 @@ public class ServiceApi {
         public static final String UserAdminContact                 = "/users/admin/{user_id}/contact";
         public static final String UserIdCardNoExistence            = "/user/id_card_no/existence";
         public static final String UserEmailNoExistence             = "/user/email/existence";
+    }
+
+    public static class Roles{
+        public static final String Role                             = "/roles/role";
+        public static final String RoleId                           = "/roles/role/{id}";
+        public static final String Roles                            = "/roles/roles";
+        public static final String RolesNoPage                      = "/roles/roles/no_paging";
+
+        public static final String RoleUser                         = "/roles/role_user";
+        public static final String RoleUserId                       = "/roles/role_user/{id}";
+        public static final String RoleUsers                        = "/roles/role_users";
+        public static final String RoleUserNoPage                   = "/roles/role_users/no_paging";
+
+        public static final String RoleFeature                      = "/roles/role_feature";
+        public static final String RoleFeatureId                    = "/roles/role_feature/{id}";
+        public static final String RoleFeatures                     = "/roles/role_features";
+        public static final String RoleFeaturesNoPage               = "/roles/role_features/no_paging";
+
+        public static final String RoleApp                          = "/roles/role_app";
+        public static final String RoleAppId                        = "/roles/role_app/{id}";
+        public static final String RoleApps                         = "/roles/role_apps";
+        public static final String RoleAppsNopage                   = "/roles/role_appd/no_paging";
     }
 
     public static class Redis{

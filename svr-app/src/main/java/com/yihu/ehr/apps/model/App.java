@@ -39,14 +39,14 @@ public class App {
     private String tags;
     private String org;
     private String code;
-    private String sourceType;
+    private int sourceType;
 
     @Column(name = "source_type", nullable = true)
-    public String getSourceType() {
+    public int getSourceType() {
         return sourceType;
     }
 
-    public void setSourceType(String sourceType) {
+    public void setSourceType(int sourceType) {
         this.sourceType = sourceType;
     }
     @Column(name = "code", nullable = true)

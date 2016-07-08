@@ -1,6 +1,6 @@
 package com.yihu.ehr.apps.service;
 
-import com.yihu.ehr.apps.model.AppApiFeature;
+import com.yihu.ehr.apps.model.AppFeature;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,30 +16,30 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class AppApiFeatureService extends BaseJpaService<AppApiFeature, XAppApiFeatureRepository> {
+public class AppFeatureService extends BaseJpaService<AppFeature, XAppApiFeatureRepository> {
     @Autowired
     private XAppApiFeatureRepository xAppFeatureRepository;
-    public AppApiFeatureService() {
+    public AppFeatureService() {
 
     }
 
-    public Page<AppApiFeature> getAppApiFeatureList(String sorts, int page, int size){
+    public Page<AppFeature> getAppFeatureList(String sorts, int page, int size){
         XAppApiFeatureRepository repo = (XAppApiFeatureRepository)getJpaRepository();
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return repo.findAll(pageable);
     }
 
-    public AppApiFeature createAppApiFeature(AppApiFeature appFeature) {
+    public AppFeature createAppFeature(AppFeature appFeature) {
         xAppFeatureRepository.save(appFeature);
         return appFeature;
     }
 
-    public AppApiFeature  updateAppApiFeature(AppApiFeature appApiFeature){
-        xAppFeatureRepository.save(appApiFeature);
-        return appApiFeature;
+    public AppFeature updateAppFeature(AppFeature appFeature){
+        xAppFeatureRepository.save(appFeature);
+        return appFeature;
     }
 
-    public void  deleteAppApiFeature(String id){
+    public void  deleteAppFeature(String id){
         xAppFeatureRepository.delete(id);
     }
 }

@@ -1,20 +1,32 @@
 package com.yihu.ehr.agModel.app;
 
 /**
- * AppApiResponse对象。
+ * AppApiParameter对象。
  *
  * @author linzhuo
  * @version 1.0
  * @created 2016年7月7日17:45:30
  */
-public class AppApiResponse {
+public class AppApiParameterModel {
 
     private int id;
     private String name;
+    private String type;
+    private String typeName;
     private String dataType;
     private String description;
+    private String required;
     private int appApiId;
     private String memo;
+    private String defaultValue;
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
 
     public int getId() {
         return id;
@@ -23,6 +35,7 @@ public class AppApiResponse {
     public void setId(int id) {
         this.id = id;
     }
+
 
     public String getName() {
         return name;
@@ -40,6 +53,14 @@ public class AppApiResponse {
         this.description = description;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getDataType() {
         return dataType;
     }
@@ -48,6 +69,13 @@ public class AppApiResponse {
         this.dataType = dataType;
     }
 
+    public String getRequired() {
+        return required;
+    }
+
+    public void setRequired(String required) {
+        this.required = required;
+    }
 
     public int getAppApiId() {
         return appApiId;
@@ -65,4 +93,11 @@ public class AppApiResponse {
         this.memo = memo;
     }
 
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
 }

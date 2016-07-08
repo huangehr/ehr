@@ -7,7 +7,7 @@ package com.yihu.ehr.agModel.app;
  * @version 1.0
  * @created 2016年7月7日17:45:30
  */
-public class AppApi {
+public class AppApiModel {
 
     private int id;
     private String appId;
