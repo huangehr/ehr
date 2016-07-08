@@ -40,6 +40,7 @@ public class AppApiResponse {
     public void setName(String name) {
         this.name = name;
     }
+
     @Column(name = "description", nullable = true)
     public String getDescription() {
         return description;
