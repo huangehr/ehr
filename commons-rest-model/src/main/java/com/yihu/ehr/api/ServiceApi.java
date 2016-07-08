@@ -210,6 +210,23 @@ public class ServiceApi {
         public static final String AppNameExistence                = "/app/{app_name}/existence";
     }
 
+    public static class AppApi{
+        public static final String AppApi                            = "/appApi";
+        public static final String DeleteAppApi                     = "/appApi/{app_api_id}";
+    }
+    public static class AppApiFeature{
+        public static final String AppApiFeature                            = "/appApiFeature";
+        public static final String DeleteAppApiFeature                    = "/AppApiFeature/{id}";
+    }
+    public static class AppApiParameter{
+        public static final String AppApiParameter                            = "/appApi";
+        public static final String DeleteAppApiParameter                     = "/appApi/{id}";
+    }
+    public static class AppApiResponse{
+        public static final String AppApiResponse                            = "/AppApiResponse";
+        public static final String DeleteAppApiResponse                    = "/AppApiResponse/{id}";
+    }
+
     public static class Dictionaries{
 
     }

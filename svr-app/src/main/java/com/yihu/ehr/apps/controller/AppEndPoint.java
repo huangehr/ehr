@@ -1,7 +1,7 @@
 package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.api.ServiceApi;
-import com.yihu.ehr.apps.service.App;
+import com.yihu.ehr.apps.model.App;
 import com.yihu.ehr.apps.service.AppService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
