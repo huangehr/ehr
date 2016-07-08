@@ -38,7 +38,7 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppApiService appApiService;
 
-    @RequestMapping(value = ServiceApi.AppApi.AppApi, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建AppApi")
     public MAppApi createAppApi(
             @ApiParam(name = "appApi", value = "对象JSON结构体", allowMultiple = true)
@@ -48,7 +48,7 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
         return convertToModel(appApi, MAppApi.class);
     }
 
-    @RequestMapping(value = ServiceApi.AppApi.AppApi, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
     public Collection<MAppApi> getAppApis(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -78,7 +78,7 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = ServiceApi.AppApi.AppApi, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新appApi")
     public MAppApi updateAppApi(
             @ApiParam(name = "appApi", value = "对象JSON结构体", allowMultiple = true)
@@ -91,14 +91,14 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.AppApi.AppApi, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi")
-    public MApp getAppApi(
+    public MAppApi getAppApi(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") String id) throws Exception {
         AppApi appApi = appApiService.retrieve(id);
-        return convertToModel(appApi, MApp.class);
+        return convertToModel(appApi, MAppApi.class);
     }
 
-    @RequestMapping(value = ServiceApi.AppApi.DeleteAppApi, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.AppApi.AppApi, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除AppApi")
     public boolean deleteAppApi(
             @ApiParam(name = "id", value = "id")

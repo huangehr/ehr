@@ -7,7 +7,6 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.app.MAppApiParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,7 +35,7 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppApiParameterService AppApiParameterService;
 
-    @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameter, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameters, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建AppApiParameter")
     public MAppApiParameter createAppApiParameter(
             @ApiParam(name = "AppApiParameter", value = "对象JSON结构体", allowMultiple = true)
@@ -46,7 +45,7 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
         return convertToModel(AppApiParameter, MAppApiParameter.class);
     }
 
-    @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameter, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameters, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiParameter列表")
     public Collection<MAppApiParameter> getAppApiParameters(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -76,7 +75,7 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameter, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameters, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新AppApiParameter")
     public MAppApiParameter updateAppApiParameter(
             @ApiParam(name = "AppApiParameter", value = "对象JSON结构体", allowMultiple = true)
@@ -89,14 +88,14 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameter, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiParameter")
-    public MApp getAppApiParameter(
+    public MAppApiParameter getAppApiParameter(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") String id) throws Exception {
         AppApiParameter AppApiParameter = AppApiParameterService.retrieve(id);
-        return convertToModel(AppApiParameter, MApp.class);
+        return convertToModel(AppApiParameter, MAppApiParameter.class);
     }
 
-    @RequestMapping(value = ServiceApi.AppApiParameter.DeleteAppApiParameter, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameter, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除AppApiParameter")
     public boolean deleteAppApiParameter(
             @ApiParam(name = "id", value = "id")

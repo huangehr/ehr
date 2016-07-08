@@ -100,7 +100,7 @@ public class AppApiParameter {
         return defaultValue;
     }
 
-    public void setDefault_value(String defaultValue) {
+    public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }
 }

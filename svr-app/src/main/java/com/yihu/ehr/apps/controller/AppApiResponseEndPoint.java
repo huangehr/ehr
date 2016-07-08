@@ -36,7 +36,7 @@ public class AppApiResponseEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppApiResponseService AppApiResponseService;
 
-    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建AppApiResponse")
     public MAppApiResponse createAppApiResponse(
             @ApiParam(name = "AppApiResponse", value = "对象JSON结构体", allowMultiple = true)
@@ -46,7 +46,7 @@ public class AppApiResponseEndPoint extends EnvelopRestEndPoint {
         return convertToModel(AppApiResponse, MAppApiResponse.class);
     }
 
-    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiResponse列表")
     public Collection<MAppApiResponse> getAppApiResponses(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -76,7 +76,7 @@ public class AppApiResponseEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新AppApiResponse")
     public MAppApiResponse updateAppApiResponse(
             @ApiParam(name = "AppApiResponse", value = "对象JSON结构体", allowMultiple = true)
@@ -89,14 +89,14 @@ public class AppApiResponseEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiResponse")
-    public MApp getAppApiResponse(
+    public MAppApiResponse getAppApiResponse(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") String id) throws Exception {
         AppApiResponse AppApiResponse = AppApiResponseService.retrieve(id);
-        return convertToModel(AppApiResponse, MApp.class);
+        return convertToModel(AppApiResponse, MAppApiResponse.class);
     }
 
-    @RequestMapping(value = ServiceApi.AppApiResponse.DeleteAppApiResponse, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除AppApiResponse")
     public boolean deleteAppApiResponse(
             @ApiParam(name = "id", value = "id")

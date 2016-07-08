@@ -7,7 +7,6 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.app.MAppApiFeature;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,7 +45,7 @@ public class AppApiFeatureEndPoint extends EnvelopRestEndPoint {
         return convertToModel(AppApiFeature, MAppApiFeature.class);
     }
 
-    @RequestMapping(value = ServiceApi.AppApiFeature.AppApiFeature, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppApiFeature.AppApiFeatures, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiFeature列表")
     public Collection<MAppApiFeature> getAppApiFeatures(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -76,7 +75,7 @@ public class AppApiFeatureEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = ServiceApi.AppApiFeature.AppApiFeature, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApiFeature.AppApiFeatures, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新AppApiFeature")
     public MAppApiFeature updateAppApiFeature(
             @ApiParam(name = "AppApiFeature", value = "对象JSON结构体", allowMultiple = true)
@@ -89,14 +88,14 @@ public class AppApiFeatureEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.AppApiFeature.AppApiFeature, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiFeature")
-    public MApp getAppApiFeature(
+    public MAppApiFeature getAppApiFeature(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") String id) throws Exception {
         AppApiFeature AppApiFeature = AppApiFeatureService.retrieve(id);
-        return convertToModel(AppApiFeature, MApp.class);
+        return convertToModel(AppApiFeature, MAppApiFeature.class);
     }
 
-    @RequestMapping(value = ServiceApi.AppApiFeature.DeleteAppApiFeature, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.AppApiFeature.AppApiFeature, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除AppApiFeature")
     public boolean deleteAppApiFeature(
             @ApiParam(name = "id", value = "id")
