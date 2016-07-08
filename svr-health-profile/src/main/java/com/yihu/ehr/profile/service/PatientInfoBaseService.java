@@ -224,22 +224,30 @@ public class PatientInfoBaseService {
             //门诊诊断
             Envelop outpatient = resource.getResources(BasisConstant.outpatientDiagnosis, appId, queryParams.replace(' ','+'),1,1000);///"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (outpatient.getDetailModelList() != null && outpatient.getDetailModelList().size() > 0) {
+                List<String>codeList=new ArrayList<>();
+                List<String>profileIdList=new ArrayList<>();
                 for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
                     if (obj.containsKey(BasisConstant.mzzd)) {
                         String code = obj.get(BasisConstant.mzzd).toString();
+                        codeList.add(code);
                         String profileId = obj.get(BasisConstant.profileId).toString();
                         //通过疾病ID获取健康问题
-                        MHealthProblemDict hp = dictClient.getHealthProblemByIcd10(code);
-                        String healthProblem = hp.getCode() + "__" + hp.getName();
+                        profileIdList.add(profileId);
+                    }
+                }
+                List<MHealthProblemDict> hpList = dictClient.getHealthProblemListByIcd10List(codeList);
+                if(hpList!=null){
+                    for(int i=0;i<hpList.size();i++) {
+                        String healthProblem = hpList.get(i).getCode() + "__" + hpList.get(i).getName();
                         List<String> profileList = new ArrayList<>();
                         if (outpatientMap.containsKey(healthProblem)) {
                             profileList = outpatientMap.get(healthProblem);
-                            if (!profileList.contains(profileId)) {
-                                profileList.add(profileId);
+                            if (!profileList.contains(profileIdList.get(i))) {
+                                profileList.add(profileIdList.get(i));
                             }
                         } else {
-                            profileList.add(profileId);
+                            profileList.add(profileIdList.get(i));
                         }
                         outpatientMap.put(healthProblem, profileList);
                     }
@@ -250,22 +258,29 @@ public class PatientInfoBaseService {
             //住院诊断
             Envelop hospitalized = resource.getResources(BasisConstant.hospitalizedDiagnosis, appId, queryParams.replace(' ','+'),1,1000); //"{\"join\":\"demographic_id:" + demographicId + "\"}");
             if (hospitalized.getDetailModelList() != null && hospitalized.getDetailModelList().size() > 0) {
+                List<String>codeList=new ArrayList<>();
+                List<String>profileIdList=new ArrayList<>();
                 for (int i = 0; i < hospitalized.getDetailModelList().size(); i++) {
                     Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
                     if (obj.containsKey(BasisConstant.zyzd)) {
                         String code = obj.get(BasisConstant.zyzd).toString();
                         String profileId = obj.get(BasisConstant.profileId).toString();
-                        //通过疾病ID获取健康问题
-                        MHealthProblemDict hp = dictClient.getHealthProblemByIcd10(code);
-                        String healthProblem = hp.getCode() + "__" + hp.getName();
+                        codeList.add(code);
+                        profileIdList.add(profileId);
+                    }
+                }
+                List<MHealthProblemDict> hpList = dictClient.getHealthProblemListByIcd10List(codeList);
+                if(hpList!=null) {
+                    for (int i = 0; i < hpList.size(); i++) {
+                        String healthProblem =  hpList.get(i).getCode() + "__" +  hpList.get(i).getName();
                         List<String> profileList = new ArrayList<>();
                         if (hospitalizedMap.containsKey(healthProblem)) {
                             profileList = hospitalizedMap.get(healthProblem);
-                            if (!profileList.contains(profileId)) {
-                                profileList.add(profileId);
+                            if (!profileList.contains(profileIdList.get(i))) {
+                                profileList.add(profileIdList.get(i));
                             }
                         } else {
-                            profileList.add(profileId);
+                            profileList.add(profileIdList.get(i));
                         }
                         hospitalizedMap.put(healthProblem, profileList);
                     }
@@ -328,14 +343,14 @@ public class PatientInfoBaseService {
                                 if (obj.get("healthProblemCode").toString().equals(healthProblemCode)) {
                                     obj.put("hospitalizationTimes", profileList.size());
                                     //事件是否更早
-                                    if (sdf.parse(eventData.toString()).getTime() > sdf.parse(obj.get("lastVisitDate").toString()).getTime()) {
+                                    if (sdf.parse(eventData.toString().replace("T", " ").replace('Z',' ')).getTime() > sdf.parse(obj.get("lastVisitDate").toString().replace("T"," ").replace('Z',' ')).getTime()) {
                                         obj.put("lastVisitDate", eventData);
                                         obj.put("lastVisitOrg", orgCode);
                                         obj.put("lastVisitRecord", profileId);
                                         obj.put("recentEvent", "住院");
                                         obj.put("profileId", profileId);
                                     }
-                                    else if(sdf.parse(eventData.toString()).getTime()  < sdf.parse(obj.get("ageOfDisease").toString()).getTime()){
+                                    else if(sdf.parse(eventData.toString().replace("T", " ").replace('Z',' ')).getTime()  < sdf.parse(obj.get("ageOfDisease").toString().replace("T"," ").replace('Z',' ')).getTime()){
                                         obj.put("ageOfDisease",getAgeOfDisease(eventData));
                                     }
                                 }
@@ -609,17 +624,18 @@ public class PatientInfoBaseService {
 
         if(codeList!=null && codeList.size()>0)
         {
-            for(String code: codeList)
+            List<MIcd10Dict> dictList = dictClient.getIcd10ByCodeList(codeList);
+            for(int i=0;i<codeList.size();i++)
             {
                 Map<String, String> map = new HashMap<>();
-                map.put("code",code);
-                MIcd10Dict dict = dictClient.getIcd10ByCode(code);
-                if(dict!=null)
+                map.put("code",codeList.get(i));
+
+                if(dictList.get(i)!=null)
                 {
-                    map.put("name",dict.getName());
+                    map.put("name",dictList.get(i).getName());
                 }
                 else{
-                    map.put("name",code);
+                    map.put("name",codeList.get(i));
                 }
                 re.add(map);
             }
@@ -713,21 +729,28 @@ public class PatientInfoBaseService {
         List<MOrganization> orgList = organization.getOrgs(orgCodeList);
         List<String> array = new ArrayList<>();
         for (MOrganization org : orgList) {
-            Map<String, String> organizationMap = new HashMap<>();
+
             String areaCode = new Integer(org.getAdministrativeDivision()).toString();
             areaCode = areaCode.substring(0, areaCode.length() - 2) + "00"; //转换成市级代码
             if (!array.contains(areaCode)) {
                 array.add(areaCode);
-                organizationMap.put("code", areaCode);
 
-                MGeographyDict area = addressClient.getAddressDictById(areaCode);
-                if(area !=null)
+            }
+        }
+        List<MGeographyDict> areaList = addressClient.getAddressDictByIdList(array);
+        if(areaList!=null) {
+            Map<String, String> organizationMap = new HashMap<>();
+            for (int i = 0; i < areaList.size(); i++) {
+                organizationMap.put("code", array.get(i));
+
+
+                if(areaList.get(i) !=null)
                 {
-                    String areaName = area.getName();
+                    String areaName = areaList.get(i).getName();
                     organizationMap.put("name", areaName);
                 }
                 else{
-                    organizationMap.put("name", areaCode);
+                    organizationMap.put("name", array.get(i));
                 }
                 organizationMapList.add(organizationMap);
             }

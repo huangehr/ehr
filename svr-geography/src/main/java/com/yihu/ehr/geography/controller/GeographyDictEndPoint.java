@@ -9,10 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,6 +57,18 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") String id) {
         GeographyDict geographyDict =  geographyDictService.findById(id);
         return convertToModel(geographyDict, MGeographyDict.class);
+    }
+
+    @RequestMapping(value = "/geography_entries_list", method = RequestMethod.POST)
+    public List<MGeographyDict> getAddressDictByIdList(
+            @ApiParam(name = "idList", value = "idList", defaultValue = "")
+            @RequestParam(value = "idList") List<String> idList) {
+        List<MGeographyDict> list=new ArrayList<>();
+        for(int i=0;i<idList.size();i++) {
+            GeographyDict geographyDict = geographyDictService.findById(idList.get(i));
+            list.add(convertToModel(geographyDict, MGeographyDict.class));
+        }
+        return list;
     }
 
     @RequestMapping(value = "/geography_entries/CacheAddressDict", method = RequestMethod.POST)
