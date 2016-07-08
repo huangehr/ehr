@@ -6,8 +6,11 @@ import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import freemarker.template.Configuration;
+import freemarker.template.SimpleDate;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.fit.cssbox.demo.ImageRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.*;
 
 import java.awt.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -123,6 +127,55 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
             else {
                 //模板路径
                 fileString += "/templates/chinesetemplate.ftl";
+            }
+
+            if(model.containsKey("data_sets") && ((Map<String,Object>)model.get("data_sets")).containsKey("HDSC01_09"))
+            {
+                List list = (List)((Map<String,Object>)model.get("data_sets")).get("HDSC01_09");
+
+                for(int i = 0; i < list.size(); i++)
+                {
+                    Map<String,Object> HDSC01_09 = (Map<String,Object>)list.get(0);
+
+                    if(HDSC01_09.containsKey("HDSD00_04_006") && !StringUtils.isBlank(HDSC01_09.get("HDSD00_04_006").toString()))
+                    {
+                        HDSC01_09.put("HDSD00_04_006",HDSC01_09.get("HDSD00_04_006").toString().replace("T"," ").replace("Z",""));
+                    }
+                }
+            }
+
+            if(model.containsKey("data_sets") && ((Map<String,Object>)model.get("data_sets")).containsKey("HDSA00_01"))
+            {
+                List list = (List)((Map<String,Object>)model.get("data_sets")).get("HDSA00_01");
+
+                for(int i = 0; i < list.size(); i++)
+                {
+                    Map<String,Object> HDSA00_01 = (Map<String,Object>)list.get(0);
+
+                    if(HDSA00_01.containsKey("HDSA00_01_012") && !StringUtils.isBlank(HDSA00_01.get("HDSA00_01_012").toString()))
+                    {
+                        Date current = new Date();
+                        Date birth = DateTimeUtil.utcDateTimeParse(HDSA00_01.get("HDSA00_01_012").toString());
+
+                        HDSA00_01.put("HDSA00_01_012",current.getYear() - birth.getYear());
+                    }
+                    if(HDSA00_01.containsKey("HDSA00_01_011") && !StringUtils.isBlank(HDSA00_01.get("HDSA00_01_011").toString()))
+                    {
+                        String sex =  HDSA00_01.get("HDSA00_01_011").toString();
+
+                        if(sex.equals("1")) {
+                            sex = "男";
+                        }
+                        else if(sex.equals("2")) {
+                            sex = "女";
+                        }
+                        else {
+                            sex = "其他";
+                        }
+
+                        HDSA00_01.put("HDSA00_01_011",sex);
+                    }
+                }
             }
 
             //把数据和模板结合生成html

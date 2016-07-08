@@ -8,6 +8,7 @@ public class RoleAppRelationModel {
     private long roleId;
     private String roleName;
     private String appId;
+    private String appName;
 
     public RoleAppRelationModel() {
     }
@@ -42,5 +43,13 @@ public class RoleAppRelationModel {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 }
