@@ -211,20 +211,20 @@ public class ServiceApi {
     }
 
     public static class AppApi{
-        public static final String AppApi                            = "/appApi";
-        public static final String DeleteAppApi                     = "/appApi/{app_api_id}";
+        public static final String AppApis                            = "/appApi";
+        public static final String AppApi                     = "/appApi/{app_api_id}";
     }
     public static class AppApiFeature{
-        public static final String AppApiFeature                            = "/appApiFeature";
-        public static final String DeleteAppApiFeature                    = "/AppApiFeature/{id}";
+        public static final String AppApiFeatures                           = "/appApiFeature";
+        public static final String AppApiFeature                    = "/appApiFeature/{id}";
     }
     public static class AppApiParameter{
-        public static final String AppApiParameter                            = "/appApi";
-        public static final String DeleteAppApiParameter                     = "/appApi/{id}";
+        public static final String AppApiParameters                            = "/appApiParameter";
+        public static final String AppApiParameter                     = "/appApi/{id}";
     }
     public static class AppApiResponse{
-        public static final String AppApiResponse                            = "/AppApiResponse";
-        public static final String DeleteAppApiResponse                    = "/AppApiResponse/{id}";
+        public static final String AppApiResponses                            = "/appApiResponse";
+        public static final String AppApiResponse                    = "/appApiResponse/{id}";
     }
 
     public static class Dictionaries{
