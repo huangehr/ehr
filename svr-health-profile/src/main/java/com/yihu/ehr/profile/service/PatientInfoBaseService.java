@@ -167,6 +167,30 @@ public class PatientInfoBaseService {
         return ageOfDisease;
     }
 
+    private int CompareAgeOfDisease(String AgeOfDisease1,String AgeOfDisease2){
+        int year1=0;
+        int month1=0;
+        int year2=0;
+        int month2=0;
+        if(AgeOfDisease1.split("年|个月").length>1) {
+            year1= Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
+            month1= Integer.parseInt(AgeOfDisease1.split("年|个月")[1]);
+        }
+        else
+            month1= Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
+        if(AgeOfDisease2.split("年|个月").length>1) {
+            year2= Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
+            month2= Integer.parseInt(AgeOfDisease2.split("年|个月")[1]);
+        }
+
+        else
+            month2= Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
+        if(year1*12+month1<=year2*12+month2)
+            return 1;
+        else
+            return 0;
+    }
+
     /**
      * @获取患者档案基本信息
      */
@@ -239,7 +263,11 @@ public class PatientInfoBaseService {
                 List<MHealthProblemDict> hpList = dictClient.getHealthProblemListByIcd10List(codeList);
                 if(hpList!=null){
                     for(int i=0;i<hpList.size();i++) {
-                        String healthProblem = hpList.get(i).getCode() + "__" + hpList.get(i).getName();
+                        String healthProblem = codeList.get(i) + "__" + codeList.get(i);
+                        if(hpList.get(i).getCode()!=null && hpList.get(i).getName()!=null) {
+                            healthProblem = hpList.get(i).getCode() + "__" + hpList.get(i).getName();
+                        }
+
                         List<String> profileList = new ArrayList<>();
                         if (outpatientMap.containsKey(healthProblem)) {
                             profileList = outpatientMap.get(healthProblem);
@@ -286,44 +314,41 @@ public class PatientInfoBaseService {
                     }
                 }
             }
-
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             //遍历所有健康问题，门诊记录和住院记录整合
             for (String key : outpatientMap.keySet()) //门诊
             {
                 String healthProblemCode = key.split("__")[0];
                 String healthProblemName = key.split("__")[1];
-
                 List<String> profileList = outpatientMap.get(key);
                 //最近的事件
                 boolean breaked = false;
-                for (Map<String, Object> event : eventList) {
-                    String rowkey = event.get("rowkey").toString();
-                    Object eventData = event.get("event_date");
-                    String orgCode = event.get("org_code").toString();
-                    for (String profileId : profileList) {
+                Map<String, Object> obj = new HashMap<>();
+                obj.put("healthProblemCode", healthProblemCode);
+                obj.put("healthProblemName", healthProblemName);
+                obj.put("visitTimes", profileList.size());
+                obj.put("hospitalizationTimes", 0);
+                obj.put("recentEvent", "就诊");
+                for (String profileId : profileList) {
+                    for (Map<String, Object> event : eventList) {
+                        String rowkey = event.get("rowkey").toString();
+                        Object eventData = event.get("event_date");
+                        String orgCode = event.get("org_code").toString();
                         if (profileId.equals(rowkey)) {
-                            Map<String, Object> obj = new HashMap<>();
-                            obj.put("healthProblemCode", healthProblemCode);
-                            obj.put("healthProblemName", healthProblemName);
-                            obj.put("visitTimes", profileList.size());
-                            obj.put("hospitalizationTimes", 0);
-                            obj.put("lastVisitDate", eventData);
-                            obj.put("lastVisitOrg", orgCode);
-                            obj.put("lastVisitRecord", profileId);
-                            obj.put("recentEvent", "就诊");
-                            obj.put("profileId", profileId);
-                            obj.put("ageOfDisease",getAgeOfDisease(eventData));
-                            re.add(obj);
-                            breaked = true;
+                            if (!obj.containsKey("lastVisitDate")||sdf.parse(eventData.toString()).getTime() > sdf.parse(obj.get("lastVisitDate").toString()).getTime()) {
+                                obj.put("lastVisitDate", eventData);
+                                obj.put("lastVisitOrg", orgCode);
+                                obj.put("lastVisitRecord", profileId);
+                                obj.put("ageOfDisease", getAgeOfDisease(eventData));
+                            }
                             break;
                         }
-                        if (breaked) {
-                            break;
-                        }
+
                     }
                 }
+                re.add(obj);
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
             for (String key : hospitalizedMap.keySet()) //住院
             {
                 String healthProblemCode = key.split("__")[0];
@@ -343,17 +368,19 @@ public class PatientInfoBaseService {
                                 if (obj.get("healthProblemCode").toString().equals(healthProblemCode)) {
                                     obj.put("hospitalizationTimes", profileList.size());
                                     //事件是否更早
-                                    if (sdf.parse(eventData.toString().replace("T", " ").replace('Z',' ')).getTime() > sdf.parse(obj.get("lastVisitDate").toString().replace("T"," ").replace('Z',' ')).getTime()) {
+                                    if (sdf.parse(eventData.toString()).getTime() > sdf.parse(obj.get("lastVisitDate").toString()).getTime()) {
                                         obj.put("lastVisitDate", eventData);
                                         obj.put("lastVisitOrg", orgCode);
                                         obj.put("lastVisitRecord", profileId);
                                         obj.put("recentEvent", "住院");
-                                        obj.put("profileId", profileId);
                                     }
-                                    else if(sdf.parse(eventData.toString().replace("T", " ").replace('Z',' ')).getTime()  < sdf.parse(obj.get("ageOfDisease").toString().replace("T"," ").replace('Z',' ')).getTime()){
+                                    else if(CompareAgeOfDisease(getAgeOfDisease(eventData),obj.get("ageOfDisease").toString())==0){
                                         obj.put("ageOfDisease",getAgeOfDisease(eventData));
                                     }
+                                    breaked=true;
+                                    break;
                                 }
+
                             }
 
                             //已存在
@@ -370,16 +397,12 @@ public class PatientInfoBaseService {
                                 obj.put("lastVisitOrg", orgCode);
                                 obj.put("lastVisitRecord", profileId);
                                 obj.put("recentEvent", "住院");
-                                obj.put("profileId", profileId);
                                 obj.put("ageOfDisease",getAgeOfDisease(eventData));
                                 re.add(obj);
                                 breaked = true;
                                 break;
                             }
                         }
-                    }
-                    if (breaked) {
-                        break;
                     }
                 }
             }
