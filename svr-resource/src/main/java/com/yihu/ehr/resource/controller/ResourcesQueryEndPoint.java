@@ -1,7 +1,9 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
 import com.yihu.ehr.resource.service.ResourcesQueryService;
 import com.yihu.ehr.resource.service.ResourcesTransformService;
@@ -11,10 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -34,6 +33,9 @@ public class ResourcesQueryEndPoint {
 
     @Autowired
     ResourcesTransformService resourcesTransformService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /*********************************** 公开接口 ************************************************************/
     /**
@@ -106,6 +108,19 @@ public class ResourcesQueryEndPoint {
         return resourcesQueryService.getRawFiles(profileId,cdaDocumentId,page,size);
     }
 
+    /**
+     * 获取非结构化数据list
+     */
+    @RequestMapping(value = ServiceApi.Resources.ResourcesRawFilesList, method = RequestMethod.GET)
+    public Map<String,Envelop> getRawFilesList(@RequestParam(value = "profileId", required = true) String profileId,
+                               @RequestParam(value = "cdaDocumentId", required = true) String[] cdaDocumentIdList) throws Exception {
+
+        Map<String,Envelop> map=new HashMap<>();
+        for(int i=0;i<cdaDocumentIdList.length;i++)
+             map.put(cdaDocumentIdList[i],resourcesQueryService.getRawFiles(profileId,cdaDocumentIdList[i],null,null));
+        return map;
+    }
+
     @ApiOperation("Hbase主表")
     @RequestMapping(value = ServiceApi.Resources.ResourcesMasterData, method = RequestMethod.GET)
     public Envelop getEhrCenter(@ApiParam(name = "queryParams", defaultValue = "{\"q\":\"*:*\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
@@ -148,6 +163,45 @@ public class ResourcesQueryEndPoint {
             re.setDetailModelList(result.getContent());
         }
         return re;
+    }
+
+    @ApiOperation("获取Cda Data")
+    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.GET)
+    public Map<String,Object> getCDAData(
+            @ApiParam(name = "masterJson", defaultValue = "")
+            @RequestParam(value = "masterJson", required = true) String masterJson,
+            @ApiParam(name = "masterDatasetCodeList", defaultValue = "")
+            @RequestParam(value = "masterDatasetCodeList", required = true) String masterDatasetCodeList,
+            @ApiParam(name = "multiDatasetCodeList", defaultValue = "")
+            @RequestParam(value = "multiDatasetCodeList", required = true) String multiDatasetCodeList) throws Exception {
+        Map<String,Object> map=new HashMap<>();
+        Map<String,Object> returnmap=new HashMap<>();
+        Map<String, Object> obj=objectMapper.readValue(java.net.URLDecoder.decode(masterJson), Map.class);
+        Map<String, List<String>> masterDatasetCodeMap=objectMapper.readValue(java.net.URLDecoder.decode(masterDatasetCodeList), Map.class);
+        Map<String, List<String>> multiDatasetCodeMap=objectMapper.readValue(java.net.URLDecoder.decode(multiDatasetCodeList), Map.class);
+        String profileId = obj.get("rowkey").toString();
+        String cdaVersion = obj.get("cda_version").toString();
+        for(String key:masterDatasetCodeMap.keySet()) {
+            for (int i = 0; i < masterDatasetCodeMap.size(); i++) {
+                List<Map<String, Object>> dataList = new ArrayList<>();
+
+                dataList.add(resourcesTransformService.stdMasterTransform(obj, masterDatasetCodeMap.get(key).get(i), cdaVersion));
+                map.put(masterDatasetCodeMap.get(key).get(i), dataList);
+            }
+            for (int i = 0; i < multiDatasetCodeMap.size(); i++) {
+
+                String q = "{\"table\":\"" + multiDatasetCodeMap.get(i) + "\",\"q\":\"profile_id:" + profileId + "\"}";
+                Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenterSub(q, null, null);
+
+                if (cdaVersion != null && cdaVersion.length() > 0) {
+                    map.put(multiDatasetCodeMap.get(key).get(i), resourcesTransformService.displayCodeConvert(result.getContent(), cdaVersion, null));
+                } else {
+                    map.put(multiDatasetCodeMap.get(key).get(i), result.getContent());
+                }
+            }
+            returnmap.put(key,map);
+        }
+        return returnmap;
     }
 
 

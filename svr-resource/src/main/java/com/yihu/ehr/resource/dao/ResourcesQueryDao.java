@@ -123,14 +123,14 @@ public class ResourcesQueryDao {
                     q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=profile_id}" +join;
                     if (obj.containsKey("table")) {
                         if (fq.length() > 0) {
-                            fq += " AND rowkey:*" + obj.get("table") + "*";
+                            fq = "("+fq+") AND rowkey:*" + obj.get("table") + "*";
                         } else {
                             fq = "rowkey:*" + obj.get("table") + "*";
                         }
                     }
                 } else if(obj.containsKey("table")){
                     if (q.length() > 0) {
-                        q += " AND rowkey:*" + obj.get("table") + "*";
+                        q = "("+q+") AND rowkey:*" + obj.get("table") + "*";
                     } else {
                         q = "rowkey:*" + obj.get("table") + "*";
                     }

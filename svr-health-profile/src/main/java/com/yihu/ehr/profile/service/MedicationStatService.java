@@ -28,7 +28,7 @@ public class MedicationStatService extends BaseJpaService<Template, XTemplateRep
     /**
      * 获取用药清单（直接查mysql）
      */
-    public List<MedicationStat> getMedicationStat(String demographicId) throws  Exception{
+    public List<MedicationStat> getMedicationStat(String demographicId,List<String> drugList) throws  Exception{
         String sql = "select m.*,d.code,d.unit,d.specifications \n" +
                 "from (select drug_id,drug_name,\n" +
                 "  sum(case  \n" +
@@ -44,6 +44,36 @@ public class MedicationStatService extends BaseJpaService<Template, XTemplateRep
                 "  where demographic_id=:demographicId\n" +
                 "  group by drug_id,drug_name) m\n" +
                 "left join drug_dict d on d.id = m.drug_id";
+        if(drugList!=null && drugList.size()>0)
+        {
+            String drugListString = "";
+            for(String drugString :drugList)
+            {
+                if(drugListString.length()>0)
+                {
+                    drugListString += ",'"+drugString+"'";
+                }
+                else {
+                    drugListString = "'"+drugString+"'";
+                }
+            }
+            sql = "select m.*,d.code,d.unit,d.specifications \n" +
+                    "from (select drug_id,drug_name,\n" +
+                    "  sum(case  \n" +
+                    "      when medication_time > :3MonthTime then drug_num\n" +
+                    "      ELSE 0\n" +
+                    "      end) as month3,\n" +
+                    "  sum(case  \n" +
+                    "    when medication_time > :6MonthTime then drug_num\n" +
+                    "    ELSE 0\n" +
+                    "    end) as month6,\n" +
+                    "  max(medication_time) as last_time \n" +
+                    "  from RS_Medication_List\n" +
+                    "  where demographic_id=:demographicId\n" +
+                    "  and drug_name in ("+drugListString+")\n" +
+                    "  group by drug_id,drug_name) m\n" +
+                    "left join drug_dict d on d.id = m.drug_id";
+        }
 
         Session session = currentSession();
         SQLQuery query = session.createSQLQuery(sql);

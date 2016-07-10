@@ -231,9 +231,11 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Profiles.CDAClass, method = RequestMethod.GET)
     public List<Map<String,Object>> CDAClass(
             @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_1000000_30000001_1465894742000")
-            @RequestParam(value = "profile_id", required = true) String profile_id) throws Exception {
+            @RequestParam(value = "profile_id", required = true) String profile_id,
+            @ApiParam(name = "event_type", value = "时间类型")
+            @RequestParam(value = "event_type", required = false) String event_type) throws Exception {
 
-        return profileCDAService.getCDAClass(profile_id);
+        return profileCDAService.getCDAClass(profile_id,event_type);
     }
 
     @ApiOperation("CDA数据OK")

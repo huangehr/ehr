@@ -6,8 +6,11 @@ import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import freemarker.template.Configuration;
+import freemarker.template.SimpleDate;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.fit.cssbox.demo.ImageRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.*;
 
 import java.awt.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -86,7 +90,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
      * @return
      * @throws Exception
      */
-    public String transformImage(String profileId,String orgCode,String cdaVersion,String cdaCode,int width,int height) throws Exception
+    public String transformImage(String profileId,String orgCode,String cdaVersion,String cdaCode,String type,int width,int height) throws Exception
     {
         //获取CDA模板信息
         Template temp = tempService.getPresriptionTemplate(orgCode,cdaVersion,cdaCode);
@@ -99,42 +103,83 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
         //获取CDA数据
         Map<String,Object> model = profileCDAService.getCDAData(profileId,temp.getCdaDocumentId());
 
-        return CDAToImage(temp,model,width,height);
+        return CDAToImage(model,type,width,height);
     }
 
 
     /**
      * 图片生成
-     * @param profileId 事件rowkey
-     * @param orgCode 机构代码
-     * @param cdaVersion cda版本
-     * @param cdaCode cda文档模板代码
-     * @param width 图片宽度
-     * @param height 图片高度
      * @return
      * @throws Exception
      */
-    public String CDAToImage(Template temp,Map<String,Object> model,int width,int height) throws Exception {
+    public String CDAToImage(Map<String,Object> model,String type,int width,int height) throws Exception {
         try
         {
             //返回文件路径
-            String filePath="";
+            String filePath = "";
             //模板路径
-            String fileString = "";
-            //模板fastdfs信息
-            String[]  pathInfo = temp.getPcTplURL().split(";");
-            //fastdfs工具类
-            FastDFSUtil fdfs= FastDFSConfig.fastDFSUtil();
-            //下载模板文件
-            String localFileName = fdfs.download(pathInfo[0],pathInfo[1],ThridPrescriptionService.class.getResource("/").getPath());
-            //模板路径
-            fileString = localFileName;
+            String fileString = ThridPrescriptionService.class.getResource("/").getPath();
+
+            if(type.equals("1")) {
+                //模板路径
+                fileString += "/templates/westerntemplate.ftl";
+            }
+            else {
+                //模板路径
+                fileString += "/templates/chinesetemplate.ftl";
+            }
+
+            if(model.containsKey("data_sets") && ((Map<String,Object>)model.get("data_sets")).containsKey("HDSC01_09"))
+            {
+                List list = (List)((Map<String,Object>)model.get("data_sets")).get("HDSC01_09");
+
+                for(int i = 0; i < list.size(); i++)
+                {
+                    Map<String,Object> HDSC01_09 = (Map<String,Object>)list.get(0);
+
+                    if(HDSC01_09.containsKey("HDSD00_04_006") && !StringUtils.isBlank(HDSC01_09.get("HDSD00_04_006").toString()))
+                    {
+                        HDSC01_09.put("HDSD00_04_006",HDSC01_09.get("HDSD00_04_006").toString().replace("T"," ").replace("Z",""));
+                    }
+                }
+            }
+
+            if(model.containsKey("data_sets") && ((Map<String,Object>)model.get("data_sets")).containsKey("HDSA00_01"))
+            {
+                List list = (List)((Map<String,Object>)model.get("data_sets")).get("HDSA00_01");
+
+                for(int i = 0; i < list.size(); i++)
+                {
+                    Map<String,Object> HDSA00_01 = (Map<String,Object>)list.get(0);
+
+                    if(HDSA00_01.containsKey("HDSA00_01_012") && !StringUtils.isBlank(HDSA00_01.get("HDSA00_01_012").toString()))
+                    {
+                        Date current = new Date();
+                        Date birth = DateTimeUtil.utcDateTimeParse(HDSA00_01.get("HDSA00_01_012").toString());
+
+                        HDSA00_01.put("HDSA00_01_012",current.getYear() - birth.getYear());
+                    }
+                    if(HDSA00_01.containsKey("HDSA00_01_011") && !StringUtils.isBlank(HDSA00_01.get("HDSA00_01_011").toString()))
+                    {
+                        String sex =  HDSA00_01.get("HDSA00_01_011").toString();
+
+                        if(sex.equals("1")) {
+                            sex = "男";
+                        }
+                        else if(sex.equals("2")) {
+                            sex = "女";
+                        }
+                        else {
+                            sex = "其他";
+                        }
+
+                        HDSA00_01.put("HDSA00_01_011",sex);
+                    }
+                }
+            }
 
             //把数据和模板结合生成html
             String html = fillTemplate(fileString,model);
-            //转换处理完成模板文件删除
-            File fileTemp = new File(fileString);
-            fileTemp.delete();
             //网页转图片 并且保存到fastdfs
             filePath = htmlToImage(html,width,height);
 
@@ -153,7 +198,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
     public String htmlToImage(String html,Integer width,Integer height) throws Exception {
         try{
             String rootPath = ThridPrescriptionService.class.getResource("/").getPath();
-            rootPath = rootPath.substring(0,rootPath.indexOf("classes"));
+            rootPath = new File(new File(rootPath).getParent()).getParent();
             //把模板保存成文件
             String fileTempName= UUID.randomUUID().toString();
             String url = rootPath + fileTempName+".html";
@@ -191,7 +236,6 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
         }
         catch (Exception e)
         {
-
             throw new Exception("html转图片失败");
         }
     }
@@ -206,12 +250,14 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
     public String fillTemplate(String fileString,Object model) throws Exception{
         try
         {
+            //模板文件
+            File tempFile = new File(fileString);
             //模板加载配置
             Configuration cfg = new Configuration();
             //模板路径配置
-            cfg.setDirectoryForTemplateLoading(new File(ThridPrescriptionService.class.getResource("/").getPath()));
-            //加载ftl文件
-            freemarker.template.Template temp = cfg.getTemplate(new File(fileString).getName());
+            cfg.setDirectoryForTemplateLoading(new File(tempFile.getParent()));
+            //加载模板文件
+            freemarker.template.Template temp = cfg.getTemplate(tempFile.getName());
             //模板解析输出流
             Writer out = new StringWriter();
             //模板解析

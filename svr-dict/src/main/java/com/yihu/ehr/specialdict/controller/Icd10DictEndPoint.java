@@ -202,8 +202,25 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
     public MIcd10Dict findByCode(@ApiParam(name = "code", value = "icd10_code")
                                      @PathVariable(value = "code") String code) throws Exception{
         Icd10Dict dict = icd10DictService.findByCode(code);
-        if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        if (dict == null) return null;
         return convertToModel(dict, MIcd10Dict.class);
+    }
+
+
+
+    @RequestMapping(value = "/dict/icd10/codeList" , method = RequestMethod.POST)
+    @ApiOperation(value = "根据codeList获取ICD10字典信息")
+    public List<MIcd10Dict> findByCodeList(@ApiParam(name = "codeList", value = "icd10_code_list")
+                                 @RequestParam(value = "codeList") List<String> codeList) throws Exception{
+        List<MIcd10Dict>list=new ArrayList<>();
+        for(int i=0;i<codeList.size();i++) {
+            Icd10Dict dict = icd10DictService.findByCode(codeList.get(i));
+            if (dict == null)
+                list.add(null);
+            else
+                list.add(convertToModel(dict, MIcd10Dict.class));
+        }
+        return list;
     }
 
     @RequestMapping(value = "/dict/icd10/ids" , method = RequestMethod.GET)
