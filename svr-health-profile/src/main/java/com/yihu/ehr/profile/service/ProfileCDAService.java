@@ -153,7 +153,7 @@ public class ProfileCDAService {
     /**
      * 根据ProfileId查询CDA分类
      */
-    public List<Map<String, Object>> getCDAClass(String profileId) throws Exception {
+    public List<Map<String, Object>> getCDAClass(String profileId,String eventType) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
 
         //根据profileId或者eventNo获取主记录
@@ -200,6 +200,7 @@ public class ProfileCDAService {
                                 item.put("profile_id", profileId);
                                 item.put("template_id", String.valueOf(template.getId()));
                                 item.put("cda_document_id", template.getCdaDocumentId());
+                                item.put("cda_code", template.getCdaCode());
                                 item.put("template_name", template.getTitle());
                                 item.put("pc_template", template.getPcTplURL());
                                 item.put("mobile_template", template.getMobileTplURL());
