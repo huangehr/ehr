@@ -182,7 +182,25 @@ public class PatientInfoDetailService {
      * 患者用药清单（根据数量，近三个月/近六个月）
      */
     public List<MedicationStat> getMedicationStat(String demographicId, String hpCode) throws Exception {
-        return medicationStatService.getMedicationStat(demographicId);
+        List<MedicationStat> re = new ArrayList<>();
+        List<String> drugList = new ArrayList<>();
+        if(hpCode!=null && hpCode.length()>0)
+        {
+            List<MDrugDict> drugDictList = dictService.getDrugDictListByHpCode(hpCode);
+            if(drugDictList!=null && drugDictList.size()>0)
+            {
+                String drugQuery = "";
+                for(MDrugDict drug : drugDictList){
+                    drugList.add(drug.getName());
+                }
+            }
+            else{
+                return re;
+            }
+        }
+
+        re = medicationStatService.getMedicationStat(demographicId,drugList);
+        return re;
     }
 
     /*
