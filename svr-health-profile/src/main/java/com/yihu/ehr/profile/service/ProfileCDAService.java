@@ -50,6 +50,13 @@ public class ProfileCDAService {
     String appId = "svr-health-profile";
 
     //event_type对应cda_code
+    Map<String,String[]> eventTypeCDA = new HashMap() {
+        {
+            put("3", new String[]{"HSDC01.04","HSDC01.05"}); //处方
+            put("4", new String[]{"HSDC02.03","HSDC02.04"}); //医嘱
+            put("5", new String[]{"HSDC02.09","HSDC02.10"}); //检查检验
+        }
+    };
 
 
     /**
@@ -159,63 +166,107 @@ public class ProfileCDAService {
         //根据profileId或者eventNo获取主记录
         String q = "{\"q\":\"rowkey:" + profileId + "\"}";
 
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, q, null, null);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, q, 1, 1);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(0);
             profileId = obj.get("rowkey").toString();
+            String profileType = obj.get("profile_type").toString(); //0结构化  1非结构化
             String cdaVersion = obj.get("cda_version").toString();
-            String orgCode = obj.get("org_code").toString();
 
-            //根据机构获取定制模板
-            List<Template> list = templateRepository.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
-            //遍历模板
-            if (list != null && list.size() > 0) {
-
-                //获取档案相关数据
-                List<String> datasetContains = new ArrayList<>();
-                Envelop data = resource.getSubData("{\"q\":\"profile_id:"+profileId+"\"}", null, null,null);
-                if(data.getDetailModelList()!=null && data.getDetailModelList().size()>0)
-                {
-                    for(int i=0;i<data.getDetailModelList().size();i++)
-                    {
-                        Map<String,Object> map = (Map<String,Object>)data.getDetailModelList().get(i);
-                        String dsCode = String.valueOf(map.get("rowkey")).split("\\$")[1];
-                        if(!datasetContains.contains(dsCode))
-                        {
-                            datasetContains.add(dsCode);
-                        }
+            //非结构化取数据rawfile
+            if (profileType.equals("1")) {
+                Envelop data = resource.getRawFiles(profileId, null, null, null);
+                if (data.getDetailModelList() != null && data.getDetailModelList().size() > 0) {
+                    for (int i=0;i<data.getDetailModelList().size();i++) {
+                        Map<String,Object> map = (Map<String, Object>) data.getDetailModelList().get(i);
+                        String cdaDocumentId = map.get("cda_document_id").toString();
+                        //获取cda内容
+                        MCDADocument cdaDocument = cdaService.getCDADocuments(cdaVersion,cdaDocumentId);
+                        Map<String, Object> item = new HashMap<>();
+                        item.put("profile_id", profileId);
+                        item.put("profile_type", profileType);
+                        item.put("cda_document_id", cdaDocumentId);
+                        item.put("cda_code", cdaDocument.getCode());
+                        item.put("template_name", cdaDocument.getName());
+                        item.put("file_list", map.get("file_list"));
+                        re.add(item);
                     }
                 }
+            } else {
+                String orgCode = obj.get("org_code").toString();
+                //根据机构获取定制模板
+                List<Template> list = templateRepository.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
+                //遍历模板
+                if (list != null && list.size() > 0) {
 
-                for (Template template : list) {
-                    String cdaDocumentId = template.getCdaDocumentId();
-                    //获取CDA关联数据集
-                    List<MCdaDataSet> datasetList = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
-                    if (datasetList != null && datasetList.size() > 0) {
-                        for (MCdaDataSet dataset : datasetList) {
-                            String dsCode = dataset.getDataSetCode();
-                            if(datasetContains.contains(dsCode))
+                    //获取档案相关数据
+                    List<String> datasetContains = new ArrayList<>();
+                    Envelop data = resource.getSubData("{\"q\":\"profile_id:" + profileId + "\"}", null, null, null);
+                    if (data.getDetailModelList() != null && data.getDetailModelList().size() > 0) {
+                        for (int i = 0; i < data.getDetailModelList().size(); i++) {
+                            Map<String, Object> map = (Map<String, Object>) data.getDetailModelList().get(i);
+                            String dsCode = String.valueOf(map.get("rowkey")).split("\\$")[1];
+                            if (!datasetContains.contains(dsCode)) {
+                                datasetContains.add(dsCode);
+                            }
+                        }
+                    }
+
+                    for (Template template : list) {
+                        String cdaDocumentId = template.getCdaDocumentId();
+                        String cdaCode = template.getCdaCode();
+
+                        //是否显示
+                        boolean isShow = false;
+                        if(eventType!= null)
+                        {
+                            String[] cdaList = eventTypeCDA.get(eventType);
+                            if(cdaList!=null && cdaList.length>0)
                             {
-                                Map<String, Object> item = new HashMap<>();
-                                item.put("profile_id", profileId);
-                                item.put("template_id", String.valueOf(template.getId()));
-                                item.put("cda_document_id", template.getCdaDocumentId());
-                                item.put("cda_code", template.getCdaCode());
-                                item.put("template_name", template.getTitle());
-                                item.put("pc_template", template.getPcTplURL());
-                                item.put("mobile_template", template.getMobileTplURL());
-                                re.add(item);
-                                break;
+                                for(String cda : cdaList)
+                                {
+                                    if(cda.equals(cdaCode))
+                                    {
+                                        isShow = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else{
+                            isShow = true;
+                        }
+
+                        if(isShow)
+                        {
+                            //获取CDA关联数据集
+                            List<MCdaDataSet> datasetList = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
+                            if (datasetList != null && datasetList.size() > 0) {
+                                for (MCdaDataSet dataset : datasetList) {
+                                    String dsCode = dataset.getDataSetCode();
+                                    if (datasetContains.contains(dsCode)) {
+
+                                        Map<String, Object> item = new HashMap<>();
+                                        item.put("profile_id", profileId);
+                                        item.put("profile_type", profileType);
+                                        item.put("template_id", String.valueOf(template.getId()));
+                                        item.put("cda_document_id", template.getCdaDocumentId());
+                                        item.put("cda_code", cdaCode);
+                                        item.put("template_name", template.getTitle());
+                                        item.put("pc_template", template.getPcTplURL());
+                                        item.put("mobile_template", template.getMobileTplURL());
+                                        re.add(item);
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-
-            return re;
-        } else {
-            throw new Exception("未查到相关记录！");
         }
+
+        return re;
     }
 
     /**
@@ -235,11 +286,9 @@ public class ProfileCDAService {
                 re.put("template_id",template.getId());
                 re.put("profile_id",obj.get("rowkey"));
                 re.put("cda_document_id",template.getCdaDocumentId());
-                return re;
             }
         }
-
-        throw new Exception("未找到相关模板！");
+        return re;
     }
 
     /**
