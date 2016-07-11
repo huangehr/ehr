@@ -20,7 +20,7 @@ import java.util.List;
 @FeignClient(name=MicroServices.Dictionary)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
- interface ConventionalDictEntryClient {
+ public interface ConventionalDictEntryClient {
 
     @RequestMapping(value = "/dictionaries/app_catalog", method = RequestMethod.GET)
     @ApiOperation(value = "获取应用类别字典项", response = MConventionalDict.class, produces = "application/json")
