@@ -6,10 +6,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.XTransformClient;
-import com.yihu.ehr.profile.service.BasisConstant;
-import com.yihu.ehr.profile.service.PatientInfoBaseService;
-import com.yihu.ehr.profile.service.PatientInfoDetailService;
-import com.yihu.ehr.profile.service.ProfileCDAService;
+import com.yihu.ehr.profile.model.MedicationStat;
+import com.yihu.ehr.profile.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,6 +51,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @Autowired
     XTransformClient transform;
 
+    @Autowired
+    IndicatorsService indicatorsService;
+
     /**
      * 单条记录转适配
      * @return
@@ -93,16 +94,20 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("全文检索")
     @RequestMapping(value = ServiceApi.Profiles.ProfileLucene, method = RequestMethod.GET)
     public Envelop ProfileLucene(
-            @ApiParam(name = "lucene", value = "开始时间")
-            @RequestParam(value = "lucene", required = false) String startTime,
-            @ApiParam(name = "lucene", value = "结束时间")
-            @RequestParam(value = "lucene", required = false) String endTime,
+            @ApiParam(name = "startTime", value = "开始时间")
+            @RequestParam(value = "startTime", required = false) String startTime,
+            @ApiParam(name = "endTime", value = "结束时间")
+            @RequestParam(value = "endTime", required = false) String endTime,
             @ApiParam(name = "lucene", value = "全文检索内容")
             @RequestParam(value = "lucene", required = false) List<String> lucene,
+            @ApiParam(name = "page", value = "第几页")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "每页几行")
+            @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "version", value = "版本号",defaultValue="56395d75b854")
             @RequestParam(value = "version", required = false) String version) throws Exception {
 
-        Envelop re = patient.getProfileLucene(startTime,endTime,lucene);
+        Envelop re = patient.getProfileLucene(startTime,endTime,lucene,page,size);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
@@ -110,7 +115,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("患者基本信息OK")
     @RequestMapping(value = ServiceApi.Profiles.ProfileInfo, method = RequestMethod.GET)
     public Map<String,Object> profileInfo(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422428197704250025")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "version", value = "版本号",defaultValue="56395d75b854")
             @RequestParam(value = "version", required = false) String version) throws Exception {
@@ -122,7 +127,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("患者患病史JSON")
     @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
     public String ProfileHistory(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422428197704250025")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
 
         return "[{\"pastHistoryType\":\"家族病史\",\"pastHistoryContents\":\"也就是医学中常常提到的家族史，也指某一种病的患者的家族成员（较大范围的家族成员，不仅限于祖孙等直系亲属）中发病情况。家族病史分为阴性跟阳性。 1)阴性（即没有发现同样病的患者）。临床上无家族史 2)阳性（即发现有同样病的患者）。比如：临床上讲糖尿病家族史、高血压病家族史、遗传型疾病家族史等。\"},\n" +
@@ -134,7 +139,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("主要健康问题OK")
     @RequestMapping(value = ServiceApi.Profiles.HealthProblem, method = RequestMethod.GET)
     public List<Map<String,Object>> HealthProblem(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420521195812172917")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
         return patient.getHealthProblem(demographic_id);
     }
@@ -142,7 +147,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("就诊过的疾病OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalDisease, method = RequestMethod.GET)
     public List<Map<String,String>> MedicalDisease(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420521195812172917")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
         return patient.getPatientDisease(demographic_id);
     }
@@ -150,7 +155,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("就诊过区域OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalArea, method = RequestMethod.GET)
     public List<Map<String,String>> MedicalArea(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420521195812172917")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
         return patient.getPatientArea(demographic_id);
     }
@@ -158,7 +163,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("就诊过年份OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalYear, method = RequestMethod.GET)
     public List<String> MedicalYear(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420521195812172917")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
         return patient.getPatientYear(demographic_id);
     }
@@ -166,7 +171,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("门诊/住院事件(时间轴)OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvents, method = RequestMethod.GET)
     public List<Map<String,Object>> MedicalEvents(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420521195812172917")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "events_type", value = "就诊事件类别")
             @RequestParam(value = "events_type", required = false) String events_type,
@@ -181,25 +186,41 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
 
-        List<Map<String,Object>> re = patient.getPatientMzZyEvents(demographic_id, events_type, year, area, hp_id, disease_id);
+        List<Map<String,Object>> re = patient.getPatientEvents(demographic_id, events_type, year, area, hp_id, disease_id);
         return adapterBatch(version,re);
     }
 
     @ApiOperation("某次就诊事件OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvent, method = RequestMethod.GET)
     public Map<String,Object> MedicalEvent(
-            @ApiParam(name = "event_no", value = "档案ID",defaultValue="ZY010000806438")
-            @RequestParam(value = "event_no", required = true) String event_no) throws Exception {
-        return patient.getMedicalEvent(event_no);
+            @ApiParam(name = "org_code", value = "机构代码",defaultValue="41872607-9")
+            @RequestParam(value = "org_code", required = true) String org_code,
+            @ApiParam(name = "event_no", value = "档案ID",defaultValue="30000001")
+            @RequestParam(value = "event_no", required = true) String event_no,
+            @ApiParam(name = "version", value = "版本号",defaultValue="57623f01b2d9")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
+        Map<String,Object> re = patient.getMedicalEvent(org_code,event_no);
+        return adapterOne(version,re);
     }
 
-    @ApiOperation("患者常用药物")
+    @ApiOperation("患者常用药物OK")
+    @RequestMapping(value = ServiceApi.Profiles.MedicationUsed, method = RequestMethod.GET)
+    public List<Map<String, Object>> MedicationUsed(
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
+            @RequestParam(value = "demographic_id", required = true) String demographic_id,
+            @ApiParam(name = "hp_id", value = "健康问题",defaultValue="GM")
+            @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception {
+
+        return patientDetail.getMedicationUsed(demographic_id, hp_id);
+    }
+
+    @ApiOperation("患者用药清单OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationStat, method = RequestMethod.GET)
-    public List<Map<String,Object>> MedicalStat(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420521195812172917")
+    public List<MedicationStat> MedicalStat(
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
-            @RequestParam(value = "hp_id", required = true) String hp_id) throws Exception {
+            @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception {
 
         return patientDetail.getMedicationStat(demographic_id, hp_id);
     }
@@ -209,18 +230,20 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("CDA分类OK")
     @RequestMapping(value = ServiceApi.Profiles.CDAClass, method = RequestMethod.GET)
     public List<Map<String,Object>> CDAClass(
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="42017976-4_0000145400_ZY010000806438_1454115983000")
-            @RequestParam(value = "profile_id", required = true) String profile_id) throws Exception {
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_1000000_30000001_1465894742000")
+            @RequestParam(value = "profile_id", required = true) String profile_id,
+            @ApiParam(name = "event_type", value = "时间类型")
+            @RequestParam(value = "event_type", required = false) String event_type) throws Exception {
 
-        return profileCDAService.getCDAClass(profile_id);
+        return profileCDAService.getCDAClass(profile_id,event_type);
     }
 
     @ApiOperation("CDA数据OK")
     @RequestMapping(value = ServiceApi.Profiles.CDAData, method = RequestMethod.GET)
     public Map<String,Object> CDAData(
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="42017976-4_0000145400_ZY010000806438_1454115983000")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_1000000_30000001_1465894742000")
             @RequestParam(value = "profile_id", required = true) String profile_id,
-            @ApiParam(name = "cda_document_id", value = "模板ID",defaultValue="0dae000656b2e9480dc3568e6a372b59")
+            @ApiParam(name = "cda_document_id", value = "模板ID",defaultValue="0dae0006568a12a20dc35654490ab357")
             @RequestParam(value = "cda_document_id", required = true) String cda_document_id) throws Exception {
 
         return profileCDAService.getCDAData(profile_id, cda_document_id);
@@ -229,7 +252,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("完整CDA文档OK")
     @RequestMapping(value = ServiceApi.Profiles.CDADocument, method = RequestMethod.GET)
     public Map<String,Object> CDADocument(
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="42017976-4_0000145400_ZY010000806438_1454115983000")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_1000000_30000001_1465894742000")
             @RequestParam(value = "profile_id", required = true) String profile_id) throws Exception {
 
         return  profileCDAService.getCDADocument(profile_id);
@@ -238,28 +261,31 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("获取cda_document_idOK")
     @RequestMapping(value = ServiceApi.Profiles.CDADocumentId, method = RequestMethod.GET)
     public Map<String, Object> CDADocumentId(
-            @ApiParam(name = "event_no", value = "事件号",defaultValue="ZY010000806438") @RequestParam(value = "event_no", required = true) String event_no,
-            @ApiParam(name = "cda_code", value = "模板类别",defaultValue="HSDC02.02") @RequestParam(value = "cda_code", required = true) String cda_code) throws Exception {
-        return profileCDAService.getCDADocumentId(event_no, cda_code);
+            @ApiParam(name = "org_code", value = "机构代码",defaultValue="41872607-9")
+            @RequestParam(value = "org_code", required = true) String org_code,
+            @ApiParam(name = "event_no", value = "事件号",defaultValue="30000001")
+            @RequestParam(value = "event_no", required = true) String event_no,
+            @ApiParam(name = "cda_code", value = "模板类别",defaultValue="HSDC01.04")
+            @RequestParam(value = "cda_code", required = true) String cda_code) throws Exception {
+        return profileCDAService.getCDADocumentId(org_code,event_no, cda_code);
     }
 
     /******************************** 处方 ***********************************************************/
-    @ApiOperation("处方主表")
+    @ApiOperation("处方主表OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationMaster, method = RequestMethod.GET)
     public List<Map<String,Object>> DrugMaster(
-            @ApiParam(name = "demographic_id", value = "身份证号")
-            @RequestParam(value = "demographic_id", required = false,defaultValue = "422428197704250025") String demographic_id,
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
+            @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "prescription_no", value = "处方编号")
             @RequestParam(value = "prescription_no", required = false) String prescription_no,
-            @ApiParam(name = "version", value = "版本号")
+            @ApiParam(name = "version", value = "版本号",defaultValue = "57623f01b2d9")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         if(demographic_id==null&&profile_id==null&&prescription_no==null)
         {
             throw new Exception("非法传参！");
         }
-
 
         List<Map<String,Object>> re = patientDetail.getMedicationMaster(demographic_id, profile_id, prescription_no);
 
@@ -267,12 +293,12 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     //1.西药处方；2.中药处方
-    @ApiOperation("根据处方编号获取处方细表数据")
+    @ApiOperation("根据处方编号获取处方细表数据OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationDetail, method = RequestMethod.GET)
     public List<Map<String,Object>> DrugDetail(
-            @ApiParam(name = "prescription_no", value = "处方编号")
+            @ApiParam(name = "prescription_no", value = "处方编号",defaultValue = "00000002")
             @RequestParam(value = "prescription_no", required = true) String prescription_no,
-            @ApiParam(name = "type", value = "类型")
+            @ApiParam(name = "type", value = "类型",defaultValue = "2")
             @RequestParam(value = "type", required = true) String type,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
@@ -281,10 +307,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return adapterBatch(version,re);
     }
 
-    @ApiOperation("处方笺")
+    @ApiOperation("处方笺OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationPrescription, method = RequestMethod.GET)
     public List<Map<String,Object>> DrugPrescription(
-            @ApiParam(name = "profile_id", value = "档案ID")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "41872607-9_1000000_20000002_1465894742000")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "prescription_no", value = "处方编号")
             @RequestParam(value = "prescription_no", required = false) String prescription_no) throws Exception
@@ -292,10 +318,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return patientDetail.getPrescription(profile_id,prescription_no);
     }
 
-    @ApiOperation("中药处方")
+    @ApiOperation("中药处方OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationDetailChinese, method = RequestMethod.GET)
     public Envelop DrugDetailChinese(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
             @RequestParam(value = "hp_id", required = false) String hp_id,
@@ -314,10 +340,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("西药处方")
+    @ApiOperation("西药处方OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationDetailWestern, method = RequestMethod.GET)
     public Envelop DrugDetailWestern(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
             @RequestParam(value = "hp_id", required = false) String hp_id,
@@ -337,10 +363,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     /******************************** 门诊 ***********************************************************/
-    @ApiOperation("门诊诊断NON")
+    @ApiOperation("门诊诊断OK")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientDiagnosis, method = RequestMethod.GET)
     public Envelop OutpatientDiagnosis(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
@@ -357,10 +383,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("门诊症状NON")
+    @ApiOperation("门诊症状OK")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientSymptom, method = RequestMethod.GET)
     public Envelop OutpatientSymptom(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
@@ -377,10 +403,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("门诊费用汇总NON")
+    @ApiOperation("门诊费用汇总OK")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientCostMaster, method = RequestMethod.GET)
     public Envelop OutpatientCostMaster(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
@@ -421,10 +447,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("住院诊断OK")
     @RequestMapping(value = ServiceApi.Profiles.HospitalizedDiagnosis, method = RequestMethod.GET)
     public Envelop HospitalizedDiagnosis(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "330101200006011945")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false,defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000") String profile_id,
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "jkzl_10003180_30000001_1467275158000")
+            @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -443,8 +469,8 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public Envelop HospitalizedSymptom(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false,defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000") String profile_id,
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "jkzl_10003180_30000001_1467275158000")
+            @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -463,7 +489,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public Envelop HospitalizedCostMaster(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "jkzl_10003180_30000001_1467275158000")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
@@ -483,7 +509,7 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public Envelop HospitalizedCostDetail(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "jkzl_10003180_30000001_1467275158000")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
@@ -503,8 +529,8 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public Envelop HospitalizedOrdersTemporary(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false,defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000") String profile_id,
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "jkzl_10003180_30000001_1467275158000")
+            @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -523,8 +549,8 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public Envelop HospitalizedOrdersLongtime(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false,defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000") String profile_id,
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "jkzl_10003180_30000001_1467275158000")
+            @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -543,8 +569,8 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     public Envelop HospitalizedDeath(
             @ApiParam(name = "demographic_id", value = "身份证号")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false,defaultValue = "jkzl_1004192_888888_1435514514000") String profile_id,
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "jkzl_10003180_30000001_1467275158000")
+            @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -559,10 +585,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     }
 
     /********************** 检查检验 ***********************************************/
-    @ApiOperation("检查报告单NON")
+    @ApiOperation("检查报告单OK")
     @RequestMapping(value = ServiceApi.Profiles.ExaminationReport, method = RequestMethod.GET)
     public Envelop ExaminationReport(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
@@ -582,10 +608,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("检查报告单图片OK")
     @RequestMapping(value = ServiceApi.Profiles.ExaminationImg, method = RequestMethod.GET)
     public Envelop ExaminationImg(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false,defaultValue = "jkzl_1004192_888888_1435514514000") String profile_id,
+            @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -599,10 +625,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
         return re;
     }
 
-    @ApiOperation("检验报告单NON")
+    @ApiOperation("检验报告单OK")
     @RequestMapping(value = ServiceApi.Profiles.LaboratoryReport, method = RequestMethod.GET)
     public Envelop LaboratoryReport(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
@@ -622,10 +648,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("检验报告单图片OK")
     @RequestMapping(value = ServiceApi.Profiles.LaboratoryImg, method = RequestMethod.GET)
     public Envelop LaboratoryImg(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false,defaultValue = "jkzl_1004192_888888_1435514514000") String profile_id,
+            @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -642,10 +668,10 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("检验报告项目OK")
     @RequestMapping(value = ServiceApi.Profiles.LaboratoryProject, method = RequestMethod.GET)
     public Envelop LaboratoryProject(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
-            @RequestParam(value = "profile_id", required = false,defaultValue = "jkzl_1004192_888888_1435514514000") String profile_id,
+            @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
             @ApiParam(name = "page", value = "第几页")
@@ -662,9 +688,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("检验药敏OK")
     @RequestMapping(value = ServiceApi.Profiles.LaboratoryAllergy, method = RequestMethod.GET)
     public Envelop LaboratoryAllergy(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "jkzl_1004192_888888_1435514514000")
+            @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
@@ -682,9 +708,9 @@ public class ProfileEndPoint extends BaseRestEndPoint {
     @ApiOperation("手术记录OK")
     @RequestMapping(value = ServiceApi.Profiles.Surgery, method = RequestMethod.GET)
     public Envelop Surgery(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "42017976-4_0000145400_ZY010000806438_1454115983000")
+            @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "event_no", value = "事件号")
             @RequestParam(value = "event_no", required = false) String event_no,
@@ -695,6 +721,43 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
         Envelop re = patientDetail.getProfileSub(BasisConstant.surgery, demographic_id, profile_id,event_no, page,size);
+        re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
+        return re;
+    }
+
+    /***************************** 指标 ***************************************************/
+    @ApiOperation("获取某个健康问题指标OK")
+    @RequestMapping(value = ServiceApi.Profiles.IndicatorsClass, method = RequestMethod.GET)
+    public List<Map<String,Object>> IndicatorsClass(
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "420521195812172917")
+            @RequestParam(value = "demographic_id", required = true) String demographic_id,
+            @ApiParam(name = "hp_id", value = "健康问题",defaultValue = "BXB")
+            @RequestParam(value = "hp_id", required = true) String hp_id,
+            @ApiParam(name = "indicator_type", value = "指标类别")
+            @RequestParam(value = "indicator_type", required = false) String indicator_type) throws Exception{
+
+        return indicatorsService.getIndicatorsClass(demographic_id,hp_id,indicator_type);
+    }
+
+    @ApiOperation("获取指标数据OK")
+    @RequestMapping(value = ServiceApi.Profiles.IndicatorsData, method = RequestMethod.GET)
+    public Envelop IndicatorsData(
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "420521195812172917")
+            @RequestParam(value = "demographic_id", required = true) String demographic_id,
+            @ApiParam(name = "indicator_code", value = "指标代码")
+            @RequestParam(value = "indicator_code", required = false) String indicator_code,
+            @ApiParam(name = "date_from", value = "指标开始时间")
+            @RequestParam(value = "date_from", required = false) String date_from,
+            @ApiParam(name = "date_end", value = "指标结束时间")
+            @RequestParam(value = "date_end", required = false) String date_end,
+            @ApiParam(name = "page", value = "第几页")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "每页几行")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version", required = false) String version) throws Exception{
+
+        Envelop re = indicatorsService.getIndicatorsData(demographic_id,indicator_code,date_from,date_end,page,size);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }

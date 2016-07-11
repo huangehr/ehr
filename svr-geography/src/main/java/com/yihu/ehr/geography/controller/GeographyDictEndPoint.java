@@ -1,20 +1,15 @@
 package com.yihu.ehr.geography.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.geography.service.Geography;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.geography.service.GeographyDict;
 import com.yihu.ehr.geography.service.GeographyDictService;
-import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,6 +57,31 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") String id) {
         GeographyDict geographyDict =  geographyDictService.findById(id);
         return convertToModel(geographyDict, MGeographyDict.class);
+    }
+
+    @RequestMapping(value = "/geography_entries_list", method = RequestMethod.POST)
+    public List<MGeographyDict> getAddressDictByIdList(
+            @ApiParam(name = "idList", value = "idList", defaultValue = "")
+            @RequestParam(value = "idList") List<String> idList) {
+        List<MGeographyDict> list=new ArrayList<>();
+        for(int i=0;i<idList.size();i++) {
+            GeographyDict geographyDict = geographyDictService.findById(idList.get(i));
+            list.add(convertToModel(geographyDict, MGeographyDict.class));
+        }
+        return list;
+    }
+
+    @RequestMapping(value = "/geography_entries/CacheAddressDict", method = RequestMethod.POST)
+    @ApiOperation(value = "缓存行政区划地址")
+    public boolean CacheAddressDict( ){
+       return   geographyDictService.CacheAddressDict();
+    }
+
+    @RequestMapping(value = "/geography_entries/GetAddressDictCache/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取缓存行政区划地址")
+    public String GetAddressDictCache(@ApiParam(name = "id", value = "id", defaultValue = "")
+                                           @PathVariable(value = "id") String id ){
+        return   geographyDictService.GetAddressDictCache(id);
     }
 
 

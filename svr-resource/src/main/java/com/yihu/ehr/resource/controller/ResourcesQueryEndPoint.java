@@ -1,18 +1,19 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
 import com.yihu.ehr.resource.service.ResourcesQueryService;
+import com.yihu.ehr.resource.service.ResourcesTransformService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -21,20 +22,27 @@ import java.util.*;
  */
 
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/rs/query")
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "query", description = "资源查询服务接口")
 public class ResourcesQueryEndPoint {
     @Autowired
-    private ResourcesQueryService resourcesQueryService;
+    ResourcesQueryService resourcesQueryService;
 
     @Autowired
-    private ResourcesQueryDao resourcesQueryDao;
+    ResourcesQueryDao resourcesQueryDao;
 
+    @Autowired
+    ResourcesTransformService resourcesTransformService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    /*********************************** 公开接口 ************************************************************/
     /**
      * 获取资源数据
      */
     @ApiOperation("获取资源数据")
-    @RequestMapping(value = "/getResources", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourcesQuery, method = RequestMethod.POST)
     public Envelop getResources(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
                                 @ApiParam("appId") @RequestParam(value = "appId", required = true) String appId,
                                 @ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
@@ -44,12 +52,33 @@ public class ResourcesQueryEndPoint {
         return resourcesQueryService.getResources(resourcesCode, appId, queryParams, page, size);
     }
 
+    /**
+     * 获取资源数据(转译)
+     */
+    @ApiOperation("获取资源数据(转译)")
+    @RequestMapping(value = ServiceApi.Resources.ResourcesQueryTransform, method = RequestMethod.POST)
+    public Envelop getResourcesTransform(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
+                                @ApiParam("appId") @RequestParam(value = "appId", required = true) String appId,
+                                @ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
+                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size,
+                                @ApiParam("version") @RequestParam(value = "version", required = false) String version) throws Exception {
+
+        Envelop re = resourcesQueryService.getResources(resourcesCode, appId, queryParams, page, size);
+        if(version!=null && version.length()>0)
+        {
+            List<Map<String,Object>> list = re.getDetailModelList();
+            re.setDetailModelList(resourcesTransformService.displayCodeConvert(list,version,null));
+        }
+
+        return re;
+    }
 
     /**
      * 资源数据源结构
      */
     @ApiOperation("资源数据源结构")
-    @RequestMapping(value = "/getResourceMetadata", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceViewMetadata, method = RequestMethod.GET)
     public String getResourceMetadata(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode) throws Exception {
         return resourcesQueryService.getResourceMetadata(resourcesCode);
     }
@@ -58,7 +87,7 @@ public class ResourcesQueryEndPoint {
      * 资源浏览
      */
     @ApiOperation("资源浏览")
-    @RequestMapping(value = "/getResourceData", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourceViewData, method = RequestMethod.GET)
     public Envelop getResourceData(@ApiParam(name = "resourcesCode", defaultValue = "RS_HOSPITALIZED_DIAGNOSIS") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
                                    @ApiParam("queryCondition") @RequestParam(value = "queryCondition", required = false) String queryCondition,
                                    @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
@@ -70,22 +99,118 @@ public class ResourcesQueryEndPoint {
      * 获取非结构化数据
      */
     @ApiOperation("获取非结构化数据")
-    @RequestMapping(value = "/getRawFiles", method = RequestMethod.GET)
-    public Envelop getRawFiles(@ApiParam("profileId") @RequestParam(value = "profileId", required = false) String profileId,
+    @RequestMapping(value = ServiceApi.Resources.ResourcesRawFiles, method = RequestMethod.GET)
+    public Envelop getRawFiles(@ApiParam("profileId") @RequestParam(value = "profileId", required = true) String profileId,
+                               @ApiParam("cdaDocumentId") @RequestParam(value = "cdaDocumentId", required = false) String cdaDocumentId,
                                 @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                 @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
-        return resourcesQueryService.getRawFiles(profileId,page,size);
+        return resourcesQueryService.getRawFiles(profileId,cdaDocumentId,page,size);
+    }
+
+    /**
+     * 获取非结构化数据list
+     */
+    @RequestMapping(value = ServiceApi.Resources.ResourcesRawFilesList, method = RequestMethod.GET)
+    public Map<String,Envelop> getRawFilesList(@RequestParam(value = "profileId", required = true) String profileId,
+                               @RequestParam(value = "cdaDocumentId", required = true) String[] cdaDocumentIdList) throws Exception {
+
+        Map<String,Envelop> map=new HashMap<>();
+        for(int i=0;i<cdaDocumentIdList.length;i++)
+             map.put(cdaDocumentIdList[i],resourcesQueryService.getRawFiles(profileId,cdaDocumentIdList[i],null,null));
+        return map;
+    }
+
+    @ApiOperation("Hbase主表")
+    @RequestMapping(value = ServiceApi.Resources.ResourcesMasterData, method = RequestMethod.GET)
+    public Envelop getEhrCenter(@ApiParam(name = "queryParams", defaultValue = "{\"q\":\"*:*\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
+                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size,
+                                @ApiParam("version") @RequestParam(value = "version", required = false) String version) throws Exception {
+        Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenter(queryParams, page, size);
+        Envelop re = new Envelop();
+        re.setCurrPage(result.getNumber());
+        re.setPageSize(result.getSize());
+        re.setTotalCount(new Long(result.getTotalElements()).intValue());
+        if(version!=null && version.length()>0)
+        {
+            re.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(),version,null));
+        }
+        else{
+            re.setDetailModelList(result.getContent());
+        }
+        return re;
     }
 
     @ApiOperation("Hbase从表")
-    @RequestMapping(value = "/getEhrCenterSub", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourcesSubData, method = RequestMethod.GET)
     public Envelop getEhrCenterSub(
-            @ApiParam(name = "queryParams", defaultValue = "{\"table\":\"HDSC02_17\",\"join\":\"demographic_id:420521195812172917\"}")
+            @ApiParam(name = "queryParams", defaultValue = "{\"table\":\"HDSC02_17\"}")
             @RequestParam(value = "queryParams", required = false) String queryParams,
             @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+            @ApiParam("size") @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam("version") @RequestParam(value = "version", required = false) String version) throws Exception {
         Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenterSub(queryParams, page, size);
+        Envelop re = new Envelop();
+        re.setCurrPage(result.getNumber());
+        re.setPageSize(result.getSize());
+        re.setTotalCount(new Long(result.getTotalElements()).intValue());
+        if(version!=null && version.length()>0)
+        {
+            re.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(),version,null));
+        }
+        else{
+            re.setDetailModelList(result.getContent());
+        }
+        return re;
+    }
+
+    @ApiOperation("获取Cda Data")
+    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.GET)
+    public Map<String,Object> getCDAData(
+            @ApiParam(name = "masterJson", defaultValue = "")
+            @RequestParam(value = "masterJson", required = true) String masterJson,
+            @ApiParam(name = "masterDatasetCodeList", defaultValue = "")
+            @RequestParam(value = "masterDatasetCodeList", required = true) String masterDatasetCodeList,
+            @ApiParam(name = "multiDatasetCodeList", defaultValue = "")
+            @RequestParam(value = "multiDatasetCodeList", required = true) String multiDatasetCodeList) throws Exception {
+        Map<String,Object> map=new HashMap<>();
+        Map<String,Object> returnmap=new HashMap<>();
+        Map<String, Object> obj=objectMapper.readValue(java.net.URLDecoder.decode(masterJson), Map.class);
+        Map<String, List<String>> masterDatasetCodeMap=objectMapper.readValue(java.net.URLDecoder.decode(masterDatasetCodeList), Map.class);
+        Map<String, List<String>> multiDatasetCodeMap=objectMapper.readValue(java.net.URLDecoder.decode(multiDatasetCodeList), Map.class);
+        String profileId = obj.get("rowkey").toString();
+        String cdaVersion = obj.get("cda_version").toString();
+        for(String key:masterDatasetCodeMap.keySet()) {
+            for (int i = 0; i < masterDatasetCodeMap.size(); i++) {
+                List<Map<String, Object>> dataList = new ArrayList<>();
+
+                dataList.add(resourcesTransformService.stdMasterTransform(obj, masterDatasetCodeMap.get(key).get(i), cdaVersion));
+                map.put(masterDatasetCodeMap.get(key).get(i), dataList);
+            }
+            for (int i = 0; i < multiDatasetCodeMap.size(); i++) {
+
+                String q = "{\"table\":\"" + multiDatasetCodeMap.get(i) + "\",\"q\":\"profile_id:" + profileId + "\"}";
+                Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenterSub(q, null, null);
+
+                if (cdaVersion != null && cdaVersion.length() > 0) {
+                    map.put(multiDatasetCodeMap.get(key).get(i), resourcesTransformService.displayCodeConvert(result.getContent(), cdaVersion, null));
+                } else {
+                    map.put(multiDatasetCodeMap.get(key).get(i), result.getContent());
+                }
+            }
+            returnmap.put(key,map);
+        }
+        return returnmap;
+    }
+
+
+    @ApiOperation("Hbase主表统计")
+    @RequestMapping(value = ServiceApi.Resources.ResourcesMasterStat, method = RequestMethod.GET)
+    public Envelop countEhrCenter(@ApiParam(value = "queryParams", defaultValue = "{\"groupFields\":\"org_code,HDSD00_01_003_VALUE_S,HDSA00_01_015_VALUE_S\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
+                                                    @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+                                                    @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+        Page<Map<String, Object>> result = resourcesQueryDao.countEhrCenter(queryParams, page, size);
         Envelop re = new Envelop();
         re.setCurrPage(result.getNumber());
         re.setPageSize(result.getSize());
@@ -94,36 +219,32 @@ public class ResourcesQueryEndPoint {
         return re;
     }
 
-    @ApiOperation("内部--Hbase主表")
-    @RequestMapping(value = "/getEhrCenter", method = RequestMethod.GET)
-    public Page<Map<String, Object>> getEhrCenter(@ApiParam(name = "queryParams", defaultValue = "{\"q\":\"demographic_id:420521195812172917\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                                  @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                                  @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourcesQueryDao.getEhrCenter(queryParams, page, size);
-    }
-
-    @ApiOperation("内部--Hbase主表统计")
-    @RequestMapping(value = "/countEhrCenter", method = RequestMethod.GET)
-    public Page<Map<String, Object>> countEhrCenter(@ApiParam(value = "queryParams", defaultValue = "{\"groupFields\":\"org_code,HDSD00_01_003_VALUE_S,HDSA00_01_015_VALUE_S\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                                    @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                                    @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourcesQueryDao.countEhrCenter(queryParams, page, size);
-    }
-
-    @ApiOperation("内部--Hbase从表统计")
-    @RequestMapping(value = "/countEhrCenterSub", method = RequestMethod.GET)
-    public Page<Map<String, Object>> countEhrCenterSub(@ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
+    @ApiOperation("Hbase从表统计")
+    @RequestMapping(value = ServiceApi.Resources.ResourcesSubStat, method = RequestMethod.GET)
+    public Envelop countEhrCenterSub(@ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                        @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                                        @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourcesQueryDao.countEhrCenterSub(queryParams, page, size);
+        Page<Map<String, Object>> result = resourcesQueryDao.countEhrCenterSub(queryParams, page, size);
+        Envelop re = new Envelop();
+        re.setCurrPage(result.getNumber());
+        re.setPageSize(result.getSize());
+        re.setTotalCount(new Long(result.getTotalElements()).intValue());
+        re.setDetailModelList(result.getContent());
+        return re;
     }
 
-    @ApiOperation("内部--Mysql查询")
-    @RequestMapping(value = "/getMysqlData", method = RequestMethod.GET)
-    public Page<Map<String, Object>> getMysqlData(@ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
+    @ApiOperation("Mysql查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourcesMysql, method = RequestMethod.GET)
+    public Envelop getMysqlData(@ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
                                                   @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                                   @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourcesQueryDao.getMysqlData(queryParams, page, size);
+        Page<Map<String, Object>> result = resourcesQueryDao.getMysqlData(queryParams, page, size);
+        Envelop re = new Envelop();
+        re.setCurrPage(result.getNumber());
+        re.setPageSize(result.getSize());
+        re.setTotalCount(new Long(result.getTotalElements()).intValue());
+        re.setDetailModelList(result.getContent());
+        return re;
     }
 
 

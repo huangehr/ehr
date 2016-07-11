@@ -84,7 +84,7 @@ public class ResourcesQueryDao {
         {
             page = defaultPage;
         }
-        //默认1000行
+        //默认行数
         if (size == null) {
             size = defaultSize;
         }
@@ -123,14 +123,14 @@ public class ResourcesQueryDao {
                     q = "{!join fromIndex="+mainJoinCore+" from=rowkey to=profile_id}" +join;
                     if (obj.containsKey("table")) {
                         if (fq.length() > 0) {
-                            fq += " AND rowkey:*" + obj.get("table") + "*";
+                            fq = "("+fq+") AND rowkey:*" + obj.get("table") + "*";
                         } else {
                             fq = "rowkey:*" + obj.get("table") + "*";
                         }
                     }
                 } else if(obj.containsKey("table")){
                     if (q.length() > 0) {
-                        q += " AND rowkey:*" + obj.get("table") + "*";
+                        q = "("+q+") AND rowkey:*" + obj.get("table") + "*";
                     } else {
                         q = "rowkey:*" + obj.get("table") + "*";
                     }
@@ -145,7 +145,7 @@ public class ResourcesQueryDao {
         if (page == null) {
             page = defaultPage;
         }
-        //默认50行
+        //默认行数
         if (size == null) {
             size = defaultSize;
         }
@@ -206,7 +206,7 @@ public class ResourcesQueryDao {
                 if (page == null) {
                     page = defaultPage;
                 }
-                //默认50行
+                //默认行数
                 if (size == null) {
                     size = defaultSize;
                 }
@@ -276,7 +276,7 @@ public class ResourcesQueryDao {
                 if (page == null) {
                     page = defaultPage;
                 }
-                //默认50行
+                //默认行数
                 if (size == null) {
                     size = defaultSize;
                 }
@@ -297,23 +297,31 @@ public class ResourcesQueryDao {
             sql = "select * from " + queryParams;
         }
 
-        //分页查询
-        if (page != null && size != null) {
-            ParserSql parser = ParserFactory.getParserSql();
-            String sqlCount = parser.getCountSql(sql);
-            String sqlList = parser.getPageSql(sql, page, size);
+        //查询总条数
+        ParserSql parser = ParserFactory.getParserSql();
+        String sqlCount = parser.getCountSql(sql);
+        long count = jdbcTemplate.queryForObject(sqlCount,Long.class);
 
-            //查询总条数
-            long count = jdbcTemplate.queryForObject(sqlCount,Long.class);
-            //查询数据
-            List<Map<String,Object>> list =jdbcTemplate.queryForList(sqlList);
-            return new PageImpl<Map<String, Object>>(list,new PageRequest(page, size),count);
+        //默认第一页
+        if (page == null) {
+            page = defaultPage;
+        }
+        //默认行数
+        if (size == null) {
+            size = defaultSize;
+        }
+
+        //分页查询
+        List<Map<String,Object>> list = new ArrayList<>();
+        if(count>size)
+        {
+            String sqlList = parser.getPageSql(sql, page, size);
+            list = jdbcTemplate.queryForList(sqlList);
         }
         else{
-            //查询数据
-            return new PageImpl<Map<String, Object>>(jdbcTemplate.queryForList(sql));
+            list = jdbcTemplate.queryForList(sql);
         }
-
+        return new PageImpl<Map<String, Object>>(list,new PageRequest(page-1, size),count);
     }
 
     /**
@@ -352,7 +360,7 @@ public class ResourcesQueryDao {
         if (page == null) {
             page = defaultPage;
         }
-        //默认50行
+        //默认行数
         if (size == null) {
             size = defaultSize;
         }

@@ -33,6 +33,7 @@ public class Icd10Dict implements Serializable{
     private String updateUser;
     private Date updateDate;
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)

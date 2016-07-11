@@ -28,8 +28,7 @@ import java.util.*;
  */
 @Table(ResourceStorageUtil.MasterTable)
 public class StandardPackage {
-
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper =  SpringContext.getApplicationContext().getBean(ObjectMapper.class);
 
     private ProfileId profileId;                        // 档案ID
     private String cardId;                              // 就诊时用的就诊卡ID

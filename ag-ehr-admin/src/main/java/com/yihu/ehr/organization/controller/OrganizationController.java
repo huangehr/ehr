@@ -1,5 +1,6 @@
 package com.yihu.ehr.organization.controller;
 
+import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.adapter.service.PlanClient;
@@ -72,6 +73,9 @@ public class OrganizationController extends BaseController {
     @Autowired
     private TemplateClient templateClient;
 
+    @Autowired
+    private FileResourceClient fileResourceClient;
+
     @RequestMapping(value = "/organizations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询机构列表")
     public Envelop searchOrgs(
@@ -84,8 +88,23 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) {
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "province", value = "省", defaultValue = "")
+            @RequestParam(value = "province",required=false) String province,
+            @ApiParam(name = "city", value = "市", defaultValue = "")
+            @RequestParam(value = "city",required=false) String city,
+            @ApiParam(name = "district", value = "县", defaultValue = "")
+            @RequestParam(value = "district",required=false) String district) {
         try {
+            String address = "";
+            if(StringUtils.isNotBlank(province)){
+              List<String> addressList = addressClient.search(province, city, district);
+                String[] addrIdsArrays = addressList.toArray(new String[addressList.size()]);
+                address = String.join(",", addrIdsArrays);
+            }
+            if(StringUtils.isNotBlank(address)){
+                filters = StringUtils.isNotBlank(filters)?(filters+";location="+address):"location="+address;
+            }
             List<OrgModel> orgModelList = new ArrayList<>();
             ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);
             List<MOrganization> organizations = responseEntity.getBody();
@@ -218,6 +237,11 @@ public class OrganizationController extends BaseController {
 
             if (!orgClient.deleteOrg(orgCode)) {
                 return failed("删除失败!");
+            }
+            try {
+               fileResourceClient.filesDelete(orgCode);
+            }catch (Exception e){
+                return success("数据删除成功！图片删除失败！");
             }
             return success(null);
         }
@@ -430,11 +454,15 @@ public class OrganizationController extends BaseController {
         org.setCreateDate(DateToString(mOrg.getCreateDate(), AgAdminConstants.DateTimeFormat));
 
         //获取机构类别字典值
-        MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
-        org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
+        if(StringUtils.isNotBlank(mOrg.getOrgType())){
+          MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
+          org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
+        }
         //获取接入方式字典字典值
-        MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
-        org.setSettledWayName(settledWayDict == null ? "" : settledWayDict.getValue());
+        if(StringUtils.isNotBlank(mOrg.getSettledWay())){
+            MConventionalDict settledWayDict = conDictEntryClient.getSettledWay(mOrg.getSettledWay());
+            org.setSettledWayName(settledWayDict == null ? "" : settledWayDict.getValue());
+        }
         //org.setTags(mOrg.getTags());
         //获取地址字典值明细
         MGeography addr = addressClient.getAddressById(mOrg.getLocation());

@@ -12,6 +12,7 @@ import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.patient.service.FamiliesClient;
 import com.yihu.ehr.patient.service.MembersClient;
 import com.yihu.ehr.patient.service.PatientClient;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -159,7 +160,8 @@ public class HomeRelationshipController extends BaseController {
             relationshipModel.setName(info==null?"0":info.getName());
         }
 
-        relationshipModel.setRelationTime(DateToString(mMembers.getCreateDate(), AgAdminConstants.DateFormat));
+//        relationshipModel.setRelationTime(DateToString(mMembers.getCreateDate(), AgAdminConstants.DateFormat));
+        relationshipModel.setRelationTime(DateTimeUtil.simpleDateTimeFormat(mMembers.getCreateDate()));
         //TODO：获取关系字典信息
 
 
@@ -176,7 +178,8 @@ public class HomeRelationshipController extends BaseController {
             MDemographicInfo info =patientClient.getPatient(mFamilies.getHouseholderIdCardNo());
             groupModel.setName(info==null?"0":info.getName());
         }
-        groupModel.setCreateTime(DateToString(mFamilies.getCreateDate(), AgAdminConstants.DateFormat));
+//        groupModel.setCreateTime(DateToString(mFamilies.getCreateDate(), AgAdminConstants.DateFormat));
+        groupModel.setCreateTime(DateTimeUtil.simpleDateTimeFormat(mFamilies.getCreateDate()));
         String filters="familyId="+mFamilies.getId()+";idCardNo="+idCardNo;
         List<MMembers> mMemberses = (List<MMembers>)membersClient.searchMembers("", filters, "", 15, 1).getBody();
         if(mMemberses!=null && mMemberses.size()>0)

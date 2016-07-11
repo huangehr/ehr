@@ -134,14 +134,14 @@ public class AdapterDictionaryController extends BaseController {
                 rsAdapterDictionaryModel= new RsAdapterDictionaryModel();
                 BeanUtils.copyProperties(mRsAdapterDictionary,rsAdapterDictionaryModel);
                      if(StringUtils.isNotBlank(rsAdapterDictionaryModel.getDictCode())){
-                    ResponseEntity<List<MRsDictionary>> responseEntitys = rsDictionaryClient.searchRsDictionaries("", "code=" + rsAdapterDictionaryModel.getDictCode(), "", 1, 1);
+                    ResponseEntity<List<MRsDictionary>> responseEntitys = rsDictionaryClient.searchRsDictionaries("", "code=" + rsAdapterDictionaryModel.getDictCode()+" g1", "", 1, 1);
                     List<MRsDictionary> mRsDictionaries = responseEntitys.getBody();
                     if(mRsDictionaries!=null&&mRsDictionaries.size()>0){
                         rsAdapterDictionaryModel.setDictName(mRsDictionaries.get(0).getName());
                     }
                 }
                 if(StringUtils.isNotBlank(rsAdapterDictionaryModel.getDictEntryCode())){
-                    ResponseEntity<List<MRsDictionaryEntry>> responseEntitys = dictionaryEntryClient.searchRsDictionaryEntries("", "dictCode=" + rsAdapterDictionaryModel.getDictCode() + ";code=" + rsAdapterDictionaryModel.getDictEntryCode(), "", 1, 1);
+                    ResponseEntity<List<MRsDictionaryEntry>> responseEntitys = dictionaryEntryClient.searchRsDictionaryEntries("", "dictCode=" + rsAdapterDictionaryModel.getDictCode() + " g1;code=" + rsAdapterDictionaryModel.getDictEntryCode(), "", 1, 1);
                     List<MRsDictionaryEntry> mRsDictionaryEntries = responseEntitys.getBody();
                     if(mRsDictionaryEntries!=null&&mRsDictionaryEntries.size()>0){
                         rsAdapterDictionaryModel.setDictEntryName(mRsDictionaryEntries.get(0).getName());

@@ -3,9 +3,11 @@ package com.yihu.ehr.specialdict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MHealthProblemDict;
-import com.yihu.ehr.specialdict.model.HealthProblemDict;
-import com.yihu.ehr.specialdict.model.Icd10HpRelation;
+import com.yihu.ehr.model.specialdict.MIcd10Dict;
+import com.yihu.ehr.model.specialdict.MIndicatorsDict;
+import com.yihu.ehr.specialdict.model.*;
 import com.yihu.ehr.specialdict.service.HealthProblemDictService;
 import com.yihu.ehr.specialdict.service.Icd10HpRelationService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -20,10 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
@@ -160,13 +159,52 @@ public class HealthProblemDictEndPoint extends EnvelopRestEndPoint {
         return hpDictService.isCodeExist(code);
     }
 
-    @RequestMapping(value = "/problemDict/code" , method = RequestMethod.GET)
+    @RequestMapping(value = "/dict/hp/{code}" , method = RequestMethod.GET)
     @ApiOperation(value = "根据字典代码获取健康问题字典")
     public MHealthProblemDict getHpDictByCode(
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code){
+            @ApiParam(name = "code", value = "code")
+            @PathVariable(value = "code") String code){
         HealthProblemDict healthProblemDict = hpDictService.findHpDictByCode(code);
         return convertToModel(healthProblemDict,MHealthProblemDict.class,null);
     }
 
+    @RequestMapping(value = "/dict/hp/{code}/drug" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据健康问题代码获取药品信息")
+    public Collection<MDrugDict> getDrugDictListByHpCode(
+            @ApiParam(name = "code", value = "code")
+            @PathVariable(value = "code") String code) throws Exception{
+        List<DrugDict> list = hpDictService.getDrugDictListByHpCode(code);
+        return convertToModels(list, new ArrayList<>(list.size()), MDrugDict.class,null);
+    }
+
+    @RequestMapping(value = "/dict/hp/{code}/indicators" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据健康问题代码获取指标信息")
+    public Collection<MIndicatorsDict> getIndicatorsByHpCode(
+            @ApiParam(name = "code", value = "code")
+            @PathVariable(value = "code") String code) throws Exception{
+        List<IndicatorsDict> list = hpDictService.getIndicatorsByHpCode(code);
+        return convertToModels(list, new ArrayList<>(list.size()), MIndicatorsDict.class,null);
+    }
+
+    @RequestMapping(value = "/dict/hp/{code}/icd10" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据健康问题代码获取ICD10代码列表")
+    public Collection<MIcd10Dict> getIcd10ByHpCode(
+            @ApiParam(name = "code", value = "code")
+            @PathVariable(value = "code") String code) throws Exception{
+        List<Icd10Dict> list = hpDictService.getIcd10ByHpCode(code);
+        return convertToModels(list, new ArrayList<>(list.size()), MIcd10Dict.class,null);
+    }
+
+    @RequestMapping(value = "/dict/hp//CacheIcd10byHpCode", method = RequestMethod.POST)
+    @ApiOperation(value = "缓存Icd10byHpCode")
+    public boolean CacheAddressDict( ){
+        return   hpDictService.CacheIcd10ByHpCode();
+    }
+
+    @RequestMapping(value = "/dict/hp//GetAddressDictCache/{code}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取缓存行政区划地址")
+    public String GetAddressDictCache(@ApiParam(name = "code", value = "code", defaultValue = "")
+                                      @PathVariable(value = "code") String code ){
+        return   hpDictService.GetIcd10ByHpCodeCache(code);
+    }
 }

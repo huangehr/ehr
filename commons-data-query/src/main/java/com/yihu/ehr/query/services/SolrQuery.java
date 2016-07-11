@@ -39,30 +39,30 @@ public class SolrQuery {
 		Object[] keywords = condition.getKeywords();
 		switch(operation){
 			case Operation.LIKE:
-				s = field+":*"+keyword+"*";
+				s = field+":*\""+keyword+"\"*";
 				break;
 			case Operation.LEFTLIKE:
-				s = field+":*"+keyword+"";
+				s = field+":*\""+keyword+"\"";
 				break;
 			case Operation.RIGHTLIKE:
-				s = field+":"+keyword+"*";
+				s = field+":\""+keyword+"\"*";
 				break;
 			case Operation.RANGE: {
-				if(keywords==null||keywords.length>=2)
+				if(keywords.length>=2)
 				{
-					s = field + ":[" + keywords[0] + " TO " + keywords[1] + "]";
+					s = field + ":[\"" + keywords[0] + "\" TO \"" + keywords[1] + "\"]";
 				}
 				break;
 			}
 			case Operation.NOTRANGE: {
-				if(keywords==null||keywords.length>=2)
+				if(keywords.length>=2)
 				{
-					s ="NOT "+ field + ":[" + keywords[0] + " TO " + keywords[1] + "]";
+					s ="NOT "+ field + ":[\"" + keywords[0] + "\" TO \"" + keywords[1] + "\"]";
 				}
 				break;
 			}
 			case Operation.NE: {
-				s ="NOT(" +field+":"+keyword+")";
+				s ="NOT(" +field+":\""+keyword+"\")";
 				break;
 			}
 			case Operation.IN:
@@ -74,16 +74,16 @@ public class SolrQuery {
 					{
 						if(in!=null&&in.length()>0)
 						{
-							in+=" OR " +field+":"+key;
+							in+=" OR " +field+":\""+key+"\"";
 						}
 						else
 						{
-							in = field+":"+key;
+							in = field+":\""+key+"\"";
 						}
 					}
 				}
 				else if(keyword!=null) {
-					in = field+":"+keyword;
+					in = field+":\""+keyword+"\"";
 				}
 				s = "( "+in+" )";
 				break;
@@ -97,42 +97,42 @@ public class SolrQuery {
 					{
 						if(in!=null&&in.length()>0)
 						{
-							in+=" OR " +field+":"+key;
+							in+=" OR " +field+":\""+key+"\"";
 						}
 						else
 						{
-							in = field+":"+key;
+							in = field+":\""+key+"\"";
 						}
 					}
 				}
 				else if(keyword!=null) {
-					in = field+":"+keyword;
+					in = field+":\""+keyword+"\"";
 				}
 				s = "NOT ("+in+")";
 				break;
 			}
 			case Operation.GT:
 			{
-				s = field+":{"+keyword+" TO *}";
+				s = field+":{\""+keyword+"\" TO *}";
 				break;
 			}
 			case Operation.GTE:
 			{
-				s = field+":["+keyword+" TO * ]";
+				s = field+":[\""+keyword+"\" TO * ]";
 				break;
 			}
 			case Operation.LT:
 			{
-				s = field+":"+"{* TO "+keyword+" }";
+				s = field+":"+"{* TO \""+keyword+"\" }";
 				break;
 			}
 			case Operation.LTE:
 			{
-				s = field+":"+"[* TO "+keyword+" ]";
+				s = field+":"+"[* TO \""+keyword+"\" ]";
 				break;
 			}
 			case Operation.EQ: {
-				s = field + ":" + keyword;
+				s = field + ":\"" + keyword+"\"";
 				break;
 			}
 			default:
@@ -148,10 +148,11 @@ public class SolrQuery {
 	public String conditionToString(List<QueryCondition> conditions)
 	{
 		String re ="";
+		String NOT="";
 		if(conditions!=null && conditions.size()>0)
 		{
 			for(QueryCondition condition:conditions){
-				if(!re.equals(""))
+				if(!re.equals("") || !NOT.equals(""))
 				{
 					switch (condition.getLogical())
 					{
@@ -159,21 +160,44 @@ public class SolrQuery {
 							re+=" AND ";
 							break;
 						case Logical.OR:
-							re+=" OR ";
+							re+=" OR  ";
 							break;
 						case Logical.NOT:
 							re+=" NOT ";
 							break;
 					}
+					if(conditionToString(condition).indexOf("NOT")==0){
+						if(NOT.equals("")){
+							NOT=" NOT("+conditionToString(condition).substring(3);
+							re = re.substring(0, re.length() - 5);
+						}
+						else {
+							NOT += re.substring(re.length() - 5) + conditionToString(condition).substring(3, conditionToString(condition).length());
+							re = re.substring(0, re.length() - 5);
+						}
+					}
+					else {
+						re += conditionToString(condition);
+						re = "(" + re + ")";
+					}
 				}
+				else {
+					re += conditionToString(condition);
+					if(conditionToString(condition).indexOf("NOT")==0){
+						NOT="NOT("+re.substring(3);
+						re="";
 
-				re += conditionToString(condition) +" ";
+					}
+				}
 			}
 		}
 		else {
 			re ="*:* ";
 		}
-		return re;
+		if(NOT.equals(""))
+			return re;
+		else
+			return re+NOT+")";
 	}
 
 	/******************************** Count方法 ******************************************************/

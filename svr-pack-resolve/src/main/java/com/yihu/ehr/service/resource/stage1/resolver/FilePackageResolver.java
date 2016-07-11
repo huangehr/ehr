@@ -102,10 +102,10 @@ public class FilePackageResolver extends PackageResolver {
                 Iterator<Map.Entry<String, JsonNode>> filedIterator = jsonRecord.fields();
                 while (filedIterator.hasNext()) {
                     Map.Entry<String, JsonNode> field = filedIterator.next();
-                    String metaData = translateMetaDataCode(profile.getCdaVersion(), dataSetCode, field.getKey());
+                    //String metaData = translateMetaDataCode(profile.getCdaVersion(), dataSetCode, field.getKey());
                     String value = field.getValue().asText();
-                    if(metaData!=null){
-                        record.putMetaData(metaData, value);
+                    if(field.getKey()!=null){
+                        record.putMetaData(field.getKey(), value);
                     }
                 }
 
@@ -140,17 +140,15 @@ public class FilePackageResolver extends PackageResolver {
                 String mine_type = file.get("mine_type").asText();
                 String url_scope = file.get("url_scope").asText();
                 String url = file.get("url").asText();
-                String report_name = file.get("report_name").asText();
-                String emr_id = file.get("url").asText();
+                String emr_id = file.get("emr_id").asText();
                 String emr_name = file.get("emr_name").asText();
 
                 OriginFile originFile = new OriginFile();
                 originFile.setMime(mine_type);
                 originFile.setExpireDate(expireDate);
                 originFile.setUrlScope(UrlScope.valueOf(Integer.parseInt(url_scope)));
-                originFile.setReportName(report_name);
                 originFile.setEmrId(emr_id);
-                originFile.setReportName(emr_name);
+                originFile.setEmrName(emr_name);
                 if(file.get("name")!=null){
                     String fileList[] = file.get("name").asText().split(";");
                     for (String fileName : fileList){

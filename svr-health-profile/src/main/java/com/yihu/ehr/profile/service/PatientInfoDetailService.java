@@ -10,14 +10,18 @@ import com.yihu.ehr.data.hbase.TableBundle;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import com.yihu.ehr.model.specialdict.MIndicatorsDict;
+import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
+import com.yihu.ehr.profile.feign.XDictClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.profile.feign.XTransformClient;
+import com.yihu.ehr.profile.model.MedicationStat;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +35,12 @@ public class PatientInfoDetailService {
     @Autowired
     XResourceClient resource;
 
-    //特殊字典信息服务
+    //字典信息服务
     @Autowired
-    CD10Service dictService;
+    XDictClient dictService;
 
-    //模板服务
     @Autowired
-    XTemplateRepository templateRepository;
+    MedicationStatService medicationStatService;
 
     @Autowired
     TemplateService templateService;
@@ -61,6 +64,12 @@ public class PatientInfoDetailService {
     @Autowired
     PrescriptionPersistService presPersistService;
 
+    /**
+     * fastDfs服务器地址
+     */
+    @Value("${fast-dfs.public-server}")
+    private String fastDfsUrl;
+
 
     String appId = "svr-health-profile";
 
@@ -72,7 +81,7 @@ public class PatientInfoDetailService {
     {
         String re = "";
         //获取相关门诊住院记录
-        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",1,1);
+        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}",null,null);
         if(main.getDetailModelList() != null && main.getDetailModelList().size() > 0)
         {
             //主表rowkey条件
@@ -96,18 +105,101 @@ public class PatientInfoDetailService {
     }
 
     /******************************* 用药信息 ***********************************************************/
+
     /*
-     * 常用药物
+     * 患者常用药（根据处方中次数）
      */
-    public List<Map<String, Object>> getMedicationStat(String demographicId, String hpId) throws Exception {
+    public List<Map<String, Object>> getMedicationUsed(String demographicId, String hpCode) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
-        //中药统计
-        Envelop result = resource.getResources(BasisConstant.medicationStat, appId, "{\"join\":\"demographic_id:" + demographicId + "\"}", null, null);
-        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
+        String rowkeys = getProfileIds(demographicId);
 
+        String xyQueryParams = "{\"q\":\""+rowkeys+"\"}";
+        String zyQueryParams = "{\"q\":\""+rowkeys+"\"}";
+        if(hpCode!=null && hpCode.length()>0)
+        {
+            List<MDrugDict> drugList = dictService.getDrugDictListByHpCode(hpCode);
+            if(drugList!=null && drugList.size()>0)
+            {
+                String drugQuery = "";
+                for(MDrugDict drug : drugList){
+                    //drug.getType()是否需要药品类型判断***************
+                    if(drugQuery.length()==0)
+                    {
+                        drugQuery = "{key}:"+drug.getName();
+                    }
+                    else{
+                        drugQuery += " OR {key}:"+drug.getName();
+                    }
+                }
+                xyQueryParams = "{\"q\":\""+rowkeys+" AND ("+ drugQuery.replace("{key}",BasisConstant.xymc) +")\"}";
+                zyQueryParams = "{\"q\":\""+rowkeys+" AND ("+ drugQuery.replace("{key}",BasisConstant.zymc) +")\"}";
+            }
         }
-        //西药统计
 
+        //西药统计
+        Envelop resultWestern = resource.getResources(BasisConstant.medicationWesternStat, appId, xyQueryParams.replace(" ","+"),null,null);
+        if(resultWestern.getDetailModelList()!=null && resultWestern.getDetailModelList().size()>0)
+        {
+            List<Map<String, Object>> list = resultWestern.getDetailModelList();
+            for(Map<String, Object> map:list)
+            {
+                Map<String, Object> item = new HashMap<>();
+                item.put("name",map.get(BasisConstant.xymc));
+                item.put("count",map.get("$count"));
+                re.add(item);
+            }
+        }
+        //中药统计
+        Envelop resultChinese = resource.getResources(BasisConstant.medicationChineseStat,appId,zyQueryParams.replace(" ","+"),null,null);
+        if(resultChinese.getDetailModelList()!=null && resultChinese.getDetailModelList().size()>0)
+        {
+            List<Map<String, Object>> list = resultChinese.getDetailModelList();
+            for(Map<String, Object> map:list)
+            {
+                Map<String, Object> item = new HashMap<>();
+                item.put("name",map.get(BasisConstant.zymc));
+                item.put("count",map.get("$count"));
+                re.add(item);
+            }
+        }
+
+        //自定义排序规则，进行排序
+        Collections.sort(re, new Comparator<Map<String, Object>>()
+        {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2)
+            {
+                Integer d1 = (Integer)o1.get("count");
+                Integer d2 = (Integer)o2.get("count");
+                return d1.compareTo(d2);
+            }
+        });
+        return re;
+    }
+
+
+    /*
+     * 患者用药清单（根据数量，近三个月/近六个月）
+     */
+    public List<MedicationStat> getMedicationStat(String demographicId, String hpCode) throws Exception {
+        List<MedicationStat> re = new ArrayList<>();
+        List<String> drugList = new ArrayList<>();
+        if(hpCode!=null && hpCode.length()>0)
+        {
+            List<MDrugDict> drugDictList = dictService.getDrugDictListByHpCode(hpCode);
+            if(drugDictList!=null && drugDictList.size()>0)
+            {
+                String drugQuery = "";
+                for(MDrugDict drug : drugDictList){
+                    drugList.add(drug.getName());
+                }
+            }
+            else{
+                return re;
+            }
+        }
+
+        re = medicationStatService.getMedicationStat(demographicId,drugList);
         return re;
     }
 
@@ -144,18 +236,12 @@ public class PatientInfoDetailService {
             }
             else{
                 queryParams = getProfileIds(demographicId);
-                if(("profile_id:(NOT *)").equals(demographicId) && demographicId!=null){
-                    Envelop envelop = new Envelop();
-                    envelop.setSuccessFlg(false);
-                    envelop.setErrorMsg("找不到此人相关记录");
-
-                    return envelop.getDetailModelList();
-                }
             }
         }
 
+        queryParams =  "{\"q\":\"" + queryParams + "\"}";
         //获取数据
-        Envelop result = resource.getResources(BasisConstant.medicationMaster, appId, "{\"q\":\"" + queryParams + "\"}", null, null);
+        Envelop result = resource.getResources(BasisConstant.medicationMaster, appId, queryParams.replace(" ","+"), null, null);
 
         return result.getDetailModelList();
     }
@@ -201,22 +287,38 @@ public class PatientInfoDetailService {
                 List<Map<String,Object>> mainList = mainPres.getDetailModelList();
                 //待入库处方笺数据列表
                 List<Map<String,String>> dataList = new ArrayList<Map<String,String>>();
+                //查询处方对应处方笺
+                Envelop presription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:"
+                        + profileId + "\"}",null,null);
+                //处方笺List
+                List<Map<String,Object>> presriptions = presription.getDetailModelList();
 
                 for(Map<String,Object> main : mainList)
                 {
-                    //查询处方对应处方笺
-                    Envelop presription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"EHR_000086:"
-                            + main.get("EHR_000086").toString() + "\"}",null,null);
+                    boolean existedFlag = false;
+                    Map<String,Object> currentPres = new HashMap<String,Object>();
 
                     //判断对应处方笺是否存在
-                    if(presription.getDetailModelList() != null && presription.getDetailModelList().size() > 0)
+                    if(presriptions != null)
+                    {
+                        for(Map<String,Object> map : presriptions)
+                        {
+                            if(map.containsKey("EHR_000086") && map.get("EHR_000086").toString().equals(main.get("EHR_000086").toString()))
+                            {
+                                existedFlag = true;
+                                currentPres = map;
+                            }
+                        }
+                    }
+
+                    //对应处方笺不存在则根据处方对应CDA数据生成处方笺图片
+                    if(!existedFlag)
                     {
                         //处方笺数据
                         Map<String,String> data = new HashMap<String,String>();
                         //处方笺不存在则生成保存
-                        String picPath = thridPrescriptionService.CDAToImage(profileId,mainEvent.get("org_code").toString(),mainEvent.get("cda_version").toString(),
-                                main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd ,800,600);
-
+                        String picPath = thridPrescriptionService.transformImage(profileId,mainEvent.get("org_code").toString(),mainEvent.get("cda_version").toString()
+                                ,main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd,main.get("EHR_001203").toString(),900,900);
                         //处方笺文件类型
                         data.put("EHR_001194","png");
                         //处方编码
@@ -226,32 +328,29 @@ public class PatientInfoDetailService {
 
                         dataList.add(data);
                     }
+                    else
+                    {
+                        returnMap.add(currentPres);
+                    }
                 }
 
                 //新生成的处方笺保存到HBASE
                 if(dataList.size() > 0)
                 {
-                    //查询已存在处方笺
-                    Envelop prescription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:" + profileId + "\"}",null,null);
-                    //已存在处方笺数
-                    int existed = 0;
-
-                    if(prescription.getDetailModelList() != null && prescription.getDetailModelList().size() > 0)
-                    {
-                        existed = prescription.getDetailModelList().size();
-                    }
                     //处方笺保存到HBASE
-                    presPersistService.savePrescription(profileId,dataList,existed);
+                    List<Map<String,Object>> savedDataList = presPersistService.savePrescription(profileId,dataList,returnMap.size());
+                    returnMap.addAll(savedDataList);
                 }
+            }
+        }
 
-                //查询处方笺
-                Envelop prescription = resource.getResources(BasisConstant.medicationPrescription,appId,"{\"q\":\"profile_id:" + profileId
-                        + (!StringUtils.isBlank(prescriptionNo) ? ("+AND+EHR_000086:" + prescriptionNo) : "")+ "\"}",null,null);
-
-                if(prescription.getDetailModelList() != null && prescription.getDetailModelList().size() > 0)
-                {
-                    returnMap = prescription.getDetailModelList();
-                }
+        //返回处方笺的图片完整地址
+        if(returnMap.size() > 0)
+        {
+            for(Map<String,Object> map : returnMap)
+            {
+                String fileUrl = fastDfsUrl+ "/" + map.get("EHR_001195").toString();
+                map.put("EHR_001195",fileUrl);
             }
         }
 
@@ -262,42 +361,42 @@ public class PatientInfoDetailService {
      * 患者中药处方（可分页）
      * 1.西药处方；2.中药处方
      */
-    public Envelop getMedicationList(String type, String demographicId, String hpId, String startTime, String endTime, Integer page, Integer size) throws Exception {
+    public Envelop getMedicationList(String type, String demographicId, String hpCode, String startTime, String endTime, Integer page, Integer size) throws Exception {
         String q = "";
-        String sj = BasisConstant.xysj;
-        String bm = BasisConstant.xybm;
+        String date = BasisConstant.xysj;
+        String name = BasisConstant.xymc;
         String resourceCode = BasisConstant.medicationWestern;
         if (type != null && type.equals("2")) //默认查询西药
         {
-            sj = BasisConstant.zysj;
-            bm = BasisConstant.zybm;
+            date = BasisConstant.zysj;
+            name = BasisConstant.zymc;
             resourceCode = BasisConstant.medicationChinese;
         }
 
         //时间范围
         if (startTime != null && startTime.length() > 0 && endTime != null && endTime.length() > 0) {
-            q = sj + ":[" + startTime + " TO " + endTime + "]";
+            q = date + ":[" + startTime + " TO " + endTime + "]";
         } else {
             if (startTime != null && startTime.length() > 0) {
-                q = sj + ":[" + startTime + " TO *]";
+                q = date + ":[" + startTime + " TO *]";
             } else if (endTime != null && endTime.length() > 0) {
-                q = sj + ":[* TO " + endTime + "]";
+                q = date + ":[* TO " + endTime + "]";
             }
         }
 
         //健康问题
-        if (hpId != null && hpId.length() > 0) {
+        if (hpCode != null && hpCode.length() > 0) {
             //健康问题->药品代码
-            List<MDrugDict> drugList = dictService.getDrugDictList(hpId);
+            List<MDrugDict> drugList = dictService.getDrugDictListByHpCode(hpCode);
             String ypQuery = "";
             if (drugList != null && drugList.size() > 0) {
                 //遍历药品列表
                 for (MDrugDict drug : drugList) {
                     String dictCode = drug.getCode();
                     if (ypQuery.length() > 0) {
-                        ypQuery += " OR " + bm + ":" + dictCode;
+                        ypQuery += " OR " + name + ":" + dictCode;
                     } else {
-                        ypQuery = bm + ":" + dictCode;
+                        ypQuery = name + ":" + dictCode;
                     }
                 }
             }
@@ -314,7 +413,7 @@ public class PatientInfoDetailService {
         //获取门诊住院记录
         String rowkeys="";
         if(demographicId!=null && demographicId!="")
-             rowkeys = getProfileIds(demographicId);
+            rowkeys = getProfileIds(demographicId);
         if(!("profile_id:(NOT *)").equals(rowkeys) && rowkeys!="")
         {
             if (q.length() > 0) {
@@ -334,102 +433,8 @@ public class PatientInfoDetailService {
         if(q=="")
             q="*:*";
         String queryParams =  "{\"q\":\"" + q + "\"}";
-        return resource.getResources(resourceCode, appId, queryParams, page, size);
+        return resource.getResources(resourceCode, appId, queryParams.replace(" ","+"), page, size);
     }
-
-
-
-
-    /*************************** 指标 **********************************************/
-    /**
-     * 检验指标（可分页）
-     */
-    public Envelop getHealthIndicators(String demographicId, String hpId, String medicalIndexId, String startTime, String endTime, Integer page, Integer size) throws Exception {
-        String q = "";
-        //时间范围
-        if (startTime != null && startTime.length() > 0 && endTime != null && endTime.length() > 0) {
-            q = BasisConstant.jysj + ":[" + startTime + " TO " + endTime + "]";
-        } else {
-            if (startTime != null && startTime.length() > 0) {
-                q = BasisConstant.jysj + ":[" + startTime + " TO *]";
-            } else if (endTime != null && endTime.length() > 0) {
-                q = BasisConstant.jysj + ":[* TO " + endTime + "]";
-            }
-        }
-
-        //指标ID不为空
-        if (medicalIndexId != null && medicalIndexId.length() > 0) {
-            if (q.length() > 0) {
-                q += " AND " + BasisConstant.jyzb + ":" + medicalIndexId;
-            } else {
-                q = BasisConstant.jyzb + ":" + medicalIndexId;
-            }
-        } else {
-            //健康问题
-            if (hpId != null && hpId.length() > 0) {
-                //健康问题->指标代码
-                List<MIndicatorsDict> indicatorsList = dictService.getIndicatorsDictList(hpId);
-                String jyzbQuery = "";
-                if (indicatorsList != null && indicatorsList.size() > 0) {
-                    //遍历指标列表
-                    for (MIndicatorsDict indicators : indicatorsList) {
-                        if (jyzbQuery.length() > 0) {
-                            jyzbQuery += " OR " + BasisConstant.jyzb + ":" + indicators.getCode();
-                        } else {
-                            jyzbQuery = BasisConstant.jyzb + ":" + indicators.getCode();
-                        }
-                    }
-                }
-
-                if (jyzbQuery.length() > 0) {
-                    if (q.length() > 0) {
-                        q += " AND (" + jyzbQuery + ")";
-                    } else {
-                        q = "(" + jyzbQuery + ")";
-                    }
-                }
-            }
-        }
-
-        //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
-
-        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
-            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
-            StringBuilder rowkeys = new StringBuilder();
-
-            for (Map<String, Object> event : eventList) {
-                if (rowkeys.length() > 0) {
-                    rowkeys.append(" OR ");
-                }
-                rowkeys.append("profile_id:" + event.get("rowkey"));
-            }
-
-            if(rowkeys.length() > 0)
-            {
-                if (q.length() > 0) {
-                    q += " AND (" + rowkeys.toString() + ")";
-                } else {
-                    q = "(" + rowkeys.toString() + ")";
-                }
-            }
-        }
-        else
-        {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("找不到此人相关记录");
-
-            return envelop;
-        }
-
-        String queryParams = "{\"q\":\"" + q + "\"}";//"{\"join\":\"demographic_id:" + demographicId + "\"}";
-        //        if (q.length() > 0) {
-        //            queryParams = "{\"join\":\"demographic_id:" + demographicId + "\",\"q\":\"" + q + "\"}";
-        //        }
-        return resource.getResources(BasisConstant.laboratoryReport, appId, queryParams, page, size);
-    }
-
 
 
     /*************************  分页查细表数据，简单公用方法 *************************************************/
@@ -471,6 +476,6 @@ public class PatientInfoDetailService {
                 queryParams = getProfileIds(demographicId);
             }
         }
-        return resource.getResources(resourceCode, appId, "{\"q\":\""+queryParams+"\"}", page, size);
+        return resource.getResources(resourceCode, appId, "{\"q\":\""+queryParams.replace(' ','+')+"\"}", page, size);
     }
 }

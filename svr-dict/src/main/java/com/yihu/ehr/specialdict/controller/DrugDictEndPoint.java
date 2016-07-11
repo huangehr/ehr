@@ -48,7 +48,7 @@ public class DrugDictEndPoint extends EnvelopRestEndPoint {
         return convertToModel(drugDict, MDrugDict.class, null);
     }
 
-    @RequestMapping(value = "dict/drug/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "、dict/drug/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "根据id删除药品字典")
     public boolean deleteDrugDict(
             @ApiParam(name = "id", value = "药品字典代码")

@@ -2,6 +2,7 @@ package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
+import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +75,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
      * @param cdaType
      * @return
      */
-    public Map<Template, MCDADocument> getOrganizationTemplates(String orgCode, String cdaVersion, String cdaType) throws Exception{
+    public Map<Template, MCDADocument> getOrganizationTemplates(String orgCode, String cdaVersion, String cdaType){
         List<Template> templates = getRepo().findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
         List<String> cdaDocumentIdList = new ArrayList<>(templates.size());
         cdaDocumentIdList.addAll(templates.stream().map(template -> template.getCdaDocumentId()).collect(Collectors.toList()));

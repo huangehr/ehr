@@ -7,8 +7,11 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.patient.MArApply;
+import com.yihu.ehr.model.patient.MArRelation;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.patient.service.ArApplyClient;
+import com.yihu.ehr.patient.service.ArRelationClient;
+import com.yihu.ehr.patient.service.XResourceClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.utils.FeignExceptionUtils;
@@ -34,13 +37,17 @@ import java.util.Map;
 @RestController
 @Api(protocols = "https", value = "archive_apply", description = "档案申请" , tags = {"档案申请"})
 public class ArApplyController extends ExtendController<ArApplyModel> {
-
+    String appId = "ag-admin";
     @Autowired
     ArApplyClient arApplyClient;
+    @Autowired
+    ArRelationClient arRelationClient;
     @Autowired
     SystemDictClient systemDictClient;
     @Autowired
     OrganizationClient organizationClient;
+    @Autowired
+    XResourceClient resource; //资源服务
 
     @RequestMapping(value = ServiceApi.Patients.ArApplications, method = RequestMethod.GET)
     @ApiOperation(value = "档案关联申请列表")
@@ -82,10 +89,10 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
             @RequestParam("model") String model) {
 
         try {
-            MArApply arApply = toEntity(model, MArApply.class);
+            ArApplyModel arApplyModel = toEntity(model, ArApplyModel.class);
+            MArApply arApply = convertToMModel(arApplyModel, MArApply.class);
             if(arApply.getId()==0)
                 return failed("编号不能为空");
-
             return success(convertModel(arApplyClient.update(arApply)));
         }catch (Exception e){
             e.printStackTrace();
@@ -139,9 +146,19 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
         try {
             MArApply arApply = arApplyClient.getInfo(id);
             Envelop envelop = success(getModel(arApply));
+            String f = "";
+            if(!StringUtils.isEmpty(arApply.getIdCard()))
+                f += "demographic_id:" + arApply.getIdCard();
 
-            //todo 通过申请的信息检索档案列表， 将检索出的信息放在DetailModelList中
-//            envelop.setDetailModelList();
+            if(!StringUtils.isEmpty(arApply.getVisDate()))
+                f += ("".equals(f)? "" : "+AND+") + "event_date:["+ arApply.getVisDate().replace("~", "+TO+") +"]" ;
+
+            if(!StringUtils.isEmpty(arApply.getVisOrg()))
+                f += ("".equals(f)? "" : "+AND+") + "org_code:"+ arApply.getVisOrg() +"" ;
+
+            envelop.setDetailModelList(
+                    getArchiveInfos(resource.getResources("RS_PATIENT_INFO", appId, "{\"q\":\"" + f + "\"}", null, null))
+            );
             return envelop;
         }catch (Exception e){
             e.printStackTrace();
@@ -158,9 +175,16 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
         try {
             MArApply arApply = arApplyClient.getInfo(id);
             Envelop envelop = success(getModel(arApply));
-
-            //todo 通过申请id获取关联的档案编号， 取得档案信息， 将信息放到DetailModelList中
-//            envelop.setDetailModelList();
+            List<MArRelation> relations = arRelationClient.search("", "arApplyId="+ arApply.getId() +";", "", 1, 1).getBody();
+            if(relations==null || relations.size()==0)
+                failed("不存在档案关联信息");
+            MArRelation relation = relations.get(0);
+            if(StringUtils.isEmpty(relation.getArchiveId()))
+                failed("档案关联信息丢失");
+            String f = "rowkey:" + relation.getArchiveId().replace(" ","+");
+            envelop.setDetailModelList(
+                    getArchiveInfos(resource.getResources("RS_PATIENT_INFO", appId, "{\"q\":\"" + f + "\"}", null, null))
+            );
             return envelop;
         }catch (Exception e){
             e.printStackTrace();
@@ -168,8 +192,102 @@ public class ArApplyController extends ExtendController<ArApplyModel> {
         }
     }
 
+    private List getArchiveInfos(Envelop main) throws Exception
+    {
+        String re = "";
+        Map<String, ArApplyModel> arApplyModels = new HashMap<>();
+        List<ArApplyModel> ls = new ArrayList<>();
+        if(main.getDetailModelList() != null && main.getDetailModelList().size() > 0)
+        {
+            //主表rowkey条件
+            StringBuilder rowkeys = new StringBuilder();
+            ArApplyModel arApplyModel;
+            for(Map<String,Object> map : (List<Map<String,Object>>)main.getDetailModelList())
+            {
+                arApplyModel = new ArApplyModel();
+                arApplyModel.setVisOrg(String.valueOf(map.get("org_code")));
+                arApplyModel.setVisOrgName(String.valueOf(map.get("org_name")));
+                arApplyModel.setVisDate(String.valueOf(map.get("event_date")));
+                arApplyModel.setCardNo(String.valueOf(map.get("card_no")));
+                arApplyModels.put(map.get("rowkey").toString(), arApplyModel);
+                ls.add(arApplyModel);
+                if(rowkeys.length() > 0)
+                {
+                    rowkeys.append(" OR ");
+                }
+                rowkeys.append("profile_id:" + map.get("rowkey").toString());
+            }
 
+            re = "(" + rowkeys.toString() +")";
+            re =  "{\"q\":\""+ re.replace(" ","+") +"\"}" ;
+            if(re!=null){
+                //门诊诊断  无数据
+                Envelop tmp = resource.getResources("RS_OUTPATIENT_DIAGNOSIS", appId, re, null, null);
+                if(tmp.getDetailModelList()!=null && tmp.getDetailModelList().size()>0){
+                    for(Map<String,Object> map : (List<Map<String,Object>>)tmp.getDetailModelList()) {
+                        if((arApplyModel = arApplyModels.get(map.get("profile_id"))) != null){
+                            arApplyModel.setDiagnosedResult(
+                                    (StringUtils.isEmpty(arApplyModel.getDiagnosedResult()) ? "" : ",") + map.get("EHR_000112") );
+                            arApplyModel.setVisDoctor(String.valueOf(map.get("EHR_000106")));
+                        }
+                    }
+                }
+                //住院诊断
+                tmp = resource.getResources("RS_HOSPITALIZED_DIAGNOSIS", appId, re, null, null);
+                if(tmp.getDetailModelList()!=null && tmp.getDetailModelList().size()>0){
+                    for(Map<String,Object> map : (List<Map<String,Object>>)tmp.getDetailModelList()) {
+                        if((arApplyModel = arApplyModels.get(map.get("profile_id"))) != null){
+                            arApplyModel.setDiagnosedResult(
+                                    (StringUtils.isEmpty(arApplyModel.getDiagnosedResult()) ? "" : ",") + map.get("EHR_000295") );
+                            arApplyModel.setVisDoctor(String.valueOf(map.get("EHR_000290")));
+                        }
+                    }
+                }
+                //检验报告单
+                tmp = resource.getResources("RS_LABORATORY_REPORT", appId, re, null, null);
+                if(tmp.getDetailModelList()!=null && tmp.getDetailModelList().size()>0){
+                    for(Map<String,Object> map : (List<Map<String,Object>>)tmp.getDetailModelList()) {
+                        if((arApplyModel = arApplyModels.get(map.get("profile_id"))) != null){
+                            arApplyModel.setDiagnosedResult(
+                                    (StringUtils.isEmpty(arApplyModel.getDiagnosedResult()) ? "" : ",") + map.get("EHR_000352") );
+                        }
+                    }
+                }
+                //检查报告单
+                tmp = resource.getResources("RS_EXAMINATION_REPORT", appId, re, null, null);
+                if(tmp.getDetailModelList()!=null && tmp.getDetailModelList().size()>0){
+                    for(Map<String,Object> map : (List<Map<String,Object>>)tmp.getDetailModelList()) {
+                        if((arApplyModel = arApplyModels.get(map.get("profile_id"))) != null){
+                            arApplyModel.setDiagnosedResult(
+                                    (StringUtils.isEmpty(arApplyModel.getDiagnosedResult()) ? "" : ",") + map.get("EHR_000317") );
+                        }
+                    }
+                }
+                //诊断开药： 西药
+                tmp = resource.getResources("medicationWestern", appId, re, null, null);
+                if(tmp.getDetailModelList()!=null && tmp.getDetailModelList().size()>0){
+                    for(Map<String,Object> map : (List<Map<String,Object>>)tmp.getDetailModelList()) {
+                        if((arApplyModel = arApplyModels.get(map.get("profile_id"))) != null){
+                            arApplyModel.setMedicines(
+                                    (StringUtils.isEmpty(arApplyModel.getMedicines()) ? "" : ",") + map.get("EHR_000100") );
+                        }
+                    }
+                }
 
+                //诊断开药： 中药
+                tmp = resource.getResources("RS_MEDICATION_CHINESE", appId, re, null, null);
+                if(tmp.getDetailModelList()!=null && tmp.getDetailModelList().size()>0){
+                    for(Map<String,Object> map : (List<Map<String,Object>>)tmp.getDetailModelList()) {
+                        if((arApplyModel = arApplyModels.get(map.get("profile_id"))) != null){
+                            arApplyModel.setMedicines(
+                                    (StringUtils.isEmpty(arApplyModel.getMedicines()) ? "" : ",") + map.get("EHR_000131"));
+                        }
+                    }
+                }
+            }
+        }
+        return ls;
+    }
 
     private ArApplyModel convertModel(MArApply arApply){
         ArApplyModel model = getModel(arApply);

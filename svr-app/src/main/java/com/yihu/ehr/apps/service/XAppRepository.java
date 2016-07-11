@@ -1,7 +1,7 @@
 package com.yihu.ehr.apps.service;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import com.yihu.ehr.apps.model.App;
 import java.util.List;
 
 /**

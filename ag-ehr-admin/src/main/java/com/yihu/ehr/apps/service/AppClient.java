@@ -77,4 +77,10 @@ public interface AppClient {
             @ApiParam(value = "app_name")
             @PathVariable(value = "app_name") String appName);
 
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.FilterList, method = RequestMethod.GET)
+    @ApiOperation(value = "存在性校验")
+    boolean isExitApp(
+            @ApiParam(name = "filters", value = "filters", defaultValue = "")
+            @RequestParam(value = "filters") String filters);
+
 }
