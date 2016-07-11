@@ -7,7 +7,9 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.users.service.RoleFeatureRelationClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,6 +39,9 @@ public class AppFeatureController extends BaseController {
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
 
+    @Autowired
+    private RoleFeatureRelationClient roleFeatureRelationClient;
+
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppFeature列表")
     public Envelop getAppFeatures(
@@ -48,14 +54,15 @@ public class AppFeatureController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page){
+            @RequestParam(value = "page", required = false) int page,@RequestParam(value = "roleId", required = false) String roleId){
         ResponseEntity<List<MAppFeature>> responseEntity =  appFeatureClient.getAppFeatures(fields, filters, sort, size, page);
         List<MAppFeature> mAppFeatureList = responseEntity.getBody();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
         for(MAppFeature mAppFeature: mAppFeatureList){
             AppFeatureModel appFeatureModel  = new AppFeatureModel();
             BeanUtils.copyProperties(mAppFeature,appFeatureModel);
-            createDictName(appFeatureModel);
+            appFeatureModel.setRoleId(roleId);
+            converModelName(appFeatureModel);
             appFeatureModels.add(appFeatureModel);
         }
         Integer totalCount = getTotalCount(responseEntity);
@@ -77,7 +84,7 @@ public class AppFeatureController extends BaseController {
         }
         AppFeatureModel appFeatureModel = new AppFeatureModel();
         BeanUtils.copyProperties(mAppFeature,appFeatureModel);
-        createDictName(appFeatureModel);
+        converModelName(appFeatureModel);
         envelop.setSuccessFlg(true);
         envelop.setObj(appFeatureModel);
         return envelop;
@@ -116,7 +123,7 @@ public class AppFeatureController extends BaseController {
             return envelop;
         }
         BeanUtils.copyProperties(mAppFeature,appFeatureModel);
-        createDictName(appFeatureModel);
+        converModelName(appFeatureModel);
         envelop.setSuccessFlg(true);
         envelop.setObj(appFeatureModel);
         return envelop;
@@ -153,7 +160,7 @@ public class AppFeatureController extends BaseController {
      * 格式化字典数据
      * @param appFeatureModel
      */
-    private void createDictName(AppFeatureModel appFeatureModel){
+    private void converModelName(AppFeatureModel appFeatureModel){
         //应用菜单类型
         if(!StringUtils.isEmpty(appFeatureModel.getType())){
             MConventionalDict catalopDict = conDictEntryClient.getApplicationMenuType(appFeatureModel.getType());
@@ -168,6 +175,14 @@ public class AppFeatureController extends BaseController {
         if(!StringUtils.isEmpty(appFeatureModel.getOpenLevel())){
             MConventionalDict catalopDict = conDictEntryClient.getOpenLevel(appFeatureModel.getOpenLevel());
             appFeatureModel.setOpenLevelName(catalopDict == null ? "" : catalopDict.getValue());
+        }
+        //是否已经被角色组适配，界面适配用
+        if(!StringUtils.isEmpty(appFeatureModel.getRoleId())){
+            ResponseEntity<Collection<MRoleFeatureRelation>> responseEntity =   roleFeatureRelationClient.searchRoleFeature("", "roleId=" + appFeatureModel.getRoleId() + ";featureId=" + appFeatureModel.getId(), "", 1, 1);
+            Collection<MRoleFeatureRelation> mRoleFeatureRelations = responseEntity.getBody();
+            if(mRoleFeatureRelations!=null&&mRoleFeatureRelations.size()>0){
+                appFeatureModel.setIschecked(true);
+            }
         }
     }
 
