@@ -34,6 +34,25 @@ public class AppDetailModel {
 
     private String sourceTypeName;
 
+    private String role;
+    private String roleJson;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getRoleJson() {
+        return roleJson;
+    }
+
+    public void setRoleJson(String roleJson) {
+        this.roleJson = roleJson;
+    }
+
     public String getSourceTypeName() {
         return sourceTypeName;
     }
