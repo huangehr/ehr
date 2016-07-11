@@ -227,4 +227,145 @@ public interface ConventionalDictEntryClient {
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
 
+    @RequestMapping(value = "/dictionaries/archives_audit_status", method = RequestMethod.GET)
+    @ApiOperation(value = "档案关联审批状态", response = MConventionalDict.class)
+    public MConventionalDict getArchivesAuditStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/archives_audit_status_list", method = RequestMethod.GET)
+    @ApiOperation(value = "档案关联审批状态", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getArchivesAuditStatusList();
+
+    @RequestMapping(value = "/dictionaries/archives_manage_status", method = RequestMethod.GET)
+    @ApiOperation(value = "档案管理状态", response = MConventionalDict.class)
+    public MConventionalDict getArchivesManageStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/archives_manage_status_list", method = RequestMethod.GET)
+    @ApiOperation(value = "档案管理状态", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getArchivesManageStatusList();
+
+    @RequestMapping(value = "/dictionaries/application_source", method = RequestMethod.GET)
+    @ApiOperation(value = "应用来源", response = MConventionalDict.class)
+    public MConventionalDict getApplicationSource(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/application_source_list", method = RequestMethod.GET)
+    @ApiOperation(value = "应用来源", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getApplicationSourceList();
+
+    @RequestMapping(value = "/dictionaries/application_menu_type", method = RequestMethod.GET)
+    @ApiOperation(value = "应用菜单类型", response = MConventionalDict.class)
+    public MConventionalDict getApplicationMenuType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/application_menu_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "应用菜单类型", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getApplicationMenuTypeList();
+
+
+    @RequestMapping(value = "/dictionaries/open_level", method = RequestMethod.GET)
+    @ApiOperation(value = "开放等级", response = MConventionalDict.class)
+    public MConventionalDict getOpenLevel(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/open_level_list", method = RequestMethod.GET)
+    @ApiOperation(value = "开放等级", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getOpenLevelList();
+
+    @RequestMapping(value = "/dictionaries/audit_level", method = RequestMethod.GET)
+    @ApiOperation(value = "审计等级", response = MConventionalDict.class)
+    public MConventionalDict getAuditLevel(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/audit_level_list", method = RequestMethod.GET)
+    @ApiOperation(value = "审计等级", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getAuditLevelList();
+
+    @RequestMapping(value = "/dictionaries/role_type", method = RequestMethod.GET)
+    @ApiOperation(value = "角色组分类", response = MConventionalDict.class)
+    public MConventionalDict getRoleType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/role_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "角色组分类", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getRoleTypeList();
+
+
+    @RequestMapping(value = "/dictionaries/valid_identification", method = RequestMethod.GET)
+    @ApiOperation(value = "有效标识", response = MConventionalDict.class)
+    public MConventionalDict getValidIdentification(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/valid_identification_list", method = RequestMethod.GET)
+    @ApiOperation(value = "有效标识", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getValidIdentificationList();
+
+    @RequestMapping(value = "/dictionaries/api_protocol", method = RequestMethod.GET)
+    @ApiOperation(value = "API协议", response = MConventionalDict.class)
+    public MConventionalDict getApiProtocol(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/api_protocol_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API协议", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getApiProtocolList();
+
+    @RequestMapping(value = "/dictionaries/api_method", method = RequestMethod.GET)
+    @ApiOperation(value = "API方法", response = MConventionalDict.class)
+    public MConventionalDict getApiMethod(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/api_method_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API方法", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getApiMethodList();
+
+    @RequestMapping(value = "/dictionaries/api_type", method = RequestMethod.GET)
+    @ApiOperation(value = "API类型", response = MConventionalDict.class)
+    public MConventionalDict getApiType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/api_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "字典代码", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getApiTypeList();
+
+    @RequestMapping(value = "/dictionaries/api_parameter_type", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数类型", response = MConventionalDict.class)
+    public MConventionalDict getApiParameterType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/api_parameter_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数类型", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getApiParameterTypeList();
+
+    @RequestMapping(value = "/dictionaries/api_parameter_data_type", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数数据类型", response = MConventionalDict.class)
+    public MConventionalDict getApiParameterDataType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/api_parameter_data_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数数据类型", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getApiParameterDataTypeList();
+
+    @RequestMapping(value = "/dictionaries/api_parameter_data_required", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数必输标识", response = MConventionalDict.class)
+    public MConventionalDict getApiParameterDataRequired(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/api_parameter_data_required_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数必输标识", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getApiParameterDataRequiredList();
 }

@@ -1,5 +1,5 @@
 server:
-  port: 1443
+  port: ${ag-ehr-cloud.server.port}
 
 management:
   port: ${server.port}
