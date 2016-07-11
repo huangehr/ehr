@@ -1,10 +1,5 @@
 server:
   port: ${ag-admin.server.port}
-  maxPostSize: 50000000
-multipart:
-  maxFileSize: 50Mb
-  maxRequestSize: 50Mb
-
 
 management:
   port: ${server.port}
