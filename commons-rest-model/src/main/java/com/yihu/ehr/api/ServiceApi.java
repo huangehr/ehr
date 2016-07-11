@@ -47,6 +47,7 @@ public class ServiceApi {
         public static final String ResourcesQuery = "/resources/query"; //资源查询接口
         public static final String ResourcesQueryTransform = "/resources/query/transform"; //资源查询接口+转译
         public static final String ResourcesRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
+        public static final String ResourcesRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
         public static final String ResourcesMasterData = "/resources/query/master_data"; //主表资源查询接口
         public static final String ResourcesSubData = "/resources/query/sub_data"; //细表资源查询接口
         public static final String getCDAData = "/resources/query/getCDAData";//获取cda data
@@ -327,11 +328,13 @@ public class ServiceApi {
 
         public static final String Documents                        = "/std/documents";
         public static final String Document                         = "/std/documents/{id}";
+        public static final String DocumentList                        = "/std/documentsList";
         public static final String DocumentFileExistence            = "/std/documents/{id}/file/existence";
         public static final String DocumentCreateFile               = "/std/documents/{id}/file/create";
         public static final String DocumentGetFile                  = "/std/documents/{id}/file";
 
         public static final String DocumentDataSet                  = "/std/documents/data_set";
+        public static final String DocumentDataSetList                  = "/std/documents/data_set_list";
         public static final String DataSetRelationships             = "/std/documents/data_set_relationships";
         public static final String DataSetRelationship              = "/std/documents/data_set_relationships/{id}";
 
