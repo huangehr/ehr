@@ -415,7 +415,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/application_source", method = RequestMethod.GET)
     @ApiOperation(value = "应用来源", response = MConventionalDict.class)
     public MConventionalDict getApplicationSource(
-            @ApiParam(name = "code", value = "应用来源", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(38, code);
         return getDictModel(drugFlag);
@@ -431,7 +431,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/application_menu_type", method = RequestMethod.GET)
     @ApiOperation(value = "应用菜单类型", response = MConventionalDict.class)
     public MConventionalDict getApplicationMenuType(
-            @ApiParam(name = "code", value = "应用来源", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(39, code);
         return getDictModel(drugFlag);
@@ -448,7 +448,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/open_level", method = RequestMethod.GET)
     @ApiOperation(value = "开放等级", response = MConventionalDict.class)
     public MConventionalDict getOpenLevel(
-            @ApiParam(name = "code", value = "开放等级", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(40, code);
         return getDictModel(drugFlag);
@@ -464,7 +464,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/audit_level", method = RequestMethod.GET)
     @ApiOperation(value = "审计等级", response = MConventionalDict.class)
     public MConventionalDict getAuditLevel(
-            @ApiParam(name = "code", value = "审计等级", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(41, code);
         return getDictModel(drugFlag);
@@ -480,7 +480,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/role_type", method = RequestMethod.GET)
     @ApiOperation(value = "角色组分类", response = MConventionalDict.class)
     public MConventionalDict getRoleType(
-            @ApiParam(name = "code", value = "角色组分类", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(42, code);
         return getDictModel(drugFlag);
@@ -497,7 +497,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/valid_identification", method = RequestMethod.GET)
     @ApiOperation(value = "有效标识", response = MConventionalDict.class)
     public MConventionalDict getValidIdentification(
-            @ApiParam(name = "code", value = "有效标识", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(43, code);
         return getDictModel(drugFlag);
@@ -513,7 +513,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/api_protocol", method = RequestMethod.GET)
     @ApiOperation(value = "API协议", response = MConventionalDict.class)
     public MConventionalDict getApiProtocol(
-            @ApiParam(name = "code", value = "API协议", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(44, code);
         return getDictModel(drugFlag);
@@ -529,7 +529,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/api_method", method = RequestMethod.GET)
     @ApiOperation(value = "API方法", response = MConventionalDict.class)
     public MConventionalDict getApiMethod(
-            @ApiParam(name = "code", value = "API方法", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(45, code);
         return getDictModel(drugFlag);
@@ -545,7 +545,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/api_type", method = RequestMethod.GET)
     @ApiOperation(value = "API类型", response = MConventionalDict.class)
     public MConventionalDict getApiType(
-            @ApiParam(name = "code", value = "API类型", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(46, code);
         return getDictModel(drugFlag);
@@ -561,7 +561,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/api_parameter_type", method = RequestMethod.GET)
     @ApiOperation(value = "API参数类型", response = MConventionalDict.class)
     public MConventionalDict getApiParameterType(
-            @ApiParam(name = "code", value = "API参数类型", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(47, code);
         return getDictModel(drugFlag);
@@ -577,7 +577,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/api_parameter_data_type", method = RequestMethod.GET)
     @ApiOperation(value = "API参数数据类型", response = MConventionalDict.class)
     public MConventionalDict getApiParameterDataType(
-            @ApiParam(name = "code", value = "API参数数据类型", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(48, code);
         return getDictModel(drugFlag);
@@ -593,7 +593,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/dictionaries/api_parameter_data_required", method = RequestMethod.GET)
     @ApiOperation(value = "API参数必输标识", response = MConventionalDict.class)
     public MConventionalDict getApiParameterDataRequired(
-            @ApiParam(name = "code", value = "API参数必输标识", defaultValue = "")
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
         SystemDictEntry drugFlag = dictEntryService.getDictEntry(49, code);
         return getDictModel(drugFlag);
