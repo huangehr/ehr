@@ -288,7 +288,7 @@ public class AppController extends BaseController {
         return mApp;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/apps/filterList", method = RequestMethod.GET)
+    @RequestMapping(value = "/apps/filterList", method = RequestMethod.GET)
     @ApiOperation(value = "存在性校验")
     Envelop isExitAppFeature(
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
