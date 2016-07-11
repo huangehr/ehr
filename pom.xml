@@ -6,9 +6,6 @@
     <groupId>com.yihu.ehr</groupId>
     <artifactId>ehr-cloud</artifactId>
     <version>1.1.0</version>
-    <modules>
-        <module>svr-archive-security</module>
-    </modules>
     <packaging>pom</packaging>
     <name>ehr-cloud</name>
     <description>EHR parent pom for all</description>
