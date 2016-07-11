@@ -156,6 +156,22 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取过滤App列表")
+    public Envelop getAppFeatureNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters){
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage(filters);
+        Envelop envelop = new Envelop();
+        List<AppFeatureModel> appFeatureModels = new ArrayList<>();
+        for(MAppFeature mAppFeature: mAppFeatures ){
+            AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
+            appFeatureModels.add(appFeatureModel);
+        }
+        envelop.setDetailModelList(appFeatureModels);
+        return envelop;
+    }
+
     /**
      * 格式化字典数据
      * @param appFeatureModel
