@@ -269,6 +269,9 @@ public class AppController extends BaseController {
             MOrganization organization = organizationClient.getOrg(mApp.getOrg());
             app.setOrgName(organization == null ? "" : organization.getFullName());
         }
+
+        MConventionalDict statusDict = conDictEntryClient.getApplicationSource(mApp.getStatus());
+        app.setSourceTypeName(statusDict == null ? "" : statusDict.getValue());
         return app;
     }
 
