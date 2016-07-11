@@ -30,7 +30,7 @@ public class AppApiController extends BaseController {
     @Autowired
     AppApiClient AppApiClient;
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
     public Envelop getAppApis(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -56,7 +56,7 @@ public class AppApiController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApis, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.POST)
     @ApiOperation(value = "创建AppApi")
     public Envelop createAppApi(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
@@ -75,7 +75,7 @@ public class AppApiController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApi, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppApi.AppApi, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi")
     public Envelop getAppApi(
             @ApiParam(name = "id", value = "id", defaultValue = "")
@@ -94,7 +94,7 @@ public class AppApiController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApis, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.PUT)
     @ApiOperation(value = "更新AppApi")
     public Envelop updateAppApi(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
@@ -113,7 +113,7 @@ public class AppApiController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApi, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.AppApi.AppApi, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除AppApi")
     Envelop deleteAppApi(
             @ApiParam(name = "id", value = "id", defaultValue = "")

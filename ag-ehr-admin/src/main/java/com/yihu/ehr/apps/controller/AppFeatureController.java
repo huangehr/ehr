@@ -70,7 +70,7 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.POST)
     @ApiOperation(value = "创建AppFeature")
     public Envelop createAppFeature(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
@@ -109,7 +109,7 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.PUT)
     @ApiOperation(value = "更新AppFeature")
     public Envelop updateAppFeature(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
@@ -153,6 +153,22 @@ public class AppFeatureController extends BaseController {
         }catch (Exception e){
          envelop.setSuccessFlg(false);
         }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取过滤App列表")
+    public Envelop getAppFeatureNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters){
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage(filters);
+        Envelop envelop = new Envelop();
+        List<AppFeatureModel> appFeatureModels = new ArrayList<>();
+        for(MAppFeature mAppFeature: mAppFeatures ){
+            AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
+            appFeatureModels.add(appFeatureModel);
+        }
+        envelop.setDetailModelList(appFeatureModels);
         return envelop;
     }
 
