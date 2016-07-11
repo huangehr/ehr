@@ -7,7 +7,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.shaded.org.apache.commons.collections.map.HashedMap;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.util.*;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
  * @created 2016.04.27 14:38
  */
 public class TableBundle {
-    Map<String, Row> rows = new HashedMap();
+    Map<String, Row> rows = new HashMap<>();
 
     public void addRows(String... rowkeys) {
         for (String rowkey : rowkeys) {
