@@ -4,17 +4,17 @@ import com.yihu.ehr.agModel.app.AppFeatureModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.app.MAppFeature;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +32,9 @@ public class AppFeatureController extends BaseController {
 
     @Autowired
     AppFeatureClient appFeatureClient;
+
+    @Autowired
+    private ConventionalDictEntryClient conDictEntryClient;
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppFeature列表")
@@ -151,7 +154,21 @@ public class AppFeatureController extends BaseController {
      * @param appFeatureModel
      */
     private void createDictName(AppFeatureModel appFeatureModel){
-
+        //应用菜单类型
+        if(!StringUtils.isEmpty(appFeatureModel.getType())){
+            MConventionalDict catalopDict = conDictEntryClient.getApplicationMenuType(appFeatureModel.getType());
+            appFeatureModel.setTypeName(catalopDict == null ? "" : catalopDict.getValue());
+        }
+        //审计等级
+        if(!StringUtils.isEmpty(appFeatureModel.getAuditLevel())){
+            MConventionalDict catalopDict = conDictEntryClient.getAuditLevel(appFeatureModel.getAuditLevel());
+            appFeatureModel.setAuditLevelName(catalopDict == null ? "" : catalopDict.getValue());
+        }
+        //开放等级
+        if(!StringUtils.isEmpty(appFeatureModel.getOpenLevel())){
+            MConventionalDict catalopDict = conDictEntryClient.getOpenLevel(appFeatureModel.getOpenLevel());
+            appFeatureModel.setOpenLevelName(catalopDict == null ? "" : catalopDict.getValue());
+        }
     }
 
 }

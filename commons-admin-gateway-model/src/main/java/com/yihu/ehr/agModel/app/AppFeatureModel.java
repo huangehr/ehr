@@ -20,8 +20,26 @@ public class AppFeatureModel {
     private String url;
     private String iconUrl;
     private String auditLevel;
+    private String auditLevelName;
     private String openLevel;
+    private String openLevelName;
     private String appId;
+
+    public String getAuditLevelName() {
+        return auditLevelName;
+    }
+
+    public void setAuditLevelName(String auditLevelName) {
+        this.auditLevelName = auditLevelName;
+    }
+
+    public String getOpenLevelName() {
+        return openLevelName;
+    }
+
+    public void setOpenLevelName(String openLevelName) {
+        this.openLevelName = openLevelName;
+    }
 
     public String getTypeName() {
         return typeName;
