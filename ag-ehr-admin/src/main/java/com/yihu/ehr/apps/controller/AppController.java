@@ -1,9 +1,12 @@
 package com.yihu.ehr.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsResources;
+import com.yihu.ehr.model.user.MRoleAppRelation;
+import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.resource.client.ResourcesClient;
 import com.yihu.ehr.resource.client.ResourcesGrantClient;
@@ -15,6 +18,8 @@ import com.yihu.ehr.agModel.app.AppDetailModel;
 import com.yihu.ehr.agModel.app.AppModel;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.users.service.RoleAppRelationClient;
+import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -24,9 +29,9 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by AndyCai on 2016/1/19.
@@ -48,6 +53,10 @@ public class AppController extends BaseController {
     private ResourcesGrantClient resourcesGrantClient;
     @Autowired
     private ResourcesClient resourcesClient;
+    @Autowired
+    private RoleAppRelationClient roleAppRelationClient;
+    @Autowired
+    private RolesClient rolesClient;
 
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
@@ -92,6 +101,10 @@ public class AppController extends BaseController {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("app创建失败！");
         }else{
+            String role =  appDetailModel.getRole();
+            if(StringUtils.isNotBlank(role)){
+                roleAppRelationClient.createRoleAppRelation(role,mApp.getId());
+            }
             envelop.setSuccessFlg(true);
             envelop.setObj(convertToAppDetailModel(mApp));
         }
@@ -109,8 +122,26 @@ public class AppController extends BaseController {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("app获取失败");
         }else{
-            envelop.setSuccessFlg(true);
-            envelop.setObj(convertToAppDetailModel(mApp));
+            //格式化角色
+            if("0".equals(mApp.getSourceType()+"")){
+                Collection<MRoleAppRelation> mRoleAppRelations =  roleAppRelationClient.searchRoleAppNoPaging("appId=" + appId);
+                Map<String,Object> roleMap = new HashMap<>();
+                for(MRoleAppRelation mRoleAppRelation:mRoleAppRelations){
+                    MRoles mRoles =  rolesClient.getRolesById(mRoleAppRelation.getRoleId());
+                    if(mRoles!=null){
+                        roleMap.put(mRoles.getId()+"",mRoles.getName());
+                    }
+                }
+               AppDetailModel appDetailModel =  convertToAppDetailModel(mApp);
+                if(roleMap.keySet().size()>0){
+                    appDetailModel.setRoleJson(toJson(appDetailModel));
+                }
+                envelop.setSuccessFlg(true);
+                envelop.setObj(appDetailModel);
+            }else{
+                envelop.setSuccessFlg(true);
+                envelop.setObj(convertToAppDetailModel(mApp));
+            }
         }
         return envelop;
     }
@@ -129,6 +160,10 @@ public class AppController extends BaseController {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("app更新失败！");
         }else{
+            String role =  appDetailModel.getRole();
+            if(StringUtils.isNotBlank(role)){
+                roleAppRelationClient.updateRoleAppRelation(role,mApp.getId());
+            }
             envelop.setSuccessFlg(true);
             envelop.setObj(convertToAppDetailModel(mApp));
         }
@@ -284,7 +319,6 @@ public class AppController extends BaseController {
         MApp mApp = convertToModel(detailModel,MApp.class);
         mApp.setCreateTime(StringToDate(detailModel.getCreateTime(),AgAdminConstants.DateTimeFormat));
         mApp.setAuditTime(StringToDate(detailModel.getAuditTime(),AgAdminConstants.DateTimeFormat));
-
         return mApp;
     }
 
