@@ -270,8 +270,8 @@ public class AppController extends BaseController {
             app.setOrgName(organization == null ? "" : organization.getFullName());
         }
 
-        MConventionalDict statusDict = conDictEntryClient.getApplicationSource(mApp.getStatus());
-        app.setSourceTypeName(statusDict == null ? "" : statusDict.getValue());
+     /*   MConventionalDict sourceType = conDictEntryClient.getApplicationSource(mApp.getSourceType()+"");
+        app.setSourceTypeName(sourceType == null ? "" : sourceType.getValue());*/
         return app;
     }
 
