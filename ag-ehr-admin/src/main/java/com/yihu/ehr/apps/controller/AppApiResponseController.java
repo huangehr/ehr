@@ -30,7 +30,7 @@ public class AppApiResponseController extends BaseController {
     @Autowired
     AppApiResponseClient AppApiResponseClient;
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiResponse列表")
     public Envelop getAppApiResponses(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -56,7 +56,7 @@ public class AppApiResponseController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.POST)
     @ApiOperation(value = "创建AppApiResponse")
     public Envelop createAppApiResponse(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
@@ -75,7 +75,7 @@ public class AppApiResponseController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiResponse")
     public Envelop getAppApiResponse(
             @ApiParam(name = "id", value = "id", defaultValue = "")
@@ -94,7 +94,7 @@ public class AppApiResponseController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.PUT)
     @ApiOperation(value = "更新AppApiResponse")
     public Envelop updateAppApiResponse(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
@@ -113,7 +113,7 @@ public class AppApiResponseController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除AppApiResponse")
     Envelop deleteAppApiResponse(
             @ApiParam(name = "id", value = "id", defaultValue = "")
