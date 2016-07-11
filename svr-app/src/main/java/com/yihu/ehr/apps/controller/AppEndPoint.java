@@ -71,7 +71,6 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             return convertToModels(appPages.getContent(), new ArrayList<>(appPages.getNumber()), MApp.class, fields);
         } else {
             List<App> appList = appService.search(fields, filters, sorts, page, size);
-
             pagedResponse(request, response, appService.getCount(filters), page, size);
             return convertToModels(appList, new ArrayList<>(appList.size()), MApp.class, fields);
         }
