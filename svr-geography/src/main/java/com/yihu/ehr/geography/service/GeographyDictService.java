@@ -3,8 +3,6 @@ package com.yihu.ehr.geography.service;
 
 import com.yihu.ehr.geography.dao.XGeographyDictRepository;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.RedisClient;
-import com.yihu.ehr.schema.AddressDictKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +24,10 @@ public class GeographyDictService extends BaseJpaService<GeographyDict,XGeograph
     @Autowired
     private XGeographyDictRepository geographyDictRepository;
 
-    @Autowired
-    private RedisClient redisClient;
-    @Autowired
-    private AddressDictKeySchema addressDictKeySchema;
+    //@Autowired
+    //private RedisClient redisClient;
+    //@Autowired
+    //private AddressDictKeySchema addressDictKeySchema;
 
 	public List<GeographyDict> getLevelToAddr(Integer level){
         List<GeographyDict> addressDictList = geographyDictRepository.getAddrDictByLevel(level);
@@ -47,13 +45,14 @@ public class GeographyDictService extends BaseJpaService<GeographyDict,XGeograph
 
     public boolean CacheAddressDict() {
         for(GeographyDict geographyDict:geographyDictRepository.getAll()){
-            String redisKey = addressDictKeySchema.AddressDictKeySchema(String.valueOf(geographyDict.getId()));
-            redisClient.set(redisKey, geographyDict.getName());
+            //String redisKey = addressDictKeySchema.AddressDictKeySchema(String.valueOf(geographyDict.getId()));
+            //redisClient.set(redisKey, geographyDict.getName());
         }
         return true;
     }
     public String GetAddressDictCache(String id) {
 
-        return  redisClient.get(addressDictKeySchema.AddressDictKeySchema(id));
+        //return  redisClient.get(addressDictKeySchema.AddressDictKeySchema(id));
+       return "";
     }
 }

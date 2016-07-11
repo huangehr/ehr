@@ -2,7 +2,7 @@
 //
 //import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 //import com.yihu.ehr.dict.controller.SystemDictController;
-//import com.yihu.ehr.dict.service.SystemDict;
+//import com.yihu.ehr.dict.service.systemdict;
 //import com.yihu.ehr.model.dict.MSystemDict;
 //import org.junit.FixMethodOrder;
 //import org.junit.Test;
@@ -39,12 +39,12 @@
 //
 //    @Test
 //    public void btestCreateDictionary() throws Exception {
-//        SystemDict systemDict = new SystemDict();
-//        systemDict.setName("test");
-//        systemDict.setAuthorId("testUser");
-//        systemDict.setCreateDate(new Date());
+//        systemdict systemdict = new systemdict();
+//        systemdict.setName("test");
+//        systemdict.setAuthorId("testUser");
+//        systemdict.setCreateDate(new Date());
 //        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonDate = objectMapper.writeValueAsString(systemDict);
+//        String jsonDate = objectMapper.writeValueAsString(systemdict);
 //        Object dict = systemDictController.createDictionary(jsonDate);
 //        assertTrue("创建失败！", dict != null);
 //    }
@@ -61,10 +61,10 @@
 //    @Test
 //    public void ctestUpdateDict() throws Exception {
 //        int id = 184;
-//        MSystemDict systemDict = systemDictController.getDictionary(id);
-//        systemDict.setName("test1");
+//        MSystemDict systemdict = systemDictController.getDictionary(id);
+//        systemdict.setName("test1");
 //        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonData = objectMapper.writeValueAsString(systemDict);
+//        String jsonData = objectMapper.writeValueAsString(systemdict);
 //        Object result = systemDictController.updateDictionary(jsonData);
 //        assertTrue("修改失败！", result != null);
 //    }
