@@ -270,8 +270,8 @@ public class AppController extends BaseController {
             app.setOrgName(organization == null ? "" : organization.getFullName());
         }
 
-        MConventionalDict statusDict = conDictEntryClient.getApplicationSource(mApp.getStatus());
-        app.setSourceTypeName(statusDict == null ? "" : statusDict.getValue());
+     /*   MConventionalDict sourceType = conDictEntryClient.getApplicationSource(mApp.getSourceType()+"");
+        app.setSourceTypeName(sourceType == null ? "" : sourceType.getValue());*/
         return app;
     }
 
@@ -288,7 +288,7 @@ public class AppController extends BaseController {
         return mApp;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/apps/filterList", method = RequestMethod.GET)
+    @RequestMapping(value = "/apps/filterList", method = RequestMethod.GET)
     @ApiOperation(value = "存在性校验")
     Envelop isExitAppFeature(
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
