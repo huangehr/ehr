@@ -42,7 +42,7 @@ public class AppFeatureController extends BaseController {
     @Autowired
     private RoleFeatureRelationClient roleFeatureRelationClient;
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppFeature列表")
     public Envelop getAppFeatures(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -70,7 +70,7 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建AppFeature")
     public Envelop createAppFeature(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
@@ -90,7 +90,7 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeature, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppFeature.AppFeature, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppFeature")
     public Envelop getAppFeature(
             @ApiParam(name = "id", value = "id", defaultValue = "")
@@ -109,7 +109,7 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "更新AppFeature")
     public Envelop updateAppFeature(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
@@ -129,7 +129,7 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeature, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.AppFeature.AppFeature, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除AppFeature")
     Envelop deleteAppFeature(
             @ApiParam(name = "id", value = "id", defaultValue = "")
@@ -140,7 +140,7 @@ public class AppFeatureController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.GET)
     @ApiOperation(value = "存在性校验")
     Envelop isExitAppFeature(
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
