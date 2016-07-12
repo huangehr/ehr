@@ -42,7 +42,7 @@ public class ConventionalDictEntryController extends BaseController{
 
         envelop.setObj(systemDictEntryModel);
 
-        return envelop;
+        return envelop  ;
     }
 
     @RequestMapping(value = "/dictionaries/app_status", method = RequestMethod.GET)
@@ -784,7 +784,7 @@ public class ConventionalDictEntryController extends BaseController{
         }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(systemDictEntryModelList);
-        return envelop;
+        return envelop  ;
     }
 
 }

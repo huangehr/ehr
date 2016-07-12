@@ -64,4 +64,17 @@ public interface RolesClient {
     Collection<MRoles> searchRolesNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
             @RequestParam(value = "filters",required = false) String filters);
+
+    @RequestMapping(value = ServiceApi.Roles.RoleNameExistence,method = RequestMethod.GET)
+    @ApiOperation(value = "角色组名称是否已存在" )
+    boolean isNameExistence(
+            @ApiParam(name = "name",value = "角色组名")
+            @RequestParam(value = "name") String name);
+
+    @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence,method = RequestMethod.GET)
+    @ApiOperation(value = "角色组代码是否已存在" )
+    boolean isCodeExistence(
+            @ApiParam(name = "code",value = "角色组代码")
+            @RequestParam(value = "code") String code);
+
 }

@@ -33,7 +33,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class PackResolveServiceApp extends SpringBootServletInitializer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
         SpringApplication.run(PackResolveServiceApp.class, args);
     }
 

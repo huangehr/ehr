@@ -9,7 +9,9 @@ public class RolesModel {
     private String name;
     private String description;
     private String appId;
+    private String appName;
     private String type;
+    private String typeName;
 
     public RolesModel() {
     }
@@ -54,13 +56,24 @@ public class RolesModel {
         this.appId = appId;
     }
 
+    public String getAppName() {
+        return appName;
+    }
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
     public String getType() {
         return type;
     }
-
     public void setType(String type) {
         this.type = type;
     }
 
-
+    public String getTypeName() {
+        return typeName;
+    }
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
 }
