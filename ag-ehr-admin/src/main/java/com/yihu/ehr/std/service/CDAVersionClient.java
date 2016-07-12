@@ -114,4 +114,10 @@ public interface CDAVersionClient {
     @RequestMapping(value = ServiceApi.Standards.VersionLatest, method = RequestMethod.GET)
     @ApiOperation(value = "获取最新版本")
     MCDAVersion getLatestVersion();
+
+    @RequestMapping(value = ServiceApi.Standards.VersionCache, method = RequestMethod.PUT)
+    @ApiOperation(value = "向Redis中缓存标准数据")
+    void cache(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @PathVariable(value = "version") String version);
 }

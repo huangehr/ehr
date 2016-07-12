@@ -121,7 +121,7 @@ public class MetadataEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Resources.MetadataCache,method = RequestMethod.POST)
-    @ApiOperation("缓存数据元字典数据")
+    @ApiOperation("缓存数据元数据")
     public boolean metadataCache()
     {
         metadataService.metadataCache();

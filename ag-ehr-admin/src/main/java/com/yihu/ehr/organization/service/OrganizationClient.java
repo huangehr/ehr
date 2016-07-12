@@ -1,5 +1,6 @@
 package com.yihu.ehr.organization.service;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.org.MOrganization;
@@ -151,4 +152,14 @@ public interface OrganizationClient {
             @RequestParam(value = "group_name") String groupName,
             @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
             @RequestParam(value = "remote_file_name") String remoteFileName);
+
+    @ApiOperation("缓存机构数据")
+    @RequestMapping(value = ServiceApi.Caches.Organizations, method = RequestMethod.PUT)
+     void cache(@ApiParam(value = "reload", defaultValue = "true")
+                      @RequestParam("reload") boolean reload);
+
+    @ApiOperation("缓存机构区域代码")
+    @RequestMapping(value = ServiceApi.Caches.OrganizationsArea, method = RequestMethod.PUT)
+    void CacheAreaCode(@ApiParam(value = "reload", defaultValue = "true")
+                              @RequestParam("reload") boolean reload) ;
 }
