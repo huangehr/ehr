@@ -1,4 +1,4 @@
-package com.yihu.ehr.dao.model;
+package com.yihu.ehr.archivrsecurity.dao.model;
 
 import javax.persistence.*;
 import java.util.Date;

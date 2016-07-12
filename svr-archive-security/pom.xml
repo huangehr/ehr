@@ -76,16 +76,6 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ehr-constants</artifactId>
             <scope>compile</scope>
@@ -109,6 +99,10 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-ui-swagger</artifactId>
         </dependency>
     </dependencies>
 

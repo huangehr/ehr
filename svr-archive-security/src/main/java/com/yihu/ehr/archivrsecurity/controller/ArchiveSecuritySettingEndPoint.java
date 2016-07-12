@@ -1,9 +1,10 @@
-package com.yihu.ehr.controller;
+package com.yihu.ehr.archivrsecurity.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.dao.model.ArchiveSecuritySetting;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.archivrsecurity.dao.model.ArchiveSecuritySetting;
 import com.yihu.ehr.model.archivesecurity.MArchiveSecuritySetting;
-import com.yihu.ehr.service.ArchiveSecuritySettingService;
+import com.yihu.ehr.archivrsecurity.service.ArchiveSecuritySettingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -44,7 +45,7 @@ public class ArchiveSecuritySettingEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        List<ArchiveSecuritySetting> archiveSecuritySettingList = archiveSecuritySettingService.search(fields,filters,sorts,size,page);
+        List<ArchiveSecuritySetting> archiveSecuritySettingList = archiveSecuritySettingService.search(fields,filters,sorts,page,size);
         pagedResponse(request, response, archiveSecuritySettingService.getCount(filters), page, size);
 
         return convertToModels(archiveSecuritySettingList, new ArrayList<MArchiveSecuritySetting>(archiveSecuritySettingList.size()), MArchiveSecuritySetting.class, fields);
@@ -64,7 +65,7 @@ public class ArchiveSecuritySettingEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/archive_security/{user_id}", method = RequestMethod.GET)
     public MArchiveSecuritySetting getArchiveSecuritySetting(
             @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
-            @PathVariable(value = "user_id") long userId) {
+            @PathVariable(value = "user_id") String userId) {
         ArchiveSecuritySetting archiveSecuritySetting = archiveSecuritySettingService.findByUserId(userId);
         if (archiveSecuritySetting == null) {
             return null;
@@ -95,12 +96,12 @@ public class ArchiveSecuritySettingEndPoint extends EnvelopRestEndPoint {
 
 
     @ApiOperation(value = "档案安全密码验证")
-    @RequestMapping(value = "/archive_security/{user_id}/security_key/authentication", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/archive_security/{user_id}/security_key/authentication", method = RequestMethod.POST)
     public boolean ArchiveSecuritySettingAuthentication(
             @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
-            @PathVariable(value = "user_id") long userId,
+            @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "security_key", value = "security_key", defaultValue = "")
-            @RequestParam(value = "security_key") long securityKey) throws Exception{
+            @RequestParam(value = "security_key") String securityKey) throws Exception{
         return archiveSecuritySettingService.ArchiveSecuritySettingAuthentication(userId,securityKey);
     }
 

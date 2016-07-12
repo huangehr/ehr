@@ -1,7 +1,7 @@
-package com.yihu.ehr.service;
+package com.yihu.ehr.archivrsecurity.service;
 
-import com.yihu.ehr.dao.model.ArchiveVisitLog;
-import com.yihu.ehr.dao.repository.XArchiveVisitLogRepository;
+import com.yihu.ehr.archivrsecurity.dao.model.ArchiveVisitLog;
+import com.yihu.ehr.archivrsecurity.dao.repository.XArchiveVisitLogRepository;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
