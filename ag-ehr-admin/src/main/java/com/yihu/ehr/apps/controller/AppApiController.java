@@ -137,7 +137,7 @@ public class AppApiController extends BaseController {
             appApiModels.add(appApiModel);
         }
         envelop.setDetailModelList(appApiModels);
-        return envelop;
+        return envelop  ;
     }
 
 }
