@@ -22,4 +22,8 @@ public class RoleFeatureRelationService extends BaseJpaService<RoleFeatureRelati
         return roleFeatureRelationRepository.findAll(pageable);
     }
 
+    public RoleFeatureRelation findRelation(long featureId,long roleId){
+        return roleFeatureRelationRepository.findRelation(featureId, roleId);
+    }
+
 }

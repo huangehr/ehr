@@ -8,6 +8,7 @@ import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MAppFeature;
+import com.yihu.ehr.model.user.MRoleAppRelation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -111,5 +112,15 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") int id) throws Exception {
         appFeatureService.delete(id);
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取过滤App列表")
+    public Collection<MAppFeature> getAppFeatureNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters
+    ) throws Exception {
+        List<AppFeature> appFeatureList =  appFeatureService.search(filters);
+        return convertToModels(appFeatureList,new ArrayList<>(appFeatureList.size()),MAppFeature.class, "");
     }
 }

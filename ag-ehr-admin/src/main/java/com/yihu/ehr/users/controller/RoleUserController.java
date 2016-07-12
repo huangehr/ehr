@@ -6,11 +6,14 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.user.MRoleUser;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.users.service.RoleUserClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.MediaType;
@@ -33,33 +36,83 @@ public class RoleUserController extends BaseController {
     private RoleUserClient roleUserClient;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private UserClient userClient;
 
-    @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "为角色组添加人员")
+    @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST)
+    @ApiOperation(value = "为角色组配置人员，单个")
     public Envelop createRoleUser(
-            @ApiParam(name = "data_json",value = "角色组-用户关系Json串")
-            @RequestBody String dataJson){
+            @ApiParam(name = "data_json",value = "角色组-人员关系Json串")
+            @RequestParam(value = "data_json") String dataJson){
         MRoleUser mRoleUser = roleUserClient.createRoleUser(dataJson);
         if(null == mRoleUser){
             return failed("角色组添加人员失败！");
         }
         return success(null);
     }
-    @RequestMapping(value = ServiceApi.Roles.RoleUserId,method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除角色组的人员")
+
+    @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id,人员Id删除角色组人员")
     public Envelop deleteRoleUser(
-            @ApiParam(name = "id",value = "角色组-用户关系id")
-            @PathVariable long id){
-        boolean bo = roleUserClient.deleteRoleUser(id);
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") String roleId){
+        if(StringUtils.isEmpty(userId)){
+            return failed("人员id不能为空！");
+        }
+        if(StringUtils.isEmpty(roleId)){
+            return failed("角色组id不能为空！");
+        }
+        boolean bo = roleUserClient.deleteRoleUser(userId, roleId);
         if(bo){
             return success(null);
         }
         return failed("角色组删除人员失败！");
     }
 
+
+    @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.POST)
+    @ApiOperation(value = "批量新增人员所属角色组，一对多")
+    public Envelop batchCreateRolUsersRelation(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_ids",value = "角色组ids,多个用逗号隔开")
+            @RequestParam(value = "role_ids") String roleIds) throws Exception{
+        if(StringUtils.isEmpty(userId)){
+            return failed("人员id不能为空！");
+        }
+        if(StringUtils.isEmpty(roleIds)){
+            return failed("角色组id不能为空！");
+        }
+        boolean bo = roleUserClient.batchCreateRolUsersRelation(userId,roleIds);
+        if(bo){
+            return success(null);
+        }
+        return failed("新增失败");
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.PUT)
+    @ApiOperation(value = "批量修改人员所属角色组关系，一对多")
+    public Envelop batchUpdateRoleUsersRelation(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_ids",value = "角色组ids,多个用逗号隔开")
+            @RequestParam(value = "role_ids") String roleIds) throws Exception{
+        if(StringUtils.isEmpty(userId)){
+            return failed("人员id不能为空！");
+        }
+        if(StringUtils.isEmpty(roleIds)){
+            return failed("角色组id不能为空！");
+        }
+        boolean bo = roleUserClient.batchUpdateRoleUsersRelation(userId,roleIds);
+        if(bo){
+            return success(null);
+        }
+        return failed("修改失败");
+    }
+
     @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色人员关系列表---分页")
+    @ApiOperation(value = "查询角色组人员关系列表---分页")
     public Envelop searchRoleUser(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,roleId,userId")
             @RequestParam(value = "fields", required = false) String fields,
@@ -82,8 +135,8 @@ public class RoleUserController extends BaseController {
         Integer totalCount = getTotalCount(responseEntity);
         return getResult(roleUserModelList,totalCount,page,size);
     }
-    @RequestMapping(value = ServiceApi.Roles.RoleUserNoPage,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色人员关系列表---不分页")
+    @RequestMapping(value = ServiceApi.Roles.RoleUsersNoPage,method = RequestMethod.GET)
+    @ApiOperation(value = "查询角色组人员关系列表---不分页")
     public Envelop searchRoleUserNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
             @RequestParam(value = "filters",required = false) String filters) throws  Exception{
@@ -101,7 +154,9 @@ public class RoleUserController extends BaseController {
 
     private RoleUserModel changeToModel(MRoleUser m) {
         RoleUserModel model = convertToModel(m, RoleUserModel.class);
-        //获取角色组类别字典
+        //获取用户名
+        MUser user = userClient.getUser(m.getUserId());
+        model.setUserName(user == null?"":user.getRealName());
         return model;
     }
 }

@@ -3,7 +3,7 @@
 //import com.eureka2.shading.codehaus.jackson.map.ObjectMapper;
 //import com.yihu.ehr.dict.controller.SystemDictController;
 //import com.yihu.ehr.dict.controller.SystemDictEntryController;
-//import com.yihu.ehr.dict.service.SystemDict;
+//import com.yihu.ehr.dict.service.systemdict;
 //import com.yihu.ehr.dict.service.SystemDictEntry;
 //import com.yihu.ehr.model.dict.MDictionaryEntry;
 //import com.yihu.ehr.model.dict.MSystemDict;

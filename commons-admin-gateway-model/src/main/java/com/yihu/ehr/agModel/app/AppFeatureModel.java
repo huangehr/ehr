@@ -24,6 +24,29 @@ public class AppFeatureModel {
     private String openLevel;
     private String openLevelName;
     private String appId;
+    //temp
+    private String roleId;
+
+    /**
+     * 界面上适配选中是否适配用做界面展示，代表是否以及被适配
+     */
+    private Boolean ischecked;
+
+    public String getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
+
+    public Boolean getIschecked() {
+        return ischecked;
+    }
+
+    public void setIschecked(Boolean ischecked) {
+        this.ischecked = ischecked;
+    }
 
     public String getAuditLevelName() {
         return auditLevelName;
