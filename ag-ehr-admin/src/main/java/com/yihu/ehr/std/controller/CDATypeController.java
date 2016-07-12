@@ -1,17 +1,20 @@
 package com.yihu.ehr.std.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.standard.cdadocument.CDAModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeDetailModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeModel;
 import com.yihu.ehr.agModel.standard.cdatype.CdaTypeTreeModel;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCDAVersion;
 import com.yihu.ehr.std.service.CDAClient;
 import com.yihu.ehr.std.service.CDATypeClient;
 import com.yihu.ehr.model.standard.MCDAType;
 import com.yihu.ehr.std.service.CDAVersionClient;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.ApiOperation;
@@ -38,6 +41,9 @@ public class CDATypeController extends BaseController {
 
     @Autowired
     CDAClient cdaClient;
+
+    @Autowired
+    ConventionalDictEntryClient dictEntryClient;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -413,7 +419,7 @@ public class CDATypeController extends BaseController {
      * @param ids
      * @return
      */
-    @RequestMapping("isExitRelativeCDA")
+    @RequestMapping(value = "/isExitRelativeCDA", method = RequestMethod.GET)
     @ResponseBody
     public Object isExitRelativeCDA(
             @ApiParam(name = "ids", value = "ids")
@@ -442,6 +448,45 @@ public class CDATypeController extends BaseController {
                 envelop.setSuccessFlg(true);
             }
         }
+        return envelop;
+    }
+    @RequestMapping(value = "/types/getCdaByTypeForBrowser", method = RequestMethod.GET)
+    @ResponseBody
+    public Envelop getCdaByTypeForBrowser(
+            @ApiParam(name = "version", value = "version")
+            @RequestParam(value = "version") String version) throws Exception {
+        //获取浏览器需要的cda类别名称列表（只到最底层类别）
+        Envelop envelop = new Envelop();
+
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getCdaTypeForBrowserList();
+        if(mConventionalDicts.size() == 0 || mConventionalDicts == null){
+            return failed("获取cda类别清单失败！");
+        }
+
+        Map cdaType = new HashMap<>();
+        List<Map> cdaList = new ArrayList<>();
+
+        for(MConventionalDict mConventionalDict : mConventionalDicts ){
+            cdaType.clear();
+            //typeId信息维护成CDA类别ID
+            cdaType.put("typeId",mConventionalDict.getCatalog().toString());
+            cdaType.put("value", mConventionalDict.getValue().toString());
+
+            String filters = "type=" + mConventionalDict.getCatalog().toString();
+            ResponseEntity<List<MCDADocument>> responseEntity  = cdaClient.GetCDADocuments("", filters,"", 1000, 1, version);
+            List<MCDADocument> mcdaDocuments = responseEntity.getBody();
+            if(mcdaDocuments.size() == 0 ||mcdaDocuments == null ){
+                cdaType.put("cda", "");
+            }
+            else{
+                cdaType.put("cda", mcdaDocuments);
+            }
+
+            cdaList.add(cdaType);
+        }
+
+        envelop.setSuccessFlg(true);
+        envelop.setObj(cdaList);
         return envelop;
     }
 

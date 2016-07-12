@@ -768,6 +768,13 @@ public class ConventionalDictEntryController extends BaseController{
         return convertDictToListModel(mConventionalDicts);
     }
 
+    @RequestMapping(value = "/dictionaries/cda_type_browser_list", method = RequestMethod.GET)
+    @ApiOperation(value = "浏览器用CDA类别清单", response = MConventionalDict.class)
+    public Envelop getCdaTypeForBrowserList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getApiParameterDataRequiredList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
     private Envelop convertDictToModel(MConventionalDict mConventionalDict){
         Envelop envelop = new Envelop();
         SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
@@ -786,5 +793,4 @@ public class ConventionalDictEntryController extends BaseController{
         envelop.setDetailModelList(systemDictEntryModelList);
         return envelop  ;
     }
-
 }
