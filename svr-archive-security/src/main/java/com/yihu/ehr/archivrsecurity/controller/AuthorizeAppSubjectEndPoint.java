@@ -1,9 +1,10 @@
-package com.yihu.ehr.controller;
+package com.yihu.ehr.archivrsecurity.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.dao.model.AuthorizeAppSubject;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.archivrsecurity.dao.model.AuthorizeAppSubject;
 import com.yihu.ehr.model.archivesecurity.MAuthorizeAppSubject;
-import com.yihu.ehr.service.AuthorizeAppSubjectService;
+import com.yihu.ehr.archivrsecurity.service.AuthorizeAppSubjectService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,7 +31,7 @@ public class AuthorizeAppSubjectEndPoint extends EnvelopRestEndPoint {
     AuthorizeAppSubjectService authorizeAppSubjectService;
 
     @ApiOperation(value = "应用授权主题列表查询")
-    @RequestMapping(value = "/authorize_apps", method = RequestMethod.GET)
+    @RequestMapping(value = "/authorize_subjects", method = RequestMethod.GET)
     public Collection<MAuthorizeAppSubject> searchAuthorizeAppApply(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -44,14 +45,14 @@ public class AuthorizeAppSubjectEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        List<AuthorizeAppSubject> authorizeAppApplyList = authorizeAppSubjectService.search(fields,filters,sorts,size,page);
+        List<AuthorizeAppSubject> authorizeAppApplyList = authorizeAppSubjectService.search(fields,filters,sorts,page,size);
         pagedResponse(request, response, authorizeAppSubjectService.getCount(filters), page, size);
 
         return convertToModels(authorizeAppApplyList, new ArrayList<MAuthorizeAppSubject>(authorizeAppApplyList.size()), MAuthorizeAppSubject.class, fields);
     }
 
     @ApiOperation(value = "应用授权主题新增")
-    @RequestMapping(value = "/authorize_apps", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/authorize_subjects", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MAuthorizeAppSubject createAuthorizeAppApply(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) {
@@ -62,7 +63,7 @@ public class AuthorizeAppSubjectEndPoint extends EnvelopRestEndPoint {
 
 
     @ApiOperation(value = "应用授权主题修改")
-    @RequestMapping(value = "/authorize_apps", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/authorize_subjects", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MAuthorizeAppSubject updateAuthorizeAppApply(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) throws Exception {
@@ -72,10 +73,10 @@ public class AuthorizeAppSubjectEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "应用授权主题删除")
-    @RequestMapping(value = "/authorize_apps/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/authorize_subjects/{id}", method = RequestMethod.DELETE)
     public boolean deleteAuthorizeAppApply(
             @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception{
+            @PathVariable(value = "id") long id) throws Exception{
         authorizeAppSubjectService.delete(id);
         return true;
     }

@@ -1,10 +1,10 @@
-package com.yihu.ehr.controller;
+package com.yihu.ehr.archivrsecurity.controller;
 
+import com.yihu.ehr.archivrsecurity.dao.model.SmsMessageReply;
+import com.yihu.ehr.archivrsecurity.service.SmsMessageReplyService;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.dao.model.ArchiveVisitLog;
-import com.yihu.ehr.model.archivesecurity.MArchiveSecuritySetting;
-import com.yihu.ehr.model.archivesecurity.MArchiveVisitLog;
-import com.yihu.ehr.service.ArchiveVisitLogService;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.archivesecurity.MSmsMessageReply;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,15 +24,15 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "ArchiveVisitLog", description = "档案访问日志管理", tags = {"档案访问日志管理"})
-public class ArchiveVisitLogEndPoint extends EnvelopRestEndPoint {
+@Api(value = "SmsMessageReply", description = "短信回复管理", tags = {"短信回复管理"})
+public class SmsMessageReplyEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    ArchiveVisitLogService archiveVisitLogService;
+    SmsMessageReplyService smsMessageReplyService;
 
-    @ApiOperation(value = "档案访问日志列表查询")
-    @RequestMapping(value = "/archive_logs", method = RequestMethod.GET)
-    public Collection<MArchiveVisitLog> searchArchiveVisitLog(
+    @ApiOperation(value = "短信回复列表查询")
+    @RequestMapping(value = "/message_reply_info", method = RequestMethod.GET)
+    public Collection<MSmsMessageReply> searchMessagesSendInfo(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
@@ -45,20 +45,20 @@ public class ArchiveVisitLogEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        List<MArchiveVisitLog> archiveVisitLogList = archiveVisitLogService.search(fields,filters,sorts,size,page);
-        pagedResponse(request, response, archiveVisitLogService.getCount(filters), page, size);
+        List<SmsMessageReply> smsMessageSendList = smsMessageReplyService.search(fields,filters,sorts,page,size);
+        pagedResponse(request, response, smsMessageReplyService.getCount(filters), page, size);
 
-        return convertToModels(archiveVisitLogList, new ArrayList<MArchiveVisitLog>(archiveVisitLogList.size()), MArchiveVisitLog.class, fields);
+        return convertToModels(smsMessageSendList, new ArrayList<MSmsMessageReply>(smsMessageSendList.size()), MSmsMessageReply.class, fields);
     }
 
-    @ApiOperation(value = "档案访问日志新增")
-    @RequestMapping(value = "/archive_logs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public MArchiveVisitLog createArchiveVisitLog(
+    @ApiOperation(value = "短信回复新增")
+    @RequestMapping(value = "/message_reply_info", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public MSmsMessageReply createMessagesSendInfo(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) {
-        ArchiveVisitLog archiveVisitLog = toEntity(jsonData, ArchiveVisitLog.class);
-        archiveVisitLogService.save(archiveVisitLog);
-        return convertToModel(archiveVisitLog, MArchiveVisitLog.class, null);
+        SmsMessageReply smsMessageReply = toEntity(jsonData, SmsMessageReply.class);
+        smsMessageReplyService.save(smsMessageReply);
+        return convertToModel(smsMessageReply, MSmsMessageReply.class, null);
     }
 
 

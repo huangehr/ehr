@@ -1,6 +1,6 @@
-package com.yihu.ehr.dao.repository;
+package com.yihu.ehr.archivrsecurity.dao.repository;
 
-import com.yihu.ehr.dao.model.AuthorizeAppApply;
+import com.yihu.ehr.archivrsecurity.dao.model.AuthorizeAppApply;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

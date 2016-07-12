@@ -1,7 +1,7 @@
-package com.yihu.ehr.service;
+package com.yihu.ehr.archivrsecurity.service;
 
-import com.yihu.ehr.dao.model.AuthorizeAppSubject;
-import com.yihu.ehr.dao.repository.XAuthorizeAppSubjectRepository;
+import com.yihu.ehr.archivrsecurity.dao.model.AuthorizeAppSubject;
+import com.yihu.ehr.archivrsecurity.dao.repository.XAuthorizeAppSubjectRepository;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +13,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class AuthorizeAppSubjectService extends BaseJpaService<AuthorizeAppSubject, XAuthorizeAppSubjectRepository> {
-
 
 }

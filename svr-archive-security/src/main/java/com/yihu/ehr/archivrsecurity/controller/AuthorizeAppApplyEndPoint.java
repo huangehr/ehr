@@ -1,9 +1,10 @@
-package com.yihu.ehr.controller;
+package com.yihu.ehr.archivrsecurity.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.dao.model.AuthorizeAppApply;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.archivrsecurity.dao.model.AuthorizeAppApply;
 import com.yihu.ehr.model.archivesecurity.MAuthorizeAppApply;
-import com.yihu.ehr.service.AuthorizeAppApplyService;
+import com.yihu.ehr.archivrsecurity.service.AuthorizeAppApplyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,14 +24,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "AuthorizeAppApply", description = "应用授权申请", tags = {"档案访问日志管理"})
+@Api(value = "AuthorizeAppApply", description = "应用授权申请", tags = {"应用授权申请"})
 public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     AuthorizeAppApplyService authorizeAppApplyService;
 
     @ApiOperation(value = "应用授权列表查询")
-    @RequestMapping(value = "/authorize_apps/subjects", method = RequestMethod.GET)
+    @RequestMapping(value = "/authorize_apps", method = RequestMethod.GET)
     public Collection<MAuthorizeAppApply> searchAuthorizeAppApply(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -44,14 +45,14 @@ public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        List<AuthorizeAppApply> authorizeAppApplyList = authorizeAppApplyService.search(fields,filters,sorts,size,page);
+        List<AuthorizeAppApply> authorizeAppApplyList = authorizeAppApplyService.search(fields,filters,sorts,page,size);
         pagedResponse(request, response, authorizeAppApplyService.getCount(filters), page, size);
 
         return convertToModels(authorizeAppApplyList, new ArrayList<MAuthorizeAppApply>(authorizeAppApplyList.size()), MAuthorizeAppApply.class, fields);
     }
 
     @ApiOperation(value = "应用授权新增")
-    @RequestMapping(value = "/authorize_apps/subjects", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/authorize_apps", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MAuthorizeAppApply createAuthorizeAppApply(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) {
@@ -61,7 +62,7 @@ public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "应用授权查询")
-    @RequestMapping(value = "/authorize_apps/{id}/subject", method = RequestMethod.GET)
+    @RequestMapping(value = "/authorize_apps/{id}", method = RequestMethod.GET)
     public MAuthorizeAppApply getAuthorizeAppApply(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") long id) {
@@ -75,7 +76,7 @@ public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "应用授权修改")
-    @RequestMapping(value = "/authorize_apps/subjects", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/authorize_apps", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MAuthorizeAppApply updateAuthorizeAppApply(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) throws Exception {
@@ -85,10 +86,10 @@ public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "应用授权删除")
-    @RequestMapping(value = "/authorize_apps/{id}/subject", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/authorize_apps/{id}", method = RequestMethod.DELETE)
     public boolean deleteAuthorizeAppApply(
             @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception{
+            @PathVariable(value = "id") long id) throws Exception{
         authorizeAppApplyService.delete(id);
         return true;
     }
