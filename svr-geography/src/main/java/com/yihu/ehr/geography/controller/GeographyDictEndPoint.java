@@ -84,5 +84,16 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
         return   geographyDictService.GetAddressDictCache(id);
     }
 
+    @RequestMapping(value = "/geography_entries/getAddressDict" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据地址中文名 查询地址编号")
+    Collection<MGeographyDict> getAddressDict(
+            @ApiParam(name = "fields", value = "fields", defaultValue = "")
+            @RequestParam(value = "fields") String[] fields ,
+            @ApiParam(name = "values", value = "values", defaultValue = "")
+            @RequestParam(value = "values") String[] values){
+        List<GeographyDict> geographyDictList = geographyDictService.findByFields(fields,values);
+        return convertToModels(geographyDictList,new ArrayList<>(geographyDictList.size()), MGeographyDict.class,"");
+    }
+
 
 }
