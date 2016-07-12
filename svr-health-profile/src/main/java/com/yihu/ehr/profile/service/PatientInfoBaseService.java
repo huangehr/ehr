@@ -314,7 +314,10 @@ public class PatientInfoBaseService {
                     }
                 }
             }
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            List<String> orgCodeList = new ArrayList<>();
+
             //遍历所有健康问题，门诊记录和住院记录整合
             for (String key : outpatientMap.keySet()) //门诊
             {
@@ -334,16 +337,21 @@ public class PatientInfoBaseService {
                         String rowkey = event.get("rowkey").toString();
                         Object eventData = event.get("event_date");
                         String orgCode = event.get("org_code").toString();
+                        if(!orgCodeList.contains(orgCode))
+                        {
+                            orgCodeList.add(orgCode);
+                        }
+
                         if (profileId.equals(rowkey)) {
                             if (!obj.containsKey("lastVisitDate")||sdf.parse(eventData.toString()).getTime() > sdf.parse(obj.get("lastVisitDate").toString()).getTime()) {
                                 obj.put("lastVisitDate", eventData);
-                                obj.put("lastVisitOrg", orgCode);
+                                obj.put("lastVisitOrgCode", orgCode);
+                                obj.put("lastVisitOrg", "");
                                 obj.put("lastVisitRecord", profileId);
                                 obj.put("ageOfDisease", getAgeOfDisease(eventData));
                             }
                             break;
                         }
-
                     }
                 }
                 re.add(obj);
@@ -361,6 +369,11 @@ public class PatientInfoBaseService {
                     String rowkey = event.get("rowkey").toString();
                     Object eventData = event.get("event_date");
                     String orgCode = event.get("org_code").toString();
+                    if(!orgCodeList.contains(orgCode))
+                    {
+                        orgCodeList.add(orgCode);
+                    }
+
                     for (String profileId : profileList) {
                         if (profileId.equals(rowkey)) {
                             //判断是否已经存在
@@ -370,7 +383,8 @@ public class PatientInfoBaseService {
                                     //事件是否更早
                                     if (sdf.parse(eventData.toString()).getTime() > sdf.parse(obj.get("lastVisitDate").toString()).getTime()) {
                                         obj.put("lastVisitDate", eventData);
-                                        obj.put("lastVisitOrg", orgCode);
+                                        obj.put("lastVisitOrgCode", orgCode);
+                                        obj.put("lastVisitOrg", "");
                                         obj.put("lastVisitRecord", profileId);
                                         obj.put("recentEvent", "住院");
                                     }
@@ -394,7 +408,8 @@ public class PatientInfoBaseService {
                                 obj.put("visitTimes", 0);
                                 obj.put("hospitalizationTimes", profileList.size());
                                 obj.put("lastVisitDate", eventData);
-                                obj.put("lastVisitOrg", orgCode);
+                                obj.put("lastVisitOrgCode", orgCode);
+                                obj.put("lastVisitOrg", "");
                                 obj.put("lastVisitRecord", profileId);
                                 obj.put("recentEvent", "住院");
                                 obj.put("ageOfDisease",getAgeOfDisease(eventData));
@@ -406,7 +421,28 @@ public class PatientInfoBaseService {
                     }
                 }
             }
+
+            //获取相关机构名称
+            List<MOrganization> orgList = organization.getOrgs(orgCodeList);
+            if(orgList!=null)
+            {
+                for(Map<String,Object> item:re)
+                {
+                    String orgCode = item.get("lastVisitOrgCode").toString();
+                    //遍历医院列表获取医院名称
+                    for(MOrganization org:orgList)
+                    {
+                        if(org.getOrgCode().equals(orgCode))
+                        {
+                            item.put("lastVisitOrg",org.getFullName());
+                            break;
+                        }
+
+                    }
+                }
+            }
         }
+
 
 
         return re;
@@ -680,9 +716,9 @@ public class PatientInfoBaseService {
         if (outpatient.getDetailModelList() != null && outpatient.getDetailModelList().size() > 0) {
             for (int i = 0; i < outpatient.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) outpatient.getDetailModelList().get(i);
-                if (obj.containsKey(BasisConstant.mzzd)) {
+                if (obj.containsKey(BasisConstant.mzzd) && obj.get(BasisConstant.mzzd)!=null) {
                     String code =obj.get(BasisConstant.mzzd).toString();
-                    if(!codeList.contains(code))
+                    if(!code.equals("null")&&!codeList.contains(code))
                     {
                         codeList.add(code);
                     }
@@ -694,9 +730,9 @@ public class PatientInfoBaseService {
         if (hospitalized.getDetailModelList() != null && hospitalized.getDetailModelList().size() > 0) {
             for (int i = 0; i < hospitalized.getDetailModelList().size(); i++) {
                 Map<String, Object> obj = (Map<String, Object>) hospitalized.getDetailModelList().get(i);
-                if (obj.containsKey(BasisConstant.zyzd)) {
+                if (obj.containsKey(BasisConstant.zyzd) && obj.get(BasisConstant.zyzd)!=null) {
                     String code =obj.get(BasisConstant.zyzd).toString();
-                    if(!codeList.contains(code))
+                    if(!code.equals("null")&&!codeList.contains(code))
                     {
                         codeList.add(code);
                     }
