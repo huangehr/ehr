@@ -64,7 +64,7 @@ public interface AppFeatureClient {
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
             @RequestParam(value = "filters") String filters);
 
-    @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
+    @RequestMapping(value =  ApiVersion.Version1_0 +ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
     @ApiOperation(value = "获取过滤App列表")
     public Collection<MAppFeature> getAppFeatureNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
