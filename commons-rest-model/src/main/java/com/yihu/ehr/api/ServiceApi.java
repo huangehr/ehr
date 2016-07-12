@@ -396,21 +396,32 @@ public class ServiceApi {
         public static final String RoleId                           = "/roles/role/{id}";
         public static final String Roles                            = "/roles/roles";
         public static final String RolesNoPage                      = "/roles/roles/no_paging";
+        public static final String RoleNameExistence                = "/roles/name/existence";
+        public static final String RoleCodeExistence                = "/roles/code/existence";
+
 
         public static final String RoleUser                         = "/roles/role_user";
         public static final String RoleUserId                       = "/roles/role_user/{id}";
         public static final String RoleUsers                        = "/roles/role_users";
-        public static final String RoleUserNoPage                   = "/roles/role_users/no_paging";
+        public static final String RoleUsersNoPage                   = "/roles/role_users/no_paging";
 
         public static final String RoleFeature                      = "/roles/role_feature";
         public static final String RoleFeatureId                    = "/roles/role_feature/{id}";
         public static final String RoleFeatures                     = "/roles/role_features";
         public static final String RoleFeaturesNoPage               = "/roles/role_features/no_paging";
+        public static final String RoleFeatureExistence             = "/roles/role_feature/existence";
 
         public static final String RoleApp                          = "/roles/role_app";
         public static final String RoleAppId                        = "/roles/role_app/{id}";
         public static final String RoleApps                         = "/roles/role_apps";
-        public static final String RoleAppsNopage                   = "/roles/role_appd/no_paging";
+        public static final String RoleAppsNoPage                   = "/roles/role_apps/no_paging";
+
+        public static final String RoleApi                          = "/roles/role_api";
+        public static final String RoleApiId                        = "/roles/role_api/{id}";
+        public static final String RoleApis                         = "/roles/role_apis";
+        public static final String RoleApisNoPage                   = "/roles/role_apis/no_paging";
+        public static final String RoleApisExistence                = "/roles/role_api/existence";
+
     }
 
     public static class Redis{

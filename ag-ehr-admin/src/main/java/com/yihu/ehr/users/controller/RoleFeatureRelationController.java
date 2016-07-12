@@ -3,14 +3,17 @@ package com.yihu.ehr.users.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.RoleFeatureRelationModel;
 import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.users.service.RoleFeatureRelationClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.MediaType;
@@ -27,39 +30,47 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
-@Api(value = "roleUser",description = "角色组应用权限配置",tags = "")
+@Api(value = "roleFeature",description = "角色组功能权限配置",tags = "")
 public class RoleFeatureRelationController extends BaseController {
     @Autowired
     private RoleFeatureRelationClient roleFeatureRelationClient;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    AppFeatureClient appFeatureClient;
 
-    @RequestMapping(value = ServiceApi.Roles.RoleFeature,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "为角色组添加权限")
+    @RequestMapping(value = ServiceApi.Roles.RoleFeature,method = RequestMethod.POST)
+    @ApiOperation(value = "为角色组配置功能权限，单个")
     public Envelop createRoleFeature(
-            @ApiParam(name = "data_json",value = "角色组-权限关系Json串")
-            @RequestBody String dataJson){
+            @ApiParam(name = "data_json",value = "角色组-功能权限关系Json串")
+            @RequestParam(value = "data_json") String dataJson){
         MRoleFeatureRelation mRoleFeatureRelation = roleFeatureRelationClient.createRoleFeature(dataJson);
         if(null == mRoleFeatureRelation){
-            return failed("添加应用权限失败！");
+            return failed("添加功能权限失败！");
         }
         return success(null);
     }
-    @RequestMapping(value = ServiceApi.Roles.RoleFeatureId,method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除角色组的权限")
+    @RequestMapping(value = ServiceApi.Roles.RoleFeature,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id,权限Id删除角色组-权限关系")
     public Envelop deleteRoleFeature(
-            @ApiParam(name = "id",value = "角色组-权限关系id")
-            @PathVariable long id){
-        boolean bo = roleFeatureRelationClient.deleteRoleFeature(id);
+            @ApiParam(name = "feature_id",value = "功能权限id")
+            @RequestParam(value = "feature_id") String featureId,
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") String roleId){
+        if(StringUtils.isEmpty(featureId)){
+            return failed("权限id不能为空！");
+        }
+        if(StringUtils.isEmpty(roleId)){
+            return failed("角色组id不能为空！");
+        }
+        boolean bo = roleFeatureRelationClient.deleteRoleFeature(featureId, roleId);
         if(bo){
             return success(null);
         }
-        return failed("删除应用权限失败！");
+        return failed("删除权限失败！");
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleFeatures,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色组-权限关系列表---分页")
+    @ApiOperation(value = "查询角色组-功能权限关系列表---分页")
     public Envelop searchRoleFeature(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,roleId,featureId")
             @RequestParam(value = "fields", required = false) String fields,
@@ -82,7 +93,7 @@ public class RoleFeatureRelationController extends BaseController {
         return getResult(relationModels,totalCount,page,size);
     }
     @RequestMapping(value = ServiceApi.Roles.RoleFeaturesNoPage,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色组-应用权限关系列表---不分页")
+    @ApiOperation(value = "查询角色组-功能权限关系列表---不分页")
     public Envelop searchRoleFeatureNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
             @RequestParam(value = "filters",required = false) String filters) throws  Exception{
@@ -98,9 +109,23 @@ public class RoleFeatureRelationController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Roles.RoleFeatureExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "通用根据过滤条件，判断是否存在")
+    public Envelop getAppFeaturesFilter(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters){
+        boolean bo = roleFeatureRelationClient.getAppFeaturesFilter(filters);
+        if(bo){
+            return success(null);
+        }
+        return failed("");
+    }
+
     private RoleFeatureRelationModel changeToModel(MRoleFeatureRelation m) {
         RoleFeatureRelationModel model = convertToModel(m, RoleFeatureRelationModel.class);
         //获取应用权限名称
+        MAppFeature appFeature = appFeatureClient.getAppFeature(m.getFeatureId()+"");
+        model.setFeatureName(appFeature == null?"":appFeature.getName());
         return model;
     }
 }

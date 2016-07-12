@@ -8,6 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by yww on 2016/7/7.
  */
@@ -22,6 +25,39 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
         return roleUserRepository.findAll(pageable);
     }
 
+    public RoleUser findRelation(String userId,long roleId){
+        return roleUserRepository.findRelation(userId, roleId);
+    }
 
+    public boolean batchCreateRoleUsersRelation(String userId,String roleIds){
+        for(String roleId : roleIds.split(",")){
+            RoleUser roleUser = new RoleUser();
+            roleUser.setUserId(userId);
+            roleUser.setRoleId(Long.parseLong(roleId));
+            save(roleUser);
+        }
+        return true;
+    }
 
+    public boolean batchUpdateRoleUsersRelation(String userId,String roleIds) throws Exception {
+        List<RoleUser> roleUsers = search("userId=" + userId + ";roleId<>" + roleIds);
+        for (RoleUser roleUser : roleUsers) {
+            delete(roleUser.getId());
+        }
+        List<RoleUser> roleUserList = search("userId=" + userId + ";roleId=" + roleIds);
+        List<Long> ids = new ArrayList<>();
+        for (int i = 0; i < roleUserList.size(); i++) {
+            ids.add(roleUserList.get(i).getRoleId());
+        }
+        for (String roleId : roleIds.split(",")) {
+            if (ids.contains(Long.parseLong(roleId))) {
+                continue;
+            }
+            RoleUser roleUser = new RoleUser();
+            roleUser.setUserId(userId);
+            roleUser.setRoleId(Long.parseLong(roleId));
+            save(roleUser);
+        }
+        return true;
+    }
 }

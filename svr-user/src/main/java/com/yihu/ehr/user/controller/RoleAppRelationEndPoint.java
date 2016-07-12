@@ -26,66 +26,59 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "roleAppRelation",description = "应用角色管理")
+@Api(value = "roleApp",description = "角色组-应用关系管理")
 public class RoleAppRelationEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RoleAppRelationService roleAppRelationService;
 
-    @RequestMapping(value = ServiceApi.Roles.RoleApp,method = RequestMethod.POST)
-    @ApiOperation(value = "新增应用-应用角色组关系")
-    public boolean createRoleAppRelation(
-            @ApiParam(name = "role_ids",value = "应用角色组ids,多个已逗号隔开")
-            @RequestParam(value = "role_ids") String roleIds,
-            @ApiParam(name = "app_id",value = "应用id")
-            @RequestParam(value = "app_id") String appId){
-        for(String roleId : roleIds.split(",")){
-            RoleAppRelation relation = new RoleAppRelation();
-            relation.setAppId(appId);
-            relation.setRoleId(Long.parseLong(roleId));
-            roleAppRelationService.save(relation);
-        }
-        return true;
+    @RequestMapping(value = ServiceApi.Roles.RoleApp,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+     @ApiOperation(value = "为角色组配置应用，单个")
+     public MRoleAppRelation createRoleAppRelation(
+            @ApiParam(name = "data_json",value = "角色组-应用关系对象Json字符串")
+            @RequestBody String dataJson){
+        RoleAppRelation roleAppRelation = toEntity(dataJson,RoleAppRelation.class);
+        RoleAppRelation roleAppRelationNew = roleAppRelationService.save(roleAppRelation);
+        return convertToModel(roleAppRelationNew,MRoleAppRelation.class,null);
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleApp,method = RequestMethod.PUT)
-    @ApiOperation(value = "修改应用-应用角色组关系")
-    public boolean updateRoleAppRelation(
-            @ApiParam(name = "role_ids",value = "应用角色组ids,多个已逗号隔开")
-            @RequestParam(value = "role_ids") String roleIds,
+    @RequestMapping(value = ServiceApi.Roles.RoleApp,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id,应用Id删除角色组-应用关系")
+    public boolean deleteRoleApp(
             @ApiParam(name = "app_id",value = "应用id")
-            @RequestParam(value = "app_id") String appId) throws Exception{
-        List<RoleAppRelation> roleAppRelations = roleAppRelationService.search("appId="+appId+";roleId<>" + roleIds);
-        for(RoleAppRelation relation : roleAppRelations){
+            @RequestParam(value = "app_id") String appId,
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") String roleId){
+        RoleAppRelation relation = roleAppRelationService.findRelation(appId, Long.parseLong(roleId));
+        if(null != relation){
             roleAppRelationService.delete(relation.getId());
         }
-        List<RoleAppRelation> roleAppRelationList = roleAppRelationService.search("appId="+appId+";roleId=" + roleIds);
-        List<Long> ids = new ArrayList<>();
-        for(RoleAppRelation roleAppRelation : roleAppRelationList){
-            ids.add(roleAppRelation.getRoleId());
-        }
-        for(String roleId : roleIds.split(",")){
-            if(ids.contains(Long.parseLong(roleId))){
-                continue;
-            }
-            RoleAppRelation relation = new RoleAppRelation();
-            relation.setAppId(appId);
-            relation.setRoleId(Long.parseLong(roleId));
-            roleAppRelationService.save(relation);
-        }
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleAppId,method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除角色组-应用关系")
-    public boolean deleteRoleApp(
-            @ApiParam(name = "id",value = "角色组-应用关系id")
-            @PathVariable(value = "id") long id){
-        roleAppRelationService.delete(id);
+    @RequestMapping(value = ServiceApi.Roles.RoleApps,method = RequestMethod.POST)
+    @ApiOperation(value = "批量新增应用-角色组关系，一对多")
+    public boolean batchCreateRoleAppRelation(
+            @ApiParam(name = "app_id",value = "应用id")
+            @RequestParam(value = "app_id") String appId,
+            @ApiParam(name = "role_ids",value = "应用角色组ids,多个用逗号隔开")
+            @RequestParam(value = "role_ids") String roleIds) throws Exception{
+        roleAppRelationService.batchCreateRoleAppRelation(appId,roleIds);
+        return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleApps,method = RequestMethod.PUT)
+    @ApiOperation(value = "批量修改应用-角色组关系，一对多")
+    public boolean batchUpdateRoleAppRelation(
+            @ApiParam(name = "app_id",value = "应用id")
+            @RequestParam(value = "app_id") String appId,
+            @ApiParam(name = "role_ids",value = "应用角色组ids,多个用逗号隔开")
+            @RequestParam(value = "role_ids") String roleIds) throws Exception{
+        roleAppRelationService.batchUpdateRoleAppRelation(appId,roleIds);
         return true;
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleApps,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色组-应用关系列表---分页")
+    @ApiOperation(value = "查询角色组-应用关系列表---分页")
     public Collection<MRoleAppRelation> searchRoleApp(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,roleId,appId")
             @RequestParam(value = "fields", required = false) String fields,
@@ -110,8 +103,8 @@ public class RoleAppRelationEndPoint extends EnvelopRestEndPoint {
             return convertToModels(roleAppRelations, new ArrayList<MRoleAppRelation>(roleAppRelations.size()), MRoleAppRelation.class, fields);
         }
     }
-    @RequestMapping(value = ServiceApi.Roles.RoleAppsNopage,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色组-应用权限关系列表---不分页")
+    @RequestMapping(value = ServiceApi.Roles.RoleAppsNoPage,method = RequestMethod.GET)
+    @ApiOperation(value = "查询角色组-应用关系列表---不分页")
     public Collection<MRoleAppRelation> searchRoleAppNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
             @RequestParam(value = "filters",required = false) String filters) throws  Exception{
