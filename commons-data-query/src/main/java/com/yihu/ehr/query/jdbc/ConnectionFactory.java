@@ -20,13 +20,13 @@ public class ConnectionFactory {
 
     String defaultName = "defaultName";
 
-    @Value("${data-source.url}")
+    @Value("${spring.datasource.url}")
     String defaultUri;
 
-    @Value("${data-source.user-name}")
+    @Value("${spring.datasource.username}")
     String defaultUser;
 
-    @Value("${data-source.password}")
+    @Value("${spring.datasource.password}")
     String defaultPassword;
 
     private final static HashMap<String, ConnectionPool> pools = new HashMap<>();

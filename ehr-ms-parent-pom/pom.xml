@@ -595,5 +595,40 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>prod-war</id>
+            <properties>
+                <skipTests>true</skipTests>
+                <packaging.type>war</packaging.type>
+                <dependency.scope>provided</dependency.scope>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <scope>${dependency.scope}</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>${dependency.scope}</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                    <scope>${dependency.scope}</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

@@ -6,6 +6,7 @@ package com.yihu.ehr.agModel.user;
 public class RoleUserModel {
     private long id;
     private long roleId;
+    private String roleName;
     private String userId;
     private String userName;
 
@@ -26,6 +27,14 @@ public class RoleUserModel {
 
     public void setRoleId(long roleId) {
         this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     public String getUserId() {

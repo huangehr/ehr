@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * 虽然支持多种HBase操作，但请注意，一次只能用于一种操作，如：Get，Put，Delete不能混用，
  * 否则将出现难以预料的后果。
  *
- * @author Sa
+ * @author Sand
  * @created 2016.04.27 14:38
  */
 public class TableBundle {
