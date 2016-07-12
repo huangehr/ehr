@@ -22,19 +22,37 @@ import java.util.Collection;
 @ApiIgnore
 public interface RoleUserClient {
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "为角色组添加人员")
+    @ApiOperation(value = "为角色组配置人员，单个")
     MRoleUser createRoleUser(
-            @ApiParam(name = "data_json",value = "角色组-用户关系Json串")
+            @ApiParam(name = "data_json",value = "角色组-人员关系Json串")
             @RequestBody String dataJson);
 
-    @RequestMapping(value = ServiceApi.Roles.RoleUserId,method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除角色组的人员")
+    @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id,人员Id删除角色组人员")
     boolean deleteRoleUser(
-            @ApiParam(name = "id",value = "角色组-用户关系id")
-            @PathVariable(value = "id") long id);
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") String roleId);
+
+    @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.POST)
+    @ApiOperation(value = "批量新增人员所属角色组，一对多")
+    boolean batchCreateRolUsersRelation(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_ids",value = "角色组ids,多个用逗号隔开")
+            @RequestParam(value = "role_ids") String roleIds);
+
+    @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.PUT)
+    @ApiOperation(value = "批量修改人员所属角色组关系，一对多")
+    boolean batchUpdateRoleUsersRelation(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_ids",value = "角色组ids,多个用逗号隔开")
+            @RequestParam(value = "role_ids") String roleIds);
 
     @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色人员关系列表---分页")
+    @ApiOperation(value = "查询角色组人员关系列表---分页")
     ResponseEntity<Collection<MRoleUser>> searchRoleUser(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,roleId,userId")
             @RequestParam(value = "fields", required = false) String fields,
@@ -47,8 +65,8 @@ public interface RoleUserClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = ServiceApi.Roles.RoleUserNoPage,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色人员关系列表---不分页")
+    @RequestMapping(value = ServiceApi.Roles.RoleUsersNoPage,method = RequestMethod.GET)
+    @ApiOperation(value = "查询角色组人员关系列表---不分页")
     Collection<MRoleUser> searchRoleUserNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
             @RequestParam(value = "filters",required = false) String filters);

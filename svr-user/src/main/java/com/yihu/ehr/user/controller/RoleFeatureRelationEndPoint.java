@@ -26,31 +26,36 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "roleFeature",description = "角色组权限配置")
+@Api(value = "roleFeature",description = "角色组功能权限配置")
 public class RoleFeatureRelationEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RoleFeatureRelationService roleFeatureRelationService;
 
     @RequestMapping(value = ServiceApi.Roles.RoleFeature,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "为角色组添加权限")
+    @ApiOperation(value = "为角色组配置功能权限，单个")
     public MRoleFeatureRelation createRoleFeature(
-            @ApiParam(name = "data_json",value = "角色组-权限关系Json串")
+            @ApiParam(name = "data_json",value = "角色组-功能权限关系Json串")
             @RequestBody String dataJson){
         RoleFeatureRelation roleFeatureRelation = toEntity(dataJson,RoleFeatureRelation.class);
         RoleFeatureRelation roleFeatureRelationNew = roleFeatureRelationService.save(roleFeatureRelation);
         return convertToModel(roleFeatureRelationNew,MRoleFeatureRelation.class);
     }
-    @RequestMapping(value = ServiceApi.Roles.RoleFeatureId,method = RequestMethod.DELETE)
-    @ApiOperation(value = "根据id删除角色组的权限")
+    @RequestMapping(value = ServiceApi.Roles.RoleFeature,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id,权限Id删除角色组-功能权限关系")
     public boolean deleteRoleFeature(
-            @ApiParam(name = "id",value = "角色组-权限关系id")
-            @PathVariable(value = "id") long id){
-        roleFeatureRelationService.delete(id);
+            @ApiParam(name = "feature_id",value = "功能权限id")
+            @RequestParam(value = "feature_id") String featureId,
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") String roleId){
+        RoleFeatureRelation relation = roleFeatureRelationService.findRelation(Long.parseLong(featureId), Long.parseLong(roleId));
+        if(null != relation){
+            roleFeatureRelationService.delete(relation.getId());
+        }
         return true;
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleFeatures,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色组-权限关系列表---分页")
+    @ApiOperation(value = "查询角色组-功能权限关系列表---分页")
     public Collection<MRoleFeatureRelation> searchRoleFeature(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,roleId,featureId")
             @RequestParam(value = "fields", required = false) String fields,
@@ -76,11 +81,20 @@ public class RoleFeatureRelationEndPoint extends EnvelopRestEndPoint {
         }
     }
     @RequestMapping(value = ServiceApi.Roles.RoleFeaturesNoPage,method = RequestMethod.GET)
-    @ApiOperation(value = "查询用户角色组-应用权限关系列表---不分页")
+    @ApiOperation(value = "查询角色组-功能权限关系列表---不分页")
     public Collection<MRoleFeatureRelation> searchRoleFeatureNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
             @RequestParam(value = "filters",required = false) String filters) throws  Exception{
         List<RoleFeatureRelation> roleFeatureRelations = roleFeatureRelationService.search(filters);
         return convertToModels(roleFeatureRelations,new ArrayList<MRoleFeatureRelation>(roleFeatureRelations.size()),MRoleFeatureRelation.class,"");
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleFeatureExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "通用根据过滤条件，判断是否存在")
+    public boolean getAppFeaturesFilter(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        Long count = roleFeatureRelationService.getCount(filters);
+        return count>0?true:false;
     }
 }

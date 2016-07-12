@@ -1,22 +1,21 @@
 package com.yihu.ehr.agModel.user;
 
 /**
- * Created by yww on 2016/7/7.
+ * Created by yww on 2016/7/8.
  */
-public class RoleUserModel {
+public class RoleApiRelationModel {
     private long id;
     private long roleId;
     private String roleName;
-    private String userId;
-    private String userName;
+    private long apiId;
+    private String apiName;
 
-    public RoleUserModel() {
+    public RoleApiRelationModel() {
     }
 
     public long getId() {
         return id;
     }
-
     public void setId(long id) {
         this.id = id;
     }
@@ -24,7 +23,6 @@ public class RoleUserModel {
     public long getRoleId() {
         return roleId;
     }
-
     public void setRoleId(long roleId) {
         this.roleId = roleId;
     }
@@ -32,24 +30,21 @@ public class RoleUserModel {
     public String getRoleName() {
         return roleName;
     }
-
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
 
-    public String getUserId() {
-        return userId;
+    public long getApiId() {
+        return apiId;
+    }
+    public void setApiId(long apiId) {
+        this.apiId = apiId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getApiName() {
+        return apiName;
     }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setApiName(String apiName) {
+        this.apiName = apiName;
     }
 }

@@ -6,6 +6,7 @@ package com.yihu.ehr.agModel.user;
 public class RoleFeatureRelationModel {
     private long id;
     private long roleId;
+    private String roleName;
     private long featureId;
     private String featureName;
 
@@ -26,6 +27,14 @@ public class RoleFeatureRelationModel {
 
     public void setRoleId(long roleId) {
         this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     public long getFeatureId() {
