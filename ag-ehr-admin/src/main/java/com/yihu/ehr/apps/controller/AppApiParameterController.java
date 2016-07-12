@@ -6,10 +6,13 @@ import com.yihu.ehr.apps.service.AppApiParameterClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppApiParameter;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,6 +33,9 @@ public class AppApiParameterController extends BaseController {
     @Autowired
     AppApiParameterClient AppApiParameterClient;
 
+    @Autowired
+    private ConventionalDictEntryClient conDictEntryClient;
+
     @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameters, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiParameter列表")
     public Envelop getAppApiParameters(
@@ -49,7 +55,7 @@ public class AppApiParameterController extends BaseController {
         for(MAppApiParameter mAppApiParameter: mAppApiParameterList){
             AppApiParameterModel appApiParameterModel  = new AppApiParameterModel();
             BeanUtils.copyProperties(mAppApiParameter,appApiParameterModel);
-            createDictName(appApiParameterModel);
+            converModelName(appApiParameterModel);
             AppApiParameterModels.add(appApiParameterModel);
         }
         Integer totalCount = getTotalCount(responseEntity);
@@ -109,7 +115,7 @@ public class AppApiParameterController extends BaseController {
             return envelop;
         }
         BeanUtils.copyProperties(mAppApiParameter,appApiParameterModel);
-        createDictName(appApiParameterModel);
+        converModelName(appApiParameterModel);
         envelop.setSuccessFlg(true);
         envelop.setObj(appApiParameterModel);
         return envelop;
@@ -130,7 +136,21 @@ public class AppApiParameterController extends BaseController {
      * 格式化字典数据
      * @param appApiParameterModel
      */
-    private void createDictName(AppApiParameterModel appApiParameterModel){
-
+    private void converModelName(AppApiParameterModel appApiParameterModel){
+        //参数类型
+        if(!StringUtils.isEmpty(appApiParameterModel.getType())){
+            MConventionalDict catalopDict = conDictEntryClient.getApiParameterType(appApiParameterModel.getType());
+            appApiParameterModel.setTypeName(catalopDict == null ? "" : catalopDict.getValue());
+        }
+        //参数数据类型
+        if(!StringUtils.isEmpty(appApiParameterModel.getDataType())){
+            MConventionalDict catalopDict = conDictEntryClient.getApiParameterDataType(appApiParameterModel.getDataType());
+            appApiParameterModel.setDataTypeName(catalopDict == null ? "" : catalopDict.getValue());
+        }
+        //参数必输
+        if(!StringUtils.isEmpty(appApiParameterModel.getRequired())){
+            MConventionalDict catalopDict = conDictEntryClient.getApiParameterDataRequired(appApiParameterModel.getRequired());
+            appApiParameterModel.setRequiredName(catalopDict == null ? "" : catalopDict.getValue());
+        }
     }
 }
