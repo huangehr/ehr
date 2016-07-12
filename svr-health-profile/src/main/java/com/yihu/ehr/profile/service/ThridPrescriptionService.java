@@ -30,10 +30,6 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
     @Autowired
     private FastDFSConfig FastDFSConfig;
 
-    //返回图片的ip地址
-    @Value("${returnurl}")
-    private String returnUrl;
-
     @Autowired
     ProfileCDAService cdaService;
 
