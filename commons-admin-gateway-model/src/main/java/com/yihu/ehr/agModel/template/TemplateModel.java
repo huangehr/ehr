@@ -22,6 +22,15 @@ public class TemplateModel {
     private String city;
     private String cdaType;
     private String cdaTypeName;
+    private String cdaCode;
+
+    public String getCdaCode() {
+        return cdaCode;
+    }
+
+    public void setCdaCode(String cdaCode) {
+        this.cdaCode = cdaCode;
+    }
 
     public int getId() {
         return id;
