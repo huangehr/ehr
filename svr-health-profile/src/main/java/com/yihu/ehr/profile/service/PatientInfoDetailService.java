@@ -1,28 +1,18 @@
 package com.yihu.ehr.profile.service;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.data.hbase.HBaseDao;
-import com.yihu.ehr.data.hbase.ResultUtil;
-import com.yihu.ehr.data.hbase.TableBundle;
-import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.model.specialdict.MDrugDict;
-import com.yihu.ehr.model.specialdict.MIndicatorsDict;
-import com.yihu.ehr.model.standard.MCDADocument;
-import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XDictClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.profile.model.MedicationStat;
 import com.yihu.ehr.util.rest.Envelop;
-import org.apache.avro.generic.GenericData;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

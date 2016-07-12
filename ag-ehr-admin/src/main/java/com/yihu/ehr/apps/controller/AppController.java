@@ -107,7 +107,8 @@ public class AppController extends BaseController {
         }else{
             String role =  appDetailModel.getRole();
             if(StringUtils.isNotBlank(role)){
-                roleAppRelationClient.createRoleAppRelation(role,mApp.getId());
+                //role 为角色组ids,以逗号隔开
+                roleAppRelationClient.batchCreateRoleAppRelation(mApp.getId(), role);
             }
             envelop.setSuccessFlg(true);
             envelop.setObj(convertToAppDetailModel(mApp));
@@ -166,7 +167,8 @@ public class AppController extends BaseController {
         }else{
             String role =  appDetailModel.getRole();
             if(StringUtils.isNotBlank(role)){
-                roleAppRelationClient.updateRoleAppRelation(role,mApp.getId());
+                //role 为角色组ids,以逗号隔开
+                roleAppRelationClient.batchUpdateRoleAppRelation(mApp.getId(),role);
             }
             envelop.setSuccessFlg(true);
             envelop.setObj(convertToAppDetailModel(mApp));

@@ -5,7 +5,13 @@ import com.yihu.ehr.agModel.user.RolesModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.model.user.MRoleAppRelation;
+import com.yihu.ehr.model.user.MRoleFeatureRelation;
+import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MRoles;
+import com.yihu.ehr.users.service.RoleAppRelationClient;
+import com.yihu.ehr.users.service.RoleFeatureRelationClient;
+import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -33,24 +39,30 @@ public class RolesController extends BaseController {
     private RolesClient rolesClient;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private RoleUserClient roleUserClient;
 
-    @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Autowired
+    private RoleFeatureRelationClient roleFeatureRelationClient;
+
+    @Autowired
+    private RoleAppRelationClient roleAppRelationClient;
+
+    @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST)
     @ApiOperation(value = "新增角色组")
     public Envelop createRoles(
             @ApiParam(name = "data_json",value = "新增角色组Json字符串")
-            @RequestBody() String dataJson){
+            @RequestParam(value = "data_json") String dataJson){
         MRoles mRoles = rolesClient.createRoles(dataJson);
         if(null == mRoles){
             return failed("新增角色组失败");
         }
         return success(convertToModel(mRoles, RolesModel.class));
     }
-    @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.PUT)
     @ApiOperation(value = "修改角色组")
     public Envelop updateRoles(
             @ApiParam(name = "data_json",value = "修改角色组Json字符串")
-            @RequestBody() String dataJson){
+            @RequestParam(value = "data_json") String dataJson){
         MRoles mRoles = rolesClient.updateRoles(dataJson);
         if(null == mRoles){
             return failed("修改角色组失败");
@@ -59,8 +71,24 @@ public class RolesController extends BaseController {
     }
     @RequestMapping(value = ServiceApi.Roles.RoleId,method = RequestMethod.DELETE)
     @ApiOperation(value = "根据角色组id删除")
-    public Envelop deleteRoles(@ApiParam(name = "id",value = "角色组id")
-                               @PathVariable(value = "id") long id){
+    public Envelop deleteRoles(
+            @ApiParam(name = "id",value = "角色组id")
+            @PathVariable(value = "id") long id){
+        //判断是否已配置人员
+        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("roleId=" + id);
+        if(mRoleUsers != null&&mRoleUsers.size()>0){
+            return failed("已配置人员角色组不能删除！");
+        }
+        //判断是否已配置应用权限
+        Collection<MRoleFeatureRelation> mRelation = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId"+id);
+        if(mRelation != null && mRelation.size()>0){
+            return failed("已配置应用权限角色组不能删除！");
+        }
+        //判断是否已配置接入应用
+        Collection<MRoleAppRelation> mRoleAppRelation = roleAppRelationClient.searchRoleAppNoPaging("roleId"+id);
+        if(mRoleAppRelation != null && mRoleAppRelation.size()>0){
+            return failed("已配置接入应用角色组不能删除！");
+        }
 
         boolean bo = rolesClient.deleteRoles(id);
         if(bo){
@@ -115,6 +143,29 @@ public class RolesController extends BaseController {
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(rolesModelList);
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleNameExistence,method = RequestMethod.GET)
+    @ApiOperation(value = "角色组名称是否已存在" )
+    public Envelop isNameExistence(
+            @ApiParam(name = "name",value = "角色组名")
+            @RequestParam(value = "name") String name){
+        boolean bo = rolesClient.isNameExistence(name);
+        if(bo){
+            return success(null);
+        }
+        return failed("");
+    }
+    @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence,method = RequestMethod.GET)
+    @ApiOperation(value = "角色组代码是否已存在" )
+    public Envelop isCodeExistence(
+            @ApiParam(name = "code",value = "角色组代码")
+            @RequestParam(value = "code") String code){
+        boolean  bo = rolesClient.isCodeExistence(code);
+        if(bo){
+            return success(null);
+        }
+        return failed("");
     }
 //    private RolesModel changeToModel(MRoles m) {
 //        RolesModel rolesModel = convertToModel(m, RolesModel.class);
