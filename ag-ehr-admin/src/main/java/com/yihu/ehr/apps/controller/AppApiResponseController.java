@@ -128,7 +128,7 @@ public class AppApiResponseController extends BaseController {
      * 格式化字典数据
      * @param appApiResponseModel
      */
-    private void createDictName(AppApiResponseModel appApiResponseModel){
+    private void converModelName(AppApiResponseModel appApiResponseModel){
 
     }
 }
