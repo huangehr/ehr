@@ -541,4 +541,250 @@ public class ConventionalDictEntryController extends BaseController{
         envelop.setObj(systemDictEntryModel);
         return envelop;
     }
+
+    @RequestMapping(value = "/dictionaries/archives_audit_status", method = RequestMethod.GET)
+    @ApiOperation(value = "档案关联审批状态", response = MConventionalDict.class)
+    public Envelop getArchivesAuditStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getArchivesAuditStatus(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/archives_audit_status_list", method = RequestMethod.GET)
+    @ApiOperation(value = "档案关联审批状态", response = MConventionalDict.class)
+    public Envelop  getArchivesAuditStatusList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getArchivesAuditStatusList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/archives_manage_status", method = RequestMethod.GET)
+    @ApiOperation(value = "档案管理状态", response = MConventionalDict.class)
+    public Envelop getArchivesManageStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getArchivesManageStatus(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/archives_manage_status_list", method = RequestMethod.GET)
+    @ApiOperation(value = "档案管理状态", response = MConventionalDict.class)
+    public Envelop getArchivesManageStatusList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getArchivesManageStatusList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/application_source", method = RequestMethod.GET)
+    @ApiOperation(value = "应用来源", response = MConventionalDict.class)
+    public Envelop getApplicationSource(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getApplicationSource(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/application_source_list", method = RequestMethod.GET)
+    @ApiOperation(value = "应用来源", response = MConventionalDict.class)
+    public Envelop getApplicationSourceList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getApplicationSourceList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/application_menu_type", method = RequestMethod.GET)
+    @ApiOperation(value = "应用菜单类型", response = MConventionalDict.class)
+    public Envelop getApplicationMenuType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getApplicationMenuType(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/application_menu_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "应用菜单类型", response = MConventionalDict.class)
+    public Envelop getApplicationMenuTypeList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getApplicationMenuTypeList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+
+    @RequestMapping(value = "/dictionaries/open_level", method = RequestMethod.GET)
+    @ApiOperation(value = "开放等级", response = MConventionalDict.class)
+    public Envelop  getOpenLevel(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getOpenLevel(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/open_level_list", method = RequestMethod.GET)
+    @ApiOperation(value = "开放等级", response = MConventionalDict.class)
+    public Envelop  getOpenLevelList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getOpenLevelList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/audit_level", method = RequestMethod.GET)
+    @ApiOperation(value = "审计等级", response = MConventionalDict.class)
+    public Envelop  getAuditLevel(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getAuditLevel(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/audit_level_list", method = RequestMethod.GET)
+    @ApiOperation(value = "审计等级", response = MConventionalDict.class)
+    public Envelop  getAuditLevelList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getAuditLevelList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/role_type", method = RequestMethod.GET)
+    @ApiOperation(value = "角色组分类", response = MConventionalDict.class)
+    public Envelop  getRoleType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getRoleType(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/role_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "角色组分类", response = MConventionalDict.class)
+    public Envelop  getRoleTypeList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getRoleTypeList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+
+    @RequestMapping(value = "/dictionaries/valid_identification", method = RequestMethod.GET)
+    @ApiOperation(value = "有效标识", response = MConventionalDict.class)
+    public Envelop  getValidIdentification(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getValidIdentification(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/valid_identification_list", method = RequestMethod.GET)
+    @ApiOperation(value = "有效标识", response = MConventionalDict.class)
+    public Envelop  getValidIdentificationList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getValidIdentificationList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_protocol", method = RequestMethod.GET)
+    @ApiOperation(value = "API协议", response = MConventionalDict.class)
+    public Envelop  getApiProtocol(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getApiProtocol(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_protocol_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API协议", response = MConventionalDict.class)
+    public Envelop  getApiProtocolList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getApiProtocolList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_method", method = RequestMethod.GET)
+    @ApiOperation(value = "API方法", response = MConventionalDict.class)
+    public Envelop  getApiMethod(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getApiMethod(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_method_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API方法", response = MConventionalDict.class)
+    public Envelop  getApiMethodList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getApiMethodList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_type", method = RequestMethod.GET)
+    @ApiOperation(value = "API类型", response = MConventionalDict.class)
+    public Envelop  getApiType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getApiType(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "字典代码", response = MConventionalDict.class)
+    public Envelop  getApiTypeList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getApiTypeList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_parameter_type", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数类型", response = MConventionalDict.class)
+    public Envelop  getApiParameterType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getApiParameterType(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_parameter_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数类型", response = MConventionalDict.class)
+    public Envelop  getApiParameterTypeList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getApiParameterTypeList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_parameter_data_type", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数数据类型", response = MConventionalDict.class)
+    public Envelop  getApiParameterDataType(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getApiParameterDataType(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_parameter_data_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数数据类型", response = MConventionalDict.class)
+    public Envelop  getApiParameterDataTypeList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getApiParameterDataTypeList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_parameter_data_required", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数必输标识", response = MConventionalDict.class)
+    public Envelop  getApiParameterDataRequired(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code){
+        MConventionalDict mConventionalDict = dictEntryClient.getApiParameterDataRequired(code);
+        return convertDictToModel(mConventionalDict);
+    }
+
+    @RequestMapping(value = "/dictionaries/api_parameter_data_required_list", method = RequestMethod.GET)
+    @ApiOperation(value = "API参数必输标识", response = MConventionalDict.class)
+    public Envelop  getApiParameterDataRequiredList(){
+        Collection<MConventionalDict> mConventionalDicts = dictEntryClient.getApiParameterDataRequiredList();
+        return convertDictToListModel(mConventionalDicts);
+    }
+
+    private Envelop convertDictToModel(MConventionalDict mConventionalDict){
+        Envelop envelop = new Envelop();
+        SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict, SystemDictEntryModel.class);
+        envelop.setObj(systemDictEntryModel);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+    private Envelop convertDictToListModel(Collection<MConventionalDict> mConventionalDicts){
+        Envelop envelop = new Envelop();
+        List<SystemDictEntryModel> systemDictEntryModelList = new ArrayList<>();
+        for (MConventionalDict mConventionalDict: mConventionalDicts){
+            SystemDictEntryModel systemDictEntryModel = convertToModel(mConventionalDict,SystemDictEntryModel.class);
+            systemDictEntryModelList.add(systemDictEntryModel);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(systemDictEntryModelList);
+        return envelop;
+    }
+
 }
