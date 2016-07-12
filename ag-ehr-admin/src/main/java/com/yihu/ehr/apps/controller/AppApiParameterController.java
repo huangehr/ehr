@@ -96,6 +96,7 @@ public class AppApiParameterController extends BaseController {
             return envelop;
         }
         BeanUtils.copyProperties(mAppApiParameter,appApiParameterModel);
+        converModelName(appApiParameterModel);
         envelop.setSuccessFlg(true);
         envelop.setObj(appApiParameterModel);
         return envelop;
