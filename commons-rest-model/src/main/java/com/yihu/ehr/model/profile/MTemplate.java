@@ -17,6 +17,15 @@ public class MTemplate {
     private String mobileTplURL;
     private String cdaType;
     private Date createTime = new Date();
+    private String cdaCode;
+
+    public String getCdaCode() {
+        return cdaCode;
+    }
+
+    public void setCdaCode(String cdaCode) {
+        this.cdaCode = cdaCode;
+    }
 
     public int getId() {
         return id;
