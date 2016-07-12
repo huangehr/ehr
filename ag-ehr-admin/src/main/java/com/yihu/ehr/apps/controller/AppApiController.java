@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ import java.util.List;
 public class AppApiController extends BaseController {
 
     @Autowired
-    AppApiClient AppApiClient;
+    AppApiClient appApiClient;
 
     @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
@@ -43,7 +44,7 @@ public class AppApiController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
-        ResponseEntity<List<MAppApi>> responseEntity =  AppApiClient.getAppApis(fields, filters, sort, size, page);
+        ResponseEntity<List<MAppApi>> responseEntity =  appApiClient.getAppApis(fields, filters, sort, size, page);
         List<MAppApi> mAppApiList = responseEntity.getBody();
         List<AppApiModel> appApiModels = new ArrayList<>();
         for(MAppApi mAppApi: mAppApiList){
@@ -62,7 +63,7 @@ public class AppApiController extends BaseController {
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
             @RequestParam(value = "model", required = false) String model){
         Envelop envelop = new Envelop();
-        MAppApi mAppApi =  AppApiClient.createAppApi(model);
+        MAppApi mAppApi =  appApiClient.createAppApi(model);
         if(mAppApi==null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败！");
@@ -81,7 +82,7 @@ public class AppApiController extends BaseController {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id){
         Envelop envelop = new Envelop();
-        MAppApi mAppApi =  AppApiClient.getAppApi(id);
+        MAppApi mAppApi =  appApiClient.getAppApi(id);
         AppApiModel appApiModel = new AppApiModel();
         if(mAppApi==null){
             envelop.setSuccessFlg(false);
@@ -100,7 +101,7 @@ public class AppApiController extends BaseController {
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "model", required = false) String AppApi){
         Envelop envelop = new Envelop();
-        MAppApi mAppApi =  AppApiClient.createAppApi(AppApi);
+        MAppApi mAppApi =  appApiClient.createAppApi(AppApi);
         AppApiModel appApiModel = new AppApiModel();
         if(mAppApi==null){
             envelop.setSuccessFlg(false);
@@ -115,12 +116,28 @@ public class AppApiController extends BaseController {
 
     @RequestMapping(value = ServiceApi.AppApi.AppApi, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除AppApi")
-    Envelop deleteAppApi(
+    public Envelop deleteAppApi(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id){
         Envelop envelop = new Envelop();
-        Boolean isDelete  = AppApiClient.deleteAppApi(id);
+        Boolean isDelete  = appApiClient.deleteAppApi(id);
         envelop.setSuccessFlg(isDelete);
         return envelop;
     }
+    @RequestMapping(value = ServiceApi.AppApi.AppApisNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取过滤App列表")
+    public Envelop getAppApiNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters){
+        Collection<MAppApi> mAppApis = appApiClient.getAppApiNoPage(filters);
+        Envelop envelop = new Envelop();
+        List<AppApiModel> appApiModels = new ArrayList<>();
+        for(MAppApi mAppApi: mAppApis ){
+            AppApiModel appApiModel = convertToModel(mAppApi, AppApiModel.class);
+            appApiModels.add(appApiModel);
+        }
+        envelop.setDetailModelList(appApiModels);
+        return envelop;
+    }
+
 }

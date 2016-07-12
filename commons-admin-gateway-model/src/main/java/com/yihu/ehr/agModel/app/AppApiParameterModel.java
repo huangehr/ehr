@@ -14,11 +14,29 @@ public class AppApiParameterModel {
     private String type;
     private String typeName;
     private String dataType;
+    private String dataTypeName;
     private String description;
     private String required;
+    private String requiredName;
     private int appApiId;
     private String memo;
     private String defaultValue;
+
+    public String getRequiredName() {
+        return requiredName;
+    }
+
+    public void setRequiredName(String requiredName) {
+        this.requiredName = requiredName;
+    }
+
+    public String getDataTypeName() {
+        return dataTypeName;
+    }
+
+    public void setDataTypeName(String dataTypeName) {
+        this.dataTypeName = dataTypeName;
+    }
 
     public String getTypeName() {
         return typeName;
