@@ -2,6 +2,7 @@ package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.model.AppApi;
+import com.yihu.ehr.apps.model.AppFeature;
 import com.yihu.ehr.apps.service.AppApiService;
 import com.yihu.ehr.apps.service.AppService;
 import com.yihu.ehr.constants.ApiVersion;
@@ -11,6 +12,7 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.app.MAppFeature;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -105,5 +107,15 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") int id) throws Exception {
         appApiService.delete(id);
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.AppApi.AppApisNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取过滤App列表")
+    public Collection<MAppApi> getAppApiNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters
+    ) throws Exception {
+        List<AppApi> appApiList =  appApiService.search(filters);
+        return convertToModels(appApiList,new ArrayList<>(appApiList.size()),MAppApi.class, "");
     }
 }

@@ -153,7 +153,7 @@ public class SanofiEndPoint {
         for (String profileId : profileIds) {
             section = document.withArray("lis");
             query = "{\"q\":\"profile_id:" + profileId;
-//            query += " AND EHR_000384:[" + DateTimeUtil.utcDateTimeFormat(since) + " TO " + DateTimeUtil.utcDateTimeFormat(to) + "]";
+            query += " AND EHR_000384:[" + DateTimeUtil.utcDateTimeFormat(since) + " TO " + DateTimeUtil.utcDateTimeFormat(to) + "]";
             query += "\"}";
             query = query.replace(" ", "+");
             dataSetList = sanofiService.getDataSet(BasisConstant.laboratoryProject, query);

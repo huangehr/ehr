@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsAdapterDictionary;
 import com.yihu.ehr.model.resource.MRsAdapterMetadata;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -51,4 +52,10 @@ public interface AdapterDictionaryClient {
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
+
+    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionariesCache, method = RequestMethod.GET)
+    @ApiOperation("缓存适配版本字典数据")
+    public boolean dictCache(
+            @ApiParam(name = "schemaId", value = "schemaId", defaultValue = "")
+            @PathVariable(value = "schemaId") String schemaId);
 }

@@ -71,11 +71,11 @@ public class Template {
     }
 
     @Column(name = "pc_template")
-    public String getPcTplURL() throws Exception {
+    public String getPcTplURL() {
         return pcTplURL;
     }
 
-    public void setPcTplURL(String url) throws Exception {
+    public void setPcTplURL(String url) {
         pcTplURL = url;
     }
 

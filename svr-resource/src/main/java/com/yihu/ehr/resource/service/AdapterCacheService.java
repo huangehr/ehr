@@ -43,14 +43,14 @@ public class AdapterCacheService extends BaseJpaService<RsAdapterScheme,AdapterS
 
         for(RsAdapterMetadata meta : metaIterable)
         {
-            if(StringUtils.isEmpty(meta.getSrcDatasetCode().trim()))
-            {
+            if (StringUtils.isEmpty(meta.getSrcDatasetCode())||StringUtils.isEmpty(meta.getMetadataId())) {
                 continue;
             }
 
-            String redisKey = keySchema.metaData(schema.getAdapterVersion(),meta.getSrcDatasetCode(),meta.getSrcMetadataCode());
 
-            redisClient.set(redisKey,meta.getMetadataId());
+            String redisKey = keySchema.metaData(schema.getAdapterVersion(), meta.getSrcDatasetCode(), meta.getSrcMetadataCode());
+
+            redisClient.set(redisKey, meta.getMetadataId());
         }
     }
 

@@ -63,7 +63,7 @@
 //    private ProfileIndicesService indicesService;
 //
 //    @ApiOperation(value = "获取体征数据", notes = "获取体征数据")
-//    @RequestMapping(value = "/legacy"+ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.GET)
+//    @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.GET)
 //    public ResponseEntity<String> getBodySigns(
 //            @ApiParam(value = "身份证号", defaultValue = "412726195111306268")
 //            @RequestParam(value = "demographic_id", required = false) String demographicId,
@@ -214,7 +214,7 @@
 //                boolean flag = false;
 //                for (String metaDataCode : metaDataCodes) {
 //                    String value = record.getMetaData(metaDataCode);
-//                    if (!StringUtils.isEmpty(value)) {
+//                    if (!StringUtils.isEmpty(value) && !metaDataCode.equals("HDSD00_08_036")) {
 //                        flag = true;
 //                    }
 //                    arrayNode.put(metaDataCode, StringUtils.isEmpty(value) ? "" : value);

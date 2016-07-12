@@ -4,10 +4,7 @@ import com.yihu.ehr.model.specialdict.MIndicatorsDict;
 import com.yihu.ehr.profile.feign.XDictClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.map.ObjectMapper;
-import org.apache.hadoop.hbase.shaded.org.codehaus.jackson.type.JavaType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
