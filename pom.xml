@@ -336,7 +336,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.hbase</groupId>
-                <artifactId>hbase-shaded-client</artifactId>
+                <artifactId>hbase-client</artifactId>
                 <version>${version.hbase-client}</version>
                 <scope>${dependency.scope}</scope>
             </dependency>
