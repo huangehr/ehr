@@ -1,6 +1,6 @@
-package com.yihu.ehr.dao.repository;
+package com.yihu.ehr.archivrsecurity.dao.repository;
 
-import com.yihu.ehr.dao.model.ArchiveVisitLog;
+import com.yihu.ehr.archivrsecurity.dao.model.ArchiveVisitLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
