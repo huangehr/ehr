@@ -203,6 +203,22 @@ public class MetadataController extends BaseController {
         return existIds;
     }
 
+
+    @RequestMapping(value = "/resources/metadata/active", method = RequestMethod.PUT)
+    @ApiOperation("激活数据元")
+    public Envelop activeMetadata(
+            @ApiParam(name = "id", value = "数据元编号", defaultValue = "")
+            @RequestParam(value = "id") String id) throws Exception {
+        try{
+            MRsMetadata rsMetadata = metadataClient.getMetadataById(id);
+            rsMetadata.setValid("1");
+            return success(metadataClient.updateMetadata(toJson(rsMetadata)));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("系统出错！");
+        }
+    }
+
     private List<RsMetadataModel> coverModelLs(List<MRsMetadata> rsMetadatas) throws UnsupportedEncodingException {
         List<RsMetadataModel> rs = new ArrayList<>();
         if(!isEmpty(rsMetadatas)){

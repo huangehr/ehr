@@ -53,7 +53,7 @@ public class ResourcesQueryService  {
     ObjectMapper objectMapper;
 
     //忽略字段
-    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","demographic_id", "patient_id","org_code","org_name","profile_id", "cda_version", "client_id"));//"profile_type",
+    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","demographic_id", "patient_id","org_code","org_name","profile_id", "cda_version", "client_id","profile_type"));
 
     /**
      * 新增参数
@@ -321,10 +321,15 @@ public class ResourcesQueryService  {
      * @return
      * @throws Exception
      */
-    public Envelop getRawFiles(String profileId,Integer page,Integer size) throws Exception{
+    public Envelop getRawFiles(String profileId,String cdaDocumentId,Integer page,Integer size) throws Exception{
         Envelop re = new Envelop();
+        String queryParams = "{\"q\":\"rowkey:"+profileId+"*\"}";
+        if(cdaDocumentId!=null && cdaDocumentId.length()>0)
+        {
+            queryParams = "{\"q\":\"rowkey:"+profileId+"* AND cda_document_id:"+cdaDocumentId+"\"}";
+        }
 
-        Page<Map<String,Object>> result = resourcesQueryDao.getRawFiles("{\"q\":\"rowkey:"+profileId+"*\"}",page,size);
+        Page<Map<String,Object>> result = resourcesQueryDao.getRawFiles(queryParams,page,size);
         if (result != null) {
             re.setSuccessFlg(true);
             re.setCurrPage(result.getNumber());

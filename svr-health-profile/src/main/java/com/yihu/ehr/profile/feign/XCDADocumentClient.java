@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sand
@@ -35,8 +36,17 @@ public interface XCDADocumentClient {
     MCDADocument getCDADocuments(@RequestParam(value = "version") String version,
                                            @RequestParam(value = "id") String id);
 
+    @RequestMapping(value = ServiceApi.Standards.DocumentList, method = RequestMethod.GET)
+    Map<String,MCDADocument> getCDADocumentsList(@RequestParam(value = "version") String version,
+                                 @RequestParam(value = "idList") String[] id);
+
     @RequestMapping(value = ServiceApi.Standards.DocumentDataSet, method = RequestMethod.GET)
     List<MCdaDataSet> getCDADataSetByCDAId(
             @RequestParam(value = "version") String version,
             @RequestParam(value = "document_Id") String cdaDocumentId);
+
+    @RequestMapping(value = ServiceApi.Standards.DocumentDataSetList, method = RequestMethod.GET)
+    Map<String,List<MCdaDataSet>> getCDADataSetByCDAIdList(
+            @RequestParam(value = "version") String version,
+            @RequestParam(value = "document_Id") String[] cdaDocumentId);
 }

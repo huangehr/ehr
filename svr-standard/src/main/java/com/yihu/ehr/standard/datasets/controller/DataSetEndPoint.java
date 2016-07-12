@@ -1,5 +1,6 @@
 package com.yihu.ehr.standard.datasets.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MStdDataSet;
@@ -184,4 +185,14 @@ public class DataSetEndPoint extends ExtendEndPoint<MStdDataSet> {
         return dataSetService.isExistByField("code", code, entityClass);
     }
 
+    @RequestMapping(value = ServiceApi.Standards.DataSetsBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量创建标准数据集以及数据元", notes = "批量创建标准数据集以及数据元")
+    public boolean createDictAndEntries(
+            @RequestParam(value = "version") String version,
+            @RequestBody String jsonData) throws Exception {
+
+        List models = objectMapper.readValue(jsonData, new TypeReference<List>() {});
+        dataSetService.batchInsertDictsAndEntry(models, version);
+        return true;
+    }
 }

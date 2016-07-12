@@ -2,16 +2,10 @@ package com.yihu.ehr.profile.controller.profile.converter;
 
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.EventType;
-import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.profile.MDataSet;
-import com.yihu.ehr.model.profile.MProfile;
-import com.yihu.ehr.model.profile.MProfileDocument;
-import com.yihu.ehr.model.profile.MRecord;
 import com.yihu.ehr.model.standard.MCDADocument;
-import com.yihu.ehr.model.standard.MCdaDataSetRelationship;
 import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
-import com.yihu.ehr.profile.service.Template;
+import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.profile.service.TemplateService;
 import com.yihu.ehr.schema.OrgKeySchema;
 import com.yihu.ehr.schema.StdDataSetKeySchema;
@@ -19,11 +13,9 @@ import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
 import java.util.Map;
 
 /**

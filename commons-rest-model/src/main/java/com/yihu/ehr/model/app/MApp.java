@@ -27,8 +27,26 @@ public class MApp implements Serializable {
     private String description;
     private String tags;
     private String org;
+    private String code;
+    private int sourceType;
 
-	public MApp(){
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public int getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(int sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public MApp(){
     }
 
     public String getId() {

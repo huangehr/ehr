@@ -11,6 +11,8 @@ package com.yihu.ehr.api;
 public class ServiceApi {
     public static class Caches{
         public static final String Organizations                   = "/caches/organizations";
+        public static final String OrganizationsArea                   = "/caches/OrganizationsArea";
+        public static final String GetOrganizationsArea                   = "/caches/organizationsArea/{orgs_code}";
         public static final String Organization                    = "/caches/organizations/{org_code}";
         public static final String Versions                        = "/caches/standards/versions";
         public static final String Version                         = "/caches/standards/versions/{version}";
@@ -39,6 +41,21 @@ public class ServiceApi {
      * 资源管理中心接口
      */
     public static class Resources{
+        //资源查询接口(命名先按原有路径，不规范)
+        public static final String ResourceViewMetadata = "/rs/query/getResourceMetadata"; //资源浏览获取结构
+        public static final String ResourceViewData = "/rs/query/getResourceData"; //资源浏览获取数据
+        public static final String ResourcesQuery = "/resources/query"; //资源查询接口
+        public static final String ResourcesQueryTransform = "/resources/query/transform"; //资源查询接口+转译
+        public static final String ResourcesRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
+        public static final String ResourcesRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
+        public static final String ResourcesMasterData = "/resources/query/master_data"; //主表资源查询接口
+        public static final String ResourcesSubData = "/resources/query/sub_data"; //细表资源查询接口
+        public static final String getCDAData = "/resources/query/getCDAData";//获取cda data
+        public static final String ResourcesMasterStat = "/resources/query/master_stat"; //主表资源统计接口
+        public static final String ResourcesSubStat = "/resources/query/sub_stat"; //细表资源查询接口
+        public static final String ResourcesMysql = "/resources/query/mysql"; //mysql资源查询接口
+
+
         public static final String Resources                         = "/resources";
         public static final String Resource                          = "/resources/{id}";
         public static final String NoPageResources                   = "/NoPageResources";
@@ -151,23 +168,25 @@ public class ServiceApi {
         public static final String HospitalizedDeath           = "/{demographic_id}/hospitalized/death"; //住院死因链情况
 
 
-        public static final String CDADocumentId         = "/profile/cda/document_id"; //cda模板（通过event_no + cda_type）
-        public static final String CDAClass            = "/{profile_id}/cda_class"; //cda分类
-        public static final String CDAData             = "/{profile_id}/cda_data"; //cda数据
-        public static final String CDADocument         =  "/{profile_id}/cda_document"; //完整CDA文档
+        public static final String CDADocumentId               = "/profile/cda/document_id"; //cda模板（通过event_no + cda_type）
+        public static final String CDAClass                    = "/{profile_id}/cda_class"; //cda分类
+        public static final String CDAData                     = "/{profile_id}/cda_data"; //cda数据
+        public static final String CDADocument                 =  "/{profile_id}/cda_document"; //完整CDA文档
 
 
         public static final String ExaminationReport           = "/{demographic_id}/examination"; //检查报告单
-        public static final String ExaminationImg           = "/{demographic_id}/examination/img"; //检查报告单图片
+        public static final String ExaminationImg              = "/{demographic_id}/examination/img"; //检查报告单图片
 
 
         public static final String LaboratoryReport            = "/{demographic_id}/laboratory"; //检验报告单
-        public static final String LaboratoryImg            = "/{demographic_id}/laboratory/img"; //检验报告单图片
+        public static final String LaboratoryImg               = "/{demographic_id}/laboratory/img"; //检验报告单图片
         public static final String LaboratoryProject           = "/{demographic_id}/laboratory/project"; //检验报告单项目
         public static final String LaboratoryAllergy           = "/{demographic_id}/laboratory/allergy"; //检验药敏
 
         public static final String Surgery                     = "/{demographic_id}/surgery";//手术-手术记录
 
+        public static final String IndicatorsClass             = "/{demographic_id}/indicators/class"; //获取某个健康问题指标
+        public static final String IndicatorsData              = "/{demographic_id}/indicators/data"; //获取指标数据
     }
 
     public static class Families{
@@ -190,6 +209,25 @@ public class ServiceApi {
         public static final String AppExistence                    = "/apps/{app_id}/existence";
         public static final String AppStatus                       = "/apps/{app_id}/status";
         public static final String AppNameExistence                = "/app/{app_name}/existence";
+        public static final String FilterList                        ="/apps/filterList";
+    }
+
+    public static class AppApi{
+        public static final String AppApis                            = "/appApi";
+        public static final String AppApi                             = "/appApi/{id}";
+    }
+    public static class AppFeature{
+        public static final String AppFeatures                           = "/appFeature";
+        public static final String FilterFeatureList                    = "/filterFeatureList";
+        public static final String AppFeature                            = "/appFeature/{id}";
+    }
+    public static class AppApiParameter{
+        public static final String AppApiParameters                            = "/appApiParameter";
+        public static final String AppApiParameter                     = "/appApiParameter/{id}";
+    }
+    public static class AppApiResponse{
+        public static final String AppApiResponses                            = "/appApiResponse";
+        public static final String AppApiResponse                    = "/appApiResponse/{id}";
     }
 
     public static class Dictionaries{
@@ -290,11 +328,13 @@ public class ServiceApi {
 
         public static final String Documents                        = "/std/documents";
         public static final String Document                         = "/std/documents/{id}";
+        public static final String DocumentList                        = "/std/documentsList";
         public static final String DocumentFileExistence            = "/std/documents/{id}/file/existence";
         public static final String DocumentCreateFile               = "/std/documents/{id}/file/create";
         public static final String DocumentGetFile                  = "/std/documents/{id}/file";
 
         public static final String DocumentDataSet                  = "/std/documents/data_set";
+        public static final String DocumentDataSetList                  = "/std/documents/data_set_list";
         public static final String DataSetRelationships             = "/std/documents/data_set_relationships";
         public static final String DataSetRelationship              = "/std/documents/data_set_relationships/{id}";
 
@@ -306,6 +346,8 @@ public class ServiceApi {
         public static final String DictCodeIsExist                  = "/std/dictionaries/is_exist/code";
         public static final String DictOther                        = "/std/dictionaries/{id}/other";
         public static final String DictParent                        = "/std/dictionaries/{id}/parent";
+        public static final String DictCodesExistence               =  "/dict/codes/existence";
+        public static final String DictEntryBatch                    ="/dict/entry/batch";
 
         public static final String Entry                            = "/std/dictionaries/entries/{id}";
         public static final String Entries                          = "/std/dictionaries/entries";
@@ -318,6 +360,7 @@ public class ServiceApi {
         public static final String DataSetsName                     = "/std/data_sets/name";
         public static final String DataSetCodeIsExist               = "/std/data_set/is_exist/code";
         public static final String DataSetsIds                      = "/std/{ids}data_sets";
+        public static final String DataSetsBatch                   = "/std/data_set/bacth";
 
         public static final String MetaDatas                        = "/std/data_sets/meta_datas";
         public static final String MetaData                         = "/std/data_sets/meta_datas/{id}";
@@ -346,6 +389,28 @@ public class ServiceApi {
         public static final String UserEmailNoExistence             = "/user/email/existence";
     }
 
+    public static class Roles{
+        public static final String Role                             = "/roles/role";
+        public static final String RoleId                           = "/roles/role/{id}";
+        public static final String Roles                            = "/roles/roles";
+        public static final String RolesNoPage                      = "/roles/roles/no_paging";
+
+        public static final String RoleUser                         = "/roles/role_user";
+        public static final String RoleUserId                       = "/roles/role_user/{id}";
+        public static final String RoleUsers                        = "/roles/role_users";
+        public static final String RoleUserNoPage                   = "/roles/role_users/no_paging";
+
+        public static final String RoleFeature                      = "/roles/role_feature";
+        public static final String RoleFeatureId                    = "/roles/role_feature/{id}";
+        public static final String RoleFeatures                     = "/roles/role_features";
+        public static final String RoleFeaturesNoPage               = "/roles/role_features/no_paging";
+
+        public static final String RoleApp                          = "/roles/role_app";
+        public static final String RoleAppId                        = "/roles/role_app/{id}";
+        public static final String RoleApps                         = "/roles/role_apps";
+        public static final String RoleAppsNopage                   = "/roles/role_appd/no_paging";
+    }
+
     public static class Redis{
         public static final String StandardVersions                 = "/std/versions";
         public static final String StandardDataSetsCount            = "/std/data_sets/count";
@@ -355,6 +420,11 @@ public class ServiceApi {
 
         public static final String Organizations                    = "/organizations";
         public static final String Organization                     = "/organizations/{id}";
+
+        public static final String DemographicIdToProfileIdCache    = "/Redis/DemographicIdToProfileId";
+        public static final String GetDemographicIdToProfileIdCache = "/Redis/GetDemographicIdToProfileIdCache/{demographic_id}";
+        public static final String TreatmentAreaCache               = "/Redis/TreatmentAreaCache";
+        public static final String GetTreatmentAreaCache            = "/Redis/GetTreatmentAreaCache/{demographic_id}";
     }
 
     public static class HealthProfile{

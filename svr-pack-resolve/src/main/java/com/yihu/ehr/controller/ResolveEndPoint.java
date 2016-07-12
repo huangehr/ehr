@@ -6,6 +6,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.config.MetricNames;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
@@ -155,4 +156,6 @@ public class ResolveEndPoint {
     private MetricRegistry getMetricRegistry(){
         return SpringContext.getService(MetricRegistry.class);
     }
+
+
 }

@@ -36,6 +36,8 @@ public class FileTableUtil {
             subNode.put("mime", originFile.getMime());
             subNode.put("urls", originFile.getUrlsStr());
             subNode.put("url_score", originFile.getUrlScope().name());
+            subNode.put("emr_id", originFile.getEmrId());
+            subNode.put("emr_name", originFile.getEmrName());
             subNode.put("expire_date", originFile.getExpireDate()==null?"": DateTimeUtil.utcDateTimeFormat(originFile.getExpireDate()));
 
             StringBuilder builder = new StringBuilder();

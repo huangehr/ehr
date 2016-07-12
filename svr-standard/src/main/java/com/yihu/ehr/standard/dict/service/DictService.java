@@ -6,16 +6,19 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.BaseHbmService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.mapping.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * @author lincl
@@ -145,4 +148,112 @@ public class DictService extends BaseHbmService<BaseDict> {
 
 
     //TODO: 从excel导入字典、字典项
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void batchInsertDictsAndEntry(List<Map<String, Object>> models,String version) throws Exception {
+        //String dictTableName = CDAVersionUtil.getDictTableName(version);
+        String dictEntryTableName = CDAVersionUtil.getDictEntryTableName(version);
+        Session session = null;
+        Transaction transaction =null;
+        Connection connection = null;
+        try {
+            //String title = "INSERT INTO "+dictTableName+"(code, name, description,std_version,hash) VALUES ";
+            //StringBuilder sql = new StringBuilder(title);
+            //int i = 1;
+            List<Map<String, Object>> dictEntry = new ArrayList<>();
+            //插入字典
+
+            Map<String,BaseDict> hashMap = new HashMap<>();
+            for(Map<String, Object> map: models){
+                Class entityClass = getServiceEntity(version);
+                BaseDict dict =(BaseDict)entityClass.newInstance();
+                dict.setCode(map.get("code")+"");
+                dict.setName(map.get("name")+"");
+                dict.setDescription(null2Space(map.get("description"))+"");
+                dict.setStdVersion(version);
+                dict.setCreateDate(new Date());
+                dict.setHashCode((map.get("code") + "").hashCode());
+                this.save(dict);
+                hashMap.put(map.get("code") + "", dict);
+                if(map.get("children")==null){
+                    continue;
+                }else{
+                     dictEntry.addAll((List)map.get("children"));
+                }
+                //sql.append("('"+  map.get("code") +"'");
+                //sql.append(",'"+  map.get("name") +"'");
+                //sql.append(",'"+  null2Space(map.get("description")) +"'");
+                //sql.append(",'"+  version +"'");
+                //sql.append(",'"+  map.get("code").hashCode() +"')");
+                //if(i%100==0 || i == models.size()){
+                //    session.createSQLQuery(sql.toString()).executeUpdate();
+                //    sql = new StringBuilder(title) ;
+                //}
+                //else
+                //    sql.append(",");
+                //
+                //
+                //i++;
+            }
+            /**
+             * 打破了完整性
+             */
+            //插入字典项
+            session = currentSession().getSessionFactory().openSession();
+            transaction = session.beginTransaction();
+
+            String  title = "INSERT INTO "+dictEntryTableName+"(dict_id, code, value, description,hash) VALUES ";
+            StringBuilder sql = new StringBuilder(title);
+            int i = 1;
+            BaseDict dict = null;
+            for(Map<String, Object> map: dictEntry){
+                if(dict==null||!map.get("dictCode").equals(dict.getCode())){
+                    dict = hashMap.get(map.get("dictCode")+"");
+                }
+                String name =  map.get("name")+"";
+                if(name.indexOf("'")>0){
+                    name = name.replaceAll("'","\'");
+                }
+                sql.append("('" + dict.getId() +"'");
+                sql.append(",'" + map.get("code") +"'");
+                sql.append(",'" + name +"'");
+                sql.append(",'"+  null2Space(map.get("description")) +"'");
+                sql.append(",'"+  (map.get("code")+"").hashCode() +"')");
+                if(i%100==0 || i == dictEntry.size()){
+                    session.createSQLQuery(sql.toString()).executeUpdate();
+                    sql = new StringBuilder(title) ;
+                }
+                else
+                    sql.append(",");
+                i++;
+            }
+            transaction.commit();
+            session.close();
+            //更新字典项关联字典字段
+            //  sql = new StringBuilder("UPDATE "+dictEntryTableName+" e,"+dictTableName+" d SET e.dict_id =d.id WHERE e.dict_id=d.code AND (e.dict_id=0 OR e.dict_id IS NULL)");
+            //jdbcTemplate.execute(sql.toString());
+        } catch (Exception e){
+            if(transaction!=null)transaction.rollback();
+            if(session!=null) session.close();
+            if(connection!=null)connection.close();
+            throw e;
+        }
+    }
+    public Object null2Space(Object str){
+        return str==null? "" : str;
+    }
+
+    /**
+     * 查询编码是否已存在， 返回已存在资源标准编码
+     */
+    public List codeExist(String[] codes,String version)
+    {
+        String dictTableName = CDAVersionUtil.getDictTableName(version);
+        String sql = "SELECT DISTINCT code FROM "+dictTableName+" WHERE code in(:codes)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("codes", codes);
+        return sqlQuery.list();
+    }
+
+
 }

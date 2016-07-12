@@ -59,12 +59,6 @@ public class ProfileService {
             profile.insertDataSet(pair.getLeft(), pair.getRight());
         }
 
-        // 读取非结构化档案文件列表
-//        if (profile.getProfileType() == ProfileType.File){
-//            String[] fileRowKeys = tuple.getFileIndices().split(";");
-//            ((MemoryFileProfile)profile).setDocuments(fileRepo.findAll(fileRowKeys));
-//        }
-
         profile.determineEventType();
         if(StringUtils.isEmpty(profile.getClientId())) profile.setClientId("kHAbVppx44");
 

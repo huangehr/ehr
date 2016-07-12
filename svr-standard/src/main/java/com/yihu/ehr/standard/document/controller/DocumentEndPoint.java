@@ -21,10 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
@@ -88,6 +85,25 @@ public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
 
         return getModel(cdaDocumentService.retrieve(id, entityClass));
     }
+
+
+    @RequestMapping(value = ServiceApi.Standards.DocumentList, method = RequestMethod.GET)
+    public Map<String,MCDADocument> getCDADocumentsList(
+            @RequestParam(value = "version") String version,
+            @RequestParam(value = "idList") String[] idList
+    ) throws Exception {
+
+        Class entityClass = getServiceEntity(version);
+        Map<String,MCDADocument>map=new HashMap<>();
+        for(int i=0;i<idList.length;i++) {
+            if (cdaDocumentService.retrieve(idList[i], entityClass) == null)
+                throw errNotFound("cda文档", idList[i]);
+
+            map.put(idList[i], getModel(cdaDocumentService.retrieve(idList[i], entityClass)));
+        }
+        return map;
+    }
+
 
     //todo： 动态实体改版完后   归并到GetCDADocuments方法中
     @RequestMapping(value = "/std/CDADocuments/ids", method = RequestMethod.GET)
@@ -207,6 +223,16 @@ public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
         return list;
     }
 
+    @RequestMapping(value = ServiceApi.Standards.DocumentDataSetList, method = RequestMethod.GET)
+    Map<String,List<MCdaDataSet>> getCDADataSetByCDAIdList(
+            @RequestParam(value = "version") String version,
+            @RequestParam(value = "document_Id") String[] cdaDocumentId){
+        Map<String,List<MCdaDataSet>> map=new HashMap<>();
+        for(int i=0;i<cdaDocumentId.length;i++){
+            map.put(cdaDocumentId[i],cdaDatasetRelationshipManager.getCDADataSetByCDAId(version, cdaDocumentId[i]));
+        }
+        return map;
+    }
 
     /**
      * 保存CDA信息

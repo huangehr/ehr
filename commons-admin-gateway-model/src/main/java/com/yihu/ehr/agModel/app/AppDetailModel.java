@@ -28,6 +28,36 @@ public class AppDetailModel {
     private String org;
     private String orgName;
 
+    private String code;
+
+    private int sourceType;
+
+    private String sourceTypeName;
+
+    public String getSourceTypeName() {
+        return sourceTypeName;
+    }
+
+    public void setSourceTypeName(String sourceTypeName) {
+        this.sourceTypeName = sourceTypeName;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public int getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(int sourceType) {
+        this.sourceType = sourceType;
+    }
+
     public String getId() {
         return id;
     }
