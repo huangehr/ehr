@@ -18,6 +18,7 @@
         <!--注意：模块添加请按字母顺序-->
         <!--module>../svr-adaption</module-->
         <module>../svr-app</module>
+        <module>../svr-archive-security</module>
         <module>../svr-cipher</module>
         <module>../svr-configuration</module>
         <module>../svr-dict</module>

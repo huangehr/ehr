@@ -28,6 +28,55 @@ public class AppDetailModel {
     private String org;
     private String orgName;
 
+    private String code;
+
+    private int sourceType;
+
+    private String sourceTypeName;
+
+    private String role;
+    private String roleJson;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getRoleJson() {
+        return roleJson;
+    }
+
+    public void setRoleJson(String roleJson) {
+        this.roleJson = roleJson;
+    }
+
+    public String getSourceTypeName() {
+        return sourceTypeName;
+    }
+
+    public void setSourceTypeName(String sourceTypeName) {
+        this.sourceTypeName = sourceTypeName;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public int getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(int sourceType) {
+        this.sourceType = sourceType;
+    }
+
     public String getId() {
         return id;
     }

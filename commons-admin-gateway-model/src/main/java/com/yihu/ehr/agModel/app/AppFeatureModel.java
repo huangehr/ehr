@@ -20,8 +20,49 @@ public class AppFeatureModel {
     private String url;
     private String iconUrl;
     private String auditLevel;
+    private String auditLevelName;
     private String openLevel;
+    private String openLevelName;
     private String appId;
+    //temp
+    private String roleId;
+
+    /**
+     * 界面上适配选中是否适配用做界面展示，代表是否以及被适配
+     */
+    private Boolean ischecked;
+
+    public String getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
+
+    public Boolean getIschecked() {
+        return ischecked;
+    }
+
+    public void setIschecked(Boolean ischecked) {
+        this.ischecked = ischecked;
+    }
+
+    public String getAuditLevelName() {
+        return auditLevelName;
+    }
+
+    public void setAuditLevelName(String auditLevelName) {
+        this.auditLevelName = auditLevelName;
+    }
+
+    public String getOpenLevelName() {
+        return openLevelName;
+    }
+
+    public void setOpenLevelName(String openLevelName) {
+        this.openLevelName = openLevelName;
+    }
 
     public String getTypeName() {
         return typeName;
