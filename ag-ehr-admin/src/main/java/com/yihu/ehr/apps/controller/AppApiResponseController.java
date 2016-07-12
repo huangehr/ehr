@@ -28,7 +28,7 @@ import java.util.List;
 public class AppApiResponseController extends BaseController {
 
     @Autowired
-    AppApiResponseClient AppApiResponseClient;
+    AppApiResponseClient appApiResponseClient;
 
     @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApiResponse列表")
@@ -43,7 +43,7 @@ public class AppApiResponseController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
-        ResponseEntity<List<MAppApiResponse>> responseEntity =  AppApiResponseClient.getAppApiResponses(fields, filters, sort, size, page);
+        ResponseEntity<List<MAppApiResponse>> responseEntity =  appApiResponseClient.getAppApiResponses(fields, filters, sort, size, page);
         List<MAppApiResponse> mAppApiResponseList = responseEntity.getBody();
         List<AppApiResponseModel> appApiResponseModels = new ArrayList<>();
         for(MAppApiResponse mAppApiResponse: mAppApiResponseList){
@@ -62,7 +62,7 @@ public class AppApiResponseController extends BaseController {
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
             @RequestParam(value = "model", required = false) String model){
         Envelop envelop = new Envelop();
-        MAppApiResponse mAppApiResponse =  AppApiResponseClient.createAppApiResponse(model);
+        MAppApiResponse mAppApiResponse =  appApiResponseClient.createAppApiResponse(model);
         if(mAppApiResponse==null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败！");
@@ -81,7 +81,7 @@ public class AppApiResponseController extends BaseController {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id){
         Envelop envelop = new Envelop();
-        MAppApiResponse mAppApiResponse =  AppApiResponseClient.getAppApiResponse(id);
+        MAppApiResponse mAppApiResponse =  appApiResponseClient.getAppApiResponse(id);
         AppApiResponseModel appApiResponseModel = new AppApiResponseModel();
         if(mAppApiResponse==null){
             envelop.setSuccessFlg(false);
@@ -100,7 +100,7 @@ public class AppApiResponseController extends BaseController {
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "model", required = false) String AppApiResponse){
         Envelop envelop = new Envelop();
-        MAppApiResponse mAppApiResponse =  AppApiResponseClient.createAppApiResponse(AppApiResponse);
+        MAppApiResponse mAppApiResponse =  appApiResponseClient.createAppApiResponse(AppApiResponse);
         AppApiResponseModel appApiResponseModel = new AppApiResponseModel();
         if(mAppApiResponse==null){
             envelop.setSuccessFlg(false);
@@ -119,7 +119,7 @@ public class AppApiResponseController extends BaseController {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id){
         Envelop envelop = new Envelop();
-        Boolean isDelete  = AppApiResponseClient.deleteAppApiResponse(id);
+        Boolean isDelete  = appApiResponseClient.deleteAppApiResponse(id);
         envelop.setSuccessFlg(isDelete);
         return envelop;
     }

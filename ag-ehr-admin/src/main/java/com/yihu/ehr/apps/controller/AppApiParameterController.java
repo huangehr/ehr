@@ -31,7 +31,7 @@ import java.util.List;
 public class AppApiParameterController extends BaseController {
 
     @Autowired
-    AppApiParameterClient AppApiParameterClient;
+    AppApiParameterClient appApiParameterClient;
 
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
@@ -49,7 +49,7 @@ public class AppApiParameterController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
-        ResponseEntity<List<MAppApiParameter>> responseEntity =  AppApiParameterClient.getAppApiParameters(fields, filters, sort, size, page);
+        ResponseEntity<List<MAppApiParameter>> responseEntity =  appApiParameterClient.getAppApiParameters(fields, filters, sort, size, page);
         List<MAppApiParameter> mAppApiParameterList = responseEntity.getBody();
         List<AppApiParameterModel> AppApiParameterModels = new ArrayList<>();
         for(MAppApiParameter mAppApiParameter: mAppApiParameterList){
@@ -69,7 +69,7 @@ public class AppApiParameterController extends BaseController {
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
             @RequestParam(value = "model", required = false) String model){
         Envelop envelop = new Envelop();
-        MAppApiParameter mAppApiParameter =  AppApiParameterClient.createAppApiParameter(model);
+        MAppApiParameter mAppApiParameter =  appApiParameterClient.createAppApiParameter(model);
         if(mAppApiParameter==null){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("保存失败！");
@@ -88,7 +88,7 @@ public class AppApiParameterController extends BaseController {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id){
         Envelop envelop = new Envelop();
-        MAppApiParameter mAppApiParameter =  AppApiParameterClient.getAppApiParameter(id);
+        MAppApiParameter mAppApiParameter =  appApiParameterClient.getAppApiParameter(id);
         AppApiParameterModel appApiParameterModel = new AppApiParameterModel();
         if(mAppApiParameter==null){
             envelop.setSuccessFlg(false);
@@ -108,7 +108,7 @@ public class AppApiParameterController extends BaseController {
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "model", required = false) String AppApiParameter){
         Envelop envelop = new Envelop();
-        MAppApiParameter mAppApiParameter =  AppApiParameterClient.createAppApiParameter(AppApiParameter);
+        MAppApiParameter mAppApiParameter =  appApiParameterClient.createAppApiParameter(AppApiParameter);
         AppApiParameterModel appApiParameterModel = new AppApiParameterModel();
         if(mAppApiParameter==null){
             envelop.setSuccessFlg(false);
@@ -128,7 +128,7 @@ public class AppApiParameterController extends BaseController {
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id){
         Envelop envelop = new Envelop();
-        Boolean isDelete  = AppApiParameterClient.deleteAppApiParameter(id);
+        Boolean isDelete  = appApiParameterClient.deleteAppApiParameter(id);
         envelop.setSuccessFlg(isDelete);
         return envelop;
     }

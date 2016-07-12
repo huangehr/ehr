@@ -4,6 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.app.MAppFeature;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -11,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -56,4 +58,10 @@ public interface AppApiClient {
     boolean deleteAppApi(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id);
+
+    @RequestMapping(value =  ApiVersion.Version1_0 +ServiceApi.AppApi.AppApisNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取过滤App列表")
+    public Collection<MAppApi> getAppApiNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters);
 }
