@@ -143,6 +143,7 @@ public class FilePackageResolver extends PackageResolver {
                 String url = file.get("url").asText();
                 String emr_id = file.get("emr_id").asText();
                 String emr_name = file.get("emr_name").asText();
+                String note = file.has("note")?file.get("note").asText():"";
 
                 OriginFile originFile = new OriginFile();
                 originFile.setMime(mine_type);
@@ -150,6 +151,11 @@ public class FilePackageResolver extends PackageResolver {
                 originFile.setUrlScope(UrlScope.valueOf(Integer.parseInt(url_scope)));
                 originFile.setEmrId(emr_id);
                 originFile.setEmrName(emr_name);
+                if(!StringUtils.isBlank(note))
+                {
+                    originFile.setNote(note);
+                }
+
                 if (file.get("name") != null) {
                     String fileList[] = file.get("name").asText().split(";");
                     for (String fileName : fileList) {
