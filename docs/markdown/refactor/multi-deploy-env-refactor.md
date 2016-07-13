@@ -1,7 +1,8 @@
-# 说明
+# 微服务内存占用过高改造方案及部署说明
+
 此次改造目的是减少微服务的运行内存，并支持多部署方式，即jar,war在dev,test,prod三种环境中的部署，以下是部署环境矩阵：
 
-[部署环境与Maven配置](../../images/deploy-env.png)
+![部署环境与Maven配置](../../images/deploy-env.png)
 
 其中，打勾表示此次改造后支持的部署模式，打叉表示暂时不支持，但稍做修改即可或未来可能会提供部署支持。
 此次修改内容较多，如遇到问题，请及时提出讨论。
@@ -13,13 +14,9 @@
 - 增加ehr-ms-parent-pom.xml微服务应用模板，定义微服务应用所需要的包依赖，插件依赖。微服务的Maven POM定义通过继承此模板实现。删除原commons-dependency-native的POM模板。
 - 原commons-utils模块拆分出一个新的公共包：commons-web，定义微服务所需要的控制器，异常处理及REST参数处理工具。
 - 为方便部署，ehr-ms-parent-pom.xml定义“说明”一节中描述的四种部署环境所需profile，部署时可通过如下方式指定profile
-    - 以下Maven命令将会使用war包打包应用
-    
-        mvn -P test-war
-
+    - 以下Maven命令将会使用war包打包应用：mvn -P test-war
     - Intellij可通过Maven Project面板切换profile
 - svr-discovery与svr-configuration服务作为全局服务依赖，而tomcat启动服务是按内部顺序执行，为保障这两个服务先行启动，它们不使用tomcat部署，而使用jar模式部署。
-
 
 # 编译
 
@@ -31,23 +28,22 @@
 
 
 # 部署
-## 使用Jar模式部署
+## 使用jar模式部署
 
 此模式使用以下命令启动，不再赘述
 
     java -Djava.security.egd=file:/dev/./urandom -jar app.jar
 
-## 使用War模式部署
+## 使用war模式部署
 
-War模式需要在应用服务器上预告安装并配置好tomcat服务器。微服务设计成独立端口调用模式，而tomcat若要支持多端口监听，需要分别为服务定义connector，具体步骤如下：
+war模式需要在应用服务器上预告安装并配置好tomcat服务器。微服务设计成独立端口调用模式，而tomcat若要支持多端口监听，需要分别为服务定义connector，具体步骤如下：
 
 - 定义connector，修改tomcat_home/conf/server.xml配置文件，为了方便可以使用此模板作为配置基础，稍微修改即可使用，可避免很多配置陷阱。此次使用svr-app作为示例：
-
 
     <Service name="svr-app">
         <Connector port="10160" protocol="HTTP/1.1" connectionTimeout="20000"/>
         <Engine name="svr-app" defaultHost="localhost">
-          <Host name="localhost"  appBase="ehr_apps/svr-app" unpackWARs="true" autoDeploy="true">
+          <Host name="localhost"  appBase="ehr_apps/svr-app" unpackwars="true" autoDeploy="true">
             <Context path="" docBase=""></Context>
             <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                    prefix="svr-app" suffix=".log"
@@ -72,7 +68,7 @@ War模式需要在应用服务器上预告安装并配置好tomcat服务器。�
     <Service name="svr-app">
         <Connector port="10160" protocol="HTTP/1.1" connectionTimeout="20000"/>
         <Engine name="svr-app" defaultHost="localhost">
-          <Host name="localhost"  appBase="ehr_apps/svr-app" unpackWARs="true" autoDeploy="true">
+          <Host name="localhost"  appBase="ehr_apps/svr-app" unpackwars="true" autoDeploy="true">
             <Context path="" docBase=""></Context>
             <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                    prefix="svr-app" suffix=".log"
@@ -83,7 +79,7 @@ War模式需要在应用服务器上预告安装并配置好tomcat服务器。�
       <Service name="svr-organization">
         <Connector port="10070" protocol="HTTP/1.1" connectionTimeout="20000"/>
         <Engine name="svr-organization" defaultHost="localhost">
-          <Host name="localhost"  appBase="ehr_apps/svr-organization" unpackWARs="true" autoDeploy="true">
+          <Host name="localhost"  appBase="ehr_apps/svr-organization" unpackwars="true" autoDeploy="true">
             <Context path="" docBase=""></Context>
             <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                    prefix="svr-organization" suffix=".log"
@@ -94,7 +90,7 @@ War模式需要在应用服务器上预告安装并配置好tomcat服务器。�
       <Service name="svr-pack-mgr">
         <Connector port="10140" protocol="HTTP/1.1" connectionTimeout="20000"/>
         <Engine name="svr-pack-mgr" defaultHost="localhost">
-          <Host name="localhost"  appBase="ehr_apps/svr-pack-mgr" unpackWARs="true" autoDeploy="true">
+          <Host name="localhost"  appBase="ehr_apps/svr-pack-mgr" unpackwars="true" autoDeploy="true">
             <Context path="" docBase=""></Context>
             <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                    prefix="svr-pack-mgr" suffix=".log"
@@ -105,7 +101,7 @@ War模式需要在应用服务器上预告安装并配置好tomcat服务器。�
       <Service name="svr-user">
         <Connector port="10120" protocol="HTTP/1.1" connectionTimeout="20000"/>
         <Engine name="svr-user" defaultHost="localhost">
-          <Host name="localhost"  appBase="ehr_apps/svr-user" unpackWARs="true" autoDeploy="true">
+          <Host name="localhost"  appBase="ehr_apps/svr-user" unpackwars="true" autoDeploy="true">
             <Context path="" docBase=""></Context>
             <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                    prefix="svr-user" suffix=".log"
@@ -116,9 +112,9 @@ War模式需要在应用服务器上预告安装并配置好tomcat服务器。�
 
 
 # 总结
-微服务使用Spring Boot框架，使用Jar模式运行的时候，会独立启动一个tomcat，并负责自己的内容，此方式虽然对应用的独立性有好处，但对硬件资源的消耗非常大。
+微服务使用Spring Boot框架，使用jar模式运行的时候，会独立启动一个tomcat，并负责自己的内容，此方式虽然对应用的独立性有好处，但对硬件资源的消耗非常大。
 鉴于Spring Boot的所有依赖被都可以被EHR微服务所共享，因此使用tomcat部署，并将公共依赖放置于tomcat_home/lib目录下，解决内存占用问题。
-Spring Boot内存占用，参见Spring Boot Memory Performance。此次调整的方案是通过共享Jar解决。另外也可以通过深入的细节调优处理内存占用问题。
+Spring Boot内存占用，参见Spring Boot Memory Performance。此次调整的方案是通过共享jar解决。另外也可以通过深入的细节调优处理内存占用问题。
 
 # 可能遇到的问题
 

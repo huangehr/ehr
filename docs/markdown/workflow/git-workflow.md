@@ -12,4 +12,4 @@
 
 接下来我们将以时序图的方式对Git开发流程进行讲解。
 
-[Git工作流](../../images/git-flow.png)
+![Git工作流](../../images/git-flow.png)
