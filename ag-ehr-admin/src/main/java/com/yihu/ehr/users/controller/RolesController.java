@@ -1,10 +1,12 @@
 package com.yihu.ehr.users.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.user.PlatformAppRolesModel;
 import com.yihu.ehr.agModel.user.RolesModel;
 import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.user.MRoleAppRelation;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.model.user.MRoleUser;
@@ -17,9 +19,9 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +48,9 @@ public class RolesController extends BaseController {
 
     @Autowired
     private RoleAppRelationClient roleAppRelationClient;
+
+    @Autowired
+    private AppClient appClient;
 
     @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST)
     @ApiOperation(value = "新增角色组")
@@ -172,4 +177,37 @@ public class RolesController extends BaseController {
 //        //获取角色组类别字典
 //        return rolesModel;
 //    }
+
+    @RequestMapping(value = "/platformAppRoles",method = RequestMethod.GET)
+    @ApiOperation(value = "获取平台应用角色组列表，不分页" )
+    public Envelop getPlatformAppRoles(
+            @ApiParam(name = "type",value = "角色组类型，应用角色/用户角色")
+            @RequestParam(value = "type") String type){
+        if(StringUtils.isEmpty(type)){
+            return failed("角色组类型不能为空！");
+        }
+        Envelop envelop = new Envelop();
+        //平台应用-应用表中source_type为1
+        Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType=1");
+        //平台应用-角色组对象模型列表
+        List<PlatformAppRolesModel> appRolesModelList = new ArrayList<>();
+        for(MApp mApp : mApps){
+            Collection<MRoleAppRelation> mRoleAppRelations = roleAppRelationClient.searchRoleAppNoPaging("appId=" + mApp.getId());
+            for(MRoleAppRelation relation : mRoleAppRelations){
+                MRoles mRoles = rolesClient.getRolesById(relation.getRoleId());
+                if(mRoles == null || StringUtils.equals(mRoles.getType(),type)){
+                    continue;
+                }
+                PlatformAppRolesModel model = new PlatformAppRolesModel();
+                model.setRoleName(mRoles.getName());
+                model.setAppId(mApp.getId());
+                model.setAppName(mApp.getName());
+                model.setRoleId(relation.getRoleId());
+                appRolesModelList.add(model);
+            }
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(appRolesModelList);
+        return envelop;
+    }
 }
