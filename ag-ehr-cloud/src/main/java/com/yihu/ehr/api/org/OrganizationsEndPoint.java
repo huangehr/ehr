@@ -14,10 +14,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author Sand
@@ -47,6 +46,18 @@ public class OrganizationsEndPoint extends BaseController {
         BeanUtils.copyProperties(orgModel, model);
 
         return model;
+    }
+
+
+    @ApiOperation(value = "获取机构列表")
+    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    List<MOrganization> search(
+            @RequestParam(value = "fields",required = false) String fields,
+            @RequestParam(value = "filters",required = false) String filters,
+            @RequestParam(value = "sorts",required = false) String sorts,
+            @RequestParam(value = "page",required = false) int page,
+            @RequestParam(value = "size",required = false) int size) {
+           return organizationClient.search(fields,filters,sorts,page,size);
     }
 
     @RequestMapping(value = "/{org_code}/administrator", method = RequestMethod.GET)
