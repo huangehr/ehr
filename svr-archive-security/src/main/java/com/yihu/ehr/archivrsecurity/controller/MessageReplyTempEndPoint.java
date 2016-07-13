@@ -1,10 +1,12 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.archivrsecurity.dao.model.SmsMessageReplyTemplate;
 import com.yihu.ehr.archivrsecurity.service.MessageReplyTempService;
+import com.yihu.ehr.model.archivesecurity.MSmsMessageReplyTemplate;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,10 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,27 +38,27 @@ public class MessageReplyTempEndPoint extends BaseRestEndPoint {
     @Autowired
     MessageReplyTempService messageReplyTempService;
 
-    @RequestMapping(value = "/messagereplytemplates",method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageReplyTempates,method = RequestMethod.POST)
     @ApiOperation("短信模板")
-    public SmsMessageReplyTemplate saveMessageReplyTemp(
+    public MSmsMessageReplyTemplate saveMessageReplyTemp(
             @ApiParam("jsonData")
-            @RequestParam(value = "jsonData")String jsonData) throws IOException {
+            @RequestBody String jsonData) throws IOException {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         SmsMessageReplyTemplate messageTemp = objectMapper.readValue(jsonData,SmsMessageReplyTemplate.class);
-        return messageReplyTempService.save(messageTemp);
+        return convertToModel(messageReplyTempService.save(messageTemp),MSmsMessageReplyTemplate.class);
     }
 
-    @RequestMapping(value = "/messagereplytemplates",method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageReplyTempates,method = RequestMethod.PUT)
     @ApiOperation("短信模板")
-    public SmsMessageReplyTemplate updateMessageReplyTemp(
+    public MSmsMessageReplyTemplate updateMessageReplyTemp(
             @ApiParam("jsonData")
-            @RequestParam(value = "jsonData")String jsonData) throws IOException {
+            @RequestBody String jsonData) throws IOException {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         SmsMessageReplyTemplate messageTemp = objectMapper.readValue(jsonData,SmsMessageReplyTemplate.class);
-        return messageReplyTempService.save(messageTemp);
+        return convertToModel(messageReplyTempService.save(messageTemp),MSmsMessageReplyTemplate.class);
     }
 
-    @RequestMapping(value = "/messagereplytemplates",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageReplyTempates,method = RequestMethod.DELETE)
     public boolean deleteMessageReplyTemp(
             @ApiParam("messageReplyCode")
             @RequestParam(value = "messageReplyCode")String messageReplyCode)
@@ -69,8 +68,8 @@ public class MessageReplyTempEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation("短信模板查询")
-    @RequestMapping(value = "/messagereplytemplates",method = RequestMethod.GET)
-    public List<SmsMessageReplyTemplate> getMessageReplyTemp(
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageReplyTempates,method = RequestMethod.GET)
+    public Collection<MSmsMessageReplyTemplate> getMessageReplyTemp(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -85,23 +84,23 @@ public class MessageReplyTempEndPoint extends BaseRestEndPoint {
             HttpServletResponse response) throws Exception
     {
         long total = 0;
-        Collection<SmsMessageReplyTemplate> rsList;
+        Collection<MSmsMessageReplyTemplate> rsList;
 
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
             Page<SmsMessageReplyTemplate> replyTemplates = messageReplyTempService.getMessageReplyTemplates(sorts,reducePage(page),size);
             total = replyTemplates.getTotalElements();
-            rsList = convertToModels(replyTemplates.getContent(),new ArrayList<>(replyTemplates.getNumber()),SmsMessageReplyTemplate.class,fields);
+            rsList = convertToModels(replyTemplates.getContent(),new ArrayList<>(replyTemplates.getNumber()),MSmsMessageReplyTemplate.class,fields);
         }
         else
         {
             List<SmsMessageReplyTemplate> replyTemplates = messageReplyTempService.search(fields,filters,sorts,page,size);
             total = messageReplyTempService.getCount(filters);
-            rsList = convertToModels(replyTemplates,new ArrayList<>(replyTemplates.size()),SmsMessageReplyTemplate.class,fields);
+            rsList = convertToModels(replyTemplates,new ArrayList<>(replyTemplates.size()),MSmsMessageReplyTemplate.class,fields);
         }
 
         pagedResponse(request,response,total,page,size);
-        return (List<SmsMessageReplyTemplate>)rsList;
+        return rsList;
     }
 }
