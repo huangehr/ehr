@@ -1,6 +1,7 @@
 package com.yihu.ehr.organization.controller;
 
 import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.adapter.service.PlanClient;
@@ -416,8 +417,6 @@ public class OrganizationController extends BaseController {
                 return failed("机构代码不能为空！");
             }
             MOrganization mOrg = orgClient.getOrg(orgCode);
-
-
             if (!StringUtils.isEmpty(mOrg.getImgRemotePath())) {
                 try {
                     String imagePath[] = mOrg.getImgRemotePath().split(":");
@@ -473,6 +472,9 @@ public class OrganizationController extends BaseController {
             org.setTown(addr.getTown());
             org.setStreet(addr.getStreet());
             org.setExtra(addr.getExtra());
+            org.setProvinceId(geographyToCode(addr.getProvince(),156));
+            org.setCityId(geographyToCode(addr.getCity(),org.getProvinceId()));
+            org.setDistrictId(geographyToCode(addr.getCity(),org.getProvinceId()));
         }
         //获取公钥信息（公钥、有效区间、开始时间）
         MKey security = securityClient.getOrgKey(mOrg.getOrgCode());
@@ -484,7 +486,12 @@ public class OrganizationController extends BaseController {
         }
         return org;
     }
-
+    public int geographyToCode(String name,int code){
+        String[] fields = {"name","pid"};
+        String[] values = {name,String.valueOf(code)};
+        List<MGeographyDict> geographyDictList = (List<MGeographyDict>) addressClient.getAddressDict(fields,values);
+        return geographyDictList.get(0).getId();
+    }
 
     /**
      * 根据name获取机构ids
@@ -609,4 +616,6 @@ public class OrganizationController extends BaseController {
         mOrganization.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
         return mOrganization;
     }
+
+
 }
