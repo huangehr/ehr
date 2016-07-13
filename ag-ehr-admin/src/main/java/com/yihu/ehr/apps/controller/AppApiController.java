@@ -6,10 +6,13 @@ import com.yihu.ehr.apps.service.AppApiClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.user.MRoleApiRelation;
+import com.yihu.ehr.users.service.RoleApiRelationClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,6 +33,9 @@ public class AppApiController extends BaseController {
 
     @Autowired
     AppApiClient appApiClient;
+
+    @Autowired
+    RoleApiRelationClient roleApiRelationClient;
 
     @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
@@ -128,16 +134,37 @@ public class AppApiController extends BaseController {
     @ApiOperation(value = "获取过滤App列表")
     public Envelop getAppApiNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "filters", required = false) String filters){
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "roleId", value = "角色组ID，需要知道是否被关联才需要传入")
+            @RequestParam(value = "roleId", required = false) String roleId){
         Collection<MAppApi> mAppApis = appApiClient.getAppApiNoPage(filters);
         Envelop envelop = new Envelop();
         List<AppApiModel> appApiModels = new ArrayList<>();
         for(MAppApi mAppApi: mAppApis ){
             AppApiModel appApiModel = convertToModel(mAppApi, AppApiModel.class);
+            if(StringUtils.isNotBlank(roleId)){
+                appApiModel.setRoleId(roleId);
+            }
+            converModelName(appApiModel);
             appApiModels.add(appApiModel);
         }
         envelop.setDetailModelList(appApiModels);
         return envelop  ;
+    }
+
+    /**
+     * 格式化字典数据
+     * @param appApiModel
+     */
+    private void converModelName(AppApiModel appApiModel){
+        //是否已经被角色组适配，界面适配用
+        if(!StringUtils.isEmpty(appApiModel.getRoleId())){
+            ResponseEntity<Collection<MRoleApiRelation>> responseEntity =   roleApiRelationClient.searchRoleApiRelations("", "roleId=" + appApiModel.getRoleId() + ";apiId=" + appApiModel.getId(), "", 1, 1);
+            Collection<MRoleApiRelation> mRoleFeatureRelations = responseEntity.getBody();
+            if(mRoleFeatureRelations!=null&&mRoleFeatureRelations.size()>0){
+                appApiModel.setIschecked(true);
+            }
+        }
     }
 
 }

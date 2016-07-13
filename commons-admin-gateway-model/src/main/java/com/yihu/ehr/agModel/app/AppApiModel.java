@@ -25,6 +25,28 @@ public class AppApiModel {
     private String responseDemo;
     private String openLevel;
     private String auditLevel;
+    /**
+     * 界面上适配选中是否适配用做界面展示，代表是否以及被适配
+     */
+    private Boolean ischecked;
+
+    private String roleId;
+
+    public String getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
+
+    public Boolean getIschecked() {
+        return ischecked;
+    }
+
+    public void setIschecked(Boolean ischecked) {
+        this.ischecked = ischecked;
+    }
 
     public String getTypeName() {
         return typeName;
