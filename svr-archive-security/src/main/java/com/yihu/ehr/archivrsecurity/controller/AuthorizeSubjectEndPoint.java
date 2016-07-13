@@ -14,10 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,8 +41,7 @@ public class AuthorizeSubjectEndPoint extends BaseRestEndPoint{
     @ApiOperation("授权主题新增")
     public MRsAuthorizeSubject saveSubject(
             @ApiParam(value="jsonData")
-            @RequestParam(value = "jsonData",required = true)
-            String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         RsAuthorizeSubject subject = objectMapper.readValue(jsonData,RsAuthorizeSubject.class);
 
@@ -56,8 +52,7 @@ public class AuthorizeSubjectEndPoint extends BaseRestEndPoint{
     @ApiOperation("授权主题更新")
     public MRsAuthorizeSubject updateSubject(
             @ApiParam(value="jsonData")
-            @RequestParam(value = "jsonData",required = true)
-                    String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         RsAuthorizeSubject subject = objectMapper.readValue(jsonData,RsAuthorizeSubject.class);
         return convertToModel(authorizeSubjectService.save(subject),MRsAuthorizeSubject.class);

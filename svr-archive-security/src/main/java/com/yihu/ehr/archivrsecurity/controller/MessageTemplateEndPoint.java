@@ -42,7 +42,7 @@ public class MessageTemplateEndPoint extends BaseRestEndPoint {
     @ApiOperation("短信模板保存")
     public MSmsMessageTemplate saveMessageTemp(
             @ApiParam("jsonData")
-            @RequestParam(value = "jsonData")String jsonData) throws IOException
+            @RequestBody String jsonData) throws IOException
     {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         SmsMessageTemplate messageTemp = objectMapper.readValue(jsonData,SmsMessageTemplate.class);
@@ -53,7 +53,7 @@ public class MessageTemplateEndPoint extends BaseRestEndPoint {
     @ApiOperation("短信模板更新")
     public MSmsMessageTemplate updateMessageTemp(
             @ApiParam("jsonData")
-            @RequestParam(value = "jsonData")String jsonData) throws IOException
+            @RequestBody String jsonData) throws IOException
     {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         SmsMessageTemplate messageTemp = objectMapper.readValue(jsonData,SmsMessageTemplate.class);

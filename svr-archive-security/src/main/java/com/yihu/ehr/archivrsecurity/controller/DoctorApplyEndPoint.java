@@ -42,8 +42,7 @@ public class DoctorApplyEndPoint extends BaseRestEndPoint {
     @ApiOperation("医生授权申请新增")
     public MScAuthorizeDoctorApply saveDoctorApply(
             @ApiParam(value="jsonData")
-            @RequestParam(value = "jsonData",required = true)
-                    String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         ScAuthorizeDoctorApply doctorApply = objectMapper.readValue(jsonData,ScAuthorizeDoctorApply.class);
         return convertToModel(doctorApplyService.save(doctorApply),MScAuthorizeDoctorApply.class);
@@ -53,8 +52,7 @@ public class DoctorApplyEndPoint extends BaseRestEndPoint {
     @ApiOperation("医生授权申请更新")
     public MScAuthorizeDoctorApply updateDoctorApply(
             @ApiParam(value="jsonData")
-            @RequestParam(value = "jsonData",required = true)
-                    String jsonData) throws Exception {
+            @RequestBody String jsonData) throws Exception {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         ScAuthorizeDoctorApply doctorApply = objectMapper.readValue(jsonData,ScAuthorizeDoctorApply.class);
         return convertToModel(doctorApplyService.save(doctorApply),MScAuthorizeDoctorApply.class);
