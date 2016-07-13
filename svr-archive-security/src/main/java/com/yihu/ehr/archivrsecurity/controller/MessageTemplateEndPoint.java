@@ -1,10 +1,12 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.archivrsecurity.dao.model.SmsMessageTemplate;
 import com.yihu.ehr.archivrsecurity.service.MessageTemplateService;
+import com.yihu.ehr.model.archivesecurity.MSmsMessageTemplate;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,29 +38,29 @@ public class MessageTemplateEndPoint extends BaseRestEndPoint {
     @Autowired
     MessageTemplateService messageTempService;
 
-    @RequestMapping(value = "/messagetemplates", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageTempates, method = RequestMethod.POST)
     @ApiOperation("短信模板保存")
-    public SmsMessageTemplate saveMessageTemp(
+    public MSmsMessageTemplate saveMessageTemp(
             @ApiParam("jsonData")
-            @RequestParam(value = "jsonData")String jsonData) throws IOException
+            @RequestBody String jsonData) throws IOException
     {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         SmsMessageTemplate messageTemp = objectMapper.readValue(jsonData,SmsMessageTemplate.class);
-        return messageTempService.save(messageTemp);
+        return convertToModel(messageTempService.save(messageTemp),MSmsMessageTemplate.class);
     }
 
-    @RequestMapping(value = "/messagetemplates", method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageTempates, method = RequestMethod.PUT)
     @ApiOperation("短信模板更新")
-    public SmsMessageTemplate updateMessageTemp(
+    public MSmsMessageTemplate updateMessageTemp(
             @ApiParam("jsonData")
-            @RequestParam(value = "jsonData")String jsonData) throws IOException
+            @RequestBody String jsonData) throws IOException
     {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         SmsMessageTemplate messageTemp = objectMapper.readValue(jsonData,SmsMessageTemplate.class);
-        return messageTempService.save(messageTemp);
+        return convertToModel(messageTempService.save(messageTemp),MSmsMessageTemplate.class);
     }
 
-    @RequestMapping(value = "/messagetemplates/{messageTempCode}", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageTempatesCode, method = RequestMethod.DELETE)
     @ApiOperation("短信模板删除")
     public boolean deleteMessageTemp(
             @ApiParam("messageTempCode")
@@ -69,8 +71,8 @@ public class MessageTemplateEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation("短信模板查询")
-    @RequestMapping(value = "/messagetemplates",method = RequestMethod.GET)
-    public List<SmsMessageTemplate> getMessageTemp(
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageTempates,method = RequestMethod.GET)
+    public Collection<MSmsMessageTemplate> getMessageTemp(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -85,23 +87,23 @@ public class MessageTemplateEndPoint extends BaseRestEndPoint {
             HttpServletResponse response) throws Exception
     {
         long total = 0;
-        Collection<SmsMessageTemplate> rsList;
+        Collection<MSmsMessageTemplate> rsList;
 
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
             Page<SmsMessageTemplate> messageTemplates = messageTempService.getMessageTemplates(sorts,reducePage(page),size);
             total = messageTemplates.getTotalElements();
-            rsList = convertToModels(messageTemplates.getContent(),new ArrayList<>(messageTemplates.getNumber()),SmsMessageTemplate.class,fields);
+            rsList = convertToModels(messageTemplates.getContent(),new ArrayList<>(messageTemplates.getNumber()),MSmsMessageTemplate.class,fields);
         }
         else
         {
             List<SmsMessageTemplate> messageTemplates = messageTempService.search(fields,filters,sorts,page,size);
             total = messageTempService.getCount(filters);
-            rsList = convertToModels(messageTemplates,new ArrayList<>(messageTemplates.size()),SmsMessageTemplate.class,fields);
+            rsList = convertToModels(messageTemplates,new ArrayList<>(messageTemplates.size()),MSmsMessageTemplate.class,fields);
         }
 
         pagedResponse(request,response,total,page,size);
-        return (List<SmsMessageTemplate>)rsList;
+        return rsList;
     }
 }

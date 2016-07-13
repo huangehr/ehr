@@ -1,22 +1,24 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.archivrsecurity.dao.model.RsAuthorizeSubject;
 import com.yihu.ehr.archivrsecurity.service.AuthorizeSubjectService;
+import com.yihu.ehr.model.archivesecurity.MRsAuthorizeSubject;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,31 +32,33 @@ import java.util.List;
 public class AuthorizeSubjectEndPoint extends BaseRestEndPoint{
 
     @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
     AuthorizeSubjectService authorizeSubjectService;
 
-    @RequestMapping(value = "/authorizesubjects",method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeSubjects,method = RequestMethod.POST)
     @ApiOperation("授权主题新增")
-    public RsAuthorizeSubject saveSubject(
+    public MRsAuthorizeSubject saveSubject(
             @ApiParam(value="jsonData")
-            @RequestParam(value = "jsonData",required = true)
-            String jsonData) throws Exception {
-        RsAuthorizeSubject subject = toEntity(jsonData,RsAuthorizeSubject.class);
+            @RequestBody String jsonData) throws Exception {
+        objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
+        RsAuthorizeSubject subject = objectMapper.readValue(jsonData,RsAuthorizeSubject.class);
 
-        return authorizeSubjectService.save(subject);
+        return convertToModel(authorizeSubjectService.save(subject),MRsAuthorizeSubject.class);
     }
 
-    @RequestMapping(value = "/authorizesubjects",method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeSubjects,method = RequestMethod.PUT)
     @ApiOperation("授权主题更新")
-    public RsAuthorizeSubject updateSubject(
+    public MRsAuthorizeSubject updateSubject(
             @ApiParam(value="jsonData")
-            @RequestParam(value = "jsonData",required = true)
-                    String jsonData) throws Exception {
-        RsAuthorizeSubject subject = toEntity(jsonData,RsAuthorizeSubject.class);
-
-        return authorizeSubjectService.save(subject);
+            @RequestBody String jsonData) throws Exception {
+        objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
+        RsAuthorizeSubject subject = objectMapper.readValue(jsonData,RsAuthorizeSubject.class);
+        return convertToModel(authorizeSubjectService.save(subject),MRsAuthorizeSubject.class);
     }
 
-    @RequestMapping(value = "/authorizesubjects",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeSubjects,method = RequestMethod.DELETE)
     @ApiOperation("授权主题删除")
     public boolean deleteSubject(
             @ApiParam(value="subjectId")
@@ -66,8 +70,8 @@ public class AuthorizeSubjectEndPoint extends BaseRestEndPoint{
     }
 
     @ApiOperation("授权主题查询")
-    @RequestMapping(value = "/authorizesubjects",method = RequestMethod.GET)
-    public List<RsAuthorizeSubject> queryResources(
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeSubjects,method = RequestMethod.GET)
+    public Collection<MRsAuthorizeSubject> queryResources(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -82,23 +86,23 @@ public class AuthorizeSubjectEndPoint extends BaseRestEndPoint{
             HttpServletResponse response) throws Exception
     {
         long total = 0;
-        Collection<RsAuthorizeSubject> rsList;
+        Collection<MRsAuthorizeSubject> rsList;
 
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
             Page<RsAuthorizeSubject> subjects = authorizeSubjectService.getSubjects(sorts,reducePage(page),size);
             total = subjects.getTotalElements();
-            rsList = convertToModels(subjects.getContent(),new ArrayList<>(subjects.getNumber()),RsAuthorizeSubject.class,fields);
+            rsList = convertToModels(subjects.getContent(),new ArrayList<>(subjects.getNumber()),MRsAuthorizeSubject.class,fields);
         }
         else
         {
             List<RsAuthorizeSubject> subjects = authorizeSubjectService.search(fields,filters,sorts,page,size);
             total = authorizeSubjectService.getCount(filters);
-            rsList = convertToModels(subjects,new ArrayList<>(subjects.size()),RsAuthorizeSubject.class,fields);
+            rsList = convertToModels(subjects,new ArrayList<>(subjects.size()),MRsAuthorizeSubject.class,fields);
         }
 
         pagedResponse(request,response,total,page,size);
-        return (List<RsAuthorizeSubject>)rsList;
+        return rsList;
     }
 }

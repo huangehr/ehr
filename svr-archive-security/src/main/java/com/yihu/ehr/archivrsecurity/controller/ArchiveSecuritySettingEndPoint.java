@@ -1,15 +1,18 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.archivrsecurity.dao.model.ArchiveSecuritySetting;
 import com.yihu.ehr.model.archivesecurity.MArchiveSecuritySetting;
 import com.yihu.ehr.archivrsecurity.service.ArchiveSecuritySettingService;
+import com.yihu.ehr.util.encrypt.MD5;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +34,7 @@ public class ArchiveSecuritySettingEndPoint extends EnvelopRestEndPoint {
     ArchiveSecuritySettingService archiveSecuritySettingService;
 
     @ApiOperation(value = "档案安全设置列表查询")
-    @RequestMapping(value = "/archive_security", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.ArchiveSecuritySetting, method = RequestMethod.GET)
     public Collection<MArchiveSecuritySetting> searchArchiveSecuritySetting(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -52,17 +55,21 @@ public class ArchiveSecuritySettingEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "档案安全设置新增")
-    @RequestMapping(value = "/archive_security", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.ArchiveSecuritySetting, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MArchiveSecuritySetting createArchiveSecuritySetting(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) {
         ArchiveSecuritySetting archiveSecuritySetting = toEntity(jsonData, ArchiveSecuritySetting.class);
+        if(!org.apache.commons.lang.StringUtils.isBlank(archiveSecuritySetting.getSecurityKey()))
+        {
+            archiveSecuritySetting.setSecurityKey(MD5.encrypt(archiveSecuritySetting.getSecurityKey()));
+        }
         archiveSecuritySettingService.save(archiveSecuritySetting);
         return convertToModel(archiveSecuritySetting, MArchiveSecuritySetting.class, null);
     }
 
     @ApiOperation(value = "档案安全设置查询")
-    @RequestMapping(value = "/archive_security/{user_id}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.ArchiveSecuritySettingUser, method = RequestMethod.GET)
     public MArchiveSecuritySetting getArchiveSecuritySetting(
             @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) {
@@ -76,17 +83,21 @@ public class ArchiveSecuritySettingEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "档案安全设置修改")
-    @RequestMapping(value = "/archive_security", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.ArchiveSecuritySetting, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MArchiveSecuritySetting updateArchiveSecuritySetting(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) throws Exception {
         ArchiveSecuritySetting archiveSecuritySetting = toEntity(jsonData, ArchiveSecuritySetting.class);
+        if(!org.apache.commons.lang.StringUtils.isBlank(archiveSecuritySetting.getSecurityKey()))
+        {
+            archiveSecuritySetting.setSecurityKey(MD5.encrypt(archiveSecuritySetting.getSecurityKey()));
+        }
         archiveSecuritySettingService.save(archiveSecuritySetting);
         return convertToModel(archiveSecuritySetting, MArchiveSecuritySetting.class, null);
     }
 
     @ApiOperation(value = "档案安全设置删除")
-    @RequestMapping(value = "/archive_security_setting/{user_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.ArchiveSecuritySettingUser, method = RequestMethod.DELETE)
     public boolean deleteArchiveSecuritySetting(
             @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
             @PathVariable(value = "user_id") String userId) throws Exception{
@@ -96,7 +107,7 @@ public class ArchiveSecuritySettingEndPoint extends EnvelopRestEndPoint {
 
 
     @ApiOperation(value = "档案安全密码验证")
-    @RequestMapping(value = "/archive_security/{user_id}/security_key/authentication", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.ArchiveSecuritySettingKeyAuthen, method = RequestMethod.POST)
     public boolean ArchiveSecuritySettingAuthentication(
             @ApiParam(name = "user_id", value = "user_id", defaultValue = "")
             @PathVariable(value = "user_id") String userId,
