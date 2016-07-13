@@ -474,8 +474,8 @@ public class ServiceApi {
         public static final String ArchivePrivateRowKey            = "/archiveprivate/{userId}/{rowKey}";
 
         public static final String ArchiveSecuritySetting             = "/archivesecurity";
-        public static final String ArchiveSecuritySettingUser           = "/archivesecurity/{userId}";
-        public static final String ArchiveSecuritySettingKeyAuthen         = "/archivesecurity/{userId}/securitykey/authentication";
+        public static final String ArchiveSecuritySettingUser           = "/archivesecurity/{user_id}";
+        public static final String ArchiveSecuritySettingKeyAuthen         = "/archivesecurity/{user_id}/securitykey/authentication";
 
         public static final String ArchiveLogs             = "/archivelogs";
 

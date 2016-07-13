@@ -23,8 +23,6 @@ public class ArchiveSecuritySettingService extends BaseJpaService<ArchiveSecurit
     }
 
     public boolean ArchiveSecuritySettingAuthentication(String userId, String securityKey) {
-        archiveSecuritySettingRepository.ArchiveSecuritySettingAuthentication(userId,securityKey);
-
         ArchiveSecuritySetting  userSetting = archiveSecuritySettingRepository.findByUserId(userId);
 
         if(MD5.encrypt(securityKey).equals( userSetting.getSecurityKey()))
