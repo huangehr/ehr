@@ -42,7 +42,6 @@ import java.util.Map;
 @Api(value = "user", description = "用户管理接口，用于用户信息管理", tags = {"用户管理接口"})
 public class UserController extends BaseController {
 
-
     @Autowired
     private UserClient userClient;
 
