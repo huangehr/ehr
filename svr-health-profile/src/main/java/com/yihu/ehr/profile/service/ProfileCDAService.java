@@ -306,24 +306,20 @@ public class ProfileCDAService {
             re.put("patient_id",profileMap.get("patient_id"));
             re.put("org_code",profileMap.get("org_code"));
             re.put("event_no",profileMap.get("event_no"));
-            String version = profileMap.get("cda_version").toString();
-            String orgCode = profileMap.get("org_code").toString();
-            String eventType = profileMap.get("event_type").toString();
 
-            //遍历所有CDA Document
-            Map<Template, MCDADocument> CDAList = templateService.getOrganizationTemplates(orgCode,version,cdaDocumentTypeOptions.getCdaDocumentTypeId(eventType));
+            //获取有数据的cda class
+            List<Map<String, Object>> cdaClassList = getCDAClass(profileId,null);
             List<Map<String, Object>> CDADataList = new ArrayList<>();
             List<String>cdaDocumentIdList=new ArrayList<>();
-            for (MCDADocument cda : CDAList.values()) {
-                String cdaDocumentId = cda.getId();
-                cdaDocumentIdList.add(cdaDocumentId);
+            for (Map<String, Object> cda : cdaClassList) {
+                cdaDocumentIdList.add(cda.get("cda_document_id").toString());
             }
             Map<String, Object> CDAData = getCDAPartData(profileMap, false,(String[])cdaDocumentIdList.toArray(new String[cdaDocumentIdList.size()]));
             for(String key :CDAData.keySet()){
-
                 CDADataList.add((Map<String, Object>)CDAData.get(key));
             }
             re.put("cda_documents",CDADataList);
+
         }
         else{
             throw new Exception("未找到该CDA档案！（profile_id："+profileId+"）");

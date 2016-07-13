@@ -17,7 +17,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -157,11 +156,35 @@ public class AppFeatureController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
-    @ApiOperation(value = "获取过滤App列表")
+    @ApiOperation(value = "获取过滤AppFeature列表")
     public Envelop getAppFeatureNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters){
         Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage(filters);
+        Envelop envelop = new Envelop();
+        List<AppFeatureModel> appFeatureModels = new ArrayList<>();
+        for(MAppFeature mAppFeature: mAppFeatures ){
+            AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
+            appFeatureModels.add(appFeatureModel);
+        }
+        envelop.setDetailModelList(appFeatureModels);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/role_app_feature/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "获取角色组的AppFeature列表")
+    public Envelop getRoleAppFeatureNoPage(
+            @ApiParam(name = "role_id", value = "角色组id")
+            @RequestParam(value = "role_id") String roleId){
+        Collection<MRoleFeatureRelation> mRoleFeatureRelations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + roleId);
+        String featureIds = "";
+        for(MRoleFeatureRelation m : mRoleFeatureRelations){
+            featureIds += m.getFeatureId()+",";
+        }
+        if(!StringUtils.isEmpty(featureIds)){
+            featureIds = featureIds.substring(0,featureIds.length()-1);
+        }
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage("id="+featureIds);
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
         for(MAppFeature mAppFeature: mAppFeatures ){
