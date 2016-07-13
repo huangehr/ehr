@@ -6,11 +6,13 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.archivrsecurity.dao.model.ArchiveSecuritySetting;
 import com.yihu.ehr.model.archivesecurity.MArchiveSecuritySetting;
 import com.yihu.ehr.archivrsecurity.service.ArchiveSecuritySettingService;
+import com.yihu.ehr.util.encrypt.MD5;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,6 +60,10 @@ public class ArchiveSecuritySettingEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) {
         ArchiveSecuritySetting archiveSecuritySetting = toEntity(jsonData, ArchiveSecuritySetting.class);
+        if(!org.apache.commons.lang.StringUtils.isBlank(archiveSecuritySetting.getSecurityKey()))
+        {
+            archiveSecuritySetting.setSecurityKey(MD5.encrypt(archiveSecuritySetting.getSecurityKey()));
+        }
         archiveSecuritySettingService.save(archiveSecuritySetting);
         return convertToModel(archiveSecuritySetting, MArchiveSecuritySetting.class, null);
     }
@@ -82,6 +88,10 @@ public class ArchiveSecuritySettingEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) throws Exception {
         ArchiveSecuritySetting archiveSecuritySetting = toEntity(jsonData, ArchiveSecuritySetting.class);
+        if(!org.apache.commons.lang.StringUtils.isBlank(archiveSecuritySetting.getSecurityKey()))
+        {
+            archiveSecuritySetting.setSecurityKey(MD5.encrypt(archiveSecuritySetting.getSecurityKey()));
+        }
         archiveSecuritySettingService.save(archiveSecuritySetting);
         return convertToModel(archiveSecuritySetting, MArchiveSecuritySetting.class, null);
     }
