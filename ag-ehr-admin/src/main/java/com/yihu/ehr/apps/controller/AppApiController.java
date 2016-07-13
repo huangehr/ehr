@@ -6,6 +6,8 @@ import com.yihu.ehr.apps.service.AppApiClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.user.MRoleApiRelation;
+import com.yihu.ehr.users.service.RoleApiRelationClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -30,6 +33,10 @@ public class AppApiController extends BaseController {
 
     @Autowired
     AppApiClient appApiClient;
+
+    @Autowired
+    private RoleApiRelationClient roleApiRelationClient;
+
 
     @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
@@ -138,6 +145,30 @@ public class AppApiController extends BaseController {
         }
         envelop.setDetailModelList(appApiModels);
         return envelop  ;
+    }
+
+    @RequestMapping(value = "/role_app_api/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "获取角色组的AppApi列表")
+    public Envelop getRoleAppFeatureNoPage(
+            @ApiParam(name = "role_id", value = "角色组id")
+            @RequestParam(value = "role_id") String roleId){
+        Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId=" + roleId);
+        String apiIds = "";
+        for(MRoleApiRelation m : mRoleApiRelations){
+            apiIds += m.getApiId()+",";
+        }
+        if(!StringUtils.isEmpty(apiIds)){
+            apiIds = apiIds.substring(0,apiIds.length()-1);
+        }
+        Collection<MAppApi> mAppApis = appApiClient.getAppApiNoPage("id=" + apiIds);
+        Envelop envelop = new Envelop();
+        List<AppApiModel> appApiModels = new ArrayList<>();
+        for(MAppApi mAppApi: mAppApis ){
+            AppApiModel appApiModel = convertToModel(mAppApi, AppApiModel.class);
+            appApiModels.add(appApiModel);
+        }
+        envelop.setDetailModelList(appApiModels);
+        return envelop;
     }
 
 }
