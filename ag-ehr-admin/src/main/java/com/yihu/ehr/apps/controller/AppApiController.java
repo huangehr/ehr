@@ -163,6 +163,8 @@ public class AppApiController extends BaseController {
             Collection<MRoleApiRelation> mRoleFeatureRelations = responseEntity.getBody();
             if(mRoleFeatureRelations!=null&&mRoleFeatureRelations.size()>0){
                 appApiModel.setIschecked(true);
+            }else{
+                appApiModel.setIschecked(false);
             }
         }
     }
