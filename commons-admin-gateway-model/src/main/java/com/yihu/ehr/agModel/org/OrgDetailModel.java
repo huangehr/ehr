@@ -26,6 +26,10 @@ public class OrgDetailModel{
     private String province;
     private String city;
     private String district;
+    private int countryId;
+    private int cityId;
+    private int provinceId;
+    private int districtId;
     private String town;
     private String street;
     private String extra;
@@ -271,5 +275,37 @@ public class OrgDetailModel{
 
     public void setAdministrativeDivision(int administrativeDivision) {
         this.administrativeDivision = administrativeDivision;
+    }
+
+    public int getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(int countryId) {
+        this.countryId = countryId;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
+    }
+
+    public int getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(int districtId) {
+        this.districtId = districtId;
     }
 }

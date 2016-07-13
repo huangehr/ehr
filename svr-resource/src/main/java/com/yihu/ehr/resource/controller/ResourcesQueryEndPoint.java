@@ -168,40 +168,44 @@ public class ResourcesQueryEndPoint {
     @ApiOperation("获取Cda Data")
     @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.GET)
     public Map<String,Object> getCDAData(
-            @ApiParam(name = "masterJson", defaultValue = "")
+            @ApiParam(name = "masterJson")
             @RequestParam(value = "masterJson", required = true) String masterJson,
-            @ApiParam(name = "masterDatasetCodeList", defaultValue = "")
+            @ApiParam(name = "masterDatasetCodeList")
             @RequestParam(value = "masterDatasetCodeList", required = true) String masterDatasetCodeList,
-            @ApiParam(name = "multiDatasetCodeList", defaultValue = "")
+            @ApiParam(name = "multiDatasetCodeList")
             @RequestParam(value = "multiDatasetCodeList", required = true) String multiDatasetCodeList) throws Exception {
-        Map<String,Object> map=new HashMap<>();
-        Map<String,Object> returnmap=new HashMap<>();
+
+        Map<String,Object> re =new HashMap<>();
         Map<String, Object> obj=objectMapper.readValue(java.net.URLDecoder.decode(masterJson), Map.class);
         Map<String, List<String>> masterDatasetCodeMap=objectMapper.readValue(java.net.URLDecoder.decode(masterDatasetCodeList), Map.class);
         Map<String, List<String>> multiDatasetCodeMap=objectMapper.readValue(java.net.URLDecoder.decode(multiDatasetCodeList), Map.class);
         String profileId = obj.get("rowkey").toString();
         String cdaVersion = obj.get("cda_version").toString();
         for(String key:masterDatasetCodeMap.keySet()) {
-            for (int i = 0; i < masterDatasetCodeMap.size(); i++) {
+            Map<String,Object> map=new HashMap<>();
+            List<String> masterDatasetList = masterDatasetCodeMap.get(key);
+            List<String> multiDatasetList = multiDatasetCodeMap.get(key);
+
+            for (int i = 0; i < masterDatasetList.size(); i++) {
                 List<Map<String, Object>> dataList = new ArrayList<>();
-
-                dataList.add(resourcesTransformService.stdMasterTransform(obj, masterDatasetCodeMap.get(key).get(i), cdaVersion));
-                map.put(masterDatasetCodeMap.get(key).get(i), dataList);
+                String dataset = masterDatasetList.get(i);
+                dataList.add(resourcesTransformService.stdMasterTransform(obj, dataset, cdaVersion));
+                map.put(dataset, dataList);
             }
-            for (int i = 0; i < multiDatasetCodeMap.size(); i++) {
-
-                String q = "{\"table\":\"" + multiDatasetCodeMap.get(i) + "\",\"q\":\"profile_id:" + profileId + "\"}";
+            for (int i = 0; i < multiDatasetList.size(); i++) {
+                String dataset = multiDatasetList.get(i);
+                String q = "{\"table\":\"" + dataset + "\",\"q\":\"profile_id:" + profileId + "\"}";
                 Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenterSub(q, null, null);
 
                 if (cdaVersion != null && cdaVersion.length() > 0) {
-                    map.put(multiDatasetCodeMap.get(key).get(i), resourcesTransformService.displayCodeConvert(result.getContent(), cdaVersion, null));
+                    map.put(dataset, resourcesTransformService.displayCodeConvert(result.getContent(), cdaVersion, null));
                 } else {
-                    map.put(multiDatasetCodeMap.get(key).get(i), result.getContent());
+                    map.put(dataset, result.getContent());
                 }
             }
-            returnmap.put(key,map);
+            re.put(key,map);
         }
-        return returnmap;
+        return re;
     }
 
 

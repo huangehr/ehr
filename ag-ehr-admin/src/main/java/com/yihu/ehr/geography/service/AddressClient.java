@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -92,4 +93,13 @@ public interface AddressClient {
     boolean isNullAddress(
             @ApiParam(name = "json_data", value = "地址json字符串")
             @RequestParam( value = "json_data") String jsonData) ;
+
+
+    @RequestMapping(value = "/geography_entries/getAddressDict" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据地址中文名 查询地址编号")
+    Collection<MGeographyDict> getAddressDict(
+            @ApiParam(name = "fields", value = "fields", defaultValue = "")
+            @RequestParam(value = "fields") String[] fields ,
+            @ApiParam(name = "values", value = "values", defaultValue = "")
+            @RequestParam(value = "values") String[] values);
 }
