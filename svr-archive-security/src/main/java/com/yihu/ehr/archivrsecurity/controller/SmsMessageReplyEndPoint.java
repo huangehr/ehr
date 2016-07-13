@@ -1,5 +1,6 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.archivrsecurity.dao.model.SmsMessageReply;
 import com.yihu.ehr.archivrsecurity.service.SmsMessageReplyService;
 import com.yihu.ehr.constants.ApiVersion;
@@ -31,7 +32,7 @@ public class SmsMessageReplyEndPoint extends EnvelopRestEndPoint {
     SmsMessageReplyService smsMessageReplyService;
 
     @ApiOperation(value = "短信回复列表查询")
-    @RequestMapping(value = "/message_reply_info", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageReply, method = RequestMethod.GET)
     public Collection<MSmsMessageReply> searchMessagesSendInfo(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -52,7 +53,7 @@ public class SmsMessageReplyEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "短信回复新增")
-    @RequestMapping(value = "/message_reply_info", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageReply, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MSmsMessageReply createMessagesSendInfo(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) {

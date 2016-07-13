@@ -1,10 +1,12 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.archivrsecurity.dao.model.ScAuthorizeDoctorApply;
 import com.yihu.ehr.archivrsecurity.service.DoctorApplyService;
+import com.yihu.ehr.model.archivesecurity.MScAuthorizeDoctorApply;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,29 +38,29 @@ public class DoctorApplyEndPoint extends BaseRestEndPoint {
     @Autowired
     ObjectMapper objectMapper;
 
-    @RequestMapping(value = "/authorizedoctors",method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeDoctors,method = RequestMethod.POST)
     @ApiOperation("医生授权申请新增")
-    public ScAuthorizeDoctorApply saveDoctorApply(
+    public MScAuthorizeDoctorApply saveDoctorApply(
             @ApiParam(value="jsonData")
             @RequestParam(value = "jsonData",required = true)
                     String jsonData) throws Exception {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         ScAuthorizeDoctorApply doctorApply = objectMapper.readValue(jsonData,ScAuthorizeDoctorApply.class);
-        return doctorApplyService.save(doctorApply);
+        return convertToModel(doctorApplyService.save(doctorApply),MScAuthorizeDoctorApply.class);
     }
 
-    @RequestMapping(value = "/authorizedoctors",method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeDoctors,method = RequestMethod.PUT)
     @ApiOperation("医生授权申请更新")
-    public ScAuthorizeDoctorApply updateDoctorApply(
+    public MScAuthorizeDoctorApply updateDoctorApply(
             @ApiParam(value="jsonData")
             @RequestParam(value = "jsonData",required = true)
                     String jsonData) throws Exception {
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.simpleDatePattern));
         ScAuthorizeDoctorApply doctorApply = objectMapper.readValue(jsonData,ScAuthorizeDoctorApply.class);
-        return doctorApplyService.save(doctorApply);
+        return convertToModel(doctorApplyService.save(doctorApply),MScAuthorizeDoctorApply.class);
     }
 
-    @RequestMapping(value = "/authorizedoctors/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeDoctorsId,method = RequestMethod.DELETE)
     @ApiOperation("医生授权申请删除")
     public boolean deleteDoctorApply(
             @ApiParam(value="id")
@@ -68,7 +70,7 @@ public class DoctorApplyEndPoint extends BaseRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = "/authorizedoctors/{id}/alteration",method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeDoctorsIdAlteration,method = RequestMethod.PUT)
     @ApiOperation("医生授权变更")
     public boolean modifyDoctorApply(
             @ApiParam(value="id")
@@ -88,7 +90,7 @@ public class DoctorApplyEndPoint extends BaseRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = "/authorizedoctors/{id}/authorization",method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeDoctorsIdAuthorization,method = RequestMethod.PUT)
     @ApiOperation("医生授权变更")
     public boolean authorizeDoctorApply(
             @ApiParam(value="id")
@@ -104,8 +106,8 @@ public class DoctorApplyEndPoint extends BaseRestEndPoint {
 
 
     @ApiOperation("医生授权申请查询")
-    @RequestMapping(value = "/authorizedoctors",method = RequestMethod.GET)
-    public List<ScAuthorizeDoctorApply> getDoctorAuthorize(
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeDoctors,method = RequestMethod.GET)
+    public Collection<MScAuthorizeDoctorApply> getDoctorAuthorize(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")
             @RequestParam(value="fields",required = false)String fields,
             @ApiParam(name="filters",value="过滤",defaultValue = "")
@@ -120,23 +122,23 @@ public class DoctorApplyEndPoint extends BaseRestEndPoint {
             HttpServletResponse response) throws Exception
     {
         long total = 0;
-        Collection<ScAuthorizeDoctorApply> rsList;
+        Collection<MScAuthorizeDoctorApply> rsList;
 
         //过滤条件为空
         if(StringUtils.isEmpty(filters))
         {
             Page<ScAuthorizeDoctorApply> doctorApplies = doctorApplyService.getDoctorApply(sorts,reducePage(page),size);
             total = doctorApplies.getTotalElements();
-            rsList = convertToModels(doctorApplies.getContent(),new ArrayList<>(doctorApplies.getNumber()),ScAuthorizeDoctorApply.class,fields);
+            rsList = convertToModels(doctorApplies.getContent(),new ArrayList<>(doctorApplies.getNumber()),MScAuthorizeDoctorApply.class,fields);
         }
         else
         {
             List<ScAuthorizeDoctorApply> doctorApplies = doctorApplyService.search(fields,filters,sorts,page,size);
             total = doctorApplyService.getCount(filters);
-            rsList = convertToModels(doctorApplies,new ArrayList<>(doctorApplies.size()),ScAuthorizeDoctorApply.class,fields);
+            rsList = convertToModels(doctorApplies,new ArrayList<>(doctorApplies.size()),MScAuthorizeDoctorApply.class,fields);
         }
 
         pagedResponse(request,response,total,page,size);
-        return (List<ScAuthorizeDoctorApply>)rsList;
+        return rsList;
     }
 }
