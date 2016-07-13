@@ -10,7 +10,10 @@
 - 中央库只维护master与dev分支。
 - 除了中央库的两个分支，还有三种临时性分支：功能分支，候选发布分支及Bug修复分支。
 - 标签只在master分支上。
-- 临时分支创建原则：功能分支以feature-开头，候选发布分支以rc-(release candidate)开头，Bug修复分支以bugfix-开头。
+- 临时分支创建原则：
+    - 功能分支以feature-开头。
+    - 候选发布分支以rc-(release candidate)开头。
+    - Bug修复分支以bugfix-开头。
 
 以下是本次开发的工作流时序图：
 
