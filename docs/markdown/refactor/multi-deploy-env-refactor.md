@@ -1,5 +1,9 @@
 # 微服务内存占用过高改造方案及部署说明
 
+- Sand Wen, 2016.06.14
+
+## 背景
+
 此次改造目的是减少微服务的运行内存，并支持多部署方式，即jar,war在dev,test,prod三种环境中的部署，以下是部署环境矩阵：
 
 ![部署环境与Maven配置](../../images/deploy-env.png)
@@ -7,7 +11,7 @@
 其中，打勾表示此次改造后支持的部署模式，打叉表示暂时不支持，但稍做修改即可或未来可能会提供部署支持。
 此次修改内容较多，如遇到问题，请及时提出讨论。
 
-# 改造内容
+## 改造内容
 
 - 增加ehr-parent-pom.xml全局模板 ，位于 ehr 目录。此POM用于管理EHR应用所有的包依赖（不含EHR所定义的公用包），插件依赖，版本定义，库定义及其他选项。
 - 增加ehr-lib-parent-pom.xml公共包模板，定义微服务公用包所需要依赖，插件依赖。若有新增公用模块，请使用commons开头命名，并在此模板中增加子模块定义，并在ehr-ms-parent-pom.xml中添加依赖定义。
@@ -18,7 +22,7 @@
     - Intellij可通过Maven Project面板切换profile
 - svr-discovery与svr-configuration服务作为全局服务依赖，而tomcat启动服务是按内部顺序执行，为保障这两个服务先行启动，它们不使用tomcat部署，而使用jar模式部署。
 
-# 编译
+## 编译
 
 - 安装ehr-parent-pom，在Maven Project中执行install操作。
 - 安装所有公用模块：ehr-lib-parent-pom，在Maven Project中执行install操作。
@@ -27,14 +31,14 @@
 - 以上操作请注意选择的profile。
 
 
-# 部署
-## 使用jar模式部署
+## 部署
+### 使用jar模式部署
 
 此模式使用以下命令启动，不再赘述
 
     java -Djava.security.egd=file:/dev/./urandom -jar app.jar
 
-## 使用war模式部署
+### 使用war模式部署
 
 war模式需要在应用服务器上预告安装并配置好tomcat服务器。微服务设计成独立端口调用模式，而tomcat若要支持多端口监听，需要分别为服务定义connector，具体步骤如下：
 
@@ -111,12 +115,12 @@ war模式需要在应用服务器上预告安装并配置好tomcat服务器。�
       </Service>
 
 
-# 总结
+## 总结
 微服务使用Spring Boot框架，使用jar模式运行的时候，会独立启动一个tomcat，并负责自己的内容，此方式虽然对应用的独立性有好处，但对硬件资源的消耗非常大。
 鉴于Spring Boot的所有依赖被都可以被EHR微服务所共享，因此使用tomcat部署，并将公共依赖放置于tomcat_home/lib目录下，解决内存占用问题。
 Spring Boot内存占用，参见Spring Boot Memory Performance。此次调整的方案是通过共享jar解决。另外也可以通过深入的细节调优处理内存占用问题。
 
-# 可能遇到的问题
+## 可能遇到的问题
 
 Q：服务启动后，每个微服务都被启动两次
 A：遇到此问题请参照第3节的部署，仔细检查。
