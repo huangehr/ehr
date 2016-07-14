@@ -198,17 +198,17 @@ public class AppApiController extends BaseController {
             List<Map<String,Object>> list =  objectMapper.readValue(apiParms,List.class);
             for(Map<String,Object> parmsMap:list){
                 //删除的是新增的数据直接跳过
-                if(DELETE.equals(parmsMap.get("__status"))&&NEW_DATA.equals(parmsMap.get("id")+"")){
+                if(DELETE.equals(parmsMap.get(DATA_STATUS))&&NEW_DATA.equals(parmsMap.get("id")+"")){
                     continue;
                 }else{
                     parmsMap.put("appApiId",apiId);
                     String json =toJson(parmsMap);
                     if(NEW_DATA.equals(parmsMap.get("id") + "")){
                         appApiParameterClient.createAppApiParameter(json);
-                    }else if(UPDATE.equals(parmsMap.get("__status"))){
+                    }else if(UPDATE.equals(parmsMap.get(DATA_STATUS))){
                         appApiParameterClient.updateAppApiParameter(json);
                     }
-                    else if(DELETE.equals(parmsMap.get("__status"))){
+                    else if(DELETE.equals(parmsMap.get(DATA_STATUS))){
                         appApiParameterClient.deleteAppApiParameter(parmsMap.get("id") + "");
                     }
                 }
@@ -216,17 +216,17 @@ public class AppApiController extends BaseController {
             list = objectMapper.readValue(apiResponse,List.class);
             for(Map<String,Object> parmsMap:list){
                 //删除的是新增的数据直接跳过
-                if(DELETE.equals(parmsMap.get("__status"))&&NEW_DATA.equals(parmsMap.get("id")+"")){
+                if(DELETE.equals(parmsMap.get(DATA_STATUS))&&NEW_DATA.equals(parmsMap.get("id")+"")){
                     continue;
                 }else{
                     parmsMap.put("appApiId",apiId);
                     String json =toJson(parmsMap);
-                    if(ADD.equals(parmsMap.get("__status"))){
+                    if(ADD.equals(parmsMap.get(DATA_STATUS))){
                         appApiResponseClient.createAppApiResponse(json);
-                    }else if(UPDATE.equals(parmsMap.get("__status"))){
+                    }else if(UPDATE.equals(parmsMap.get(DATA_STATUS))){
                         appApiResponseClient.updateAppApiResponse(json);
                     }
-                    else if(DELETE.equals(parmsMap.get("__status"))){
+                    else if(DELETE.equals(parmsMap.get(DATA_STATUS))){
                         appApiResponseClient.deleteAppApiResponse(parmsMap.get("id")+"");
                     }
                 }
@@ -236,10 +236,11 @@ public class AppApiController extends BaseController {
         }
     }
 
-    private static final String DELETE="delete";
-    private static final String ADD="add";
-    private static final String UPDATE="update";
-    private static final String NEW_DATA ="0";
+    private static final String DELETE  =   "delete";
+    private static final String ADD     =   "add";
+    private static final String UPDATE  =   "update";
+    private static final String NEW_DATA     =  "0";
+    private static final String DATA_STATUS     =   "__status";
 
     @RequestMapping(value = "/role_app_api/no_paging", method = RequestMethod.GET)
     @ApiOperation(value = "获取角色组的AppApi列表")
