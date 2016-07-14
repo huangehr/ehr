@@ -202,7 +202,7 @@ public class RolesController extends BaseController {
                 model.setRoleName(mRoles.getName());
                 model.setAppId(mApp.getId());
                 model.setAppName(mApp.getName());
-                model.setRoleId(relation.getRoleId());
+                model.setRoleId(relation.getRoleId()+"");
                 appRolesModelList.add(model);
             }
         }
