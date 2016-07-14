@@ -169,4 +169,28 @@ public class AppApiController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/role_app_api/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "获取角色组的AppApi列表")
+    public Envelop getRoleAppFeatureNoPage(
+            @ApiParam(name = "role_id", value = "角色组id")
+            @RequestParam(value = "role_id") String roleId){
+        Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId=" + roleId);
+        String apiIds = "";
+        for(MRoleApiRelation m : mRoleApiRelations){
+            apiIds += m.getApiId()+",";
+        }
+        if(!StringUtils.isEmpty(apiIds)){
+            apiIds = apiIds.substring(0,apiIds.length()-1);
+        }
+        Collection<MAppApi> mAppApis = appApiClient.getAppApiNoPage("id=" + apiIds);
+        Envelop envelop = new Envelop();
+        List<AppApiModel> appApiModels = new ArrayList<>();
+        for(MAppApi mAppApi: mAppApis ){
+            AppApiModel appApiModel = convertToModel(mAppApi, AppApiModel.class);
+            appApiModels.add(appApiModel);
+        }
+        envelop.setDetailModelList(appApiModels);
+        return envelop;
+    }
+
 }
