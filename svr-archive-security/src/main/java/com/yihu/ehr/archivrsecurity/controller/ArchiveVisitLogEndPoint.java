@@ -1,5 +1,6 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.archivrsecurity.dao.model.ArchiveVisitLog;
@@ -31,7 +32,7 @@ public class ArchiveVisitLogEndPoint extends EnvelopRestEndPoint {
     ArchiveVisitLogService archiveVisitLogService;
 
     @ApiOperation(value = "档案访问日志列表查询")
-    @RequestMapping(value = "/archive_logs", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.ArchiveLogs, method = RequestMethod.GET)
     public Collection<MArchiveVisitLog> searchArchiveVisitLog(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -52,7 +53,7 @@ public class ArchiveVisitLogEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "档案访问日志新增")
-    @RequestMapping(value = "/archive_logs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.ArchiveLogs, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MArchiveVisitLog createArchiveVisitLog(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) {
