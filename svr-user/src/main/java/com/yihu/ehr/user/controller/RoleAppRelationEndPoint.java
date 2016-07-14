@@ -92,16 +92,9 @@ public class RoleAppRelationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-        page = reducePage(page);
-        if (StringUtils.isEmpty(filters)) {
-            Page<RoleAppRelation> roleAppRelationPage = roleAppRelationService.getRoleUserList(sorts, page, size);
-            pagedResponse(request, response, roleAppRelationPage.getTotalElements(), page, size);
-            return convertToModels(roleAppRelationPage.getContent(), new ArrayList<>(roleAppRelationPage.getNumber()), MRoleAppRelation.class, fields);
-        } else {
-            List<RoleAppRelation> roleAppRelations = roleAppRelationService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, roleAppRelationService.getCount(filters), page, size);
-            return convertToModels(roleAppRelations, new ArrayList<MRoleAppRelation>(roleAppRelations.size()), MRoleAppRelation.class, fields);
-        }
+        List<RoleAppRelation> roleAppRelations = roleAppRelationService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, roleAppRelationService.getCount(filters), page, size);
+        return convertToModels(roleAppRelations, new ArrayList<MRoleAppRelation>(roleAppRelations.size()), MRoleAppRelation.class, fields);
     }
     @RequestMapping(value = ServiceApi.Roles.RoleAppsNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组-应用关系列表---不分页")

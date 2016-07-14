@@ -69,16 +69,9 @@ public class RoleFeatureRelationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-        page = reducePage(page);
-        if (StringUtils.isEmpty(filters)) {
-            Page<RoleFeatureRelation> roleUserPage = roleFeatureRelationService.getRoleUserList(sorts, page, size);
-            pagedResponse(request, response, roleUserPage.getTotalElements(), page, size);
-            return convertToModels(roleUserPage.getContent(), new ArrayList<>(roleUserPage.getNumber()), MRoleFeatureRelation.class, fields);
-        } else {
-            List<RoleFeatureRelation> roleFeatureRelations = roleFeatureRelationService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, roleFeatureRelationService.getCount(filters), page, size);
-            return convertToModels(roleFeatureRelations, new ArrayList<MRoleFeatureRelation>(roleFeatureRelations.size()), MRoleFeatureRelation.class, fields);
-        }
+        List<RoleFeatureRelation> roleFeatureRelations = roleFeatureRelationService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, roleFeatureRelationService.getCount(filters), page, size);
+        return convertToModels(roleFeatureRelations, new ArrayList<MRoleFeatureRelation>(roleFeatureRelations.size()), MRoleFeatureRelation.class, fields);
     }
     @RequestMapping(value = ServiceApi.Roles.RoleFeaturesNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组-功能权限关系列表---不分页")
