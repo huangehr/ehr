@@ -61,18 +61,9 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<AppFeature> appPages = appFeatureService.getAppFeatureList(sorts, page, size);
-            pagedResponse(request, response, appPages.getTotalElements(), page, size);
-            return convertToModels(appPages.getContent(), new ArrayList<>(appPages.getNumber()), MAppFeature.class, fields);
-        } else {
             List<AppFeature> appFeatureList = appFeatureService.search(fields, filters, sorts, page, size);
-
             pagedResponse(request, response, appFeatureService.getCount(filters), page, size);
             return convertToModels(appFeatureList, new ArrayList<>(appFeatureList.size()), MAppFeature.class, fields);
-        }
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.GET)

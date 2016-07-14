@@ -60,19 +60,11 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<AppApiParameter> appPages = appApiParameterService.getAppApiParameterList(sorts, page, size);
-
-            pagedResponse(request, response, appPages.getTotalElements(), page, size);
-            return convertToModels(appPages.getContent(), new ArrayList<>(appPages.getNumber()), MAppApiParameter.class, fields);
-        } else {
             List<AppApiParameter> AppApiParameterList = appApiParameterService.search(fields, filters, sorts, page, size);
 
             pagedResponse(request, response, appApiParameterService.getCount(filters), page, size);
             return convertToModels(AppApiParameterList, new ArrayList<>(AppApiParameterList.size()), MAppApiParameter.class, fields);
-        }
+
     }
 
     @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameters, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
