@@ -153,9 +153,11 @@ public class RolesController extends BaseController {
     @RequestMapping(value = ServiceApi.Roles.RoleNameExistence,method = RequestMethod.GET)
     @ApiOperation(value = "角色组名称是否已存在" )
     public Envelop isNameExistence(
+            @ApiParam(name = "app_id",value = "应用id")
+            @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "name",value = "角色组名")
             @RequestParam(value = "name") String name){
-        boolean bo = rolesClient.isNameExistence(name);
+        boolean bo = rolesClient.isNameExistence(appId,name);
         if(bo){
             return success(null);
         }
@@ -164,9 +166,11 @@ public class RolesController extends BaseController {
     @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence,method = RequestMethod.GET)
     @ApiOperation(value = "角色组代码是否已存在" )
     public Envelop isCodeExistence(
+            @ApiParam(name = "app_id",value = "应用id")
+            @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "code",value = "角色组代码")
             @RequestParam(value = "code") String code){
-        boolean  bo = rolesClient.isCodeExistence(code);
+        boolean  bo = rolesClient.isCodeExistence(appId,code);
         if(bo){
             return success(null);
         }
@@ -195,7 +199,7 @@ public class RolesController extends BaseController {
             Collection<MRoleAppRelation> mRoleAppRelations = roleAppRelationClient.searchRoleAppNoPaging("appId=" + mApp.getId());
             for(MRoleAppRelation relation : mRoleAppRelations){
                 MRoles mRoles = rolesClient.getRolesById(relation.getRoleId());
-                if(mRoles == null || StringUtils.equals(mRoles.getType(),type)){
+                if(mRoles == null || !StringUtils.equals(mRoles.getType(),type)){
                     continue;
                 }
                 PlatformAppRolesModel model = new PlatformAppRolesModel();
@@ -205,6 +209,49 @@ public class RolesController extends BaseController {
                 model.setRoleId(relation.getRoleId()+"");
                 appRolesModelList.add(model);
             }
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(appRolesModelList);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/platformAppRolesView",method = RequestMethod.GET)
+    @ApiOperation(value = "获取平台应用-所属角色组ids,names组成的对象集合，不分页" )
+    public Envelop getPlatformAppRolesView(
+            @ApiParam(name = "type",value = "角色组类型，应用角色/用户角色")
+            @RequestParam(value = "type") String type){
+        if(StringUtils.isEmpty(type)){
+            return failed("角色组类型不能为空！");
+        }
+        Envelop envelop = new Envelop();
+        //平台应用-应用表中source_type为1
+        Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType=1");
+        //平台应用-角色组对象模型列表
+        List<PlatformAppRolesModel> appRolesModelList = new ArrayList<>();
+        for(MApp mApp : mApps){
+            Collection<MRoleAppRelation> mRoleAppRelations = roleAppRelationClient.searchRoleAppNoPaging("appId=" + mApp.getId());
+            PlatformAppRolesModel model = new PlatformAppRolesModel();
+            String roleIds = "";
+            String roleNames = "";
+            for(MRoleAppRelation relation : mRoleAppRelations){
+                MRoles mRoles = rolesClient.getRolesById(relation.getRoleId());
+                if(mRoles == null || !StringUtils.equals(mRoles.getType(),type)){
+                    continue;
+                }
+                roleIds += roleIds+mRoles.getId()+",";
+                roleNames += roleNames+mRoles.getName()+",";
+            }
+            if(StringUtils.isEmpty(roleIds)){
+                continue;
+            }
+            if(StringUtils.isEmpty(roleNames)){
+                continue;
+            }
+            roleIds = roleIds.substring(0,roleIds.length()-1);
+            roleNames = roleNames.substring(0,roleNames.length()-1);
+            model.setRoleId(roleIds);
+            model.setRoleName(roleNames);
+            appRolesModelList.add(model);
         }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(appRolesModelList);
