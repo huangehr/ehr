@@ -34,7 +34,7 @@ public interface AppClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = ServiceApi.Apps.AppsNoPage, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0+ServiceApi.Apps.AppsNoPage, method = RequestMethod.GET)
     @ApiOperation(value = "获取app列表，不分页")
     Collection<MApp> getAppsNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件",defaultValue = "")
