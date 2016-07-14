@@ -205,8 +205,11 @@ public class AppApiController extends BaseController {
                     String json =toJson(parmsMap);
                     if(NEW_DATA.equals(parmsMap.get("id") + "")){
                         appApiParameterClient.createAppApiParameter(json);
-                    }else{
+                    }else if(UPDATE.equals(parmsMap.get("__status"))){
                         appApiParameterClient.updateAppApiParameter(json);
+                    }
+                    else if(DELETE.equals(parmsMap.get("__status"))){
+                        appApiParameterClient.deleteAppApiParameter(parmsMap.get("id") + "");
                     }
                 }
             }
@@ -218,10 +221,13 @@ public class AppApiController extends BaseController {
                 }else{
                     parmsMap.put("appApiId",apiId);
                     String json =toJson(parmsMap);
-                    if(NEW_DATA.equals(parmsMap.get("id") + "")){
+                    if(ADD.equals(parmsMap.get("__status"))){
                         appApiResponseClient.createAppApiResponse(json);
-                    }else{
+                    }else if(UPDATE.equals(parmsMap.get("__status"))){
                         appApiResponseClient.updateAppApiResponse(json);
+                    }
+                    else if(DELETE.equals(parmsMap.get("__status"))){
+                        appApiResponseClient.deleteAppApiResponse(parmsMap.get("id")+"");
                     }
                 }
             }
@@ -234,4 +240,29 @@ public class AppApiController extends BaseController {
     private static final String ADD="add";
     private static final String UPDATE="update";
     private static final String NEW_DATA ="0";
+
+    @RequestMapping(value = "/role_app_api/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "获取角色组的AppApi列表")
+    public Envelop getRoleAppFeatureNoPage(
+            @ApiParam(name = "role_id", value = "角色组id")
+            @RequestParam(value = "role_id") String roleId){
+        Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId=" + roleId);
+        String apiIds = "";
+        for(MRoleApiRelation m : mRoleApiRelations){
+            apiIds += m.getApiId()+",";
+        }
+        if(!StringUtils.isEmpty(apiIds)){
+            apiIds = apiIds.substring(0,apiIds.length()-1);
+        }
+        Collection<MAppApi> mAppApis = appApiClient.getAppApiNoPage("id=" + apiIds);
+        Envelop envelop = new Envelop();
+        List<AppApiModel> appApiModels = new ArrayList<>();
+        for(MAppApi mAppApi: mAppApis ){
+            AppApiModel appApiModel = convertToModel(mAppApi, AppApiModel.class);
+            appApiModels.add(appApiModel);
+        }
+        envelop.setDetailModelList(appApiModels);
+        return envelop;
+    }
+
 }
