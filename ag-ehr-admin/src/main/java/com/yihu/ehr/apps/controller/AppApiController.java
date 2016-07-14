@@ -1,8 +1,12 @@
 package com.yihu.ehr.apps.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.yihu.ehr.agModel.app.AppApiModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppApiClient;
+import com.yihu.ehr.apps.service.AppApiParameterClient;
+import com.yihu.ehr.apps.service.AppApiResponseClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppApi;
@@ -12,6 +16,8 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jdk.nashorn.internal.runtime.JSONListAdapter;
+import jdk.nashorn.internal.runtime.ListAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by linz on 2016年7月8日11:30:18.
@@ -36,6 +40,12 @@ public class AppApiController extends BaseController {
 
     @Autowired
     RoleApiRelationClient roleApiRelationClient;
+
+    @Autowired
+    AppApiParameterClient appApiParameterClient;
+
+    @Autowired
+    AppApiResponseClient appApiResponseClient;
 
     @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
@@ -67,7 +77,11 @@ public class AppApiController extends BaseController {
     @ApiOperation(value = "创建AppApi")
     public Envelop createAppApi(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true, defaultValue = "")
-            @RequestParam(value = "model", required = false) String model){
+            @RequestParam(value = "model", required = false) String model,
+            @ApiParam(name = "apiParms", value = "api请求参数集合")
+            @RequestParam(value = "apiParms", required = false) String apiParms,
+            @ApiParam(name = "apiResponse", value = "api响应参数集合")
+            @RequestParam(value = "apiResponse", required = false) String apiResponse){
         Envelop envelop = new Envelop();
         MAppApi mAppApi =  appApiClient.createAppApi(model);
         if(mAppApi==null){
@@ -77,6 +91,7 @@ public class AppApiController extends BaseController {
         }
         AppApiModel appApiModel = new AppApiModel();
         BeanUtils.copyProperties(mAppApi,appApiModel);
+        saveApiParmsResponse(appApiModel.getId()+"",apiParms,apiResponse);
         envelop.setSuccessFlg(true);
         envelop.setObj(appApiModel);
         return envelop;
@@ -105,7 +120,11 @@ public class AppApiController extends BaseController {
     @ApiOperation(value = "更新AppApi")
     public Envelop updateAppApi(
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
-            @RequestParam(value = "model", required = false) String AppApi){
+            @RequestParam(value = "model", required = false) String AppApi,
+            @ApiParam(name = "apiParms", value = "api请求参数集合")
+            @RequestParam(value = "apiParms", required = false) String apiParms,
+            @ApiParam(name = "apiResponse", value = "api响应参数集合")
+            @RequestParam(value = "apiResponse", required = false) String apiResponse){
         Envelop envelop = new Envelop();
         MAppApi mAppApi =  appApiClient.createAppApi(AppApi);
         AppApiModel appApiModel = new AppApiModel();
@@ -115,6 +134,7 @@ public class AppApiController extends BaseController {
             return envelop;
         }
         BeanUtils.copyProperties(mAppApi,appApiModel);
+        saveApiParmsResponse(appApiModel.getId()+"",apiParms,apiResponse);
         envelop.setSuccessFlg(true);
         envelop.setObj(appApiModel);
         return envelop;
@@ -163,11 +183,63 @@ public class AppApiController extends BaseController {
             Collection<MRoleApiRelation> mRoleFeatureRelations = responseEntity.getBody();
             if(mRoleFeatureRelations!=null&&mRoleFeatureRelations.size()>0){
                 appApiModel.setIschecked(true);
-            }else{
-                appApiModel.setIschecked(false);
             }
         }
     }
+
+    /**
+     * 保存apiParms及apiResponse
+     * @param apiId
+     * @param apiParms
+     * @param apiResponse
+     */
+    private void saveApiParmsResponse(String apiId,String apiParms,String apiResponse){
+        try{
+            List<Map<String,Object>> list =  objectMapper.readValue(apiParms,List.class);
+            for(Map<String,Object> parmsMap:list){
+                //删除的是新增的数据直接跳过
+                if(DELETE.equals(parmsMap.get("__status"))&&NEW_DATA.equals(parmsMap.get("id")+"")){
+                    continue;
+                }else{
+                    parmsMap.put("appApiId",apiId);
+                    String json =toJson(parmsMap);
+                    if(NEW_DATA.equals(parmsMap.get("id") + "")){
+                        appApiParameterClient.createAppApiParameter(json);
+                    }else if(UPDATE.equals(parmsMap.get("__status"))){
+                        appApiParameterClient.updateAppApiParameter(json);
+                    }
+                    else if(DELETE.equals(parmsMap.get("__status"))){
+                        appApiParameterClient.deleteAppApiParameter(parmsMap.get("id") + "");
+                    }
+                }
+            }
+            list = objectMapper.readValue(apiResponse,List.class);
+            for(Map<String,Object> parmsMap:list){
+                //删除的是新增的数据直接跳过
+                if(DELETE.equals(parmsMap.get("__status"))&&NEW_DATA.equals(parmsMap.get("id")+"")){
+                    continue;
+                }else{
+                    parmsMap.put("appApiId",apiId);
+                    String json =toJson(parmsMap);
+                    if(ADD.equals(parmsMap.get("__status"))){
+                        appApiResponseClient.createAppApiResponse(json);
+                    }else if(UPDATE.equals(parmsMap.get("__status"))){
+                        appApiResponseClient.updateAppApiResponse(json);
+                    }
+                    else if(DELETE.equals(parmsMap.get("__status"))){
+                        appApiResponseClient.deleteAppApiResponse(parmsMap.get("id")+"");
+                    }
+                }
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private static final String DELETE="delete";
+    private static final String ADD="add";
+    private static final String UPDATE="update";
+    private static final String NEW_DATA ="0";
 
     @RequestMapping(value = "/role_app_api/no_paging", method = RequestMethod.GET)
     @ApiOperation(value = "获取角色组的AppApi列表")
