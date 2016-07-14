@@ -34,7 +34,7 @@ public class RoleApiRelation {
         this.roleId = roleId;
     }
 
-    @Column(name = "api_id",nullable = false)
+    @Column(name = "app_api_id",nullable = false)
     public long getApiId() {
         return apiId;
     }

@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -32,6 +33,12 @@ public interface AppClient {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
+
+    @RequestMapping(value = ServiceApi.Apps.AppsNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取app列表，不分页")
+    Collection<MApp> getAppsNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件",defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")

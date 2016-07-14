@@ -1,13 +1,14 @@
 package com.yihu.ehr.users.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.RoleUserModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.user.MRoleUser;
+import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.users.service.RoleUserClient;
+import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -16,7 +17,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +37,9 @@ public class RoleUserController extends BaseController {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private RolesClient rolesClient;
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -157,6 +160,9 @@ public class RoleUserController extends BaseController {
         //获取用户名
         MUser user = userClient.getUser(m.getUserId());
         model.setUserName(user == null?"":user.getRealName());
+        //获取角色名
+        MRoles roles = rolesClient.getRolesById(m.getRoleId());
+        model.setRoleName(roles == null?"":roles.getName());
         return model;
     }
 }
