@@ -1,7 +1,6 @@
 package com.yihu.ehr.medicalRecord.service;
 
 
-import com.yihu.ehr.medicalRecord.dao.intf.MRResourcesDao;
 import com.yihu.ehr.medicalRecord.model.MRRsResources;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
