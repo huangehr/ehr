@@ -4,14 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.Channel;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.web.RestTemplates;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -35,27 +31,11 @@ public class MessageSendTask {
     @Autowired
     RedisTemplate<String, Serializable> redisTemplate;
 
-    @Autowired
-    RestTemplates restTemplates;
-
-    @Value("${svr-pack-mgr.server.port}")
-    int port;
-
     @Scheduled(cron = "0/2 * * * * ?")
     public void sendResolveMessage() throws JsonProcessingException {
         Set<MPackage> packages = messageBuffer.pickMessages();
         for (MPackage pack : packages){
             redisTemplate.convertAndSend(Channel.PackageResolve, objectMapper.writeValueAsString(pack));
         }
-    }
-
-
-    @Scheduled(cron = "0/300 * * * * ?")
-    public void sendResolveMessage1() throws JsonProcessingException {
-        MultiValueMap<String,String> map = new LinkedMultiValueMap<>();
-        map.set("count","500");
-        map.set("filters","resourced=false");
-        map.set("sort","+receiveDate");
-        restTemplates.doPut("http://localhost:"+port+"/api/v1.0/message/resolve",map);
     }
 }
