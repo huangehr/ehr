@@ -168,6 +168,7 @@ public class AppApiController extends BaseController {
             converModelName(appApiModel);
             appApiModels.add(appApiModel);
         }
+        envelop.setSuccessFlg(true);
         envelop.setDetailModelList(appApiModels);
         return envelop  ;
     }
