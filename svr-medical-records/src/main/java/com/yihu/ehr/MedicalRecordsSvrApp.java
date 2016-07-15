@@ -22,14 +22,14 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @EnableFeignClients
 @EnableSpringDataWebSupport
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-public class MedivalRecordsSvrApp extends SpringBootServletInitializer {
+public class MedicalRecordsSvrApp extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        SpringApplication.run(MedivalRecordsSvrApp.class, args);
+        SpringApplication.run(MedicalRecordsSvrApp.class, args);
     }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(MedivalRecordsSvrApp.class);
+        return application.sources(MedicalRecordsSvrApp.class);
     }
 }

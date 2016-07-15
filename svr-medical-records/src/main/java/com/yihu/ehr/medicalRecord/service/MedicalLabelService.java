@@ -3,12 +3,16 @@ package com.yihu.ehr.medicalRecord.service;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalLabelDao;
 import com.yihu.ehr.medicalRecord.model.MrMedicalLabelEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * Created by shine on 2016/7/14.
  */
+@Transactional
+@Service
 public class MedicalLabelService {
 
     @Autowired

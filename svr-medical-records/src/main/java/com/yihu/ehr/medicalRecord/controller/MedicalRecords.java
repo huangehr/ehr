@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "medivalRecords", description = "病例夹服务接口")
-public class MedivalRecords extends EnvelopRestEndPoint {
+public class MedicalRecords extends EnvelopRestEndPoint {
     @Autowired
     private UserInfoService uiService;
 
