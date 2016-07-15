@@ -164,6 +164,12 @@ public class ResourcesTransformService {
                 {
                     returnRs.put(srcMetadataCode,resource.get(metadataId));
                 }
+
+                //同时返回字典值
+                if(resource.containsKey(metadataId+"_VALUE"))
+                {
+                    returnRs.put(srcMetadataCode+"_VALUE",resource.get(metadataId+"_VALUE"));
+                }
             }
         }
 

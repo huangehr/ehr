@@ -4,10 +4,14 @@ import com.yihu.ehr.medicalRecord.dao.intf.MrSystemDictDao;
 import com.yihu.ehr.medicalRecord.dao.intf.MrSystemDictEntryDao;
 import com.yihu.ehr.medicalRecord.model.MrSystemDictEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by shine on 2016/7/14.
  */
+@Transactional
+@Service
 public class MrSystemDictService {
 
     @Autowired
@@ -15,14 +19,14 @@ public class MrSystemDictService {
     @Autowired
     MrSystemDictEntryDao mrSystemDictEntryDao;
 
-    public boolean addMrSystemDictEntry(MrSystemDictEntity MrSystemDictEntry){
-        mrSystemDictDao.save(MrSystemDictEntry);
+    public boolean addMrSystemDict(MrSystemDictEntity MrSystemDict){
+        mrSystemDictDao.save(MrSystemDict);
         return true;
     }
 
 
-    public boolean deleteMrSystemDictEntry( String dictCode){
-        if(mrSystemDictEntryDao.findBydictCode(dictCode)!=null)
+    public boolean deleteMrSystemDict( String dictCode){
+        if(mrSystemDictEntryDao.findByDictCode(dictCode)!=null)
             return false;
         else {
             mrSystemDictDao.deleteBydictCode(dictCode);
@@ -35,7 +39,7 @@ public class MrSystemDictService {
         return true;
     }
 
-    public boolean updataMrSystemDictEntry(MrSystemDictEntity mrSystemDictEntity){
+    public boolean updateMrSystemDict(MrSystemDictEntity mrSystemDictEntity){
         if(mrSystemDictEntity!=null){
             MrSystemDictEntity m=mrSystemDictDao.findBydictCode(mrSystemDictEntity.getDictCode());
             if(m!=null)
