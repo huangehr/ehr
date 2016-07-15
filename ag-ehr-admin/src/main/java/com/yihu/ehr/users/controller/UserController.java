@@ -1,20 +1,25 @@
 package com.yihu.ehr.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.app.AppFeatureModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
+import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
+import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
+import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.users.service.RoleFeatureRelationClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -30,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +65,10 @@ public class UserController extends BaseController {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private RoleFeatureRelationClient roleFeatureRelationClient;
+    @Autowired
+    AppFeatureClient appFeatureClient;
 
     @Autowired
     private FileResourceClient fileResourceClient;
@@ -605,4 +615,32 @@ public class UserController extends BaseController {
 
         return mUser;
     }
+
+    //查看用户权限列表
+    @RequestMapping(value = "/users/user_features",method = RequestMethod.GET)
+    @ApiOperation(value = "查看用户权限", notes = "查看用户权限")
+    public Envelop getUserFeatureList(
+            @ApiParam(name = "roles_ids",value = "用户所属角色组ids，多个以逗号隔开")
+            @RequestParam(value = "roles_ids") String roleIds){
+        Collection<MRoleFeatureRelation> relations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + roleIds);
+        String featureIds = "";
+        for(MRoleFeatureRelation relation : relations){
+            featureIds += relation.getFeatureId()+",";
+        }
+        if(StringUtils.isEmpty(featureIds)){
+            return success(null);
+        }
+        featureIds = featureIds.substring(0,featureIds.length()-1);
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage("id=" + featureIds);
+        Envelop envelop = new Envelop();
+        List<AppFeatureModel> appFeatureModels = new ArrayList<>();
+        for(MAppFeature mAppFeature: mAppFeatures ){
+            AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
+            appFeatureModels.add(appFeatureModel);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(appFeatureModels);
+        return envelop;
+    }
+
 }

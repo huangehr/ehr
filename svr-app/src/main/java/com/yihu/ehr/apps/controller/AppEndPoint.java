@@ -62,18 +62,18 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<App> appPages = appService.getAppList(sorts, page, size);
-
-            pagedResponse(request, response, appPages.getTotalElements(), page, size);
-            return convertToModels(appPages.getContent(), new ArrayList<>(appPages.getNumber()), MApp.class, fields);
-        } else {
             List<App> appList = appService.search(fields, filters, sorts, page, size);
             pagedResponse(request, response, appService.getCount(filters), page, size);
             return convertToModels(appList, new ArrayList<>(appList.size()), MApp.class, fields);
-        }
+    }
+
+    @RequestMapping(value = ServiceApi.Apps.AppsNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取app列表，不分页")
+    public Collection<MApp> getAppsNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件",defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<App> appList = appService.search(filters);
+        return convertToModels(appList,new ArrayList<MApp>(appList.size()),MApp.class,"");
     }
 
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

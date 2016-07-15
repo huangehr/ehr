@@ -87,16 +87,9 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-        page = reducePage(page);
-        if (StringUtils.isEmpty(filters)) {
-            Page<Roles> rolesPage = rolesService.getRolesList(sorts, page, size);
-            pagedResponse(request, response, rolesPage.getTotalElements(), page, size);
-            return convertToModels(rolesPage.getContent(), new ArrayList<>(rolesPage.getNumber()), MRoles.class, fields);
-        } else {
-            List<Roles> rolesList = rolesService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, rolesService.getCount(filters), page, size);
-            return convertToModels(rolesList, new ArrayList<>(rolesList.size()), MRoles.class, fields);
-        }
+        List<Roles> rolesList = rolesService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, rolesService.getCount(filters), page, size);
+        return convertToModels(rolesList, new ArrayList<>(rolesList.size()), MRoles.class, fields);
     }
     @RequestMapping(value = ServiceApi.Roles.RolesNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组列表---不分页")
@@ -110,9 +103,13 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
     @RequestMapping(value = ServiceApi.Roles.RoleNameExistence,method = RequestMethod.GET)
     @ApiOperation(value = "角色组名称是否已存在" )
     public boolean isNameExistence(
-            @ApiParam(name = "name",value = "角色组名")
+            @ApiParam(name = "app_id",value = "应用id")
+            @RequestParam(value = "app_id") String appId,
+            @ApiParam(name = "name",value = "角色组名称")
             @RequestParam(value = "name") String name){
-        List<Roles> roles = rolesService.findByField("name", name);
+        String[] fields = {"appId","name"};
+        String[] values = {appId,name};
+        List<Roles> roles = rolesService.findByFields(fields,values);
         if(roles != null && roles.size() >0){
             return true;
         }
@@ -121,9 +118,13 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
     @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence,method = RequestMethod.GET)
     @ApiOperation(value = "角色组代码是否已存在" )
     public boolean isCodeExistence(
+            @ApiParam(name = "app_id",value = "应用id")
+            @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "code",value = "角色组代码")
             @RequestParam(value = "code") String code){
-        List<Roles> roles = rolesService.findByField("code", code);
+        String[] fields = {"appId","code"};
+        String[] values = {appId,code};
+        List<Roles> roles = rolesService.findByFields(fields, values);
         if(roles != null && roles.size() >0){
             return true;
         }
