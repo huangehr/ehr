@@ -1,4 +1,4 @@
-package com.yihu.ehr.medicalRecord.dao.intf;
+package com.yihu.ehr.medicalRecord.service;
 
 import com.yihu.ehr.medicalRecord.model.MRRsResources;
 import org.springframework.data.repository.PagingAndSortingRepository;

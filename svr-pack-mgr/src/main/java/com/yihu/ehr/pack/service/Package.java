@@ -29,7 +29,7 @@ public class Package {
     private Date receiveDate;
     private Date parseDate;
     private Date finishDate;
-    private Boolean resourced;                          // 是否已经资源化处理
+    private boolean resourced;                          // 是否已经资源化处理
     private ArchiveStatus archiveStatus;
 
     @Id
@@ -133,11 +133,11 @@ public class Package {
     }
 
     @Column(name = "resourced")
-    public Boolean isResourced() {
+    public boolean isResourced() {
         return resourced;
     }
 
-    public void setResourced(Boolean resourced) {
+    public void setResourced(boolean resourced) {
         this.resourced = resourced;
     }
 
