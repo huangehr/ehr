@@ -25,6 +25,25 @@ public class AppApiModel {
     private String responseDemo;
     private String openLevel;
     private String auditLevel;
+    private String openLevelName;
+    private String auditLevelName;
+
+    public String getOpenLevelName() {
+        return openLevelName;
+    }
+
+    public void setOpenLevelName(String openLevelName) {
+        this.openLevelName = openLevelName;
+    }
+
+    public String getAuditLevelName() {
+        return auditLevelName;
+    }
+
+    public void setAuditLevelName(String auditLevelName) {
+        this.auditLevelName = auditLevelName;
+    }
+
     /**
      * 界面上适配选中是否适配用做界面展示，代表是否以及被适配
      */
