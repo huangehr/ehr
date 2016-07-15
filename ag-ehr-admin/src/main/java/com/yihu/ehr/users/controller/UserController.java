@@ -148,10 +148,10 @@ public class UserController extends BaseController {
                 usersModel.setUserTypeName(dict == null ? "" : dict.getValue());
             }
             //获取机构信息
-//            if(StringUtils.isNotEmpty(mUser.getOrganization())) {
-//                MOrganization organization = orgClient.getOrg(mUser.getOrganization());
-//                usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
-//            }
+            if(StringUtils.isNotEmpty(mUser.getOrganization())) {
+                MOrganization organization = orgClient.getOrg(mUser.getOrganization());
+                usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
+            }
             //获取用户来源信息
             if(StringUtils.isNotEmpty(mUser.getSource())){
                 MConventionalDict dict = conventionalDictClient.getUserSource(mUser.getSource());
@@ -333,12 +333,12 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
-            if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
-//                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
-                String imagePath[] = mUser.getImgRemotePath().split(":");
-                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
-                mUser.setImgLocalPath(localPath);
-            }
+//            if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
+////                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
+//                String imagePath[] = mUser.getImgRemotePath().split(":");
+//                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
+//                mUser.setImgLocalPath(localPath);
+//            }
 
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
