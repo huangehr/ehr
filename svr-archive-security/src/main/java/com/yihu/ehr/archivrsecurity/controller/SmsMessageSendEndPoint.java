@@ -1,5 +1,6 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.archivrsecurity.dao.model.SmsMessageSend;
 import com.yihu.ehr.archivrsecurity.service.SmsMessageSendService;
 import com.yihu.ehr.constants.ApiVersion;
@@ -31,7 +32,7 @@ public class SmsMessageSendEndPoint extends EnvelopRestEndPoint {
     SmsMessageSendService smsMessageSendService;
 
     @ApiOperation(value = "短信发送情况列表查询")
-    @RequestMapping(value = "/messages_send_info", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageSend, method = RequestMethod.GET)
     public Collection<MSmsMessageSend> searchMessagesSendInfo(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -52,7 +53,7 @@ public class SmsMessageSendEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "短信发送情况新增")
-    @RequestMapping(value = "/messages_send_info", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageSend, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MSmsMessageSend createMessagesSendInfo(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) {
@@ -63,7 +64,7 @@ public class SmsMessageSendEndPoint extends EnvelopRestEndPoint {
 
 
     @ApiOperation(value = "短信发送情况状态跟新")
-    @RequestMapping(value = "/messages_send_info/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.MessageSendId, method = RequestMethod.PUT)
     public boolean updateMessagesSendInfoStatus(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") long id,

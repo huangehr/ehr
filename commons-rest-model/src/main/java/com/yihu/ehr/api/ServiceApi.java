@@ -468,4 +468,48 @@ public class ServiceApi {
     public static class SanofiSupport{
         public static final String PhysicSigns                      = "/sanofi/physic_signs";
     }
+
+    public static class ArchiveSecurity
+    {
+        public static final String ArchivePrivate                   = "/archiveprivate/{userId}";
+        public static final String ArchivePrivateRowKey            = "/archiveprivate/{userId}/{rowKey}";
+
+        public static final String ArchiveSecuritySetting             = "/archivesecurity";
+        public static final String ArchiveSecuritySettingUser           = "/archivesecurity/{user_id}";
+        public static final String ArchiveSecuritySettingKeyAuthen         = "/archivesecurity/{user_id}/securitykey/authentication";
+
+        public static final String ArchiveLogs             = "/archivelogs";
+
+        public static final String AuthorizeApps             = "/authorizeapps";
+        public static final String AuthorizeAppsId             = "/authorizeapps/{id}";
+
+        public static final String AuthorizeAppsSubjects            = "/authorizeapps/subjects";
+        public static final String AuthorizeAppsSubjectsId            = "/authorizeapps/subjects/{id}";
+
+        public static final String AuthorizeSubjects            = "/authorizesubjects";
+
+        public static final String AuthorizeSubjectsResources            = "/authorizesubjects/{subjectId}/resources";
+
+        public static final String AuthorizeDoctors           = "/authorizedoctors";
+        public static final String AuthorizeDoctorsId           = "/authorizedoctors/{id}";
+        public static final String AuthorizeDoctorsIdAlteration           = "/authorizedoctors/{id}/alteration";
+        public static final String AuthorizeDoctorsIdAuthorization           = "/authorizedoctors/{id}/authorization";
+
+        public static final String MessageReplyTempates   = "/messagereplytemplates";
+
+        public static final String MessageTempates   = "/messagetemplates";
+        public static final String MessageTempatesCode   = "/messagetemplates/{messageTempCode}";
+
+        public static final String MessageSend   = "/messagesend";
+        public static final String MessageSendId   = "/messagesend/{id}";
+
+        public static final String MessageReply   = "/messagereply";
+    }
+
+    public static class MedivalRecords{
+
+        public static final String MedivalRecords                         = "/medivalRecords";
+        public static final String MedivalRecordsId                       = "/medivalRecords/{id}";
+
+    }
 }

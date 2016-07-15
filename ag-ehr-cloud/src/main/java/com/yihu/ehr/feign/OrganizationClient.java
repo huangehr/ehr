@@ -27,7 +27,7 @@ public interface OrganizationClient {
     @RequestMapping(value = ApiVersion.Version1_0 + "/organizations/admin/{admin_login_code}", method = GET)
     MOrganization getOrgByAdminLoginCode(@PathVariable(value = "admin_login_code") String adminLoginCode);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/organizations", method = GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + "/organizations/list", method = GET)
     List<MOrganization> search(
             @RequestParam(value = "fields") String fields,
             @RequestParam(value = "filters") String filters,
