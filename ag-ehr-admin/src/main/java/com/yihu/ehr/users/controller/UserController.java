@@ -11,17 +11,14 @@ import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
-import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.RoleFeatureRelationClient;
-import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -67,9 +64,6 @@ public class UserController extends BaseController {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private RoleUserClient roleUserClient;
     @Autowired
     private RoleFeatureRelationClient roleFeatureRelationClient;
     @Autowired
@@ -153,10 +147,10 @@ public class UserController extends BaseController {
                 usersModel.setUserTypeName(dict == null ? "" : dict.getValue());
             }
             //获取机构信息
-            if(StringUtils.isNotEmpty(mUser.getOrganization())) {
-                MOrganization organization = orgClient.getOrg(mUser.getOrganization());
-                usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
-            }
+//            if(StringUtils.isNotEmpty(mUser.getOrganization())) {
+//                MOrganization organization = orgClient.getOrg(mUser.getOrganization());
+//                usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
+//            }
             //获取用户来源信息
             if(StringUtils.isNotEmpty(mUser.getSource())){
                 MConventionalDict dict = conventionalDictClient.getUserSource(mUser.getSource());
@@ -586,16 +580,16 @@ public class UserController extends BaseController {
         }
 
         //获取归属机构
-        String orgCode = mUser.getOrganization();
-        if(StringUtils.isNotEmpty(orgCode)) {
-            MOrganization orgModel = orgClient.getOrg(orgCode);
-            detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
-            if(orgModel!=null&&StringUtils.isNotEmpty(orgModel.getLocation())) {
-                MGeography mGeography = addressClient.getAddressById(orgModel.getLocation());
-                detailModel.setProvince(mGeography==null?"":mGeography.getProvince());
-                detailModel.setCity(mGeography==null?"":mGeography.getCity());
-            }
-        }
+//        String orgCode = mUser.getOrganization();
+//        if(StringUtils.isNotEmpty(orgCode)) {
+//            MOrganization orgModel = orgClient.getOrg(orgCode);
+//            detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
+//            if(orgModel!=null&&StringUtils.isNotEmpty(orgModel.getLocation())) {
+//                MGeography mGeography = addressClient.getAddressById(orgModel.getLocation());
+//                detailModel.setProvince(mGeography==null?"":mGeography.getProvince());
+//                detailModel.setCity(mGeography==null?"":mGeography.getCity());
+//            }
+//        }
         //获取秘钥信息
         MKey userSecurity = securityClient.getUserKey(mUser.getId(),true);
         if (userSecurity != null) {
@@ -622,23 +616,12 @@ public class UserController extends BaseController {
     }
 
     //查看用户权限列表
-    @RequestMapping(value = "/user_features",method = RequestMethod.GET)
+    @RequestMapping(value = "/users/user_features",method = RequestMethod.GET)
     @ApiOperation(value = "查看用户权限", notes = "查看用户权限")
     public Envelop getUserFeatureList(
-            @ApiParam(name = "user_id",value = "用户id")
-            @RequestParam(value = "user_id") String userId,
-            @ApiParam(name = "roles_ids",value = "平台应用所含角色组ids，多个以逗号隔开")
+            @ApiParam(name = "roles_ids",value = "用户所属角色组ids，多个以逗号隔开")
             @RequestParam(value = "roles_ids") String roleIds){
-        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + userId+";roleId="+roleIds);
-        String newRoleIds = "";
-        for(MRoleUser mRoleUser : mRoleUsers){
-            newRoleIds += mRoleUser.getRoleId()+",";
-        }
-        if(StringUtils.isEmpty(newRoleIds)){
-            return success(null);
-        }
-        newRoleIds = newRoleIds.substring(0,newRoleIds.length()-1);
-        Collection<MRoleFeatureRelation> relations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + newRoleIds);
+        Collection<MRoleFeatureRelation> relations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + roleIds);
         String featureIds = "";
         for(MRoleFeatureRelation relation : relations){
             featureIds += relation.getFeatureId()+",";

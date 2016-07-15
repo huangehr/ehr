@@ -7,14 +7,8 @@ import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.model.user.MRoleAppRelation;
-import com.yihu.ehr.model.user.MRoleFeatureRelation;
-import com.yihu.ehr.model.user.MRoleUser;
-import com.yihu.ehr.model.user.MRoles;
-import com.yihu.ehr.users.service.RoleAppRelationClient;
-import com.yihu.ehr.users.service.RoleFeatureRelationClient;
-import com.yihu.ehr.users.service.RoleUserClient;
-import com.yihu.ehr.users.service.RolesClient;
+import com.yihu.ehr.model.user.*;
+import com.yihu.ehr.users.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,16 +33,14 @@ import java.util.List;
 public class RolesController extends BaseController {
     @Autowired
     private RolesClient rolesClient;
-
     @Autowired
     private RoleUserClient roleUserClient;
-
     @Autowired
     private RoleFeatureRelationClient roleFeatureRelationClient;
-
     @Autowired
     private RoleAppRelationClient roleAppRelationClient;
-
+    @Autowired
+    private RoleApiRelationClient roleApiRelationClient;
     @Autowired
     private AppClient appClient;
 
@@ -85,14 +77,19 @@ public class RolesController extends BaseController {
             return failed("已配置人员角色组不能删除！");
         }
         //判断是否已配置应用权限
-        Collection<MRoleFeatureRelation> mRelation = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId"+id);
+        Collection<MRoleFeatureRelation> mRelation = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId="+id);
         if(mRelation != null && mRelation.size()>0){
             return failed("已配置应用权限角色组不能删除！");
         }
         //判断是否已配置接入应用
-        Collection<MRoleAppRelation> mRoleAppRelation = roleAppRelationClient.searchRoleAppNoPaging("roleId"+id);
+        Collection<MRoleAppRelation> mRoleAppRelation = roleAppRelationClient.searchRoleAppNoPaging("roleId="+id);
         if(mRoleAppRelation != null && mRoleAppRelation.size()>0){
             return failed("已配置接入应用角色组不能删除！");
+        }
+        //判断是否已配应用api
+        Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId="+id);
+        if(mRoleApiRelations != null && mRoleApiRelations.size()>0){
+            return failed("已配置应用api的角色组不能删除！");
         }
 
         boolean bo = rolesClient.deleteRoles(id);
@@ -215,40 +212,38 @@ public class RolesController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/roles/platformAppRolesView",method = RequestMethod.GET)
-    @ApiOperation(value = "获取平台应用-所属角色组ids,names组成的对象集合，不分页" )
+    @RequestMapping(value = "/roles/app_user_roles",method = RequestMethod.GET)
+    @ApiOperation(value = "获取平台应用与所属用户角色组ids,names组成的对象集合，不分页" )
     public Envelop getPlatformAppRolesView(
-            @ApiParam(name = "type",value = "角色组类型，应用角色/用户角色")
-            @RequestParam(value = "type") String type){
+            @ApiParam(name = "type",value = "用户角色组的字典值")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "source_type",value = "平台应用sourceType字典值")
+            @RequestParam(value = "source_type") String sourceType){
         if(StringUtils.isEmpty(type)){
             return failed("角色组类型不能为空！");
         }
+        if(StringUtils.isEmpty(sourceType)){
+            return failed("平台应用类型不能为空！！");
+        }
         Envelop envelop = new Envelop();
-        //平台应用-应用表中source_type为1
-        Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType=1");
+        Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType="+sourceType);
         //平台应用-角色组对象模型列表
         List<PlatformAppRolesModel> appRolesModelList = new ArrayList<>();
         for(MApp mApp : mApps){
-            Collection<MRoleAppRelation> mRoleAppRelations = roleAppRelationClient.searchRoleAppNoPaging("appId=" + mApp.getId());
+            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId()+";type="+type);
             PlatformAppRolesModel model = new PlatformAppRolesModel();
             String roleIds = "";
             String roleNames = "";
-            for(MRoleAppRelation relation : mRoleAppRelations){
-                MRoles mRoles = rolesClient.getRolesById(relation.getRoleId());
-                if(mRoles == null || !StringUtils.equals(mRoles.getType(),type)){
-                    continue;
-                }
-                roleIds += mRoles.getId()+",";
-                roleNames += mRoles.getName()+",";
+            for(MRoles m : mRoles){
+                roleIds += m.getId()+",";
+                roleNames += m.getName()+",";
             }
-            if(StringUtils.isEmpty(roleIds)){
-                continue;
+            if(!StringUtils.isEmpty(roleIds)){
+                roleIds = roleIds.substring(0,roleIds.length()-1);
             }
-            if(StringUtils.isEmpty(roleNames)){
-                continue;
+            if(!StringUtils.isEmpty(roleNames)){
+                roleNames = roleNames.substring(0,roleNames.length()-1);
             }
-            roleIds = roleIds.substring(0,roleIds.length()-1);
-            roleNames = roleNames.substring(0,roleNames.length()-1);
             model.setAppId(mApp.getId());
             model.setAppName(mApp.getName());
             model.setRoleId(roleIds);
