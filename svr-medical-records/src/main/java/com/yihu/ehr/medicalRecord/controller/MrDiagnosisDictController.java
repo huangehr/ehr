@@ -3,6 +3,7 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecord.model.MrDiagnosisDictEntity;
+import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.medicalRecord.service.MrDiagnosisDictService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,8 +46,9 @@ public class MrDiagnosisDictController extends BaseRestEndPoint {
     @RequestMapping(value = "/medical_record/diagnosisDict/updateMrDiagnosisDict", method = RequestMethod.POST)
     public boolean updateMrDiagnosisDict(
             @ApiParam(name = "DiagnosisDictInformation", value = "诊段字典信息")
-            @RequestParam(value = "DiagnosisDictInformation", required = true) String json){
-        MrDiagnosisDictEntity mrDiagnosisDict=toEntity(json,MrDiagnosisDictEntity.class);
+            @RequestParam(value = "DiagnosisDictInformation", required = true) String json)throws Exception{
+        //MrDiagnosisDictEntity mrDiagnosisDict=toEntity(json,MrDiagnosisDictEntity.class);
+        MrDiagnosisDictEntity mrDiagnosisDict=objectMapper.readValue(json, MrDiagnosisDictEntity.class);
         return mrDiagnosisDictService.updateMrDiagnosisDict(mrDiagnosisDict);
     }
 }
