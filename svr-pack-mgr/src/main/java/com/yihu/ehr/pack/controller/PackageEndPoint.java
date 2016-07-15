@@ -182,6 +182,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
 
         aPackage.setArchiveStatus(status);
+        //资源化状态，0未入库 1已入库
+        aPackage.setResourced(true);
         aPackage.setMessage(message);
         if (status != ArchiveStatus.Failed) {
             aPackage.setFinishDate(new Date());

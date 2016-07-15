@@ -51,6 +51,8 @@ public class PackageResourceJob implements InterruptableJob {
     private void doResolve(MPackage pack) {
         PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
         XPackageMgrClient packageMgrClient = SpringContext.getService(XPackageMgrClient.class);
+        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
+        System.out.println("-----------------正在入库中:" + pack.getId() + "------------------------");
         PackMill packMill = SpringContext.getService(PackMill.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
 
@@ -67,10 +69,12 @@ public class PackageResourceJob implements InterruptableJob {
                     String.format("Profile: %s, identity: %s", resourceBucket.getId(), resourceBucket.getDemographicId()));
 
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
-        } catch(LegacyPackageException e){
+        } catch (LegacyPackageException e) {
+            LogService.getLogger().error("Package resolve job error: package " + e.getMessage());          //未能入库的档案
             packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.LegacyIgnored, e.getMessage());
         } catch (Throwable throwable) {
-            LogService.getLogger().error("Package resolve job error: package " + throwable.getMessage());
+            LogService.getLogger().error("Package resolve job error: package " + throwable.getMessage());  //空指针异常
+            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, throwable.getMessage());
         }
     }
 
