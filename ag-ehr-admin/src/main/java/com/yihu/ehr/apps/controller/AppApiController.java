@@ -10,7 +10,9 @@ import com.yihu.ehr.apps.service.AppApiResponseClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.user.MRoleApiRelation;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.RoleApiRelationClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -46,6 +48,9 @@ public class AppApiController extends BaseController {
 
     @Autowired
     AppApiResponseClient appApiResponseClient;
+
+    @Autowired
+    private ConventionalDictEntryClient conDictEntryClient;
 
     @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
@@ -185,6 +190,16 @@ public class AppApiController extends BaseController {
             if(mRoleFeatureRelations!=null&&mRoleFeatureRelations.size()>0){
                 appApiModel.setIschecked(true);
             }
+        }
+        //审计等级
+        if(!StringUtils.isEmpty(appApiModel.getAuditLevel())){
+            MConventionalDict catalopDict = conDictEntryClient.getAuditLevel(appApiModel.getAuditLevel());
+            appApiModel.setAuditLevelName(catalopDict == null ? "" : catalopDict.getValue());
+        }
+        //开放等级
+        if(!StringUtils.isEmpty(appApiModel.getOpenLevel())){
+            MConventionalDict catalopDict = conDictEntryClient.getOpenLevel(appApiModel.getOpenLevel());
+            appApiModel.setOpenLevelName(catalopDict == null ? "" : catalopDict.getValue());
         }
     }
 
