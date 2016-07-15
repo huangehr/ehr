@@ -19,6 +19,7 @@ public class OriginFile {
     private UrlScope urlScope;
     private String emrId;
     private String emrName;
+    private String note;
 
     // 文件索引，key为文件名
     private Map<String, String> fileUrls = new TreeMap<>();
@@ -83,5 +84,13 @@ public class OriginFile {
 
     public void setEmrName(String emrName) {
         this.emrName = emrName;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

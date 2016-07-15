@@ -54,6 +54,7 @@ public class CdaDocument {
             objectNode.put("expireDate", originFile.getExpireDate()==null ? null: DateTimeUtil.simpleDateFormat(originFile.getExpireDate()));
             objectNode.put("emr_id",originFile.getEmrId());
             objectNode.put("emr_name",originFile.getEmrName());
+            objectNode.put("note",originFile.getNote());
             ObjectNode listNode = objectNode.putObject("files");
             Map<String, String> files = originFile.getFileUrls();
             for (String fileName : files.keySet()){
