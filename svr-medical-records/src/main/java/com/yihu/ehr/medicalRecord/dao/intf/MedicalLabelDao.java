@@ -15,6 +15,6 @@ public interface MedicalLabelDao extends PagingAndSortingRepository<MrMedicalLab
     MrMedicalLabelEntity findByid(String id);
     void deleteByid(String id);
 
-    @Query("select recordsId from MrMedicalLabelEntity r where r.LABEL in (:label)")
+    @Query("select recordsId from MrMedicalLabelEntity r where r.label in (:label)")
     List<String> findByLabel(String[] label);
 }

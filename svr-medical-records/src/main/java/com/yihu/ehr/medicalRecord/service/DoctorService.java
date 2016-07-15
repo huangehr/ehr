@@ -3,10 +3,14 @@ package com.yihu.ehr.medicalRecord.service;
 import com.yihu.ehr.medicalRecord.dao.intf.DoctorDao;
 import com.yihu.ehr.medicalRecord.model.MrDoctorsEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by shine on 2016/7/14.
  */
+@Transactional
+@Service
 public class DoctorService {
 
     @Autowired
@@ -16,7 +20,7 @@ public class DoctorService {
         return doctorDao.findBydemographicId(demographicId);
     }
 
-    public boolean updataDoctorInformationByDemographicId(MrDoctorsEntity doctor){
+    public boolean updateDoctorInformationByDemographicId(MrDoctorsEntity doctor){
         if(doctor!=null) {
             MrDoctorsEntity doctorModel = doctorDao.findBydemographicId(String.valueOf(doctor.getDemographicId()));
             if(doctorModel!=null ){
@@ -43,7 +47,7 @@ public class DoctorService {
 
     }
 
-    public boolean updataDoctorStatusByDemographicId(String status,String demographicId){
+    public boolean updateDoctorStatusByDemographicId(String status,String demographicId){
 
         MrDoctorsEntity DoctorModel=doctorDao.findBydemographicId(demographicId);
         if(DoctorModel!=null) {

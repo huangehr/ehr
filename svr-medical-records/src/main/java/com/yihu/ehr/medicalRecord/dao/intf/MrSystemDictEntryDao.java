@@ -11,10 +11,10 @@ import java.util.List;
  */
 public interface MrSystemDictEntryDao extends PagingAndSortingRepository<MrSystemDictEntryEntity,Integer> {
 
-    MrSystemDictEntryEntity findByid(Integer id);
+    MrSystemDictEntryEntity findById(Integer id);
 
-    MrSystemDictEntryEntity findBydictCodeAndcode(String dictCode,String code);
+    MrSystemDictEntryEntity findByDictCodeAndCode(String dictCode,String code);
 
-    List<MrSystemDictEntryEntity> findBydictCode(String dictCode);
+    List<MrSystemDictEntryEntity> findByDictCode(String dictCode);
     void deleteByid(Integer id);
 }
