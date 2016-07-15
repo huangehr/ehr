@@ -505,4 +505,11 @@ public class ServiceApi {
 
         public static final String MessageReply   = "/messagereply";
     }
+
+    public static class MedivalRecords{
+
+        public static final String MedivalRecords                         = "/medivalRecords";
+        public static final String MedivalRecordsId                       = "/medivalRecords/{id}";
+
+    }
 }

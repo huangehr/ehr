@@ -481,6 +481,7 @@ public class PatientInfoBaseService {
         //疾病事件纪录rowkey
         List<String> returnRowkey = new ArrayList<String>();
 
+        Map<String,String>recordMap=new HashMap<>();
         //事件类型
         if (!StringUtils.isBlank(eventType))
         {
@@ -611,6 +612,27 @@ public class PatientInfoBaseService {
                 }
             }
         }
+        else{
+            String queryParams = "{\"q\":\""+ "(" + rowkeys +")\"";
+            //门诊诊断纪录
+            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, appId, queryParams.replace(' ', '+'), null, null);
+
+            //获取疾病门诊事件纪录rowkey
+            List<String>list=new ArrayList<>();
+            List<String>peofilelist=new ArrayList<>();
+            if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
+            {
+                for(Map<String,Object> map : (List<Map<String, Object>>)resultMzzd.getDetailModelList())
+                {
+                    list.add(map.get("EHR_000109").toString());
+                    peofilelist.add((String) map.get("profile_id"));
+                }
+                List<MIcd10Dict> l=dictClient.getIcd10ByCodeList(list);
+                for(int i=0;i<l.size();i++)
+                    recordMap.put(peofilelist.get(i),l.get(i).getName());
+            }
+
+        }
         //过滤住院纪录
         if(!StringUtils.isBlank(zyQuery))
         {
@@ -624,8 +646,29 @@ public class PatientInfoBaseService {
             {
                 for (Map<String, Object> map : (List<Map<String, Object>>)resultZyzd.getDetailModelList())
                 {
-                    returnRowkey.add((String)map.get("profile_id"));
+                    returnRowkey.add((String) map.get("profile_id"));
                 }
+            }
+        }
+        else{
+            String queryParams = "{\"q\":\"" + "(" + rowkeys +")\"";
+            //门诊诊断纪录
+            //住院诊断纪录
+            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,queryParams.replace(' ', '+'), null, null);
+
+            //获取疾病住院事件纪录rowkey
+            if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0)
+            {
+                List<String>list=new ArrayList<>();
+                List<String>peofilelist=new ArrayList<>();
+                for (Map<String, Object> map : (List<Map<String, Object>>)resultZyzd.getDetailModelList())
+                {
+                    list.add(map.get("EHR_000293").toString());
+                    peofilelist.add((String) map.get("profile_id"));
+                }
+                List<MIcd10Dict> l=dictClient.getIcd10ByCodeList(list);
+                for(int i=0;i<l.size();i++)
+                    recordMap.put(peofilelist.get(i),l.get(i).getName());
             }
         }
 
@@ -651,6 +694,7 @@ public class PatientInfoBaseService {
             //筛选事件
             for(Map<String,Object> map : eventList) {
                 //包含该事件
+                map.put("Diagnosis",recordMap.get((map.get("rowkey"))));
                 if(returnRowkey.contains(map.get("rowkey")))
                 {
                     //通过client_id获取数据来源
