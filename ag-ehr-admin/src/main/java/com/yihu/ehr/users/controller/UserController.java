@@ -11,6 +11,7 @@ import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
@@ -332,12 +333,12 @@ public class UserController extends BaseController {
             if (mUser == null) {
                 return failed("用户信息获取失败!");
             }
-//            if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
-////                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
-//                String imagePath[] = mUser.getImgRemotePath().split(":");
-//                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
-//                mUser.setImgLocalPath(localPath);
-//            }
+            if (!StringUtils.isEmpty(mUser.getImgRemotePath())) {
+//                Map<String, String> map = toEntity(mUser.getImgRemotePath(), Map.class);
+                String imagePath[] = mUser.getImgRemotePath().split(":");
+                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
+                mUser.setImgLocalPath(localPath);
+            }
 
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
@@ -580,16 +581,16 @@ public class UserController extends BaseController {
         }
 
         //获取归属机构
-//        String orgCode = mUser.getOrganization();
-//        if(StringUtils.isNotEmpty(orgCode)) {
-//            MOrganization orgModel = orgClient.getOrg(orgCode);
-//            detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
-//            if(orgModel!=null&&StringUtils.isNotEmpty(orgModel.getLocation())) {
-//                MGeography mGeography = addressClient.getAddressById(orgModel.getLocation());
-//                detailModel.setProvince(mGeography==null?"":mGeography.getProvince());
-//                detailModel.setCity(mGeography==null?"":mGeography.getCity());
-//            }
-//        }
+        String orgCode = mUser.getOrganization();
+        if(StringUtils.isNotEmpty(orgCode)) {
+            MOrganization orgModel = orgClient.getOrg(orgCode);
+            detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
+            if(orgModel!=null&&StringUtils.isNotEmpty(orgModel.getLocation())) {
+                MGeography mGeography = addressClient.getAddressById(orgModel.getLocation());
+                detailModel.setProvince(mGeography==null?"":mGeography.getProvince());
+                detailModel.setCity(mGeography==null?"":mGeography.getCity());
+            }
+        }
         //获取秘钥信息
         MKey userSecurity = securityClient.getUserKey(mUser.getId(),true);
         if (userSecurity != null) {
