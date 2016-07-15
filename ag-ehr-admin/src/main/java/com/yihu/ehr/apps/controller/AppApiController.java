@@ -1,7 +1,5 @@
 package com.yihu.ehr.apps.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.yihu.ehr.agModel.app.AppApiModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppApiClient;
@@ -18,16 +16,16 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import jdk.nashorn.internal.runtime.JSONListAdapter;
-import jdk.nashorn.internal.runtime.ListAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by linz on 2016年7月8日11:30:18.
