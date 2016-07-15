@@ -182,7 +182,7 @@ public class RolesController extends BaseController {
 //        return rolesModel;
 //    }
 
-    @RequestMapping(value = "/platformAppRoles",method = RequestMethod.GET)
+    @RequestMapping(value = "/roles/platformAppRoles",method = RequestMethod.GET)
     @ApiOperation(value = "获取平台应用角色组列表，不分页" )
     public Envelop getPlatformAppRoles(
             @ApiParam(name = "type",value = "角色组类型，应用角色/用户角色")
@@ -215,7 +215,7 @@ public class RolesController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/platformAppRolesView",method = RequestMethod.GET)
+    @RequestMapping(value = "/roles/platformAppRolesView",method = RequestMethod.GET)
     @ApiOperation(value = "获取平台应用-所属角色组ids,names组成的对象集合，不分页" )
     public Envelop getPlatformAppRolesView(
             @ApiParam(name = "type",value = "角色组类型，应用角色/用户角色")
@@ -238,8 +238,8 @@ public class RolesController extends BaseController {
                 if(mRoles == null || !StringUtils.equals(mRoles.getType(),type)){
                     continue;
                 }
-                roleIds += roleIds+mRoles.getId()+",";
-                roleNames += roleNames+mRoles.getName()+",";
+                roleIds += mRoles.getId()+",";
+                roleNames += mRoles.getName()+",";
             }
             if(StringUtils.isEmpty(roleIds)){
                 continue;
@@ -249,6 +249,8 @@ public class RolesController extends BaseController {
             }
             roleIds = roleIds.substring(0,roleIds.length()-1);
             roleNames = roleNames.substring(0,roleNames.length()-1);
+            model.setAppId(mApp.getId());
+            model.setAppName(mApp.getName());
             model.setRoleId(roleIds);
             model.setRoleName(roleNames);
             appRolesModelList.add(model);

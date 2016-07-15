@@ -125,17 +125,9 @@ public class Icd10IndicatorRelationEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<Icd10IndicatorRelation> icd10IndicatorRelationPage = icd10IndicatorRelationService.getRelationList(sorts, page, size);
-            pagedResponse(request, response, icd10IndicatorRelationPage.getTotalElements(), page, size);
-            return convertToModels(icd10IndicatorRelationPage.getContent(), new ArrayList<>(icd10IndicatorRelationPage.getNumber()), MIcd10IndicatorRelation.class, fields);
-        } else {
-            List<Icd10IndicatorRelation> icd10IndicatorRelationList = icd10IndicatorRelationService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, icd10IndicatorRelationService.getCount(filters), page, size);
-            return convertToModels(icd10IndicatorRelationList, new ArrayList<>(icd10IndicatorRelationList.size()), MIcd10IndicatorRelation.class, fields);
-        }
+        List<Icd10IndicatorRelation> icd10IndicatorRelationList = icd10IndicatorRelationService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, icd10IndicatorRelationService.getCount(filters), page, size);
+        return convertToModels(icd10IndicatorRelationList, new ArrayList<>(icd10IndicatorRelationList.size()), MIcd10IndicatorRelation.class, fields);
     }
 
     @RequestMapping(value = "/dict/icd10/indicators/no_paging", method = RequestMethod.GET)

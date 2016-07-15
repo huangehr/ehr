@@ -632,7 +632,7 @@ public class UserController extends BaseController {
         Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + userId+";roleId="+roleIds);
         String newRoleIds = "";
         for(MRoleUser mRoleUser : mRoleUsers){
-            newRoleIds += newRoleIds+mRoleUser.getRoleId()+",";
+            newRoleIds += mRoleUser.getRoleId()+",";
         }
         if(StringUtils.isEmpty(newRoleIds)){
             return success(null);
@@ -641,7 +641,7 @@ public class UserController extends BaseController {
         Collection<MRoleFeatureRelation> relations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + newRoleIds);
         String featureIds = "";
         for(MRoleFeatureRelation relation : relations){
-            featureIds += featureIds+relation.getFeatureId()+",";
+            featureIds += relation.getFeatureId()+",";
         }
         if(StringUtils.isEmpty(featureIds)){
             return success(null);
