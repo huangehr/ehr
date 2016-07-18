@@ -1,6 +1,7 @@
 package com.yihu.ehr.users.controller;
 
 import com.yihu.ehr.agModel.user.PlatformAppRolesModel;
+import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
 import com.yihu.ehr.agModel.user.RolesModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
@@ -179,36 +180,45 @@ public class RolesController extends BaseController {
 //        return rolesModel;
 //    }
 
-    @RequestMapping(value = "/roles/platformAppRoles",method = RequestMethod.GET)
-    @ApiOperation(value = "获取平台应用角色组列表，不分页" )
-    public Envelop getPlatformAppRoles(
-            @ApiParam(name = "type",value = "角色组类型，应用角色/用户角色")
-            @RequestParam(value = "type") String type){
+    @RequestMapping(value = "/roles/platformAppRolesTree",method = RequestMethod.GET)
+    @ApiOperation(value = "获取平台应用角色组列表,tree" )
+    public Envelop getPlatformAppRolesTree(
+            @ApiParam(name = "type",value = "角色组类型，应用角色/用户角色字典值")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "source_type",value = "平台应用sourceType字典值")
+            @RequestParam(value = "source_type") String sourceType){
         if(StringUtils.isEmpty(type)){
             return failed("角色组类型不能为空！");
         }
+        if(StringUtils.isEmpty(sourceType)){
+            return failed("平台应用类型不能为空！！");
+        }
         Envelop envelop = new Envelop();
         //平台应用-应用表中source_type为1
-        Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType=1");
+        Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType="+sourceType);
+        List<PlatformAppRolesTreeModel> appRolesTreeModelList = new ArrayList<>();
+
         //平台应用-角色组对象模型列表
-        List<PlatformAppRolesModel> appRolesModelList = new ArrayList<>();
         for(MApp mApp : mApps){
-            Collection<MRoleAppRelation> mRoleAppRelations = roleAppRelationClient.searchRoleAppNoPaging("appId=" + mApp.getId());
-            for(MRoleAppRelation relation : mRoleAppRelations){
-                MRoles mRoles = rolesClient.getRolesById(relation.getRoleId());
-                if(mRoles == null || !StringUtils.equals(mRoles.getType(),type)){
-                    continue;
-                }
-                PlatformAppRolesModel model = new PlatformAppRolesModel();
-                model.setRoleName(mRoles.getName());
-                model.setAppId(mApp.getId());
-                model.setAppName(mApp.getName());
-                model.setRoleId(relation.getRoleId()+"");
-                appRolesModelList.add(model);
+            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId() + ";type=" + type);
+            List<PlatformAppRolesTreeModel> roleTreeModelList = new ArrayList<>();
+            for(MRoles m : mRoles){
+                PlatformAppRolesTreeModel modelTree = new PlatformAppRolesTreeModel();
+                modelTree.setId(m.getId()+"");
+                modelTree.setName(m.getName());
+                modelTree.setType("1");
+                modelTree.setChildren(null);
+                roleTreeModelList.add(modelTree);
             }
+            PlatformAppRolesTreeModel app = new PlatformAppRolesTreeModel();
+            app.setId(mApp.getId());
+            app.setName(mApp.getName());
+            app.setType("0");
+            app.setChildren(roleTreeModelList);
+            appRolesTreeModelList.add(app);
         }
         envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(appRolesModelList);
+        envelop.setDetailModelList(appRolesTreeModelList);
         return envelop;
     }
 

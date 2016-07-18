@@ -55,6 +55,16 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.DELETE)
+    @ApiOperation(value = "人员id,角色组ids，批量删除人员-角色组关系")
+    public boolean batchDeleteRoleUserRelation(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_ids",value = "角色组ids")
+            @RequestParam(value = "role_ids") String roleIds) throws Exception{
+        return roleUserService.batchDeleteRoleUserRelation(userId, roleIds);
+    }
+
     @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.POST)
     @ApiOperation(value = "批量新增人员所属角色组，一对多")
     public boolean batchCreateRolUsersRelation(

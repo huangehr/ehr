@@ -15,11 +15,13 @@ import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
+import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.RoleFeatureRelationClient;
+import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -69,7 +71,8 @@ public class UserController extends BaseController {
     private RoleFeatureRelationClient roleFeatureRelationClient;
     @Autowired
     AppFeatureClient appFeatureClient;
-
+    @Autowired
+    private RoleUserClient roleUserClient;
     @Autowired
     private FileResourceClient fileResourceClient;
 
@@ -233,6 +236,10 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getTelephone())) {
                 errorMsg += "电话号码不能为空!";
             }
+//            String roles = detailModel.getRole();
+//            if (StringUtils.isEmpty(roles)) {
+//                errorMsg += "用户角色不能为空!";
+//            }
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
@@ -245,13 +252,18 @@ public class UserController extends BaseController {
             if (userClient.isEmailExists(detailModel.getEmail())) {
                 return failed("邮箱已存在!");
             }
-
             detailModel.setPassword(AgAdminConstants.DefaultPassword);
             MUser mUser = convertToMUser(detailModel);
             mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
+            //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败），
+//            boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
+//            if(!bo){
+//                userClient.deleteUser(mUser.getId());
+//                return failed("保存失败!");
+//            }
             detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
         } catch (Exception ex) {
@@ -267,9 +279,7 @@ public class UserController extends BaseController {
             @ApiParam(name = "user_json_data", value = "", defaultValue = "")
             @RequestParam(value = "user_json_data") String userJsonData) {
         try {
-
             UserDetailModel detailModel = toEntity(userJsonData, UserDetailModel.class);
-
             String errorMsg = null;
             if (StringUtils.isEmpty(detailModel.getLoginCode())) {
                 errorMsg += "账户不能为空";
@@ -286,6 +296,10 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getTelephone())) {
                 errorMsg += "电话号码不能为空!";
             }
+//            String roles = detailModel.getRole();
+//            if (StringUtils.isEmpty(roles)) {
+//                errorMsg += "用户角色不能为空!";
+//            }
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
@@ -304,15 +318,37 @@ public class UserController extends BaseController {
                     && userClient.isEmailExists(detailModel.getEmail())) {
                 return failed("邮箱已存在!");
             }
-
+            //-----------
             mUser = convertToMUser(detailModel);
             mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
             detailModel = convertToUserDetailModel(mUser);
-
             return success(detailModel);
+
+            //修改时先修改所属角色组再修改用户，修改角色组失败（修改失败）、修改用户失败 （回显角色组）
+//            Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());
+//            boolean bo = roleUserClient.batchUpdateRoleUsersRelation(mUser.getId(),detailModel.getRole());
+//            if(!bo){
+//                return failed("保存失败！");
+//            }
+//            mUser = convertToMUser(detailModel);
+//            mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
+//            if (mUser != null) {
+//                detailModel = convertToUserDetailModel(mUser);
+//                return success(detailModel);
+//            }
+//            StringBuffer buffer = new StringBuffer();
+//            for(MRoleUser m : mRoleUsers){
+//                buffer.append(m.getRoleId());
+//                buffer.append(",");
+//            }
+//            if(buffer.length()>0){
+//                String oldRoleIds = buffer.substring(0, buffer.length() - 1);
+//                roleUserClient.batchDeleteRoleUserRelation(mUser.getId(),oldRoleIds);
+//            }
+//            return failed("保存失败!");
         }
         catch (Exception ex)
         {
