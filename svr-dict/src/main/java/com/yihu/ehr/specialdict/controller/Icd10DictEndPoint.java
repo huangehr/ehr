@@ -159,17 +159,9 @@ public class Icd10DictEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<Icd10Dict> icd10DictPage = icd10DictService.getDictList(sorts, page, size);
-            pagedResponse(request, response, icd10DictPage.getTotalElements(), page, size);
-            return convertToModels(icd10DictPage.getContent(), new ArrayList<>(icd10DictPage.getNumber()), MIcd10Dict.class, fields);
-        } else {
-            List<Icd10Dict> icd10DictList = icd10DictService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, icd10DictService.getCount(filters), page, size);
-            return convertToModels(icd10DictList, new ArrayList<>(icd10DictList.size()), MIcd10Dict.class, fields);
-        }
+        List<Icd10Dict> icd10DictList = icd10DictService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, icd10DictService.getCount(filters), page, size);
+        return convertToModels(icd10DictList, new ArrayList<>(icd10DictList.size()), MIcd10Dict.class, fields);
     }
 
     @RequestMapping(value = "/dict/icd10/hp/{id}", method = RequestMethod.GET)

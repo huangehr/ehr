@@ -108,15 +108,9 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
 
         page = reducePage(page);
 
-        if (StringUtils.isEmpty(filters)) {
-            Page<IndicatorsDict> indicatorsDictPage = indicatorsDictService.getDictList(sorts, page, size);
-            pagedResponse(request, response, indicatorsDictPage.getTotalElements(), page, size);
-            return convertToModels(indicatorsDictPage.getContent(), new ArrayList<>(indicatorsDictPage.getNumber()), MIndicatorsDict.class, fields);
-        } else {
-            List<IndicatorsDict> indicatorsDictList = indicatorsDictService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, indicatorsDictService.getCount(filters), page, size);
-            return convertToModels(indicatorsDictList, new ArrayList<>(indicatorsDictList.size()), MIndicatorsDict.class, fields);
-        }
+        List<IndicatorsDict> indicatorsDictList = indicatorsDictService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, indicatorsDictService.getCount(filters), page, size);
+        return convertToModels(indicatorsDictList, new ArrayList<>(indicatorsDictList.size()), MIndicatorsDict.class, fields);
     }
 
     @RequestMapping(value = "/dict/indicator/icd10/{id}", method = RequestMethod.GET)

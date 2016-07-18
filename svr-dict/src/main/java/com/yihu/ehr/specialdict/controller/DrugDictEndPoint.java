@@ -111,18 +111,9 @@ public class DrugDictEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<DrugDict> drugDictPage = drugDictService.getDictList(sorts, page, size);
-            pagedResponse(request, response, drugDictPage.getTotalElements(), page, size);
-            return convertToModels(drugDictPage.getContent(), new ArrayList<>(drugDictPage.getNumber()), MDrugDict.class, fields);
-        } else {
-            List<DrugDict> drugDictList = drugDictService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, drugDictService.getCount(filters), page, size);
-            return convertToModels(drugDictList, new ArrayList<>(drugDictList.size()), MDrugDict.class, fields);
-        }
+        List<DrugDict> drugDictList = drugDictService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, drugDictService.getCount(filters), page, size);
+        return convertToModels(drugDictList, new ArrayList<>(drugDictList.size()), MDrugDict.class, fields);
     }
 
     @RequestMapping(value = "/dict/drug/icd10/{id}", method = RequestMethod.GET)

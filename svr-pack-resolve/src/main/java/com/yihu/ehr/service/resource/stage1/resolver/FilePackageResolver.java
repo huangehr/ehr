@@ -56,15 +56,16 @@ public class FilePackageResolver extends PackageResolver {
     private void parseFile(FilePackage profile, File metaFile) throws Exception {
         JsonNode root = objectMapper.readTree(metaFile);
 
-        String demographicId = root.get("demographic_id")==null?null:root.get("demographic_id").asText();
+        String demographicId = root.get("demographic_id") == null ? null : root.get("demographic_id").asText();
         String patientId = root.get("patient_id").asText();
         String eventNo = root.get("event_no").asText();
         int eventType = root.get("event_type").asInt();
         String orgCode = root.get("org_code").asText();
         String eventDate = root.get("event_time").asText();
-        String createDate = root.get("create_date")==null?null:root.get("create_date").asText();
+        String createDate = root.get("create_date") == null ? null : root.get("create_date").asText();
         String cdaVersion = root.get("inner_version").asText();
-        if (cdaVersion.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+        if (cdaVersion.equals("000000000000"))
+            throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
 
         profile.setDemographicId(demographicId);
         profile.setPatientId(patientId);
@@ -104,7 +105,7 @@ public class FilePackageResolver extends PackageResolver {
                     Map.Entry<String, JsonNode> field = filedIterator.next();
                     //String metaData = translateMetaDataCode(profile.getCdaVersion(), dataSetCode, field.getKey());
                     String value = field.getValue().asText();
-                    if(field.getKey()!=null){
+                    if (field.getKey() != null) {
                         record.putMetaData(field.getKey(), value);
                     }
                 }
@@ -121,13 +122,13 @@ public class FilePackageResolver extends PackageResolver {
             ObjectNode objectNode = (ObjectNode) files.get(i);
             String cdaDocumentId = objectNode.get("cda_doc_id").asText();
             Date expireDate = null;
-            if(objectNode.get("expire_date")!=null){
+            if (objectNode.get("expire_date") != null) {
                 expireDate = DateTimeUtil.simpleDateParse(objectNode.get("expire_date").asText());
             }
 
             // 解析过程中，使用cda文档id作为文档列表的主键，待解析完成后，统一更新为rowkey
             CdaDocument cdaDocument = profile.getCdaDocuments().get(cdaDocumentId);
-            if (cdaDocument == null){
+            if (cdaDocument == null) {
                 cdaDocument = new CdaDocument();
                 cdaDocument.setId(cdaDocumentId);
 
@@ -142,6 +143,7 @@ public class FilePackageResolver extends PackageResolver {
                 String url = file.get("url").asText();
                 String emr_id = file.get("emr_id").asText();
                 String emr_name = file.get("emr_name").asText();
+                String note = file.has("note")?file.get("note").asText():"";
 
                 OriginFile originFile = new OriginFile();
                 originFile.setMime(mine_type);
@@ -149,13 +151,18 @@ public class FilePackageResolver extends PackageResolver {
                 originFile.setUrlScope(UrlScope.valueOf(Integer.parseInt(url_scope)));
                 originFile.setEmrId(emr_id);
                 originFile.setEmrName(emr_name);
-                if(file.get("name")!=null){
+                if(!StringUtils.isBlank(note))
+                {
+                    originFile.setNote(note);
+                }
+
+                if (file.get("name") != null) {
                     String fileList[] = file.get("name").asText().split(";");
-                    for (String fileName : fileList){
+                    for (String fileName : fileList) {
                         String fileNames[] = fileName.split(",");
-                        for(String file_name : fileNames){
+                        for (String file_name : fileNames) {
                             File f = new File(documentsPath + File.separator + file_name);
-                            if(f.exists()){
+                            if (f.exists()) {
                                 String storageUrl = saveFile(documentsPath + File.separator + file_name);
                                 originFile.addUrl(file_name.substring(0, file_name.indexOf('.')), storageUrl);
                             }
@@ -163,8 +170,8 @@ public class FilePackageResolver extends PackageResolver {
                     }
                 }
 
-                for(String fileUrl: url.split(",")){
-                    originFile.addUrl(fileUrl,fileUrl);
+                for (String fileUrl : url.split(",")) {
+                    originFile.addUrl(fileUrl, fileUrl);
                 }
                 cdaDocument.getOriginFiles().add(originFile);
             }

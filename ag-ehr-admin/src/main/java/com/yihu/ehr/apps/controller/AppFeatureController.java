@@ -196,8 +196,11 @@ public class AppFeatureController extends BaseController {
             AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
             appFeatureModels.add(appFeatureModel);
         }
-        envelop.setDetailModelList(appFeatureModels);
-        return envelop;
+        if(appFeatureModels.size()>0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(appFeatureModels);
+        }
+        return failed("");
     }
 
     /**

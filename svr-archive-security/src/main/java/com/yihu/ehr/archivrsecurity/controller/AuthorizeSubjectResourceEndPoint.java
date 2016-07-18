@@ -1,9 +1,11 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.archivrsecurity.dao.model.RsAuthorizeSubjectResource;
 import com.yihu.ehr.archivrsecurity.service.AuthorizeSubjectResourceService;
+import com.yihu.ehr.model.archivesecurity.MRsAuthorizeSubjectResource;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,9 +27,9 @@ public class AuthorizeSubjectResourceEndPoint extends BaseRestEndPoint {
     @Autowired
     AuthorizeSubjectResourceService subjectResourceService;
 
-    @RequestMapping(value = "/authorizesubjects/{subjectId}/resources",method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeSubjectsResources,method = RequestMethod.POST)
     @ApiOperation("授权主题资源新增")
-    public List<RsAuthorizeSubjectResource> saveSubjectResource(
+    public Collection<MRsAuthorizeSubjectResource> saveSubjectResource(
             @ApiParam(value = "主题标识")
             @PathVariable(value = "subjectId")String subjectId,
             @ApiParam(value = "资源标识")
@@ -44,11 +47,12 @@ public class AuthorizeSubjectResourceEndPoint extends BaseRestEndPoint {
 
             subjectResources.add(subjectResource);
         }
-
-        return subjectResourceService.saveSubjectResource(subjectResources);
+        subjectResourceService.saveSubjectResource(subjectResources);
+        return convertToModels(subjectResources,new ArrayList<MRsAuthorizeSubjectResource>(subjectResources.size())
+                ,MRsAuthorizeSubjectResource.class,"");
     }
 
-    @RequestMapping(value = "/authorizesubjects/{subjectId}/resources",method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeSubjectsResources,method = RequestMethod.DELETE)
     @ApiOperation("授权主题资源删除")
     public boolean deleteSubjectResource(
             @ApiParam(value = "主题标识")
@@ -60,12 +64,14 @@ public class AuthorizeSubjectResourceEndPoint extends BaseRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = "/authorizesubjects/{subjectId}/resources",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeSubjectsResources,method = RequestMethod.GET)
     @ApiOperation("授权主题资源查询")
-    public List<RsAuthorizeSubjectResource> getSubjectResources(
+    public Collection<MRsAuthorizeSubjectResource> getSubjectResources(
             @ApiParam(value = "主题标识")
             @PathVariable(value = "subjectId")String subjectId)
     {
-        return subjectResourceService.getSubjectResources(subjectId);
+        List<RsAuthorizeSubjectResource>  subjectResources = subjectResourceService.getSubjectResources(subjectId);
+        return convertToModels(subjectResources,new ArrayList<MRsAuthorizeSubjectResource>(subjectResources.size())
+                ,MRsAuthorizeSubjectResource.class,"");
     }
 }

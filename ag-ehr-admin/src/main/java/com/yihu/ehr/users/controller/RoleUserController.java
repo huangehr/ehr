@@ -155,6 +155,22 @@ public class RoleUserController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/roles/role_user/userRolesIds",method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户所属角色组ids")
+    public Envelop getUserRolesIds(
+            @ApiParam(name = "user_id",value = "用户id")
+            @RequestParam(value = "user_id") String userId){
+        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId="+userId);
+        String roleIds = "";
+        for (MRoleUser m : mRoleUsers){
+            roleIds += m.getRoleId()+",";
+        }
+        if(!StringUtils.isEmpty(roleIds)){
+            roleIds = roleIds.substring(0,roleIds.length()-1);
+        }
+        return success(roleIds);
+    }
+
     private RoleUserModel changeToModel(MRoleUser m) {
         RoleUserModel model = convertToModel(m, RoleUserModel.class);
         //获取用户名

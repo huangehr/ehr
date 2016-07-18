@@ -28,5 +28,5 @@ public class MicroServices {
     public static final String Cipher = "svr-cipher";
     public static final String Resource = "svr-resource";
     public static final String SpecialDict = "svr-dict";
-
+    public static final String ArchiveSecurity = "svr-archive-security";
 }

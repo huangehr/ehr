@@ -59,7 +59,7 @@ public class SanofiEndPoint {
     XResourceClient resourceClient;
 
     @ApiOperation(value = "获取体征数据", notes = "获取体征数据")
-    @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.SanofiSupport.PhysicSigns, method = RequestMethod.POST)
     public ResponseEntity<String> getBodySigns(
             @ApiParam(value = "身份证号", defaultValue = "360101200006011131")
             @RequestParam(value = "demographic_id", required = false) String demographicId,

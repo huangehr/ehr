@@ -1,5 +1,6 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.archivrsecurity.dao.model.AuthorizeAppApply;
@@ -31,7 +32,7 @@ public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
     AuthorizeAppApplyService authorizeAppApplyService;
 
     @ApiOperation(value = "应用授权列表查询")
-    @RequestMapping(value = "/authorize_apps", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeApps, method = RequestMethod.GET)
     public Collection<MAuthorizeAppApply> searchAuthorizeAppApply(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -52,7 +53,7 @@ public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "应用授权新增")
-    @RequestMapping(value = "/authorize_apps", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeApps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MAuthorizeAppApply createAuthorizeAppApply(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) {
@@ -62,7 +63,7 @@ public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "应用授权查询")
-    @RequestMapping(value = "/authorize_apps/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeAppsId, method = RequestMethod.GET)
     public MAuthorizeAppApply getAuthorizeAppApply(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") long id) {
@@ -76,7 +77,7 @@ public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "应用授权修改")
-    @RequestMapping(value = "/authorize_apps", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeApps, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MAuthorizeAppApply updateAuthorizeAppApply(
             @ApiParam(name = "json_data", value = "json对象")
             @RequestBody String jsonData) throws Exception {
@@ -86,7 +87,7 @@ public class AuthorizeAppApplyEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation(value = "应用授权删除")
-    @RequestMapping(value = "/authorize_apps/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ArchiveSecurity.AuthorizeAppsId, method = RequestMethod.DELETE)
     public boolean deleteAuthorizeAppApply(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") long id) throws Exception{
