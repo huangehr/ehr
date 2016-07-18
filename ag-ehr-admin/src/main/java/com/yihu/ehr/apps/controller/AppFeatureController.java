@@ -199,6 +199,7 @@ public class AppFeatureController extends BaseController {
         if(appFeatureModels.size()>0){
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(appFeatureModels);
+            return envelop;
         }
         return failed("");
     }
