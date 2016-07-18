@@ -90,7 +90,9 @@ public class MAppApiParameter implements Serializable {
         return defaultValue;
     }
 
-    public void setDefault_value(String defaultValue) {
+    public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }
+
+
 }
