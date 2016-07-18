@@ -2,6 +2,7 @@ package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
@@ -390,6 +391,10 @@ public class PatientController extends BaseController {
             if (mGeography != null) {
                 detailModel.setHomeAddressFull(mGeography.fullAddress());
                 detailModel.setHomeAddressInfo(convertToModel(mGeography, GeographyModel.class));
+
+                detailModel.getHomeAddressInfo().setProvinceId(geographyToCode(detailModel.getHomeAddressInfo().getProvince(),156));
+                detailModel.getHomeAddressInfo().setCityId(geographyToCode(detailModel.getHomeAddressInfo().getCity(),detailModel.getHomeAddressInfo().getProvinceId()));
+                detailModel.getHomeAddressInfo().setDistrictId(geographyToCode(detailModel.getHomeAddressInfo().getDistrict(),detailModel.getHomeAddressInfo().getCityId()));
             }
         }
         if (!StringUtils.isEmpty(demographicInfo.getBirthPlace())) {
@@ -398,6 +403,10 @@ public class PatientController extends BaseController {
             if (mGeography != null) {
                 detailModel.setBirthPlaceFull(mGeography.fullAddress());
                 detailModel.setBirthPlaceInfo(convertToModel(mGeography, GeographyModel.class));
+
+                detailModel.getBirthPlaceInfo().setProvinceId(geographyToCode(detailModel.getBirthPlaceInfo().getProvince(),156));
+                detailModel.getBirthPlaceInfo().setCityId(geographyToCode(detailModel.getBirthPlaceInfo().getCity(),detailModel.getBirthPlaceInfo().getProvinceId()));
+                detailModel.getBirthPlaceInfo().setDistrictId(geographyToCode(detailModel.getBirthPlaceInfo().getDistrict(),detailModel.getBirthPlaceInfo().getCityId()));
             }
         }
         //工作地址
@@ -406,6 +415,10 @@ public class PatientController extends BaseController {
             if (mGeography != null) {
                 detailModel.setWorkAddressFull(mGeography.fullAddress());
                 detailModel.setWorkAddressInfo(convertToModel(mGeography, GeographyModel.class));
+
+                detailModel.getWorkAddressInfo().setProvinceId(geographyToCode(detailModel.getWorkAddressInfo().getProvince(),156));
+                detailModel.getWorkAddressInfo().setCityId(geographyToCode(detailModel.getWorkAddressInfo().getCity(),detailModel.getWorkAddressInfo().getProvinceId()));
+                detailModel.getWorkAddressInfo().setDistrictId(geographyToCode(detailModel.getWorkAddressInfo().getDistrict(),detailModel.getWorkAddressInfo().getCityId()));
             }
         }
 
@@ -424,5 +437,12 @@ public class PatientController extends BaseController {
         }
 
         return detailModel;
+    }
+
+    public int geographyToCode(String name,int code){
+        String[] fields = {"name","pid"};
+        String[] values = {name,String.valueOf(code)};
+        List<MGeographyDict> geographyDictList = (List<MGeographyDict>) addressClient.getAddressDict(fields,values);
+        return geographyDictList.get(0).getId();
     }
 }

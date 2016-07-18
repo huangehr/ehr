@@ -40,10 +40,10 @@ public class AppApiResponseEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "创建AppApiResponse")
     public MAppApiResponse createAppApiResponse(
             @ApiParam(name = "AppApiResponse", value = "对象JSON结构体", allowMultiple = true)
-            @RequestBody String AppApiResponseJson) throws Exception {
-        AppApiResponse AppApiResponse = toEntity(AppApiResponseJson, AppApiResponse.class);
-        AppApiResponse = AppApiResponseService.createAppApiResponse(AppApiResponse);
-        return convertToModel(AppApiResponse, MAppApiResponse.class);
+            @RequestBody String appApiResponseJson) throws Exception {
+        AppApiResponse appApiResponse = toEntity(appApiResponseJson, AppApiResponse.class);
+        appApiResponse = AppApiResponseService.createAppApiResponse(appApiResponse);
+        return convertToModel(appApiResponse, MAppApiResponse.class);
     }
 
     @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponses, method = RequestMethod.GET)
@@ -62,10 +62,10 @@ public class AppApiResponseEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 
-            List<AppApiResponse> AppApiResponseList = AppApiResponseService.search(fields, filters, sorts, page, size);
+            List<AppApiResponse> appApiResponseList = AppApiResponseService.search(fields, filters, sorts, page, size);
 
             pagedResponse(request, response, AppApiResponseService.getCount(filters), page, size);
-            return convertToModels(AppApiResponseList, new ArrayList<>(AppApiResponseList.size()), MAppApiResponse.class, fields);
+            return convertToModels(appApiResponseList, new ArrayList<>(appApiResponseList.size()), MAppApiResponse.class, fields);
 
     }
 
@@ -74,10 +74,10 @@ public class AppApiResponseEndPoint extends EnvelopRestEndPoint {
     public MAppApiResponse updateAppApiResponse(
             @ApiParam(name = "AppApiResponse", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson) throws Exception {
-        AppApiResponse AppApiResponse = toEntity(appJson, AppApiResponse.class);
-        if (AppApiResponseService.retrieve(AppApiResponse.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
-        AppApiResponseService.save(AppApiResponse);
-        return convertToModel(AppApiResponse, MAppApiResponse.class);
+        AppApiResponse appApiResponse = toEntity(appJson, AppApiResponse.class);
+        if (AppApiResponseService.retrieve(appApiResponse.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        AppApiResponseService.save(appApiResponse);
+        return convertToModel(appApiResponse, MAppApiResponse.class);
     }
 
     @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.GET)
@@ -85,8 +85,8 @@ public class AppApiResponseEndPoint extends EnvelopRestEndPoint {
     public MAppApiResponse getAppApiResponse(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") int id) throws Exception {
-        AppApiResponse AppApiResponse = AppApiResponseService.retrieve(id);
-        return convertToModel(AppApiResponse, MAppApiResponse.class);
+        AppApiResponse appApiResponse = AppApiResponseService.retrieve(id);
+        return convertToModel(appApiResponse, MAppApiResponse.class);
     }
 
     @RequestMapping(value = ServiceApi.AppApiResponse.AppApiResponse, method = RequestMethod.DELETE)

@@ -41,9 +41,9 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
     public MAppFeature createAppFeature(
             @ApiParam(name = "AppFeature", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String AppFeatureJson) throws Exception {
-        AppFeature AppFeature = toEntity(AppFeatureJson, AppFeature.class);
-        AppFeature = appFeatureService.createAppFeature(AppFeature);
-        return convertToModel(AppFeature, MAppFeature.class);
+        AppFeature appFeature = toEntity(AppFeatureJson, AppFeature.class);
+        appFeature = appFeatureService.createAppFeature(appFeature);
+        return convertToModel(appFeature, MAppFeature.class);
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.GET)
@@ -81,10 +81,10 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
     public MAppFeature updateAppFeature(
             @ApiParam(name = "AppFeature", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson) throws Exception {
-        AppFeature AppFeature = toEntity(appJson, AppFeature.class);
-        if (appFeatureService.retrieve(AppFeature.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
-        appFeatureService.save(AppFeature);
-        return convertToModel(AppFeature, MAppFeature.class);
+        AppFeature appFeature = toEntity(appJson, AppFeature.class);
+        if (appFeatureService.retrieve(appFeature.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        appFeatureService.save(appFeature);
+        return convertToModel(appFeature, MAppFeature.class);
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.AppFeature, method = RequestMethod.GET)
@@ -92,8 +92,8 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
     public MAppFeature getAppFeature(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") int id) throws Exception {
-        AppFeature AppFeature = appFeatureService.retrieve(id);
-        return convertToModel(AppFeature, MAppFeature.class);
+        AppFeature appFeature = appFeatureService.retrieve(id);
+        return convertToModel(appFeature, MAppFeature.class);
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.AppFeature, method = RequestMethod.DELETE)

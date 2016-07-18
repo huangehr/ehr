@@ -474,7 +474,7 @@ public class OrganizationController extends BaseController {
             org.setExtra(addr.getExtra());
             org.setProvinceId(geographyToCode(addr.getProvince(),156));
             org.setCityId(geographyToCode(addr.getCity(),org.getProvinceId()));
-            org.setDistrictId(geographyToCode(addr.getCity(),org.getProvinceId()));
+            org.setDistrictId(geographyToCode(addr.getDistrict(),org.getCityId()));
         }
         //获取公钥信息（公钥、有效区间、开始时间）
         MKey security = securityClient.getOrgKey(mOrg.getOrgCode());
