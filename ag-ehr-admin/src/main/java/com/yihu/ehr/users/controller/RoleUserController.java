@@ -73,6 +73,26 @@ public class RoleUserController extends BaseController {
         return failed("角色组删除人员失败！");
     }
 
+    @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.DELETE)
+    @ApiOperation(value = "人员id,角色组ids，批量删除人员-角色组关系")
+    public Envelop batchDeleteRoleUserRelation(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_ids",value = "角色组ids")
+            @RequestParam(value = "role_ids") String roleIds){
+        if(StringUtils.isEmpty(userId)){
+            return failed("人员id不能为空！");
+        }
+        if(StringUtils.isEmpty(roleIds)) {
+            return failed("角色组ids不能为空！");
+        }
+        boolean bo = roleUserClient.batchDeleteRoleUserRelation(userId, roleIds);
+        if(bo){
+            return success(null);
+        }
+        return failed("删除失败！");
+    }
+
 
     @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.POST)
     @ApiOperation(value = "批量新增人员所属角色组，一对多")
