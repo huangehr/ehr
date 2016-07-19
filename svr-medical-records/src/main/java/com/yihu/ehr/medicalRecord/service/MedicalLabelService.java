@@ -40,7 +40,8 @@ public class MedicalLabelService extends BaseRestEndPoint {
         if(MedicalLabels.size()>0) {
             for (int i = 0; i < MedicalLabels.size(); i++) {
                 MedicalLabels.get(i).getLabel();
-                if(!medicalLabelDao.findByRecordsIdAndLabel(MedicalLabels.get(i).getRecordsId(), MedicalLabels.get(i).getLabel()).getLabel().equals(MedicalLabels.get(i).getLabel()))
+                if(medicalLabelDao.findByRecordsIdAndLabel(MedicalLabels.get(i).getRecordsId(), MedicalLabels.get(i).getLabel())==null
+                        || medicalLabelDao.findByRecordsIdAndLabel(MedicalLabels.get(i).getRecordsId(), MedicalLabels.get(i).getLabel()).size()==0)
                     medicalLabelDao.save(MedicalLabels.get(i));
             }
             return true;
