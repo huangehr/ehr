@@ -506,10 +506,24 @@ public class ServiceApi {
         public static final String MessageReply   = "/messagereply";
     }
 
-    public static class MedivalRecords{
+    public static class MedicalRecords{
 
-        public static final String MedivalRecords                         = "/medivalRecords";
-        public static final String MedivalRecordsId                       = "/medivalRecords/{id}";
+        public static final String MedicalRecordByLastOne                 = "/medicalRecords/medicalRecordByLastOne";
+        public static final String MedicalRecord                          = "/medicalRecords/medicalRecord";
+        public static final String MedicalReport                          = "/medicalRecords/MedicalReport";
+        public static final String MedicalReportImg                       = "/medicalRecords/MedicalReportImg";
+        public static final String DocTmpByDocId                          = "/medicalRecords/Doctortemplate/{id}";
+        public static final String DoctorDraft                            = "/medicalRecords/DoctorDraft";
+        public static final String MedicalDraft                           = "/medicalRecords/MedicalDraft";
+        public static final String DoctorMedicalRecords                   = "/medicalRecords/DoctorMedicalRecords";
+        public static final String DeleteDoctorMedicalRecords             = "/medicalRecords/DeleteAllDoctorMedicalRecord/{id}";
+        public static final String DoctorInfo                             = "/medicalRecords/DoctorInfo";
+        public static final String ChangeDocStatus                        = "/medicalRecords/ChangeDocStatus";
+        public static final String MedicalLabels                          = "/medicalRecords/MedicalLabels";
+        public static final String DiagnosisDict                          = "/medicalRecords/DiagnosisDict";
+        public static final String SystemDict                             = "/medicalRecords/SystemDict";
+        public static final String SystemDictEntry                        = "/medicalRecords/SystemDictEntry";
+        public static final String Patient                                = "/medicalRecords/Patient";
 
     }
 }
