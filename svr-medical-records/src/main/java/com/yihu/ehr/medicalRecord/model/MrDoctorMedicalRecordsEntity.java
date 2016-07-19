@@ -8,9 +8,21 @@ import javax.persistence.*;
 @Table(name = "mr_doctor_medical_records", schema = "", catalog = "medical_records")
 public class MrDoctorMedicalRecordsEntity {
     private int id;
-    private int doctorId;
+    private String doctorId;
     private int recordId;
     private String isCreator;
+
+    @Basic
+    @Column(name = "RECORD_TYPE")
+    public String getRecordType() {
+        return recordType;
+    }
+
+    public void setRecordType(String recordType) {
+        this.recordType = recordType;
+    }
+
+    private String recordType;
 
     @Id
     @Column(name = "ID")
@@ -24,11 +36,11 @@ public class MrDoctorMedicalRecordsEntity {
 
     @Basic
     @Column(name = "DOCTOR_ID")
-    public int getDoctorId() {
+    public String getDoctorId() {
         return doctorId;
     }
 
-    public void setDoctorId(int doctorId) {
+    public void setDoctorId(String doctorId) {
         this.doctorId = doctorId;
     }
 
@@ -65,14 +77,5 @@ public class MrDoctorMedicalRecordsEntity {
         if (isCreator != null ? !isCreator.equals(that.isCreator) : that.isCreator != null) return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + doctorId;
-        result = 31 * result + recordId;
-        result = 31 * result + (isCreator != null ? isCreator.hashCode() : 0);
-        return result;
     }
 }
