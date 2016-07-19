@@ -85,4 +85,13 @@ public class DoctorController extends BaseRestEndPoint {
         MrDoctorsEntity doctor=toEntity(json,MrDoctorsEntity.class);
         return doctorService.updateDoctorInformationByDemographicId(doctor);
     }
+
+
+    @ApiOperation("获取医生诊断")
+    @RequestMapping(value = ServiceApi.MedicalRecords.PatientDiagnosis, method = RequestMethod.GET)
+    public List<String> getDoctorDiagnosis(
+            @ApiParam(name = "doctorId", value = "医生ID")
+            @RequestParam(value = "doctorId", required = true)int doctorId) {
+        return doctorService.getDoctorDiagnosis(doctorId);
+    }
 }
