@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Table(name = "mr_medical_draft", schema = "", catalog = "medical_records")
 public class MrMedicalDraftEntity {
     private int id;
-    private int doctorId;
+    private String doctorId;
     private int patientId;
     private String type;
     private String content;
@@ -29,11 +29,11 @@ public class MrMedicalDraftEntity {
 
     @Basic
     @Column(name = "DOCTOR_ID")
-    public int getDoctorId() {
+    public String getDoctorId() {
         return doctorId;
     }
 
-    public void setDoctorId(int doctorId) {
+    public void setDoctorId(String doctorId) {
         this.doctorId = doctorId;
     }
 
@@ -103,17 +103,5 @@ public class MrMedicalDraftEntity {
         if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + doctorId;
-        result = 31 * result + patientId;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (content != null ? content.hashCode() : 0);
-        result = 31 * result + (fastdfsUrl != null ? fastdfsUrl.hashCode() : 0);
-        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
-        return result;
     }
 }

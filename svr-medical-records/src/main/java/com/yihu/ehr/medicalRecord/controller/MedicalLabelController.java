@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecord.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecord.model.MrMedicalLabelEntity;
@@ -28,7 +29,7 @@ public class MedicalLabelController extends BaseRestEndPoint {
     MedicalLabelService medicalLabelService;
 
     @ApiOperation("批量保存病历标签")
-    @RequestMapping(value = "/medical_record/label/addMedicalLabels", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalLabels, method = RequestMethod.POST)
     public boolean addMedicalLabels(@ApiParam(name = "MedicalLabels", value = "病历标签集")
                                     @RequestParam(value = "MedicalLabels", required = true)String MedicalLabels){
         List<Map<String,String>>tmp=toEntity(MedicalLabels,List.class);
@@ -43,7 +44,7 @@ public class MedicalLabelController extends BaseRestEndPoint {
     }
 
     @ApiOperation("获取病历标签by RecordId")
-    @RequestMapping(value = "/medical_record/label/getMedicalLabelInformationByID", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalLabels, method = RequestMethod.GET)
     public List<MrMedicalLabelEntity> getMedicalLabelInformationByID(
             @ApiParam(name = "RecordId", value = "病历表编号")
             @RequestParam(value = "RecordId", required = true)String RecordId){

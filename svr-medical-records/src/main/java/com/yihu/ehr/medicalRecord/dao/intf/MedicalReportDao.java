@@ -1,6 +1,7 @@
 package com.yihu.ehr.medicalRecord.dao.intf;
 
 import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
+import com.yihu.ehr.medicalRecord.model.MrMedicalReportEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -9,9 +10,10 @@ import java.util.List;
 /**
  * Created by shine on 2016/7/14.
  */
-public interface MedicalRecordDao extends PagingAndSortingRepository<MrMedicalRecordsEntity,String> {
+public interface MedicalReportDao extends PagingAndSortingRepository<MrMedicalReportEntity,String> {
 
-    List<MrMedicalRecordsEntity> findBypatientIdAndDoctorId(int patientId, int doctorId);
+    List<MrMedicalReportEntity> findByrecordsId(int id);
 
-    MrMedicalRecordsEntity findByid(int id);
+    MrMedicalReportEntity findByid(int id);
+
 }
