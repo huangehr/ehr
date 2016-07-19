@@ -63,8 +63,9 @@ public class GeographyEndPoint extends EnvelopRestEndPoint {
     public String saveAddress(
             @ApiParam(name = "json_data", value = "地址json字符串")
             @RequestBody String jsonData) throws Exception{
-        ObjectMapper objectMapper = new ObjectMapper();
-        Geography geography = objectMapper.readValue(jsonData, Geography.class);
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        Geography geography = objectMapper.readValue(jsonData, Geography.class);
+        Geography geography = toEntity(jsonData,Geography.class);
         if (geography.getCountry() == null) {
             geography.setCountry("中国");
         }
