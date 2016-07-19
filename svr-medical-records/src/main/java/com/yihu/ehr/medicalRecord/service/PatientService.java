@@ -53,6 +53,9 @@ public class PatientService {
         if(patient.getPhone()==null&&patient.getDemographicId()==null){
             return false;
         }
+        else if(patientDao.findBydemographicId(patient.getDemographicId())!=null ||patientDao.findByphone(patient.getPhone())!=null){
+            return false;
+        }
         else {
             patientDao.save(patient);
             return true;

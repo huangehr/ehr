@@ -13,6 +13,7 @@ public class MrMedicalLabelEntity {
     private String label;
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
     public int getId() {
         return id;

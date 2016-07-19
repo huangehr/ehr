@@ -156,7 +156,7 @@ public class AppController extends BaseController {
                 }
                AppDetailModel appDetailModel =  convertToAppDetailModel(mApp);
                 if(roleMap.keySet().size()>0){
-                    appDetailModel.setRoleJson(toJson(appDetailModel));
+                    appDetailModel.setRoleJson(toJson(roleMap));
                 }
                 envelop.setSuccessFlg(true);
                 envelop.setObj(appDetailModel);

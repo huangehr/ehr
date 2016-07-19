@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecord.service;
 
+import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalLabelDao;
 import com.yihu.ehr.medicalRecord.model.MrMedicalLabelEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,12 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class MedicalLabelService {
+public class MedicalLabelService extends BaseRestEndPoint {
 
     @Autowired
     MedicalLabelDao medicalLabelDao;
     public List<MrMedicalLabelEntity> getMedicalLabelInformationByRecordId(String RecordId){
-       return medicalLabelDao.findByrecordsId(RecordId);
+       return medicalLabelDao.findByrecordsId(Integer.parseInt(RecordId));
     }
 
     public boolean updataMEDICALLABELInformationByID(MrMedicalLabelEntity MedicalLabel){
@@ -35,11 +36,18 @@ public class MedicalLabelService {
         return true;
     }
 
-    public boolean addMedicalLabels(MrMedicalLabelEntity[] MedicalLabels){
-        for(int i=0;i<MedicalLabels.length;i++) {
-            medicalLabelDao.save(MedicalLabels[i]);
+    public boolean addMedicalLabels(List<MrMedicalLabelEntity> MedicalLabels){
+        if(MedicalLabels.size()>0) {
+            for (int i = 0; i < MedicalLabels.size(); i++) {
+                MedicalLabels.get(i).getLabel();
+                if(!medicalLabelDao.findByRecordsIdAndLabel(MedicalLabels.get(i).getRecordsId(), MedicalLabels.get(i).getLabel()).getLabel().equals(MedicalLabels.get(i).getLabel()))
+                    medicalLabelDao.save(MedicalLabels.get(i));
+            }
+            return true;
         }
-        return true;
+        else
+            return false;
+
     }
 
     public List<String> getMEDICALLABELsByLable(String...Lable){

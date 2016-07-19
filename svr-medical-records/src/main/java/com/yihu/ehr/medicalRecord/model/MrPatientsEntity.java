@@ -20,6 +20,7 @@ public class MrPatientsEntity {
     private String isVerified;
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
     public int getId() {
         return id;
