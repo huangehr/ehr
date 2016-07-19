@@ -29,6 +29,14 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
         return roleUserRepository.findRelation(userId, roleId);
     }
 
+    public boolean batchDeleteRoleUserRelation(String userId,String roleIds) throws Exception{
+        List<RoleUser> roleUsers = this.search("userId=" + userId + ",roleId=" + roleIds);
+        for(RoleUser roleUser : roleUsers){
+            delete(roleUser.getId());
+        }
+        return true;
+    }
+
     public boolean batchCreateRoleUsersRelation(String userId,String roleIds){
         for(String roleId : roleIds.split(",")){
             RoleUser roleUser = new RoleUser();
