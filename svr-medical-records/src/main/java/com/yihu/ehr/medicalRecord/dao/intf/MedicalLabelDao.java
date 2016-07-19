@@ -12,7 +12,9 @@ public interface MedicalLabelDao extends PagingAndSortingRepository<MrMedicalLab
 
     List<MrMedicalLabelEntity> findByrecordsId(Integer id);
 
-    MrMedicalLabelEntity findByRecordsIdAndLabel(Integer RecordsId,String label);
+    @Query("from MrMedicalLabelEntity where recordsId= ?1 AND  label= ?2 ")
+    List<MrMedicalLabelEntity> findByRecordsIdAndLabel(Integer RecordsId,String label);
+
     MrMedicalLabelEntity findByid(String id);
     void deleteByid(String id);
 

@@ -18,6 +18,29 @@ public class MrPatientsEntity {
     private String photo;
     private String phone;
     private String isVerified;
+    private String appUid;
+
+    @Basic
+    @Column(name = "APP_UID")
+    public String getAppUid() {
+        return appUid;
+    }
+
+    public void setAppUid(String appUid) {
+        this.appUid = appUid;
+    }
+
+    @Basic
+    @Column(name = "APP_PATIENT_ID")
+    public String getAppPatientId() {
+        return appPatientId;
+    }
+
+    public void setAppPatientId(String appPatientId) {
+        this.appPatientId = appPatientId;
+    }
+
+    private String appPatientId;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
