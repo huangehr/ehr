@@ -619,17 +619,26 @@ public class PatientInfoBaseService {
 
             //获取疾病门诊事件纪录rowkey
             List<String>list=new ArrayList<>();
-            List<String>peofilelist=new ArrayList<>();
+            Map<String,String>peofileMap=new HashMap<>();
             if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
             {
                 for(Map<String,Object> map : (List<Map<String, Object>>)resultMzzd.getDetailModelList())
                 {
-                    list.add(map.get("EHR_000109").toString());
-                    peofilelist.add((String) map.get("profile_id"));
+                    if(!list.contains(map.get("EHR_000109").toString())) {
+                        list.add(map.get("EHR_000109").toString());
+                    }
+                    peofileMap.put((String) map.get("profile_id"),map.get("EHR_000109").toString());
                 }
                 List<MIcd10Dict> l=dictClient.getIcd10ByCodeList(list);
-                for(int i=0;i<l.size();i++)
-                    recordMap.put(peofilelist.get(i),l.get(i).getName());
+                for(String key:peofileMap.keySet()) {
+                    if(l.get(list.indexOf(peofileMap.get(key)))!=null) {
+                        recordMap.put(key, l.get(list.indexOf(peofileMap.get(key))).getName());
+                    }
+                    else{
+                        recordMap.put(key,null);
+                    }
+
+                }
             }
 
         }
@@ -657,18 +666,24 @@ public class PatientInfoBaseService {
             Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,queryParams.replace(' ', '+'), null, null);
 
             //获取疾病住院事件纪录rowkey
-            if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0)
-            {
-                List<String>list=new ArrayList<>();
-                List<String>peofilelist=new ArrayList<>();
-                for (Map<String, Object> map : (List<Map<String, Object>>)resultZyzd.getDetailModelList())
-                {
-                    list.add(map.get("EHR_000293").toString());
-                    peofilelist.add((String) map.get("profile_id"));
+            if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0) {
+                List<String> list = new ArrayList<>();
+                Map<String, String> peofileMap = new HashMap<>();
+                for (Map<String, Object> map : (List<Map<String, Object>>) resultZyzd.getDetailModelList()) {
+                    if (!list.contains(map.get("EHR_000293").toString())) {
+                        list.add(map.get("EHR_000293").toString());
+                    }
+                    peofileMap.put((String) map.get("profile_id"), map.get("EHR_000293").toString());
                 }
-                List<MIcd10Dict> l=dictClient.getIcd10ByCodeList(list);
-                for(int i=0;i<l.size();i++)
-                    recordMap.put(peofilelist.get(i),l.get(i).getName());
+                List<MIcd10Dict> l = dictClient.getIcd10ByCodeList(list);
+                for (String key : peofileMap.keySet()) {
+                    if (l.get(list.indexOf(peofileMap.get(key))) != null) {
+                        recordMap.put(key, l.get(list.indexOf(peofileMap.get(key))).getName());
+                    } else {
+                        recordMap.put(key, null);
+                    }
+
+                }
             }
         }
 

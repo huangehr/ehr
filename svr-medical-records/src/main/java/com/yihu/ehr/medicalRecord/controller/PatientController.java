@@ -27,7 +27,7 @@ public class PatientController extends BaseRestEndPoint {
     @ApiOperation("增加患者")
     @RequestMapping(value = "/medical_record/patient/addPatient", method = RequestMethod.PUT)
     public boolean addPatient(
-            @ApiParam(name = "patientInformation", value = "患者信息") @RequestParam(value = "patient", required = true) String json){
+            @ApiParam(name = "patientInformation", value = "患者信息") @RequestParam(value = "patientInformation", required = true) String json){
         MrPatientsEntity patient=toEntity(json,MrPatientsEntity.class);
         return patientService.addPatient(patient);
     }
