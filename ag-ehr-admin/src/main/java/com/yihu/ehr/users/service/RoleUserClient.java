@@ -35,6 +35,12 @@ public interface RoleUserClient {
             @ApiParam(name = "role_id",value = "角色组id")
             @RequestParam(value = "role_id") String roleId);
 
+    @RequestMapping(value = ServiceApi.Roles.RoleUserByUserId,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据人员id，删除其与所有角色组关系")
+    boolean deleteRoleUserBuUserId(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId);
+
     @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.DELETE)
     @ApiOperation(value = "人员id,角色组ids，批量删除人员-角色组关系")
     boolean batchDeleteRoleUserRelation(

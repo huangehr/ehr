@@ -402,7 +402,7 @@ public class ServiceApi {
 
 
         public static final String RoleUser                         = "/roles/role_user";
-        public static final String RoleUserId                       = "/roles/role_user/{id}";
+        public static final String RoleUserByUserId                 = "/roles/role_user/{user_id}";
         public static final String RoleUsers                        = "/roles/role_users";
         public static final String RoleUsersNoPage                   = "/roles/role_users/no_paging";
 
