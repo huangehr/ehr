@@ -209,39 +209,43 @@ public class AppApiController extends BaseController {
      */
     private void saveApiParmsResponse(String apiId,String apiParms,String apiResponse){
         try{
-            List<Map<String,Object>> list =  objectMapper.readValue(apiParms,List.class);
-            for(Map<String,Object> parmsMap:list){
-                //删除的是新增的数据直接跳过
-                if(DELETE.equals(parmsMap.get(DATA_STATUS))&&NEW_DATA.equals(parmsMap.get("id")+"")){
-                    continue;
-                }else{
-                    parmsMap.put("appApiId",apiId);
-                    String json =toJson(parmsMap);
-                    if(NEW_DATA.equals(parmsMap.get("id") + "")){
-                        appApiParameterClient.createAppApiParameter(json);
-                    }else if(UPDATE.equals(parmsMap.get(DATA_STATUS))){
-                        appApiParameterClient.updateAppApiParameter(json);
-                    }
-                    else if(DELETE.equals(parmsMap.get(DATA_STATUS))){
-                        appApiParameterClient.deleteAppApiParameter(parmsMap.get("id") + "");
+            List<Map<String,Object>> list;
+            if(!StringUtils.isEmpty(apiParms)){
+                list =  objectMapper.readValue(apiParms,List.class);
+                for(Map<String,Object> parmsMap:list){
+                    //删除的是新增的数据直接跳过
+                    if(DELETE.equals(parmsMap.get(DATA_STATUS))&&NEW_DATA.equals(parmsMap.get("id")+"")){
+                        continue;
+                    }else{
+                        parmsMap.put("appApiId",apiId);
+                        String json =toJson(parmsMap);
+                        if(NEW_DATA.equals(parmsMap.get("id") + "")){
+                            appApiParameterClient.createAppApiParameter(json);
+                        }else if(UPDATE.equals(parmsMap.get(DATA_STATUS))){
+                            appApiParameterClient.updateAppApiParameter(json);
+                        }
+                        else if(DELETE.equals(parmsMap.get(DATA_STATUS))){
+                            appApiParameterClient.deleteAppApiParameter(parmsMap.get("id") + "");
+                        }
                     }
                 }
             }
-            list = objectMapper.readValue(apiResponse,List.class);
-            for(Map<String,Object> parmsMap:list){
-                //删除的是新增的数据直接跳过
-                if(DELETE.equals(parmsMap.get(DATA_STATUS))&&NEW_DATA.equals(parmsMap.get("id")+"")){
-                    continue;
-                }else{
-                    parmsMap.put("appApiId",apiId);
-                    String json =toJson(parmsMap);
-                    if(ADD.equals(parmsMap.get(DATA_STATUS))){
-                        appApiResponseClient.createAppApiResponse(json);
-                    }else if(UPDATE.equals(parmsMap.get(DATA_STATUS))){
-                        appApiResponseClient.updateAppApiResponse(json);
-                    }
-                    else if(DELETE.equals(parmsMap.get(DATA_STATUS))){
-                        appApiResponseClient.deleteAppApiResponse(parmsMap.get("id")+"");
+            if(!StringUtils.isEmpty(apiResponse)) {
+                list = objectMapper.readValue(apiResponse, List.class);
+                for (Map<String, Object> parmsMap : list) {
+                    //删除的是新增的数据直接跳过
+                    if (DELETE.equals(parmsMap.get(DATA_STATUS)) && NEW_DATA.equals(parmsMap.get("id") + "")) {
+                        continue;
+                    } else {
+                        parmsMap.put("appApiId", apiId);
+                        String json = toJson(parmsMap);
+                        if (ADD.equals(parmsMap.get(DATA_STATUS))) {
+                            appApiResponseClient.createAppApiResponse(json);
+                        } else if (UPDATE.equals(parmsMap.get(DATA_STATUS))) {
+                            appApiResponseClient.updateAppApiResponse(json);
+                        } else if (DELETE.equals(parmsMap.get(DATA_STATUS))) {
+                            appApiResponseClient.deleteAppApiResponse(parmsMap.get("id") + "");
+                        }
                     }
                 }
             }
