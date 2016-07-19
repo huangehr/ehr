@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecord.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
@@ -25,15 +26,15 @@ public class PatientController extends BaseRestEndPoint {
     PatientService patientService;
 
     @ApiOperation("增加患者")
-    @RequestMapping(value = "/medical_record/patient/addPatient", method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.PUT)
     public boolean addPatient(
-            @ApiParam(name = "patientInformation", value = "患者信息") @RequestParam(value = "patient", required = true) String json){
+            @ApiParam(name = "patientInformation", value = "患者信息") @RequestParam(value = "patientInformation", required = true) String json){
         MrPatientsEntity patient=toEntity(json,MrPatientsEntity.class);
         return patientService.addPatient(patient);
     }
 
     @ApiOperation("获取患者个人信息by身份证号或手机号")
-    @RequestMapping(value = "/medical_record/patient/getPatientInformation", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.GET)
     public MrPatientsEntity getPatientInformationBydemographicIdOrPhone(
             @ApiParam(name = "phone", value = "手机号") @RequestParam(value = "phone", required = false) String phone,
             @ApiParam(name = "demographicId", value = "身份证号")

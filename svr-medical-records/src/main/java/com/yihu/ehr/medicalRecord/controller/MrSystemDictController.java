@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecord.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecord.model.MrDiagnosisDictEntity;
@@ -26,7 +27,7 @@ public class MrSystemDictController extends BaseRestEndPoint {
     MrSystemDictService mrSystemDictService;
 
     @ApiOperation("增加系统字典")
-    @RequestMapping(value = "/medical_record/SystemDict/addMrSystemDict", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.POST)
     public boolean addMrSystemDict(
             @ApiParam(name = "SystemDict", value = "系统字典信息")
             @RequestParam(value = "SystemDict", required = true) String json){
@@ -35,7 +36,7 @@ public class MrSystemDictController extends BaseRestEndPoint {
     }
 
     @ApiOperation("删除系统字典")
-    @RequestMapping(value = "/medical_record/SystemDict/deleteMrSystemDictEntry", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.GET)
     public boolean deleteMrSystemDictEntry(
             @ApiParam(name = "MrSystemDictCode", value = "系统字典代码")
             @RequestParam(value = "MrSystemDictCode", required = true)String dictCode){
@@ -43,7 +44,7 @@ public class MrSystemDictController extends BaseRestEndPoint {
     }
 
     @ApiOperation("更新系统字典")
-    @RequestMapping(value = "/medical_record/SystemDict/updateMrSystemDict", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.POST)
     public boolean updateMrSystemDict(
             @ApiParam(name = "SystemDict", value = "系统字典信息")
             @RequestParam(value = "SystemDict", required = true) String json){
