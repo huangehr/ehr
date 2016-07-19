@@ -207,6 +207,7 @@ public class RolesController extends BaseController {
                 modelTree.setId(m.getId()+"");
                 modelTree.setName(m.getName());
                 modelTree.setType("1");
+                modelTree.setPid(mApp.getId());
                 modelTree.setChildren(null);
                 roleTreeModelList.add(modelTree);
             }
@@ -214,6 +215,7 @@ public class RolesController extends BaseController {
             app.setId(mApp.getId());
             app.setName(mApp.getName());
             app.setType("0");
+            app.setPid(null);
             app.setChildren(roleTreeModelList);
             appRolesTreeModelList.add(app);
         }
