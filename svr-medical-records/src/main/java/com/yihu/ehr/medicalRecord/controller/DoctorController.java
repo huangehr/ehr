@@ -31,7 +31,7 @@ public class DoctorController extends BaseRestEndPoint {
     DoctorService doctorService;
 
     @ApiOperation("获取医生信息by身份证号")
-    @RequestMapping(value = "/medical_record/doctor/getDoctorInformation", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorInfo, method = RequestMethod.GET)
     public MrDoctorsEntity getDoctorInformationByDemographicId(
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true)String demographicId){
@@ -42,7 +42,7 @@ public class DoctorController extends BaseRestEndPoint {
     }
 
     @ApiOperation("增加医生")
-    @RequestMapping(value = "/medical_record/doctor/addDoctor", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorInfo, method = RequestMethod.POST)
     public boolean addDoctor( @ApiParam(name = "name", value = "名字") @RequestParam(value = "name", required = true) String name,
                               @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
                               @ApiParam(name = "sex", value = "性别") @RequestParam(value = "sex", required = false) String sex,
@@ -68,7 +68,7 @@ public class DoctorController extends BaseRestEndPoint {
     }
 
     @ApiOperation("更新医生职业状态")
-    @RequestMapping(value = "/medical_record/doctor/updateDoctorStatus", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.ChangeDocStatus, method = RequestMethod.PUT)
     public boolean updateDoctorStatusByDemographicId(
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = true) String demographicId,
@@ -78,7 +78,7 @@ public class DoctorController extends BaseRestEndPoint {
     }
 
     @ApiOperation("更新医生信息")
-    @RequestMapping(value = "/medical_record/doctor/updateDoctor", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorInfo, method = RequestMethod.PUT)
     public boolean updateDoctorInformationByDemographicId(
             @ApiParam(name = "doctorInformation", value = "医生信息")
             @RequestParam(value = "json", required = true)String json) {

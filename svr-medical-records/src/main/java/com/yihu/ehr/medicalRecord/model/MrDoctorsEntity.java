@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "mr_doctors", schema = "", catalog = "medical_records")
 public class MrDoctorsEntity {
-    private int id;
+    private String id;
     private String name;
     private String demographicId;
     private String sex;
@@ -26,11 +26,11 @@ public class MrDoctorsEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -177,23 +177,5 @@ public class MrDoctorsEntity {
         if (status != null ? !status.equals(that.status) : that.status != null) return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (demographicId != null ? demographicId.hashCode() : 0);
-        result = 31 * result + (sex != null ? sex.hashCode() : 0);
-        result = 31 * result + (birthday != null ? birthday.hashCode() : 0);
-        result = 31 * result + (orgCode != null ? orgCode.hashCode() : 0);
-        result = 31 * result + (orgName != null ? orgName.hashCode() : 0);
-        result = 31 * result + (orgDept != null ? orgDept.hashCode() : 0);
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (good != null ? good.hashCode() : 0);
-        result = 31 * result + (photo != null ? photo.hashCode() : 0);
-        result = 31 * result + (phone != null ? phone.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
-        return result;
     }
 }

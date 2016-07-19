@@ -2,9 +2,12 @@ package com.yihu.ehr.medicalRecord.service;
 
 import com.yihu.ehr.medicalRecord.dao.intf.DoctorDao;
 import com.yihu.ehr.medicalRecord.model.MrDoctorsEntity;
+import org.apache.logging.log4j.core.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.xml.transform.Result;
 
 /**
  * Created by shine on 2016/7/14.
@@ -63,7 +66,12 @@ public class DoctorService {
     }
 
     public boolean addDoctor(MrDoctorsEntity doctor){
-        doctorDao.save(doctor);
-        return true;
+        if(doctorDao.findBydemographicId(doctor.getDemographicId())!=null){
+            return false;
+        }
+        else {
+            doctorDao.save(doctor);
+            return true;
+        }
     }
 }

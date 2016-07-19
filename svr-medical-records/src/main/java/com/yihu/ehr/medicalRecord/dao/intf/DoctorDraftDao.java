@@ -1,0 +1,22 @@
+package com.yihu.ehr.medicalRecord.dao.intf;
+
+import com.yihu.ehr.medicalRecord.model.MrDoctorDraftEntity;
+import com.yihu.ehr.medicalRecord.model.MrDoctorTemplateEntity;
+import com.yihu.ehr.medicalRecord.model.MrMedicalDraftEntity;
+import com.yihu.ehr.medicalRecord.model.MrMedicalReportEntity;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+
+import java.util.List;
+
+/**
+ * Created by shine on 2016/7/14.
+ */
+public interface DoctorDraftDao extends PagingAndSortingRepository<MrDoctorDraftEntity,String> {
+
+    @Query(value = "select * from mr_doctor_draft where doctor_id = ?1 and type = ?2 order by usage_count desc limit 10", nativeQuery = true)
+    List<MrDoctorDraftEntity> findBydoctorId(int id, String type);
+
+    MrDoctorDraftEntity findByid(int id);
+
+}
