@@ -1,8 +1,10 @@
 package com.yihu.ehr.medicalRecord.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecord.model.MrDiagnosisDictEntity;
+import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.medicalRecord.service.MrDiagnosisDictService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +27,7 @@ public class MrDiagnosisDictController extends BaseRestEndPoint {
     MrDiagnosisDictService mrDiagnosisDictService;
 
     @ApiOperation("增加诊断字典")
-    @RequestMapping(value = "/medical_record/diagnosisDict/addMrDiagnosisDict", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DiagnosisDict, method = RequestMethod.POST)
     public boolean addMrDiagnosisDict(
             @ApiParam(name = "DiagnosisDictInformation", value = "诊段字典信息")
             @RequestParam(value = "DiagnosisDictInformation", required = true) String json){
@@ -34,7 +36,7 @@ public class MrDiagnosisDictController extends BaseRestEndPoint {
     }
 
     @ApiOperation("删除诊断字典")
-    @RequestMapping(value = "/medical_record/diagnosisDict/deleteMrDiagnosisDict", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DiagnosisDict, method = RequestMethod.GET)
     public boolean deleteMrDiagnosisDict(
             @ApiParam(name = "MrDiagnosisDictCode", value = "诊段字典代码")
             @RequestParam(value = "MrDiagnosisDictCode", required = true) String code){
@@ -42,11 +44,12 @@ public class MrDiagnosisDictController extends BaseRestEndPoint {
     }
 
     @ApiOperation("更新诊断字典")
-    @RequestMapping(value = "/medical_record/diagnosisDict/updateMrDiagnosisDict", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DiagnosisDict, method = RequestMethod.POST)
     public boolean updateMrDiagnosisDict(
             @ApiParam(name = "DiagnosisDictInformation", value = "诊段字典信息")
-            @RequestParam(value = "DiagnosisDictInformation", required = true) String json){
-        MrDiagnosisDictEntity mrDiagnosisDict=toEntity(json,MrDiagnosisDictEntity.class);
+            @RequestParam(value = "DiagnosisDictInformation", required = true) String json)throws Exception{
+        //MrDiagnosisDictEntity mrDiagnosisDict=toEntity(json,MrDiagnosisDictEntity.class);
+        MrDiagnosisDictEntity mrDiagnosisDict=objectMapper.readValue(json, MrDiagnosisDictEntity.class);
         return mrDiagnosisDictService.updateMrDiagnosisDict(mrDiagnosisDict);
     }
 }
