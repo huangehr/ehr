@@ -524,6 +524,7 @@ public class ServiceApi {
         public static final String SystemDict                             = "/medicalRecords/SystemDict";
         public static final String SystemDictEntry                        = "/medicalRecords/SystemDictEntry";
         public static final String Patient                                = "/medicalRecords/Patient";
+        public static final String PatientDiagnosis                                = "/medicalRecords/PatientDiagnosis";
 
     }
 }

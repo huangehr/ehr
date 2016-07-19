@@ -1,13 +1,17 @@
 package com.yihu.ehr.medicalRecord.service;
 
 import com.yihu.ehr.medicalRecord.dao.intf.DoctorDao;
+import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
 import com.yihu.ehr.medicalRecord.model.MrDoctorsEntity;
+import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import org.apache.logging.log4j.core.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.transform.Result;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by shine on 2016/7/14.
@@ -18,6 +22,8 @@ public class DoctorService {
 
     @Autowired
     DoctorDao doctorDao;
+    MedicalRecordDao medicalRecordDao;
+
     public MrDoctorsEntity getDoctorInformationByDemographicId(String demographicId){
 
         return doctorDao.findBydemographicId(demographicId);
@@ -73,5 +79,18 @@ public class DoctorService {
             doctorDao.save(doctor);
             return true;
         }
+    }
+
+    public List<String> getDoctorDiagnosis(int doctorId){
+        List<MrMedicalRecordsEntity>list= medicalRecordDao.findByDoctorId(doctorId);
+        List<String> diagnosisList=new ArrayList<>();
+        for(int i=0;i<list.size();i++){
+            if(list.get(i)!=null){
+                if(!list.contains(list.get(i).getMedicalDiagnosis())) {
+                    diagnosisList.add(list.get(i).getMedicalDiagnosis());
+                }
+            }
+        }
+        return diagnosisList;
     }
 }
