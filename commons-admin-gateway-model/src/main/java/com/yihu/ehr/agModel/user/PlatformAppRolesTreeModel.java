@@ -9,6 +9,7 @@ public class PlatformAppRolesTreeModel {
     private String id;// 应用id或角色组id
     private String name; //应用名称或角色组名称
     private String type; //0或1，表示该模型是应用还是角色
+    private String pid;
     private List<PlatformAppRolesTreeModel> children;
 
     public PlatformAppRolesTreeModel() {
@@ -36,6 +37,14 @@ public class PlatformAppRolesTreeModel {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid;
     }
 
     public List<PlatformAppRolesTreeModel> getChildren() {

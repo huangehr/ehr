@@ -55,6 +55,20 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.Roles.RoleUserByUserId,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据人员id，删除其与所有角色组关系")
+    public boolean deleteRoleUserBuUserId(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId)throws Exception{
+        Collection<RoleUser> roleUsers = roleUserService.search("userId=" + userId);
+        List<Long> ids = new ArrayList<>();
+        for(RoleUser roleUser : roleUsers){
+            ids.add(roleUser.getId());
+        }
+        roleUserService.delete(ids);
+        return true;
+    }
+
     @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.DELETE)
     @ApiOperation(value = "人员id,角色组ids，批量删除人员-角色组关系")
     public boolean batchDeleteRoleUserRelation(
