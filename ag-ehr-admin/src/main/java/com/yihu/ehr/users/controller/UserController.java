@@ -197,6 +197,21 @@ public class UserController extends BaseController {
             if (!result) {
                 return failed("删除失败!");
             }
+            //删除用户-用户角色组关系
+            //Todo 根据用户id删除的接口
+            Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
+            if(mRoleUsers != null){
+                StringBuffer buffer = new StringBuffer();
+                for(MRoleUser m : mRoleUsers){
+                    buffer.append(m.getRoleId());
+                    buffer.append(",");
+                }
+                String roleIds = buffer.substring(0,buffer.length()-1);
+                boolean bo = roleUserClient.batchDeleteRoleUserRelation(userId,roleIds);
+                if(!bo){
+                    return failed("删除失败！");
+                }
+            }
             try{
              fileResourceClient.filesDelete(userId);
             }catch (Exception e){
@@ -236,10 +251,10 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getTelephone())) {
                 errorMsg += "电话号码不能为空!";
             }
-//            String roles = detailModel.getRole();
-//            if (StringUtils.isEmpty(roles)) {
-//                errorMsg += "用户角色不能为空!";
-//            }
+            String roles = detailModel.getRole();
+            if (StringUtils.isEmpty(roles)) {
+                errorMsg += "用户角色不能为空!";
+            }
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
@@ -259,11 +274,11 @@ public class UserController extends BaseController {
                 return failed("保存失败!");
             }
             //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败），
-//            boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
-//            if(!bo){
-//                userClient.deleteUser(mUser.getId());
-//                return failed("保存失败!");
-//            }
+            boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
+            if(!bo){
+                userClient.deleteUser(mUser.getId());
+                return failed("保存失败!");
+            }
             detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
         } catch (Exception ex) {
@@ -296,10 +311,10 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getTelephone())) {
                 errorMsg += "电话号码不能为空!";
             }
-//            String roles = detailModel.getRole();
-//            if (StringUtils.isEmpty(roles)) {
-//                errorMsg += "用户角色不能为空!";
-//            }
+            String roles = detailModel.getRole();
+            if (StringUtils.isEmpty(roles)) {
+                errorMsg += "用户角色不能为空!";
+            }
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
@@ -319,36 +334,36 @@ public class UserController extends BaseController {
                 return failed("邮箱已存在!");
             }
             //-----------
-            mUser = convertToMUser(detailModel);
-            mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
-            if (mUser == null) {
-                return failed("保存失败!");
-            }
-            detailModel = convertToUserDetailModel(mUser);
-            return success(detailModel);
-
-            //修改时先修改所属角色组再修改用户，修改角色组失败（修改失败）、修改用户失败 （回显角色组）
-//            Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());
-//            boolean bo = roleUserClient.batchUpdateRoleUsersRelation(mUser.getId(),detailModel.getRole());
-//            if(!bo){
-//                return failed("保存失败！");
-//            }
 //            mUser = convertToMUser(detailModel);
 //            mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
-//            if (mUser != null) {
-//                detailModel = convertToUserDetailModel(mUser);
-//                return success(detailModel);
+//            if (mUser == null) {
+//                return failed("保存失败!");
 //            }
-//            StringBuffer buffer = new StringBuffer();
-//            for(MRoleUser m : mRoleUsers){
-//                buffer.append(m.getRoleId());
-//                buffer.append(",");
-//            }
-//            if(buffer.length()>0){
-//                String oldRoleIds = buffer.substring(0, buffer.length() - 1);
-//                roleUserClient.batchDeleteRoleUserRelation(mUser.getId(),oldRoleIds);
-//            }
-//            return failed("保存失败!");
+//            detailModel = convertToUserDetailModel(mUser);
+//            return success(detailModel);
+
+            //修改时先修改所属角色组再修改用户，修改角色组失败（修改失败）、修改用户失败 （回显角色组）
+            Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());
+            boolean bo = roleUserClient.batchUpdateRoleUsersRelation(mUser.getId(),detailModel.getRole());
+            if(!bo){
+                return failed("保存失败！");
+            }
+            mUser = convertToMUser(detailModel);
+            mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
+            if (mUser != null) {
+                detailModel = convertToUserDetailModel(mUser);
+                return success(detailModel);
+            }
+            StringBuffer buffer = new StringBuffer();
+            for(MRoleUser m : mRoleUsers){
+                buffer.append(m.getRoleId());
+                buffer.append(",");
+            }
+            if(buffer.length()>0){
+                String oldRoleIds = buffer.substring(0, buffer.length() - 1);
+                roleUserClient.batchDeleteRoleUserRelation(mUser.getId(),oldRoleIds);
+            }
+            return failed("保存失败!");
         }
         catch (Exception ex)
         {
@@ -615,7 +630,17 @@ public class UserController extends BaseController {
             dict = conventionalDictClient.getUserSource(userSource);
             detailModel.setSourceName(dict == null ? "":dict.getValue());
         }
-
+        //从用户-角色组关系表获取用户所属角色组ids
+        detailModel.setRole("");
+        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());
+        if(mRoleUsers.size()>0){
+            StringBuffer buffer = new StringBuffer();
+            for(MRoleUser m : mRoleUsers){
+                buffer.append(m.getRoleId());
+                buffer.append(",");
+            }
+            detailModel.setRole(buffer.substring(0,buffer.length()-1));
+        }
         //获取归属机构
         String orgCode = mUser.getOrganization();
         if(StringUtils.isNotEmpty(orgCode)) {
