@@ -157,22 +157,6 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
 
                         HDSA00_01.put("HDSA00_01_012",current.getYear() - birth.getYear());
                     }
-                    if(HDSA00_01.containsKey("HDSA00_01_011") && !StringUtils.isBlank(HDSA00_01.get("HDSA00_01_011").toString()))
-                    {
-                        String sex =  HDSA00_01.get("HDSA00_01_011").toString();
-
-                        if(sex.equals("1")) {
-                            sex = "男";
-                        }
-                        else if(sex.equals("2")) {
-                            sex = "女";
-                        }
-                        else {
-                            sex = "其他";
-                        }
-
-                        HDSA00_01.put("HDSA00_01_011",sex);
-                    }
                 }
             }
 
