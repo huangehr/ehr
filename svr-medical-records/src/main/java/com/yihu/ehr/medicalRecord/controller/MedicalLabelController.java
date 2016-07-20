@@ -35,10 +35,12 @@ public class MedicalLabelController extends BaseRestEndPoint {
         List<Map<String,String>>tmp=toEntity(MedicalLabels,List.class);
         List<MrMedicalLabelEntity>m=new ArrayList<>();
         for(int i=0;i<tmp.size();i++){
-            MrMedicalLabelEntity mrMedicalLabelEntity=new MrMedicalLabelEntity();
-            mrMedicalLabelEntity.setRecordsId(Integer.parseInt(tmp.get(i).get("recordsId")));
-            mrMedicalLabelEntity.setLabel(tmp.get(i).get("label"));
-            m.add(mrMedicalLabelEntity);
+            if(tmp.get(i)!=null) {
+                MrMedicalLabelEntity mrMedicalLabelEntity = new MrMedicalLabelEntity();
+                mrMedicalLabelEntity.setRecordsId(Integer.parseInt(tmp.get(i).get("recordsId")));
+                mrMedicalLabelEntity.setLabel(tmp.get(i).get("label"));
+                m.add(mrMedicalLabelEntity);
+            }
         }
         return  medicalLabelService.addMedicalLabels(m);
     }

@@ -11,7 +11,11 @@ import java.util.List;
  */
 public interface MedicalRecordDao extends PagingAndSortingRepository<MrMedicalRecordsEntity,String> {
 
+    @Query("from MrMedicalRecordsEntity where patientId=?1 And doctorId=?2 order by medicalTime desc")
     List<MrMedicalRecordsEntity> findBypatientIdAndDoctorId(int patientId, int doctorId);
+
+    @Query("from MrMedicalRecordsEntity where doctorId=?1 order by medicalTime desc")
+    List<MrMedicalRecordsEntity> findByDoctorId(int doctorId);
 
     MrMedicalRecordsEntity findByid(int id);
 }

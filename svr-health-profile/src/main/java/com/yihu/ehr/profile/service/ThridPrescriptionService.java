@@ -7,6 +7,7 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.log.LogService;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleDate;
 import org.apache.commons.io.FileUtils;
@@ -93,6 +94,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
 
         if(temp == null)
         {
+            LogService.getLogger("prescription").error("CDA template not existed");
             throw new Exception("找不到对应CDA模板信息");
         }
 
@@ -183,7 +185,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
         }
         catch (Exception e)
         {
-            throw new Exception("html转图片失败");
+            throw new Exception("CDA转图片失败");
         }
     }
     /**
