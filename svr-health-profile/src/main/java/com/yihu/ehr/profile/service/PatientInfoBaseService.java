@@ -596,6 +596,9 @@ public class PatientInfoBaseService {
                 zyQuery = BasisConstant.zyzd + ":" + diseaseId;
             }
         }
+
+        List<String>list=new ArrayList<>();
+        Map<String,String>peofileMap=new HashMap<>();
         //过滤门诊纪录
         if (!StringUtils.isBlank(mzQuery))
         {
@@ -618,26 +621,18 @@ public class PatientInfoBaseService {
             Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, appId, queryParams.replace(' ', '+'), null, null);
 
             //获取疾病门诊事件纪录rowkey
-            List<String>list=new ArrayList<>();
-            Map<String,String>peofileMap=new HashMap<>();
+
             if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
             {
-                for(Map<String,Object> map : (List<Map<String, Object>>)resultMzzd.getDetailModelList())
+                List<Map<String, Object>>resultMzzdList=resultMzzd.getDetailModelList();
+                for(Map<String,Object> map :resultMzzdList)
                 {
-                    if(!list.contains(map.get("EHR_000109").toString())) {
-                        list.add(map.get("EHR_000109").toString());
+                    if(map.get("EHR_000109")!=null) {
+                        if (!list.contains(map.get("EHR_000109").toString())) {
+                            list.add(map.get("EHR_000109").toString());
+                        }
+                        peofileMap.put((String) map.get("profile_id")+"outpatient", map.get("EHR_000109").toString());
                     }
-                    peofileMap.put((String) map.get("profile_id"),map.get("EHR_000109").toString());
-                }
-                List<MIcd10Dict> l=dictClient.getIcd10ByCodeList(list);
-                for(String key:peofileMap.keySet()) {
-                    if(l.get(list.indexOf(peofileMap.get(key)))!=null) {
-                        recordMap.put(key, l.get(list.indexOf(peofileMap.get(key))).getName());
-                    }
-                    else{
-                        recordMap.put(key,null);
-                    }
-
                 }
             }
 
@@ -667,26 +662,26 @@ public class PatientInfoBaseService {
 
             //获取疾病住院事件纪录rowkey
             if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0) {
-                List<String> list = new ArrayList<>();
-                Map<String, String> peofileMap = new HashMap<>();
                 for (Map<String, Object> map : (List<Map<String, Object>>) resultZyzd.getDetailModelList()) {
-                    if (!list.contains(map.get("EHR_000293").toString())) {
-                        list.add(map.get("EHR_000293").toString());
+                    if(map.get("EHR_000293")!=null) {
+                        if (!list.contains(map.get("EHR_000293").toString())) {
+                            list.add(map.get("EHR_000293").toString());
+                        }
+                        peofileMap.put((String) map.get("profile_id")+"hospitalized", map.get("EHR_000293").toString());
                     }
-                    peofileMap.put((String) map.get("profile_id"), map.get("EHR_000293").toString());
                 }
-                List<MIcd10Dict> l = dictClient.getIcd10ByCodeList(list);
-                for (String key : peofileMap.keySet()) {
-                    if (l.get(list.indexOf(peofileMap.get(key))) != null) {
-                        recordMap.put(key, l.get(list.indexOf(peofileMap.get(key))).getName());
-                    } else {
-                        recordMap.put(key, null);
-                    }
 
-                }
             }
         }
+        List<MIcd10Dict> l = dictClient.getIcd10ByCodeList(list);
+        for (String key : peofileMap.keySet()) {
+            if (l.get(list.indexOf(peofileMap.get(key))) != null) {
+                recordMap.put(key, l.get(list.indexOf(peofileMap.get(key))).getName());
+            } else {
+                recordMap.put(key, null);
+            }
 
+        }
 
         if(eventList != null)
         {

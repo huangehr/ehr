@@ -44,7 +44,7 @@ public class MrDiagnosisDictController extends BaseRestEndPoint {
     }
 
     @ApiOperation("更新诊断字典")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DiagnosisDict, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DiagnosisDict, method = RequestMethod.PUT)
     public boolean updateMrDiagnosisDict(
             @ApiParam(name = "DiagnosisDictInformation", value = "诊段字典信息")
             @RequestParam(value = "DiagnosisDictInformation", required = true) String json)throws Exception{

@@ -44,7 +44,7 @@ public class MrSystemDictController extends BaseRestEndPoint {
     }
 
     @ApiOperation("更新系统字典")
-    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.PUT)
     public boolean updateMrSystemDict(
             @ApiParam(name = "SystemDict", value = "系统字典信息")
             @RequestParam(value = "SystemDict", required = true) String json){

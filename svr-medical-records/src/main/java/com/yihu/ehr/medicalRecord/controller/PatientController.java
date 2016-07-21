@@ -30,7 +30,7 @@ public class PatientController extends BaseRestEndPoint {
 
 
     @ApiOperation("增加患者")
-    @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.POST)
     public boolean addPatient(
             @ApiParam(name = "patientInformation", value = "患者信息") @RequestParam(value = "patientInformation", required = true) String json){
         MrPatientsEntity patient=toEntity(json,MrPatientsEntity.class);
@@ -47,15 +47,15 @@ public class PatientController extends BaseRestEndPoint {
     }
 
     @ApiOperation("获取患者所有诊断")
-    @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.PatientDiagnosis, method = RequestMethod.GET)
     public List<String> getPatientDiagnosis(
             @ApiParam(name = "phone", value = "手机号") @RequestParam(value = "phone", required = false) String phone,
             @ApiParam(name = "demographicId", value = "身份证号")
             @RequestParam(value = "demographicId", required = false) String demographicId,
             @ApiParam(name = "doctorId", value = "医生id")
-            @RequestParam(value = "doctorId", required = true) int doctorId){
+            @RequestParam(value = "doctorId", required = true) String doctorId){
         int id=patientService.getPatientInformationBydemographicIdOrPhone(demographicId,phone).getId();
-        return patientService.getPatientDiagnosis(id,doctorId);
+        return patientService.getPatientDiagnosis(id,Integer.parseInt(doctorId));
     }
 
 }
