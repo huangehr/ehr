@@ -36,7 +36,7 @@ public class MrDiagnosisDictController extends BaseRestEndPoint {
     }
 
     @ApiOperation("删除诊断字典")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DiagnosisDict, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DiagnosisDict, method = RequestMethod.DELETE)
     public boolean deleteMrDiagnosisDict(
             @ApiParam(name = "MrDiagnosisDictCode", value = "诊段字典代码")
             @RequestParam(value = "MrDiagnosisDictCode", required = true) String code){

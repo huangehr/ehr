@@ -6,7 +6,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 /**
  * Created by shine on 2016/7/14.
  */
-public interface DoctorDao extends PagingAndSortingRepository<MrDoctorsEntity,Integer> {
+public interface DoctorDao extends PagingAndSortingRepository<MrDoctorsEntity,String> {
 
     MrDoctorsEntity findBydemographicId(String demographicId);
 

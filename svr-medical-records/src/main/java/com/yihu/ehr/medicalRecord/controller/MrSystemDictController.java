@@ -36,7 +36,7 @@ public class MrSystemDictController extends BaseRestEndPoint {
     }
 
     @ApiOperation("删除系统字典")
-    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.DELETE)
     public boolean deleteMrSystemDictEntry(
             @ApiParam(name = "MrSystemDictCode", value = "系统字典代码")
             @RequestParam(value = "MrSystemDictCode", required = true)String dictCode){

@@ -70,7 +70,7 @@ public class MedicalRecordsController extends EnvelopRestEndPoint {
             @ApiParam(name="patientId",value="patientId",defaultValue = "")
             @RequestParam(value="patientId",required = false)int patientId,
             @ApiParam(name="doctorId",value="doctorId",defaultValue = "")
-            @RequestParam(value="doctorId",required = false)int doctorId) throws Exception
+            @RequestParam(value="doctorId",required = false)String doctorId) throws Exception
     {
         return mRService.getMedicalHistoryByLastOne(doctorId,patientId);
     }

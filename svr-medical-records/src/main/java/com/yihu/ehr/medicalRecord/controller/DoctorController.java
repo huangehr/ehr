@@ -43,7 +43,8 @@ public class DoctorController extends BaseRestEndPoint {
 
     @ApiOperation("增加医生")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorInfo, method = RequestMethod.POST)
-    public boolean addDoctor( @ApiParam(name = "name", value = "名字") @RequestParam(value = "name", required = true) String name,
+    public boolean addDoctor( @ApiParam(name = "id", value = "id") @RequestParam(value = "id", required = true) String id,
+                              @ApiParam(name = "name", value = "名字") @RequestParam(value = "name", required = true) String name,
                               @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
                               @ApiParam(name = "sex", value = "性别") @RequestParam(value = "sex", required = false) String sex,
                               @ApiParam(name = "birthday", value = "生日") @RequestParam(value = "birthday", required = false) String birthday,
@@ -56,6 +57,7 @@ public class DoctorController extends BaseRestEndPoint {
                               @ApiParam(name = "phone", value = "电话号码")@RequestParam(value = "phone", required = false) String phone,
                               @ApiParam(name = "status", value = "状态")@RequestParam(value = "status", required = false) String status){
         MrDoctorsEntity doctor=new MrDoctorsEntity();
+        doctor.setId(id);
         doctor.setName(name);
         doctor.setDemographicId(demographicId);
         doctor.setSex(sex);
@@ -81,17 +83,16 @@ public class DoctorController extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorInfo, method = RequestMethod.PUT)
     public boolean updateDoctorInformationByDemographicId(
             @ApiParam(name = "doctorInformation", value = "医生信息")
-            @RequestParam(value = "json", required = true)String json) {
+            @RequestParam(value = "doctorInformation", required = true)String json) {
         MrDoctorsEntity doctor=toEntity(json,MrDoctorsEntity.class);
         return doctorService.updateDoctorInformationByDemographicId(doctor);
     }
-
 
     @ApiOperation("获取医生诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorDiagnosis, method = RequestMethod.GET)
     public List<String> getDoctorDiagnosis(
             @ApiParam(name = "doctorId", value = "医生ID")
             @RequestParam(value = "doctorId", required = true)String doctorId) {
-        return doctorService.getDoctorDiagnosis(Integer.parseInt(doctorId));
+        return doctorService.getDoctorDiagnosis(doctorId);
     }
 }
