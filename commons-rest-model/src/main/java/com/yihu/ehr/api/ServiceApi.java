@@ -517,6 +517,7 @@ public class ServiceApi {
         public static final String MedicalDraft                           = "/medicalRecords/MedicalDraft";
         public static final String DoctorMedicalRecords                   = "/medicalRecords/DoctorMedicalRecords";
         public static final String DeleteDoctorMedicalRecords             = "/medicalRecords/DeleteAllDoctorMedicalRecord/{id}";
+        public static final String DoctorDiagnosis                             = "/medicalRecords/DoctorDiagnosis";
         public static final String DoctorInfo                             = "/medicalRecords/DoctorInfo";
         public static final String ChangeDocStatus                        = "/medicalRecords/ChangeDocStatus";
         public static final String MedicalLabels                          = "/medicalRecords/MedicalLabels";
