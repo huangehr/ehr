@@ -1,9 +1,7 @@
 package com.yihu.ehr.medicalRecord.service;
 
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
-import com.yihu.ehr.medicalRecord.model.MrDoctorMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,7 @@ public class PatientService {
     PatientDao patientDao;
     MedicalRecordDao medicalRecordDao;
 
-    public MrPatientsEntity getPatientInformationBydemographicIdOrPhone(String demographicId,String phone){
+    public MrPatientsEntity getPatientInformationBydemographicIdOrPhone1(String demographicId,String phone){
         if(demographicId==null || patientDao.findBydemographicId(demographicId)==null){
             if(phone!=null&&patientDao.findByphone(phone)!=null)
                 return patientDao.findByphone(phone);
@@ -36,7 +34,7 @@ public class PatientService {
             return patientDao.findBydemographicId(demographicId);
     }
 
-    public boolean updataPatientInformationByID(MrPatientsEntity patient){
+    public boolean updataPatientInformationByID1(MrPatientsEntity patient){
 
         MrPatientsEntity patientModel=patientDao.findBydemographicId(String.valueOf(patient.getId()));
         if(patient!=null) {
@@ -71,7 +69,7 @@ public class PatientService {
         }
     }
 
-    public List<String> getPatientDiagnosis(int patientId ,int doctorId){
+    public List<String> getPatientDiagnosis1(int patientId ,String doctorId){
         List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorId(patientId,doctorId);
         List<String> diagnosisList=new ArrayList<>();
         for(int i=0;i<list.size();i++){
@@ -82,6 +80,19 @@ public class PatientService {
             }
         }
         return diagnosisList;
+    }
+
+    public MrPatientsEntity checkInfo(String AppUId, String AppPatientId, MrPatientsEntity mrPatientsEntity){
+
+        MrPatientsEntity patientsInfo = patientDao.findByappUidAndAppPatientId(AppUId,AppPatientId);
+
+        if(patientsInfo == null){
+
+            return patientDao.save(mrPatientsEntity);
+        }else{
+
+            return patientsInfo;
+        }
     }
 
 }

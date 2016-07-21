@@ -10,10 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -56,6 +53,23 @@ public class PatientController extends BaseRestEndPoint {
             @RequestParam(value = "doctorId", required = true) String doctorId){
         int id=patientService.getPatientInformationBydemographicIdOrPhone(demographicId,phone).getId();
         return patientService.getPatientDiagnosis(id,Integer.parseInt(doctorId));
+    }
+
+    @ApiOperation("确认患者信息是否存在")
+    @RequestMapping(value = ServiceApi.MedicalRecords.PatientExistence, method = RequestMethod.GET)
+    public int PatientExistence(
+            @ApiParam(name="AppPatientId",value="AppPatientId",defaultValue = "")
+            @PathVariable(value="app_patient_id")String AppPatientId,
+            @ApiParam(name="appUId",value="appUId",defaultValue = "")
+            @RequestParam(value="app_uid",required = false)String appUId,
+            @ApiParam(name="patientJson",value="患者信息JSON",defaultValue = "")
+            @RequestBody String patientJson) throws Exception
+    {
+
+        MrPatientsEntity mrPatientsEntity = toEntity(patientJson,MrPatientsEntity.class);
+        MrPatientsEntity mrPatient = patientService.checkInfo(appUId, AppPatientId, mrPatientsEntity);
+
+        return mrPatient.getId();
     }
 
 }

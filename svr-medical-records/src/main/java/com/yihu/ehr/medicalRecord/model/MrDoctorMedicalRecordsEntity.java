@@ -25,6 +25,7 @@ public class MrDoctorMedicalRecordsEntity {
     private String recordType;
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
     public int getId() {
         return id;

@@ -3,7 +3,6 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecord.model.MrMedicalDrugEntity;
-import com.yihu.ehr.medicalRecord.model.MrMedicalLabelEntity;
 import com.yihu.ehr.medicalRecord.service.MedicalDrugService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -1,8 +1,6 @@
 package com.yihu.ehr.medicalRecord.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
@@ -27,6 +25,7 @@ public class MrMedicalRecordsEntity {
     private Integer firstRecordId;
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @javax.persistence.Column(name = "ID")
     public int getId() {
         return id;

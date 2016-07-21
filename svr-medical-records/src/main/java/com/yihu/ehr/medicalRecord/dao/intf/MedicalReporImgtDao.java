@@ -10,6 +10,7 @@ import java.util.List;
  */
 public interface MedicalReporImgtDao extends PagingAndSortingRepository<MrMedicalReportImgEntity,String> {
 
-    List<MrMedicalReportImgEntity> findByreportId(int id);
+
+    List<MrMedicalReportImgEntity> findByreportIdOrderBySort(int reportId);
 
 }

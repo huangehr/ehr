@@ -15,6 +15,7 @@ public class MrDoctorDraftEntity {
     private int usageCount;
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
     public int getId() {
         return id;

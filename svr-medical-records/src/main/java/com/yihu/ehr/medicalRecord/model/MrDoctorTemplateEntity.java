@@ -9,11 +9,12 @@ import javax.persistence.*;
 @Table(name = "mr_doctor_template", schema = "", catalog = "medical_records")
 public class MrDoctorTemplateEntity {
     private int id;
-    private int doctorId;
+    private String doctorId;
     private String code;
     private String name;
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
     public int getId() {
         return id;
@@ -25,11 +26,11 @@ public class MrDoctorTemplateEntity {
 
     @Basic
     @Column(name = "DOCTOR_ID")
-    public int getDoctorId() {
+    public String getDoctorId() {
         return doctorId;
     }
 
-    public void setDoctorId(int doctorId) {
+    public void setDoctorId(String doctorId) {
         this.doctorId = doctorId;
     }
 
@@ -71,7 +72,6 @@ public class MrDoctorTemplateEntity {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + doctorId;
         result = 31 * result + (code != null ? code.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
