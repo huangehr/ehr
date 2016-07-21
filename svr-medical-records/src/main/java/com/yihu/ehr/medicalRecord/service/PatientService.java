@@ -1,10 +1,17 @@
 package com.yihu.ehr.medicalRecord.service;
 
+import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
+import com.yihu.ehr.medicalRecord.model.MrDoctorMedicalRecordsEntity;
+import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by shine on 2016/7/14.
@@ -16,6 +23,8 @@ public class PatientService {
 
     @Autowired
     PatientDao patientDao;
+    MedicalRecordDao medicalRecordDao;
+
     public MrPatientsEntity getPatientInformationBydemographicIdOrPhone(String demographicId,String phone){
         if(demographicId==null || patientDao.findBydemographicId(demographicId)==null){
             if(phone!=null&&patientDao.findByphone(phone)!=null)
@@ -61,4 +70,18 @@ public class PatientService {
             return true;
         }
     }
+
+    public List<String> getPatientDiagnosis(int patientId ,int doctorId){
+        List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorId(patientId,doctorId);
+        List<String> diagnosisList=new ArrayList<>();
+        for(int i=0;i<list.size();i++){
+            if(list.get(i)!=null){
+                if(!list.contains(list.get(i).getMedicalDiagnosis())) {
+                    diagnosisList.add(list.get(i).getMedicalDiagnosis());
+                }
+            }
+        }
+        return diagnosisList;
+    }
+
 }
