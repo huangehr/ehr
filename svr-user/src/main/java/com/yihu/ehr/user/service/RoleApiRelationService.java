@@ -1,6 +1,7 @@
 package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,34 +30,31 @@ public class RoleApiRelationService extends BaseJpaService<RoleApiRelation,XRole
         return  roleApiRelationRepository.findRelation(apiId, roleId);
     }
 
-    public boolean batchCreateRoleApiRelation(long roleId,String apiIds){
-        for(String apiId : apiIds.split(",")){
-            RoleApiRelation roleApiRelation = new RoleApiRelation();
-            roleApiRelation.setApiId(Long.parseLong(apiId));
-            roleApiRelation.setRoleId(roleId);
-            roleApiRelationRepository.save(roleApiRelation);
+    public boolean batchUpdateRoleApiRelation(Long roleId,long[] addApiIds,String deleteApiIds) throws Exception{
+        if(!StringUtils.isEmpty(deleteApiIds)){
+            List<RoleApiRelation> deleteList = search("roleId=" + roleId + ";apiId=" +deleteApiIds);
+            for(RoleApiRelation m : deleteList){
+                delete(m.getId());
+            }
         }
-        return true;
-    }
-
-    public boolean batchUpdateRoleApiRelation(long roleId,String apiIds) throws Exception{
-        List<RoleApiRelation> deleteList = search("roleId=" + roleId + ";userId<>" + apiIds);
-        for(RoleApiRelation m : deleteList){
-            delete(m.getId());
+        if(addApiIds == null || addApiIds.length == 0){
+            return true;
         }
-        List<RoleApiRelation> oldList = search("roleId=" + roleId + ";userI=" + apiIds);
-        List<String> oldApiIds = new ArrayList<>();
-        for(int i=0;i<oldList.size();i++){
-            oldApiIds.add(oldList.get(i).getApiId()+"");
+        List<RoleApiRelation> relationList = findByField("roleId",roleId);
+        List<Long> oldApiIds = new ArrayList<>();
+        if(relationList != null && relationList.size()>0){
+            for(int i=0;i<relationList.size();i++){
+                oldApiIds.add(relationList.get(i).getApiId());
+            }
         }
-        for(String apiId : apiIds.split(",")){
-            if(oldApiIds.contains(apiId)){
+        for(long apiId : addApiIds){
+            if(oldApiIds !=null && oldApiIds.contains(apiId)){
                 continue;
             }
-            RoleApiRelation roleFeatureRelation = new RoleApiRelation();
-            roleFeatureRelation.setRoleId(roleId);
-            roleFeatureRelation.setApiId(Long.parseLong(apiId));
-            save(roleFeatureRelation);
+            RoleApiRelation roleApiRelation = new RoleApiRelation();
+            roleApiRelation.setRoleId(roleId);
+            roleApiRelation.setApiId(apiId);
+            save(roleApiRelation);
         }
         return true;
     }
