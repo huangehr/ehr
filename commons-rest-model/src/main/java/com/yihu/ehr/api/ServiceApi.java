@@ -97,8 +97,11 @@ public class ServiceApi {
         public static final String DictEntryBatch               ="/resources/dict/entry/batch";
         public static final String DictCodesExistence            ="/resources/dict/codes/existence";
 
-        public static final String Params                       ="/resources/param";
-        public static final String Param                        ="/resources/param/{id}";
+        public static final String Params                       ="/resources/params";
+        public static final String ParamsNoPage                 ="/resources/params/no_paging";
+        public static final String Param                        ="/resources/param";
+        public static final String ParamById                    ="/resources/param/{id}";
+        public static final String ParamKeyValueExistence       ="/resources/param/key_value_existence";
 
 
         public static final String DictEntries                   ="/resources/dict_entries";
