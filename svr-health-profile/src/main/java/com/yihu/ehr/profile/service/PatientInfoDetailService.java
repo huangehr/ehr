@@ -278,6 +278,11 @@ public class PatientInfoDetailService {
                             LogService.getLogger("prescription").info("profile:" + profileId + " prescription not existed,will be generated automatically");
                             //处方笺数据
                             Map<String, String> data = new HashMap<String, String>();
+                            if(main.get("EHR_001203") == null || StringUtils.isBlank(main.get("EHR_001203").toString()))
+                            {
+                                LogService.getLogger("prescription").error("EHR_001203 is null");
+                                throw new Exception("处方类型为空，请确认数据是否完整");
+                            }
                             //处方笺不存在则生成保存
                             String picPath = thridPrescriptionService.transformImage(profileId, mainEvent.get("org_code").toString(), mainEvent.get("cda_version").toString()
                                     , main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd, main.get("EHR_001203").toString(), 900, 900);
