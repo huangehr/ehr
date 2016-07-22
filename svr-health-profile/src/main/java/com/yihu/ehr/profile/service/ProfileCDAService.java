@@ -3,6 +3,7 @@ package com.yihu.ehr.profile.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.model.resource.MCdaTransformDto;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSet;
@@ -64,77 +65,88 @@ public class ProfileCDAService {
      */
     private Map<String, Object> getCDAPartData(Map<String, Object> obj,boolean isPart,String...cdaDocumentIdList) throws Exception
     {
-        String profileId = obj.get("rowkey").toString();
-        String cdaVersion = obj.get("cda_version").toString();
-        List<String>SingleDatasetCodeList=new ArrayList<>();
-        List<String>multiDatasetCodeList=new ArrayList<>();
-        Map<String, Object> result = new HashMap<>();
-        //获取CDA关联数据集
-        Map<String,Object> datasetList = new HashMap<>();
-        Map<String,List<String>>SingleDatasetMap=new HashMap<>();
-        Map<String,List<String>>multiDatasetMap=new HashMap<>();
-        Map<String,List<MCdaDataSet>> CDADatasetMap = cdaService.getCDADataSetByCDAIdList(cdaVersion, cdaDocumentIdList);
-        for(String key:CDADatasetMap.keySet()) {
-            List<MCdaDataSet> CDADataset=CDADatasetMap.get(key);
-            if (CDADataset != null && CDADataset.size() > 0) {
-                for (MCdaDataSet dataset : CDADataset) {
-                    String datasetCode = dataset.getDataSetCode();
-                    String multiRecord = dataset.getMultiRecord();
+        try {
+            String profileId = obj.get("rowkey").toString();
+            String cdaVersion = obj.get("cda_version").toString();
+            List<String> SingleDatasetCodeList = new ArrayList<>();
+            List<String> multiDatasetCodeList = new ArrayList<>();
+            Map<String, Object> result = new HashMap<>();
+            //获取CDA关联数据集
+            Map<String, Object> datasetList = new HashMap<>();
+            Map<String, List<String>> SingleDatasetMap = new HashMap<>();
+            Map<String, List<String>> multiDatasetMap = new HashMap<>();
+            Map<String, List<MCdaDataSet>> CDADatasetMap = cdaService.getCDADataSetByCDAIdList(cdaVersion, cdaDocumentIdList);
+            for (String key : CDADatasetMap.keySet()) {
+                List<MCdaDataSet> CDADataset = CDADatasetMap.get(key);
+                if (CDADataset != null && CDADataset.size() > 0) {
+                    for (MCdaDataSet dataset : CDADataset) {
+                        String datasetCode = dataset.getDataSetCode();
+                        String multiRecord = dataset.getMultiRecord();
 
-                    //单条数据
-                    if (multiRecord.equals("0")) {
-                        SingleDatasetCodeList.add(datasetCode);
-                    } else {
-                        //获取Hbase细表数据
-                        multiDatasetCodeList.add(datasetCode);
+                        //单条数据
+                        if (multiRecord.equals("0")) {
+                            SingleDatasetCodeList.add(datasetCode);
+                        } else {
+                            //获取Hbase细表数据
+                            multiDatasetCodeList.add(datasetCode);
+                        }
                     }
+                    SingleDatasetMap.put(key, SingleDatasetCodeList);
+                    multiDatasetMap.put(key, multiDatasetCodeList);
+
                 }
-                SingleDatasetMap.put(key,SingleDatasetCodeList);
-                multiDatasetMap.put(key,multiDatasetCodeList);
 
             }
+            //获取所有数据集数据
+            MCdaTransformDto cdaTransformDto = new MCdaTransformDto();
+            cdaTransformDto.setMasterJson(obj);
+            cdaTransformDto.setMasterDatasetCodeList(SingleDatasetMap);
+            cdaTransformDto.setMultiDatasetCodeList(multiDatasetMap);
+            datasetList = resource.getCDAData(objectMapper.writeValueAsString(cdaTransformDto));
 
-        }
-        datasetList = resource.getCDAData(java.net.URLEncoder.encode(objectMapper.writeValueAsString(obj)), java.net.URLEncoder.encode(objectMapper.writeValueAsString(SingleDatasetMap)),java.net.URLEncoder.encode(objectMapper.writeValueAsString( multiDatasetMap)));
-
-        //获取cda document数据
-        Map<String, MCDADocument> cdaMap = cdaService.getCDADocumentsList(cdaVersion,cdaDocumentIdList);
-        for(String key:cdaMap.keySet()){
-            Map<String, Object> re = new HashMap<>();
-            re.put("cda_version",cdaVersion);
-            re.put("cda_document_id",key);
-            re.put("cda_document_name", cdaMap.get(key).getName());
-            re.put("data_sets",datasetList.get(key));
-            result.put(key,re);
-        }
-        //非结构化数据
-        Map<String, Envelop> rawFilesMap = resource.getRawFilesList(profileId, cdaDocumentIdList);
-        for(String key:rawFilesMap.keySet()) {
-            Envelop rawFiles=rawFilesMap.get(key);
-            if (rawFiles.getDetailModelList() != null && rawFiles.getDetailModelList().size() > 0) {
-                Map<String, Object> rawFile = (Map<String, Object>) rawFiles.getDetailModelList().get(0);
-                String fileString = rawFile.get("file_list").toString();
-                JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, Map.class);
-                List<Map<String, Object>> fileList = objectMapper.readValue(fileString, javaType);
-                ((Map<String,Object>)result.get(key)).put("file_list", fileList);
+            //获取cda document数据
+            Map<String, MCDADocument> cdaMap = cdaService.getCDADocumentsList(cdaVersion, cdaDocumentIdList);
+            for (String key : cdaMap.keySet()) {
+                Map<String, Object> re = new HashMap<>();
+                re.put("cda_version", cdaVersion);
+                re.put("cda_document_id", key);
+                re.put("cda_document_name", cdaMap.get(key).getName());
+                re.put("data_sets", datasetList.get(key));
+                result.put(key, re);
             }
-        }
-
-
-        //单独获取CDA片段数据额外信息
-        for(int i=0;i<cdaDocumentIdList.length;i++) {
-            String key=cdaDocumentIdList[i];
-            if (isPart) {
-                ((Map<String, Object>) result.get(key)).put("event_type", obj.get("event_type"));
-                ((Map<String, Object>) result.get(key)).put("patient_id", obj.get("patient_id"));
-                ((Map<String, Object>) result.get(key)).put("org_code", obj.get("org_code"));
-                ((Map<String, Object>) result.get(key)).put("event_no", obj.get("event_no"));
+            //非结构化数据
+            Map<String, Envelop> rawFilesMap = resource.getRawFilesList(profileId, cdaDocumentIdList);
+            for (String key : rawFilesMap.keySet()) {
+                Envelop rawFiles = rawFilesMap.get(key);
+                if (rawFiles.getDetailModelList() != null && rawFiles.getDetailModelList().size() > 0) {
+                    Map<String, Object> rawFile = (Map<String, Object>) rawFiles.getDetailModelList().get(0);
+                    String fileString = rawFile.get("file_list").toString();
+                    JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, Map.class);
+                    List<Map<String, Object>> fileList = objectMapper.readValue(fileString, javaType);
+                    ((Map<String, Object>) result.get(key)).put("file_list", fileList);
+                }
             }
+
+
+            //单独获取CDA片段数据额外信息
+            for (int i = 0; i < cdaDocumentIdList.length; i++) {
+                String key = cdaDocumentIdList[i];
+                if (isPart) {
+                    ((Map<String, Object>) result.get(key)).put("event_type", obj.get("event_type"));
+                    ((Map<String, Object>) result.get(key)).put("patient_id", obj.get("patient_id"));
+                    ((Map<String, Object>) result.get(key)).put("org_code", obj.get("org_code"));
+                    ((Map<String, Object>) result.get(key)).put("event_no", obj.get("event_no"));
+                }
+            }
+
+
+            return result;
         }
-
-
-
-        return result;
+        catch (Exception ex)
+        {
+            System.out.print(ex.getMessage());
+            throw ex;
+        }
     }
 
     /**
