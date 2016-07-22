@@ -55,25 +55,16 @@ public class RoleApiRelationEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleApis,method = RequestMethod.POST)
-    @ApiOperation(value = "批量新增角色组-api关系,一对多")
-    public boolean batchCreateRoleApiRelation(
-            @ApiParam(name = "api_ids",value = "api的ids,多个用逗号隔开")
-            @RequestParam(value = "api_ids") String apiIds,
-            @ApiParam(name = "role_id",value = "角色组Id")
-            @RequestParam(value = "role_id") String roleId) throws Exception{
-        roleApiRelationService.batchCreateRoleApiRelation(Long.parseLong(roleId),apiIds);
-        return true;
-    }
-
     @RequestMapping(value = ServiceApi.Roles.RoleApis,method = RequestMethod.PUT)
     @ApiOperation(value = "批量修改角色组-api关系,一对多")
     public boolean batchUpdateRoleApiRelation(
             @ApiParam(name = "role_id",value = "角色组Id")
-            @RequestParam(value = "role_id") String roleId,
-            @ApiParam(name = "api_ids",value = "api的ids,多个用逗号隔开")
-            @RequestParam(value = "api_ids") String apiIds) throws Exception{
-        roleApiRelationService.batchUpdateRoleApiRelation(Long.parseLong(roleId),apiIds);
+            @RequestParam(value = "role_id") Long roleId,
+            @ApiParam(name = "api_ids_add",value = "要新增的apiIds",defaultValue = "")
+            @RequestParam(name = "api_ids_add",required = false) long[] addApiIds,
+            @ApiParam(name = "api_ids_delete",value = "要删除的apiIds",defaultValue = "")
+            @RequestParam(value = "api_ids_delete",required = false) String deleteApiIds) throws Exception{
+        roleApiRelationService.batchUpdateRoleApiRelation(roleId,addApiIds,deleteApiIds);
         return true;
     }
 

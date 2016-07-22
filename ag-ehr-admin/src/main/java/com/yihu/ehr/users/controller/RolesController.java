@@ -230,19 +230,38 @@ public class RolesController extends BaseController {
             @ApiParam(name = "type",value = "用户角色组的字典值")
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source_type",value = "平台应用sourceType字典值")
-            @RequestParam(value = "source_type") String sourceType){
+            @RequestParam(value = "source_type") String sourceType,
+            @ApiParam(name = "user_id",value = "用户id")
+            @RequestParam(value = "user_id") String userId){
         if(StringUtils.isEmpty(type)){
             return failed("角色组类型不能为空！");
         }
         if(StringUtils.isEmpty(sourceType)){
             return failed("平台应用类型不能为空！！");
         }
+        if(StringUtils.isEmpty(userId)){
+            return failed("用户id不能为空！");
+        }
+        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
+        if(mRoleUsers == null){
+            return success(null);
+        }
+        StringBuffer buffer = new StringBuffer();
+        for(MRoleUser m : mRoleUsers){
+            buffer.append(m.getRoleId());
+            buffer.append(",");
+        }
+        String rolesIds = buffer.substring(0,buffer.length()-1);
         Envelop envelop = new Envelop();
         Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType="+sourceType);
         //平台应用-角色组对象模型列表
         List<PlatformAppRolesModel> appRolesModelList = new ArrayList<>();
         for(MApp mApp : mApps){
-            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId()+";type="+type);
+            //查找用户所属角色组
+            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId()+";type="+type+";id="+rolesIds);
+            if(mRoles == null || mRoles.size() <= 0){
+                continue;
+            }
             PlatformAppRolesModel model = new PlatformAppRolesModel();
             String roleIds = "";
             String roleNames = "";

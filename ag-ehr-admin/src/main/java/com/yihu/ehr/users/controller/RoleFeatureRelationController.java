@@ -1,6 +1,5 @@
 package com.yihu.ehr.users.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.RoleFeatureRelationModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppFeatureClient;
@@ -16,7 +15,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,6 +65,25 @@ public class RoleFeatureRelationController extends BaseController {
             return success(null);
         }
         return failed("删除权限失败！");
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleFeatures,method = RequestMethod.PUT)
+    @ApiOperation(value = "批量修改角色组-应用权限关系，一对多")
+    public Envelop batchUpdateRoleFeatureRelation(
+            @ApiParam(name = "role_id",value = "角色组Id")
+            @RequestParam(value = "role_id") Long roleId,
+            @ApiParam(name = "feature_ids_add",value = "要新增的featureIds",defaultValue = "")
+            @RequestParam(name = "feature_ids_add",required = false) long[] addFeatureIds,
+            @ApiParam(name = "feature_ids_delete",value = "要删除的featureIds",defaultValue = "")
+            @RequestParam(value = "feature_ids_delete",required = false) String deleteFeatureIds){
+        if(roleId == null){
+            return failed("角色组id不能为空！");
+        }
+        boolean bo = roleFeatureRelationClient.batchUpdateRoleFeatureRelation(roleId,addFeatureIds,deleteFeatureIds);
+        if(bo){
+            return success(null);
+        }
+        return failed("");
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleFeatures,method = RequestMethod.GET)

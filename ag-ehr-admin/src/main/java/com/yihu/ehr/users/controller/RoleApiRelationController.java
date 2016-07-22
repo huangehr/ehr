@@ -13,10 +13,8 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,38 +62,23 @@ public class RoleApiRelationController extends BaseController {
         return failed("删除失败！");
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleApis,method = RequestMethod.POST)
-    @ApiOperation(value = "批量新增角色组-api关系,一对多")
-    public Envelop batchCreateRoleAppRelation(
-            @ApiParam(name = "role_id",value = "角色组Id")
-            @RequestParam(value = "role_id") String roleId,
-            @ApiParam(name = "api_ids",value = "api的ids,多个用逗号隔开")
-            @RequestParam(value = "api_ids") String apiIds) throws Exception{
-        if(StringUtils.isEmpty(apiIds)){
-            return failed("api的id不能为空！");
-        }
-        if(StringUtils.isEmpty(roleId)){
-            return failed("角色组id不能为空！");
-        }
-        boolean bo = roleApiRelationClient.batchCreateRoleApiRelation(roleId, apiIds);
-        if(bo){
-            return success(null);
-        }
-        return failed("新增失败！");
-    }
-
     @RequestMapping(value = ServiceApi.Roles.RoleApis,method = RequestMethod.PUT)
     @ApiOperation(value = "批量修改角色组-api关系,一对多")
-    public Envelop batchUpdateRoleAppRelation(
+    public Envelop batchUpdateRoleApiRelation(
             @ApiParam(name = "role_id",value = "角色组Id")
-            @RequestParam(value = "role_id") String roleId,
-            @ApiParam(name = "api_ids",value = "api的ids,多个用逗号隔开")
-            @RequestParam(value = "api_ids") String apiIds) throws Exception{
-        boolean bo = roleApiRelationClient.batchUpdateRoleApiRelation(roleId, apiIds);
+            @RequestParam(value = "role_id") Long roleId,
+            @ApiParam(name = "api_ids_add",value = "要新增的apiIds",defaultValue = "")
+            @RequestParam(name = "api_ids_add",required = false) long[] addApiIds,
+            @ApiParam(name = "api_ids_delete",value = "要删除的apiIds",defaultValue = "")
+            @RequestParam(value = "api_ids_delete",required = false) String deleteApiIds) throws Exception{
+        if(roleId == null){
+            return failed("角色组id不能为空！");
+        }
+        boolean bo = roleApiRelationClient.batchUpdateRoleApiRelation(roleId,addApiIds,deleteApiIds);
         if(bo){
             return success(null);
         }
-        return failed("修改失败！");
+        return failed("");
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleApis,method = RequestMethod.GET)

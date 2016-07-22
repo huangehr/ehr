@@ -35,6 +35,17 @@ public interface RoleFeatureRelationClient {
             @ApiParam(name = "role_id",value = "角色组id")
             @RequestParam(value = "role_id") String roleId);
 
+    @RequestMapping(value = ServiceApi.Roles.RoleFeatures,method = RequestMethod.PUT)
+    @ApiOperation(value = "批量修改角色组-应用权限关系，一对多")
+    boolean batchUpdateRoleFeatureRelation(
+            @ApiParam(name = "role_id",value = "角色组Id")
+            @RequestParam(value = "role_id") Long roleId,
+            @ApiParam(name = "feature_ids_add",value = "要新增的featureIds",defaultValue = "")
+            @RequestParam(name = "feature_ids_add",required = false) long[] addFeatureIds,
+            @ApiParam(name = "feature_ids_delete",value = "要删除的featureIds",defaultValue = "")
+            @RequestParam(value = "feature_ids_delete",required = false) String deleteFeatureIds);
+
+
     @RequestMapping(value = ServiceApi.Roles.RoleFeatures,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组-功能权限关系列表---分页")
     ResponseEntity<Collection<MRoleFeatureRelation>> searchRoleFeature(
