@@ -36,13 +36,19 @@ public interface RoleApiRelationClient {
             @ApiParam(name = "role_id",value = "角色组id")
             @RequestParam(value = "role_id") String roleId);
 
+    @RequestMapping(value = ServiceApi.Roles.RoleApiByRoleId,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id删除所配置的api")
+    boolean deleteRoleApiRelationByRoleId(
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") Long roleId);
+
     @RequestMapping(value = ServiceApi.Roles.RoleApis,method = RequestMethod.PUT)
     @ApiOperation(value = "批量修改角色组-api关系,一对多")
     boolean batchUpdateRoleApiRelation(
             @ApiParam(name = "role_id",value = "角色组Id")
             @RequestParam(value = "role_id") Long roleId,
             @ApiParam(name = "api_ids_add",value = "要新增的apiIds",defaultValue = "")
-            @RequestParam(name = "api_ids_add",required = false) long[] addApiIds,
+            @RequestParam(name = "api_ids_add",required = false) Long[] addApiIds,
             @ApiParam(name = "api_ids_delete",value = "要删除的apiIds",defaultValue = "")
             @RequestParam(value = "api_ids_delete",required = false) String deleteApiIds);
 

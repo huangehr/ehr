@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,7 +31,19 @@ public class RoleFeatureRelationService extends BaseJpaService<RoleFeatureRelati
         return roleFeatureRelationRepository.findRelation(featureId, roleId);
     }
 
-    public boolean batchUpdateRoleFeatureRelation(Long roleId,long[] addFeatureIds,String deleteFeatureIds) throws Exception{
+    public boolean deleteRoleFeatureRelationByRoleId(Long roleId){
+        Collection<RoleFeatureRelation> relations =findByField("roleId", roleId);
+        if(relations.size()>0){
+            List<Long> deleteIds = new ArrayList<>();
+            for(RoleFeatureRelation relation:relations){
+                deleteIds.add(relation.getId());
+            }
+            delete(deleteIds);
+        }
+        return true;
+    }
+
+    public boolean batchUpdateRoleFeatureRelation(Long roleId,Long[] addFeatureIds,String deleteFeatureIds) throws Exception{
         if(!StringUtils.isEmpty(deleteFeatureIds)){
             List<RoleFeatureRelation> deleteList = search("roleId=" + roleId + ";featureId=" +deleteFeatureIds);
             for(RoleFeatureRelation m : deleteList){

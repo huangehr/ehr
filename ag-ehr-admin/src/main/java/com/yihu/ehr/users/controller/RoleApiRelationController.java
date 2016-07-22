@@ -62,13 +62,25 @@ public class RoleApiRelationController extends BaseController {
         return failed("删除失败！");
     }
 
+    @RequestMapping(value = ServiceApi.Roles.RoleApiByRoleId,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id删除所配置的api")
+    public Envelop deleteRoleApiRelationByRoleId(
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") Long roleId){
+        boolean bo = roleApiRelationClient.deleteRoleApiRelationByRoleId(roleId);
+        if(bo){
+            return success(null);
+        }
+        return failed("删除失败！");
+    }
+
     @RequestMapping(value = ServiceApi.Roles.RoleApis,method = RequestMethod.PUT)
-    @ApiOperation(value = "批量修改角色组-api关系,一对多")
+    @ApiOperation(value = "根据角色组、新增应用接口id、删除应用接口id批量修改,一对多")
     public Envelop batchUpdateRoleApiRelation(
             @ApiParam(name = "role_id",value = "角色组Id")
             @RequestParam(value = "role_id") Long roleId,
             @ApiParam(name = "api_ids_add",value = "要新增的apiIds",defaultValue = "")
-            @RequestParam(name = "api_ids_add",required = false) long[] addApiIds,
+            @RequestParam(name = "api_ids_add",required = false) Long[] addApiIds,
             @ApiParam(name = "api_ids_delete",value = "要删除的apiIds",defaultValue = "")
             @RequestParam(value = "api_ids_delete",required = false) String deleteApiIds) throws Exception{
         if(roleId == null){
@@ -139,6 +151,57 @@ public class RoleApiRelationController extends BaseController {
         MAppApi appApi = appApiClient.getAppApi(m.getId()+"");
         model.setApiName(appApi==null?"":appApi.getName());
         return model;
+    }
+
+    @RequestMapping(value = "/roles/role_apis_update",method = RequestMethod.PUT)
+    @ApiOperation(value = "根据角色组、应用接口id批量修改,一对多")
+    public Envelop batchUpdateRoleApiRelation(
+            @ApiParam(name = "role_id",value = "角色组Id")
+            @RequestParam(value = "role_id") Long roleId,
+            @ApiParam(name = "api_ids",value = "选择的应用apiIds",defaultValue = "")
+            @RequestParam(name = "api_ids",required = false) Long[] apiIds){
+        boolean bo = false;
+        //根据传入的参数获取新增、删除ids
+        if(apiIds == null){
+            //删除角色组下配置的所有应用api
+            // bo = roleApiRelationClient.deleteByRoleId(roleId);
+            bo = roleApiRelationClient.deleteRoleApiRelationByRoleId(roleId);
+            if(bo)
+                return success(null);
+            return failed("");
+        }
+        Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId=" + roleId);
+        if(mRoleApiRelations == null || mRoleApiRelations.size() == 0){
+            //原角色组不存在配置api则直接新增
+            bo = roleApiRelationClient.batchUpdateRoleApiRelation(roleId,apiIds,"");
+            if(bo)
+                return success(null);
+            return failed("");
+        }
+        //获取新增和删除ids
+        List<Long> newApiIds = new ArrayList<>();
+        for(int i =0;i<apiIds.length;i++){
+            newApiIds.add(apiIds[i]);
+        }
+        String deleteApiIds = "";
+        StringBuffer deleteBuffer = new StringBuffer();
+        for(MRoleApiRelation m:mRoleApiRelations){
+            Long apiId = m.getApiId();
+            if(newApiIds.contains(apiId)){
+                newApiIds.remove(apiId);
+                continue;
+            }
+            deleteBuffer.append(apiId);
+            deleteBuffer.append(",");
+        }
+        if(deleteBuffer.length()>0){
+            deleteApiIds = deleteBuffer.substring(0,deleteBuffer.length()-1);
+        }
+        Long[] addApiIds = newApiIds.toArray(new Long[newApiIds.size()]);
+        bo = roleApiRelationClient.batchUpdateRoleApiRelation(roleId,addApiIds,deleteApiIds);
+        if(bo)
+            return success(null);
+        return failed("");
     }
 
 }
