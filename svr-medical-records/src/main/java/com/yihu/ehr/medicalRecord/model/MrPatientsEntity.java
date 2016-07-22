@@ -19,6 +19,7 @@ public class MrPatientsEntity {
     private String phone;
     private String isVerified;
     private String appUid;
+    private String appPatientId;
 
     @Basic
     @Column(name = "APP_UID")
@@ -39,8 +40,6 @@ public class MrPatientsEntity {
     public void setAppPatientId(String appPatientId) {
         this.appPatientId = appPatientId;
     }
-
-    private String appPatientId;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -131,41 +130,5 @@ public class MrPatientsEntity {
 
     public void setIsVerified(String isVerified) {
         this.isVerified = isVerified;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MrPatientsEntity that = (MrPatientsEntity) o;
-
-        if (id != that.id) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (demographicId != null ? !demographicId.equals(that.demographicId) : that.demographicId != null)
-            return false;
-        if (sex != null ? !sex.equals(that.sex) : that.sex != null) return false;
-        if (birthday != null ? !birthday.equals(that.birthday) : that.birthday != null) return false;
-        if (maritalStatus != null ? !maritalStatus.equals(that.maritalStatus) : that.maritalStatus != null)
-            return false;
-        if (photo != null ? !photo.equals(that.photo) : that.photo != null) return false;
-        if (phone != null ? !phone.equals(that.phone) : that.phone != null) return false;
-        if (isVerified != null ? !isVerified.equals(that.isVerified) : that.isVerified != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (demographicId != null ? demographicId.hashCode() : 0);
-        result = 31 * result + (sex != null ? sex.hashCode() : 0);
-        result = 31 * result + (birthday != null ? birthday.hashCode() : 0);
-        result = 31 * result + (maritalStatus != null ? maritalStatus.hashCode() : 0);
-        result = 31 * result + (photo != null ? photo.hashCode() : 0);
-        result = 31 * result + (phone != null ? phone.hashCode() : 0);
-        result = 31 * result + (isVerified != null ? isVerified.hashCode() : 0);
-        return result;
     }
 }

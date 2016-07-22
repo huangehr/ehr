@@ -26,15 +26,8 @@ public class PatientService {
     @Autowired
     MedicalRecordDao medicalRecordDao;
 
-    public MrPatientsEntity getPatientInformationBydemographicIdOrPhone(String demographicId,String phone){
-        if(demographicId==null || patientDao.findBydemographicId(demographicId)==null){
-            if(phone!=null&&patientDao.findByphone(phone)!=null)
-                return patientDao.findByphone(phone);
-            else
-                return null;
-        }
-        else
-            return patientDao.findBydemographicId(demographicId);
+    public MrPatientsEntity getPatientInformation(String appUid,String appPatientId){
+            return patientDao.findByappUidAndAppPatientId(appUid,appPatientId);
     }
 
     public boolean updataPatientInformationByID(MrPatientsEntity patient){
@@ -54,25 +47,31 @@ public class PatientService {
 
     }
 
+    public boolean IsCreated(String appUid,String appPatientId) {
+        if (appUid != null && appPatientId != null) {
+            MrPatientsEntity mp = new MrPatientsEntity();
+            mp = patientDao.findByappUidAndAppPatientId(appUid, appPatientId);
+            if (mp != null) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
+
+
+    }
+
     public boolean deletePatientByID(String id){
         patientDao.deleteBydemographicId(id);
         return true;
     }
 
     public boolean addPatient(MrPatientsEntity patient){
-        if(patient.getPhone()==null&&patient.getDemographicId()==null){
-            return false;
-        }
-        else if(patient.getDemographicId()!=null && patientDao.findBydemographicId(patient.getDemographicId())!=null){
-                return false;
-        }
-        else if(patient.getPhone()!=null && patientDao.findByphone(patient.getPhone())!=null){
-            return false;
-        }
-        else{
             patientDao.save(patient);
             return true;
-        }
     }
 
     public List<String> getPatientDiagnosis(int patientId ,String doctorId){

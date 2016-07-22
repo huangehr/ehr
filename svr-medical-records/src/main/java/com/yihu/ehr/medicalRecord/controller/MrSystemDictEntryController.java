@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * Created by shine on 2016/7/14.
  */
@@ -43,6 +45,14 @@ public class MrSystemDictEntryController extends BaseRestEndPoint {
             @ApiParam(name = "MrSystemDictEntryCode", value = "系统字典项代码")
             @RequestParam(value = "MrSystemDictEntryCode", required = true)String Code){
         return mrSystemDictEntryService.deleteMrSystemDictEntry(DictCode,Code);
+    }
+
+    @ApiOperation("拼音模糊查找字典")
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDictEntry, method = RequestMethod.GET)
+    public List<MrSystemDictEntryEntity> searchMrDiagnosisDictByPinyin(
+            @ApiParam(name = "pinyin", value = "拼音")
+            @RequestParam(value = "pinyin", required = true) String pinyin)throws  Exception{
+        return mrSystemDictEntryService.searchMrDiagnosisDictByPinyin(pinyin);
     }
 
     @ApiOperation("更新系统字典项")
