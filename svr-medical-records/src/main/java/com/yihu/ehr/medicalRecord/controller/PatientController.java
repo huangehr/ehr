@@ -54,8 +54,14 @@ public class PatientController extends BaseRestEndPoint {
             @RequestParam(value = "demographicId", required = false) String demographicId,
             @ApiParam(name = "doctorId", value = "医生id")
             @RequestParam(value = "doctorId", required = true) String doctorId){
-        int id=patientService.getPatientInformationBydemographicIdOrPhone(demographicId,phone).getId();
-        return patientService.getPatientDiagnosis(id,Integer.parseInt(doctorId));
+
+        if(patientService.getPatientInformationBydemographicIdOrPhone(demographicId,phone)!=null) {
+            int id= patientService.getPatientInformationBydemographicIdOrPhone(demographicId, phone).getId();
+            return patientService.getPatientDiagnosis(id,doctorId);
+        }
+        else
+            return null;
+
     }
 
 }
