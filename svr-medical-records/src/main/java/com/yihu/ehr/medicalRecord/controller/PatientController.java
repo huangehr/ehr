@@ -31,17 +31,10 @@ public class PatientController extends BaseRestEndPoint {
 
     @ApiOperation("增加患者")
     @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.POST)
-    public boolean addPatient(@ApiParam(name = "appUid", value = "appUid")
-                              @RequestParam(value = "appUid", required = true) String appUid,
-                              @ApiParam(name = "appPatientId", value = "appPatientId")
-                              @RequestParam(value = "appPatientId", required = true) String appPatientId,
-                              @ApiParam(name = "patientInformation", value = "患者信息")
-                              @RequestParam(value = "patientInformation", required = true) String json){
-        if(!patientService.IsCreated(appUid,appPatientId)) {
-            MrPatientsEntity patient = toEntity(json, MrPatientsEntity.class);
-            patient.setAppUid(appUid);
-            patient.setAppPatientId(appPatientId);
-            return patientService.addPatient(patient);
+    public boolean addPatient(@ApiParam(name = "id", value = "id")
+                              @RequestParam(value = "id", required = true) String id)throws Exception{
+        if(!patientService.IsCreated(id)) {
+            return patientService.addPatient(id);
         }
         else
             return false;
@@ -50,12 +43,10 @@ public class PatientController extends BaseRestEndPoint {
     @ApiOperation("获取患者个人信息")
     @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.GET)
     public MrPatientsEntity getPatientInformation(
-            @ApiParam(name = "appUid", value = "appUid")
-            @RequestParam(value = "appUid", required = true) String appUid,
-            @ApiParam(name = "appPatientId", value = "appPatientId")
-            @RequestParam(value = "appPatientId", required = true) String appPatientId){
-        if(patientService.IsCreated(appUid,appPatientId)) {
-            return patientService.getPatientInformation(appUid, appPatientId);
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id", required = true) String id){
+        if(patientService.IsCreated(id)) {
+            return patientService.getPatientInformation(id);
         }
         else
             return null;
@@ -64,15 +55,13 @@ public class PatientController extends BaseRestEndPoint {
     @ApiOperation("获取患者所有诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientDiagnosis, method = RequestMethod.GET)
     public List<String> getPatientDiagnosis(
-            @ApiParam(name = "appUid", value = "appUid")
-            @RequestParam(value = "appUid", required = true) String appUid,
-            @ApiParam(name = "appPatientId", value = "appPatientId")
-            @RequestParam(value = "appPatientId", required = true) String appPatientId,
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id", required = true) String id,
             @ApiParam(name = "doctorId", value = "医生id")
             @RequestParam(value = "doctorId", required = true) String doctorId) {
 
-        if (patientService.IsCreated(appUid, appPatientId)) {
-           return patientService.getPatientDiagnosis(patientService.getPatientInformation(appUid, appPatientId).getId(), doctorId);
+        if (patientService.IsCreated(id)) {
+           return patientService.getPatientDiagnosis(id, doctorId);
         }
         else
             return null;
