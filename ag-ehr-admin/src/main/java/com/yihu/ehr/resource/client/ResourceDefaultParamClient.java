@@ -46,7 +46,7 @@ public interface ResourceDefaultParamClient {
     @ApiOperation("根据id删除资源默认参数")
     boolean deleteResourceDefaultParams(
             @ApiParam(name="id",value="资源默认参数id")
-            @RequestParam(value="id") Long id);
+            @PathVariable(value="id") Long id);
 
     @RequestMapping(value = ServiceApi.Resources.Params, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取资源默认参数列表，分页")

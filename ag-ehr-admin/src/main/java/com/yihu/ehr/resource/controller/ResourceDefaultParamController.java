@@ -46,10 +46,10 @@ public class ResourceDefaultParamController extends BaseController {
             @RequestParam(value = "json_data") String jsonData){
         try{
             MResourceDefaultParam model = objectMapper.readValue(jsonData,MResourceDefaultParam.class);
-            boolean bo = rsDefaultParamclient.isExistenceRsParamKeyValue(model.getResourcesId(),model.getParamKey(),model.getParamValue());
-            if(!bo){
-                return failed("参数值不能重复！");
-            }
+//            boolean bo = rsDefaultParamclient.isExistenceRsParamKeyValue(model.getResourcesId(),model.getParamKey(),model.getParamValue());
+//            if(bo){
+//                return failed("参数值不能重复！");
+//            }
             MResourceDefaultParam modelNew = rsDefaultParamclient.addResourceDefaultParams(jsonData);
             if(modelNew == null){
                 return failed("新增失败！");
@@ -68,10 +68,10 @@ public class ResourceDefaultParamController extends BaseController {
             @RequestParam(value = "json_data") String jsonData){
         try{
             MResourceDefaultParam model = objectMapper.readValue(jsonData,MResourceDefaultParam.class);
-            boolean bo = rsDefaultParamclient.isExistenceRsParamKeyValue(model.getResourcesId(),model.getParamKey(),model.getParamValue());
-            if(!bo){
+           /* boolean bo = rsDefaultParamclient.isExistenceRsParamKeyValue(model.getResourcesId(),model.getParamKey(),model.getParamValue());
+            if(bo){
                 return failed("参数值不能重复！");
-            }
+            }*/
             MResourceDefaultParam modelNew = rsDefaultParamclient.addResourceDefaultParams(jsonData);
             if(modelNew == null){
                 return failed("更新失败！");
@@ -87,7 +87,7 @@ public class ResourceDefaultParamController extends BaseController {
     @ApiOperation("根据id删除资源默认参数")
     public Envelop deleteResourceDefaultParams(
             @ApiParam(name="id",value="资源默认参数id")
-            @RequestParam(value="id") Long id){
+            @PathVariable(value="id") Long id){
         boolean bo = rsDefaultParamclient.deleteResourceDefaultParams(id);
         if(bo){
             return success(null);
