@@ -313,9 +313,11 @@ public class ProfileEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "profile_id", value = "档案ID",defaultValue = "41872607-9_1000000_20000002_1465894742000")
             @RequestParam(value = "profile_id", required = false) String profile_id,
             @ApiParam(name = "prescription_no", value = "处方编号")
-            @RequestParam(value = "prescription_no", required = false) String prescription_no) throws Exception
+            @RequestParam(value = "prescription_no", required = false) String prescription_no,
+            @ApiParam(name = "reproduce", value = "是否重新生成",defaultValue = "false")
+            @RequestParam(value = "reproduce", required = false,defaultValue = "false") boolean reproduce) throws Exception
     {
-        return patientDetail.getPrescription(profile_id,prescription_no);
+        return patientDetail.getPrescription(profile_id,prescription_no,reproduce);
     }
 
     @ApiOperation("中药处方OK")

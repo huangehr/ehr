@@ -18,7 +18,7 @@ public class MrMedicalDrugEntity {
     private String drugFrequency;
 
     @Id
-    @Basic
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
     public int getId() {
         return id;

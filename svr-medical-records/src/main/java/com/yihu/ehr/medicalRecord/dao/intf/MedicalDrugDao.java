@@ -13,5 +13,5 @@ public interface MedicalDrugDao  extends PagingAndSortingRepository<MrMedicalDru
 
     List<MrMedicalDrugEntity> findByrecordsId(Integer recordsId);
 
-    boolean deleteByrecordsId(Integer recordsId);
+    void deleteByRecordsId(Integer recordsId);
 }

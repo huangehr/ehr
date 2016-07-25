@@ -23,6 +23,7 @@ public class PatientService {
 
     @Autowired
     PatientDao patientDao;
+    @Autowired
     MedicalRecordDao medicalRecordDao;
 
     public MrPatientsEntity getPatientInformationBydemographicIdOrPhone(String demographicId,String phone){
@@ -62,16 +63,19 @@ public class PatientService {
         if(patient.getPhone()==null&&patient.getDemographicId()==null){
             return false;
         }
-        else if(patientDao.findBydemographicId(patient.getDemographicId())!=null ||patientDao.findByphone(patient.getPhone())!=null){
+        else if(patient.getDemographicId()!=null && patientDao.findBydemographicId(patient.getDemographicId())!=null){
+                return false;
+        }
+        else if(patient.getPhone()!=null && patientDao.findByphone(patient.getPhone())!=null){
             return false;
         }
-        else {
+        else{
             patientDao.save(patient);
             return true;
         }
     }
 
-    public List<String> getPatientDiagnosis(int patientId ,int doctorId){
+    public List<String> getPatientDiagnosis(int patientId ,String doctorId){
         List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorId(patientId,doctorId);
         List<String> diagnosisList=new ArrayList<>();
         for(int i=0;i<list.size();i++){
