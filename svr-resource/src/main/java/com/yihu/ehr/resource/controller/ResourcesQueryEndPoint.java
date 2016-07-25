@@ -3,6 +3,7 @@ package com.yihu.ehr.resource.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.resource.MCdaTransformDto;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
 import com.yihu.ehr.resource.service.ResourcesQueryService;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -166,19 +168,15 @@ public class ResourcesQueryEndPoint {
     }
 
     @ApiOperation("获取Cda Data")
-    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.GET)
-    public Map<String,Object> getCDAData(
-            @ApiParam(name = "masterJson")
-            @RequestParam(value = "masterJson", required = true) String masterJson,
-            @ApiParam(name = "masterDatasetCodeList")
-            @RequestParam(value = "masterDatasetCodeList", required = true) String masterDatasetCodeList,
-            @ApiParam(name = "multiDatasetCodeList")
-            @RequestParam(value = "multiDatasetCodeList", required = true) String multiDatasetCodeList) throws Exception {
+    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Map<String,Object> getCDAData( @ApiParam(name="cdaTransformDtoJson",value="资源数据模型",required = true)
+                                           @RequestBody String cdaTransformDtoJson) throws Exception {
+        MCdaTransformDto cdaTransformDto =  objectMapper.readValue(cdaTransformDtoJson,MCdaTransformDto.class);
 
-        Map<String,Object> re =new HashMap<>();
-        Map<String, Object> obj=objectMapper.readValue(java.net.URLDecoder.decode(masterJson), Map.class);
-        Map<String, List<String>> masterDatasetCodeMap=objectMapper.readValue(java.net.URLDecoder.decode(masterDatasetCodeList), Map.class);
-        Map<String, List<String>> multiDatasetCodeMap=objectMapper.readValue(java.net.URLDecoder.decode(multiDatasetCodeList), Map.class);
+        Map<String,Object> re = new HashMap<>();
+        Map<String, Object> obj = cdaTransformDto.getMasterJson();
+        Map<String, List<String>> masterDatasetCodeMap = cdaTransformDto.getMasterDatasetCodeList();
+        Map<String, List<String>> multiDatasetCodeMap = cdaTransformDto.getMultiDatasetCodeList();
         String profileId = obj.get("rowkey").toString();
         String cdaVersion = obj.get("cda_version").toString();
         for(String key:masterDatasetCodeMap.keySet()) {

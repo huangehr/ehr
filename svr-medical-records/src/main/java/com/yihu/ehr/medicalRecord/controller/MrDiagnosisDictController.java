@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * Created by shine on 2016/7/14.
  */
@@ -30,7 +32,7 @@ public class MrDiagnosisDictController extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.DiagnosisDict, method = RequestMethod.POST)
     public boolean addMrDiagnosisDict(
             @ApiParam(name = "DiagnosisDictInformation", value = "诊段字典信息")
-            @RequestParam(value = "DiagnosisDictInformation", required = true) String json){
+            @RequestParam(value = "DiagnosisDictInformation", required = true) String json)throws Exception{
         MrDiagnosisDictEntity mrDiagnosisDict=toEntity(json,MrDiagnosisDictEntity.class);
         return mrDiagnosisDictService.addMrDiagnosisDict(mrDiagnosisDict);
     }
@@ -41,6 +43,14 @@ public class MrDiagnosisDictController extends BaseRestEndPoint {
             @ApiParam(name = "MrDiagnosisDictCode", value = "诊段字典代码")
             @RequestParam(value = "MrDiagnosisDictCode", required = true) String code){
         return mrDiagnosisDictService.deleteMrDiagnosisDict(code);
+    }
+
+    @ApiOperation("拼音模糊查找字典")
+    @RequestMapping(value = ServiceApi.MedicalRecords.DiagnosisDict, method = RequestMethod.GET)
+    public List<MrDiagnosisDictEntity> searchMrDiagnosisDictByPinyin(
+            @ApiParam(name = "pinyin", value = "拼音")
+            @RequestParam(value = "pinyin", required = true) String pinyin)throws  Exception{
+        return mrDiagnosisDictService.searchMrDiagnosisDictByPinyin(pinyin);
     }
 
     @ApiOperation("更新诊断字典")

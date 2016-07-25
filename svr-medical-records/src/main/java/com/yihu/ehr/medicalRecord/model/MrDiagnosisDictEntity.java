@@ -11,6 +11,7 @@ public class MrDiagnosisDictEntity {
     private String code;
     private String name;
     private String description;
+    private String PhoneticCode;
 
     @Id
     @Column(name = "CODE")
@@ -20,6 +21,15 @@ public class MrDiagnosisDictEntity {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    @Column(name = "PHONETIC_CODE")
+    public String getPhoneticCode() {
+        return PhoneticCode;
+    }
+
+    public void setPhoneticCode(String phoneticCode) {
+        PhoneticCode = phoneticCode;
     }
 
     @Basic

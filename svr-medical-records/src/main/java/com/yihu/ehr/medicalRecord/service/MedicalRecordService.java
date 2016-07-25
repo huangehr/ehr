@@ -35,7 +35,7 @@ public class MedicalRecordService{
     /**
      * 根据医生ID和病人ID获取最近的一次病历
      */
-    public MrMedicalRecordsEntity getMedicalHistoryByLastOne(String doctorId, int patientId) throws Exception {
+    public MrMedicalRecordsEntity getMedicalHistoryByLastOne(String doctorId, String patientId) throws Exception {
 
         MrMedicalRecordsEntity medicalRecord = new MrMedicalRecordsEntity();
 
