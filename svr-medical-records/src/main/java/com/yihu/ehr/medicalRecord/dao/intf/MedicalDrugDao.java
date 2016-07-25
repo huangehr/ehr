@@ -1,6 +1,5 @@
 package com.yihu.ehr.medicalRecord.dao.intf;
 
-import com.yihu.ehr.medicalRecord.model.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecord.model.MrMedicalDrugEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 

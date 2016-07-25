@@ -3,17 +3,13 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.medicalRecord.service.PatientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,7 +25,7 @@ public class PatientController extends BaseRestEndPoint {
     PatientService patientService;
 
 
-    @ApiOperation("增加患者")
+    /*@ApiOperation("增加患者")
     @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.POST)
     public boolean addPatient(@ApiParam(name = "id", value = "id")
                               @RequestParam(value = "id", required = true) String id)throws Exception{
@@ -38,7 +34,7 @@ public class PatientController extends BaseRestEndPoint {
         }
         else
             return false;
-    }
+    }*/
 
     @ApiOperation("获取患者个人信息")
     @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.GET)
@@ -52,7 +48,7 @@ public class PatientController extends BaseRestEndPoint {
             return null;
     }
 
-    @ApiOperation("获取患者所有诊断")
+    /*@ApiOperation("获取患者所有诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientDiagnosis, method = RequestMethod.GET)
     public List<String> getPatientDiagnosis(
             @ApiParam(name = "id", value = "id")
@@ -65,6 +61,23 @@ public class PatientController extends BaseRestEndPoint {
         }
         else
             return null;
-    }
+    }*/
+
+    /*@ApiOperation("确认患者信息是否存在")
+    @RequestMapping(value = ServiceApi.MedicalRecords.PatientExistence, method = RequestMethod.GET)
+    public String PatientExistence(
+            @ApiParam(name="AppPatientId",value="AppPatientId",defaultValue = "")
+            @PathVariable(value="app_patient_id")String AppPatientId,
+            @ApiParam(name="appUId",value="appUId",defaultValue = "")
+            @RequestParam(value="app_uid",required = false)String appUId,
+            @ApiParam(name="patientJson",value="患者信息JSON",defaultValue = "")
+            @RequestBody String patientJson) throws Exception
+    {
+
+        MrPatientsEntity mrPatientsEntity = toEntity(patientJson,MrPatientsEntity.class);
+        MrPatientsEntity mrPatient = patientService.checkInfo(appUId, AppPatientId, mrPatientsEntity);
+
+        return mrPatient.getId();
+    }*/
 
 }

@@ -1,7 +1,6 @@
 package com.yihu.ehr.medicalRecord.service;
 
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalDrugDao;
-import com.yihu.ehr.medicalRecord.model.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecord.model.MrMedicalDrugEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

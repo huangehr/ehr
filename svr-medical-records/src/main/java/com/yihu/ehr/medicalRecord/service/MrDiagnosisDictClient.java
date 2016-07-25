@@ -5,7 +5,6 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.specialdict.MIcd10Dict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

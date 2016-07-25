@@ -6,11 +6,11 @@ import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
 import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.web.RestTemplates;
-import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -84,6 +84,7 @@ public class PatientService extends RestTemplates  {
         param.put("Param", parma);
         return param;
     }
+    /*
     public boolean addPatient(String id) throws Exception{
         Map<String, Object> params = getLoginParam("UserMgmt.User.queryUserInfoByID", "{ \"UserID\":\"" + id + "\"}");
         String result;
@@ -107,7 +108,7 @@ public class PatientService extends RestTemplates  {
         mrPatientsEntity.setIsVerified(myJsonObject.getString("UserID"));
         patientDao.save(mrPatientsEntity);
         return true;
-    }
+    }*/
 
     public List<String> getPatientDiagnosis(String patientId ,String doctorId){
         List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorId(patientId,doctorId);
@@ -122,4 +123,16 @@ public class PatientService extends RestTemplates  {
         return diagnosisList;
     }
 
+    /*public MrPatientsEntity checkInfo(String AppUId, String AppPatientId, MrPatientsEntity mrPatientsEntity){
+
+        MrPatientsEntity patientsInfo = patientDao.findByappUidAndAppPatientId(AppUId,AppPatientId);
+
+        if(patientsInfo == null){
+
+            return patientDao.save(mrPatientsEntity);
+        }else{
+
+            return patientsInfo;
+        }
+    }*/
 }

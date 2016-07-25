@@ -4,6 +4,8 @@ import com.yihu.ehr.medicalRecord.model.MrDoctorDraftEntity;
 import com.yihu.ehr.medicalRecord.model.MrMedicalDraftEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -13,4 +15,7 @@ public interface MedicalDraftDao extends PagingAndSortingRepository<MrMedicalDra
 
     List<MrMedicalDraftEntity> findBydoctorIdAndType(int id, String type);
 
+    MrMedicalDraftEntity findBydoctorIdAndTypeAndContentAndFastdfsUrl(String doctorId, String Type, String content,String fastdfsUrl);
+
+    List<MrMedicalDraftEntity> findByidIn(List id);
 }

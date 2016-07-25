@@ -9,10 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +46,7 @@ public class MedicalLabelController extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalLabels, method = RequestMethod.GET)
     public List<MrMedicalLabelEntity> getMedicalLabelInformationByID(
             @ApiParam(name = "RecordId", value = "病历表编号")
-            @RequestParam(value = "RecordId", required = true)String RecordId){
+            @PathVariable(value = "Record_id")String RecordId){
         return medicalLabelService.getMedicalLabelInformationByRecordId(RecordId);
     }
 }

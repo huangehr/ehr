@@ -1,6 +1,5 @@
 package com.yihu.ehr.medicalRecord.dao.intf;
 
-import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.medicalRecord.model.PronunciationEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

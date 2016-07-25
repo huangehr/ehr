@@ -4,7 +4,6 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecord.model.MrDiagnosisDictEntity;
-import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.medicalRecord.service.MrDiagnosisDictService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
