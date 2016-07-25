@@ -7,7 +7,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.patient.MArRelation;
 import com.yihu.ehr.patient.service.ArRelationClient;
 import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.utils.FeignExceptionUtils;
+import com.yihu.ehr.util.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

@@ -285,7 +285,7 @@ public class PatientInfoDetailService {
                             }
                             //处方笺不存在则生成保存
                             String picPath = thridPrescriptionService.transformImage(profileId, mainEvent.get("org_code").toString(), mainEvent.get("cda_version").toString()
-                                    , main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd, main.get("EHR_001203").toString(), 900, 900);
+                                    , main.get("EHR_001203").toString().equals("1") ? BasisConstant.xycd : BasisConstant.zycd, main.get("EHR_001203").toString(), 850, 900);
                             LogService.getLogger("prescription").info("generate completed");
                             //处方笺文件类型
                             data.put("EHR_001194", "png");
@@ -322,7 +322,7 @@ public class PatientInfoDetailService {
             return returnMap;
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new Exception("处方签查询失败！");
+            throw new Exception(ex.getMessage());
         }
     }
 
