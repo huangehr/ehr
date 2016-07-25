@@ -6,8 +6,6 @@ import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
 import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
-import com.yihu.ehr.query.common.model.QueryCondition;
-import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.web.RestTemplates;
@@ -25,8 +23,8 @@ import java.util.*;
 @Service
 public class PatientService extends RestTemplates  {
 
-    @Autowired
-    SolrQuery solr;
+//    @Autowired
+//    SolrQuery solr;
     @Autowired
     PatientDao patientDao;
     @Autowired
