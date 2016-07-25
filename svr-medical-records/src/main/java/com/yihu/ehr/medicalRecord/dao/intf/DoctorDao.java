@@ -10,6 +10,8 @@ public interface DoctorDao extends PagingAndSortingRepository<MrDoctorsEntity,St
 
     MrDoctorsEntity findBydemographicId(String demographicId);
 
+    MrDoctorsEntity findById(String id);
+
     void deleteBydemographicId(String id);
 
 }
