@@ -54,7 +54,7 @@ public class MedicalDraftService extends BaseJpaService<MrMedicalDraftEntity,Med
                                     , String type
                                     , String content
                                     , String fastdfsURL
-                                    , int patientId){
+                                    , String patientId){
 
         MrMedicalDraftEntity draft = mDDao.findBydoctorIdAndTypeAndContentAndFastdfsUrl(doctorId, type, content,fastdfsURL);
 
@@ -68,7 +68,7 @@ public class MedicalDraftService extends BaseJpaService<MrMedicalDraftEntity,Med
             draft.setDoctorId(doctorId);
             draft.setType(type);
             draft.setContent(content);
-            draft.setPatientId(patientId);
+            draft.setPatientId(Integer.valueOf(patientId));
             draft.setFastdfsUrl(fastdfsURL);
         }
         draft.setCreateTime(t);

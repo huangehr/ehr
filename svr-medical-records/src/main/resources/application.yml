@@ -6,42 +6,22 @@ management:
 
 info:
   app:
-    name: MedicalRecordsSvrApp
-    description: MedicalRecordsSvrApp service.
+    name: MedivalRecordsSvrApp
+    description: MedivalRecordsSvrApp service.
     version: 1.0.0
 
-logging:
-  level:
-    com:
-      netflix: ERROR
-spring:
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    max-active: 20
-    max-idle: 8
-    min-idle: 8
-    validation-query: SELECT 1
-    test-on-borrow: true
-fast-dfs:
-  pool:
-    init-size: 5
-    max-size: 20
-    wait-time: 500
-  connect-timeout: 2
-  network-timeout: 30
-  charset: ISO8859-1
-  http:
-    tracker-http-port: 80
-    anti-steal-token: no
-    secret-key: FastDFS1234567890
 ---
 spring:
   profiles: dev
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/medical_records?useUnicode=true&characterEncoding=UTF-8
-    username: zhanpeng
-    password: zhanpeng
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
 
+---
+spring:
+  profiles: alpha
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod
