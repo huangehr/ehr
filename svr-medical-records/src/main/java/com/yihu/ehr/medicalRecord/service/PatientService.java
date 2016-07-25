@@ -110,7 +110,7 @@ public class PatientService extends RestTemplates  {
         return true;
     }*/
 
-    public List<String> getPatientDiagnosis(int patientId ,String doctorId){
+    public List<String> getPatientDiagnosis(String patientId ,String doctorId){
         List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorId(patientId,doctorId);
         List<String> diagnosisList=new ArrayList<>();
         for(int i=0;i<list.size();i++){
@@ -123,8 +123,7 @@ public class PatientService extends RestTemplates  {
         return diagnosisList;
     }
 
-
-    public MrPatientsEntity checkInfo(String AppUId, String AppPatientId, MrPatientsEntity mrPatientsEntity){
+    /*public MrPatientsEntity checkInfo(String AppUId, String AppPatientId, MrPatientsEntity mrPatientsEntity){
 
         MrPatientsEntity patientsInfo = patientDao.findByappUidAndAppPatientId(AppUId,AppPatientId);
 
@@ -135,5 +134,5 @@ public class PatientService extends RestTemplates  {
 
             return patientsInfo;
         }
-    }
+    }*/
 }

@@ -63,7 +63,7 @@ public class PatientController extends BaseRestEndPoint {
             return null;
     }*/
 
-    @ApiOperation("确认患者信息是否存在")
+    /*@ApiOperation("确认患者信息是否存在")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientExistence, method = RequestMethod.GET)
     public String PatientExistence(
             @ApiParam(name="AppPatientId",value="AppPatientId",defaultValue = "")
@@ -78,6 +78,6 @@ public class PatientController extends BaseRestEndPoint {
         MrPatientsEntity mrPatient = patientService.checkInfo(appUId, AppPatientId, mrPatientsEntity);
 
         return mrPatient.getId();
-    }
+    }*/
 
 }

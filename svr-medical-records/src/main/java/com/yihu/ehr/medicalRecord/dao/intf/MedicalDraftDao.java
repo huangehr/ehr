@@ -1,8 +1,11 @@
 package com.yihu.ehr.medicalRecord.dao.intf;
 
+import com.yihu.ehr.medicalRecord.model.MrDoctorDraftEntity;
 import com.yihu.ehr.medicalRecord.model.MrMedicalDraftEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**

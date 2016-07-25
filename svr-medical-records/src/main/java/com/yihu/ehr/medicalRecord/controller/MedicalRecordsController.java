@@ -124,7 +124,7 @@ public class MedicalRecordsController extends EnvelopRestEndPoint {
     @ApiOperation("根据医生ID和病人ID获取最近的一次病历")
     public MrMedicalRecordsEntity getRecordByLastOne(
             @ApiParam(name="patientId",value="patientId",defaultValue = "")
-            @RequestParam(value="patientId",required = false)int patientId,
+            @RequestParam(value="patientId",required = false)String patientId,
             @ApiParam(name="doctorId",value="doctorId",defaultValue = "")
             @RequestParam(value="doctorId",required = false)String doctorId) throws Exception
     {
@@ -181,7 +181,7 @@ public class MedicalRecordsController extends EnvelopRestEndPoint {
     @ApiOperation("病历拷贝")
     public MrMedicalRecordsEntity copyRecord(
             @ApiParam(name="patientId",value="病人Id",defaultValue = "")
-            @RequestParam(value="patientId",required = false)int patientId,
+            @RequestParam(value="patientId",required = false)String patientId,
             @ApiParam(name="doctorId",value="医生Id",defaultValue = "")
             @RequestParam(value="doctorId",required = false)String doctorId,
             @ApiParam(name="id",value="病历Id",defaultValue = "")

@@ -18,5 +18,5 @@ public interface PatientDao extends PagingAndSortingRepository<MrPatientsEntity,
 
     MrPatientsEntity findByid(String id);
 
-    MrPatientsEntity findByappUidAndAppPatientId(String AppUid, String AppPatientId);
+    //MrPatientsEntity findByappUidAndAppPatientId(String AppUid, String AppPatientId);
 }
