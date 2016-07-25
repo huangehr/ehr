@@ -411,6 +411,7 @@ public class ServiceApi {
 
         public static final String RoleFeature                      = "/roles/role_feature";
         public static final String RoleFeatureId                    = "/roles/role_feature/{id}";
+        public static final String RoleFeatureByRoleId              = "/roles/role_feature/role_id";
         public static final String RoleFeatures                     = "/roles/role_features";
         public static final String RoleFeaturesNoPage               = "/roles/role_features/no_paging";
         public static final String RoleFeatureExistence             = "/roles/role_feature/existence";
@@ -422,6 +423,7 @@ public class ServiceApi {
 
         public static final String RoleApi                          = "/roles/role_api";
         public static final String RoleApiId                        = "/roles/role_api/{id}";
+        public static final String RoleApiByRoleId                  = "/roles/role_api/role_id";
         public static final String RoleApis                         = "/roles/role_apis";
         public static final String RoleApisNoPage                   = "/roles/role_apis/no_paging";
         public static final String RoleApisExistence                = "/roles/role_api/existence";
