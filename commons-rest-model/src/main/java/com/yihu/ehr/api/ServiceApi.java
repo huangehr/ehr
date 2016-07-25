@@ -522,14 +522,16 @@ public class ServiceApi {
         public static final String MedicalDraft                           = "/medicalRecords/MedicalDraft";
         public static final String DoctorMedicalRecords                   = "/medicalRecords/DoctorMedicalRecords";
         public static final String DeleteDoctorMedicalRecords             = "/medicalRecords/DeleteAllDoctorMedicalRecord/{id}";
-        public static final String DoctorInfo                             = "/medicalRecords/DoctorInfo";
+        public static final String DoctorDiagnosis                        = "/medicalRecords/DoctorDiagnosis/{doctor_id}";
+        public static final String DoctorInfo                             = "/medicalRecords/DoctorInfo/{demographic_id}";
         public static final String ChangeDocStatus                        = "/medicalRecords/ChangeDocStatus";
-        public static final String MedicalLabels                          = "/medicalRecords/MedicalLabels";
-        public static final String DiagnosisDict                          = "/medicalRecords/DiagnosisDict";
-        public static final String SystemDict                             = "/medicalRecords/SystemDict";
-        public static final String SystemDictEntry                        = "/medicalRecords/SystemDictEntry";
-        public static final String Patient                                = "/medicalRecords/Patient";
-        public static final String PatientDiagnosis                                = "/medicalRecords/PatientDiagnosis";
+        public static final String MedicalLabels                          = "/medicalRecords/MedicalLabels/{record_id}";
+        public static final String DiagnosisDict                          = "/medicalRecords/DiagnosisDict/{code}";
+        public static final String SystemDict                             = "/medicalRecords/SystemDict/{dict_code}";
+        public static final String SystemDictEntry                        = "/medicalRecords/SystemDictEntry/{dict_code}/{code}";
+        public static final String Patient                                = "/medicalRecords/Patient/{phone}/{demographic_id}";
+        public static final String PatientDiagnosis                       = "/medicalRecords/PatientDiagnosis";
+        public static final String MedicalDrug                            = "/medicalRecords/MedicalDrug/{records_id}";
 
     }
 }

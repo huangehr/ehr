@@ -26,7 +26,7 @@ public class MrSystemDictService {
 
 
     public boolean deleteMrSystemDict( String dictCode){
-        if(mrSystemDictEntryDao.findByDictCode(dictCode)!=null)
+        if(mrSystemDictEntryDao.findByDictCode(dictCode)!=null&&mrSystemDictEntryDao.findByDictCode(dictCode).size()>0)//系统字典项无值才可删除
             return false;
         else {
             mrSystemDictDao.deleteBydictCode(dictCode);
