@@ -68,7 +68,7 @@ public class MedicalRecordsController extends EnvelopRestEndPoint {
     @ApiOperation("根据医生ID和病人ID获取最近的一次病历")
     public MrMedicalRecordsEntity getMedicalHistoryByLastOne(
             @ApiParam(name="patientId",value="patientId",defaultValue = "")
-            @RequestParam(value="patientId",required = false)int patientId,
+            @RequestParam(value="patientId",required = false)String patientId,
             @ApiParam(name="doctorId",value="doctorId",defaultValue = "")
             @RequestParam(value="doctorId",required = false)String doctorId) throws Exception
     {
