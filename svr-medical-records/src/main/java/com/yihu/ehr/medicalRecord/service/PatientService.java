@@ -5,12 +5,13 @@ import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
 import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
+import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.web.RestTemplates;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,15 +28,35 @@ public class PatientService extends RestTemplates  {
     @Autowired
     MedicalRecordDao medicalRecordDao;
     @Autowired
+    UserInfoService userInfoService;
+    @Autowired
     ObjectMapper objectMapper;
 
-    @Value("${service-gateway.wsurl}")
-    public String wsurl;
-    @Value("${service-gateway.WSclientId}")
-    public String WSclientId;
-
-    public MrPatientsEntity getPatientInformation(String id){
-            return patientDao.findByid(id);
+    public MrPatientsEntity getPatientInformation(String id)throws Exception{
+        MrPatientsEntity p=patientDao.findByid(id);
+        if(p !=null)
+            return p;
+        else{
+            Map re=new HashMap<>();
+            String s=userInfoService.getUserInfo(id);
+            if (s!=null) {
+                re = objectMapper.readValue(s, Map.class);
+                MrPatientsEntity mrPatientsEntity=new MrPatientsEntity();
+                mrPatientsEntity.setId(re.get("UserID").toString());
+                mrPatientsEntity.setName(re.get("CName").toString());
+                mrPatientsEntity.setDemographicId(re.get("IdNumber").toString());
+                mrPatientsEntity.setSex(re.get("Sex").toString());
+                if (re.get("BirthDate") != null && re.get("BirthDate").toString().length() > 0) {
+                    mrPatientsEntity.setBirthday(java.sql.Timestamp.valueOf(re.get("BirthDate").toString()));
+                }
+                mrPatientsEntity.setMaritalStatus(re.get("IsMarried").toString());
+                mrPatientsEntity.setPhoto(re.get("PhotoUri").toString());
+                mrPatientsEntity.setPhone(re.get("Phone").toString());
+                mrPatientsEntity.setIsVerified(re.get("IsMarried").toString());
+                return mrPatientsEntity;
+            } else
+                return null;
+        }
     }
 
     public boolean updataPatientInformationByID(MrPatientsEntity patient){
@@ -76,39 +97,11 @@ public class PatientService extends RestTemplates  {
         return true;
     }
 
-    private Map<String, Object> getLoginParam(String api, String parma) {
-        Map<String, Object> param = new HashMap<>();
-        param.put("AuthInfo", "{ \"ClientId\": " + WSclientId + " }");
-        param.put("SequenceNo", new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()));
-        param.put("Api", api);
-        param.put("Param", parma);
-        return param;
-    }
-    /*
-    public boolean addPatient(String id) throws Exception{
-        Map<String, Object> params = getLoginParam("UserMgmt.User.queryUserInfoByID", "{ \"UserID\":\"" + id + "\"}");
-        String result;
-        MrPatientsEntity mrPatientsEntity=new MrPatientsEntity();
-        result = doPost(wsurl, params, null, null);
-        //objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
-        //mrPatientsEntity= objectMapper.readValue(result, MrPatientsEntity.class);
+    public boolean addPatient(MrPatientsEntity mrPatientsEntity) throws Exception{
 
-
-        JSONObject myJsonObject = new JSONObject(result);
-        mrPatientsEntity.setId(myJsonObject.getString("UserID"));
-        mrPatientsEntity.setName(myJsonObject.getString("CName"));
-        mrPatientsEntity.setDemographicId(myJsonObject.getString("IdNumber "));
-        mrPatientsEntity.setSex(myJsonObject.getString("UserID"));
-        if(myJsonObject.getString("BirthDate")!=null&&myJsonObject.getString("BirthDate").length()>0) {
-            mrPatientsEntity.setBirthday(java.sql.Timestamp.valueOf(myJsonObject.getString("BirthDate")));
-        }
-        mrPatientsEntity.setMaritalStatus(myJsonObject.getString("IsMarried"));
-        mrPatientsEntity.setPhoto(myJsonObject.getString("PhotoUri"));
-        mrPatientsEntity.setPhone(myJsonObject.getString("Phone"));
-        mrPatientsEntity.setIsVerified(myJsonObject.getString("UserID"));
         patientDao.save(mrPatientsEntity);
         return true;
-    }*/
+    }
 
     public List<String> getPatientDiagnosis(String patientId ,String doctorId){
         List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorId(patientId,doctorId);
@@ -123,16 +116,4 @@ public class PatientService extends RestTemplates  {
         return diagnosisList;
     }
 
-    /*public MrPatientsEntity checkInfo(String AppUId, String AppPatientId, MrPatientsEntity mrPatientsEntity){
-
-        MrPatientsEntity patientsInfo = patientDao.findByappUidAndAppPatientId(AppUId,AppPatientId);
-
-        if(patientsInfo == null){
-
-            return patientDao.save(mrPatientsEntity);
-        }else{
-
-            return patientsInfo;
-        }
-    }*/
 }
