@@ -1,16 +1,12 @@
 package com.yihu.ehr.medicalRecord.service;
 
 
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
-import com.yihu.ehr.medicalRecord.model.MrDoctorMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,8 +20,6 @@ public class MedicalRecordService{
     @Autowired
     MedicalRecordDao mrDao;
 
-    @Autowired
-    DoctorMedicalRecordDao dMRDao;
 
     /**
      * 创建数据元
@@ -41,7 +35,7 @@ public class MedicalRecordService{
     /**
      * 根据医生ID和病人ID获取最近的一次病历
      */
-    public MrMedicalRecordsEntity getRecordByLastOne(int patientId, String doctorId) throws Exception {
+    public MrMedicalRecordsEntity getMedicalHistoryByLastOne(String doctorId, String patientId) throws Exception {
 
         MrMedicalRecordsEntity medicalRecord = new MrMedicalRecordsEntity();
 
@@ -51,24 +45,6 @@ public class MedicalRecordService{
         if(medicalRecordList.size() > 0){
 
             medicalRecord = medicalRecordList.get(0);
-        }else{
-
-            Date date = new Date();
-            Timestamp t = new Timestamp(date.getTime());
-
-            medicalRecord.setPatientId(patientId);
-            medicalRecord.setDoctorId(doctorId);
-            medicalRecord.setMedicalTime(t);
-            medicalRecord = mrDao.save(medicalRecord);
-
-            MrDoctorMedicalRecordsEntity drRelation = new MrDoctorMedicalRecordsEntity();
-
-            drRelation.setRecordId(medicalRecord.getId());
-            drRelation.setDoctorId(medicalRecord.getDoctorId());
-            drRelation.setIsCreator("1");//创建者
-            drRelation.setRecordType("0");//线上诊断
-
-            dMRDao.save(drRelation);
         }
 
         return medicalRecord;
@@ -95,34 +71,5 @@ public class MedicalRecordService{
     {
 
         return mrDao.findByid(id);
-    }
-
-    public MrMedicalRecordsEntity copyRecord(int patientId, String doctorId, int id, Integer firstRecordId)
-    {
-        MrMedicalRecordsEntity newRecord = new MrMedicalRecordsEntity();
-        MrMedicalRecordsEntity templateRecord = mrDao.findByid(id);
-
-        Date date = new Date();
-        Timestamp t = new Timestamp(date.getTime());
-
-        newRecord.setPatientId(patientId);
-        newRecord.setDoctorId(doctorId);
-        newRecord.setMedicalTime(t);
-
-        if(firstRecordId != null){
-            newRecord.setFirstRecordId(firstRecordId);
-        }
-
-        newRecord.setMedicalDiagnosis(templateRecord.getMedicalDiagnosis());
-        newRecord.setMedicalDiagnosisCode(templateRecord.getMedicalDiagnosisCode());
-        newRecord.setMedicalSuggest(templateRecord.getMedicalSuggest());
-        newRecord.setPatientAllergy(templateRecord.getPatientAllergy());
-        newRecord.setPatientCondition(templateRecord.getPatientCondition());
-        newRecord.setPatientHistoryNow(templateRecord.getPatientHistoryNow());
-        newRecord.setPatientHistoryPast(templateRecord.getPatientHistoryPast());
-        newRecord.setPatientHistoryFamily(templateRecord.getPatientHistoryFamily());
-        newRecord.setPatientPhysical(templateRecord.getPatientPhysical());
-
-        return mrDao.save(newRecord);
     }
 }

@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecord.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecord.model.MrMedicalDrugEntity;
@@ -28,7 +29,7 @@ public class MedicalDrugController extends BaseRestEndPoint {
     MedicalDrugService medicalDrugService;
 
     @ApiOperation("获取用药信息")
-    @RequestMapping(value = "/medical_drug", method = RequestMethod.GET)
+    @RequestMapping(value =  ServiceApi.MedicalRecords.MedicalDrug, method = RequestMethod.GET)
     public List<MrMedicalDrugEntity> getMedicalDrugInformationByRecordsId(
             @ApiParam(name = "recordsId", value = "病历号")
             @RequestParam(value = "recordsId", required = true)int recordsId){
@@ -36,16 +37,15 @@ public class MedicalDrugController extends BaseRestEndPoint {
     }
 
     @ApiOperation("提交用药信息")
-    @RequestMapping(value = "/medical_drug", method = RequestMethod.POST)
+    @RequestMapping(value =  ServiceApi.MedicalRecords.MedicalDrug, method = RequestMethod.POST)
     public boolean postMedicalDrugInformationByRecordsId(
             @ApiParam(name = "MedicalDrug", value = "药品集")
             @RequestParam(value = "MedicalDrug", required = true)String MedicalDrugs){
         List<Map<String,String>>tmp=toEntity(MedicalDrugs,List.class);
         List<MrMedicalDrugEntity>m=new ArrayList<>();
         for(int i=0;i<tmp.size();i++){
-            if(tmp.get(i)!=null) {
+            if(tmp.get(i)!=null && tmp.get(i).get("recordsId")!=null) {
                 MrMedicalDrugEntity mrMedicalDrugEntity = new MrMedicalDrugEntity();
-                mrMedicalDrugEntity.setId(Integer.parseInt(tmp.get(i).get("id")));
                 mrMedicalDrugEntity.setRecordsId(Integer.parseInt(tmp.get(i).get("recordsId")));
                 mrMedicalDrugEntity.setDrugName(tmp.get(i).get("drugName"));
                 mrMedicalDrugEntity.setDrugName(tmp.get(i).get("drugSpecifications"));

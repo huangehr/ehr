@@ -20,6 +20,7 @@ public class DoctorService {
 
     @Autowired
     DoctorDao doctorDao;
+    @Autowired
     MedicalRecordDao medicalRecordDao;
 
     public MrDoctorsEntity getDoctorInformationByDemographicId(String demographicId){
@@ -79,7 +80,7 @@ public class DoctorService {
         }
     }
 
-    public List<String> getDoctorDiagnosis(int doctorId){
+    public List<String> getDoctorDiagnosis(String doctorId){
         List<MrMedicalRecordsEntity>list= medicalRecordDao.findByDoctorId(doctorId);
         List<String> diagnosisList=new ArrayList<>();
         for(int i=0;i<list.size();i++){

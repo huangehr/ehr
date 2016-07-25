@@ -70,7 +70,7 @@ public class MedicalDraftController extends EnvelopRestEndPoint {
             @ApiParam(name="fastdfsURL",value="图片路径",defaultValue = "")
             @RequestParam(value="fastdfsURL") String fastdfsURL,
             @ApiParam(name="patientId",value="患者Id",defaultValue = "")
-            @RequestParam(value="patientId") String patientId) throws Exception
+            @RequestParam(value="patientId") int patientId) throws Exception
     {
 
         mDService.checkMedicalDraft(doctorId, type, content, fastdfsURL, patientId);

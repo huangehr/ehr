@@ -3,7 +3,6 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecord.model.MrDiagnosisDictEntity;
 import com.yihu.ehr.medicalRecord.model.MrSystemDictEntity;
 import com.yihu.ehr.medicalRecord.service.MrSystemDictService;
 import io.swagger.annotations.Api;
@@ -36,7 +35,7 @@ public class MrSystemDictController extends BaseRestEndPoint {
     }
 
     @ApiOperation("删除系统字典")
-    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.DELETE)
     public boolean deleteMrSystemDictEntry(
             @ApiParam(name = "MrSystemDictCode", value = "系统字典代码")
             @RequestParam(value = "MrSystemDictCode", required = true)String dictCode){

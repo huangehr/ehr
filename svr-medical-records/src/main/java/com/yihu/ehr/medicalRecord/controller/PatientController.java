@@ -3,7 +3,6 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.medicalRecord.service.PatientService;
 import io.swagger.annotations.Api;
@@ -26,38 +25,47 @@ public class PatientController extends BaseRestEndPoint {
     PatientService patientService;
 
 
-    @ApiOperation("增加患者")
+    /*@ApiOperation("增加患者")
     @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.POST)
-    public boolean addPatient(
-            @ApiParam(name = "patientInformation", value = "患者信息") @RequestParam(value = "patientInformation", required = true) String json){
-        MrPatientsEntity patient=toEntity(json,MrPatientsEntity.class);
-        return patientService.addPatient(patient);
-    }
+    public boolean addPatient(@ApiParam(name = "id", value = "id")
+                              @RequestParam(value = "id", required = true) String id)throws Exception{
+        if(!patientService.IsCreated(id)) {
+            return patientService.addPatient(id);
+        }
+        else
+            return false;
+    }*/
 
-    @ApiOperation("获取患者个人信息by身份证号或手机号")
+    @ApiOperation("获取患者个人信息")
     @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.GET)
-    public MrPatientsEntity getPatientInformationBydemographicIdOrPhone(
-            @ApiParam(name = "phone", value = "手机号") @RequestParam(value = "phone", required = false) String phone,
-            @ApiParam(name = "demographicId", value = "身份证号")
-            @RequestParam(value = "demographicId", required = false) String demographicId){
-        return patientService.getPatientInformationBydemographicIdOrPhone(demographicId,phone);
+    public MrPatientsEntity getPatientInformation(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id", required = true) String id){
+        if(patientService.IsCreated(id)) {
+            return patientService.getPatientInformation(id);
+        }
+        else
+            return null;
     }
 
-    @ApiOperation("获取患者所有诊断")
+    /*@ApiOperation("获取患者所有诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientDiagnosis, method = RequestMethod.GET)
     public List<String> getPatientDiagnosis(
-            @ApiParam(name = "phone", value = "手机号") @RequestParam(value = "phone", required = false) String phone,
-            @ApiParam(name = "demographicId", value = "身份证号")
-            @RequestParam(value = "demographicId", required = false) String demographicId,
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id", required = true) String id,
             @ApiParam(name = "doctorId", value = "医生id")
-            @RequestParam(value = "doctorId", required = true) String doctorId){
-        int id=patientService.getPatientInformationBydemographicIdOrPhone(demographicId,phone).getId();
-        return patientService.getPatientDiagnosis(id,Integer.parseInt(doctorId));
-    }
+            @RequestParam(value = "doctorId", required = true) String doctorId) {
+
+        if (patientService.IsCreated(id)) {
+           return patientService.getPatientDiagnosis(id, doctorId);
+        }
+        else
+            return null;
+    }*/
 
     @ApiOperation("确认患者信息是否存在")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientExistence, method = RequestMethod.GET)
-    public int PatientExistence(
+    public String PatientExistence(
             @ApiParam(name="AppPatientId",value="AppPatientId",defaultValue = "")
             @PathVariable(value="app_patient_id")String AppPatientId,
             @ApiParam(name="appUId",value="appUId",defaultValue = "")

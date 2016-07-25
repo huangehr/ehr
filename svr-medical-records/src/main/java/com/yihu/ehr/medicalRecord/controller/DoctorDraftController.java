@@ -46,33 +46,14 @@ public class DoctorDraftController extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorDraft,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("保存草稿")
-    public MrDoctorDraftEntity saveDoctorDraft(
+    public boolean saveDoctorDraft(
             @ApiParam(name="doctorDraft",value="草稿JSON",defaultValue = "")
             @RequestBody String doctorDraft) throws Exception
     {
         MrDoctorDraftEntity mrDoctorDraft = toEntity(doctorDraft,MrDoctorDraftEntity.class);
 
         mrDoctorDraft.setUsageCount(1); //设置默认使用次数
-        mrDoctorDraft = dDService.saveDoctorDraft(mrDoctorDraft);
-        return convertToModel(mrDoctorDraft,MrDoctorDraftEntity.class);
-    }
-
-
-    /**
-     * 更新草稿的使用次数
-     *
-     * @param id 草稿Id
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorDraft,method = RequestMethod.PUT)
-    @ApiOperation("更新使用次数")
-    public boolean updateDoctorDraft(
-            @ApiParam(name="id",value="草稿Id",defaultValue = "")
-            @RequestParam(value="id") int id) throws Exception
-    {
-        dDService.updateDraftBy(id);
-
+        dDService.saveDoctorDraft(mrDoctorDraft);
         return true;
     }
 

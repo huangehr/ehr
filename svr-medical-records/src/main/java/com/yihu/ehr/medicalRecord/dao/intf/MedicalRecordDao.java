@@ -15,7 +15,7 @@ public interface MedicalRecordDao extends PagingAndSortingRepository<MrMedicalRe
     List<MrMedicalRecordsEntity> findBypatientIdAndDoctorId(int patientId, String doctorId);
 
     @Query("from MrMedicalRecordsEntity where doctorId= ?1 order by medicalTime desc")
-    List<MrMedicalRecordsEntity> findByDoctorId(int doctorId);
+    List<MrMedicalRecordsEntity> findByDoctorId(String doctorId);
 
     MrMedicalRecordsEntity findByid(int id);
 }

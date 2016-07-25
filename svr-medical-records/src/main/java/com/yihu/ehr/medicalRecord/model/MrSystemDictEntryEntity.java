@@ -13,6 +13,17 @@ public class MrSystemDictEntryEntity {
     private String code;
     private String name;
     private String description;
+    private String PhoneticCode;
+
+
+    @Column(name = "PHONETIC_CODE")
+    public String getPhoneticCode() {
+        return PhoneticCode;
+    }
+
+    public void setPhoneticCode(String phoneticCode) {
+        PhoneticCode = phoneticCode;
+    }
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

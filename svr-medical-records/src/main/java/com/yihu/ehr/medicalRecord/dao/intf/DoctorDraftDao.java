@@ -1,11 +1,6 @@
 package com.yihu.ehr.medicalRecord.dao.intf;
 
 import com.yihu.ehr.medicalRecord.model.MrDoctorDraftEntity;
-import com.yihu.ehr.medicalRecord.model.MrDoctorTemplateEntity;
-import com.yihu.ehr.medicalRecord.model.MrMedicalDraftEntity;
-import com.yihu.ehr.medicalRecord.model.MrMedicalReportEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 

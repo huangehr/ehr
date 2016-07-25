@@ -1,6 +1,5 @@
 package com.yihu.ehr.medicalRecord.model;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
