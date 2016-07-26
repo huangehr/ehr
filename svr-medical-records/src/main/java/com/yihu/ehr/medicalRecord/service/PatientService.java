@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecord.service;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
@@ -22,7 +23,8 @@ import java.util.*;
 @Service
 public class PatientService extends RestTemplates  {
 
-
+//    @Autowired
+//    SolrQuery solr;
     @Autowired
     PatientDao patientDao;
     @Autowired
@@ -53,11 +55,36 @@ public class PatientService extends RestTemplates  {
                 mrPatientsEntity.setPhoto(re.get("PhotoUri").toString());
                 mrPatientsEntity.setPhone(re.get("Phone").toString());
                 mrPatientsEntity.setIsVerified(re.get("IsMarried").toString());
+                addPatient(mrPatientsEntity);
                 return mrPatientsEntity;
             } else
                 return null;
         }
     }
+
+//    public List<MrPatientsEntity> searchPatient(String queryCondition)throws Exception{
+//        ObjectMapper mapper = new ObjectMapper();
+//        JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Map.class);
+//        List<Map<String,Object>> list = objectMapper.readValue(queryCondition,javaType);
+//        List<QueryCondition> ql = new ArrayList<>();
+//        if(list!=null && list.size()>0)
+//        {
+//            for(Map<String,Object> item : list)
+//            {
+//                String field = String.valueOf(item.get("field")).trim();
+//                String cond = String.valueOf(item.get("condition")).trim();
+//                String value = String.valueOf(item.get("value"));
+//                if(value.indexOf(",")>0)
+//                {
+//                    ql.add(new QueryCondition("And", cond, field, value.split(",")));
+//                }
+//                else{
+//                    ql.add(new QueryCondition("And", cond, field, value));
+//                }
+//            }
+//        }
+//        solr.conditionToString(ql);
+//    }
 
     public boolean updataPatientInformationByID(MrPatientsEntity patient){
 

@@ -555,6 +555,7 @@ public class ServiceApi {
 
         //病人信息
         public static final String Patient                                = "/medicalRecords/patient";
+        public static final String SearchPatient                                = "/medicalRecords/SearchPatient";
         public static final String PatientExistence                       = "/medicalRecords/{app_uid}/existence/{app_patient_id}";
 
         //文件操作

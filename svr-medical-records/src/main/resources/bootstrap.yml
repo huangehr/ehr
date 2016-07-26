@@ -1,6 +1,7 @@
 spring:
   application:
-    name: svr-org
+    name: svr-medical-records
+
 
 ---
 spring:

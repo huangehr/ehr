@@ -8,10 +8,12 @@ import com.yihu.ehr.medicalRecord.model.User;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.web.RestTemplates;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,7 +30,8 @@ public class UserInfoService{
 
     @Autowired
     ObjectMapper objectMapper;
-
+    @Autowired
+    RestTemplates restTemplates;
     @Value("${service-gateway.wsurl}")
     public String wsurl;
     @Value("${service-gateway.WSclientId}")
@@ -45,9 +48,10 @@ public class UserInfoService{
 
     public String getUserInfo(String id)throws Exception{
         Map<String, Object> params = getLoginParam("UserMgmt.User.queryUserInfoByID", "{ \"UserID\":\"" + id + "\"}");
-        String result;
+        String result,result1;
         MrPatientsEntity mrPatientsEntity=new MrPatientsEntity();
-        result = HttpClientUtil.doPost(wsurl, params, null, null);
+        result1 = restTemplates.doPost(wsurl, params,Map.class);
+        result = HttpClientUtil.doPost(wsurl, params,null,null);
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
         Map map=objectMapper.readValue(result, Map.class);
 

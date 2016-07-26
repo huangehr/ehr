@@ -45,6 +45,14 @@ public class PatientController extends BaseRestEndPoint {
             return patientService.getPatientInformation(id);
     }
 
+//    @ApiOperation("自定义查询")
+//    @RequestMapping(value = ServiceApi.MedicalRecords.SearchPatient, method = RequestMethod.GET)
+//    public List<MrPatientsEntity> searchPatient(
+//            @ApiParam(name = "queryCondition", value = "queryCondition")
+//            @RequestParam(value = "queryCondition", required = true) String queryCondition)throws Exception{
+//        return patientService.searchPatient(queryCondition);
+//    }
+
     @ApiOperation("获取患者所有诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientDiagnosis, method = RequestMethod.GET)
     public List<String> getPatientDiagnosis(
