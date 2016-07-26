@@ -3,6 +3,10 @@ package com.yihu.ehr.medicalRecord.service;
 
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalDraftDao;
+import com.yihu.ehr.medicalRecord.dao.intf.MrFileDao;
+import com.yihu.ehr.medicalRecord.dao.intf.MrFileRelationDao;
+import com.yihu.ehr.medicalRecord.model.MrFileEntity;
+import com.yihu.ehr.medicalRecord.model.MrFileRelationEntity;
 import com.yihu.ehr.medicalRecord.model.MrMedicalDraftEntity;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +31,15 @@ public class MedicalDraftService extends BaseJpaService<MrMedicalDraftEntity,Med
 
     @Autowired
     MedicalDraftDao mDDao;
+
     @Autowired
-    private FastDFSUtil fastDFSUtil;
+    MrFileDao fileDao;
+
+    @Autowired
+    MrFileRelationDao fileRelationDao;
+
+    @Autowired
+    FastDFSUtil fastDFSUtil;
 
     public List<MrMedicalDraftEntity> getDraftByDoctorId(int doctorId, String type){
 
@@ -60,6 +71,7 @@ public class MedicalDraftService extends BaseJpaService<MrMedicalDraftEntity,Med
 
         Date date = new Date();
         Timestamp t = new Timestamp(date.getTime());
+        boolean firstFlag = false;
 
         if(draft == null){
 
@@ -70,14 +82,33 @@ public class MedicalDraftService extends BaseJpaService<MrMedicalDraftEntity,Med
             draft.setContent(content);
             draft.setPatientId(Integer.valueOf(patientId));
             draft.setFastdfsUrl(fastdfsURL);
+
+            firstFlag = true;
         }
         draft.setCreateTime(t);
 
-        mDDao.save(draft);
+        draft = mDDao.save(draft);
+
+        if(firstFlag){
+
+            MrFileEntity fileEntity = fileDao.findByfilePath(fastdfsURL);
+            if(fileEntity != null){
+
+                MrFileRelationEntity relationEntity = new MrFileRelationEntity();
+
+                relationEntity.setOwnerType("1");//所属类型为草稿
+                relationEntity.setOwnerId(String.valueOf(draft.getId()));
+                relationEntity.setFileId(String.valueOf(fileEntity.getId()));
+                relationEntity.setCreateTime(t);
+
+                fileRelationDao.save(relationEntity);
+            }
+        }
+
         return true;
     }
 
-    public boolean deleteDraft(String ids){
+    public boolean deleteDraft(String ids) throws Exception {
 
         ArrayList<Integer> idArray = new ArrayList<>();
         String[] idList = ids.split(",");
@@ -88,7 +119,26 @@ public class MedicalDraftService extends BaseJpaService<MrMedicalDraftEntity,Med
         }
 
         List<MrMedicalDraftEntity> draftList = mDDao.findByidIn(idArray);
+        List<MrFileRelationEntity> relationList = fileRelationDao.findByownerIdIn(idArray);
+
+        for(MrFileRelationEntity relation: relationList){
+
+            List<MrFileRelationEntity> thisFileCount = fileRelationDao.findByfileId(relation.getFileId());
+
+            if(thisFileCount.size() == 1){
+
+                MrFileEntity fileEntity = fileDao.findByid(Integer.valueOf(thisFileCount.get(0).getFileId()));
+
+                fileDao.delete(fileEntity);
+
+                String storagePath = fileEntity.getFilePath();
+                String groupName = storagePath.split(":")[0];
+                String remoteFileName = storagePath.split(":")[1];
+                fastDFSUtil.delete(groupName,remoteFileName);
+            }
+        }
         mDDao.delete(draftList);
+        fileRelationDao.delete(relationList);
 
         return true;
     }

@@ -511,9 +511,9 @@ public class ServiceApi {
         //病历
         public static final String MedicalRecordByLastOne                 = "/medicalRecords/getRecordByLastOne";
         public static final String MedicalRecord                          = "/medicalRecords/medicalRecord";
-        public static final String MedicalRecordId                        = "/medicalRecords/{id}/Record";
-        public static final String MedicalRecordDocId                     = "/medicalRecords/{doctor_id}/Record";
-        public static final String MedicalRecordPatId                     = "/medicalRecords/{patient_id}/Record";
+        public static final String MedicalRecordId                        = "/medicalRecords/{id}/record";
+        public static final String MedicalRecordDocId                     = "/medicalRecords/{doctor_id}/record";
+        public static final String MedicalRecordPatId                     = "/medicalRecords/{patient_id}/record";
         public static final String MedicalRecordCopy                      = "/medicalRecords/medicalRecordCopy";
 
         //病历报告
@@ -561,8 +561,8 @@ public class ServiceApi {
         public static final String PatientExistence                       = "/medicalRecords/{app_uid}/existence/{app_patient_id}";
 
         //文件操作
-        public static final String imgFile                                = "/medicalRecords/imgFile";
-        public static final String file                                   = "/medicalRecords/file";
+        public static final String imgFile                                = "/medicalRecords/{id}/imgFile";
+        public static final String file                                   = "/medicalRecords/{id}/file";
 
     }
 }

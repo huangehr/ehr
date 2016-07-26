@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Guo Yanshan on 2016/7/15.
@@ -206,22 +207,6 @@ public class MedicalRecordsController extends EnvelopRestEndPoint {
     }
 
     /**
-     * 根据医生Id获取病历
-     *
-     * @param doctorId 医生id
-     * @return List<MrMedicalRecordsEntity>
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordDocId,method = RequestMethod.GET)
-    @ApiOperation("根据医生ID获取病历")
-    public List<MrMedicalRecordsEntity> getRecordsByDoctorId(
-            @ApiParam(name="doctor_id",value="医生id",defaultValue = "")
-            @PathVariable(value="doctor_id")String doctorId) throws Exception
-    {
-        return mRService.getRecordsBydocId(doctorId);
-    }
-
-    /**
      * 根据患者Id获取病历
      *
      * @param patientId 患者id
@@ -230,10 +215,26 @@ public class MedicalRecordsController extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordPatId,method = RequestMethod.GET)
     @ApiOperation("根据患者ID获取病历")
-    public List<MrMedicalRecordsEntity> getRecordsByPatientId(
+    public List<Map> getRecordsByPatientId(
             @ApiParam(name="patient_id",value="医生id",defaultValue = "")
             @PathVariable(value="patient_id")String patientId) throws Exception
     {
         return mRService.getRecordsBypatId(patientId);
+    }
+
+    /**
+     * 根据医生Id获取病历一览表(医生病历库)
+     *
+     * @param doctorId 医生id
+     * @return List<Map>
+     * @throws Exception
+     */
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordDocId,method = RequestMethod.GET)
+    @ApiOperation("根据医生ID医生病历库")
+    public List<Map> getRecordList(
+            @ApiParam(name="doctor_id",value="医生id",defaultValue = "")
+            @PathVariable(value="doctor_id")String doctorId) throws Exception
+    {
+        return mRService.getListBydocId(doctorId);
     }
 }

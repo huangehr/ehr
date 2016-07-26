@@ -146,40 +146,4 @@ public class MedicalDraftController extends EnvelopRestEndPoint {
         mDService.deleteDraft(ids);
         return true;
     }
-
-    /**
-     * 图片上传
-     * @return
-     * @throws IOException
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalDraftPicture,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "上传图片")
-    public String uploadPicture(
-            @ApiParam(name = "localPath", value = "本地路径")
-            @RequestParam(name="localPath") String localPath,
-            @ApiParam(name = "picName", value = "文件名称")
-            @RequestParam(name="picName") String picName) throws IOException {
-
-        InputStream in = new FileInputStream(localPath);
-        String prefix = localPath.substring(localPath.indexOf(".")+1);
-
-        String path = null;
-        try {
-
-            ObjectNode objectNode = fastDFSUtil.upload(in, prefix, picName);
-
-            String groupName = objectNode.get("groupName").toString();
-            String remoteFileName = objectNode.get("remoteFileName").toString();
-
-            path = groupName.substring(1,groupName.length()-1) + ":" +
-                    remoteFileName.substring(1,remoteFileName.length()-1);
-
-        } catch (Exception e) {
-
-            LogService.getLogger(MrMedicalDraftEntity.class).error("图片上传失败；错误代码："+e);
-        }
-
-        //返回文件路径
-        return path;
-    }
 }
