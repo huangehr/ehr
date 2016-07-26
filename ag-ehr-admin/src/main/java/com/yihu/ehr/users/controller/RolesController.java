@@ -5,11 +5,14 @@ import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
 import com.yihu.ehr.agModel.user.RolesModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
+import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.user.*;
 import com.yihu.ehr.users.service.*;
+import com.yihu.ehr.util.array.ListUtils;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,6 +47,8 @@ public class RolesController extends BaseController {
     private RoleApiRelationClient roleApiRelationClient;
     @Autowired
     private AppClient appClient;
+    @Autowired
+    private AppFeatureClient appFeatureClient;
 
     @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST)
     @ApiOperation(value = "新增角色组")
@@ -284,5 +289,33 @@ public class RolesController extends BaseController {
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(appRolesModelList);
         return envelop;
+    }
+
+    @RequestMapping(value = "/roles/user/features",method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户的权限信息" )
+    public Envelop getPlatformAppRolesView(
+            @ApiParam(name = "user_id",value = "用户编号")
+            @RequestParam(value = "user_id") String userId){
+
+        try {
+            Envelop envelop = success(null);
+            Collection<MRoleUser> roles = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
+            if(roles!=null){
+                String ids = ListUtils.toString(roles, MRoleUser.class, "getRoleId");
+                if(ids.length()>0){
+                    Collection<MRoleFeatureRelation> featureRelations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + ids);
+                    ids = ListUtils.toString(featureRelations, MRoleFeatureRelation.class, "getFeatureId");
+                    if(ids.length()>0){
+                        Collection<MAppFeature> features = appFeatureClient.getAppFeatureNoPage("id=" + ids);
+                        envelop.setDetailModelList((List<MAppFeature>) convertToModels(features,
+                                new ArrayList<>(), MAppFeature.class, null));
+                    }
+                }
+            }
+            return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failed("查询用户权限出错！");
+        }
     }
 }
