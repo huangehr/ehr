@@ -3,7 +3,6 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecord.model.MrDiagnosisDictEntity;
 import com.yihu.ehr.medicalRecord.model.MrSystemDictEntity;
 import com.yihu.ehr.medicalRecord.service.MrSystemDictService;
 import io.swagger.annotations.Api;

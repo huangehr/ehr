@@ -1,7 +1,6 @@
 package com.yihu.ehr.medicalRecord.dao.intf;
 
 import com.yihu.ehr.medicalRecord.model.MrDoctorTemplateEntity;
-import com.yihu.ehr.medicalRecord.model.MrMedicalReportEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
@@ -11,6 +10,6 @@ import java.util.List;
  */
 public interface DoctorTemplateDao extends PagingAndSortingRepository<MrDoctorTemplateEntity,String> {
 
-    List<MrDoctorTemplateEntity> findBydoctorId(int id);
+    List<MrDoctorTemplateEntity> findBydoctorId(String id);
 
 }

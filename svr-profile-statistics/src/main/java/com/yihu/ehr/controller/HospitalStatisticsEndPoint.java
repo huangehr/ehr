@@ -1,0 +1,84 @@
+package com.yihu.ehr.controller;
+
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.service.StatisticsService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+/**
+ * Created by lyr on 2016/7/21.
+ */
+@RestController
+@RequestMapping(value = ApiVersion.Version1_0)
+@Api(value = "Hospital-Statistics", description = "住院统计")
+public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
+
+    @Autowired
+    StatisticsService statisticsService;
+
+    @RequestMapping(value = "/hospital/statistics/{orgCode}/dept", method = RequestMethod.GET)
+    @ApiOperation("不同科室出院统计")
+    public Map<String, String> getOutPatientStatisticsByDept(
+            @ApiParam(value = "orgCode")
+            @PathVariable(value = "orgCode") String orgCode,
+            @ApiParam(value = "eventDate")
+            @RequestParam(value = "eventDate") String eventDate) throws Exception {
+        try {
+            return statisticsService.groupStatistics("EHR_000223", orgCode, eventDate, "1");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @RequestMapping(value = "/hospital/statistics/{orgCode}/sex", method = RequestMethod.GET)
+    @ApiOperation("不同性别出院统计")
+    public Map<String, String> getOutPatientStatisticsBySex(
+            @ApiParam(value = "orgCode")
+            @PathVariable(value = "orgCode") String orgCode,
+            @ApiParam(value = "eventDate")
+            @RequestParam(value = "eventDate") String eventDate) throws Exception {
+        try {
+            return statisticsService.groupStatistics("EHR_000019_VALUE", orgCode, eventDate, "1");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @RequestMapping(value = "/hospital/statistics/{orgCode}/disease", method = RequestMethod.GET)
+    @ApiOperation("不同疾病出院统计")
+    public Map<String, String> getOutPatientStatisticsByDisease(
+            @ApiParam(value = "orgCode")
+            @PathVariable(value = "orgCode") String orgCode,
+            @ApiParam(value = "eventDate")
+            @RequestParam(value = "eventDate") String eventDate) throws Exception {
+        try {
+            return statisticsService.groupStatistics("EHR_000163_VALUE", orgCode, eventDate, "1");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @RequestMapping(value = "/hospital/statistics/{orgCode}", method = RequestMethod.GET)
+    @ApiOperation("出院统计")
+    public long getOutPatientStatistics(
+            @ApiParam(value = "orgCode")
+            @PathVariable(value = "orgCode") String orgCode,
+            @ApiParam(value = "eventDate")
+            @RequestParam(value = "eventDate") String eventDate) throws Exception {
+        try {
+            return statisticsService.filterQueryStatistics(orgCode, eventDate, "1");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+
+}

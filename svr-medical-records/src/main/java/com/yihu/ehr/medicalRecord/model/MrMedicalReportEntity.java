@@ -16,6 +16,7 @@ public class MrMedicalReportEntity {
     private String reportContent;
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
     public int getId() {
         return id;

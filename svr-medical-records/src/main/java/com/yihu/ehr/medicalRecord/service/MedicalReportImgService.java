@@ -1,19 +1,14 @@
 package com.yihu.ehr.medicalRecord.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalReporImgtDao;
-import com.yihu.ehr.medicalRecord.dao.intf.MedicalReportDao;
-import com.yihu.ehr.medicalRecord.model.MrMedicalReportEntity;
 import com.yihu.ehr.medicalRecord.model.MrMedicalReportImgEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by Guo Yanshan on 2016/7/12.
@@ -31,7 +26,7 @@ public class MedicalReportImgService {
      */
     public List<MrMedicalReportImgEntity> getMedicalReportInfoByReportId(int ReportId){
 
-         return  medicalReportImgDao.findByreportId(ReportId);
+         return  medicalReportImgDao.findByreportIdOrderBySort(ReportId);
     }
 
     /**
@@ -46,11 +41,10 @@ public class MedicalReportImgService {
 
             MrMedicalReportImgEntity mmr = new MrMedicalReportImgEntity();
 
-            mmr.setId((Integer) map.get("id"));
-            mmr.setReportId((Integer) map.get("reportId"));
+            mmr.setReportId(Integer.valueOf((String) map.get("reportId")));
             mmr.setReportImgUrl((String) map.get("reportImgUrl"));
             mmr.setReportFastdfsImgUrl((String) map.get("reportFastdfsImgUrl"));
-            mmr.setSort((Integer) map.get("sort"));
+            mmr.setSort(Integer.valueOf((String) map.get("sort")));
 
             medicalReportImgDao.save(mmr);
         }
@@ -64,7 +58,7 @@ public class MedicalReportImgService {
      */
     public void deleteImgs(int reportId){
 
-        List<MrMedicalReportImgEntity> imgList = medicalReportImgDao.findByreportId(reportId);
+        List<MrMedicalReportImgEntity> imgList = medicalReportImgDao.findByreportIdOrderBySort(reportId);
 
         medicalReportImgDao.delete(imgList);
     }

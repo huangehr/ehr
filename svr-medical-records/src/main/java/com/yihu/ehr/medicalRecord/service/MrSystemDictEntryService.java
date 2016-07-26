@@ -2,7 +2,6 @@ package com.yihu.ehr.medicalRecord.service;
 
 import com.yihu.ehr.medicalRecord.dao.intf.MrSystemDictEntryDao;
 import com.yihu.ehr.medicalRecord.dao.intf.PronunciationDao;
-import com.yihu.ehr.medicalRecord.model.MrDiagnosisDictEntity;
 import com.yihu.ehr.medicalRecord.model.MrSystemDictEntryEntity;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
