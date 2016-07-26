@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by shine on 2016/7/14.
@@ -48,5 +49,32 @@ public class MedicalLabelController extends BaseRestEndPoint {
             @ApiParam(name = "RecordId", value = "病历表编号")
             @PathVariable(value = "Record_id")String RecordId){
         return medicalLabelService.getMedicalLabelInformationByRecordId(RecordId);
+    }
+
+    @ApiOperation("更新病历标签")
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalLabels, method = RequestMethod.PUT)
+    public boolean updateMedicalLabel(
+            @ApiParam(name = "Labels", value = "病历标签")
+            @RequestParam(value = "Labels")String MedicalLabels)throws Exception{
+        List<Map<String,String>>tmp=toEntity(MedicalLabels,List.class);
+        List<MrMedicalLabelEntity>m=new ArrayList<>();
+        for(int i=0;i<tmp.size();i++){
+            if(tmp.get(i)!=null) {
+                MrMedicalLabelEntity mrMedicalLabelEntity = new MrMedicalLabelEntity();
+                mrMedicalLabelEntity.setRecordsId(Integer.parseInt(tmp.get(i).get("recordsId")));
+                mrMedicalLabelEntity.setLabel(tmp.get(i).get("label"));
+                m.add(mrMedicalLabelEntity);
+            }
+        }
+        return medicalLabelService.updateMedicalLabel(m);
+    }
+
+    @ApiOperation("获取RecordId by Labels")
+    @RequestMapping(value = ServiceApi.MedicalRecords.getRecordIdByLabels, method = RequestMethod.GET)
+    public List<Integer> getRecordIdByLabels(
+            @ApiParam(name = "Labels", value = "病历表编号")
+            @RequestParam(value = "Labels")List<String> Labels){
+        String[] arr = (String[])Labels.toArray(new String[Labels.size()]);
+        return medicalLabelService.getRecordIdByLabels(arr);
     }
 }

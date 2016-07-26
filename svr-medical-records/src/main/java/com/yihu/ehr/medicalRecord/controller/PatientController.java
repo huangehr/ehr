@@ -45,13 +45,13 @@ public class PatientController extends BaseRestEndPoint {
             return patientService.getPatientInformation(id);
     }
 
-//    @ApiOperation("自定义查询")
-//    @RequestMapping(value = ServiceApi.MedicalRecords.SearchPatient, method = RequestMethod.GET)
-//    public List<MrPatientsEntity> searchPatient(
-//            @ApiParam(name = "queryCondition", value = "queryCondition")
-//            @RequestParam(value = "queryCondition", required = true) String queryCondition)throws Exception{
-//        return patientService.searchPatient(queryCondition);
-//    }
+    @ApiOperation("自定义查询")
+    @RequestMapping(value = ServiceApi.MedicalRecords.SearchPatient, method = RequestMethod.GET)
+    public List<MrPatientsEntity> searchPatient(
+            @ApiParam(name = "queryCondition", value = "queryCondition")
+            @RequestParam(value = "queryCondition", required = true) String queryCondition)throws Exception{
+        return patientService.searchPatient(queryCondition);
+    }
 
     @ApiOperation("获取患者所有诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientDiagnosis, method = RequestMethod.GET)
@@ -67,22 +67,5 @@ public class PatientController extends BaseRestEndPoint {
         else
             return null;
     }
-
-    /*@ApiOperation("确认患者信息是否存在")
-    @RequestMapping(value = ServiceApi.MedicalRecords.PatientExistence, method = RequestMethod.GET)
-    public String PatientExistence(
-            @ApiParam(name="AppPatientId",value="AppPatientId",defaultValue = "")
-            @PathVariable(value="app_patient_id")String AppPatientId,
-            @ApiParam(name="appUId",value="appUId",defaultValue = "")
-            @RequestParam(value="app_uid",required = false)String appUId,
-            @ApiParam(name="patientJson",value="患者信息JSON",defaultValue = "")
-            @RequestBody String patientJson) throws Exception
-    {
-
-        MrPatientsEntity mrPatientsEntity = toEntity(patientJson,MrPatientsEntity.class);
-        MrPatientsEntity mrPatient = patientService.checkInfo(appUId, AppPatientId, mrPatientsEntity);
-
-        return mrPatient.getId();
-    }*/
 
 }
