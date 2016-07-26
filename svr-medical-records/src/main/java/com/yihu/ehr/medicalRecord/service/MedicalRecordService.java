@@ -46,8 +46,9 @@ public class MedicalRecordService{
         MrMedicalRecordsEntity medicalRecord = new MrMedicalRecordsEntity();
 
         //获取最近一次的就诊病历
-        List<MrMedicalRecordsEntity> medicalRecordList = mrDao.findBypatientIdAndDoctorId(patientId,doctorId);
+        List<MrMedicalRecordsEntity> medicalRecordList = mrDao.findBypatientIdAndDoctorIdOrderByMedicalTime(patientId,doctorId);
 
+        //判断是否存在就诊病历
         if(medicalRecordList.size() > 0){
 
             medicalRecord = medicalRecordList.get(0);
@@ -63,7 +64,7 @@ public class MedicalRecordService{
 
             MrDoctorMedicalRecordsEntity drRelation = new MrDoctorMedicalRecordsEntity();
 
-            drRelation.setRecordId(medicalRecord.getId());
+            drRelation.setRecordId(String.valueOf(medicalRecord.getId()));
             drRelation.setDoctorId(medicalRecord.getDoctorId());
             drRelation.setIsCreator("1");//创建者
             drRelation.setRecordType("0");//线上诊断
@@ -124,5 +125,15 @@ public class MedicalRecordService{
         newRecord.setPatientPhysical(templateRecord.getPatientPhysical());
 
         return mrDao.save(newRecord);
+    }
+
+    public List<MrMedicalRecordsEntity> getRecordsBydocId(String doctorId){
+
+        return  mrDao.findByDoctorIdOrderByMedicalTime(doctorId);
+    }
+
+    public List<MrMedicalRecordsEntity> getRecordsBypatId(String patientId){
+
+        return  mrDao.findByPatientIdOrderByMedicalTime(patientId);
     }
 }

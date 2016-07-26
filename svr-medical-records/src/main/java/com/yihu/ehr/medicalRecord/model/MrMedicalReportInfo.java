@@ -9,6 +9,11 @@ public class MrMedicalReportInfo {
     private int recordsId;
     private String reportName;
     private Timestamp reportDatetime;
+    private String name;
+    private String reportContent;
+    private String reportImgUrl;
+    private String reportFastdfsImgUrl;
+    private int sort;
 
     public int getRecordsId() {
         return recordsId;
@@ -32,6 +37,14 @@ public class MrMedicalReportInfo {
 
     public void setReportDatetime(Timestamp reportDatetime) {
         this.reportDatetime = reportDatetime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getReportContent() {
@@ -65,9 +78,4 @@ public class MrMedicalReportInfo {
     public void setSort(int sort) {
         this.sort = sort;
     }
-
-    private String reportContent;
-    private String reportImgUrl;
-    private String reportFastdfsImgUrl;
-    private int sort;
 }

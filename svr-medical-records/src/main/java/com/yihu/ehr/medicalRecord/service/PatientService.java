@@ -111,7 +111,7 @@ public class PatientService extends RestTemplates  {
     }*/
 
     public List<String> getPatientDiagnosis(String patientId ,String doctorId){
-        List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorId(patientId,doctorId);
+        List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorIdOrderByMedicalTime(patientId,doctorId);
         List<String> diagnosisList=new ArrayList<>();
         for(int i=0;i<list.size();i++){
             if(list.get(i)!=null){

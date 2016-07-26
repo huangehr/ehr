@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Guo Yanshan on 2016/7/15.
@@ -50,7 +51,7 @@ public class MedicalRecordsController extends EnvelopRestEndPoint {
                              "patientHistoryFamily": "string",
                              "patientHistoryNow": "string",
                              "patientHistoryPast": "string",
-                             "patientId": int,
+                             "patientId": "String",
                              "patientPhysical": "string"
                             }
      * @return MrMedicalRecordsEntity
@@ -73,7 +74,7 @@ public class MedicalRecordsController extends EnvelopRestEndPoint {
         mrMedicalRecord = mRService.saveMedicalRecord(mrMedicalRecord);
 
         MrDoctorMedicalRecordsEntity drRelation = new MrDoctorMedicalRecordsEntity();
-        drRelation.setRecordId(mrMedicalRecord.getId());
+        drRelation.setRecordId(String.valueOf(mrMedicalRecord.getId()));
         drRelation.setDoctorId(mrMedicalRecord.getDoctorId());
         drRelation.setIsCreator("1");  //0:非创建者，1:创建者
         drRelation.setRecordType(recordType);
@@ -195,12 +196,44 @@ public class MedicalRecordsController extends EnvelopRestEndPoint {
         MrMedicalRecordsEntity mrMedicalRecord = mRService.copyRecord(patientId, doctorId, id, firstRecordId);
 
         MrDoctorMedicalRecordsEntity drRelation = new MrDoctorMedicalRecordsEntity();
-        drRelation.setRecordId(mrMedicalRecord.getId());
+        drRelation.setRecordId(String.valueOf(mrMedicalRecord.getId()));
         drRelation.setDoctorId(mrMedicalRecord.getDoctorId());
         drRelation.setIsCreator("1");  //0:非创建者，1:创建者
         drRelation.setRecordType(recordType);
         dMRService.saveDoctorMedicalRecord(drRelation);
 
         return convertToModel(mrMedicalRecord,MrMedicalRecordsEntity.class);
+    }
+
+    /**
+     * 根据医生Id获取病历
+     *
+     * @param doctorId 医生id
+     * @return List<MrMedicalRecordsEntity>
+     * @throws Exception
+     */
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordDocId,method = RequestMethod.GET)
+    @ApiOperation("根据医生ID获取病历")
+    public List<MrMedicalRecordsEntity> getRecordsByDoctorId(
+            @ApiParam(name="doctor_id",value="医生id",defaultValue = "")
+            @PathVariable(value="doctor_id")String doctorId) throws Exception
+    {
+        return mRService.getRecordsBydocId(doctorId);
+    }
+
+    /**
+     * 根据患者Id获取病历
+     *
+     * @param patientId 患者id
+     * @return List<MrMedicalRecordsEntity>
+     * @throws Exception
+     */
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordPatId,method = RequestMethod.GET)
+    @ApiOperation("根据患者ID获取病历")
+    public List<MrMedicalRecordsEntity> getRecordsByPatientId(
+            @ApiParam(name="patient_id",value="医生id",defaultValue = "")
+            @PathVariable(value="patient_id")String patientId) throws Exception
+    {
+        return mRService.getRecordsBypatId(patientId);
     }
 }

@@ -512,6 +512,8 @@ public class ServiceApi {
         public static final String MedicalRecordByLastOne                 = "/medicalRecords/getRecordByLastOne";
         public static final String MedicalRecord                          = "/medicalRecords/medicalRecord";
         public static final String MedicalRecordId                        = "/medicalRecords/{id}/Record";
+        public static final String MedicalRecordDocId                     = "/medicalRecords/{doctor_id}/Record";
+        public static final String MedicalRecordPatId                     = "/medicalRecords/{patient_id}/Record";
         public static final String MedicalRecordCopy                      = "/medicalRecords/medicalRecordCopy";
 
         //病历报告
