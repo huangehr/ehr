@@ -25,30 +25,35 @@ public class PatientController extends BaseRestEndPoint {
     PatientService patientService;
 
 
-    /*@ApiOperation("增加患者")
-    @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.POST)
-    public boolean addPatient(@ApiParam(name = "id", value = "id")
-                              @RequestParam(value = "id", required = true) String id)throws Exception{
-        if(!patientService.IsCreated(id)) {
-            return patientService.addPatient(id);
-        }
-        else
-            return false;
-    }*/
+    //    @ApiOperation("增加患者")
+//    @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.POST)
+//    public boolean addPatient(@ApiParam(name = "patientJson", value = "patientJson")
+//                              @RequestParam(value = "patientJson", required = true) String patientJson)throws Exception{
+//        if(!patientService.IsCreated(id)) {
+//            MrPatientsEntity patient = toEntity(patientJson, MrPatientsEntity.class);
+//            return patientService.addPatient(patient);
+//        }
+//        else
+//            return false;
+//    }
 
     @ApiOperation("获取患者个人信息")
     @RequestMapping(value = ServiceApi.MedicalRecords.Patient, method = RequestMethod.GET)
     public MrPatientsEntity getPatientInformation(
             @ApiParam(name = "id", value = "id")
-            @RequestParam(value = "id", required = true) String id){
-        if(patientService.IsCreated(id)) {
+            @RequestParam(value = "id", required = true) String id)throws Exception{
             return patientService.getPatientInformation(id);
-        }
-        else
-            return null;
     }
 
-    /*@ApiOperation("获取患者所有诊断")
+//    @ApiOperation("自定义查询")
+//    @RequestMapping(value = ServiceApi.MedicalRecords.SearchPatient, method = RequestMethod.GET)
+//    public List<MrPatientsEntity> searchPatient(
+//            @ApiParam(name = "queryCondition", value = "queryCondition")
+//            @RequestParam(value = "queryCondition", required = true) String queryCondition)throws Exception{
+//        return patientService.searchPatient(queryCondition);
+//    }
+
+    @ApiOperation("获取患者所有诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientDiagnosis, method = RequestMethod.GET)
     public List<String> getPatientDiagnosis(
             @ApiParam(name = "id", value = "id")
@@ -57,11 +62,11 @@ public class PatientController extends BaseRestEndPoint {
             @RequestParam(value = "doctorId", required = true) String doctorId) {
 
         if (patientService.IsCreated(id)) {
-           return patientService.getPatientDiagnosis(id, doctorId);
+            return patientService.getPatientDiagnosis(id, doctorId);
         }
         else
             return null;
-    }*/
+    }
 
     /*@ApiOperation("确认患者信息是否存在")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientExistence, method = RequestMethod.GET)
