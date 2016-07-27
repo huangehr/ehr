@@ -115,7 +115,7 @@ public class DoctorService {
     }
 
     public List<String> getDoctorDiagnosis(String doctorId){
-        List<MrMedicalRecordsEntity>list= medicalRecordDao.findByDoctorId(doctorId);
+        List<MrMedicalRecordsEntity>list= medicalRecordDao.findByDoctorIdOrderByMedicalTimeDesc(doctorId);
         List<String> diagnosisList=new ArrayList<>();
         for(int i=0;i<list.size();i++){
             if(list.get(i)!=null){
