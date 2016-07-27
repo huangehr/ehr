@@ -21,8 +21,8 @@
 	  table-layout:fixed;
 	}
 	.row{
-	    height:28px;
-		line-height: 28px;
+	    height:33px;
+		line-height: 33px;
 	}
 	.field{
 	  width:33.33%;
@@ -58,8 +58,8 @@
 	  table-layout:fixed;
 	}
 	.list-tr{
-	  height:24px;
-	  line-height:24px;
+	  height:28px;
+	  line-height:28px;
 	}
 	.list-td{
 	  white-space:nowrap;

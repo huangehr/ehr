@@ -23,13 +23,13 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
 
     @RequestMapping(value = "/hospital/statistics/{orgCode}/dept", method = RequestMethod.GET)
     @ApiOperation("不同科室出院统计")
-    public Map<String, String> getOutPatientStatisticsByDept(
+    public Map<String, Long> getOutPatientStatisticsByDept(
             @ApiParam(value = "orgCode")
             @PathVariable(value = "orgCode") String orgCode,
             @ApiParam(value = "eventDate")
             @RequestParam(value = "eventDate") String eventDate) throws Exception {
         try {
-            return statisticsService.groupStatistics("EHR_000223", orgCode, eventDate, "1");
+            return statisticsService.groupStatistics("EHR_000223", orgCode, eventDate, "1",true);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -38,13 +38,13 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
 
     @RequestMapping(value = "/hospital/statistics/{orgCode}/sex", method = RequestMethod.GET)
     @ApiOperation("不同性别出院统计")
-    public Map<String, String> getOutPatientStatisticsBySex(
+    public Map<String, Long> getOutPatientStatisticsBySex(
             @ApiParam(value = "orgCode")
             @PathVariable(value = "orgCode") String orgCode,
             @ApiParam(value = "eventDate")
             @RequestParam(value = "eventDate") String eventDate) throws Exception {
         try {
-            return statisticsService.groupStatistics("EHR_000019_VALUE", orgCode, eventDate, "1");
+            return statisticsService.groupStatistics("EHR_000019_VALUE", orgCode, eventDate, "1",true);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -53,13 +53,13 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
 
     @RequestMapping(value = "/hospital/statistics/{orgCode}/disease", method = RequestMethod.GET)
     @ApiOperation("不同疾病出院统计")
-    public Map<String, String> getOutPatientStatisticsByDisease(
+    public Map<String, Long> getOutPatientStatisticsByDisease(
             @ApiParam(value = "orgCode")
             @PathVariable(value = "orgCode") String orgCode,
             @ApiParam(value = "eventDate")
             @RequestParam(value = "eventDate") String eventDate) throws Exception {
         try {
-            return statisticsService.groupStatistics("EHR_000163_VALUE", orgCode, eventDate, "1");
+            return statisticsService.groupStatistics("EHR_000163_VALUE", orgCode, eventDate, "1",true);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
