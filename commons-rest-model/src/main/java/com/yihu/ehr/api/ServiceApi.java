@@ -545,7 +545,7 @@ public class ServiceApi {
 
         //病历标签
         public static final String MedicalLabels                          = "/medicalRecords/{record_id}/labels";
-
+        public static final String getRecordIdByLabels                     ="/medicalRecords/getRecordIdByLabels";
         //诊断字典
         public static final String DiagnosisDict                          = "/medicalRecords/diagnosisDict";
 
