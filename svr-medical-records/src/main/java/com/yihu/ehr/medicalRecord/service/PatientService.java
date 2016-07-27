@@ -2,10 +2,14 @@ package com.yihu.ehr.medicalRecord.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.PageArg;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
 import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
+import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.query.URLQueryParser;
 import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.web.RestTemplates;
@@ -13,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.criteria.CriteriaQuery;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -21,7 +27,7 @@ import java.util.*;
  */
 @Transactional
 @Service
-public class PatientService extends RestTemplates  {
+public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao> {
 
 //    @Autowired
 //    SolrQuery solr;
@@ -62,29 +68,16 @@ public class PatientService extends RestTemplates  {
         }
     }
 
-//    public List<MrPatientsEntity> searchPatient(String queryCondition)throws Exception{
-//        ObjectMapper mapper = new ObjectMapper();
-//        JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Map.class);
-//        List<Map<String,Object>> list = objectMapper.readValue(queryCondition,javaType);
-//        List<QueryCondition> ql = new ArrayList<>();
-//        if(list!=null && list.size()>0)
-//        {
-//            for(Map<String,Object> item : list)
-//            {
-//                String field = String.valueOf(item.get("field")).trim();
-//                String cond = String.valueOf(item.get("condition")).trim();
-//                String value = String.valueOf(item.get("value"));
-//                if(value.indexOf(",")>0)
-//                {
-//                    ql.add(new QueryCondition("And", cond, field, value.split(",")));
-//                }
-//                else{
-//                    ql.add(new QueryCondition("And", cond, field, value));
-//                }
-//            }
-//        }
-//        solr.conditionToString(ql);
-//    }
+    public List<MrPatientsEntity> searchPatient(String queryCondition)throws Exception{
+        URLQueryParser queryParser = createQueryParser(null, queryCondition, null);
+        CriteriaQuery query = queryParser.makeCriteriaQuery();
+        int page=1,size=100;
+        return entityManager
+                .createQuery(query)
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
 
     public boolean updataPatientInformationByID(MrPatientsEntity patient){
 
@@ -131,7 +124,7 @@ public class PatientService extends RestTemplates  {
     }
 
     public List<String> getPatientDiagnosis(String patientId ,String doctorId){
-        List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorId(patientId,doctorId);
+        List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorIdOrderByMedicalTimeDesc(patientId,doctorId);
         List<String> diagnosisList=new ArrayList<>();
         for(int i=0;i<list.size();i++){
             if(list.get(i)!=null){

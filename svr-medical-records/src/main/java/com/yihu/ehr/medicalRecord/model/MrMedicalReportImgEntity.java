@@ -10,6 +10,7 @@ import javax.persistence.*;
 public class MrMedicalReportImgEntity {
     private int id;
     private int reportId;
+    private String name;
     private String reportImgUrl;
     private String reportFastdfsImgUrl;
     private int sort;
@@ -34,6 +35,18 @@ public class MrMedicalReportImgEntity {
     public void setReportId(int reportId) {
         this.reportId = reportId;
     }
+
+
+    @Basic
+    @Column(name = "name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 
     @Basic
     @Column(name = "REPORT_IMG_URL")

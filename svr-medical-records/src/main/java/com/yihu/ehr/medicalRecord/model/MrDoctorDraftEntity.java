@@ -12,6 +12,7 @@ public class MrDoctorDraftEntity {
     private String doctorId;
     private String type;
     private String content;
+    private String label;
     private int usageCount;
 
     @Id
@@ -33,6 +34,15 @@ public class MrDoctorDraftEntity {
 
     public void setDoctorId(String doctorId) {
         this.doctorId = doctorId;
+    }
+    @Basic
+    @Column(name = "label")
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     @Basic

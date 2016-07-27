@@ -10,6 +10,7 @@ import javax.persistence.*;
 public class MrDoctorTemplateEntity {
     private int id;
     private String doctorId;
+    private String fieldType;
     private String code;
     private String name;
 
@@ -25,6 +26,16 @@ public class MrDoctorTemplateEntity {
     }
 
     @Basic
+    @Column(name = "FIELD_TYPE")
+    public String getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(String fieldType) {
+        this.fieldType = fieldType;
+    }
+
+    @Basic
     @Column(name = "DOCTOR_ID")
     public String getDoctorId() {
         return doctorId;
@@ -33,7 +44,6 @@ public class MrDoctorTemplateEntity {
     public void setDoctorId(String doctorId) {
         this.doctorId = doctorId;
     }
-
     @Basic
     @Column(name = "CODE")
     public String getCode() {
