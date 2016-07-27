@@ -523,7 +523,7 @@ public class ServiceApi {
         public static final String MedicalReportImgPicture                = "/medicalRecords/medicalReportImgPicture";
 
         //医生模板
-        public static final String DoctorTemplate                         = "/medicalRecords/{doctor_id}/template";
+        public static final String DoctorTemplate                         = "/medicalRecords/doctor/{doctor_id}/template";
 
         //文本草稿
         public static final String DoctorDraft                            = "/medicalRecords/{doctor_id}/doctorDraft";
@@ -539,14 +539,18 @@ public class ServiceApi {
         public static final String DoctorMedicalRecord                    = "/medicalRecords/DoctorMedicalRecord/{record_id}";
 
         //医生信息
-        public static final String DoctorInfo                             = "/medicalRecords/{demographic_id}/Info";
+        public static final String AddDoctor                              = "/medicalRecords/doctor";
+        public static final String DoctorInfo                             = "/medicalRecords/doctor/{doctor_id}";
         public static final String ChangeDocStatus                        = "/medicalRecords/changeDocStatus";
         public static final String PatientDiagnosis                       = "/medicalRecords/PatientDiagnosis";
         public static final String DoctorDiagnosis                        = "/medicalRecords/DoctorDiagnosis/{doctor_id}";
         public static final String MedicalDrug                            = "/medicalRecords/MedicalDrug/{records_id}";
 
-        //病历标签
+        //标签
         public static final String MedicalLabels                          = "/medicalRecords/{record_id}/labels";
+        public static final String DoctorLabelClass                       = "/medicalRecords/doctor/{doctor_id}/labelClass";
+        public static final String DoctorLabel                            = "/medicalRecords/doctor/{doctor_id}/label";
+        public static final String DoctorLabelUsed                        = " /medicalRecords/doctor/{doctor_id}/labelUsed";
         public static final String getRecordIdByLabels                     ="/medicalRecords/getRecordIdByLabels";
         //诊断字典
         public static final String DiagnosisDict                          = "/medicalRecords/diagnosisDict";
@@ -556,8 +560,10 @@ public class ServiceApi {
         public static final String SystemDictEntry                        = "/medicalRecords/systemDictEntry";
 
         //病人信息
-        public static final String Patient                                = "/medicalRecords/patient";
-        public static final String SearchPatient                                = "/medicalRecords/SearchPatient";
+        public static final String AddPatient                             = "/medicalRecords/patient";
+        public static final String PatientInfo                            = "/medicalRecords/patient/{patient_id}";
+        public static final String PatientRecords                         = "/medicalRecords/patient/{patient_id}/records";
+        public static final String SearchPatient                          = "/medicalRecords/SearchPatient";
         public static final String PatientExistence                       = "/medicalRecords/{app_uid}/existence/{app_patient_id}";
 
         //文件操作

@@ -17,7 +17,6 @@ public class MrPatientsEntity {
     private String maritalStatus;
     private String photo;
     private String phone;
-    private String isVerified;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -98,15 +97,5 @@ public class MrPatientsEntity {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    @Basic
-    @Column(name = "IS_Verified")
-    public String getIsVerified() {
-        return isVerified;
-    }
-
-    public void setIsVerified(String isVerified) {
-        this.isVerified = isVerified;
     }
 }

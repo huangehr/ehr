@@ -60,7 +60,6 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
                 mrPatientsEntity.setMaritalStatus(re.get("IsMarried").toString());
                 mrPatientsEntity.setPhoto(re.get("PhotoUri").toString());
                 mrPatientsEntity.setPhone(re.get("Phone").toString());
-                mrPatientsEntity.setIsVerified(re.get("IsMarried").toString());
                 addPatient(mrPatientsEntity);
                 return mrPatientsEntity;
             } else
@@ -79,10 +78,10 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
                 .getResultList();
     }
 
-    public boolean updataPatientInformationByID(MrPatientsEntity patient){
+    public boolean updatePatientInformationByID(MrPatientsEntity patient){
 
-        MrPatientsEntity patientModel=patientDao.findBydemographicId(String.valueOf(patient.getId()));
-        if(patient!=null) {
+        MrPatientsEntity patientModel=patientDao.findByid(patient.getId());
+        if(patient!=null && patientModel!=null) {
             patientModel.setPhoto(patient.getPhoto());
             patientModel.setName(patient.getName());
             patientModel.setBirthday(patient.getBirthday());
@@ -90,7 +89,6 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
             patientModel.setSex(patient.getSex());
             patientModel.setMaritalStatus(patient.getMaritalStatus());
             patientModel.setPhone(patient.getPhone());
-            patientModel.setIsVerified(patient.getIsVerified());
         }
         return true;
 
@@ -119,11 +117,16 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
 
     public boolean addPatient(MrPatientsEntity mrPatientsEntity) throws Exception{
 
-        patientDao.save(mrPatientsEntity);
-        return true;
+        if(patientDao.findByid(mrPatientsEntity.getId())!=null) {
+            return false;
+        }
+        else {
+            patientDao.save(mrPatientsEntity);
+            return true;
+        }
     }
 
-    public List<String> getPatientDiagnosis(String patientId ,String doctorId){
+    public List<String> getPatientDiagnosis(String patientId, String doctorId){
         List<MrMedicalRecordsEntity>list= medicalRecordDao.findBypatientIdAndDoctorIdOrderByMedicalTimeDesc(patientId,doctorId);
         List<String> diagnosisList=new ArrayList<>();
         for(int i=0;i<list.size();i++){

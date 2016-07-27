@@ -50,6 +50,7 @@ public class DoctorService {
                 mrDoctorsEntity.setPhoto(re.get("PhotoUri").toString());
                 mrDoctorsEntity.setPhone(re.get("Phone").toString());
                 mrDoctorsEntity.setGood(re.get("Skill").toString());
+                addDoctor(mrDoctorsEntity);
                 return mrDoctorsEntity;
             } else
                 return null;
@@ -62,13 +63,12 @@ public class DoctorService {
         return doctorDao.findBydemographicId(demographicId);
     }
 
-    public boolean updateDoctorInformationByDemographicId(MrDoctorsEntity doctor){
+    public boolean updateDoctorInformationById(MrDoctorsEntity doctor){
         if(doctor!=null) {
-            MrDoctorsEntity doctorModel = doctorDao.findBydemographicId(String.valueOf(doctor.getDemographicId()));
+            MrDoctorsEntity doctorModel = doctorDao.findById(doctor.getId());
             if(doctorModel!=null ){
                 doctorModel.setSex(doctor.getSex());
                 doctorModel.setBirthday(doctor.getBirthday());
-                doctorModel.setStatus(doctor.getStatus());
                 doctorModel.setGood(doctor.getGood());
                 doctorModel.setOrgCode(doctor.getOrgCode());
                 doctorModel.setOrgName(doctor.getOrgName());
@@ -89,15 +89,15 @@ public class DoctorService {
 
     }
 
-    public boolean updateDoctorStatusByDemographicId(String status,String demographicId){
-
-        MrDoctorsEntity DoctorModel=doctorDao.findBydemographicId(demographicId);
-        if(DoctorModel!=null) {
-            DoctorModel.setStatus(status);
-        }
-        return true;
-
-    }
+//    public boolean updateDoctorStatusByDemographicId(String status,String demographicId){
+//
+//        MrDoctorsEntity DoctorModel=doctorDao.findBydemographicId(demographicId);
+//        if(DoctorModel!=null) {
+//            DoctorModel.setStatus(status);
+//        }
+//        return true;
+//
+//    }
 
     public boolean deleteDoctorByDemographicId(String id){
         doctorDao.deleteBydemographicId(id);
@@ -105,7 +105,7 @@ public class DoctorService {
     }
 
     public boolean addDoctor(MrDoctorsEntity doctor){
-        if(doctorDao.findBydemographicId(doctor.getDemographicId())!=null){
+        if(doctorDao.findById(doctor.getId())!=null){
             return false;
         }
         else {

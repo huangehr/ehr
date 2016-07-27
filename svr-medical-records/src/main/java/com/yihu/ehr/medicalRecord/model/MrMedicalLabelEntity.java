@@ -10,7 +10,17 @@ import javax.persistence.*;
 public class MrMedicalLabelEntity {
     private int id;
     private int recordsId;
+    private String doctorId;
     private String label;
+
+    @Column(name = "DOCTOR_ID")
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
+    }
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

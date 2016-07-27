@@ -48,43 +48,43 @@ public class DoctorController extends BaseRestEndPoint {
         return doctorService.getPatientInformation(id);
     }
 
-//    @ApiOperation("增加医生")
-//    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorInfo, method = RequestMethod.POST)
-//    public boolean addDoctor( @ApiParam(name = "id", value = "id") @RequestParam(value = "id", required = true) String id,
-//                              @ApiParam(name = "name", value = "名字") @RequestParam(value = "name", required = true) String name,
-//                              @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
-//                              @ApiParam(name = "sex", value = "性别") @RequestParam(value = "sex", required = false) String sex,
-//                              @ApiParam(name = "birthday", value = "生日") @RequestParam(value = "birthday", required = false) String birthday,
-//                              @ApiParam(name = "orgCode", value = "所属医院代码")@RequestParam(value = "orgCode", required = false)String orgCode,
-//                              @ApiParam(name = "orgName", value = "所属医院名字")@RequestParam(value = "orgName", required = false) String orgName,
-//                              @ApiParam(name = "orgDept", value = "科室")@RequestParam(value = "orgDept", required = false) String orgDept,
-//                              @ApiParam(name = "title", value = "职称")@RequestParam(value = "title", required = false) String title,
-//                              @ApiParam(name = "good", value = "擅长")@RequestParam(value = "good", required = false) String good,
-//                              @ApiParam(name = "photo", value = "头像")@RequestParam(value = "photo", required = false) String photo,
-//                              @ApiParam(name = "phone", value = "电话号码")@RequestParam(value = "phone", required = false) String phone,
-//                              @ApiParam(name = "status", value = "状态")@RequestParam(value = "status", required = false) String status){
-//        MrDoctorsEntity doctor=new MrDoctorsEntity();
-//        doctor.setId(id);
-//        doctor.setName(name);
-//        doctor.setDemographicId(demographicId);
-//        doctor.setSex(sex);
-//        if(birthday!=null&&birthday.length()>0) {
-//            doctor.setBirthday(Timestamp.valueOf(birthday));
-//        }
-//        doctor.setOrgCode(orgCode);doctor.setOrgName(orgName);doctor.setOrgDept(orgDept);doctor.setTitle(title);
-//        doctor.setGood(good);doctor.setPhoto(photo);doctor.setPhone(phone);doctor.setStatus(status);
-//        return doctorService.addDoctor(doctor);
-//    }
-
-    @ApiOperation("更新医生职业状态")
-    @RequestMapping(value = ServiceApi.MedicalRecords.ChangeDocStatus, method = RequestMethod.PUT)
-    public boolean updateDoctorStatusByDemographicId(
-            @ApiParam(name = "demographicId", value = "身份证号")
-            @RequestParam(value = "demographicId", required = true) String demographicId,
-            @ApiParam(name = "status", value = "状态")
-            @RequestParam(value = "status", required = true)String status){
-        return doctorService.updateDoctorStatusByDemographicId(status, demographicId);
+    @ApiOperation("增加医生")
+    @RequestMapping(value = ServiceApi.MedicalRecords.AddDoctor, method = RequestMethod.POST)
+    public boolean addDoctor( @ApiParam(name = "id", value = "id") @RequestParam(value = "id", required = true) String id,
+                              @ApiParam(name = "name", value = "名字") @RequestParam(value = "name", required = true) String name,
+                              @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
+                              @ApiParam(name = "sex", value = "性别") @RequestParam(value = "sex", required = false) String sex,
+                              @ApiParam(name = "birthday", value = "生日") @RequestParam(value = "birthday", required = false) String birthday,
+                              @ApiParam(name = "orgCode", value = "所属医院代码")@RequestParam(value = "orgCode", required = false)String orgCode,
+                              @ApiParam(name = "orgName", value = "所属医院名字")@RequestParam(value = "orgName", required = false) String orgName,
+                              @ApiParam(name = "orgDept", value = "科室")@RequestParam(value = "orgDept", required = false) String orgDept,
+                              @ApiParam(name = "title", value = "职称")@RequestParam(value = "title", required = false) String title,
+                              @ApiParam(name = "good", value = "擅长")@RequestParam(value = "good", required = false) String good,
+                              @ApiParam(name = "photo", value = "头像")@RequestParam(value = "photo", required = false) String photo,
+                              @ApiParam(name = "phone", value = "电话号码")@RequestParam(value = "phone", required = false) String phone,
+                              @ApiParam(name = "status", value = "状态")@RequestParam(value = "status", required = false) String status){
+        MrDoctorsEntity doctor=new MrDoctorsEntity();
+        doctor.setId(id);
+        doctor.setName(name);
+        doctor.setDemographicId(demographicId);
+        doctor.setSex(sex);
+        if(birthday!=null&&birthday.length()>0) {
+            doctor.setBirthday(Timestamp.valueOf(birthday));
+        }
+        doctor.setOrgCode(orgCode);doctor.setOrgName(orgName);doctor.setOrgDept(orgDept);doctor.setTitle(title);
+        doctor.setGood(good);doctor.setPhoto(photo);doctor.setPhone(phone);
+        return doctorService.addDoctor(doctor);
     }
+
+//    @ApiOperation("更新医生职业状态")
+//    @RequestMapping(value = ServiceApi.MedicalRecords.ChangeDocStatus, method = RequestMethod.PUT)
+//    public boolean updateDoctorStatusByDemographicId(
+//            @ApiParam(name = "demographicId", value = "身份证号")
+//            @RequestParam(value = "demographicId", required = true) String demographicId,
+//            @ApiParam(name = "status", value = "状态")
+//            @RequestParam(value = "status", required = true)String status){
+//        return doctorService.updateDoctorStatusByDemographicId(status, demographicId);
+//    }
 
     @ApiOperation("更新医生信息")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorInfo, method = RequestMethod.PUT)
@@ -92,7 +92,7 @@ public class DoctorController extends BaseRestEndPoint {
             @ApiParam(name = "doctorInformation", value = "医生信息")
             @RequestParam(value = "doctorInformation", required = true)String json) {
         MrDoctorsEntity doctor=toEntity(json,MrDoctorsEntity.class);
-        return doctorService.updateDoctorInformationByDemographicId(doctor);
+        return doctorService.updateDoctorInformationById(doctor);
     }
 
     @ApiOperation("获取医生诊断")
