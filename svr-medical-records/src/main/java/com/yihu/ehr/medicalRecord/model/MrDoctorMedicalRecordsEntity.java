@@ -9,7 +9,7 @@ import javax.persistence.*;
 public class MrDoctorMedicalRecordsEntity {
     private int id;
     private String doctorId;
-    private int recordId;
+    private String recordId;
     private String isCreator;
 
     @Basic
@@ -47,11 +47,11 @@ public class MrDoctorMedicalRecordsEntity {
 
     @Basic
     @Column(name = "RECORD_ID")
-    public int getRecordId() {
+    public String getRecordId() {
         return recordId;
     }
 
-    public void setRecordId(int recordId) {
+    public void setRecordId(String recordId) {
         this.recordId = recordId;
     }
 

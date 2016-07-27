@@ -2,6 +2,7 @@ package com.yihu.ehr.medicalRecord.dao.intf;
 import com.yihu.ehr.medicalRecord.model.MrMedicalLabelEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -16,8 +17,12 @@ public interface MedicalLabelDao extends PagingAndSortingRepository<MrMedicalLab
     List<MrMedicalLabelEntity> findByRecordsIdAndLabel(Integer RecordsId,String label);
 
     MrMedicalLabelEntity findByid(String id);
-    void deleteByid(String id);
 
-    @Query("select recordsId from MrMedicalLabelEntity r where r.label in (:label)")
-    List<String> findByLabel(String[] label);
+    void deleteByrecordsId(Integer recordsId);
+
+    @Query("select m from MrMedicalLabelEntity m where m.label in (:labels)")
+    List<MrMedicalLabelEntity> findByLabels(@Param("labels") String[] labels);
+
+    @Query(value="select RECORDS_ID from mr_medical_label where ?1",nativeQuery=true)
+    List<Integer> findByLabelst(String label);
 }

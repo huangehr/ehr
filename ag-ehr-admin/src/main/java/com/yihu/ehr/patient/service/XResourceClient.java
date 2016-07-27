@@ -1,5 +1,6 @@
 package com.yihu.ehr.patient.service;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.util.rest.Envelop;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
  * @author hzp
@@ -20,7 +22,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public interface XResourceClient {
 
 
-    @RequestMapping(value = "/rs/query/getResources", method = GET)
+    @RequestMapping(value = ServiceApi.Resources.ResourcesQuery, method = POST)
     Envelop getResources(
             @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
             @RequestParam(value = "appId", required = true) String appId,
