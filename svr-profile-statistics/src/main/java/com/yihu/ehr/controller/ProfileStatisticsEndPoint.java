@@ -2,6 +2,7 @@ package com.yihu.ehr.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.service.StatisticsService;
 import io.swagger.annotations.Api;
@@ -26,7 +27,7 @@ public class ProfileStatisticsEndPoint extends BaseRestEndPoint {
     @Autowired
     StatisticsService statisticsService;
 
-    @RequestMapping(value = "/profiles/statistics/createDate", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsProfileCreateDate, method = RequestMethod.GET)
     @ApiOperation("按入库时间统计")
     public Map<String, Map<String, Long>> resolveStatisticsByCreateDate(
             @ApiParam(value = "orgCode")
@@ -43,7 +44,7 @@ public class ProfileStatisticsEndPoint extends BaseRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "/profiles/statistics/eventDate", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsProfileEventDate, method = RequestMethod.GET)
     @ApiOperation("按事件时间统计")
     public Map<String, Map<String, Long>> resolveStatisticsByEventDate(
             @ApiParam(value = "orgCode")
@@ -60,7 +61,7 @@ public class ProfileStatisticsEndPoint extends BaseRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "/profiles/statistics/idNotNull", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsProfileIdNotNull, method = RequestMethod.GET)
     @ApiOperation("可识别人数统计")
     public Map<String,Map<String,Long>> resolveStatisticsByIdNotNull(
             @ApiParam(value = "orgCode")
@@ -77,7 +78,7 @@ public class ProfileStatisticsEndPoint extends BaseRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "/profiles/statistics/eventDateGroup", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsProfileEventDateGroup, method = RequestMethod.GET)
     @ApiOperation("按事件时间分组统计")
     public Map<String, String> resolveStatisticsByEventDateGroup(
             @ApiParam(value = "orgCode")

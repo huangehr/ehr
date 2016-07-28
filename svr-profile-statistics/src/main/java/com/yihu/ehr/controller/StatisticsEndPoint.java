@@ -41,7 +41,7 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
     @Autowired
     DailyMonitorService dailyMonitorService;
 
-    @RequestMapping(value = "/statistics/profiles",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsProfile,method = RequestMethod.GET)
     @ApiOperation("档案入库统计")
     public Map<String,Object> profileStatistics(
             @RequestParam(value = "items")
@@ -56,8 +56,8 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
         }
     }
 
-    @RequestMapping(value = "/statistics/outPatientHospital",method = RequestMethod.GET)
-    @ApiOperation("档案入库统计")
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsOutpatientHospital,method = RequestMethod.GET)
+    @ApiOperation("门诊住院统计")
     public Map<String,Object> outpatientAndHospitalStatistics(
             @RequestParam(value = "items")
             @ApiParam(value = "items")String items,
@@ -71,8 +71,8 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
         }
     }
 
-    @RequestMapping(value = "/statistics/dailyReport",method = RequestMethod.GET)
-    @ApiOperation("日常监测报表")
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsDailyReport,method = RequestMethod.GET)
+    @ApiOperation("日常监测统计生成")
     public DailyMonitorFile generateDailyReport(
             @ApiParam(value = "date")
             @RequestParam(value = "date") String date){
@@ -84,7 +84,7 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
         }
     }
 
-    @RequestMapping(value = "/statistics/dailyReportFiles",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsDailyReportFiles,method = RequestMethod.GET)
     @ApiOperation("查询日常监测文件")
     public List<MDailyMonitorFile> getMetadata(
             @ApiParam(name="fields",value="返回字段",defaultValue = "")

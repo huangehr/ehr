@@ -11,22 +11,18 @@ import com.yihu.ehr.util.ExcelUtils;
 import com.yihu.ehr.util.IdcardValidator;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.log.LogService;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.util.EnumCounters;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.RangeFacet;
-import org.apache.solr.handler.component.FacetComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.yihu.ehr.config.FastDFSConfig;
 
 import java.io.*;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -880,12 +876,12 @@ public class StatisticsService {
             //合并单元格
             ExcelUtils.createRows(sheet, 0, 2, 13, null);
             ExcelUtils.createRows(sheet, 2, 2, 13, centerStyle);
-            ExcelUtils.mergerRegion(sheet, 1, 1, 0, 12);
-            ExcelUtils.mergerRegion(sheet, 2, 3, 0, 0);
-            ExcelUtils.mergerRegion(sheet, 2, 2, 1, 3);
-            ExcelUtils.mergerRegion(sheet, 2, 2, 4, 6);
-            ExcelUtils.mergerRegion(sheet, 2, 2, 7, 9);
-            ExcelUtils.mergerRegion(sheet, 2, 2, 10, 12);
+            ExcelUtils.mergeRegion(sheet, 1, 1, 0, 12);
+            ExcelUtils.mergeRegion(sheet, 2, 3, 0, 0);
+            ExcelUtils.mergeRegion(sheet, 2, 2, 1, 3);
+            ExcelUtils.mergeRegion(sheet, 2, 2, 4, 6);
+            ExcelUtils.mergeRegion(sheet, 2, 2, 7, 9);
+            ExcelUtils.mergeRegion(sheet, 2, 2, 10, 12);
 
             sheet.getRow(0).getCell(0).setCellStyle(leftAlignStyle);
             sheet.getRow(1).getCell(0).setCellStyle(centerBoldStyle);
@@ -1020,14 +1016,14 @@ public class StatisticsService {
             HSSFCellStyle centerBackStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true,HSSFColor.LIGHT_BLUE.index);
             ExcelUtils.createRows(sheet, 0, 2, 16, null);
             ExcelUtils.createRows(sheet, 2, 4, 16, null);
-            ExcelUtils.mergerRegion(sheet, 0, 0, 0, 3);
-            ExcelUtils.mergerRegion(sheet, 1, 1, 0, 1);
-            ExcelUtils.mergerRegion(sheet, 1, 1, 5, 6);
-            ExcelUtils.mergerRegion(sheet, 1, 1, 11, 12);
-            ExcelUtils.mergerRegion(sheet, 2, 2, 6, 7);
-            ExcelUtils.mergerRegion(sheet, 2, 2, 8, 9);
-            ExcelUtils.mergerRegion(sheet, 2, 2, 12, 13);
-            ExcelUtils.mergerRegion(sheet, 2, 2, 14, 15);
+            ExcelUtils.mergeRegion(sheet, 0, 0, 0, 3);
+            ExcelUtils.mergeRegion(sheet, 1, 1, 0, 1);
+            ExcelUtils.mergeRegion(sheet, 1, 1, 5, 6);
+            ExcelUtils.mergeRegion(sheet, 1, 1, 11, 12);
+            ExcelUtils.mergeRegion(sheet, 2, 2, 6, 7);
+            ExcelUtils.mergeRegion(sheet, 2, 2, 8, 9);
+            ExcelUtils.mergeRegion(sheet, 2, 2, 12, 13);
+            ExcelUtils.mergeRegion(sheet, 2, 2, 14, 15);
 
             sheet.getRow(0).getCell(0).setCellValue(StringUtils.isBlank(orgName) ? orgCode : orgName);
 

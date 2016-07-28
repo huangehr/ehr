@@ -1,5 +1,6 @@
 package com.yihu.ehr.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.service.StatisticsService;
 import io.swagger.annotations.Api;
@@ -21,7 +22,7 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
     @Autowired
     StatisticsService statisticsService;
 
-    @RequestMapping(value = "/hospital/statistics/{orgCode}/dept", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsHospitalizationDept, method = RequestMethod.GET)
     @ApiOperation("不同科室出院统计")
     public Map<String, Long> getOutPatientStatisticsByDept(
             @ApiParam(value = "orgCode")
@@ -36,7 +37,7 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "/hospital/statistics/{orgCode}/sex", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsHospitalizationSex, method = RequestMethod.GET)
     @ApiOperation("不同性别出院统计")
     public Map<String, Long> getOutPatientStatisticsBySex(
             @ApiParam(value = "orgCode")
@@ -51,7 +52,7 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "/hospital/statistics/{orgCode}/disease", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsHospitalizationDisease, method = RequestMethod.GET)
     @ApiOperation("不同疾病出院统计")
     public Map<String, Long> getOutPatientStatisticsByDisease(
             @ApiParam(value = "orgCode")
@@ -66,7 +67,7 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
         }
     }
 
-    @RequestMapping(value = "/hospital/statistics/{orgCode}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsHospitalization, method = RequestMethod.GET)
     @ApiOperation("出院统计")
     public long getOutPatientStatistics(
             @ApiParam(value = "orgCode")

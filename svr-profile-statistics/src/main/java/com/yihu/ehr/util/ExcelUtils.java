@@ -10,14 +10,32 @@ import org.apache.poi.ss.util.CellRangeAddress;
  */
 public class ExcelUtils {
 
+    /**
+     * 创建Excel文档
+     * @return
+     */
     public static HSSFWorkbook createWorkBook() {
         return new HSSFWorkbook();
     }
 
+    /**
+     * 创建sheet
+     * @param wb
+     * @param sheetName
+     * @return
+     */
     public static HSSFSheet createSheet(HSSFWorkbook wb, String sheetName) {
         return wb.createSheet(sheetName);
     }
 
+    /**
+     * 创建一行多列
+     * @param sheet
+     * @param rowNum
+     * @param columnNum
+     * @param cellStyle
+     * @return
+     */
     public static HSSFRow createRow(HSSFSheet sheet, int rowNum, int columnNum, HSSFCellStyle cellStyle) {
         HSSFRow row = sheet.createRow(rowNum);
 
@@ -33,6 +51,15 @@ public class ExcelUtils {
         return row;
     }
 
+    /**
+     * 创建多行多列
+     * @param sheet
+     * @param rowNum
+     * @param rowCount
+     * @param columnNum
+     * @param cellStyle
+     * @return
+     */
     public static boolean createRows(HSSFSheet sheet, int rowNum, int rowCount, int columnNum, HSSFCellStyle cellStyle) {
         for (int i = 0; i < rowCount; i++) {
             HSSFRow row = sheet.createRow(rowNum + i);
@@ -50,11 +77,29 @@ public class ExcelUtils {
         return true;
     }
 
-    public static int mergerRegion(HSSFSheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+    /**
+     * 合并单元格
+     * @param sheet
+     * @param firstRow
+     * @param lastRow
+     * @param firstCol
+     * @param lastCol
+     * @return
+     */
+    public static int mergeRegion(HSSFSheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
         int num = sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
         return num;
     }
 
+    /**
+     * 创建单元格样式
+     * @param wb
+     * @param align
+     * @param bold
+     * @param border
+     * @param backColor
+     * @return
+     */
     public static HSSFCellStyle createCellStyle(HSSFWorkbook wb, short align, boolean bold, boolean border, short backColor) {
         HSSFCellStyle style = wb.createCellStyle();
 

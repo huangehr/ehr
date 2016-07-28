@@ -563,6 +563,31 @@ public class ServiceApi {
         //文件操作
         public static final String imgFile                                = "/medicalRecords/{id}/imgFile";
         public static final String file                                   = "/medicalRecords/{id}/file";
+    }
+
+    public static class DailyStatistics{
+        //日常监测
+        public static final String  StatisticsProfile                        = "/statistics/profiles";
+        public static final String  StatisticsOutpatientHospital            = "/statistics/outpatientHospital";
+        public static final String  StatisticsDailyReport                    = "/statistics/dailyReport";
+        public static final String  StatisticsDailyReportFiles                    = "/statistics/dailyReportFiles";
+
+        //住院
+        public static final String  StatisticsHospitalization                    = "/statistics/hospitalization/{orgCode}";
+        public static final String  StatisticsHospitalizationDept                    = "/statistics/hospitalization/{orgCode}/dept";
+        public static final String  StatisticsHospitalizationSex                    = "/statistics/hospitalization/{orgCode}/sex";
+        public static final String  StatisticsHospitalizationDisease                    = "/statistics/hospitalization/{orgCode}/disease";
+
+        //门诊
+        public static final String  StatisticsOutpatient                    = "/statistics/outpatient/{orgCode}";
+        public static final String  StatisticsOutpatientDept                    = "/statistics/outpatient/{orgCode}/dept";
+        public static final String  StatisticsOutpatientSex                    = "/statistics/outpatient/{orgCode}/sex";
+
+        //入库统计
+        public static final String  StatisticsProfileCreateDate                    = "/statistics/profiles/createDate";
+        public static final String  StatisticsProfileEventDate                      = "/statistics/profiles/eventDate";
+        public static final String  StatisticsProfileIdNotNull                       = "/statistics/profiles/idNotNull";
+        public static final String  StatisticsProfileEventDateGroup                   = "/statistics/profiles/eventDateGroup";
 
     }
 }
