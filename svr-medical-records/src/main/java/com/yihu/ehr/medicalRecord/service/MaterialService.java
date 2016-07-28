@@ -43,17 +43,11 @@ public class MaterialService extends HBaseUtil {
         return true;
     }
 
-    public boolean uploadTextMaterial(String creatorId,String businessClass,String content,String patientId)throws Exception{
-        if(creatorId.length()>0 && content.length()>0 ) {
+    public boolean uploadTextMaterial(String creatorId,String creatorName,String businessClass,String content,String patientId,String patientName)throws Exception{
+        if(creatorId.length()>0 && content.length()>0 && businessClass.length()>0 ) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            String[] value = {content, creatorId, timestamp.toString(), patientId, businessClass};
-            String rowKey = "";
-            if (patientId != null && patientId.length() > 0) {
-                rowKey = creatorId + "_" + patientId + "_" + timestamp.toString();
-            } else {
-                rowKey = creatorId + "_" + creatorId + "_" + timestamp.toString();
-            }
-
+            String[] value = {content, creatorId,creatorName, timestamp.toString(), patientId,creatorName, businessClass};
+            String rowKey = TextFamily.getRowkey(creatorId,patientId);
             insertRecord(TextFamily.TableName, rowKey, TextFamily.Data, TextFamily.getColumns(TextFamily.Data), value);
             return true;
         }
@@ -64,7 +58,7 @@ public class MaterialService extends HBaseUtil {
     public List<String> getTextMaterial(String creatorId,String businessClass,String patientId){
         if(creatorId.length()>0) {
             String rowKey = "";
-            if (patientId.length() > 0) {
+            if (patientId!=null && patientId.length() > 0) {
                 rowKey = creatorId + "_" + patientId;
             }
             else {
@@ -86,16 +80,11 @@ public class MaterialService extends HBaseUtil {
 
     }
 
-    public boolean uploadImgMaterial(String documentName,String creatorId,String fileType,String dataFrom,String patientId,String path)throws Exception{
+    public boolean uploadImgMaterial(String documentName,String creatorId,String creatorName,String fileType,String dataFrom,String patientId,String patientName,String path)throws Exception{
         if(creatorId.length()>0 && fileType.length()>0 &&path.length()>0) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            String[] value = {documentName,timestamp.toString(),creatorId, patientId,null,fileType,path,dataFrom};
-            String rowKey = "";
-            if (patientId != null && patientId.length() > 0) {
-                rowKey = creatorId + "_" + patientId + "_" + timestamp.toString();
-            } else {
-                rowKey = creatorId + "_" + creatorId + "_" + timestamp.toString();
-            }
+            String[] value = {documentName,timestamp.toString(),creatorId,creatorName, patientId,patientName,null,fileType,path,dataFrom};
+            String rowKey = DocumentFamily.getRowkey(creatorId,patientId);
 
             insertRecord(DocumentFamily.TableName, rowKey, DocumentFamily.Data, DocumentFamily.getColumns(TextFamily.Data), value);
             return true;

@@ -3,6 +3,7 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.medicalRecord.model.MedicalRecordModel;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.medicalRecord.service.PatientService;
 import io.swagger.annotations.Api;
@@ -26,7 +27,7 @@ public class PatientController extends BaseRestEndPoint {
 
 
     @ApiOperation("增加患者")
-    @RequestMapping(value = ServiceApi.MedicalRecords.AddPatient, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.PatientInfoManage, method = RequestMethod.POST)
     public boolean addPatient(@ApiParam(name = "patientJson", value = "patientJson")
                               @RequestParam(value = "patientJson", required = true) String patientJson)throws Exception{
             MrPatientsEntity patient = toEntity(patientJson, MrPatientsEntity.class);
@@ -41,7 +42,7 @@ public class PatientController extends BaseRestEndPoint {
             return patientService.getPatientInformation(id);
     }
     @ApiOperation("更新患者个人信息")
-    @RequestMapping(value = ServiceApi.MedicalRecords.PatientInfo, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.PatientInfoManage, method = RequestMethod.GET)
     public boolean updatePatientInformation(
             @ApiParam(name = "patientInformation", value = "patientInformation")
             @RequestParam(value = "patientInformation", required = true) String patientInformation)throws Exception{
@@ -52,12 +53,16 @@ public class PatientController extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.SearchPatient, method = RequestMethod.GET)
     public List<MrPatientsEntity> searchPatient(
             @ApiParam(name = "queryCondition", value = "queryCondition")
-            @RequestParam(value = "queryCondition", required = true) String queryCondition)throws Exception{
-        return patientService.searchPatient(queryCondition);
+            @RequestParam(value = "queryCondition", required = true) String queryCondition,
+            @ApiParam(name = "page", value = "page")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "size")
+            @RequestParam(value = "size", required = false) int size)throws Exception{
+        return patientService.searchPatient(queryCondition,page,size);
     }
 
     @ApiOperation("获取患者所有诊断")
-    @RequestMapping(value = ServiceApi.MedicalRecords.PatientDiagnosis, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.PatientICD10, method = RequestMethod.GET)
     public List<String> getPatientDiagnosis(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id", required = true) String id,
@@ -73,17 +78,24 @@ public class PatientController extends BaseRestEndPoint {
 
     @ApiOperation("获取患者所有病历")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientRecords, method = RequestMethod.GET)
-    public List<String> getPatientRecords(
-            @ApiParam(name = "id", value = "id")
-            @RequestParam(value = "id", required = true) String id,
+    public List<MedicalRecordModel> getPatientRecords(
+            @ApiParam(name = "patientId", value = "patientId")
+            @RequestParam(value = "patientId", required = true) String patientId,
+            @ApiParam(name = "label", value = "label")
+            @RequestParam(value = "label", required = false) String label,
+            @ApiParam(name = "medicalTimeFrom", value = "medicalTimeFrom")
+            @RequestParam(value = "medicalTimeFrom", required = true) String medicalTimeFrom,
+            @ApiParam(name = "medicalTimeEnd", value = "medicalTimeEnd")
+            @RequestParam(value = "medicalTimeEnd", required = true) String medicalTimeEnd,
+            @ApiParam(name = "recordType", value = "recordType")
+            @RequestParam(value = "recordType", required = false) String recordType,
+            @ApiParam(name = "medicalDiagnosisCode", value = "medicalDiagnosisCode")
+            @RequestParam(value = "medicalDiagnosisCode", required = false) String medicalDiagnosisCode,
             @ApiParam(name = "doctorId", value = "医生id")
-            @RequestParam(value = "doctorId", required = true) String doctorId) {
+            @RequestParam(value = "doctorId", required = true) String doctorId) throws Exception{
 
-        if (patientService.IsCreated(id)) {
-            return patientService.getPatientDiagnosis(id, doctorId);
-        }
-        else
-            return null;
+
+        return patientService.getPatientRecords(patientId, label,medicalTimeFrom,medicalTimeEnd,recordType,medicalDiagnosisCode,doctorId);
     }
 
 }

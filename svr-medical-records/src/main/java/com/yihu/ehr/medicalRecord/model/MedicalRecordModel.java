@@ -25,6 +25,10 @@ public class MedicalRecordModel {
     private String patientCondition;
     private String patientHistoryNow;
     private String patientHistoryPast;
+    private String patientAllergy;
+    private String patientHistoryFamily;
+    private String dataFrom;
+    private String firstRecordId;
 
     public Data getCreateTime() {
         return createTime;
@@ -186,16 +190,11 @@ public class MedicalRecordModel {
         this.dataFrom = dataFrom;
     }
 
-    public Integer getFirstRecordId() {
+    public String getFirstRecordId() {
         return firstRecordId;
     }
 
-    public void setFirstRecordId(Integer firstRecordId) {
+    public void setFirstRecordId(String firstRecordId) {
         this.firstRecordId = firstRecordId;
     }
-
-    private String patientAllergy;
-    private String patientHistoryFamily;
-    private String dataFrom;
-    private Integer firstRecordId;
 }

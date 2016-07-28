@@ -74,18 +74,21 @@ public class DoctorLabelService {
         return true;
     }
 
-    public List<MrLabelEntity> getDoctorLabels(String doctorId){
-        return  doctorLabelDao.findByDoctorId(doctorId);
+    public List<MrLabelEntity> getDoctorLabels(String doctorId,String labelType,String labelClass){
+        if(labelClass!=null && labelClass.length()>0){
+            return doctorLabelDao.findByDoctorIdAndLabelTypeAndLabelClass(doctorId,labelType,labelClass);
+        }
+        else{
+            return  doctorLabelDao.findByDoctorIdAndLabelType(doctorId,labelType);
+        }
+
     }
 
-    public boolean DoctorLabelUsed(int id){
+    public void DoctorLabelUsed(int id){
         MrLabelEntity m=doctorLabelDao.findByid(id);
         if(m!=null){
             m.setUsageCount(m.getUsageCount()+1);
-            return true;
         }
-        else
-            return false;
     }
 
 }

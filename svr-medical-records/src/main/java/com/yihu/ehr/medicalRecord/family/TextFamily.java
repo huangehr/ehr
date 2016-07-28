@@ -14,8 +14,10 @@ public class TextFamily {
     public static class DataColumns {
         public static final String Content       = "content"; //内容
         public static final String Creater       = "creater";//创建者id
+        public static final String CreaterName   = "creater_name";//创建者name
         public static final String CreateTime    = "create_time";//创建时间
         public static final String PatientId     = "patient_id";//病人ID
+        public static final String PatientName     = "patient_name";//病人name
         public static final String BusinessClass = "business_class";//业务类型 0 治疗建议 1 病情描述
     }
 
@@ -40,8 +42,10 @@ public class TextFamily {
             return new String[]{
                 DataColumns.Content,
                 DataColumns.Creater,
+                DataColumns.CreaterName,
                 DataColumns.CreateTime,
                 DataColumns.PatientId,
+                DataColumns.PatientName,
                 DataColumns.BusinessClass
             };
         }

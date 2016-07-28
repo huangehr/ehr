@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Table(name = "mr_medical_label", schema = "", catalog = "medical_records")
 public class MrMedicalLabelEntity {
     private int id;
-    private int recordsId;
+    private String recordsId;
     private String doctorId;
     private String label;
 
@@ -35,11 +35,11 @@ public class MrMedicalLabelEntity {
 
     @Basic
     @Column(name = "RECORDS_ID")
-    public int getRecordsId() {
+    public String getRecordsId() {
         return recordsId;
     }
 
-    public void setRecordsId(int recordsId) {
+    public void setRecordsId(String recordsId) {
         this.recordsId = recordsId;
     }
 
@@ -65,13 +65,5 @@ public class MrMedicalLabelEntity {
         if (label != null ? !label.equals(that.label) : that.label != null) return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + recordsId;
-        result = 31 * result + (label != null ? label.hashCode() : 0);
-        return result;
     }
 }

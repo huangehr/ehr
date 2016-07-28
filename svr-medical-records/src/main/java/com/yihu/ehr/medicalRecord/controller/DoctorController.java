@@ -3,6 +3,7 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.medicalRecord.model.MedicalRecordModel;
 import com.yihu.ehr.medicalRecord.model.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecord.service.DoctorService;
 import io.swagger.annotations.Api;
@@ -49,7 +50,7 @@ public class DoctorController extends BaseRestEndPoint {
     }
 
     @ApiOperation("增加医生")
-    @RequestMapping(value = ServiceApi.MedicalRecords.AddDoctor, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DcotorInfoManage, method = RequestMethod.POST)
     public boolean addDoctor( @ApiParam(name = "id", value = "id") @RequestParam(value = "id", required = true) String id,
                               @ApiParam(name = "name", value = "名字") @RequestParam(value = "name", required = true) String name,
                               @ApiParam(name = "demographicId", value = "身份证号") @RequestParam(value = "demographicId", required = true) String demographicId,
@@ -87,7 +88,7 @@ public class DoctorController extends BaseRestEndPoint {
 //    }
 
     @ApiOperation("更新医生信息")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorInfo, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DcotorInfoManage, method = RequestMethod.PUT)
     public boolean updateDoctorInformationByDemographicId(
             @ApiParam(name = "doctorInformation", value = "医生信息")
             @RequestParam(value = "doctorInformation", required = true)String json) {
@@ -96,10 +97,34 @@ public class DoctorController extends BaseRestEndPoint {
     }
 
     @ApiOperation("获取医生诊断")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorDiagnosis, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DcotorICD10, method = RequestMethod.GET)
     public List<String> getDoctorDiagnosis(
             @ApiParam(name = "doctorId", value = "医生ID")
             @RequestParam(value = "doctorId", required = true)String doctorId) {
         return doctorService.getDoctorDiagnosis(doctorId);
+    }
+
+    @ApiOperation("获取患者所有病历")
+    @RequestMapping(value = ServiceApi.MedicalRecords.PatientRecords, method = RequestMethod.GET)
+    public List<MedicalRecordModel> getPatientRecords(
+            @ApiParam(name = "doctorId", value = "医生id")
+            @RequestParam(value = "doctorId", required = true) String doctorId,
+            @ApiParam(name = "filter", value = "filter")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "label", value = "label")
+            @RequestParam(value = "label", required = false) String label,
+            @ApiParam(name = "medicalTimeFrom", value = "medicalTimeFrom")
+            @RequestParam(value = "medicalTimeFrom", required = true) String medicalTimeFrom,
+            @ApiParam(name = "medicalTimeEnd", value = "medicalTimeEnd")
+            @RequestParam(value = "medicalTimeEnd", required = true) String medicalTimeEnd,
+            @ApiParam(name = "recordType", value = "recordType")
+            @RequestParam(value = "recordType", required = false) String recordType,
+            @ApiParam(name = "page", value = "page")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "size")
+            @RequestParam(value = "size", required = false) int size) throws Exception{
+
+
+        return doctorService.getPatientRecords(filter, label,medicalTimeFrom,medicalTimeEnd,recordType,doctorId,page,size);
     }
 }

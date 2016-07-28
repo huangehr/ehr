@@ -29,7 +29,7 @@ public class DoctorLabelController extends BaseRestEndPoint {
     DoctorLabelService doctorLabelService;
 
     @ApiOperation("新增医生标签类别")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabelClass, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DcotorLabelClassManage, method = RequestMethod.POST)
     public MrLabelClassEntity addDoctorLabelsClass(@ApiParam(name = "DoctorLabelsClass", value = "医生标签类别")
                                     @RequestParam(value = "DoctorLabelsClass", required = true)String DoctorLabelsClass){
         MrLabelClassEntity mrLabelClassEntity=toEntity(DoctorLabelsClass,MrLabelClassEntity.class);
@@ -37,7 +37,7 @@ public class DoctorLabelController extends BaseRestEndPoint {
     }
 
     @ApiOperation("更新医生标签类别")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabelClass, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DcotorLabelClassManage, method = RequestMethod.PUT)
     public boolean updateDoctorLabelsClass(@ApiParam(name = "DoctorLabelsClass", value = "医生标签类别")
                                     @RequestParam(value = "DoctorLabelsClass", required = true)String DoctorLabelsClass){
         MrLabelClassEntity mrLabelClassEntity=toEntity(DoctorLabelsClass,MrLabelClassEntity.class);
@@ -45,7 +45,7 @@ public class DoctorLabelController extends BaseRestEndPoint {
     }
 
     @ApiOperation("删除医生标签类别")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabelClass, method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DcotorLabelClassManage, method = RequestMethod.DELETE)
     public boolean deleteDoctorLabelsClass(@ApiParam(name = "id", value = "id")
                                     @RequestParam(value = "id", required = true)int id){
         return  doctorLabelService.deleteDoctorLabelsClass(id);
@@ -85,15 +85,24 @@ public class DoctorLabelController extends BaseRestEndPoint {
     @ApiOperation("获取医生标签")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabel, method = RequestMethod.GET)
     public List<MrLabelEntity> getDoctorLabels(@ApiParam(name = "doctorId", value = "doctorId")
-                                                         @RequestParam(value = "doctorId", required = true)String doctorId){
-        return  doctorLabelService.getDoctorLabels(doctorId);
+                                               @RequestParam(value = "doctorId", required = true)String doctorId,
+                                               @ApiParam(name = "labelType", value = "labelType")
+                                               @RequestParam(value = "labelType", required = true)String labelType,
+                                               @ApiParam(name = "labelClass", value = "labelClass")
+                                               @RequestParam(value = "labelClass", required = false)String labelClass){
+        if(labelType.length()>0 && doctorId.length()>0) {
+            return doctorLabelService.getDoctorLabels(doctorId, labelType, labelClass);
+        }
+        else {
+            return null;
+        }
     }
 
     @ApiOperation("医生标签使用次数")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabelUsed, method = RequestMethod.PUT)
-    public boolean DoctorLabelUsed(
+    public void DoctorLabelUsed(
                                    @ApiParam(name = "ID", value = "ID")
                                    @RequestParam(value = "ID", required = true)int ID){
-        return  doctorLabelService.DoctorLabelUsed(ID);
+            doctorLabelService.DoctorLabelUsed(ID);
     }
 }
