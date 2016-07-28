@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by shine on 2016/7/14.
@@ -46,7 +47,7 @@ public class DoctorController extends BaseRestEndPoint {
     public MrDoctorsEntity getPatientInformation(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id", required = true) String id)throws Exception{
-        return doctorService.getPatientInformation(id);
+        return doctorService.getDoctorInformation(id);
     }
 
     @ApiOperation("增加医生")
@@ -98,9 +99,9 @@ public class DoctorController extends BaseRestEndPoint {
 
     @ApiOperation("获取医生诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.DcotorICD10, method = RequestMethod.GET)
-    public List<String> getDoctorDiagnosis(
+    public Map<String,String>  getDoctorDiagnosis(
             @ApiParam(name = "doctorId", value = "医生ID")
-            @RequestParam(value = "doctorId", required = true)String doctorId) {
+            @RequestParam(value = "doctorId", required = true)String doctorId) throws Exception{
         return doctorService.getDoctorDiagnosis(doctorId);
     }
 
@@ -125,6 +126,6 @@ public class DoctorController extends BaseRestEndPoint {
             @RequestParam(value = "size", required = false) int size) throws Exception{
 
 
-        return doctorService.getPatientRecords(filter, label,medicalTimeFrom,medicalTimeEnd,recordType,doctorId,page,size);
+        return doctorService.getDoctorRecords(filter, label, medicalTimeFrom, medicalTimeEnd, recordType, doctorId, page, size);
     }
 }

@@ -15,6 +15,7 @@ import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.query.URLQueryParser;
+import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.web.RestTemplates;
@@ -25,6 +26,7 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.hadoop.hbase.HbaseTemplate;
 import org.springframework.data.hadoop.hbase.RowMapper;
 import org.springframework.stereotype.Service;
@@ -57,16 +59,17 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
     ObjectMapper objectMapper;
     @Autowired
     HbaseTemplate hbaseTemplate;
+    @Autowired
+    HbaseQuery hbaseQuery;
 
     public MrPatientsEntity getPatientInformation(String id) throws Exception {
         MrPatientsEntity p = patientDao.findByid(id);
         if (p != null)
             return p;
         else {
-            Map re = new HashMap<>();
-            String s = userInfoService.getUserInfo(id);
-            if (s != null) {
-                re = objectMapper.readValue(s, Map.class);
+            HashMap<String,Object> re=(HashMap)userInfoService.getUserInfo(id);
+            if (re!=null&&re.size()>0) {
+               // re = objectMapper.readValue(s, Map.class);
                 MrPatientsEntity mrPatientsEntity = new MrPatientsEntity();
                 mrPatientsEntity.setId(re.get("UserID").toString());
                 mrPatientsEntity.setName(re.get("CName").toString());
@@ -142,17 +145,50 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
         }
     }
 
-    public List<String> getPatientDiagnosis(String patientId, String doctorId) {
-        List<MrMedicalRecordsEntity> list = medicalRecordDao.findBypatientIdAndDoctorIdOrderByMedicalTimeDesc(patientId, doctorId);
-        List<String> diagnosisList = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) != null) {
-                if (!list.contains(list.get(i).getMedicalDiagnosis())) {
-                    diagnosisList.add(list.get(i).getMedicalDiagnosis());
+    public Map<String,String> getPatientDiagnosis(String patientId, String doctorId) throws Exception{
+//        List<MrMedicalRecordsEntity> list = medicalRecordDao.findBypatientIdAndDoctorIdOrderByMedicalTimeDesc(patientId, doctorId);
+//        List<String> diagnosisList = new ArrayList<>();
+//        for (int i = 0; i < list.size(); i++) {
+//            if (list.get(i) != null) {
+//                if (!list.contains(list.get(i).getMedicalDiagnosis())) {
+//                    diagnosisList.add(list.get(i).getMedicalDiagnosis());
+//                }
+//            }
+//        }
+//        return diagnosisList;
+        List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId,patientId);
+        String q="";
+        if (Mlist != null && Mlist.size() > 0) {
+            for (int i = 0; i < Mlist.size(); i++) {
+                if (Mlist.get(i) != null) {
+                    q="rowKey:"+Mlist.get(i).getRecordId()+" or ";
                 }
             }
         }
-        return diagnosisList;
+        q.substring(0,q.length()-4);
+        if("".equals(q)){
+            return null;
+        }
+        Page<Map<String, Object>> result = hbaseQuery.queryBySolr(MedicalRecordsFamily.TableName, "rowkey", null, 1, 1000000000);
+        Map<String, String> list = new HashMap<>();
+        if (result.getContent() != null && result.getContent().size() > 0) {
+
+            //遍历所有行
+            for (int i = 0; i < result.getContent().size(); i++) {
+                Map<String, Object> obj = (Map<String, Object>) result.getContent().get(i);
+                if (obj.get("MEDICAL_DIAGNOSIS_CODE") != null) {
+                    if(obj.get("MEDICAL_DIAGNOSIS") != null){
+                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),obj.get("MEDICAL_DIAGNOSIS").toString());
+                    }
+                    else {
+                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),"");
+                    }
+
+                }
+
+            }
+        }
+        return list;
     }
 
     public List<MedicalRecordModel> getPatientRecords(String patientId, String label, String medicalTimeFrom,

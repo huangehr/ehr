@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by shine on 2016/7/14.
@@ -63,17 +64,12 @@ public class PatientController extends BaseRestEndPoint {
 
     @ApiOperation("获取患者所有诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientICD10, method = RequestMethod.GET)
-    public List<String> getPatientDiagnosis(
+    public Map<String,String> getPatientDiagnosis(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id", required = true) String id,
             @ApiParam(name = "doctorId", value = "医生id")
-            @RequestParam(value = "doctorId", required = true) String doctorId) {
-
-        if (patientService.IsCreated(id)) {
+            @RequestParam(value = "doctorId", required = true) String doctorId) throws Exception{
             return patientService.getPatientDiagnosis(id, doctorId);
-        }
-        else
-            return null;
     }
 
     @ApiOperation("获取患者所有病历")

@@ -6,9 +6,11 @@ import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
 import com.yihu.ehr.medicalRecord.family.MedicalRecordsFamily;
 import com.yihu.ehr.medicalRecord.model.*;
+import com.yihu.ehr.query.services.HbaseQuery;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.hadoop.hbase.HbaseTemplate;
 import org.springframework.data.hadoop.hbase.RowMapper;
 import org.springframework.stereotype.Service;
@@ -42,18 +44,19 @@ public class DoctorService {
     HbaseTemplate hbaseTemplate;
     @Autowired
     MedicalLabelService medicalLabelService;
+    @Autowired
+    HbaseQuery hbaseQuery;
 
-    public MrDoctorsEntity getPatientInformation(String id)throws Exception{
+    public MrDoctorsEntity getDoctorInformation(String id)throws Exception{
         MrDoctorsEntity m=doctorDao.findById(id);
-        Map re=new HashMap<>();
         if(m==null) {
-            String s=userInfoService.getUserInfo(id);
-            if (s!=null) {
-                re = objectMapper.readValue(s, Map.class);
+            HashMap<String,Object> re=(HashMap)userInfoService.getUserInfo(id);
+            if (re!=null&&re.size()>0) {
+                //re = objectMapper.readValue(s, Map.class);
                 MrDoctorsEntity mrDoctorsEntity=new MrDoctorsEntity();
                 mrDoctorsEntity.setId(re.get("UserID").toString());
                 mrDoctorsEntity.setName(re.get("CName").toString());
-                mrDoctorsEntity.setDemographicId(re.get("IdNumber").toString());
+                mrDoctorsEntity.setDemographicId(re.get("IDNumber").toString());
                 mrDoctorsEntity.setSex(re.get("Sex").toString());
                 if (re.get("BirthDate") != null && re.get("BirthDate").toString().length() > 0) {
                     mrDoctorsEntity.setBirthday(java.sql.Timestamp.valueOf(re.get("BirthDate").toString()));
@@ -126,20 +129,53 @@ public class DoctorService {
         }
     }
 
-    public List<String> getDoctorDiagnosis(String doctorId){
-        List<MrMedicalRecordsEntity>list= medicalRecordDao.findByDoctorIdOrderByMedicalTimeDesc(doctorId);
-        List<String> diagnosisList=new ArrayList<>();
-        for(int i=0;i<list.size();i++){
-            if(list.get(i)!=null){
-                if(!list.contains(list.get(i).getMedicalDiagnosis())) {
-                    diagnosisList.add(list.get(i).getMedicalDiagnosis());
+    public Map<String, String> getDoctorDiagnosis(String doctorId)throws Exception {
+//        List<MrMedicalRecordsEntity>list= medicalRecordDao.findByDoctorIdOrderByMedicalTimeDesc(doctorId);
+//        List<String> diagnosisList=new ArrayList<>();
+//        for(int i=0;i<list.size();i++){
+//            if(list.get(i)!=null){
+//                if(!list.contains(list.get(i).getMedicalDiagnosis())) {
+//                    diagnosisList.add(list.get(i).getMedicalDiagnosis());
+//                }
+//            }
+//        }
+//        return diagnosisList;
+        List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorId(doctorId);
+        String q="";
+        if (Mlist != null && Mlist.size() > 0) {
+            for (int i = 0; i < Mlist.size(); i++) {
+                if (Mlist.get(i) != null) {
+                    q="rowKey:"+Mlist.get(i).getRecordId()+" or ";
                 }
             }
         }
-        return diagnosisList;
+        q.substring(0,q.length()-4);
+        if("".equals(q)){
+            return null;
+        }
+        Page<Map<String, Object>> result = hbaseQuery.queryBySolr(MedicalRecordsFamily.TableName, "rowkey", null, 1, 1000000000);
+        Map<String, String> list = new HashMap<>();
+        if (result.getContent() != null && result.getContent().size() > 0) {
+
+            //遍历所有行
+            for (int i = 0; i < result.getContent().size(); i++) {
+                Map<String, Object> obj = (Map<String, Object>) result.getContent().get(i);
+                if (obj.get("MEDICAL_DIAGNOSIS_CODE") != null) {
+                    if(obj.get("MEDICAL_DIAGNOSIS") != null){
+                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),obj.get("MEDICAL_DIAGNOSIS").toString());
+                    }
+                    else {
+                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),"");
+                    }
+
+                }
+
+            }
+        }
+        return list;
     }
 
-    public List<MedicalRecordModel> getPatientRecords(String filter, String label, String medicalTimeFrom,
+    public List<MedicalRecordModel> getDoctorRecords(String filter, String label, String medicalTimeFrom,
                                                       String medicalTimeEnd, String recordType, String doctorId,int page,int size) throws Exception {
 
         List<MrPatientsEntity>patientsEntityList=patientService.searchPatient(filter,1,1000000000);

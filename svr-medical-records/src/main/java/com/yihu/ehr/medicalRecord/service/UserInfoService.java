@@ -46,7 +46,7 @@ public class UserInfoService{
         return param;
     }
 
-    public String getUserInfo(String id)throws Exception{
+    public Object getUserInfo(String id)throws Exception{
         Map<String, Object> params = getLoginParam("UserMgmt.User.queryUserInfoByID", "{ \"UserID\":\"" + id + "\"}");
         String result,result1;
         MrPatientsEntity mrPatientsEntity=new MrPatientsEntity();
@@ -55,7 +55,7 @@ public class UserInfoService{
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
         Map map=objectMapper.readValue(result, Map.class);
 
-       return map.get("result").toString();
+       return map.get("Result");
 
         //JSONObject myJsonObject = new JSONObject(result);
 
