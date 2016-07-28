@@ -544,7 +544,7 @@ public class DictController extends BaseController {
     public Envelop createDictAndEntries(
             @ApiParam(name = "model", value = "", defaultValue = "")
             @RequestParam("model") String model,@RequestParam("version") String version) throws Exception {
-        if(dictClient.createDictAndEntries(new String(Base64.getDecoder().decode(model.getBytes())),version))
+        if(dictClient.createDictAndEntries(model,version))
             return success("");
         return failed("新增出错！");
     }
