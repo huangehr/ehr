@@ -46,7 +46,7 @@ public class DoctorLabelService {
     }
 
     public List<MrLabelClassEntity> getDoctorLabelsClass(String doctorId){
-        return  doctorLabelClassDao.findByDoctoId(doctorId);
+        return  doctorLabelClassDao.findByDoctorId(doctorId);
     }
 
 
@@ -75,7 +75,7 @@ public class DoctorLabelService {
     }
 
     public List<MrLabelEntity> getDoctorLabels(String doctorId){
-        return  doctorLabelDao.findByDoctoId(doctorId);
+        return  doctorLabelDao.findByDoctorId(doctorId);
     }
 
     public boolean DoctorLabelUsed(int id){

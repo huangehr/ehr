@@ -541,6 +541,7 @@ public class ServiceApi {
         //医生信息
         public static final String AddDoctor                              = "/medicalRecords/doctor";
         public static final String DoctorInfo                             = "/medicalRecords/doctor/{doctor_id}";
+        public static final String DoctorRecords                          = "/medicalRecords/doctor/{doctor_id}/records";
         public static final String ChangeDocStatus                        = "/medicalRecords/changeDocStatus";
         public static final String PatientDiagnosis                       = "/medicalRecords/PatientDiagnosis";
         public static final String DoctorDiagnosis                        = "/medicalRecords/DoctorDiagnosis/{doctor_id}";
@@ -569,6 +570,11 @@ public class ServiceApi {
         //文件操作
         public static final String imgFile                                = "/medicalRecords/{id}/imgFile";
         public static final String file                                   = "/medicalRecords/{id}/file";
+
+
+        //素材
+        public static final String DcotorText             = "/medicalRecords/doctor/{doctor_id}/text";
+        public static final String DcotorImg              = "/medicalRecords/doctor/{doctor_id}/img";
 
     }
 }
