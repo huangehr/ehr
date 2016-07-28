@@ -244,7 +244,8 @@ public class URLQueryParser<T> {
             for (String value : pair.getValue().split(",")) {
                 if (pair.getKey().getJavaType().isEnum()) {
                     values.add(Enum.valueOf(pair.getKey().getJavaType(), value));
-                } else if (pair.getKey().getJavaType().equals(Boolean.TYPE)) {
+                } else if (pair.getKey().getJavaType().equals(Boolean.class) ||
+                        pair.getKey().getJavaType().equals(Boolean.TYPE)) {
                     values.add(BooleanUtils.toBoolean(value));
                 } else if(pair.getKey().getJavaType() == Date.class){
                     Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());

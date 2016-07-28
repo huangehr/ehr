@@ -159,8 +159,10 @@ public class RolesController extends BaseController {
             @ApiParam(name = "app_id",value = "应用id")
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "name",value = "角色组名")
-            @RequestParam(value = "name") String name){
-        boolean bo = rolesClient.isNameExistence(appId,name);
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type") String type){
+        boolean bo = rolesClient.isNameExistence(appId,name,type);
         if(bo){
             return success(null);
         }
@@ -172,8 +174,10 @@ public class RolesController extends BaseController {
             @ApiParam(name = "app_id",value = "应用id")
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "code",value = "角色组代码")
-            @RequestParam(value = "code") String code){
-        boolean  bo = rolesClient.isCodeExistence(appId,code);
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type") String type){
+        boolean  bo = rolesClient.isCodeExistence(appId,code,type);
         if(bo){
             return success(null);
         }
@@ -215,6 +219,9 @@ public class RolesController extends BaseController {
                 modelTree.setPid(mApp.getId());
                 modelTree.setChildren(null);
                 roleTreeModelList.add(modelTree);
+            }
+            if(roleTreeModelList.size()==0){
+                continue;
             }
             PlatformAppRolesTreeModel app = new PlatformAppRolesTreeModel();
             app.setId(mApp.getId());
