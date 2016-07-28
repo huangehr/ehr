@@ -33,7 +33,7 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
             return statisticsService.groupStatistics("EHR_000223", orgCode, eventDate, "1",true,false);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
@@ -48,7 +48,7 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
             return statisticsService.groupStatistics("EHR_000019_VALUE", orgCode, eventDate, "1",true,false);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
@@ -63,7 +63,7 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
             return statisticsService.groupStatistics("EHR_000163_VALUE", orgCode, eventDate, "1",true,false);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
@@ -78,7 +78,7 @@ public class HospitalStatisticsEndPoint extends BaseRestEndPoint {
             return statisticsService.filterQueryStatistics(orgCode, eventDate, "1");
         } catch (Exception ex) {
             ex.printStackTrace();
-            return 0;
+            throw ex;
         }
     }
 

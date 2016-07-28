@@ -47,12 +47,13 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
             @RequestParam(value = "items")
             @ApiParam(value = "items")String items,
             @RequestParam(value = "params")
-            @ApiParam(value = "params")String params){
+            @ApiParam(value = "params")String params) throws Exception {
         try{
             JsonNode jsonNode = objectMapper.readTree(params);
             return statisticsService.profileStatistics(items,jsonNode);
         }catch (Exception ex){
-            return null;
+            ex.printStackTrace();
+            throw ex;
         }
     }
 
@@ -62,12 +63,13 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
             @RequestParam(value = "items")
             @ApiParam(value = "items")String items,
             @RequestParam(value = "params")
-            @ApiParam(value = "params")String params){
+            @ApiParam(value = "params")String params) throws Exception {
         try{
             JsonNode jsonNode = objectMapper.readTree(params);
             return statisticsService.outpatientAndHospitalStatistics(items,jsonNode,false);
         }catch (Exception ex){
-            return null;
+            ex.printStackTrace();
+            throw ex;
         }
     }
 
@@ -75,12 +77,12 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
     @ApiOperation("日常监测统计生成")
     public DailyMonitorFile generateDailyReport(
             @ApiParam(value = "date")
-            @RequestParam(value = "date") String date){
+            @RequestParam(value = "date") String date) throws Exception {
         try{
             return statisticsService.generateDailyReportFile(date);
         }catch (Exception ex){
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
@@ -100,24 +102,26 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
             HttpServletRequest request,
             HttpServletResponse response) throws Exception
     {
-        long total = 0;
-        Collection<MDailyMonitorFile> metaList;
+        try {
+            long total = 0;
+            Collection<MDailyMonitorFile> metaList;
 
-        //过滤条件为空
-        if(StringUtils.isEmpty(filters))
-        {
-            Page<DailyMonitorFile> metadataPage = dailyMonitorService.findByPageAndSort(reducePage(page),size,sorts);
-            total = metadataPage.getTotalElements();
-            metaList = convertToModels(metadataPage.getContent(),new ArrayList<>(metadataPage.getNumber()),MDailyMonitorFile.class,fields);
-        }
-        else
-        {
-            List<DailyMonitorFile> metadata = dailyMonitorService.search(fields,filters,sorts,page,size);
-            total = dailyMonitorService.getCount(filters);
-            metaList = convertToModels(metadata,new ArrayList<>(metadata.size()),MDailyMonitorFile.class,fields);
-        }
+            //过滤条件为空
+            if (StringUtils.isEmpty(filters)) {
+                Page<DailyMonitorFile> metadataPage = dailyMonitorService.findByPageAndSort(reducePage(page), size, sorts);
+                total = metadataPage.getTotalElements();
+                metaList = convertToModels(metadataPage.getContent(), new ArrayList<>(metadataPage.getNumber()), MDailyMonitorFile.class, fields);
+            } else {
+                List<DailyMonitorFile> metadata = dailyMonitorService.search(fields, filters, sorts, page, size);
+                total = dailyMonitorService.getCount(filters);
+                metaList = convertToModels(metadata, new ArrayList<>(metadata.size()), MDailyMonitorFile.class, fields);
+            }
 
-        pagedResponse(request,response,total,page,size);
-        return (List<MDailyMonitorFile>)metaList;
+            pagedResponse(request, response, total, page, size);
+            return (List<MDailyMonitorFile>) metaList;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
+        }
     }
 }

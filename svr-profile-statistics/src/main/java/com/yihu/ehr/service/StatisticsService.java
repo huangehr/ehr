@@ -391,7 +391,7 @@ public class StatisticsService {
      * @return
      * @throws Exception
      */
-    public Map<String, Long> groupStatistics(String field, String orgCode, String eventDate, String eventType, boolean missing,boolean noTotal) throws Exception {
+    public Map<String, Long> groupStatistics(String field, String orgCode, String eventDate, String eventType, boolean missing, boolean noTotal) throws Exception {
         StringBuilder fq = new StringBuilder();
         Map<String, Long> result = new TreeMap<>();
 
@@ -427,7 +427,7 @@ public class StatisticsService {
                 result.put(key, val);
                 total += val;
             }
-            if (total > 0 &&  !noTotal) {
+            if (total > 0 && !noTotal) {
                 result.put("合计", total);
             }
             if (result.containsKey("") && result.get("") < 1) {
@@ -597,6 +597,19 @@ public class StatisticsService {
         String grap = params.has("grap") ? params.get("grap").textValue() : "";
         String eventType = params.has("eventType") ? params.get("eventType").textValue() : "";
 
+        if (StringUtils.isBlank(orgCode)) {
+            LogService.getLogger().error("orgCode is null");
+            throw new Exception("orgCode is null");
+        }
+        if (StringUtils.isBlank(startDate)) {
+            LogService.getLogger().error("startDate is null");
+            throw new Exception("startDate is null");
+        }
+        if (StringUtils.isBlank(endDate)) {
+            LogService.getLogger().error("endDate is null");
+            throw new Exception("endDate is null");
+        }
+
         for (String stat : stats) {
             switch (stat) {
                 case "byCreateDate":
@@ -609,6 +622,14 @@ public class StatisticsService {
                     result.put("byIdNotNull", statisticsByIdNotNull(orgCode, startDate, endDate));
                     break;
                 case "byEventDateGroup":
+                    if (StringUtils.isBlank(grap)) {
+                        LogService.getLogger().error("grap is null");
+                        throw new Exception("grap is null");
+                    }
+                    if (StringUtils.isBlank(eventType)) {
+                        LogService.getLogger().error("eventType is null");
+                        throw new Exception("eventType is null");
+                    }
                     result.put("byIdNotNull", resolveStatisticsByEventDateGroup(orgCode, startDate, endDate, grap, eventType));
                     break;
             }
@@ -624,12 +645,21 @@ public class StatisticsService {
      * @param params
      * @return
      */
-    public Map<String, Object> outpatientAndHospitalStatistics(String items, JsonNode params,boolean noTotal) throws Exception {
+    public Map<String, Object> outpatientAndHospitalStatistics(String items, JsonNode params, boolean noTotal) throws Exception {
         Map<String, Object> result = new HashMap<>();
         int statType = 0;
         String[] stats = items.split(",");
         String orgCode = params.has("orgCode") ? params.get("orgCode").textValue() : "";
         String eventDate = params.has("eventDate") ? params.get("eventDate").textValue() : "";
+
+        if (StringUtils.isBlank(orgCode)) {
+            LogService.getLogger().error("orgCode is null");
+            throw new Exception("orgCode is null");
+        }
+        if (StringUtils.isBlank(eventDate)) {
+            LogService.getLogger().error("eventDate is null");
+            throw new Exception("eventDate is null");
+        }
 
         for (String stat : stats) {
             switch (stat) {
@@ -660,7 +690,6 @@ public class StatisticsService {
         return result;
     }
 
-
     /**
      * 生成日常监测文件
      *
@@ -672,9 +701,9 @@ public class StatisticsService {
         HSSFWorkbook wb = ExcelUtils.createWorkBook();
 
         boolean totalFlag = generateTotalReportSheet(wb, date);
-        boolean orgFlag = generateOrgReportSheets(wb,date);
+        boolean orgFlag = generateOrgReportSheets(wb, date);
 
-        if(totalFlag || orgFlag) {
+        if (totalFlag || orgFlag) {
             //输出文件
             String rootPath = StatisticsService.class.getResource("/").getPath();
             rootPath = new File(rootPath).getParent() + Path.SEPARATOR + "dailyReport.xlsx";
@@ -689,10 +718,11 @@ public class StatisticsService {
             String fastDfsFileName = jsonResult.get("fid").textValue();
             in.close();
             new File(rootPath).delete();
-            return dailyMonitorService.saveDailyMonitorFile(date.replaceAll("-",""),fastDfsFileName);
+            return dailyMonitorService.saveDailyMonitorFile(date.replaceAll("-", ""), fastDfsFileName);
         }
         return null;
     }
+
     /**
      * 日报监测数据生成
      *
@@ -700,7 +730,7 @@ public class StatisticsService {
      * @return
      * @throws Exception
      */
-    public Map<String, Object> generateDailyReportData(String date) throws Exception {
+    public Map<String, Object> generateDailyProfileReportData(String date) throws Exception {
         Map<String, Object> result = new HashMap<>();
         //入库时间条件
         String dq = "create_date:[" + date + "T00:00:00Z TO " + date + "T23:59:59Z]";
@@ -711,7 +741,7 @@ public class StatisticsService {
             List<FacetField.Count> counts = facetField.getValues();
 
             for (FacetField.Count count : counts) {
-                Object orgResult = generateOrgDailyReportData(count.getName(), date);
+                Object orgResult = generateOrgDailyProfileReportData(count.getName(), date);
                 result.put(count.getName(), orgResult);
             }
         }
@@ -727,7 +757,7 @@ public class StatisticsService {
      * @return
      * @throws Exception
      */
-    public Map<String, Map<String, Long>> generateOrgDailyReportData(String orgCode, String date) throws Exception {
+    public Map<String, Map<String, Long>> generateOrgDailyProfileReportData(String orgCode, String date) throws Exception {
         if (StringUtils.isBlank(orgCode)) {
             LogService.getLogger("daily monitor report").error("orgCode is null");
             throw new Exception("orgCode is null");
@@ -864,9 +894,9 @@ public class StatisticsService {
      * @param date
      */
     public boolean generateTotalReportSheet(HSSFWorkbook wb, String date) throws Exception {
-        Map<String, Object> reportData = generateDailyReportData(date);
+        Map<String, Object> reportData = generateDailyProfileReportData(date);
 
-        if(reportData != null && reportData.size() > 0) {
+        if (reportData != null && reportData.size() > 0) {
             HSSFSheet sheet = ExcelUtils.createSheet(wb, "汇总统计表");
             Set<String> keys = reportData.keySet();
             HSSFCellStyle leftAlignStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_LEFT, false, false, (short) -1);
@@ -962,18 +992,19 @@ public class StatisticsService {
             }
 
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
     /**
      * 生成机构人次指标报表
+     *
      * @param wb
      * @param date
      * @throws Exception
      */
-    public boolean generateOrgReportSheets(HSSFWorkbook wb,String date) throws Exception {
+    public boolean generateOrgReportSheets(HSSFWorkbook wb, String date) throws Exception {
         //入库时间条件
         String dq = "event_date:[" + date + "T00:00:00Z TO " + date + "T23:59:59Z]";
         //查询时间范围内有入库机构
@@ -985,18 +1016,19 @@ public class StatisticsService {
             for (FacetField.Count count : counts) {
                 String orgName = redisClient.get(orgKeySchema.name(count.getName()));
                 HSSFSheet sheet = ExcelUtils.createSheet(wb, "机构" + (StringUtils.isBlank(orgName) ? count.getName() : orgName)
-                        + "统计表(" + date.replaceAll("-","") + ")");
-                generateOrgReportSheet(wb,sheet,count.getName(), date);
+                        + "统计表(" + date.replaceAll("-", "") + ")");
+                generateOrgReportSheet(wb, sheet, count.getName(), date);
             }
 
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
     /**
      * 生成机构人次指标报表
+     *
      * @param wb
      * @param sheet
      * @param orgCode
@@ -1008,12 +1040,14 @@ public class StatisticsService {
         String params = "{\"orgCode\":\"" + orgCode + "\",\"eventDate\":\"" + date + "\"}";
         String orgName = redisClient.get(orgKeySchema.name(orgCode));
 
-        Map<String, Object> data = outpatientAndHospitalStatistics(items, objectMapper.readTree(params),true);
+        Map<String, Object> data = outpatientAndHospitalStatistics(items, objectMapper.readTree(params), true);
 
         if (data != null && data.size() > 0) {
-            HSSFCellStyle leftStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_LEFT, false, false,(short)-1);
-            HSSFCellStyle centerStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true,(short)-1);
-            HSSFCellStyle centerBackStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true,HSSFColor.LIGHT_BLUE.index);
+            //单元格样式
+            HSSFCellStyle leftStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_LEFT, false, false, (short) -1);
+            HSSFCellStyle centerStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true, (short) -1);
+            HSSFCellStyle centerBackStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true, HSSFColor.LIGHT_BLUE.index);
+            //合并单元格
             ExcelUtils.createRows(sheet, 0, 2, 16, null);
             ExcelUtils.createRows(sheet, 2, 4, 16, null);
             ExcelUtils.mergeRegion(sheet, 0, 0, 0, 3);
@@ -1025,8 +1059,10 @@ public class StatisticsService {
             ExcelUtils.mergeRegion(sheet, 2, 2, 12, 13);
             ExcelUtils.mergeRegion(sheet, 2, 2, 14, 15);
 
+            //机构名称
             sheet.getRow(0).getCell(0).setCellValue(StringUtils.isBlank(orgName) ? orgCode : orgName);
 
+            //统计类别
             HSSFRow titleRow = sheet.getRow(1);
             titleRow.getCell(0).setCellStyle(leftStyle);
             titleRow.getCell(5).setCellStyle(leftStyle);
@@ -1035,6 +1071,7 @@ public class StatisticsService {
             titleRow.getCell(5).setCellValue("按科室人次统计");
             titleRow.getCell(11).setCellValue("按疾病人次统计");
 
+            //列标题
             HSSFRow colTitleRowFirst = sheet.getRow(2);
             colTitleRowFirst.getCell(0).setCellValue("序号");
             colTitleRowFirst.getCell(0).setCellStyle(centerBackStyle);
@@ -1103,31 +1140,32 @@ public class StatisticsService {
             sheet.getRow(5).getCell(2).setCellStyle(centerStyle);
             sheet.getRow(5).getCell(3).setCellStyle(centerStyle);
 
-            if(data.containsKey("outpatientSex") && ((Map<String,Long>)data.get("outpatientSex")).size() > 0){
-                Map<String,Long> sexData = (Map<String,Long>)data.get("outpatientSex");
+            //门诊性别
+            if (data.containsKey("outpatientSex") && ((Map<String, Long>) data.get("outpatientSex")).size() > 0) {
+                Map<String, Long> sexData = (Map<String, Long>) data.get("outpatientSex");
 
-                sheet.getRow(3).getCell(2).setCellValue(sexData.containsKey("男性")?sexData.get("男性"):0);
-                sheet.getRow(4).getCell(2).setCellValue(sexData.containsKey("女性")?sexData.get("女性"):0);
+                sheet.getRow(3).getCell(2).setCellValue(sexData.containsKey("男性") ? sexData.get("男性") : 0);
+                sheet.getRow(4).getCell(2).setCellValue(sexData.containsKey("女性") ? sexData.get("女性") : 0);
                 sheet.getRow(5).getCell(2).setCellFormula("SUM(C4:C5)");
             }
+            //出院性别
+            if (data.containsKey("hospitalSex") && ((Map<String, Long>) data.get("hospitalSex")).size() > 0) {
+                Map<String, Long> sexData = (Map<String, Long>) data.get("hospitalSex");
 
-            if(data.containsKey("hospitalSex") && ((Map<String,Long>)data.get("hospitalSex")).size() > 0){
-                Map<String,Long> sexData = (Map<String,Long>)data.get("hospitalSex");
-
-                sheet.getRow(3).getCell(3).setCellValue(sexData.containsKey("男性")?sexData.get("男性"):0);
-                sheet.getRow(4).getCell(3).setCellValue(sexData.containsKey("女性")?sexData.get("女性"):0);
+                sheet.getRow(3).getCell(3).setCellValue(sexData.containsKey("男性") ? sexData.get("男性") : 0);
+                sheet.getRow(4).getCell(3).setCellValue(sexData.containsKey("女性") ? sexData.get("女性") : 0);
                 sheet.getRow(5).getCell(3).setCellFormula("SUM(D4:D5)");
             }
-
-            if(data.containsKey("outpatientDept") && ((Map<String,Long>)data.get("outpatientDept")).size() > 0){
-                Map<String,Long> deptData = (Map<String,Long>)data.get("outpatientDept");
+            //门诊科室
+            if (data.containsKey("outpatientDept") && ((Map<String, Long>) data.get("outpatientDept")).size() > 0) {
+                Map<String, Long> deptData = (Map<String, Long>) data.get("outpatientDept");
                 int count = 0;
 
-                for(String key : deptData.keySet()){
+                for (String key : deptData.keySet()) {
                     HSSFRow row;
-                    if(count > 1){
-                        row = ExcelUtils.createRow(sheet,4 + count,16,null);
-                    }else{
+                    if (count > 1) {
+                        row = ExcelUtils.createRow(sheet, 4 + count, 16, null);
+                    } else {
                         row = sheet.getRow(4 + count);
                     }
 
@@ -1143,11 +1181,12 @@ public class StatisticsService {
                     count++;
                 }
 
-                if(count > 0){
+                //合计行
+                if (count > 0) {
                     HSSFRow row;
-                    if((4 + count) > sheet.getLastRowNum()){
-                        row = ExcelUtils.createRow(sheet,4 + count,16,null);
-                    }else{
+                    if ((4 + count) > sheet.getLastRowNum()) {
+                        row = ExcelUtils.createRow(sheet, 4 + count, 16, null);
+                    } else {
                         row = sheet.getRow(4 + count);
                     }
                     row.getCell(5).setCellStyle(centerStyle);
@@ -1157,19 +1196,19 @@ public class StatisticsService {
                     row.getCell(9).setCellStyle(centerStyle);
 
                     row.getCell(6).setCellValue("合计");
-                    row.getCell(7).setCellFormula("SUM(H5:H" + (4 + count) + ")" );
+                    row.getCell(7).setCellFormula("SUM(H5:H" + (4 + count) + ")");
                 }
             }
-
-            if(data.containsKey("hospitalDept") && ((Map<String,Long>)data.get("hospitalDept")).size() > 0){
-                Map<String,Long> deptData = (Map<String,Long>)data.get("hospitalDept");
+            //出院科室
+            if (data.containsKey("hospitalDept") && ((Map<String, Long>) data.get("hospitalDept")).size() > 0) {
+                Map<String, Long> deptData = (Map<String, Long>) data.get("hospitalDept");
                 int count = 0;
 
-                for(String key : deptData.keySet()){
+                for (String key : deptData.keySet()) {
                     HSSFRow row;
-                    if((4 + count) > sheet.getLastRowNum()){
-                        row = ExcelUtils.createRow(sheet,4 + count,16,null);
-                    }else{
+                    if ((4 + count) > sheet.getLastRowNum()) {
+                        row = ExcelUtils.createRow(sheet, 4 + count, 16, null);
+                    } else {
                         row = sheet.getRow(4 + count);
                     }
 
@@ -1185,11 +1224,11 @@ public class StatisticsService {
                     count++;
                 }
 
-                if(count > 0){
+                if (count > 0) {
                     HSSFRow row;
-                    if((4 + count) > sheet.getLastRowNum()){
-                        row = ExcelUtils.createRow(sheet,4 + count,16,null);
-                    }else{
+                    if ((4 + count) > sheet.getLastRowNum()) {
+                        row = ExcelUtils.createRow(sheet, 4 + count, 16, null);
+                    } else {
                         row = sheet.getRow(4 + count);
                     }
                     row.getCell(5).setCellStyle(centerStyle);
@@ -1199,19 +1238,19 @@ public class StatisticsService {
                     row.getCell(9).setCellStyle(centerStyle);
 
                     row.getCell(8).setCellValue("合计");
-                    row.getCell(9).setCellFormula("SUM(J5:J" + (4 + count) + ")" );
+                    row.getCell(9).setCellFormula("SUM(J5:J" + (4 + count) + ")");
                 }
             }
-
-            if(data.containsKey("hospitalDisease") && ((Map<String,Long>)data.get("hospitalDisease")).size() > 0){
-                Map<String,Long> diseaseData = (Map<String,Long>)data.get("hospitalDisease");
+            //出院疾病
+            if (data.containsKey("hospitalDisease") && ((Map<String, Long>) data.get("hospitalDisease")).size() > 0) {
+                Map<String, Long> diseaseData = (Map<String, Long>) data.get("hospitalDisease");
                 int count = 0;
 
-                for(String key : diseaseData.keySet()){
+                for (String key : diseaseData.keySet()) {
                     HSSFRow row;
-                    if((4 + count) > sheet.getLastRowNum()){
-                        row = ExcelUtils.createRow(sheet,4 + count,16,null);
-                    }else{
+                    if ((4 + count) > sheet.getLastRowNum()) {
+                        row = ExcelUtils.createRow(sheet, 4 + count, 16, null);
+                    } else {
                         row = sheet.getRow(4 + count);
                     }
 
@@ -1227,11 +1266,11 @@ public class StatisticsService {
                     count++;
                 }
 
-                if(count > 0){
+                if (count > 0) {
                     HSSFRow row;
-                    if((4 + count) > sheet.getLastRowNum()){
-                        row = ExcelUtils.createRow(sheet,4 + count,16,null);
-                    }else{
+                    if ((4 + count) > sheet.getLastRowNum()) {
+                        row = ExcelUtils.createRow(sheet, 4 + count, 16, null);
+                    } else {
                         row = sheet.getRow(4 + count);
                     }
                     row.getCell(11).setCellStyle(centerStyle);
@@ -1241,10 +1280,9 @@ public class StatisticsService {
                     row.getCell(15).setCellStyle(centerStyle);
 
                     row.getCell(12).setCellValue("合计");
-                    row.getCell(13).setCellFormula("SUM(N5:N" + (4 + count) + ")" );
+                    row.getCell(13).setCellFormula("SUM(N5:N" + (4 + count) + ")");
                 }
             }
-
         }
     }
 }

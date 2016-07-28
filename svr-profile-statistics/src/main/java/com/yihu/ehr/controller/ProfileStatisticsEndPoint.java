@@ -40,7 +40,7 @@ public class ProfileStatisticsEndPoint extends BaseRestEndPoint {
             return statisticsService.resolveStatisticsByCreateDateOrEventDate(orgCode, startDate, endDate,1);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
@@ -57,7 +57,7 @@ public class ProfileStatisticsEndPoint extends BaseRestEndPoint {
             return statisticsService.resolveStatisticsByCreateDateOrEventDate(orgCode, startDate, endDate,2);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
@@ -74,7 +74,7 @@ public class ProfileStatisticsEndPoint extends BaseRestEndPoint {
             return statisticsService.statisticsByIdNotNull(orgCode, startDate, endDate);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
@@ -95,7 +95,7 @@ public class ProfileStatisticsEndPoint extends BaseRestEndPoint {
             return statisticsService.resolveStatisticsByEventDateGroup(orgCode, startDate, endDate, grap,eventType);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
