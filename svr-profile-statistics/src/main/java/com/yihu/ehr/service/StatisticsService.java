@@ -700,27 +700,25 @@ public class StatisticsService {
     public DailyMonitorFile generateDailyReportFile(String date) throws Exception {
         HSSFWorkbook wb = ExcelUtils.createWorkBook();
 
-        boolean totalFlag = generateTotalReportSheet(wb, date);
-        boolean orgFlag = generateOrgReportSheets(wb, date);
+        generateTotalReportSheet(wb, date);
+        generateOrgReportSheets(wb, date);
 
-        if (totalFlag || orgFlag) {
-            //输出文件
-            String rootPath = StatisticsService.class.getResource("/").getPath();
-            rootPath = new File(rootPath).getParent() + Path.SEPARATOR + "dailyReport.xlsx";
-            FileOutputStream out = new FileOutputStream(rootPath);
-            wb.write(out);
-            out.close();
+        //输出文件
+        String rootPath = StatisticsService.class.getResource("/").getPath();
+        rootPath = new File(rootPath).getParent() + Path.SEPARATOR + "dailyReport.xlsx";
+        FileOutputStream out = new FileOutputStream(rootPath);
+        wb.write(out);
+        out.close();
 
-            //保存到fastdfs
-            InputStream in = new FileInputStream(rootPath);
-            FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
-            ObjectNode jsonResult = fdfs.upload(in, "xlsx", "");
-            String fastDfsFileName = jsonResult.get("fid").textValue();
-            in.close();
-            new File(rootPath).delete();
-            return dailyMonitorService.saveDailyMonitorFile(date.replaceAll("-", ""), fastDfsFileName);
-        }
-        return null;
+        //保存到fastdfs
+        InputStream in = new FileInputStream(rootPath);
+        FastDFSUtil fdfs = FastDFSConfig.fastDFSUtil();
+        ObjectNode jsonResult = fdfs.upload(in, "xlsx", "");
+        String fastDfsFileName = jsonResult.get("fid").textValue();
+        in.close();
+        new File(rootPath).delete();
+
+        return dailyMonitorService.saveDailyMonitorFile(date.replaceAll("-", ""), fastDfsFileName);
     }
 
     /**
@@ -893,50 +891,50 @@ public class StatisticsService {
      * @param reportData
      * @param date
      */
-    public boolean generateTotalReportSheet(HSSFWorkbook wb, String date) throws Exception {
+    public void generateTotalReportSheet(HSSFWorkbook wb, String date) throws Exception {
         Map<String, Object> reportData = generateDailyProfileReportData(date);
 
+        HSSFSheet sheet = ExcelUtils.createSheet(wb, "汇总统计表");
+        Set<String> keys = reportData.keySet();
+        HSSFCellStyle leftAlignStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_LEFT, false, false, (short) -1);
+        HSSFCellStyle centerBoldStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, true, false, (short) -1);
+        HSSFCellStyle centerStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true, (short) -1);
+
+        //合并单元格
+        ExcelUtils.createRows(sheet, 0, 2, 13, null);
+        ExcelUtils.createRows(sheet, 2, 2, 13, centerStyle);
+        ExcelUtils.mergeRegion(sheet, 1, 1, 0, 12);
+        ExcelUtils.mergeRegion(sheet, 2, 3, 0, 0);
+        ExcelUtils.mergeRegion(sheet, 2, 2, 1, 3);
+        ExcelUtils.mergeRegion(sheet, 2, 2, 4, 6);
+        ExcelUtils.mergeRegion(sheet, 2, 2, 7, 9);
+        ExcelUtils.mergeRegion(sheet, 2, 2, 10, 12);
+
+        sheet.getRow(0).getCell(0).setCellStyle(leftAlignStyle);
+        sheet.getRow(1).getCell(0).setCellStyle(centerBoldStyle);
+
+        //设置日期、标题、列标题
+        sheet.getRow(0).getCell(0).setCellValue("日期:" + date.replaceAll("-", "/"));
+        sheet.getRow(1).getCell(0).setCellValue("健康档案管理平台数据采集汇总统计报表");
+        sheet.getRow(2).getCell(0).setCellValue("机构名称");
+        sheet.getRow(2).getCell(1).setCellValue("累计入库档案数");
+        sheet.getRow(2).getCell(4).setCellValue("当日入库档案数");
+        sheet.getRow(2).getCell(7).setCellValue("累计可识别人数");
+        sheet.getRow(2).getCell(10).setCellValue("区间新增加可识别就诊人次");
+        sheet.getRow(3).getCell(1).setCellValue("门诊");
+        sheet.getRow(3).getCell(2).setCellValue("住院");
+        sheet.getRow(3).getCell(3).setCellValue("合计");
+        sheet.getRow(3).getCell(4).setCellValue("门诊");
+        sheet.getRow(3).getCell(5).setCellValue("住院");
+        sheet.getRow(3).getCell(6).setCellValue("合计");
+        sheet.getRow(3).getCell(7).setCellValue("门诊");
+        sheet.getRow(3).getCell(8).setCellValue("住院");
+        sheet.getRow(3).getCell(9).setCellValue("合计");
+        sheet.getRow(3).getCell(10).setCellValue("门诊");
+        sheet.getRow(3).getCell(11).setCellValue("住院");
+        sheet.getRow(3).getCell(12).setCellValue("合计");
+
         if (reportData != null && reportData.size() > 0) {
-            HSSFSheet sheet = ExcelUtils.createSheet(wb, "汇总统计表");
-            Set<String> keys = reportData.keySet();
-            HSSFCellStyle leftAlignStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_LEFT, false, false, (short) -1);
-            HSSFCellStyle centerBoldStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, true, false, (short) -1);
-            HSSFCellStyle centerStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true, (short) -1);
-
-            //合并单元格
-            ExcelUtils.createRows(sheet, 0, 2, 13, null);
-            ExcelUtils.createRows(sheet, 2, 2, 13, centerStyle);
-            ExcelUtils.mergeRegion(sheet, 1, 1, 0, 12);
-            ExcelUtils.mergeRegion(sheet, 2, 3, 0, 0);
-            ExcelUtils.mergeRegion(sheet, 2, 2, 1, 3);
-            ExcelUtils.mergeRegion(sheet, 2, 2, 4, 6);
-            ExcelUtils.mergeRegion(sheet, 2, 2, 7, 9);
-            ExcelUtils.mergeRegion(sheet, 2, 2, 10, 12);
-
-            sheet.getRow(0).getCell(0).setCellStyle(leftAlignStyle);
-            sheet.getRow(1).getCell(0).setCellStyle(centerBoldStyle);
-
-            //设置日期、标题、列标题
-            sheet.getRow(0).getCell(0).setCellValue("日期:" + date.replaceAll("-", "/"));
-            sheet.getRow(1).getCell(0).setCellValue("健康档案管理平台数据采集汇总统计报表");
-            sheet.getRow(2).getCell(0).setCellValue("机构名称");
-            sheet.getRow(2).getCell(1).setCellValue("累计入库档案数");
-            sheet.getRow(2).getCell(4).setCellValue("当日入库档案数");
-            sheet.getRow(2).getCell(7).setCellValue("累计可识别人数");
-            sheet.getRow(2).getCell(10).setCellValue("区间新增加可识别就诊人次");
-            sheet.getRow(3).getCell(1).setCellValue("门诊");
-            sheet.getRow(3).getCell(2).setCellValue("住院");
-            sheet.getRow(3).getCell(3).setCellValue("合计");
-            sheet.getRow(3).getCell(4).setCellValue("门诊");
-            sheet.getRow(3).getCell(5).setCellValue("住院");
-            sheet.getRow(3).getCell(6).setCellValue("合计");
-            sheet.getRow(3).getCell(7).setCellValue("门诊");
-            sheet.getRow(3).getCell(8).setCellValue("住院");
-            sheet.getRow(3).getCell(9).setCellValue("合计");
-            sheet.getRow(3).getCell(10).setCellValue("门诊");
-            sheet.getRow(3).getCell(11).setCellValue("住院");
-            sheet.getRow(3).getCell(12).setCellValue("合计");
-
             int rowNum = 4;
             //数据
             for (String key : keys) {
@@ -990,10 +988,6 @@ public class StatisticsService {
                 row.getCell(11).setCellFormula("SUM(L5:L" + rowNum + ")");
                 row.getCell(12).setCellFormula("SUM(M5:M" + rowNum + ")");
             }
-
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -1004,7 +998,7 @@ public class StatisticsService {
      * @param date
      * @throws Exception
      */
-    public boolean generateOrgReportSheets(HSSFWorkbook wb, String date) throws Exception {
+    public void generateOrgReportSheets(HSSFWorkbook wb, String date) throws Exception {
         //入库时间条件
         String dq = "event_date:[" + date + "T00:00:00Z TO " + date + "T23:59:59Z]";
         //查询时间范围内有入库机构
@@ -1019,10 +1013,6 @@ public class StatisticsService {
                         + "统计表(" + date.replaceAll("-", "") + ")");
                 generateOrgReportSheet(wb, sheet, count.getName(), date);
             }
-
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -1042,104 +1032,104 @@ public class StatisticsService {
 
         Map<String, Object> data = outpatientAndHospitalStatistics(items, objectMapper.readTree(params), true);
 
+        //单元格样式
+        HSSFCellStyle leftStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_LEFT, false, false, (short) -1);
+        HSSFCellStyle centerStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true, (short) -1);
+        HSSFCellStyle centerBackStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true, HSSFColor.LIGHT_BLUE.index);
+        //合并单元格
+        ExcelUtils.createRows(sheet, 0, 2, 16, null);
+        ExcelUtils.createRows(sheet, 2, 4, 16, null);
+        ExcelUtils.mergeRegion(sheet, 0, 0, 0, 3);
+        ExcelUtils.mergeRegion(sheet, 1, 1, 0, 1);
+        ExcelUtils.mergeRegion(sheet, 1, 1, 5, 6);
+        ExcelUtils.mergeRegion(sheet, 1, 1, 11, 12);
+        ExcelUtils.mergeRegion(sheet, 2, 2, 6, 7);
+        ExcelUtils.mergeRegion(sheet, 2, 2, 8, 9);
+        ExcelUtils.mergeRegion(sheet, 2, 2, 12, 13);
+        ExcelUtils.mergeRegion(sheet, 2, 2, 14, 15);
+
+        //机构名称
+        sheet.getRow(0).getCell(0).setCellValue(StringUtils.isBlank(orgName) ? orgCode : orgName);
+
+        //统计类别
+        HSSFRow titleRow = sheet.getRow(1);
+        titleRow.getCell(0).setCellStyle(leftStyle);
+        titleRow.getCell(5).setCellStyle(leftStyle);
+        titleRow.getCell(11).setCellStyle(leftStyle);
+        titleRow.getCell(0).setCellValue("按性别人次统计");
+        titleRow.getCell(5).setCellValue("按科室人次统计");
+        titleRow.getCell(11).setCellValue("按疾病人次统计");
+
+        //列标题
+        HSSFRow colTitleRowFirst = sheet.getRow(2);
+        colTitleRowFirst.getCell(0).setCellValue("序号");
+        colTitleRowFirst.getCell(0).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(1).setCellValue("性别");
+        colTitleRowFirst.getCell(1).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(2).setCellValue("门诊人次");
+        colTitleRowFirst.getCell(2).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(3).setCellValue("住院人次");
+        colTitleRowFirst.getCell(3).setCellStyle(centerBackStyle);
+
+        colTitleRowFirst.getCell(5).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(6).setCellValue("门诊");
+        colTitleRowFirst.getCell(6).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(7).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(8).setCellValue("住院");
+        colTitleRowFirst.getCell(8).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(9).setCellStyle(centerBackStyle);
+
+        colTitleRowFirst.getCell(11).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(12).setCellValue("门诊");
+        colTitleRowFirst.getCell(12).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(13).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(14).setCellValue("住院");
+        colTitleRowFirst.getCell(14).setCellStyle(centerBackStyle);
+        colTitleRowFirst.getCell(15).setCellStyle(centerBackStyle);
+
+        HSSFRow colTitleRowSecond = sheet.getRow(3);
+        colTitleRowSecond.getCell(0).setCellValue("1");
+        colTitleRowSecond.getCell(0).setCellStyle(centerStyle);
+        colTitleRowSecond.getCell(1).setCellValue("男性");
+        colTitleRowSecond.getCell(1).setCellStyle(centerStyle);
+        colTitleRowSecond.getCell(2).setCellStyle(centerStyle);
+        colTitleRowSecond.getCell(3).setCellStyle(centerStyle);
+        colTitleRowSecond.getCell(5).setCellValue("序号");
+        colTitleRowSecond.getCell(5).setCellStyle(centerBackStyle);
+        colTitleRowSecond.getCell(6).setCellValue("科室");
+        colTitleRowSecond.getCell(6).setCellStyle(centerBackStyle);
+        colTitleRowSecond.getCell(7).setCellValue("门诊人次");
+        colTitleRowSecond.getCell(7).setCellStyle(centerBackStyle);
+        colTitleRowSecond.getCell(8).setCellValue("科室");
+        colTitleRowSecond.getCell(8).setCellStyle(centerBackStyle);
+        colTitleRowSecond.getCell(9).setCellValue("出院人次");
+        colTitleRowSecond.getCell(9).setCellStyle(centerBackStyle);
+
+        colTitleRowSecond.getCell(11).setCellValue("序号");
+        colTitleRowSecond.getCell(11).setCellStyle(centerBackStyle);
+        colTitleRowSecond.getCell(12).setCellValue("疾病名称");
+        colTitleRowSecond.getCell(12).setCellStyle(centerBackStyle);
+        colTitleRowSecond.getCell(13).setCellValue("出院人次");
+        colTitleRowSecond.getCell(13).setCellStyle(centerBackStyle);
+        colTitleRowSecond.getCell(14).setCellValue("疾病名称");
+        colTitleRowSecond.getCell(14).setCellStyle(centerBackStyle);
+        colTitleRowSecond.getCell(15).setCellValue("门诊人次");
+        colTitleRowSecond.getCell(15).setCellStyle(centerBackStyle);
+
+        sheet.getRow(4).getCell(0).setCellValue("2");
+        sheet.getRow(4).getCell(0).setCellStyle(centerStyle);
+        sheet.getRow(4).getCell(1).setCellValue("女性");
+        sheet.getRow(4).getCell(1).setCellStyle(centerStyle);
+        sheet.getRow(4).getCell(2).setCellStyle(centerStyle);
+        sheet.getRow(4).getCell(3).setCellStyle(centerStyle);
+
+        sheet.getRow(5).getCell(0).setCellStyle(centerStyle);
+        sheet.getRow(5).getCell(1).setCellValue("合计");
+        sheet.getRow(5).getCell(1).setCellStyle(centerStyle);
+        sheet.getRow(5).getCell(2).setCellStyle(centerStyle);
+        sheet.getRow(5).getCell(3).setCellStyle(centerStyle);
+
         if (data != null && data.size() > 0) {
-            //单元格样式
-            HSSFCellStyle leftStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_LEFT, false, false, (short) -1);
-            HSSFCellStyle centerStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true, (short) -1);
-            HSSFCellStyle centerBackStyle = ExcelUtils.createCellStyle(wb, HSSFCellStyle.ALIGN_CENTER, false, true, HSSFColor.LIGHT_BLUE.index);
-            //合并单元格
-            ExcelUtils.createRows(sheet, 0, 2, 16, null);
-            ExcelUtils.createRows(sheet, 2, 4, 16, null);
-            ExcelUtils.mergeRegion(sheet, 0, 0, 0, 3);
-            ExcelUtils.mergeRegion(sheet, 1, 1, 0, 1);
-            ExcelUtils.mergeRegion(sheet, 1, 1, 5, 6);
-            ExcelUtils.mergeRegion(sheet, 1, 1, 11, 12);
-            ExcelUtils.mergeRegion(sheet, 2, 2, 6, 7);
-            ExcelUtils.mergeRegion(sheet, 2, 2, 8, 9);
-            ExcelUtils.mergeRegion(sheet, 2, 2, 12, 13);
-            ExcelUtils.mergeRegion(sheet, 2, 2, 14, 15);
-
-            //机构名称
-            sheet.getRow(0).getCell(0).setCellValue(StringUtils.isBlank(orgName) ? orgCode : orgName);
-
-            //统计类别
-            HSSFRow titleRow = sheet.getRow(1);
-            titleRow.getCell(0).setCellStyle(leftStyle);
-            titleRow.getCell(5).setCellStyle(leftStyle);
-            titleRow.getCell(11).setCellStyle(leftStyle);
-            titleRow.getCell(0).setCellValue("按性别人次统计");
-            titleRow.getCell(5).setCellValue("按科室人次统计");
-            titleRow.getCell(11).setCellValue("按疾病人次统计");
-
-            //列标题
-            HSSFRow colTitleRowFirst = sheet.getRow(2);
-            colTitleRowFirst.getCell(0).setCellValue("序号");
-            colTitleRowFirst.getCell(0).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(1).setCellValue("性别");
-            colTitleRowFirst.getCell(1).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(2).setCellValue("门诊人次");
-            colTitleRowFirst.getCell(2).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(3).setCellValue("住院人次");
-            colTitleRowFirst.getCell(3).setCellStyle(centerBackStyle);
-
-            colTitleRowFirst.getCell(5).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(6).setCellValue("门诊");
-            colTitleRowFirst.getCell(6).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(7).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(8).setCellValue("住院");
-            colTitleRowFirst.getCell(8).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(9).setCellStyle(centerBackStyle);
-
-            colTitleRowFirst.getCell(11).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(12).setCellValue("门诊");
-            colTitleRowFirst.getCell(12).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(13).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(14).setCellValue("住院");
-            colTitleRowFirst.getCell(14).setCellStyle(centerBackStyle);
-            colTitleRowFirst.getCell(15).setCellStyle(centerBackStyle);
-
-            HSSFRow colTitleRowSecond = sheet.getRow(3);
-            colTitleRowSecond.getCell(0).setCellValue("1");
-            colTitleRowSecond.getCell(0).setCellStyle(centerStyle);
-            colTitleRowSecond.getCell(1).setCellValue("男性");
-            colTitleRowSecond.getCell(1).setCellStyle(centerStyle);
-            colTitleRowSecond.getCell(2).setCellStyle(centerStyle);
-            colTitleRowSecond.getCell(3).setCellStyle(centerStyle);
-            colTitleRowSecond.getCell(5).setCellValue("序号");
-            colTitleRowSecond.getCell(5).setCellStyle(centerBackStyle);
-            colTitleRowSecond.getCell(6).setCellValue("科室");
-            colTitleRowSecond.getCell(6).setCellStyle(centerBackStyle);
-            colTitleRowSecond.getCell(7).setCellValue("门诊人次");
-            colTitleRowSecond.getCell(7).setCellStyle(centerBackStyle);
-            colTitleRowSecond.getCell(8).setCellValue("科室");
-            colTitleRowSecond.getCell(8).setCellStyle(centerBackStyle);
-            colTitleRowSecond.getCell(9).setCellValue("出院人次");
-            colTitleRowSecond.getCell(9).setCellStyle(centerBackStyle);
-
-            colTitleRowSecond.getCell(11).setCellValue("序号");
-            colTitleRowSecond.getCell(11).setCellStyle(centerBackStyle);
-            colTitleRowSecond.getCell(12).setCellValue("疾病名称");
-            colTitleRowSecond.getCell(12).setCellStyle(centerBackStyle);
-            colTitleRowSecond.getCell(13).setCellValue("出院人次");
-            colTitleRowSecond.getCell(13).setCellStyle(centerBackStyle);
-            colTitleRowSecond.getCell(14).setCellValue("疾病名称");
-            colTitleRowSecond.getCell(14).setCellStyle(centerBackStyle);
-            colTitleRowSecond.getCell(15).setCellValue("门诊人次");
-            colTitleRowSecond.getCell(15).setCellStyle(centerBackStyle);
-
-            sheet.getRow(4).getCell(0).setCellValue("2");
-            sheet.getRow(4).getCell(0).setCellStyle(centerStyle);
-            sheet.getRow(4).getCell(1).setCellValue("女性");
-            sheet.getRow(4).getCell(1).setCellStyle(centerStyle);
-            sheet.getRow(4).getCell(2).setCellStyle(centerStyle);
-            sheet.getRow(4).getCell(3).setCellStyle(centerStyle);
-
-            sheet.getRow(5).getCell(0).setCellStyle(centerStyle);
-            sheet.getRow(5).getCell(1).setCellValue("合计");
-            sheet.getRow(5).getCell(1).setCellStyle(centerStyle);
-            sheet.getRow(5).getCell(2).setCellStyle(centerStyle);
-            sheet.getRow(5).getCell(3).setCellStyle(centerStyle);
-
             //门诊性别
             if (data.containsKey("outpatientSex") && ((Map<String, Long>) data.get("outpatientSex")).size() > 0) {
                 Map<String, Long> sexData = (Map<String, Long>) data.get("outpatientSex");

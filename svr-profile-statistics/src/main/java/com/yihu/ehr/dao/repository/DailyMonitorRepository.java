@@ -6,7 +6,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 /**
  * Created by lyr on 2016/7/27.
  */
-public interface DailyMonitorRepository extends PagingAndSortingRepository<DailyMonitorFile,String> {
+public interface DailyMonitorRepository extends PagingAndSortingRepository<DailyMonitorFile, String> {
 
     DailyMonitorFile findByMonitorDate(String monitorDate);
 }

@@ -21,6 +21,7 @@ public class DailyMonitorService extends BaseJpaService<DailyMonitorFile, DailyM
 
     /**
      * 保存日报监测文件信息
+     *
      * @param monitorDate
      * @param fileName
      * @return
@@ -28,7 +29,7 @@ public class DailyMonitorService extends BaseJpaService<DailyMonitorFile, DailyM
     public DailyMonitorFile saveDailyMonitorFile(String monitorDate, String fileName) {
         DailyMonitorFile monitorFile = monitorRepository.findByMonitorDate(monitorDate);
 
-        if(monitorFile == null){
+        if (monitorFile == null) {
             monitorFile = new DailyMonitorFile();
         }
 
@@ -41,6 +42,7 @@ public class DailyMonitorService extends BaseJpaService<DailyMonitorFile, DailyM
 
     /**
      * 分页排序查询日常监测文件
+     *
      * @param page
      * @param size
      * @param sort

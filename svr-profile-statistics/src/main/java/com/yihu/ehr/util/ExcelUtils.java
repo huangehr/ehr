@@ -12,6 +12,7 @@ public class ExcelUtils {
 
     /**
      * 创建Excel文档
+     *
      * @return
      */
     public static HSSFWorkbook createWorkBook() {
@@ -20,6 +21,7 @@ public class ExcelUtils {
 
     /**
      * 创建sheet
+     *
      * @param wb
      * @param sheetName
      * @return
@@ -30,6 +32,7 @@ public class ExcelUtils {
 
     /**
      * 创建一行多列
+     *
      * @param sheet
      * @param rowNum
      * @param columnNum
@@ -53,6 +56,7 @@ public class ExcelUtils {
 
     /**
      * 创建多行多列
+     *
      * @param sheet
      * @param rowNum
      * @param rowCount
@@ -79,6 +83,7 @@ public class ExcelUtils {
 
     /**
      * 合并单元格
+     *
      * @param sheet
      * @param firstRow
      * @param lastRow
@@ -93,6 +98,7 @@ public class ExcelUtils {
 
     /**
      * 创建单元格样式
+     *
      * @param wb
      * @param align
      * @param bold

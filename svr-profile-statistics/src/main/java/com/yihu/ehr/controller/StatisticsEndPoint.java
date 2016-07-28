@@ -31,8 +31,8 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "statistics",description = "档案、人次指标统计")
-public class StatisticsEndPoint extends BaseRestEndPoint{
+@Api(value = "statistics", description = "档案、人次指标统计")
+public class StatisticsEndPoint extends BaseRestEndPoint {
 
     @Autowired
     ObjectMapper objectMapper;
@@ -41,67 +41,66 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
     @Autowired
     DailyMonitorService dailyMonitorService;
 
-    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsProfile,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsProfile, method = RequestMethod.GET)
     @ApiOperation("档案入库统计")
-    public Map<String,Object> profileStatistics(
+    public Map<String, Object> profileStatistics(
             @RequestParam(value = "items")
-            @ApiParam(value = "items")String items,
+            @ApiParam(value = "items") String items,
             @RequestParam(value = "params")
-            @ApiParam(value = "params")String params) throws Exception {
-        try{
+            @ApiParam(value = "params") String params) throws Exception {
+        try {
             JsonNode jsonNode = objectMapper.readTree(params);
-            return statisticsService.profileStatistics(items,jsonNode);
-        }catch (Exception ex){
+            return statisticsService.profileStatistics(items, jsonNode);
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
         }
     }
 
-    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsOutpatientHospital,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsOutpatientHospital, method = RequestMethod.GET)
     @ApiOperation("门诊住院统计")
-    public Map<String,Object> outpatientAndHospitalStatistics(
+    public Map<String, Object> outpatientAndHospitalStatistics(
             @RequestParam(value = "items")
-            @ApiParam(value = "items")String items,
+            @ApiParam(value = "items") String items,
             @RequestParam(value = "params")
-            @ApiParam(value = "params")String params) throws Exception {
-        try{
+            @ApiParam(value = "params") String params) throws Exception {
+        try {
             JsonNode jsonNode = objectMapper.readTree(params);
-            return statisticsService.outpatientAndHospitalStatistics(items,jsonNode,false);
-        }catch (Exception ex){
+            return statisticsService.outpatientAndHospitalStatistics(items, jsonNode, false);
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
         }
     }
 
-    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsDailyReport,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsDailyReport, method = RequestMethod.GET)
     @ApiOperation("日常监测统计生成")
     public DailyMonitorFile generateDailyReport(
             @ApiParam(value = "date")
             @RequestParam(value = "date") String date) throws Exception {
-        try{
+        try {
             return statisticsService.generateDailyReportFile(date);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
         }
     }
 
-    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsDailyReportFiles,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsDailyReportFiles, method = RequestMethod.GET)
     @ApiOperation("查询日常监测文件")
     public List<MDailyMonitorFile> getMetadata(
-            @ApiParam(name="fields",value="返回字段",defaultValue = "")
-            @RequestParam(name="fields",required = false)String fields,
-            @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(name="filters",required = false)String filters,
-            @ApiParam(name="sorts",value="排序",defaultValue = "")
-            @RequestParam(name="sorts",required = false)String sorts,
-            @ApiParam(name="page",value="页码",defaultValue = "1")
-            @RequestParam(name="page",required = false)int page,
-            @ApiParam(name="size",value="分页大小",defaultValue = "15")
-            @RequestParam(name="size",required = false)int size,
+            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
+            @RequestParam(name = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(name = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(name = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(name = "page", required = false) int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(name = "size", required = false) int size,
             HttpServletRequest request,
-            HttpServletResponse response) throws Exception
-    {
+            HttpServletResponse response) throws Exception {
         try {
             long total = 0;
             Collection<MDailyMonitorFile> metaList;
@@ -119,7 +118,7 @@ public class StatisticsEndPoint extends BaseRestEndPoint{
 
             pagedResponse(request, response, total, page, size);
             return (List<MDailyMonitorFile>) metaList;
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
         }

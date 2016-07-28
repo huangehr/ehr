@@ -30,7 +30,7 @@ public class OutPatientStatisticsEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "eventDate")
             @RequestParam(value = "eventDate") String eventDate) throws Exception {
         try {
-            return statisticsService.groupStatistics("EHR_000082", orgCode, eventDate, "0",true,false);
+            return statisticsService.groupStatistics("EHR_000082", orgCode, eventDate, "0", true, false);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
@@ -45,7 +45,7 @@ public class OutPatientStatisticsEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "eventDate")
             @RequestParam(value = "eventDate") String eventDate) throws Exception {
         try {
-            return statisticsService.groupStatistics("EHR_000019_VALUE", orgCode, eventDate, "0",true,false);
+            return statisticsService.groupStatistics("EHR_000019_VALUE", orgCode, eventDate, "0", true, false);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw ex;
