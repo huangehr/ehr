@@ -463,7 +463,7 @@ public class ResourcesGrantController extends BaseController {
     }
 
     @ApiOperation("资源数据元生失效操作")
-    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasValid,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.ResourceMetadatasValid,method = RequestMethod.POST)
     public boolean valid(
             @ApiParam(name="data",value="授权数据元",defaultValue = "")
             @RequestParam(value="data") String data,
