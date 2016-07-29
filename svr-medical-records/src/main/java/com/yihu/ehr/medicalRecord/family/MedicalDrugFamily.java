@@ -10,7 +10,7 @@ import java.util.Date;
 public class MedicalDrugFamily {
 
     public static final String TableName = "EHR_MEDICAL_DRUG";
-    public static final String Data      = "Data";
+    public static final String Data      = "data";
 
     public static class DataColumns {
         public static final String RecordRowkey       = "record_rowkey";       //病历rowkey

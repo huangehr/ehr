@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class TextFamily {
     public static final String TableName = "HBMR_TEXT_LIST";
-    public static final String Data = "Data";
+    public static final String Data = "data";
 
     public static class DataColumns {
         public static final String Content       = "content"; //内容

@@ -18,26 +18,12 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "素材接口", description = "素材接口管理")
-public class MaterialController {
+public class DoctorMatericalEndPoint {
 
     @Autowired
     MaterialService materialService;
     @Autowired
     FileOperationController fileOperationController;
-
-//    @RequestMapping(value = ServiceApi.MedicalRecords.DcotorText,method = RequestMethod.GET)
-//    @ApiOperation("判断文本素材是否存在")
-//    public boolean checkMaterial( @ApiParam(name="creatorId",value="创建者Id",defaultValue = "")
-//                                  @RequestParam(value="creatorId") String creatorId,
-//                                  @ApiParam(name="businessClass",value="素材类型",defaultValue = "")
-//                                  @RequestParam(value="businessClass") String businessClass,
-//                                  @ApiParam(name="content",value="草稿内容",defaultValue = "")
-//                                  @RequestParam(value="content") String content,
-//                                  @ApiParam(name="patientId",value="患者Id",defaultValue = "")
-//                                  @RequestParam(value="patientId") String patientId) throws Exception{
-//        return materialService.checkMaterial(creatorId,businessClass,content,patientId);
-//    }
-
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorText,method = RequestMethod.POST)
     @ApiOperation("上传文本素材")

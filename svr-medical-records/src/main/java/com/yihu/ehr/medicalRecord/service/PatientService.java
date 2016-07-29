@@ -1,31 +1,21 @@
 package com.yihu.ehr.medicalRecord.service;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.PageArg;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
-import com.yihu.ehr.medicalRecord.dao.intf.MedicalLabelDao;
 import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
 import com.yihu.ehr.medicalRecord.family.MedicalRecordsFamily;
 import com.yihu.ehr.medicalRecord.model.MedicalRecordModel;
 import com.yihu.ehr.medicalRecord.model.MrDoctorMedicalRecordsEntity;
-import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.query.URLQueryParser;
 import com.yihu.ehr.query.services.HbaseQuery;
-import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.web.RestTemplates;
-import org.apache.hadoop.conf.Configuration;
+import com.yihu.ehr.yihu.UserMgmt;
+import com.yihu.ehr.yihu.YihuResponse;
 import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.hadoop.hbase.HbaseTemplate;
 import org.springframework.data.hadoop.hbase.RowMapper;
@@ -33,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.CriteriaQuery;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -43,8 +32,6 @@ import java.util.*;
 @Service
 public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao> {
 
-    //    @Autowired
-//    SolrQuery solr;
     @Autowired
     PatientDao patientDao;
     @Autowired
@@ -54,7 +41,7 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
     @Autowired
     MedicalLabelService medicalLabelService;
     @Autowired
-    UserInfoService userInfoService;
+    UserMgmt userMgmt;
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
@@ -63,34 +50,52 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
     HbaseQuery hbaseQuery;
 
     public MrPatientsEntity getPatientInformation(String id) throws Exception {
-        MrPatientsEntity p = patientDao.findByid(id);
-        if (p != null)
-            return p;
-        else {
-            HashMap<String,Object> re=(HashMap)userInfoService.getUserInfo(id);
-            if (re!=null&&re.size()>0) {
-               // re = objectMapper.readValue(s, Map.class);
+        MrPatientsEntity re = patientDao.findByid(id);
+        if (re == null)
+        {
+            YihuResponse response = userMgmt.queryUserInfoByID(id);
+            if(response.getCode() == 10000)
+            {
+                Map<String,Object> map = (Map<String,Object>)response;
+
                 MrPatientsEntity mrPatientsEntity = new MrPatientsEntity();
-                mrPatientsEntity.setId(re.get("UserID").toString());
-                mrPatientsEntity.setName(re.get("CName").toString());
-                mrPatientsEntity.setDemographicId(re.get("IdNumber").toString());
-                mrPatientsEntity.setSex(re.get("Sex").toString());
-                if (re.get("BirthDate") != null && re.get("BirthDate").toString().length() > 0) {
-                    mrPatientsEntity.setBirthday(java.sql.Timestamp.valueOf(re.get("BirthDate").toString()));
+                mrPatientsEntity.setId(map.get("UserID").toString());
+                mrPatientsEntity.setName(map.get("CName").toString());
+                mrPatientsEntity.setDemographicId(map.get("IDNumber").toString());
+                mrPatientsEntity.setSex(map.get("Sex").toString());
+                if (map.get("BirthDate") != null && map.get("BirthDate").toString().length() > 0) {
+                    mrPatientsEntity.setBirthday(java.sql.Timestamp.valueOf(map.get("BirthDate").toString()));
                 }
-                mrPatientsEntity.setMaritalStatus(re.get("IsMarried").toString());
-                mrPatientsEntity.setPhoto(re.get("PhotoUri").toString());
-                mrPatientsEntity.setPhone(re.get("Phone").toString());
+                mrPatientsEntity.setMaritalStatus(map.get("IsMarried").toString());
+                mrPatientsEntity.setPhoto(map.get("PhotoUri").toString());
+                mrPatientsEntity.setPhone(map.get("Phone").toString());
                 addPatient(mrPatientsEntity);
-                return mrPatientsEntity;
-            } else
-                return null;
+                re = mrPatientsEntity;
+            }
+            else{
+                throw new Exception(response.getMessage());
+            }
         }
+
+        return re;
     }
 
+    /**
+     * like：使用"?"来表示，如：name?%医
+     * in：使用"="来表示并用","逗号对值进行分隔，如：status=2,3,4,5
+     * not in：使用"<>"来表示并用","逗号对值进行分隔，如：status=2,3,4,5
+     * =：使用"="来表示，如：status=2
+     * >=：使用大于号和大于等于语法，如：createDate>2012
+     * <=：使用小于号和小于等于语法，如：createDate<=2015
+     * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接 GB/T 2261.2-2003
+     * 多条件组合：使用";"来分隔
+     * */
     public List<MrPatientsEntity> searchPatient(String queryCondition,int page,int size) throws Exception {
         URLQueryParser queryParser = createQueryParser(null, queryCondition, null);
         CriteriaQuery query = queryParser.makeCriteriaQuery();
+
+        if(page<1) page=1;
+        if(size<0) size=15;
 
         return entityManager
                 .createQuery(query)
@@ -146,16 +151,7 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
     }
 
     public Map<String,String> getPatientDiagnosis(String patientId, String doctorId) throws Exception{
-//        List<MrMedicalRecordsEntity> list = medicalRecordDao.findBypatientIdAndDoctorIdOrderByMedicalTimeDesc(patientId, doctorId);
-//        List<String> diagnosisList = new ArrayList<>();
-//        for (int i = 0; i < list.size(); i++) {
-//            if (list.get(i) != null) {
-//                if (!list.contains(list.get(i).getMedicalDiagnosis())) {
-//                    diagnosisList.add(list.get(i).getMedicalDiagnosis());
-//                }
-//            }
-//        }
-//        return diagnosisList;
+
         List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId,patientId);
         String q="";
         if (Mlist != null && Mlist.size() > 0) {

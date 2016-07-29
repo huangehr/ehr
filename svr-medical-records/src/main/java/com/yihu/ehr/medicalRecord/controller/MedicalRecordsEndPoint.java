@@ -24,12 +24,10 @@ import java.util.Map;
 /**
  * Created by Guo Yanshan on 2016/7/15.
  */
-
-
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "MedicalRecords", description = "病历服务接口")
-public class MedicalRecordsController extends EnvelopRestEndPoint {
+public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     MedicalRecordService mRService;

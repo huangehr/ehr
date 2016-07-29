@@ -506,75 +506,93 @@ public class ServiceApi {
         public static final String MessageReply   = "/messagereply";
     }
 
+    /**
+     * 病历夹接口
+     */
     public static class MedicalRecords{
+
+        //公用接口
+        public static final String MedicalRecord	 = "/medicalRecords/medicalRecord"; //系统接入接口，通过单点登录获取最新病历
+        public static final String DictEntry	 = "/medicalRecords/dictEntry"; //获取系统字典
+        public static final String ICD10Dict = "/medicalRecords/icd10Dict"; //获取ICD10字典
+
+        //病历接口
+        public static final String AddRecord = "/medicalRecords/record/addRecord"; //新增病历
+        public static final String ImportRecord = "/medicalRecords/record/importRecord"; //导入病历
+        public static final String MedicalInfo = "/medicalRecords/record/{record_id}"; //	获取病历信息
+        public static final String EditRecord = "/medicalRecords/record/{record_id}/edit"; //修改病历信息
+        public static final String MedicalLabel = "/medicalRecords/record/{record_id}/label"; //获取病历标签/批量保存病历标签
+        public static final String MedicalLabelManage = "/medicalRecords/record/label"; //新增病历标签/删除病历标签
+        public static final String MedicalReport = "/medicalRecords/record/{record_id}/report/{report_id}"; //获取某病历某报告
+        public static final String MedicalReportManage = "/medicalRecords/record/{record_id}/report"; //新增/修改/导入报告/删除报告
+        public static final String ImportMedicalPrescription = "/medicalRecords/record/{record_id}/drug/import"; //导入处方
+        public static final String MedicalDrug = "/medicalRecords/record/{record_id}/drug"; //新增/修改病历用药记录/删除病历用药记录/获取病历用药记录
+        public static final String MedicalShare = "/medicalRecords/record/{record_id}/share"; //病历分享
+
+        //医生接口
+        public static final String DoctorInfo	= "/medicalRecords/doctor/{doctor_id}"; //获取医生信息
+        public static final String DoctorLabelClass	= "/medicalRecords/doctor/{doctor_id}/labelClass"; //获取全部医生标签类别
+        public static final String DoctorLabel	= "/medicalRecords/doctor/{doctor_id}/label"; //获取医生标签
+        public static final String DoctorTemplate	= "/medicalRecords/doctor/{doctor_id}/template"; //获取医生模板/批量保存医生模板
+        public static final String DoctorRecords	= "/medicalRecords/doctor/{doctor_id}/records"; //获取医生病历
+        public static final String DoctorText	= "/medicalRecords/doctor/{doctor_id}/text"; //上传医生文本素材/获取医生文本素材
+        public static final String DoctorImg	= "/medicalRecords/doctor/{doctor_id}/img"; //上传医生图片素材/获取医生图片素材
+        public static final String DoctorICD10	= "/medicalRecords/doctor/{doctor_id}/icd10"; //	获取医生ICD10
+        public static final String DoctorInfoManage	= "/medicalRecords/doctor/info"; //	新增医生信息/修改医生信息
+        public static final String DoctorLabelClassManage	= "/medicalRecords/doctor/labelClass"; //	新增医生标签类别/修改医生标签类别/删除医生标签类别
+        public static final String DoctorLabelManage	= "/medicalRecords/doctor/label"; //	新增医生标签/删除医生标签
+        public static final String DoctorLabelUsed	= "/medicalRecords/doctor/labelUsed"; //	标签使用次数+1
+
+        //患者接口
+        public static final String PatientInfo	= "/medicalRecords/patient/{patient_id}/info"; //	获取患者基本信息
+        public static final String PatientInfoManage	= "/medicalRecords/patient/info"; //	新增患者信息/修改患者信息
+        public static final String PatientRecords	= "/medicalRecords/patient/{patient_id}/records"; //	获取患者病历
+        public static final String PatientICD10	= "/medicalRecords/patient/{patient_id}/icd10"; //	获取患者ICD10
+
+        //系统字典
+        public static final String SystemDict                             = "/medicalRecords/systemDict";
+        public static final String SystemDictEntry                        = "/medicalRecords/systemDictEntry";
+
+
+
+
+
 
         //病历
         public static final String MedicalRecordByLastOne                 = "/medicalRecords/getRecordByLastOne";
-        public static final String MedicalRecord                          = "/medicalRecords/medicalRecord";
         public static final String MedicalRecordId                        = "/medicalRecords/{id}/record";
         public static final String MedicalRecordDocId                     = "/medicalRecords/{doctor_id}/record";
         public static final String MedicalRecordPatId                     = "/medicalRecords/{patient_id}/record";
         public static final String MedicalRecordCopy                      = "/medicalRecords/medicalRecordCopy";
 
         //病历报告
-        public static final String MedicalReport                          = "/medicalRecords/{record_id}/report";
         public static final String DeleteMedicalReport                    = "/medicalRecords/medicalReport/{id}";
         public static final String MedicalReportImg                       = "/medicalRecords/{report_id}/reportImg";
         public static final String MedicalReportImgPicture                = "/medicalRecords/medicalReportImgPicture";
 
-        //医生模板
-        public static final String DoctorTemplate                         = "/medicalRecords/doctor/{doctor_id}/template";
-        public static final String DcotorTemplateManage                   = "/medicalRecords/doctor/template";
-
-        //文本草稿
-        public static final String DoctorDraft                            = "/medicalRecords/{doctor_id}/doctorDraft";
-        public static final String CheckDoctorDraft                       = "/medicalRecords/checkDoctorDraft";
 
         //对话草稿
         public static final String MedicalDraft                           = "/medicalRecords/{doctor_id}/medicalDraft";
         public static final String CheckMedicalDraft                      = "/medicalRecords/checkMedicalDraft";
-        public static final String MedicalDraftPicture                    = "/medicalRecords/medicalDraftPicture";
 
         //医生病历关联
         public static final String DoctorMedicalRecords                   = "/medicalRecords/{doctor_id}/relation/{record_id}";
         public static final String DoctorMedicalRecord                    = "/medicalRecords/DoctorMedicalRecord/{record_id}";
 
-        //医生信息
-        public static final String AddDoctor                              = "/medicalRecords/doctor";
-        public static final String DoctorInfo                             = "/medicalRecords/doctor/{doctor_id}";
-        public static final String DcotorInfoManage                       = "/medicalRecords/doctor/info";
-        public static final String DoctorRecords                          = "/medicalRecords/doctor/{doctor_id}/records";
-        public static final String ChangeDocStatus                        = "/medicalRecords/changeDocStatus";
-        public static final String PatientDiagnosis                       = "/medicalRecords/PatientDiagnosis";
-        public static final String DcotorICD10                            = "/medicalRecords/doctor/{doctor_id}/icd10";
-        public static final String MedicalDrug                            = "/medicalRecords/MedicalDrug/{records_id}";
 
         //标签
         public static final String MedicalLabels                          = "/medicalRecords/{record_id}/labels";
-        public static final String DcotorLabelClassManage                 = "/medicalRecords/doctor/labelClass";
-        public static final String DoctorLabelClass                       = "/medicalRecords/doctor/{doctor_id}/labelClass";
-        public static final String DcotorLabelManage                      = "/medicalRecords/doctor/label";
-        public static final String DoctorLabel                            = "/medicalRecords/doctor/{doctor_id}/label";
-        public static final String DoctorLabelUsed                        = " /medicalRecords/doctor/{doctor_id}/labelUsed";
         public static final String getRecordIdByLabels                     ="/medicalRecords/getRecordIdByLabels";
         //诊断字典
         public static final String DiagnosisDict                          = "/medicalRecords/diagnosisDict";
 
-        //系统字典
-        public static final String SystemDict                             = "/medicalRecords/systemDict";
-        public static final String SystemDictEntry                        = "/medicalRecords/systemDictEntry";
-
         //病人信息
-        public static final String PatientInfoManage                      = "/medicalRecords/patient/info";
-        public static final String PatientInfo                            = "/medicalRecords/patient/{patient_id}/info";
-        public static final String PatientICD10                           = "/medicalRecords/patient/{patient_id}/icd10";
-        public static final String PatientRecords                         = "/medicalRecords/patient/{patient_id}/records";
         public static final String SearchPatient                          = "/medicalRecords/SearchPatient";
-        public static final String PatientExistence                       = "/medicalRecords/{app_uid}/existence/{app_patient_id}";
 
         //文件操作
         public static final String imgFile                                = "/medicalRecords/{id}/imgFile";
         public static final String file                                   = "/medicalRecords/{id}/file";
+
     }
 
     public static class DailyStatistics{
@@ -601,10 +619,6 @@ public class ServiceApi {
         public static final String  StatisticsProfileIdNotNull                       = "/statistics/profiles/idNotNull";
         public static final String  StatisticsProfileEventDateGroup                   = "/statistics/profiles/eventDateGroup";
 
-
-        //素材
-        public static final String DoctorText             = "/medicalRecords/doctor/{doctor_id}/text";
-        public static final String DoctorImg              = "/medicalRecords/doctor/{doctor_id}/img";
 
     }
 }

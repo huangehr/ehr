@@ -3,8 +3,10 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.medicalRecord.model.MrSystemDictEntity;
 import com.yihu.ehr.medicalRecord.model.MrSystemDictEntryEntity;
 import com.yihu.ehr.medicalRecord.service.MrSystemDictEntryService;
+import com.yihu.ehr.medicalRecord.service.MrSystemDictService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,17 +19,51 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * Created by shine on 2016/7/14.
+ * Created by hzp on 2016/7/29.
  */
-
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "系统字典项", description = "系统字典项管理")
-public class MrSystemDictEntryController extends BaseRestEndPoint {
+@Api(value = "字典服务", description = "字典服务")
+public class DictEndPoint extends BaseRestEndPoint {
+
+    @Autowired
+    MrSystemDictService mrSystemDictService;
 
     @Autowired
     MrSystemDictEntryService mrSystemDictEntryService;
 
+    /**************************** 获取诊断字典ICD10 ******************************************/
+
+
+
+    /**************************** 系统字典 ***************************************************/
+    @ApiOperation("增加系统字典")
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.POST)
+    public boolean addMrSystemDict(
+            @ApiParam(name = "SystemDict", value = "系统字典信息")
+            @RequestParam(value = "SystemDict", required = true) String json){
+        MrSystemDictEntity mrSystemDictEntity=toEntity(json,MrSystemDictEntity.class);
+        return mrSystemDictService.addMrSystemDict(mrSystemDictEntity);
+    }
+
+    @ApiOperation("删除系统字典")
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.DELETE)
+    public boolean deleteMrSystemDictEntry(
+            @ApiParam(name = "MrSystemDictCode", value = "系统字典代码")
+            @RequestParam(value = "MrSystemDictCode", required = true)String dictCode){
+        return mrSystemDictService.deleteMrSystemDict(dictCode);
+    }
+
+    @ApiOperation("更新系统字典")
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.PUT)
+    public boolean updateMrSystemDict(
+            @ApiParam(name = "SystemDict", value = "系统字典信息")
+            @RequestParam(value = "SystemDict", required = true) String json){
+        MrSystemDictEntity mrSystemDictEntity=toEntity(json,MrSystemDictEntity.class);
+        return mrSystemDictService.updateMrSystemDict(mrSystemDictEntity);
+    }
+
+    /****************************** 系统字典项 *************************************************/
     @ApiOperation("增加系统字典项")
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemDictEntry, method = RequestMethod.POST)
     public boolean addMrSystemDictEntry(

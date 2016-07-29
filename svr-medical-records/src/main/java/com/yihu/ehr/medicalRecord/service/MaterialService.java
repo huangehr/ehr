@@ -10,6 +10,7 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +23,10 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class MaterialService extends HBaseUtil {
+public class MaterialService  {
+
+    @Autowired
+    HBaseUtil hbase;
 
     public boolean checkTextMaterial(String creatorId,String businessClass,String content,String patientId){
         FilterList filterList = new FilterList();
@@ -30,7 +34,7 @@ public class MaterialService extends HBaseUtil {
         Filter vs = new SingleColumnValueFilter(Bytes.toBytes(TextFamily.Data),Bytes.toBytes(TextFamily.DataColumns.BusinessClass),CompareFilter.CompareOp.EQUAL, new SubstringComparator("1"));
         Scan scan = new Scan();
         scan.setFilter(vs);
-        ResultScanner scanner = getScanner(TextFamily.TableName,scan);
+        ResultScanner scanner = hbase.getScanner(TextFamily.TableName,scan);
         for(Result r:scanner) {
             for (KeyValue kv : r.raw()) {
                 System.out.print(new String(kv.getRow()) + " ");
@@ -48,7 +52,7 @@ public class MaterialService extends HBaseUtil {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             String[] value = {content, creatorId,creatorName, timestamp.toString(), patientId,creatorName, businessClass};
             String rowKey = TextFamily.getRowkey(creatorId,patientId);
-            insertRecord(TextFamily.TableName, rowKey, TextFamily.Data, TextFamily.getColumns(TextFamily.Data), value);
+            hbase.insertRecord(TextFamily.TableName, rowKey, TextFamily.Data, TextFamily.getColumns(TextFamily.Data), value);
             return true;
         }
         else
@@ -68,7 +72,7 @@ public class MaterialService extends HBaseUtil {
             Scan scan = new Scan();
             Filter filter = new RowFilter(CompareFilter.CompareOp.EQUAL,new BinaryPrefixComparator(rowKey.getBytes()));
             scan.setFilter(filter);
-            ResultScanner scanner = getScanner(TextFamily.TableName,scan);
+            ResultScanner scanner = hbase.getScanner(TextFamily.TableName,scan);
             for (Result res : scanner) {
                 byte[]bytes=res.getValue(Bytes.toBytes(TextFamily.Data), Bytes.toBytes(TextFamily.DataColumns.Content));
                 list.add(bytes.toString());
@@ -86,7 +90,7 @@ public class MaterialService extends HBaseUtil {
             String[] value = {documentName,timestamp.toString(),creatorId,creatorName, patientId,patientName,null,fileType,path,dataFrom};
             String rowKey = DocumentFamily.getRowkey(creatorId,patientId);
 
-            insertRecord(DocumentFamily.TableName, rowKey, DocumentFamily.Data, DocumentFamily.getColumns(TextFamily.Data), value);
+            hbase.insertRecord(DocumentFamily.TableName, rowKey, DocumentFamily.Data, DocumentFamily.getColumns(TextFamily.Data), value);
             return true;
         }
         else
@@ -106,7 +110,7 @@ public class MaterialService extends HBaseUtil {
             Scan scan = new Scan();
             Filter filter = new RowFilter(CompareFilter.CompareOp.EQUAL,new BinaryPrefixComparator(rowKey.getBytes()));
             scan.setFilter(filter);
-            ResultScanner scanner = getScanner(DocumentFamily.TableName,scan);
+            ResultScanner scanner = hbase.getScanner(DocumentFamily.TableName,scan);
             for (Result res : scanner) {
                 byte[]bytes=res.getValue(Bytes.toBytes(DocumentFamily.Data), Bytes.toBytes(DocumentFamily.DataColumns.FileUrl));
                 list.add(bytes.toString());

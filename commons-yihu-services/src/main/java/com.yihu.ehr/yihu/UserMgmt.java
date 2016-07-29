@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 public class UserMgmt {
 
     @Autowired
-    YihuHttpService service;
+    private YihuHttpService service;
 
     @Value("${yihu-service.appuid}")
-    public String appUid;
+    private String appUid;
 
     /***
      * 健康之路账号登录

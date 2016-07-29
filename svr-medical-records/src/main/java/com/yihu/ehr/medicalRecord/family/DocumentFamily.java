@@ -12,7 +12,7 @@ import java.util.Date;
 public class DocumentFamily {
 
     public static final String TableName = "EHR_DOCUMENT_LIST";
-    public static final String Data      = "Data";
+    public static final String Data      = "data";
 
     public static class DataColumns {
         public static final String DocumentName       = "document_name"; //文件名

@@ -2,6 +2,7 @@ package com.yihu.ehr.yihu;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -22,13 +23,13 @@ import java.util.Map;
 public class YihuHttpService {
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @Value("${yihu-service.url}")
-    public String url;
+    private String url;
 
     @Value("${yihu-service.clientid}")
-    public String clientId;
+    private String clientId;
 
     /**
      * yihu服务请求
@@ -48,6 +49,7 @@ public class YihuHttpService {
 
             String result = HttpClientUtil.doPost(url, params, null, null);
             Map<String,Object> map = objectMapper.readValue(result, Map.class);
+            objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
 
             if(map.containsKey("Code"))
             {
