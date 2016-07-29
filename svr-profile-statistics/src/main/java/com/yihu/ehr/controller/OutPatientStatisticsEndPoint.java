@@ -1,5 +1,6 @@
 package com.yihu.ehr.controller;
 
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.service.StatisticsService;
 import io.swagger.annotations.Api;
@@ -21,7 +22,7 @@ public class OutPatientStatisticsEndPoint extends BaseRestEndPoint {
     @Autowired
     StatisticsService statisticsService;
 
-    @RequestMapping(value = "/outpatient/statistics/{orgCode}/dept", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsOutpatientDept, method = RequestMethod.GET)
     @ApiOperation("不同科室门诊统计")
     public Map<String, Long> getOutPatientStatisticsByDept(
             @ApiParam(value = "orgCode")
@@ -29,14 +30,14 @@ public class OutPatientStatisticsEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "eventDate")
             @RequestParam(value = "eventDate") String eventDate) throws Exception {
         try {
-            return statisticsService.groupStatistics("EHR_000082", orgCode, eventDate, "0",true);
+            return statisticsService.groupStatistics("EHR_000082", orgCode, eventDate, "0", true, false);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
-    @RequestMapping(value = "/outpatient/statistics/{orgCode}/sex", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsOutpatientSex, method = RequestMethod.GET)
     @ApiOperation("不同性别门诊统计")
     public Map<String, Long> getOutPatientStatisticsBySex(
             @ApiParam(value = "orgCode")
@@ -44,14 +45,14 @@ public class OutPatientStatisticsEndPoint extends BaseRestEndPoint {
             @ApiParam(value = "eventDate")
             @RequestParam(value = "eventDate") String eventDate) throws Exception {
         try {
-            return statisticsService.groupStatistics("EHR_000019_VALUE", orgCode, eventDate, "0",true);
+            return statisticsService.groupStatistics("EHR_000019_VALUE", orgCode, eventDate, "0", true, false);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            throw ex;
         }
     }
 
-    @RequestMapping(value = "/outpatient/statistics/{orgCode}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DailyStatistics.StatisticsOutpatient, method = RequestMethod.GET)
     @ApiOperation("门诊统计")
     public long getOutPatientStatistics(
             @ApiParam(value = "orgCode")
@@ -62,7 +63,7 @@ public class OutPatientStatisticsEndPoint extends BaseRestEndPoint {
             return statisticsService.filterQueryStatistics(orgCode, eventDate, "0");
         } catch (Exception ex) {
             ex.printStackTrace();
-            return 0;
+            throw ex;
         }
     }
 

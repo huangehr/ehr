@@ -18,7 +18,9 @@ public class DocumentFamily {
         public static final String DocumentName       = "document_name"; //文件名
         public static final String CreateTime         = "create_time";//文件创建时间
         public static final String Creater            = "creater";//上传用户id
+        public static final String CreaterName        = "creater_name";//上传用户id
         public static final String PatientId          = "patient_id";//病人ID
+        public static final String PatientName        = "patient_name";//病人ID
         public static final String DocumentContent    = "document_content";//文档摘要
         public static final String FileType           = "file_type";//文件格式类型（图片/PDF）
         public static final String FileUrl            = "file_url";//文件源url
@@ -53,7 +55,9 @@ public class DocumentFamily {
                 DataColumns.DocumentName,
                 DataColumns.CreateTime,
                 DataColumns.Creater,
+                DataColumns.CreaterName,
                 DataColumns.PatientId,
+                DataColumns.PatientName,
                 DataColumns.DocumentContent,
                 DataColumns.FileType,
                 DataColumns.FileUrl,

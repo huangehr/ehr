@@ -19,7 +19,7 @@ public class MedicalLabelService extends BaseRestEndPoint {
     @Autowired
     MedicalLabelDao medicalLabelDao;
     public List<MrMedicalLabelEntity> getMedicalLabelInformationByRecordId(String RecordId){
-       return medicalLabelDao.findByrecordsId(Integer.parseInt(RecordId));
+       return medicalLabelDao.findByrecordsId(RecordId);
     }
 
     public boolean updateMedicalLabel(List<MrMedicalLabelEntity> MedicalLabels){
@@ -44,7 +44,7 @@ public class MedicalLabelService extends BaseRestEndPoint {
 
     }
 
-    public boolean deleteMedicalLabelByR(Integer id){
+    public boolean deleteMedicalLabelByR(String id){
         medicalLabelDao.deleteByrecordsId(id);
         return true;
     }
@@ -72,13 +72,13 @@ public class MedicalLabelService extends BaseRestEndPoint {
 
     }
 
-    public List<Integer> getRecordIdByLabels(String...Lable){
+    public List<String> getRecordIdByLabels(String...Lable){
         List<MrMedicalLabelEntity>m=medicalLabelDao.findByLabels(Lable);
-        Map<Integer,Integer>map=new HashMap<>();
+        Map<String,Integer>map=new HashMap<>();
         for(int i=0;i<m.size();i++) {
             if (m.get(i) != null) {
                 if (map.get(m.get(i).getRecordsId()) != null) {
-                    int k= m.get(i).getRecordsId();
+                    String k= m.get(i).getRecordsId();
                     map.put(m.get(i).getRecordsId(),map.get(k)+1);
                 }
                 else{
@@ -87,13 +87,13 @@ public class MedicalLabelService extends BaseRestEndPoint {
 
             }
         }
-        List<Integer>inte=new ArrayList<>();
-        for(Integer key:map.keySet()){
+        List<String>list=new ArrayList<>();
+        for(String key:map.keySet()){
             if(map.get(key)==Lable.length){
-                inte.add(key);
+                list.add(key);
             }
         }
-       return inte;
+       return list;
     }
 
 }
