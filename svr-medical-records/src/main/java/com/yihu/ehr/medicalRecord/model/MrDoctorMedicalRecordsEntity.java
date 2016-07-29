@@ -9,8 +9,18 @@ import javax.persistence.*;
 public class MrDoctorMedicalRecordsEntity {
     private int id;
     private String doctorId;
+    private String patientId;
     private String recordId;
     private String isCreator;
+
+    @Column(name = "PATIENT_ID")
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
 
     @Basic
     @Column(name = "RECORD_TYPE")

@@ -108,5 +108,21 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-solr</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-redis-keyschema</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-fastdfs</artifactId>
+        </dependency>
     </dependencies>
 </project>

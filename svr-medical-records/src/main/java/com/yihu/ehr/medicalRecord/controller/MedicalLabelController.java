@@ -35,7 +35,7 @@ public class MedicalLabelController extends BaseRestEndPoint {
         for(int i=0;i<tmp.size();i++){
             if(tmp.get(i)!=null) {
                 MrMedicalLabelEntity mrMedicalLabelEntity = new MrMedicalLabelEntity();
-                mrMedicalLabelEntity.setRecordsId(Integer.parseInt(tmp.get(i).get("recordsId")));
+                mrMedicalLabelEntity.setRecordsId(tmp.get(i).get("recordsId"));
                 mrMedicalLabelEntity.setLabel(tmp.get(i).get("label"));
                 m.add(mrMedicalLabelEntity);
             }
@@ -61,7 +61,7 @@ public class MedicalLabelController extends BaseRestEndPoint {
         for(int i=0;i<tmp.size();i++){
             if(tmp.get(i)!=null) {
                 MrMedicalLabelEntity mrMedicalLabelEntity = new MrMedicalLabelEntity();
-                mrMedicalLabelEntity.setRecordsId(Integer.parseInt(tmp.get(i).get("recordsId")));
+                mrMedicalLabelEntity.setRecordsId(tmp.get(i).get("recordsId"));
                 mrMedicalLabelEntity.setLabel(tmp.get(i).get("label"));
                 m.add(mrMedicalLabelEntity);
             }
@@ -71,7 +71,7 @@ public class MedicalLabelController extends BaseRestEndPoint {
 
     @ApiOperation("获取RecordId by Labels")
     @RequestMapping(value = ServiceApi.MedicalRecords.getRecordIdByLabels, method = RequestMethod.GET)
-    public List<Integer> getRecordIdByLabels(
+    public List<String> getRecordIdByLabels(
             @ApiParam(name = "Labels", value = "病历表编号")
             @RequestParam(value = "Labels")List<String> Labels){
         String[] arr = (String[])Labels.toArray(new String[Labels.size()]);
