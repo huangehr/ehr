@@ -42,6 +42,7 @@ spring:
     username: zhanpeng
     password: zhanpeng
 
+
 service-gateway:
   wsurl: http://service.yihu.com:8085/WSGW/rest
   WSclientId: 9000192
@@ -50,5 +51,9 @@ service-gateway:
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
+
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.quorum: node2.jkzldev.com,node1.jkzldev.com,node4.jkzldev.com
 
 

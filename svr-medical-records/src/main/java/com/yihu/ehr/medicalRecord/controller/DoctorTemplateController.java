@@ -56,7 +56,7 @@ public class DoctorTemplateController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorTemplate,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DcotorTemplateManage,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("批量保存模板")
     public boolean saveTemplate(
             @ApiParam(name="doctor_id",value="医生Id",defaultValue = "")

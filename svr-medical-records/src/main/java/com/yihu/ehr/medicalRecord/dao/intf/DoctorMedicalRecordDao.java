@@ -17,5 +17,7 @@ public interface DoctorMedicalRecordDao extends PagingAndSortingRepository<MrDoc
 
     List<MrDoctorMedicalRecordsEntity> findByrecordId(int recordId);
 
+    List<MrDoctorMedicalRecordsEntity> findBydoctorIdAndPatientId(String doctorId,String patientId);
+
     MrDoctorMedicalRecordsEntity findByrecordIdAndIsCreator(int recordId, String isCreator);
 }

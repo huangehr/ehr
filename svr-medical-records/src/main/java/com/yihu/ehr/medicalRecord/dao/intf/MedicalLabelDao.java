@@ -11,14 +11,14 @@ import java.util.List;
  */
 public interface MedicalLabelDao extends PagingAndSortingRepository<MrMedicalLabelEntity,Integer> {
 
-    List<MrMedicalLabelEntity> findByrecordsId(Integer id);
+    List<MrMedicalLabelEntity> findByrecordsId(String id);
 
     @Query("from MrMedicalLabelEntity where recordsId= ?1 AND  label= ?2 ")
-    List<MrMedicalLabelEntity> findByRecordsIdAndLabel(Integer RecordsId,String label);
+    List<MrMedicalLabelEntity> findByRecordsIdAndLabel(String RecordsId,String label);
 
     MrMedicalLabelEntity findByid(String id);
 
-    void deleteByrecordsId(Integer recordsId);
+    void deleteByrecordsId(String recordsId);
 
     @Query("select m from MrMedicalLabelEntity m where m.label in (:labels)")
     List<MrMedicalLabelEntity> findByLabels(@Param("labels") String[] labels);
