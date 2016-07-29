@@ -1050,7 +1050,7 @@ public class StatisticsService {
 
         //机构名称
         sheet.getRow(0).getCell(0).setCellValue(StringUtils.isBlank(orgName) ? orgCode : orgName);
-
+        sheet.getRow(0).getCell(0).setCellStyle(leftStyle);
         //统计类别
         HSSFRow titleRow = sheet.getRow(1);
         titleRow.getCell(0).setCellStyle(leftStyle);
