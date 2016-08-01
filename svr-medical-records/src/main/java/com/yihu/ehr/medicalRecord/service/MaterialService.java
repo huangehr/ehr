@@ -1,124 +1,71 @@
 package com.yihu.ehr.medicalRecord.service;
 
-import com.yihu.ehr.hbase.HBaseUtil;
-import com.yihu.ehr.medicalRecord.family.DocumentFamily;
-import com.yihu.ehr.medicalRecord.family.TextFamily;
-import org.apache.commons.net.ntp.TimeStamp;
-import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.*;
-import org.apache.hadoop.hbase.util.Bytes;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.medicalRecord.dao.DoctorDao;
+import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecord.dao.hbaseDao.DocumentDao;
+import com.yihu.ehr.medicalRecord.dao.hbaseDao.TextDao;
+import com.yihu.ehr.medicalRecord.model.DTO.Document;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
+import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorMedicalRecordsEntity;
+import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorsEntity;
+import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
+import com.yihu.ehr.yihu.UserMgmt;
+import com.yihu.ehr.yihu.YihuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by shine on 2016/7/27.
+ * Created by hzp on 2016/8/1.
+ * 素材管理类
  */
 @Service
-@Transactional
-public class MaterialService  {
+public class MaterialService {
 
     @Autowired
-    HBaseUtil hbase;
+    DocumentDao DocumentDao;
 
-    public boolean checkTextMaterial(String creatorId,String businessClass,String content,String patientId){
-        FilterList filterList = new FilterList();
-        Filter vf = new ValueFilter(CompareFilter.CompareOp.EQUAL, new SubstringComparator("ROW2_QUAL1"));
-        Filter vs = new SingleColumnValueFilter(Bytes.toBytes(TextFamily.Data),Bytes.toBytes(TextFamily.DataColumns.BusinessClass),CompareFilter.CompareOp.EQUAL, new SubstringComparator("1"));
-        Scan scan = new Scan();
-        scan.setFilter(vs);
-        ResultScanner scanner = hbase.getScanner(TextFamily.TableName,scan);
-        for(Result r:scanner) {
-            for (KeyValue kv : r.raw()) {
-                System.out.print(new String(kv.getRow()) + " ");
-                System.out.print(new String(kv.getFamily()) + ":");
-                System.out.print(new String(kv.getQualifier()) + " ");
-                System.out.print(kv.getTimestamp() + " ");
-                System.out.println(new String(kv.getValue()));
-            }
-        }
+    @Autowired
+    TextDao textDao;
+
+
+    /**
+     * 上传文本素材
+     * @return
+     * @throws Exception
+     */
+    public boolean uploadTextMaterial(String creator,String creatorName,String businessClass,String content,String patientId,String patientName) throws Exception
+    {
         return true;
     }
 
-    public boolean uploadTextMaterial(String creatorId,String creatorName,String businessClass,String content,String patientId,String patientName)throws Exception{
-        if(creatorId.length()>0 && content.length()>0 && businessClass.length()>0 ) {
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            String[] value = {content, creatorId,creatorName, timestamp.toString(), patientId,creatorName, businessClass};
-            String rowKey = TextFamily.getRowkey(creatorId,patientId);
-            hbase.insertRecord(TextFamily.TableName, rowKey, TextFamily.Data, TextFamily.getColumns(TextFamily.Data), value);
-            return true;
-        }
-        else
-            return false;
+    /**
+     * 获取文本素材
+     */
+    public List<String> getTextMaterial(String creatorId,String businessClass,String patientId,int page, int size) throws Exception{
+        return null;
     }
 
-    public List<String> getTextMaterial(String creatorId,String businessClass,String patientId){
-        if(creatorId.length()>0) {
-            String rowKey = "";
-            if (patientId!=null && patientId.length() > 0) {
-                rowKey = creatorId + "_" + patientId;
-            }
-            else {
-                rowKey = creatorId + "_" + creatorId;
-            }
-            List<String>list=new ArrayList<>();
-            Scan scan = new Scan();
-            Filter filter = new RowFilter(CompareFilter.CompareOp.EQUAL,new BinaryPrefixComparator(rowKey.getBytes()));
-            scan.setFilter(filter);
-            ResultScanner scanner = hbase.getScanner(TextFamily.TableName,scan);
-            for (Result res : scanner) {
-                byte[]bytes=res.getValue(Bytes.toBytes(TextFamily.Data), Bytes.toBytes(TextFamily.DataColumns.Content));
-                list.add(bytes.toString());
-            }
-            return list;
-        }
-        else
-            return null;
-
+    /**
+     * 上传图片素材
+     * @return
+     * @throws Exception
+     */
+    public boolean uploadImgMaterial() throws Exception
+    {
+        return true;
     }
 
-    public boolean uploadImgMaterial(String documentName,String creatorId,String creatorName,String fileType,String dataFrom,String patientId,String patientName,String path)throws Exception{
-        if(creatorId.length()>0 && fileType.length()>0 &&path.length()>0) {
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            String[] value = {documentName,timestamp.toString(),creatorId,creatorName, patientId,patientName,null,fileType,path,dataFrom};
-            String rowKey = DocumentFamily.getRowkey(creatorId,patientId);
-
-            hbase.insertRecord(DocumentFamily.TableName, rowKey, DocumentFamily.Data, DocumentFamily.getColumns(TextFamily.Data), value);
-            return true;
-        }
-        else
-            return false;
+    /**
+     * 获取图片素材
+     */
+    public List<Document> getImgMaterial(String creatorId,String patientId,String dataFrom, int page, int size) throws Exception{
+        return null;
     }
-
-    public List<String> getImgMaterial(String creatorId,String patientId)throws Exception{
-        if(creatorId.length()>0) {
-            String rowKey = "";
-            if (patientId.length() > 0) {
-                rowKey = creatorId + "_" + patientId;
-            }
-            else {
-                rowKey = creatorId + "_" + creatorId;
-            }
-            List<String>list=new ArrayList<>();
-            Scan scan = new Scan();
-            Filter filter = new RowFilter(CompareFilter.CompareOp.EQUAL,new BinaryPrefixComparator(rowKey.getBytes()));
-            scan.setFilter(filter);
-            ResultScanner scanner = hbase.getScanner(DocumentFamily.TableName,scan);
-            for (Result res : scanner) {
-                byte[]bytes=res.getValue(Bytes.toBytes(DocumentFamily.Data), Bytes.toBytes(DocumentFamily.DataColumns.FileUrl));
-                list.add(bytes.toString());
-            }
-            return list;
-        }
-        else
-            return null;
-    }
-
 }

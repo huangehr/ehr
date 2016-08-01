@@ -513,14 +513,14 @@ public class ServiceApi {
 
         //公用接口
         public static final String MedicalRecord	 = "/medicalRecords/medicalRecord"; //系统接入接口，通过单点登录获取最新病历
-        public static final String DictEntry	 = "/medicalRecords/dictEntry"; //获取系统字典
+        public static final String SystemDict  = "/medicalRecords/systemDict";
+        public static final String SystemDictEntry = "/medicalRecords/systemDictEntry"; //获取系统字典项
         public static final String ICD10Dict = "/medicalRecords/icd10Dict"; //获取ICD10字典
 
         //病历接口
         public static final String AddRecord = "/medicalRecords/record/addRecord"; //新增病历
         public static final String ImportRecord = "/medicalRecords/record/importRecord"; //导入病历
         public static final String MedicalInfo = "/medicalRecords/record/{record_id}"; //	获取病历信息
-        public static final String EditRecord = "/medicalRecords/record/{record_id}/edit"; //修改病历信息
         public static final String MedicalLabel = "/medicalRecords/record/{record_id}/label"; //获取病历标签/批量保存病历标签
         public static final String MedicalLabelManage = "/medicalRecords/record/label"; //新增病历标签/删除病历标签
         public static final String MedicalReport = "/medicalRecords/record/{record_id}/report/{report_id}"; //获取某病历某报告
@@ -549,49 +549,6 @@ public class ServiceApi {
         public static final String PatientRecords	= "/medicalRecords/patient/{patient_id}/records"; //	获取患者病历
         public static final String PatientICD10	= "/medicalRecords/patient/{patient_id}/icd10"; //	获取患者ICD10
 
-        //系统字典
-        public static final String SystemDict                             = "/medicalRecords/systemDict";
-        public static final String SystemDictEntry                        = "/medicalRecords/systemDictEntry";
-
-
-
-
-
-
-        //病历
-        public static final String MedicalRecordByLastOne                 = "/medicalRecords/getRecordByLastOne";
-        public static final String MedicalRecordId                        = "/medicalRecords/{id}/record";
-        public static final String MedicalRecordDocId                     = "/medicalRecords/{doctor_id}/record";
-        public static final String MedicalRecordPatId                     = "/medicalRecords/{patient_id}/record";
-        public static final String MedicalRecordCopy                      = "/medicalRecords/medicalRecordCopy";
-
-        //病历报告
-        public static final String DeleteMedicalReport                    = "/medicalRecords/medicalReport/{id}";
-        public static final String MedicalReportImg                       = "/medicalRecords/{report_id}/reportImg";
-        public static final String MedicalReportImgPicture                = "/medicalRecords/medicalReportImgPicture";
-
-
-        //对话草稿
-        public static final String MedicalDraft                           = "/medicalRecords/{doctor_id}/medicalDraft";
-        public static final String CheckMedicalDraft                      = "/medicalRecords/checkMedicalDraft";
-
-        //医生病历关联
-        public static final String DoctorMedicalRecords                   = "/medicalRecords/{doctor_id}/relation/{record_id}";
-        public static final String DoctorMedicalRecord                    = "/medicalRecords/DoctorMedicalRecord/{record_id}";
-
-
-        //标签
-        public static final String MedicalLabels                          = "/medicalRecords/{record_id}/labels";
-        public static final String getRecordIdByLabels                     ="/medicalRecords/getRecordIdByLabels";
-        //诊断字典
-        public static final String DiagnosisDict                          = "/medicalRecords/diagnosisDict";
-
-        //病人信息
-        public static final String SearchPatient                          = "/medicalRecords/SearchPatient";
-
-        //文件操作
-        public static final String imgFile                                = "/medicalRecords/{id}/imgFile";
-        public static final String file                                   = "/medicalRecords/{id}/file";
 
     }
 

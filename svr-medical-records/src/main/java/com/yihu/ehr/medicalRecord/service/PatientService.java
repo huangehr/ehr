@@ -1,24 +1,15 @@
 package com.yihu.ehr.medicalRecord.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
-import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
-import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
-import com.yihu.ehr.medicalRecord.family.MedicalRecordsFamily;
-import com.yihu.ehr.medicalRecord.model.MedicalRecordModel;
-import com.yihu.ehr.medicalRecord.model.MrDoctorMedicalRecordsEntity;
-import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
+import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecord.dao.PatientDao;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
+import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.query.URLQueryParser;
-import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.yihu.UserMgmt;
 import com.yihu.ehr.yihu.YihuResponse;
-import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.client.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.hadoop.hbase.HbaseTemplate;
-import org.springframework.data.hadoop.hbase.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,26 +25,26 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
 
     @Autowired
     PatientDao patientDao;
-    @Autowired
-    MedicalRecordDao medicalRecordDao;
-    @Autowired
-    DoctorMedicalRecordDao doctorMedicalRecordDao;
-    @Autowired
-    MedicalLabelService medicalLabelService;
+
     @Autowired
     UserMgmt userMgmt;
+
     @Autowired
     ObjectMapper objectMapper;
-    @Autowired
-    HbaseTemplate hbaseTemplate;
-    @Autowired
-    HbaseQuery hbaseQuery;
 
-    public MrPatientsEntity getPatientInformation(String id) throws Exception {
-        MrPatientsEntity re = patientDao.findByid(id);
+    @Autowired
+    DoctorMedicalRecordDao doctorMedicalRecordDao;
+
+    @Autowired
+    MedicalLabelService medicalLabelService;
+
+
+
+    public MrPatientsEntity getPatientInformation(String patientId) throws Exception {
+        MrPatientsEntity re = patientDao.findByid(patientId);
         if (re == null)
         {
-            YihuResponse response = userMgmt.queryUserInfoByID(id);
+            YihuResponse response = userMgmt.queryUserInfoByID(patientId);
             if(response.getCode() == 10000)
             {
                 Map<String,Object> map = (Map<String,Object>)response;
@@ -152,7 +143,7 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
 
     public Map<String,String> getPatientDiagnosis(String patientId, String doctorId) throws Exception{
 
-        List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId,patientId);
+        /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId,patientId);
         String q="";
         if (Mlist != null && Mlist.size() > 0) {
             for (int i = 0; i < Mlist.size(); i++) {
@@ -165,7 +156,7 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
         if("".equals(q)){
             return null;
         }
-        Page<Map<String, Object>> result = hbaseQuery.queryBySolr(MedicalRecordsFamily.TableName, "rowkey", null, 1, 1000000000);
+        Page<Map<String, Object>> result = hbaseQuery.queryBySolr("1", q, null, 1, 1000000000);
         Map<String, String> list = new HashMap<>();
         if (result.getContent() != null && result.getContent().size() > 0) {
 
@@ -184,15 +175,17 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
 
             }
         }
-        return list;
+        return list;*/
+
+        return null;
     }
 
-    public List<MedicalRecordModel> getPatientRecords(String patientId, String label, String medicalTimeFrom,
-                                                      String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String doctorId) throws Exception {
+    public List<MedicalRecord> getPatientRecords(String patientId, String label, String medicalTimeFrom,
+                                                 String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String doctorId) throws Exception {
 
-        List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId, patientId);
+        /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId, patientId);
         List<String> recordsIdList = new ArrayList<>();
-        List<MedicalRecordModel> medicalRecordModelList = new ArrayList<>();
+        List<MedicalRecord> medicalRecordModelList = new ArrayList<>();
         if (label != null && label.length() > 0) {
             List<String> Ilist = medicalLabelService.getRecordIdByLabels(label.split(","));
             if (Mlist != null && Mlist.size() > 0) {
@@ -205,14 +198,14 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
 
         }
         for (int i = 0; i < recordsIdList.size(); i++) {
-            Result result = hbaseTemplate.get(MedicalRecordsFamily.TableName, recordsIdList.get(i), new RowMapper<Result>() {
+            Result result = hbaseTemplate.get("", recordsIdList.get(i), new RowMapper<Result>() {
                 public Result mapRow(Result result, int rowNum) throws Exception {
                     return result;
                 }
             });
             KeyValue[] kv = result.raw();
 
-            MedicalRecordModel m = objectMapper.readValue(kv.toString(), MedicalRecordModel.class);
+            MedicalRecord m = objectMapper.readValue(kv.toString(), MedicalRecord.class);
 //            for (int j = 0; j< kv.length; j++)
 //            {
 //                // 循环每一列
@@ -222,7 +215,7 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
             medicalRecordModelList.add(m);
 
         }
-        return medicalRecordModelList;
-
+        return medicalRecordModelList;*/
+        return  null;
     }
 }

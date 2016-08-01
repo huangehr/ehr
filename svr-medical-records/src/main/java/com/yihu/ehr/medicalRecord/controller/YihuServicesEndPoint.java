@@ -1,10 +1,7 @@
 package com.yihu.ehr.medicalRecord.controller;
 
-import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecord.model.MrDoctorsEntity;
-import com.yihu.ehr.medicalRecord.service.DoctorService;
 import com.yihu.ehr.yihu.UserMgmt;
 import com.yihu.ehr.yihu.YihuResponse;
 import io.swagger.annotations.Api;
@@ -15,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * Created by shine on 2016/7/14.
@@ -42,7 +37,7 @@ public class YihuServicesEndPoint extends BaseRestEndPoint {
     @ApiOperation("单点登录接口")
     @RequestMapping(value =  "/medicalRecords/yihu/userSessionCheck", method = RequestMethod.GET)
     public YihuResponse userSessionCheck(
-            @ApiParam(name = "userId", value = "用户ID")
+            @ApiParam(name = "userId", value = "用户ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
             @RequestParam(value = "userId", required = true)String userId,
             @ApiParam(name = "ticket", value = "ticket")
             @RequestParam(value = "ticket", required = true)String ticket)
@@ -53,7 +48,7 @@ public class YihuServicesEndPoint extends BaseRestEndPoint {
     @ApiOperation("获取用户信息")
     @RequestMapping(value =  "/medicalRecords/yihu/queryUserInfoByID", method = RequestMethod.GET)
     public YihuResponse queryUserInfoByID (
-            @ApiParam(name = "userId", value = "用户ID")
+            @ApiParam(name = "userId", value = "用户ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
             @RequestParam(value = "userId", required = true)String userId)
     {
         return userMgmt.queryUserInfoByID(userId);

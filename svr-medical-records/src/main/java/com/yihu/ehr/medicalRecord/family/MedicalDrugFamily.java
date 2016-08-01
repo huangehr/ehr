@@ -35,35 +35,11 @@ public class MedicalDrugFamily {
         };
     }
 
-    /**
-     * 获取指定族的列.
-     *
-     * @return
-     */
-    public static String[] getColumns(String family) {
-        if (family.equals(Data)) {
-            return new String[]{
-                    DataColumns.RecordRowkey,
-                    DataColumns.PrescriptionRowkey,
-                    DataColumns.DrugName,
-                    DataColumns.DrugSpecifications,
-                    DataColumns.DrugQuantity,
-                    DataColumns.DrugUnit,
-                    DataColumns.DrugUse,
-                    DataColumns.DrugDosage,
-                    DataColumns.DrugFrequency
-            };
-        }
 
-        return null;
-    }
 
     public static String getRowkey(String recordRowkey, String PrescriptionRowkey){
 
         return recordRowkey + "_" + PrescriptionRowkey + "_" + Long.toString(new Date().getTime());
     }
 
-    public String getTableName(){
-        return TableName;
-    }
 }

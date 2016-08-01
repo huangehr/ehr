@@ -2,6 +2,8 @@ package com.yihu.ehr.medicalRecord.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.medicalRecord.model.DTO.Document;
+import com.yihu.ehr.medicalRecord.model.DTO.Text;
 import com.yihu.ehr.medicalRecord.service.MaterialService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,28 +24,22 @@ public class DoctorMatericalEndPoint {
 
     @Autowired
     MaterialService materialService;
-    @Autowired
-    FileOperationController fileOperationController;
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorText,method = RequestMethod.POST)
     @ApiOperation("上传文本素材")
-    public boolean uploadTextMaterial( @ApiParam(name="creatorId",value="创建者Id")
-                                       @RequestParam(value="creatorId",required = true) String creatorId,
-                                       @ApiParam(name="creatorName",value="创建者name")
-                                       @RequestParam(value="creatorName",required = true) String creatorName,
-                                       @ApiParam(name="businessClass",value="素材类型")
-                                       @RequestParam(value="businessClass",required = true) String businessClass,
+    public boolean uploadTextMaterial(@ApiParam(name="creator",value="创建者Id")
+                                       @RequestParam(value="creator",required = true) String creator,
+                                       @ApiParam(name="creator_name",value="创建者name")
+                                       @RequestParam(value="creator_name",required = false) String creatorName,
+                                       @ApiParam(name="business_class",value="素材类型")
+                                       @RequestParam(value="business_class",required = true) String businessClass,
                                        @ApiParam(name="content",value="草稿内容")
                                        @RequestParam(value="content",required = true) String content,
-                                       @ApiParam(name="patientId",value="患者Id")
-                                       @RequestParam(value="patientId",required = false) String patientId,
-                                       @ApiParam(name="patientName",value="患者name")
-                                       @RequestParam(value="patientName",required = false) String patientName) throws Exception{
-        if(materialService.checkTextMaterial(creatorId, businessClass, content, patientId)) {
-            return materialService.uploadTextMaterial(creatorId,creatorName, businessClass, content, patientId,patientName);
-        }
-        else
-            return false;
+                                       @ApiParam(name="patient_id",value="患者Id")
+                                       @RequestParam(value="patient_id",required = false) String patientId,
+                                       @ApiParam(name="patient_name",value="患者name")
+                                       @RequestParam(value="patient_name",required = false) String patientName) throws Exception{
+        return materialService.uploadTextMaterial(creator,creatorName,businessClass,content,patientId,patientName);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorText,method = RequestMethod.GET)
@@ -58,7 +54,7 @@ public class DoctorMatericalEndPoint {
                                           @RequestParam(value="page",required = false) int page,
                                           @ApiParam(name="size",value="size")
                                           @RequestParam(value="size",required = false) int size) throws Exception{
-        return materialService.getTextMaterial(creatorId, businessClass, patientId);
+        return materialService.getTextMaterial(creatorId, businessClass, patientId,page,size);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorImg,method = RequestMethod.POST)
@@ -69,32 +65,31 @@ public class DoctorMatericalEndPoint {
                                        @RequestParam(value="creatorId",required = true) String creatorId,
                                        @ApiParam(name="creatorName",value="创建者name")
                                        @RequestParam(value="creatorName",required = true) String creatorName,
-                                       @ApiParam(name="fileType",value="文件类型")
-                                       @RequestParam(value="fileType",required = true) String fileType,
                                        @ApiParam(name="patientId",value="患者Id")
                                        @RequestParam(value="patientId",required = false) String patientId,
                                        @ApiParam(name="patientName",value="患者name")
                                        @RequestParam(value="patientName",required = false) String patientName,
                                        @ApiParam(name = "jsonData", value = "图片转化后的输入流")
-                                       @RequestBody String jsonData ) throws Exception{
-            Map m=fileOperationController.uploadPicture(creatorId,jsonData);
-        if(m!=null && m.get("path")!=null) {
-            return materialService.uploadImgMaterial(documentName, creatorId,creatorName,fileType, "2", patientId,patientName, m.get("path").toString());
-        }
-        else
-            return false;
+                                       @RequestBody String jsonData) throws Exception{
+        //上传图片
+        String url = "";
+
+        return materialService.uploadImgMaterial();
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorImg,method = RequestMethod.GET)
     @ApiOperation("获取图片素材")
-    public List<String> getImgMaterial(@ApiParam(name="creatorId",value="创建者Id")
+    public List<Document> getImgMaterial(@ApiParam(name="creatorId",value="创建者Id")
                                        @RequestParam(value="creatorId",required = true) String creatorId,
-                                       @ApiParam(name="patientId",value="患者Id")
+                                         @ApiParam(name="patientId",value="患者Id")
                                        @RequestParam(value="patientId",required = false) String patientId,
-                                       @ApiParam(name="page",value="page")
+                                         @ApiParam(name="dataFrom",value="数据来源")
+                                           @RequestParam(value="dataFrom",required = false) String dataFrom,
+                                         @ApiParam(name="page",value="page")
                                        @RequestParam(value="page",required = false) int page,
-                                       @ApiParam(name="size",value="size")
+                                         @ApiParam(name="size",value="size")
                                        @RequestParam(value="size",required = false) int size) throws Exception{
-        return materialService.getImgMaterial(creatorId, patientId);
+
+        return materialService.getImgMaterial(creatorId, patientId,dataFrom,page,size);
     }
 }

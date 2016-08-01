@@ -52,10 +52,10 @@ hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.jkzldev.com,node2.jkzldev.com,node8.jkzldev.com
 
-service-gateway:
-  wsurl: http://service.yihu.com:8085/WSGW/rest
-  WSclientId: 9000192
-  sign: KK66VXAFN9QTVLTI7NWJLEX3NXH4BUIRGOV83331O75
+yihu-service:
+  url: http://service.yihu.com:8085/WSGW/rest
+  clientid: 9000192
+  appuid: KK66VXAFN9QTVLTI7NWJLEX3NXH4BUIRGOV83331O75
 
 fast-dfs:
   tracker-server: 172.19.103.54:22122

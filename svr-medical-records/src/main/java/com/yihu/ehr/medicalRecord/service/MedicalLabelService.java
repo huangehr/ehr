@@ -1,8 +1,8 @@
 package com.yihu.ehr.medicalRecord.service;
 
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecord.dao.intf.MedicalLabelDao;
-import com.yihu.ehr.medicalRecord.model.MrMedicalLabelEntity;
+import com.yihu.ehr.medicalRecord.dao.MedicalLabelDao;
+import com.yihu.ehr.medicalRecord.model.Entity.MrMedicalLabelEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,60 +18,24 @@ public class MedicalLabelService extends BaseRestEndPoint {
 
     @Autowired
     MedicalLabelDao medicalLabelDao;
-    public List<MrMedicalLabelEntity> getMedicalLabelInformationByRecordId(String RecordId){
-       return medicalLabelDao.findByrecordsId(RecordId);
+
+    /**
+     * 获取病历标签
+     */
+    public List<MrMedicalLabelEntity> getMedicalLabelByRecordId(String recordId){
+       return medicalLabelDao.findByrecordsId(recordId);
     }
 
-    public boolean updateMedicalLabel(List<MrMedicalLabelEntity> MedicalLabels){
-
-        if(MedicalLabels.size()>0) {
-            for (int i = 0; i < MedicalLabels.size(); i++) {
-
-                MrMedicalLabelEntity m= MedicalLabels.get(i);
-                if(m!=null) {
-                    if (medicalLabelDao.findByrecordsId(m.getRecordsId()) != null
-                            && medicalLabelDao.findByrecordsId(m.getRecordsId()).size() > 0){
-                        medicalLabelDao.deleteByrecordsId(m.getRecordsId());
-                        medicalLabelDao.save(MedicalLabels.get(i));
-                    }
-                }
-            }
-            return true;
-        }
-        else
-            return false;
-
-
-    }
-
-    public boolean deleteMedicalLabelByR(String id){
-        medicalLabelDao.deleteByrecordsId(id);
+    /**
+     * 获取病历标签
+     */
+    public boolean saveMedicalLabel(String recordId,String doctorId,List<String> list){
         return true;
     }
 
-    public boolean addMedicalLabels(List<MrMedicalLabelEntity> MedicalLabels){
-        if(MedicalLabels.size()>0) {
-            for (int i = 0; i < MedicalLabels.size(); i++) {
-
-                MrMedicalLabelEntity m= MedicalLabels.get(i);
-                if(m!=null) {
-                    if (medicalLabelDao.findByrecordsId(m.getRecordsId()) != null
-                            && medicalLabelDao.findByrecordsId(m.getRecordsId()).size() > 0){
-
-                    }
-                    else{
-                        medicalLabelDao.save(MedicalLabels.get(i));
-                    }
-
-                }
-            }
-            return true;
-        }
-        else
-            return false;
-
-    }
-
+    /**
+     * 通过标签获取病历
+     */
     public List<String> getRecordIdByLabels(String...Lable){
         List<MrMedicalLabelEntity>m=medicalLabelDao.findByLabels(Lable);
         Map<String,Integer>map=new HashMap<>();

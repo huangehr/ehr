@@ -1,28 +1,27 @@
 package com.yihu.ehr.medicalRecord.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.medicalRecord.model.MrDoctorMedicalRecordsEntity;
-import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
+import com.yihu.ehr.medicalRecord.model.Entity.MrMedicalLabelEntity;
 import com.yihu.ehr.medicalRecord.service.DoctorMedicalRecordService;
+import com.yihu.ehr.medicalRecord.service.MedicalLabelService;
 import com.yihu.ehr.medicalRecord.service.MedicalRecordService;
-import com.yihu.ehr.medicalRecord.service.PatientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.omg.CORBA.Object;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Guo Yanshan on 2016/7/15.
+ * Created by hzp on 2016/8/1.
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
@@ -30,209 +29,110 @@ import java.util.Map;
 public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    MedicalRecordService mRService;
+    MedicalRecordService recordService;
+
     @Autowired
-    PatientService patientService;
+    DoctorMedicalRecordService doctorRecordService;
+
     @Autowired
-    DoctorMedicalRecordService dMRService;
+    MedicalLabelService medicalLabelService;
 
     /**
-     * 新建病历，同时建立医生病历关联
+     * 根据医生ID和病人ID获取最近的一次病历
      *
-     * @param recordType 0:线上诊断，1: 线下诊断 2:用户上传
-     * @param medicalRecord {"doctorId": "string",
-                             "firstRecordId": int,（仅限复诊）
-                             "medicalDiagnosis": "string",
-                             "medicalDiagnosisCode": "string",
-                             "medicalSuggest": "string",
-                             "patientAllergy": "string",
-                             "patientCondition": "string",
-                             "patientHistoryFamily": "string",
-                             "patientHistoryNow": "string",
-                             "patientHistoryPast": "string",
-                             "patientId": "String",
-                             "patientPhysical": "string"
-                            }
-     * @return MrMedicalRecordsEntity
-     * @throws Exception
      */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation("新建病历")
-    public MrMedicalRecordsEntity saveRecord(
-            @ApiParam(name="recordType",value="recordType",defaultValue = "")
-            @RequestParam(value="recordType",required = false)String recordType,
-            @ApiParam(name="medicalRecord",value="病历JSON",defaultValue = "")
-            @RequestBody String medicalRecord) throws Exception
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.GET)
+    @ApiOperation("系统接入接口")
+    public Map<String,Object> medicalRecord(
+            @ApiParam(name="patientId",value="病人ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
+            @RequestParam(value="patientId",required = true)String patientId,
+            @ApiParam(name="userId",value="用户ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
+            @RequestParam(value="userId",required = true)String userId,
+            @ApiParam(name="ticket",value="ticket",defaultValue = "")
+            @RequestParam(value="ticket",required = true)String ticket,
+            @ApiParam(name="appUid",value="应用轻ID",defaultValue = "")
+            @RequestParam(value="appUid",required = true)String appUid) throws Exception
     {
-        MrMedicalRecordsEntity mrMedicalRecord = toEntity(medicalRecord,MrMedicalRecordsEntity.class);
-
-        Date date = new Date();
-        Timestamp t = new Timestamp(date.getTime());
-        mrMedicalRecord.setMedicalTime(t);
-
-        mrMedicalRecord = mRService.saveMedicalRecord(mrMedicalRecord);
-
-        MrDoctorMedicalRecordsEntity drRelation = new MrDoctorMedicalRecordsEntity();
-        drRelation.setRecordId(String.valueOf(mrMedicalRecord.getId()));
-        drRelation.setDoctorId(mrMedicalRecord.getDoctorId());
-        drRelation.setIsCreator("1");  //0:非创建者，1:创建者
-        drRelation.setRecordType(recordType);
-        dMRService.saveDoctorMedicalRecord(drRelation);
-
-        return convertToModel(mrMedicalRecord,MrMedicalRecordsEntity.class);
+        return recordService.medicalRecord(patientId, userId,ticket,appUid);
     }
 
-    /**
-     * 更新病历
-     *
-     * @param medicalRecord {"doctorId": "string",
-                             "firstRecordId": int,（仅限复诊）
-                             "medicalDiagnosis": "string",
-                             "medicalDiagnosisCode": "string",
-                             "medicalSuggest": "string",
-                             "patientAllergy": "string",
-                             "patientCondition": "string",
-                             "patientHistoryFamily": "string",
-                             "patientHistoryNow": "string",
-                             "patientHistoryPast": "string",
-                             "patientId": int,
-                             "patientPhysical": "string"
-                            }
-     * @return MrMedicalRecordsEntity
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation("更新数据元")
-    public MrMedicalRecordsEntity updateRecord(
-            @ApiParam(name="medicalRecord",value="数据元JSON",defaultValue = "")
-            @RequestBody String medicalRecord) throws Exception
+    @RequestMapping(value = ServiceApi.MedicalRecords.AddRecord,method = RequestMethod.POST)
+    @ApiOperation("新增病历")
+    public MedicalRecord addRecord(
+            @ApiParam(name="doctor_id",value="医生ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
+            @RequestParam(value="doctor_id",required = true)String doctorId,
+            @ApiParam(name="patient_id",value="患者ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
+            @RequestParam(value="patient_id",required = true)String patientId) throws Exception
     {
-        MrMedicalRecordsEntity mrMedicalRecord = toEntity(medicalRecord,MrMedicalRecordsEntity.class);
-        mrMedicalRecord = mRService.saveMedicalRecord(mrMedicalRecord);
-        return convertToModel(mrMedicalRecord,MrMedicalRecordsEntity.class);
+        return recordService.addRecord(doctorId, patientId);
     }
 
-    /**
-     * 获取最近一次病历
-     *
-     * @param patientId    病人Id
-     * @param doctorId     医生Id
-     * @return MrMedicalRecordsEntity
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordByLastOne,method = RequestMethod.GET)
-    @ApiOperation("根据医生ID和病人ID获取最近的一次病历")
-    public MrMedicalRecordsEntity getRecordByLastOne(
-            @ApiParam(name="patientId",value="patientId",defaultValue = "")
-            @RequestParam(value="patientId",required = false)String patientId,
-            @ApiParam(name="doctorId",value="doctorId",defaultValue = "")
-            @RequestParam(value="doctorId",required = false)String doctorId) throws Exception
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalInfo,method = RequestMethod.PUT)
+    @ApiOperation("修改病历")
+    public boolean editRecord(
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "")
+            @RequestParam(value="record_id",required = true)String recordId,
+            @ApiParam(name="json",value="修改内容",defaultValue = "{}")
+            @RequestParam(value="json",required = true)String json) throws Exception
     {
-
-        return mRService.getRecordByLastOne(patientId, doctorId);
+        Map<String,Object> map = toEntity(json,Map.class);
+        return recordService.editRecord(recordId, map);
     }
 
-    /**
-     * 根据病历Id获取病历
-     *
-     * @param id 病历Id
-     * @return MrMedicalRecordsEntity
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordId,method = RequestMethod.GET)
-    @ApiOperation("根据ID获取病历")
-    public MrMedicalRecordsEntity getRecords(
-            @ApiParam(name="id",value="数据元ID",defaultValue = "")
-            @PathVariable(value="id")int id) throws Exception
-    {
-        return mRService.getMedicalRecord(id);
-    }
-
-    /**
-     * 根据病历Id删除病历，同时清除与该病历有关的关系表中数据
-     *
-     * @param id 病历Id
-     * @return true
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordId,method = RequestMethod.DELETE)
-    @ApiOperation("删除数据元")
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalInfo,method = RequestMethod.DELETE)
+    @ApiOperation("删除病历")
     public boolean deleteRecord(
-            @ApiParam(name="id",value="数据元ID",defaultValue = "")
-            @PathVariable(value="id")int id) throws Exception
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "")
+            @RequestParam(value="record_id",required = true)String recordId) throws Exception
     {
-        mRService.deleteRecord(id);
-        dMRService.deleteRecords(id);
-        return true;
+        return recordService.deleteRecord(recordId);
     }
 
-    /**
-     * 拷贝病历
-     *
-     * @param patientId  病人Id
-     * @param doctorId   医生Id
-     * @param id         病历Id
-     * @param recordType 病历类型
-     * @param firstRecordId 初诊id
-     * @return MrMedicalRecordsEntity
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordCopy,method = RequestMethod.GET)
-    @ApiOperation("病历拷贝")
-    public MrMedicalRecordsEntity copyRecord(
-            @ApiParam(name="patientId",value="病人Id",defaultValue = "")
-            @RequestParam(value="patientId",required = false)String patientId,
-            @ApiParam(name="doctorId",value="医生Id",defaultValue = "")
-            @RequestParam(value="doctorId",required = false)String doctorId,
-            @ApiParam(name="id",value="病历Id",defaultValue = "")
-            @RequestParam(value="id",required = false)int id,
-            @ApiParam(name="recordType",value="病历类型",defaultValue = "")
-            @RequestParam(value="recordType",required = false)String recordType,
-            @ApiParam(name="firstRecordId",value="firstRecordId",defaultValue = "")
-            @RequestParam(value="firstRecordId",required = false)Integer firstRecordId) throws Exception
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalInfo,method = RequestMethod.GET)
+    @ApiOperation("获取病历")
+    public Map<String,Object> getMedicalRecord(
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "")
+            @RequestParam(value="record_id",required = true)String recordId) throws Exception
     {
-
-        MrMedicalRecordsEntity mrMedicalRecord = mRService.copyRecord(patientId, doctorId, id, firstRecordId);
-
-        MrDoctorMedicalRecordsEntity drRelation = new MrDoctorMedicalRecordsEntity();
-        drRelation.setRecordId(String.valueOf(mrMedicalRecord.getId()));
-        drRelation.setDoctorId(mrMedicalRecord.getDoctorId());
-        drRelation.setIsCreator("1");  //0:非创建者，1:创建者
-        drRelation.setRecordType(recordType);
-        dMRService.saveDoctorMedicalRecord(drRelation);
-
-        return convertToModel(mrMedicalRecord,MrMedicalRecordsEntity.class);
+        return recordService.getMedicalRecord(recordId);
     }
 
-    /**
-     * 根据患者Id获取病历
-     *
-     * @param patientId 患者id
-     * @return List<MrMedicalRecordsEntity>
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordPatId,method = RequestMethod.GET)
-    @ApiOperation("根据患者ID获取病历")
-    public List<Map> getRecordsByPatientId(
-            @ApiParam(name="patient_id",value="医生id",defaultValue = "")
-            @PathVariable(value="patient_id")String patientId) throws Exception
+
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalShare,method = RequestMethod.GET)
+    @ApiOperation("病历分享")
+    public boolean shareRecord(
+            @ApiParam(name="record_id",value="病历ID")
+            @RequestParam(value="record_id",required = true)String recordId,
+            @ApiParam(name="patient_id",value="患者ID")
+            @RequestParam(value="patient_id",required = true)String patientId,
+            @ApiParam(name="doctor_id",value="医生ID")
+            @RequestParam(value="doctor_id",required = true)String doctorId) throws Exception
     {
-        return mRService.getRecordsBypatId(patientId);
+        return recordService.shareRecord(recordId,patientId,doctorId);
     }
 
-    /**
-     * 根据医生Id获取病历一览表(医生病历库)
-     *
-     * @param doctorId 医生id
-     * @return List<Map>
-     * @throws Exception
-     */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordDocId,method = RequestMethod.GET)
-    @ApiOperation("根据医生ID医生病历库")
-    public List<Map> getRecordList(
-            @ApiParam(name="doctor_id",value="医生id",defaultValue = "")
-            @PathVariable(value="doctor_id")String doctorId) throws Exception
+    /******************************* 病历标签 *****************************************************/
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalLabel,method = RequestMethod.GET)
+    @ApiOperation("获取病历标签")
+    public List<MrMedicalLabelEntity> getMedicalLabelByRecordId(
+            @ApiParam(name="record_id",value="病历ID")
+            @RequestParam(value="record_id",required = true)String recordId) throws Exception
     {
-        return mRService.getListBydocId(doctorId);
+        return medicalLabelService.getMedicalLabelByRecordId(recordId);
     }
+
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalLabel,method = RequestMethod.POST)
+    @ApiOperation("批量保存病历标签")
+    public boolean saveMedicalLabel(
+            @ApiParam(name="record_id",value="病历ID")
+            @RequestParam(value="record_id",required = true)String recordId,
+            @ApiParam(name="doctor_id",value="医生ID")
+            @RequestParam(value="doctor_id",required = true)String doctorId,
+            @ApiParam(name="list",value="标签列表")
+            @RequestParam(value="list",required = true)List<String> list) throws Exception
+    {
+        return medicalLabelService.saveMedicalLabel(recordId,doctorId,list);
+    }
+
+
 }

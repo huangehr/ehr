@@ -3,8 +3,8 @@ package com.yihu.ehr.medicalRecord.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecord.model.MedicalRecordModel;
-import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
+import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
 import com.yihu.ehr.medicalRecord.service.PatientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,7 +39,7 @@ public class PatientEndPoint extends BaseRestEndPoint {
 
     @ApiOperation("获取患者所有病历")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientRecords, method = RequestMethod.GET)
-    public List<MedicalRecordModel> getPatientRecords(
+    public List<MedicalRecord> getPatientRecords(
             @ApiParam(name = "patient_id", value = "患者ID")
             @PathVariable(value = "patient_id") String patientId,
             @ApiParam(name = "label", value = "label")

@@ -5,11 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecord.model.*;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
+import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorTemplateEntity;
+import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorsEntity;
+import com.yihu.ehr.medicalRecord.model.Entity.MrLabelClassEntity;
+import com.yihu.ehr.medicalRecord.model.Entity.MrLabelEntity;
 import com.yihu.ehr.medicalRecord.service.DoctorLabelService;
 import com.yihu.ehr.medicalRecord.service.DoctorService;
 import com.yihu.ehr.medicalRecord.service.DoctorTemplateService;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +46,7 @@ public class DoctorEndPoint extends BaseRestEndPoint {
     /*********************************************************************************/
     @ApiOperation("获取医生所有病历")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorRecords, method = RequestMethod.GET)
-    public List<MedicalRecordModel> getPatientRecords(
+    public List<MedicalRecord> getPatientRecords(
             @ApiParam(name = "doctor_id", value = "医生id")
             @PathVariable(value = "doctor_id") String doctorId,
             @ApiParam(name = "filter", value = "患者信息JSON")

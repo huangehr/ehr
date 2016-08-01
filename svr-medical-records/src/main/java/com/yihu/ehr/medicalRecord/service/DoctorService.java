@@ -1,20 +1,15 @@
 package com.yihu.ehr.medicalRecord.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorDao;
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
-import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
-import com.yihu.ehr.medicalRecord.family.MedicalRecordsFamily;
-import com.yihu.ehr.medicalRecord.model.*;
-import com.yihu.ehr.query.services.HbaseQuery;
+import com.yihu.ehr.medicalRecord.dao.DoctorDao;
+import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
+import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorMedicalRecordsEntity;
+import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorsEntity;
+import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
 import com.yihu.ehr.yihu.UserMgmt;
 import com.yihu.ehr.yihu.YihuResponse;
-import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.client.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.hadoop.hbase.HbaseTemplate;
-import org.springframework.data.hadoop.hbase.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,22 +27,22 @@ public class DoctorService {
 
     @Autowired
     DoctorDao doctorDao;
-    @Autowired
-    PatientService patientService;
-    @Autowired
-    MedicalRecordDao medicalRecordDao;
-    @Autowired
-    DoctorMedicalRecordDao doctorMedicalRecordDao;
+
     @Autowired
     UserMgmt userMgmt;
+
     @Autowired
     ObjectMapper objectMapper;
+
     @Autowired
-    HbaseTemplate hbaseTemplate;
+    PatientService patientService;
+
+    @Autowired
+    DoctorMedicalRecordDao doctorMedicalRecordDao;
+
     @Autowired
     MedicalLabelService medicalLabelService;
-    @Autowired
-    HbaseQuery hbaseQuery;
+
 
     /**
      * 获取医生信息
@@ -84,11 +79,22 @@ public class DoctorService {
         }
         return re;
     }
+
+    /**
+     * 获取医生信息（通过身份证）
+     * @param demographicId
+     * @return
+     */
     public MrDoctorsEntity getDoctorInformationByDemographicId(String demographicId){
 
         return doctorDao.findBydemographicId(demographicId);
     }
 
+    /**
+     * 更新医生信息
+     * @param doctor
+     * @return
+     */
     public boolean updateDoctorInformationById(MrDoctorsEntity doctor){
         if(doctor!=null) {
             MrDoctorsEntity doctorModel = doctorDao.findById(doctor.getId());
@@ -115,21 +121,11 @@ public class DoctorService {
 
     }
 
-//    public boolean updateDoctorStatusByDemographicId(String status,String demographicId){
-//
-//        MrDoctorsEntity DoctorModel=doctorDao.findBydemographicId(demographicId);
-//        if(DoctorModel!=null) {
-//            DoctorModel.setStatus(status);
-//        }
-//        return true;
-//
-//    }
-
-    public boolean deleteDoctorByDemographicId(String id){
-        doctorDao.deleteBydemographicId(id);
-        return true;
-    }
-
+    /**
+     * 新增医生信息
+     * @param doctor
+     * @return
+     */
     public boolean addDoctor(MrDoctorsEntity doctor){
         if(doctorDao.findById(doctor.getId())!=null){
             return false;
@@ -140,6 +136,12 @@ public class DoctorService {
         }
     }
 
+    /**
+     * 获取医生诊断
+     * @param doctorId
+     * @return
+     * @throws Exception
+     */
     public Map<String, String> getDoctorDiagnosis(String doctorId)throws Exception {
 
         List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorId(doctorId);
@@ -155,8 +157,9 @@ public class DoctorService {
         if("".equals(q)){
             return null;
         }
-        Page<Map<String, Object>> result = hbaseQuery.queryBySolr(MedicalRecordsFamily.TableName, "rowkey", null, 1, 1000000000);
         Map<String, String> list = new HashMap<>();
+        /*Page<Map<String, Object>> result = hbaseQuery.queryBySolr(MedicalRecordsFamily.TableName, "rowkey", null, 1, 1000000000);
+
         if (result.getContent() != null && result.getContent().size() > 0) {
 
             //遍历所有行
@@ -173,15 +176,28 @@ public class DoctorService {
                 }
 
             }
-        }
+        }*/
         return list;
     }
 
-    public List<MedicalRecordModel> getDoctorRecords(String filter, String label, String medicalTimeFrom,
-                                                      String medicalTimeEnd, String recordType, String doctorId,int page,int size) throws Exception {
+    /**
+     * 获取医生病历
+     * @param filter
+     * @param label
+     * @param medicalTimeFrom
+     * @param medicalTimeEnd
+     * @param recordType
+     * @param doctorId
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<MedicalRecord> getDoctorRecords(String filter, String label, String medicalTimeFrom,
+                                                String medicalTimeEnd, String recordType, String doctorId, int page, int size) throws Exception {
 
         List<MrPatientsEntity>patientsEntityList=patientService.searchPatient(filter,1,1000000000);
-        List<MedicalRecordModel> medicalRecordModelList = new ArrayList<>();
+        List<MedicalRecord> medicalRecordModelList = new ArrayList<>();
         if(patientsEntityList!=null && patientsEntityList.size()>0) {
             for (int l = 0; l < patientsEntityList.size(); l++) {
                 String patientId = patientsEntityList.get(l).getId();
@@ -198,7 +214,7 @@ public class DoctorService {
                     }
 
                 }
-                for (int i = 0; i < recordsIdList.size(); i++) {
+                /*for (int i = 0; i < recordsIdList.size(); i++) {
                     Result result = hbaseTemplate.get(MedicalRecordsFamily.TableName, recordsIdList.get(i), new RowMapper<Result>() {
                         public Result mapRow(Result result, int rowNum) throws Exception {
                             return result;
@@ -215,7 +231,7 @@ public class DoctorService {
                     if(m.getCreateTime().toString().compareTo(medicalTimeFrom)>0 && m.getCreateTime().toString().compareTo(medicalTimeEnd)<0 && m.getDataFrom().equals(recordType))
                         medicalRecordModelList.add(m);
 
-                }
+                }*/
             }
 
         }
