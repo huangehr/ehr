@@ -27,6 +27,7 @@ public class AppApiModel {
     private String auditLevel;
     private String openLevelName;
     private String auditLevelName;
+    private String methodName;
 
     public String getOpenLevelName() {
         return openLevelName;
@@ -189,5 +190,13 @@ public class AppApiModel {
 
     public void setAuditLevel(String auditLevel) {
         this.auditLevel = auditLevel;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
     }
 }

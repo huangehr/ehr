@@ -5,11 +5,14 @@ import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
 import com.yihu.ehr.agModel.user.RolesModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
+import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.user.*;
 import com.yihu.ehr.users.service.*;
+import com.yihu.ehr.util.array.ListUtils;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,6 +47,8 @@ public class RolesController extends BaseController {
     private RoleApiRelationClient roleApiRelationClient;
     @Autowired
     private AppClient appClient;
+    @Autowired
+    private AppFeatureClient appFeatureClient;
 
     @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST)
     @ApiOperation(value = "新增角色组")
@@ -154,8 +159,10 @@ public class RolesController extends BaseController {
             @ApiParam(name = "app_id",value = "应用id")
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "name",value = "角色组名")
-            @RequestParam(value = "name") String name){
-        boolean bo = rolesClient.isNameExistence(appId,name);
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type") String type){
+        boolean bo = rolesClient.isNameExistence(appId,name,type);
         if(bo){
             return success(null);
         }
@@ -167,8 +174,10 @@ public class RolesController extends BaseController {
             @ApiParam(name = "app_id",value = "应用id")
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "code",value = "角色组代码")
-            @RequestParam(value = "code") String code){
-        boolean  bo = rolesClient.isCodeExistence(appId,code);
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type") String type){
+        boolean  bo = rolesClient.isCodeExistence(appId,code,type);
         if(bo){
             return success(null);
         }
@@ -211,6 +220,9 @@ public class RolesController extends BaseController {
                 modelTree.setChildren(null);
                 roleTreeModelList.add(modelTree);
             }
+            if(roleTreeModelList.size()==0){
+                continue;
+            }
             PlatformAppRolesTreeModel app = new PlatformAppRolesTreeModel();
             app.setId(mApp.getId());
             app.setName(mApp.getName());
@@ -230,19 +242,38 @@ public class RolesController extends BaseController {
             @ApiParam(name = "type",value = "用户角色组的字典值")
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source_type",value = "平台应用sourceType字典值")
-            @RequestParam(value = "source_type") String sourceType){
+            @RequestParam(value = "source_type") String sourceType,
+            @ApiParam(name = "user_id",value = "用户id")
+            @RequestParam(value = "user_id") String userId){
         if(StringUtils.isEmpty(type)){
             return failed("角色组类型不能为空！");
         }
         if(StringUtils.isEmpty(sourceType)){
             return failed("平台应用类型不能为空！！");
         }
+        if(StringUtils.isEmpty(userId)){
+            return failed("用户id不能为空！");
+        }
+        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
+        if(mRoleUsers == null){
+            return success(null);
+        }
+        StringBuffer buffer = new StringBuffer();
+        for(MRoleUser m : mRoleUsers){
+            buffer.append(m.getRoleId());
+            buffer.append(",");
+        }
+        String rolesIds = buffer.substring(0,buffer.length()-1);
         Envelop envelop = new Envelop();
         Collection<MApp> mApps =  appClient.getAppsNoPage("sourceType="+sourceType);
         //平台应用-角色组对象模型列表
         List<PlatformAppRolesModel> appRolesModelList = new ArrayList<>();
         for(MApp mApp : mApps){
-            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId()+";type="+type);
+            //查找用户所属角色组
+            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId()+";type="+type+";id="+rolesIds);
+            if(mRoles == null || mRoles.size() <= 0){
+                continue;
+            }
             PlatformAppRolesModel model = new PlatformAppRolesModel();
             String roleIds = "";
             String roleNames = "";
@@ -265,5 +296,33 @@ public class RolesController extends BaseController {
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(appRolesModelList);
         return envelop;
+    }
+
+    @RequestMapping(value = "/roles/user/features",method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户的权限信息" )
+    public Envelop getPlatformAppRolesView(
+            @ApiParam(name = "user_id",value = "用户编号")
+            @RequestParam(value = "user_id") String userId){
+
+        try {
+            Envelop envelop = success(null);
+            Collection<MRoleUser> roles = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
+            if(roles!=null){
+                String ids = ListUtils.toString(roles, MRoleUser.class, "getRoleId");
+                if(ids.length()>0){
+                    Collection<MRoleFeatureRelation> featureRelations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + ids);
+                    ids = ListUtils.toString(featureRelations, MRoleFeatureRelation.class, "getFeatureId");
+                    if(ids.length()>0){
+                        Collection<MAppFeature> features = appFeatureClient.getAppFeatureNoPage("id=" + ids);
+                        envelop.setDetailModelList((List<MAppFeature>) convertToModels(features,
+                                new ArrayList<>(), MAppFeature.class, null));
+                    }
+                }
+            }
+            return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failed("查询用户权限出错！");
+        }
     }
 }

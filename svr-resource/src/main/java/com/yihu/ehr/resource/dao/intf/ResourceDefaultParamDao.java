@@ -10,7 +10,7 @@ import java.util.List;
  * @author linaz
  * @created 2016.05.17 16:33
  */
-public interface ResourceDefaultParamDao extends PagingAndSortingRepository<ResourceDefaultParam,String> {
+public interface ResourceDefaultParamDao extends PagingAndSortingRepository<ResourceDefaultParam,Long> {
 
     List<ResourceDefaultParam> findByResourcesCode(String resourcesCode);
 
