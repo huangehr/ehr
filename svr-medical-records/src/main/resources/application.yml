@@ -22,6 +22,10 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.property.clientPort: 2181
+    - zookeeper.znode.parent: /hbase-unsecure
 fast-dfs:
   pool:
     init-size: 5
@@ -41,19 +45,21 @@ spring:
     url: jdbc:mysql://192.168.1.220:3306/medical_records?useUnicode=true&characterEncoding=UTF-8
     username: zhanpeng
     password: zhanpeng
+  data:
+    solr:
+      zk-host: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.quorum: node1.jkzldev.com,node2.jkzldev.com,node8.jkzldev.com
 
-
-service-gateway:
-  wsurl: http://service.yihu.com:8085/WSGW/rest
-  WSclientId: 9000192
-  sign: KK66VXAFN9QTVLTI7NWJLEX3NXH4BUIRGOV83331O75
+yihu-service:
+  url: http://service.yihu.com:8085/WSGW/rest
+  clientid: 9000192
+  appuid: KK66VXAFN9QTVLTI7NWJLEX3NXH4BUIRGOV83331O75
 
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
 
-hadoop:
-  hbase-properties:
-    - hbase.zookeeper.quorum: node2.jkzldev.com,node1.jkzldev.com,node4.jkzldev.com
 
 

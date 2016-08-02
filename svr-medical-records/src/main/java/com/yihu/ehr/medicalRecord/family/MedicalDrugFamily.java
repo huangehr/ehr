@@ -10,7 +10,7 @@ import java.util.Date;
 public class MedicalDrugFamily {
 
     public static final String TableName = "EHR_MEDICAL_DRUG";
-    public static final String Data      = "Data";
+    public static final String Data      = "data";
 
     public static class DataColumns {
         public static final String RecordRowkey       = "record_rowkey";       //病历rowkey
@@ -35,35 +35,11 @@ public class MedicalDrugFamily {
         };
     }
 
-    /**
-     * 获取指定族的列.
-     *
-     * @return
-     */
-    public static String[] getColumns(String family) {
-        if (family.equals(Data)) {
-            return new String[]{
-                    DataColumns.RecordRowkey,
-                    DataColumns.PrescriptionRowkey,
-                    DataColumns.DrugName,
-                    DataColumns.DrugSpecifications,
-                    DataColumns.DrugQuantity,
-                    DataColumns.DrugUnit,
-                    DataColumns.DrugUse,
-                    DataColumns.DrugDosage,
-                    DataColumns.DrugFrequency
-            };
-        }
 
-        return null;
-    }
 
     public static String getRowkey(String recordRowkey, String PrescriptionRowkey){
 
-        return recordRowkey + "_" + PrescriptionRowkey + "_" + Long.toString(new Date().getTime());
+        return recordRowkey + "_" + PrescriptionRowkey + "_" + (Long.MAX_VALUE -new Date().getTime());
     }
 
-    public String getTableName(){
-        return TableName;
-    }
 }

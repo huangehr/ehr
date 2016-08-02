@@ -1,8 +1,8 @@
 package com.yihu.ehr.medicalRecord.service;
 
 
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorTemplateDao;
-import com.yihu.ehr.medicalRecord.model.MrDoctorTemplateEntity;
+import com.yihu.ehr.medicalRecord.dao.DoctorTemplateDao;
+import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorTemplateEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

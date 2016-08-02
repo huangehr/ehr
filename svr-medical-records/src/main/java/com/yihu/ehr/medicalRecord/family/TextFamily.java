@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class TextFamily {
     public static final String TableName = "HBMR_TEXT_LIST";
-    public static final String Data = "Data";
+    public static final String Data = "data";
 
     public static class DataColumns {
         public static final String Content       = "content"; //内容
@@ -57,14 +57,11 @@ public class TextFamily {
     public static String getRowkey(String creater,String patientId){
         if(patientId!=null && patientId.length()>0)
         {
-            return creater+"_"+patientId+"_"+Long.toString(new Date().getTime());
+            return creater+"_"+patientId+"_"+(Long.MAX_VALUE -new Date().getTime());
         }
         else{
-            return creater+"_"+creater+"_"+Long.toString(new Date().getTime());
+            return creater+"_"+creater+"_"+(Long.MAX_VALUE -new Date().getTime());
         }
     }
 
-    public String getTableName(){
-        return TableName;
-    }
 }

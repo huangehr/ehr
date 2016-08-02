@@ -1,7 +1,7 @@
 package com.yihu.ehr.medicalRecord.service;
 
-import com.yihu.ehr.medicalRecord.dao.intf.MedicalDrugDao;
-import com.yihu.ehr.medicalRecord.model.MrMedicalDrugEntity;
+import com.yihu.ehr.medicalRecord.dao.hbaseDao.MedicalDrugDao;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalDrug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,22 +18,36 @@ public class MedicalDrugService {
     @Autowired
     MedicalDrugDao medicalDrugDao;
 
-    public List<MrMedicalDrugEntity> getMedicalDrugInformationByRecordsId(int recordsId){
+    /**
+     * 获取用药信息
+     */
+    public List<MedicalDrug> getMedicalDrug(String recordId) throws Exception{
 
-        return medicalDrugDao.findByrecordsId(recordsId);
+        return null;
     }
 
-
-    public boolean postMedicalDrug(List<MrMedicalDrugEntity> mrMedicalDrugEntities) {
-
-        if (mrMedicalDrugEntities != null && mrMedicalDrugEntities.size() > 0) {
-            if (medicalDrugDao.findByrecordsId(mrMedicalDrugEntities.get(0).getRecordsId()) !=null) {
-                medicalDrugDao.deleteByRecordsId(mrMedicalDrugEntities.get(0).getRecordsId());
-            }
-            for (int i = 0; i < mrMedicalDrugEntities.size(); i++) {
-                medicalDrugDao.save(mrMedicalDrugEntities.get(i));
-            }
-        }
+    /**
+     * 导入用药信息
+     */
+    public boolean importMedicalPrescription(List<MedicalDrug> list) throws Exception
+    {
         return true;
     }
+
+    /**
+     * 保存病历用药记录
+     */
+    public boolean saveMedicalDrug(String recordId,MedicalDrug obj) throws Exception
+    {
+        return true;
+    }
+
+    /**
+     * 删除病历用药记录
+     */
+    public boolean deleteMedicalDrug(String recordId,String drugId) throws Exception
+    {
+        return true;
+    }
+
 }

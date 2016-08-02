@@ -1,21 +1,23 @@
 package com.yihu.ehr.medicalRecord.service;
 
 
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorDao;
-import com.yihu.ehr.medicalRecord.dao.intf.DoctorMedicalRecordDao;
-import com.yihu.ehr.medicalRecord.dao.intf.MedicalRecordDao;
-import com.yihu.ehr.medicalRecord.dao.intf.PatientDao;
-import com.yihu.ehr.medicalRecord.model.MrDoctorMedicalRecordsEntity;
-import com.yihu.ehr.medicalRecord.model.MrDoctorsEntity;
-import com.yihu.ehr.medicalRecord.model.MrMedicalRecordsEntity;
-import com.yihu.ehr.medicalRecord.model.MrPatientsEntity;
+import com.yihu.ehr.medicalRecord.comom.Message;
+import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecord.dao.hbaseDao.MedicalRecordsDao;
+import com.yihu.ehr.medicalRecord.family.MedicalRecordsFamily;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
+import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorMedicalRecordsEntity;
+import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorsEntity;
+import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
+import com.yihu.ehr.medicalRecord.model.EnumClass;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.yihu.UserMgmt;
+import com.yihu.ehr.yihu.YihuResponse;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -23,177 +25,178 @@ import java.util.*;
  */
 
 @Service
-@Transactional
 public class MedicalRecordService{
 
     @Autowired
-    MedicalRecordDao mrDao;
+    MedicalRecordsDao medicalRecordsDao;
 
     @Autowired
-    DoctorMedicalRecordDao dMRDao;
+    DoctorMedicalRecordDao doctorMedicalRecordDao;
 
     @Autowired
-    PatientDao pDao;
+    PatientService patientService;
 
     @Autowired
-    DoctorDao dDao;
+    DoctorService doctorService;
 
-    /**
-     * 创建数据元
-     *
-     * @param medicalRecord MrMedicalRecordsEntity 数据元
-     * @return MrMedicalRecordsEntity 数据元
-     */
-    public MrMedicalRecordsEntity saveMedicalRecord(MrMedicalRecordsEntity medicalRecord){
-
-        return mrDao.save(medicalRecord);
-    }
+    @Autowired
+    UserMgmt userMgmt;
 
     /**
      * 根据医生ID和病人ID获取最近的一次病历
      */
-    public MrMedicalRecordsEntity getRecordByLastOne(String patientId, String doctorId) throws Exception {
+    public Map<String,Object> medicalRecord(String patientId, String userId, String ticket, String appUid) throws Exception {
+        Map<String, Object> re = new HashMap<>();
+        //单点登录校验
+        YihuResponse response = userMgmt.userSessionCheck(userId, ticket, appUid);
+        if (response.getCode() != 10000) {
+            Message.error(response.getMessage());
+        } else {
 
-        MrMedicalRecordsEntity medicalRecord = new MrMedicalRecordsEntity();
+            //获取医生信息
+            MrDoctorsEntity doctor = doctorService.getDoctorInformation(userId);
+            //获取患者信息
+            MrPatientsEntity patient = patientService.getPatientInformation(patientId);
+            //获取最新病历
+            MrDoctorMedicalRecordsEntity record = doctorMedicalRecordDao.getLastRecord(userId, patientId);
 
-        //获取最近一次的就诊病历
-        List<MrMedicalRecordsEntity> medicalRecordList = mrDao.findBypatientIdAndDoctorIdOrderByMedicalTimeDesc(patientId,doctorId);
-
-        //判断是否存在就诊病历
-        if(medicalRecordList.size() > 0){
-
-            medicalRecord = medicalRecordList.get(0);
-        }else{
-
-            Date date = new Date();
-            Timestamp t = new Timestamp(date.getTime());
-
-            medicalRecord.setPatientId(patientId);
-            medicalRecord.setDoctorId(doctorId);
-            medicalRecord.setMedicalTime(t);
-            medicalRecord = mrDao.save(medicalRecord);
-
-            MrDoctorMedicalRecordsEntity drRelation = new MrDoctorMedicalRecordsEntity();
-
-            drRelation.setRecordId(String.valueOf(medicalRecord.getId()));
-            drRelation.setDoctorId(medicalRecord.getDoctorId());
-            drRelation.setIsCreator("1");//创建者
-            drRelation.setRecordType("0");//线上诊断
-
-            dMRDao.save(drRelation);
+            //不存在则新增病历
+            if (record != null) {
+                //获取病历信息
+                re = medicalRecordsDao.getDataByRowkey(record.getRecordId());
+            } else {
+                //新增病历信息
+                re = addRecord(doctor, patient);
+            }
         }
-
-        return medicalRecord;
-    }
-
-    /**
-     * 删除数据元
-     *
-     * @param id int 数据元ID
-     */
-    public void deleteRecord(int id)
-    {
-
-        MrMedicalRecordsEntity medicalRecord = mrDao.findByid(id);
-        mrDao.delete(medicalRecord);
+        return re;
     }
 
     /**
      * 获取病历
-     *
-     * @param id int 数据元ID
      */
-    public MrMedicalRecordsEntity getMedicalRecord(int id)
-    {
-
-        return mrDao.findByid(id);
+    public Map<String,Object> getMedicalRecord(String recordId) throws Exception {
+        return medicalRecordsDao.getDataByRowkey(recordId);
     }
 
-    public MrMedicalRecordsEntity copyRecord(String patientId, String doctorId, int id, Integer firstRecordId)
-    {
-        MrMedicalRecordsEntity newRecord = new MrMedicalRecordsEntity();
-        MrMedicalRecordsEntity templateRecord = mrDao.findByid(id);
 
-        Date date = new Date();
-        Timestamp t = new Timestamp(date.getTime());
+    /**
+     * 新增病历
+     */
+    private Map<String,Object> addRecord(MrDoctorsEntity doctor,MrPatientsEntity patient) throws Exception{
+        Map<String,Object> re = new HashedMap();
+        if(doctor!=null && patient!=null)
+        {
+            MedicalRecord record = new MedicalRecord();
+            String dataFrom = EnumClass.RecordDataFrom.MedicalRecord;
+            String rowkey = MedicalRecordsFamily.getRowkey(patient.getId(),dataFrom);
+            String datetimeNow = DateTimeUtil.utcDateTimeFormat(new Date());
+            record.setRowkey(rowkey);
+            record.setCreateTime(datetimeNow);
+            record.setMedicalTime(datetimeNow);
+            record.setDoctorId(doctor.getId());
+            record.setDoctorName(doctor.getName());
+            record.setTitle(doctor.getTitle());
+            record.setOrgDept(doctor.getOrgDept());
+            record.setOrgName(doctor.getOrgName());
+            record.setPatientId(patient.getId());
+            record.setPatientName(patient.getName());
+            record.setDemographicId(patient.getDemographicId());
+            record.setSex(patient.getSex());
+            record.setBirthday(DateTimeUtil.utcDateTimeFormat(patient.getBirthday()));
+            record.setIsMarried(patient.getMaritalStatus());
+            record.setPhone(patient.getPhone());
+            record.setDataFrom(EnumClass.RecordDataFrom.MedicalRecord);
 
-        newRecord.setPatientId(patientId);
-        newRecord.setDoctorId(doctorId);
-        newRecord.setMedicalTime(t);
+            medicalRecordsDao.save(record);
 
-        if(firstRecordId != null){
-            newRecord.setFirstRecordId(firstRecordId);
+            re = medicalRecordsDao.getDataByRowkey(rowkey);
+        }
+        else{
+            Message.error("医生或者患者信息缺失！");
+        }
+        return re;
+    }
+
+    /**
+     * 新增病历
+     */
+    @Transactional
+    public Map<String,Object> addRecord(String doctorId, String patientId) throws Exception {
+        //获取医生信息
+        MrDoctorsEntity doctor = doctorService.getDoctorInformation(doctorId);
+        //获取患者信息
+        MrPatientsEntity patient = patientService.getPatientInformation(patientId);
+
+        //新增病历信息
+        Map<String,Object> re = addRecord(doctor,patient);
+
+        if(re!=null)
+        {
+            //新增关联
+            MrDoctorMedicalRecordsEntity dr = new MrDoctorMedicalRecordsEntity();
+            dr.setDoctorId(doctorId);
+            dr.setPatientId(patientId);
+            dr.setRecordId(re.get("rowkey").toString());
+            dr.setIsCreator("1");
+            dr.setRecordType(EnumClass.RecordType.Online);
+
+            doctorMedicalRecordDao.save(dr);
         }
 
-        newRecord.setMedicalDiagnosis(templateRecord.getMedicalDiagnosis());
-        newRecord.setMedicalDiagnosisCode(templateRecord.getMedicalDiagnosisCode());
-        newRecord.setMedicalSuggest(templateRecord.getMedicalSuggest());
-        newRecord.setPatientAllergy(templateRecord.getPatientAllergy());
-        newRecord.setPatientCondition(templateRecord.getPatientCondition());
-        newRecord.setPatientHistoryNow(templateRecord.getPatientHistoryNow());
-        newRecord.setPatientHistoryPast(templateRecord.getPatientHistoryPast());
-        newRecord.setPatientHistoryFamily(templateRecord.getPatientHistoryFamily());
-        newRecord.setPatientPhysical(templateRecord.getPatientPhysical());
-
-        return mrDao.save(newRecord);
+        return re;
     }
 
-    public List<Map> getRecordsBypatId(String patientId){
 
-        List<MrMedicalRecordsEntity> recordsList = mrDao.findByPatientIdOrderByMedicalTimeDesc(patientId);
-
-        if(!recordsList.isEmpty()){
-
-            List<Map> list = new ArrayList<>();
-
-            for(MrMedicalRecordsEntity record: recordsList){
-
-                Map<String, String> map = new HashMap<String, String>();
-                SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                String medicalTime = f.format(record.getMedicalTime());
-
-                MrDoctorsEntity doctor = dDao.findById(record.getDoctorId());
-                MrDoctorMedicalRecordsEntity relation = dMRDao.findByrecordIdAndIsCreator(record.getId(), "1");
-
-                map.put("id", String.valueOf(record.getId()));
-                map.put("medicalTime", medicalTime);
-                map.put("recordType", relation.getRecordType());
-                map.put("medicalDiagnosis", record.getMedicalDiagnosis());
-                map.put("orgName", doctor.getOrgName());
-                map.put("orgDept", doctor.getOrgDept());
-                map.put("title", doctor.getTitle());
-                map.put("name", doctor.getName());
-
-                list.add(map);
+    /**
+     * 修改病历
+     */
+    @Transactional
+    public boolean editRecord(String recordId, Map<String,String> map) throws Exception {
+        boolean re = true;
+        if(map!=null)
+        {
+            for(String key : map.keySet())
+            {
+                try {
+                    String value = map.get(key);
+                    medicalRecordsDao.update(recordId,key,value);
+                }
+                catch (Exception ex)
+                {
+                    Message.debug(ex.getMessage());
+                    re = false;
+                }
             }
-            return list;
-        }else return null;
+        }
+        else{
+            Message.error("修改参数为空！");
+        }
+        return re;
     }
 
-    public List<Map> getListBydocId(String doctorId){
 
-       List<MrMedicalRecordsEntity> recordsList = mrDao.findByDoctorIdOrderByMedicalTimeDesc(doctorId);
+    /**
+     * 删除病历
+     */
+    public boolean deleteRecord(String recordId) throws Exception {
 
-        if(!recordsList.isEmpty()){
+        return medicalRecordsDao.delete(recordId);
+    }
 
-            List<Map> list = new ArrayList<>();
+    /**
+     * 病历分享
+     */
+    public boolean shareRecord(String recordId,String patientId,String doctorId) throws Exception {
+        MrDoctorMedicalRecordsEntity dr = new MrDoctorMedicalRecordsEntity();
+        dr.setDoctorId(doctorId);
+        dr.setPatientId(patientId);
+        dr.setRecordId(recordId);
+        dr.setIsCreator("0");
+        dr.setRecordType(EnumClass.RecordType.Online);
 
-            for(MrMedicalRecordsEntity record: recordsList){
+        doctorMedicalRecordDao.save(dr);
 
-                Map<String, String> map = new HashMap<String, String>();
-                SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
-                String medicalTime = f.format(record.getMedicalTime());
-
-                MrPatientsEntity patient = pDao.findByid(record.getPatientId());
-                map.put("id",String.valueOf(record.getId()));
-                map.put("medicalDiagnosis", record.getMedicalDiagnosis());
-                map.put("medicalTime", medicalTime);
-                map.put("name",patient.getName());
-                map.put("sex",patient.getSex());
-
-                list.add(map);
-            }
-            return list;
-        }else return null;
+        return true;
     }
 }

@@ -1,8 +1,8 @@
 package com.yihu.ehr.medicalRecord.service;
 
-import com.yihu.ehr.medicalRecord.dao.intf.MrSystemDictDao;
-import com.yihu.ehr.medicalRecord.dao.intf.MrSystemDictEntryDao;
-import com.yihu.ehr.medicalRecord.model.MrSystemDictEntity;
+import com.yihu.ehr.medicalRecord.dao.SystemDictDao;
+import com.yihu.ehr.medicalRecord.dao.SystemDictEntryDao;
+import com.yihu.ehr.medicalRecord.model.Entity.MrSystemDictEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class MrSystemDictService {
 
     @Autowired
-    MrSystemDictDao mrSystemDictDao;
+    SystemDictDao mrSystemDictDao;
     @Autowired
-    MrSystemDictEntryDao mrSystemDictEntryDao;
+    SystemDictEntryDao mrSystemDictEntryDao;
 
     public boolean addMrSystemDict(MrSystemDictEntity MrSystemDict){
         mrSystemDictDao.save(MrSystemDict);

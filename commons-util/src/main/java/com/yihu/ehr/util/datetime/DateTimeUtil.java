@@ -87,8 +87,14 @@ public class DateTimeUtil {
     }
 
     public static String utcDateTimeFormat(final Date date){
-        String time = utcDateTimeFormat.get().format(date);
-        return time;
+        //为空判断
+        if(date!=null) {
+            String time = utcDateTimeFormat.get().format(date);
+            return time;
+        }
+        else{
+            return null;
+        }
     }
 
     public static Date utcDateTimeParse(final String date) throws ParseException {

@@ -12,13 +12,13 @@ import java.util.Date;
 public class DocumentFamily {
 
     public static final String TableName = "EHR_DOCUMENT_LIST";
-    public static final String Data      = "Data";
+    public static final String Data      = "data";
 
     public static class DataColumns {
         public static final String DocumentName       = "document_name"; //文件名
         public static final String CreateTime         = "create_time";//文件创建时间
         public static final String Creater            = "creater";//上传用户id
-        public static final String CreaterName        = "creater_name";//上传用户id
+        public static final String CreaterName        = "creater_name";//上传用户名
         public static final String PatientId          = "patient_id";//病人ID
         public static final String PatientName        = "patient_name";//病人ID
         public static final String DocumentContent    = "document_content";//文档摘要
@@ -44,47 +44,15 @@ public class DocumentFamily {
         };
     }
 
-    /**
-     * 获取指定族的列.
-     *
-     * @return
-     */
-    public static String[] getColumns(String family) {
-        if (family.equals(Data)) {
-            return new String[]{
-                DataColumns.DocumentName,
-                DataColumns.CreateTime,
-                DataColumns.Creater,
-                DataColumns.CreaterName,
-                DataColumns.PatientId,
-                DataColumns.PatientName,
-                DataColumns.DocumentContent,
-                DataColumns.FileType,
-                DataColumns.FileUrl,
-                DataColumns.DataFrom,
-                DataColumns.DocumentType,
-                DataColumns.MedicalInstitution,
-                DataColumns.CertificateType,
-                DataColumns.CertificateId,
-                DataColumns.EventNo,
-                DataColumns.FileRemoteStorage
-            };
-        }
-
-        return null;
-    }
 
     public static String getRowkey(String creater,String patientId){
         if(patientId!=null && patientId.length()>0)
         {
-            return creater+"_"+patientId+"_"+Long.toString(new Date().getTime());
+            return creater+"_"+patientId+"_"+(Long.MAX_VALUE -new Date().getTime());
         }
         else{
-            return creater+"_"+creater+"_"+Long.toString(new Date().getTime());
+            return creater+"_"+creater+"_"+(Long.MAX_VALUE -new Date().getTime());
         }
     }
 
-    public String getTableName(){
-        return TableName;
-    }
 }

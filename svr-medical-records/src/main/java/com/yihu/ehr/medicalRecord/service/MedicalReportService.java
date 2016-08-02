@@ -1,8 +1,8 @@
 package com.yihu.ehr.medicalRecord.service;
 
 
-import com.yihu.ehr.medicalRecord.dao.intf.MedicalReportDao;
-import com.yihu.ehr.medicalRecord.model.MrMedicalReportEntity;
+import com.yihu.ehr.medicalRecord.dao.hbaseDao.MedicalRecordsDao;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalReportDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,45 +18,29 @@ import java.util.List;
 public class MedicalReportService {
 
     @Autowired
-    MedicalReportDao medicalReportDao;
+    MedicalRecordsDao medicalRecordsDao;
 
     /**
-     * 创建数据元
-     *
-     * @param medicalReport MrMedicalReportEntity 数据元
-     * @return MrMedicalReportEntity 数据元
+     * 获取病历报告
      */
-    public MrMedicalReportEntity saveMedicalRecord(MrMedicalReportEntity medicalReport){
-
-        return medicalReportDao.save(medicalReport);
-    }
-
-    public List<MrMedicalReportEntity> getMedicalReportInfoByRecordId(int RecordId){
-
-         return  medicalReportDao.findByrecordsId(RecordId);
-    }
-
-    /**
-     * 删除数据元
-     *
-     * @param id int 数据元ID
-     */
-    public void deleteReport(int id)
+    public MedicalReportDTO getMedicalReport(String recordId,String reportId) throws Exception
     {
-
-        MrMedicalReportEntity medicalRecord = medicalReportDao.findByid(id);
-        medicalReportDao.delete(medicalRecord);
+        return null;
     }
 
     /**
-     * 删除数据元
-     *
-     * @param id int 病历Id
+     * 保存病历报告
      */
-    public void deleteReportByRecordId(int id)
+    public boolean saveMedicalReport(String recordId,MedicalReportDTO obj) throws Exception
     {
+        return true;
+    }
 
-        List<MrMedicalReportEntity> medicalRecord = medicalReportDao.findByrecordsId(id);
-        medicalReportDao.delete(medicalRecord);
+    /**
+     * 根据报告id删除病历报告
+     */
+    public boolean deleteReportById(String recordId,String reportId) throws Exception
+    {
+        return true;
     }
 }
