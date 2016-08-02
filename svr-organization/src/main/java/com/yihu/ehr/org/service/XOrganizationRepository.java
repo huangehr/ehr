@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface XOrganizationRepository extends PagingAndSortingRepository<Organization, String> {
 
-    @Query("select org from Organization org where org.location in (:geographyIds)")
+    @Query("select org from Organization org where org.location in (:geographyIds) and org.activityFlag=1")
     List<Organization> searchByAddress(@Param("geographyIds") List<String> geographyIds);
 
     @Query("select org.orgCode from Organization org where org.fullName like %:name% or org.shortName like %:name%")
