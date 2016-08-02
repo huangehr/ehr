@@ -9,9 +9,7 @@ import com.yihu.ehr.user.service.RoleUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +35,12 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "data_json",value = "角色组-人员关系Json串")
             @RequestBody String dataJson){
         RoleUser roleUser = toEntity(dataJson,RoleUser.class);
+        String[] fields = {"userId","roleId"};
+        String[] values = {roleUser.getUserId(),roleUser.getRoleId()+""};
+        List<RoleUser> roleUserList = roleUserService.findByFields(fields, values);
+        if(roleUserList != null && roleUserList.size() > 0){
+            return convertToModel(roleUserList.get(0), MRoleUser.class);
+        }
         RoleUser roleUserNew = roleUserService.save(roleUser);
         return convertToModel(roleUserNew,MRoleUser.class);
     }
