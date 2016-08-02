@@ -12,15 +12,7 @@ import java.util.List;
  */
 public interface DoctorMedicalRecordDao extends PagingAndSortingRepository<MrDoctorMedicalRecordsEntity,String> {
 
-    List<MrDoctorMedicalRecordsEntity> findBydoctorIdAndRecordId(String doctorId, int recordId);
-
-    List<MrDoctorMedicalRecordsEntity> findBydoctorId(String doctorId);
-
-    List<MrDoctorMedicalRecordsEntity> findByrecordId(int recordId);
-
-    List<MrDoctorMedicalRecordsEntity> findBydoctorIdAndPatientId(String doctorId,String patientId);
-
-    MrDoctorMedicalRecordsEntity findByrecordIdAndIsCreator(int recordId, String isCreator);
+    MrDoctorMedicalRecordsEntity findByDoctorIdAndRecordId(String doctorId, String recordId);
 
     @Query(value = "select * from mr_doctor_medical_records where doctor_id = ?1 and patient_id=?2 and record_type='"+ EnumClass.RecordType.Online+"' limit 1", nativeQuery = true)
     MrDoctorMedicalRecordsEntity getLastRecord(String doctorId,String patientId);

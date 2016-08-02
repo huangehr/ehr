@@ -141,7 +141,7 @@ public class DoctorEndPoint extends BaseRestEndPoint {
     }
 
 
-    /********************************* 医生标签类别 *********************************************/
+    /********************************* 医生标签 *********************************************/
     @ApiOperation("获取医生标签")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabel, method = RequestMethod.GET)
     public List<MrLabelEntity> getDoctorLabels(@ApiParam(name = "doctor_id", value = "医生ID")
@@ -154,40 +154,8 @@ public class DoctorEndPoint extends BaseRestEndPoint {
         return doctorLabelService.getDoctorLabels(doctorId, labelType, labelClass);
     }
 
-    @ApiOperation("新增医生标签")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabelManage, method = RequestMethod.POST)
-    public MrLabelEntity addDoctorLabels(@ApiParam(name = "json", value = "医生标签")
-                                         @RequestParam(value = "json", required = true) String  json) throws Exception
-    {
-        MrLabelEntity mrLabelEntity=toEntity(json,MrLabelEntity.class);
-        return  doctorLabelService.addDoctorLabels(mrLabelEntity);
-    }
 
-    @ApiOperation("更新医生标签")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabelManage, method = RequestMethod.PUT)
-    public boolean updateDoctorLabels(@ApiParam(name = "json", value = "医生标签")
-                                      @RequestParam(value = "json", required = true) String json) throws Exception
-    {
-        MrLabelEntity mrLabelEntity=toEntity(json,MrLabelEntity.class);
-        return  doctorLabelService.updateDoctorLabels(mrLabelEntity);
-    }
 
-    @ApiOperation("删除医生标签")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabelManage, method = RequestMethod.DELETE)
-    public boolean deleteDoctorLabels(@ApiParam(name = "id", value = "id")
-                                      @RequestParam(value = "id", required = true) int id) throws Exception
-    {
-        return  doctorLabelService.deleteDoctorLabels(id);
-    }
-
-    @ApiOperation("医生标签使用次数")
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabelUsed, method = RequestMethod.PUT)
-    public void DoctorLabelUsed(
-            @ApiParam(name = "id", value = "内部id")
-            @RequestParam(value = "id", required = true) int id) throws Exception
-    {
-        doctorLabelService.DoctorLabelUsed(id);
-    }
     /****************************** 医生模板 *******************************************************/
     @ApiOperation("根据医生ID获取模板")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorTemplate,method = RequestMethod.GET)

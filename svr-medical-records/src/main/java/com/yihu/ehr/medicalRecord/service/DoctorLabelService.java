@@ -4,6 +4,7 @@ import com.yihu.ehr.medicalRecord.dao.DoctorLabelClassDao;
 import com.yihu.ehr.medicalRecord.dao.DoctorLabelDao;
 import com.yihu.ehr.medicalRecord.model.Entity.MrLabelClassEntity;
 import com.yihu.ehr.medicalRecord.model.Entity.MrLabelEntity;
+import com.yihu.ehr.medicalRecord.model.EnumClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,45 +71,33 @@ public class DoctorLabelService {
         return  doctorLabelClassDao.findByDoctorId(doctorId);
     }
 
-
+    /************************ 医生标签 ******************************************************/
     /**
-     * 新增医生标签
-     * @param mrLabelEntity
-     * @return
+     * 保存医生标签，不存在则新增，存在则+1次数
      */
-    public  MrLabelEntity addDoctorLabels(MrLabelEntity mrLabelEntity){
-        doctorLabelDao.save(mrLabelEntity);
-        return mrLabelEntity;
-    }
+    public boolean saveDoctorLabel(String doctorId,String label){
+        MrLabelEntity obj = doctorLabelDao.findByDoctorIdAndLabel(doctorId,label);
 
-    /**
-     * 修改医生标签
-     * @param mrLabelEntity
-     * @return
-     */
-    public  boolean updateDoctorLabels(MrLabelEntity mrLabelEntity){
-        MrLabelEntity m=doctorLabelDao.findByid(mrLabelEntity.getId());
-        if(mrLabelEntity!=null && m!=null){
-            m.setDoctorId(mrLabelEntity.getDoctorId());
-            m.setLabelType(mrLabelEntity.getLabelType());
-            m.setLabel(mrLabelEntity.getLabel());
-            m.setLabelClass(mrLabelEntity.getLabelClass());
-            return true;
+        //存在则次数+1
+        if(obj!=null)
+        {
+            int num = obj.getUsageCount();
+            obj.setUsageCount(num+1);
+
         }
-        else
-            return false;
+        else{
+            obj = new MrLabelEntity();
+            obj.setUsageCount(1);
+            obj.setLabel(label);
+            obj.setDoctorId(doctorId);
+            obj.setLabelClass(0); //暂时默认
+            obj.setLabelType(EnumClass.LabelType.MedicalLabel); //暂时默认
+        }
+        doctorLabelDao.save(obj);
 
-    }
-
-    /**
-     * 删除医生标签
-     * @param id
-     * @return
-     */
-    public  boolean deleteDoctorLabels(int id){
-        doctorLabelDao.deleteById(id);
         return true;
     }
+
 
     /**
      * 获取医生标签
@@ -127,15 +116,5 @@ public class DoctorLabelService {
 
     }
 
-    /**
-     * 标签使用次数+1
-     * @param id
-     */
-    public void DoctorLabelUsed(int id){
-        MrLabelEntity m=doctorLabelDao.findByid(id);
-        if(m!=null){
-            m.setUsageCount(m.getUsageCount()+1);
-        }
-    }
 
 }
