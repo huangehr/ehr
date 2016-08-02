@@ -2,24 +2,24 @@ package com.yihu.ehr.medicalRecord.model.Entity;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by shine on 2016/7/14.
  */
 @Entity
-@Table(name = "mr_patients", schema = "", catalog = "medical_records")
+@Table(name = "mr_patients", schema = "", catalog = "")
 public class MrPatientsEntity {
     private String id;
     private String name;
     private String demographicId;
     private String sex;
-    private Timestamp birthday;
+    private Date birthday;
     private String maritalStatus;
     private String photo;
     private String phone;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "ID")
     public String getId() {
         return id;
@@ -61,11 +61,11 @@ public class MrPatientsEntity {
 
     @Basic
     @Column(name = "BIRTHDAY")
-    public Timestamp getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Timestamp birthday) {
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
 

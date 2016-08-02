@@ -48,10 +48,10 @@ public class DocumentFamily {
     public static String getRowkey(String creater,String patientId){
         if(patientId!=null && patientId.length()>0)
         {
-            return creater+"_"+patientId+"_"+Long.toString(new Date().getTime());
+            return creater+"_"+patientId+"_"+(Long.MAX_VALUE -new Date().getTime());
         }
         else{
-            return creater+"_"+creater+"_"+Long.toString(new Date().getTime());
+            return creater+"_"+creater+"_"+(Long.MAX_VALUE -new Date().getTime());
         }
     }
 

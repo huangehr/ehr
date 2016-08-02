@@ -1,20 +1,17 @@
 package com.yihu.ehr.medicalRecord.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.medicalRecord.comom.Message;
 import com.yihu.ehr.medicalRecord.dao.DoctorDao;
 import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
-import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorsEntity;
-import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
+import com.yihu.ehr.medicalRecord.model.EnumClass;
 import com.yihu.ehr.yihu.UserMgmt;
 import com.yihu.ehr.yihu.YihuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +28,6 @@ public class DoctorService {
     @Autowired
     UserMgmt userMgmt;
 
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Autowired
     PatientService patientService;
@@ -45,35 +40,48 @@ public class DoctorService {
 
 
     /**
-     * 获取医生信息
+     * 获取医生信息,不存在则新增
      */
-    public MrDoctorsEntity getDoctorInformation(String id)throws Exception{
-        MrDoctorsEntity re = doctorDao.findById(id);
+    public MrDoctorsEntity getDoctorInformation(String doctorId)throws Exception{
+        MrDoctorsEntity re = doctorDao.findById(doctorId);
         if(re ==null) {
-            YihuResponse response = userMgmt.queryUserInfoByID(id);
+            YihuResponse response = userMgmt.queryUserInfoByID(doctorId);
             if(response.getCode() == 10000)
             {
-                Map<String,Object> map = (Map<String,Object>)userMgmt.queryUserInfoByID(id).getResult();
+                Map<String,Object> map = (Map<String,Object>)response.getResult();
                 if (map!=null && map.size()>0) {
-                    //re = objectMapper.readValue(s, Map.class);
-                    MrDoctorsEntity mrDoctorsEntity = new MrDoctorsEntity();
-                    mrDoctorsEntity.setId(map.get("UserID").toString());
-                    mrDoctorsEntity.setName(map.get("CName").toString());
-                    mrDoctorsEntity.setDemographicId(map.get("IDNumber").toString());
-                    mrDoctorsEntity.setSex(map.get("Sex").toString());
-                    if (map.get("BirthDate") != null && map.get("BirthDate").toString().length() > 0) {
-                        mrDoctorsEntity.setBirthday(java.sql.Timestamp.valueOf(map.get("BirthDate").toString()));
+                    String type = map.get("UserType").toString();
+                    if(type.equals(EnumClass.UserType.Doctor))
+                    {
+                        MrDoctorsEntity doctor = new MrDoctorsEntity();
+                        doctor.setId(doctorId);
+                        doctor.setName(map.get("CName").toString());
+                        doctor.setDemographicId(map.get("IDNumber").toString());
+                        doctor.setSex(map.get("Sex").toString());
+                        if (map.get("BirthDate") != null && map.get("BirthDate").toString().length() > 0) {
+                            doctor.setBirthday(java.sql.Timestamp.valueOf(map.get("BirthDate").toString()));
+                        }
+                        doctor.setPhoto(map.get("PhotoUri").toString());
+                        doctor.setPhone(map.get("Phone").toString());
+
+                        if(map.containsKey("Lczc"))
+                        {
+                            doctor.setTitle(map.get("Lczc").toString());
+                        }
+                        if(map.containsKey("Skill"))
+                        {
+                            doctor.setGood(map.get("Skill").toString());
+                        }
+                        doctorDao.save(doctor);
+                        re = doctor;
                     }
-                    mrDoctorsEntity.setTitle(map.get("Lczc").toString());
-                    mrDoctorsEntity.setPhoto(map.get("PhotoUri").toString());
-                    mrDoctorsEntity.setPhone(map.get("Phone").toString());
-                    mrDoctorsEntity.setGood(map.get("Skill").toString());
-                    addDoctor(mrDoctorsEntity);
-                    re = mrDoctorsEntity;
+                    else{
+                        Message.debug("该用户不是医生，id:"+doctorId);
+                    }
                 }
             }
             else {
-                throw new Exception(response.getMessage());
+                Message.error(response.getMessage());
             }
 
         }
@@ -81,70 +89,29 @@ public class DoctorService {
     }
 
     /**
-     * 获取医生信息（通过身份证）
-     * @param demographicId
-     * @return
+     * 获取医生信息
      */
-    public MrDoctorsEntity getDoctorInformationByDemographicId(String demographicId){
-
-        return doctorDao.findBydemographicId(demographicId);
+    public MrDoctorsEntity getDoctor(String doctorId) throws Exception
+    {
+        return doctorDao.findById(doctorId);
     }
+
 
     /**
-     * 更新医生信息
-     * @param doctor
-     * @return
+     * 保存医生信息
      */
-    public boolean updateDoctorInformationById(MrDoctorsEntity doctor){
-        if(doctor!=null) {
-            MrDoctorsEntity doctorModel = doctorDao.findById(doctor.getId());
-            if(doctorModel!=null ){
-                doctorModel.setSex(doctor.getSex());
-                doctorModel.setBirthday(doctor.getBirthday());
-                doctorModel.setGood(doctor.getGood());
-                doctorModel.setOrgCode(doctor.getOrgCode());
-                doctorModel.setOrgName(doctor.getOrgName());
-                doctorModel.setOrgDept(doctor.getOrgDept());
-                doctorModel.setTitle(doctor.getTitle());
-                doctorModel.setName(doctor.getName());
-                doctorModel.setPhone(doctor.getPhone());
-                doctorModel.setPhoto(doctor.getPhoto());
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            return false;
-        }
-
+    public boolean saveDoctor(MrDoctorsEntity doctor){
+        doctorDao.save(doctor);
+        return true;
     }
 
-    /**
-     * 新增医生信息
-     * @param doctor
-     * @return
-     */
-    public boolean addDoctor(MrDoctorsEntity doctor){
-        if(doctorDao.findById(doctor.getId())!=null){
-            return false;
-        }
-        else {
-            doctorDao.save(doctor);
-            return true;
-        }
-    }
 
     /**
      * 获取医生诊断
-     * @param doctorId
-     * @return
-     * @throws Exception
      */
     public Map<String, String> getDoctorDiagnosis(String doctorId)throws Exception {
 
-        List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorId(doctorId);
+        /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorId(doctorId);
         String q="";
         if (Mlist != null && Mlist.size() > 0) {
             for (int i = 0; i < Mlist.size(); i++) {
@@ -158,7 +125,7 @@ public class DoctorService {
             return null;
         }
         Map<String, String> list = new HashMap<>();
-        /*Page<Map<String, Object>> result = hbaseQuery.queryBySolr(MedicalRecordsFamily.TableName, "rowkey", null, 1, 1000000000);
+        Page<Map<String, Object>> result = hbaseQuery.queryBySolr(MedicalRecordsFamily.TableName, "rowkey", null, 1, 1000000000);
 
         if (result.getContent() != null && result.getContent().size() > 0) {
 
@@ -177,26 +144,16 @@ public class DoctorService {
 
             }
         }*/
-        return list;
+        return null;
     }
 
     /**
      * 获取医生病历
-     * @param filter
-     * @param label
-     * @param medicalTimeFrom
-     * @param medicalTimeEnd
-     * @param recordType
-     * @param doctorId
-     * @param page
-     * @param size
-     * @return
-     * @throws Exception
      */
     public List<MedicalRecord> getDoctorRecords(String filter, String label, String medicalTimeFrom,
                                                 String medicalTimeEnd, String recordType, String doctorId, int page, int size) throws Exception {
 
-        List<MrPatientsEntity>patientsEntityList=patientService.searchPatient(filter,1,1000000000);
+        /*List<MrPatientsEntity>patientsEntityList=patientService.searchPatient(filter,1,1000000000);
         List<MedicalRecord> medicalRecordModelList = new ArrayList<>();
         if(patientsEntityList!=null && patientsEntityList.size()>0) {
             for (int l = 0; l < patientsEntityList.size(); l++) {
@@ -231,12 +188,13 @@ public class DoctorService {
                     if(m.getCreateTime().toString().compareTo(medicalTimeFrom)>0 && m.getCreateTime().toString().compareTo(medicalTimeEnd)<0 && m.getDataFrom().equals(recordType))
                         medicalRecordModelList.add(m);
 
-                }*/
+                }
             }
 
         }
 
-        return medicalRecordModelList;
+        return medicalRecordModelList;*/
+        return null;
 
     }
 }

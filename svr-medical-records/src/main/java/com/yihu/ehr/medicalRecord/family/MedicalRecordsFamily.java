@@ -64,12 +64,9 @@ public class MedicalRecordsFamily {
      * @param dataFrom
      * @return
      */
-    public String getRowkey(String patientId, String dataFrom){
+    public static String getRowkey(String patientId, String dataFrom){
 
-        return patientId + "_" + dataFrom + "_" + Long.toString(new Date().getTime());
+        return patientId + "_" + dataFrom + "_" + (Long.MAX_VALUE -new Date().getTime());
     }
 
-    public String getTableName(){
-        return TableName;
-    }
 }

@@ -11,7 +11,7 @@ import java.util.Date;
 public class Text {
     private String rowkey;
     private String content;
-    private Date createTime;
+    private String createTime;
     private String creater;
     private String createrName;
     private String patientId;
@@ -26,11 +26,19 @@ public class Text {
         this.content = content;
     }
 
-    public Date getCreateTime() {
+    public String getRowkey() {
+        return rowkey;
+    }
+
+    public void setRowkey(String rowkey) {
+        this.rowkey = rowkey;
+    }
+
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 

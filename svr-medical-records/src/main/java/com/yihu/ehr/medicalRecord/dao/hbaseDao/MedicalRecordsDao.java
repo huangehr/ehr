@@ -1,6 +1,10 @@
 package com.yihu.ehr.medicalRecord.dao.hbaseDao;
 
 import com.yihu.ehr.hbase.HBaseUtil;
+import com.yihu.ehr.medicalRecord.comom.Message;
+import com.yihu.ehr.medicalRecord.family.MedicalRecordsFamily;
+import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
+import org.omg.CORBA.Object;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,21 +19,42 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class MedicalRecordsDao {
+public class MedicalRecordsDao extends HbaseDao {
 
     @Autowired
     HBaseUtil hbase;
 
-    //新增病历
+    @Override
+    protected String getTableName(){
+        return MedicalRecordsFamily.TableName;
+    }
 
+    /**
+     * 行保存病历
+     */
+    public boolean save(MedicalRecord obj) throws Exception
+    {
+        hbase.insertRecord(getTableName(), obj.getRowkey(), MedicalRecordsFamily.Data,obj.getColumns(), obj.getValues());
+        return true;
+    }
 
-    //修改病历
+    /**
+     * 列修改病历, data列族
+     */
+    public boolean update(String rowkey, String column, String value) throws Exception
+    {
+        hbase.updateRecord(getTableName(), rowkey, MedicalRecordsFamily.Data,column,value);
+        return true;
+    }
 
-
-    //删除病历
-
-
-
+    /**
+     * 列修改病历, dynamic列族
+     */
+    public boolean updateDynamic(String rowkey, String column, String value) throws Exception
+    {
+        hbase.updateRecord(getTableName(), rowkey, MedicalRecordsFamily.Dynamic,column,value);
+        return true;
+    }
 
     /******************************** solr查询 ********************************************/
     /**

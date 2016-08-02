@@ -11,6 +11,9 @@ public class YihuResponse {
     private String Message;
     private Object Result;
 
+    /**
+     * 10000成功
+     */
     public int getCode() {
         return Code;
     }

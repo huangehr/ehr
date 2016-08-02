@@ -1,19 +1,17 @@
 package com.yihu.ehr.medicalRecord.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.medicalRecord.comom.Message;
 import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.PatientDao;
 import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
 import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
-import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.query.URLQueryParser;
 import com.yihu.ehr.yihu.UserMgmt;
 import com.yihu.ehr.yihu.YihuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaQuery;
 import java.util.*;
 
 /**
@@ -21,7 +19,7 @@ import java.util.*;
  */
 @Transactional
 @Service
-public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao> {
+public class PatientService {
 
     @Autowired
     PatientDao patientDao;
@@ -39,32 +37,54 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
     MedicalLabelService medicalLabelService;
 
 
+    /**
+     * 获取患者信息
+     */
+    public MrPatientsEntity getPatient(String patientId) throws Exception
+    {
+        return patientDao.findById(patientId);
+    }
 
+    /**
+     * 保存患者信息
+     */
+    public boolean savePatient(MrPatientsEntity patient) throws Exception
+    {
+        patientDao.save(patient);
+        return true;
+    }
+
+    /**
+     * 获取患者信息，不存在则新增
+     * @param patientId
+     * @return
+     * @throws Exception
+     */
     public MrPatientsEntity getPatientInformation(String patientId) throws Exception {
-        MrPatientsEntity re = patientDao.findByid(patientId);
+        MrPatientsEntity re = patientDao.findById(patientId);
         if (re == null)
         {
             YihuResponse response = userMgmt.queryUserInfoByID(patientId);
             if(response.getCode() == 10000)
             {
-                Map<String,Object> map = (Map<String,Object>)response;
+                Map<String,Object> map = (Map<String,Object>)response.getResult();
 
-                MrPatientsEntity mrPatientsEntity = new MrPatientsEntity();
-                mrPatientsEntity.setId(map.get("UserID").toString());
-                mrPatientsEntity.setName(map.get("CName").toString());
-                mrPatientsEntity.setDemographicId(map.get("IDNumber").toString());
-                mrPatientsEntity.setSex(map.get("Sex").toString());
+                MrPatientsEntity patient = new MrPatientsEntity();
+                patient.setId(patientId);
+                patient.setName(map.get("CName").toString());
+                patient.setDemographicId(map.get("IDNumber").toString());
+                patient.setSex(map.get("Sex").toString());
                 if (map.get("BirthDate") != null && map.get("BirthDate").toString().length() > 0) {
-                    mrPatientsEntity.setBirthday(java.sql.Timestamp.valueOf(map.get("BirthDate").toString()));
+                    patient.setBirthday(java.sql.Timestamp.valueOf(map.get("BirthDate").toString()));
                 }
-                mrPatientsEntity.setMaritalStatus(map.get("IsMarried").toString());
-                mrPatientsEntity.setPhoto(map.get("PhotoUri").toString());
-                mrPatientsEntity.setPhone(map.get("Phone").toString());
-                addPatient(mrPatientsEntity);
-                re = mrPatientsEntity;
+                patient.setMaritalStatus(map.get("IsMarried").toString());
+                patient.setPhoto(map.get("PhotoUri").toString());
+                patient.setPhone(map.get("Phone").toString());
+                patientDao.save(patient);
+                re = patient;
             }
             else{
-                throw new Exception(response.getMessage());
+                Message.error(response.getMessage());
             }
         }
 
@@ -80,7 +100,7 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
      * <=：使用小于号和小于等于语法，如：createDate<=2015
      * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接 GB/T 2261.2-2003
      * 多条件组合：使用";"来分隔
-     * */
+     * *//*
     public List<MrPatientsEntity> searchPatient(String queryCondition,int page,int size) throws Exception {
         URLQueryParser queryParser = createQueryParser(null, queryCondition, null);
         CriteriaQuery query = queryParser.makeCriteriaQuery();
@@ -93,54 +113,11 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
                 .setFirstResult((page - 1) * size)
                 .setMaxResults(size)
                 .getResultList();
-    }
+    }*/
 
-    public boolean updatePatientInformationByID(MrPatientsEntity patient) {
-
-        MrPatientsEntity patientModel = patientDao.findByid(patient.getId());
-        if (patient != null && patientModel != null) {
-            patientModel.setPhoto(patient.getPhoto());
-            patientModel.setName(patient.getName());
-            patientModel.setBirthday(patient.getBirthday());
-            patientModel.setDemographicId(patient.getDemographicId());
-            patientModel.setSex(patient.getSex());
-            patientModel.setMaritalStatus(patient.getMaritalStatus());
-            patientModel.setPhone(patient.getPhone());
-        }
-        return true;
-
-    }
-
-    public boolean IsCreated(String id) {
-        if (id != null) {
-            MrPatientsEntity mp = patientDao.findByid(id);
-            if (mp != null) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-
-
-    }
-
-    public boolean deletePatientByID(String id) {
-        patientDao.deleteBydemographicId(id);
-        return true;
-    }
-
-    public boolean addPatient(MrPatientsEntity mrPatientsEntity) throws Exception {
-
-        if (patientDao.findByid(mrPatientsEntity.getId()) != null) {
-            return false;
-        } else {
-            patientDao.save(mrPatientsEntity);
-            return true;
-        }
-    }
-
+    /**
+     * 获取患者诊断
+     */
     public Map<String,String> getPatientDiagnosis(String patientId, String doctorId) throws Exception{
 
         /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId,patientId);
@@ -180,6 +157,9 @@ public class PatientService extends BaseJpaService<MrPatientsEntity, PatientDao>
         return null;
     }
 
+    /**
+     * 获取患者病历
+     */
     public List<MedicalRecord> getPatientRecords(String patientId, String label, String medicalTimeFrom,
                                                  String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String doctorId) throws Exception {
 

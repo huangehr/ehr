@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by shine on 2016/7/14.
  */
 @Entity
-@Table(name = "mr_system_dict", schema = "", catalog = "medical_records")
+@Table(name = "mr_system_dict", schema = "", catalog = "")
 public class MrSystemDictEntity {
     private String dictCode;
     private String dictName;

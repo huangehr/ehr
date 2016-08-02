@@ -39,7 +39,7 @@ public class MedicalDrugFamily {
 
     public static String getRowkey(String recordRowkey, String PrescriptionRowkey){
 
-        return recordRowkey + "_" + PrescriptionRowkey + "_" + Long.toString(new Date().getTime());
+        return recordRowkey + "_" + PrescriptionRowkey + "_" + (Long.MAX_VALUE -new Date().getTime());
     }
 
 }

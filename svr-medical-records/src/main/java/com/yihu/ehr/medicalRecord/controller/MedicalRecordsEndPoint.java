@@ -1,19 +1,17 @@
 package com.yihu.ehr.medicalRecord.controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.medicalRecord.comom.Message;
 import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
 import com.yihu.ehr.medicalRecord.model.Entity.MrMedicalLabelEntity;
-import com.yihu.ehr.medicalRecord.service.DoctorMedicalRecordService;
 import com.yihu.ehr.medicalRecord.service.MedicalLabelService;
 import com.yihu.ehr.medicalRecord.service.MedicalRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.omg.CORBA.Object;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +29,6 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @Autowired
     MedicalRecordService recordService;
 
-    @Autowired
-    DoctorMedicalRecordService doctorRecordService;
 
     @Autowired
     MedicalLabelService medicalLabelService;
@@ -50,15 +46,22 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value="userId",required = true)String userId,
             @ApiParam(name="ticket",value="ticket",defaultValue = "")
             @RequestParam(value="ticket",required = true)String ticket,
-            @ApiParam(name="appUid",value="应用轻ID",defaultValue = "")
+            @ApiParam(name="appUid",value="应用轻ID",defaultValue = "KK66VXAFN9QTVLTI7NWJLEX3NXH4BUIRGOV83331O75")
             @RequestParam(value="appUid",required = true)String appUid) throws Exception
     {
-        return recordService.medicalRecord(patientId, userId,ticket,appUid);
+        try {
+            return recordService.medicalRecord(patientId, userId, ticket, appUid);
+        }
+        catch (Exception ex)
+        {
+            Message.error(ex.getMessage());
+            return null;
+        }
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.AddRecord,method = RequestMethod.POST)
     @ApiOperation("新增病历")
-    public MedicalRecord addRecord(
+    public Map<String,Object> addRecord(
             @ApiParam(name="doctor_id",value="医生ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
             @RequestParam(value="doctor_id",required = true)String doctorId,
             @ApiParam(name="patient_id",value="患者ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
@@ -75,7 +78,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name="json",value="修改内容",defaultValue = "{}")
             @RequestParam(value="json",required = true)String json) throws Exception
     {
-        Map<String,Object> map = toEntity(json,Map.class);
+        Map<String,String> map = toEntity(json,Map.class);
         return recordService.editRecord(recordId, map);
     }
 

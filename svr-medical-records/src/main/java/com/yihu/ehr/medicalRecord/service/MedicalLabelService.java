@@ -14,7 +14,7 @@ import java.util.*;
  */
 @Transactional
 @Service
-public class MedicalLabelService extends BaseRestEndPoint {
+public class MedicalLabelService {
 
     @Autowired
     MedicalLabelDao medicalLabelDao;

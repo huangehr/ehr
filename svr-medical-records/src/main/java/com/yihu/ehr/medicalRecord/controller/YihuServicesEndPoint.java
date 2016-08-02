@@ -40,9 +40,11 @@ public class YihuServicesEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "userId", value = "用户ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
             @RequestParam(value = "userId", required = true)String userId,
             @ApiParam(name = "ticket", value = "ticket")
-            @RequestParam(value = "ticket", required = true)String ticket)
+            @RequestParam(value = "ticket", required = true)String ticket,
+            @ApiParam(name="appUid",value="应用轻ID",defaultValue = "KK66VXAFN9QTVLTI7NWJLEX3NXH4BUIRGOV83331O75")
+            @RequestParam(value="appUid",required = true)String appUid)
     {
-        return userMgmt.userSessionCheck(userId,ticket);
+        return userMgmt.userSessionCheck(userId,ticket,appUid);
     }
 
     @ApiOperation("获取用户信息")

@@ -64,7 +64,7 @@ public class PatientEndPoint extends BaseRestEndPoint {
     public MrPatientsEntity getPatientInformation(
             @ApiParam(name = "patient_id", value = "患者ID")
             @PathVariable(value = "patient_id") String patientId)throws Exception{
-        return patientService.getPatientInformation(patientId);
+        return patientService.getPatient(patientId);
     }
 
     @ApiOperation("增加患者")
@@ -72,7 +72,7 @@ public class PatientEndPoint extends BaseRestEndPoint {
     public boolean addPatient(@ApiParam(name = "json", value = "患者信息json")
                               @RequestParam(value = "json", required = true) String json)throws Exception{
             MrPatientsEntity patient = toEntity(json, MrPatientsEntity.class);
-            return patientService.addPatient(patient);
+            return patientService.savePatient(patient);
     }
 
     @ApiOperation("更新患者个人信息")
@@ -81,7 +81,7 @@ public class PatientEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "json", value = "患者信息json")
             @RequestParam(value = "json", required = true) String json)throws Exception{
         MrPatientsEntity mrPatientsEntity=toEntity(json,MrPatientsEntity.class);
-        return patientService.updatePatientInformationByID(mrPatientsEntity);
+        return patientService.savePatient(mrPatientsEntity);
     }
 
 

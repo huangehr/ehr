@@ -21,10 +21,15 @@ import java.util.Map;
  * Created by hzp on 2016/8/1.
  */
 @Service
-public class TextDao {
+public class TextDao extends HbaseDao {
 
     @Autowired
     HBaseUtil hbase;
+
+    @Override
+    protected String getTableName(){
+        return TextFamily.TableName;
+    }
 
     /**
      * 新增记录
@@ -33,28 +38,13 @@ public class TextDao {
         if(obj.getCreater() !=null && obj.getContent()!=null && obj.getBusinessClass()!=null) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             String rowkey = TextFamily.getRowkey(obj.getCreater(),obj.getPatientId());
-            hbase.insertRecord(TextFamily.TableName, rowkey, TextFamily.Data, obj.getColumns(), obj.getValues());
+            hbase.insertRecord(getTableName(), rowkey, TextFamily.Data, obj.getColumns(), obj.getValues());
             return true;
         }
         else
             return false;
     }
 
-    /**
-     * 删除记录
-     * @return
-     */
-    public boolean delete(String rowkey) throws Exception
-    {
-        return true;
-    }
-
-    /**
-     * 通过rowkey获取数据
-     */
-    public Map<String, Object> getText(String rowkey)throws Exception{
-        return hbase.getResultMap(TextFamily.TableName, rowkey);
-    }
 
     /******************************** solr查询 ********************************************/
     /**
@@ -73,7 +63,7 @@ public class TextDao {
         Filter vs = new SingleColumnValueFilter(Bytes.toBytes(TextFamily.Data),Bytes.toBytes(TextFamily.DataColumns.BusinessClass),CompareFilter.CompareOp.EQUAL, new SubstringComparator("1"));
         Scan scan = new Scan();
         scan.setFilter(vs);
-        ResultScanner scanner = hbase.getScanner(TextFamily.TableName,scan);
+        ResultScanner scanner = hbase.getScanner(getTableName(),scan);
         for(Result r:scanner) {
             for (KeyValue kv : r.raw()) {
                 System.out.print(new String(kv.getRow()) + " ");

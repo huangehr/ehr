@@ -14,9 +14,6 @@ public class UserMgmt {
     @Autowired
     private YihuHttpService service;
 
-    @Value("${yihu-service.appuid}")
-    private String appUid;
-
     /***
      * 健康之路账号登录
      */
@@ -28,7 +25,7 @@ public class UserMgmt {
     /***
      * 单点登录接口
      */
-    public YihuResponse userSessionCheck(String userId,String ticket)
+    public YihuResponse userSessionCheck(String userId,String ticket,String appUid)
     {
         return service.doPost("UserMgmt.Account.userSessionCheck", "{ \"userId\":\"" + userId + "\",\"ticket\":\"" + ticket + "\",\"appUid\": \""+appUid+"\" }");
     }

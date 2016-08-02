@@ -10,7 +10,7 @@ import java.util.Date;
 public class Document {
     private String rowkey;
     private String documentName;
-    private Date createTime;
+    private String createTime;
     private String creater;
     private String createrName;
     private String patientId;
@@ -36,11 +36,11 @@ public class Document {
         this.documentName = documentName;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 

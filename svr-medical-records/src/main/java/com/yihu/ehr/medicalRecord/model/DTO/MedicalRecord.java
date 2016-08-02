@@ -8,8 +8,8 @@ import com.yihu.ehr.medicalRecord.family.MedicalRecordsFamily;
  */
 public class MedicalRecord {
     private String rowkey;
-    private Data createTime;
-    private Data medicalTime;
+    private String createTime;
+    private String medicalTime;
     private String doctorId;
     private String doctorName;
     private String title;
@@ -42,12 +42,20 @@ public class MedicalRecord {
         this.rowkey = rowkey;
     }
 
-    public Data getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Data createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public String getMedicalTime() {
+        return medicalTime;
+    }
+
+    public void setMedicalTime(String medicalTime) {
+        this.medicalTime = medicalTime;
     }
 
     public String getPatientId() {
@@ -208,14 +216,6 @@ public class MedicalRecord {
 
     public void setFirstRecordId(String firstRecordId) {
         this.firstRecordId = firstRecordId;
-    }
-
-    public Data getMedicalTime() {
-        return medicalTime;
-    }
-
-    public void setMedicalTime(Data medicalTime) {
-        this.medicalTime = medicalTime;
     }
 
     public String getTitle() {

@@ -92,7 +92,7 @@ public class DoctorEndPoint extends BaseRestEndPoint {
                                     @RequestParam(value = "json", required = true) String json) throws Exception
     {
         MrDoctorsEntity doctor = toEntity(json,MrDoctorsEntity.class);
-        return doctorService.addDoctor(doctor);
+        return doctorService.saveDoctor(doctor);
     }
 
     @ApiOperation("更新医生信息")
@@ -102,7 +102,7 @@ public class DoctorEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "json", required = true)String json) throws Exception
     {
         MrDoctorsEntity doctor=toEntity(json,MrDoctorsEntity.class);
-        return doctorService.updateDoctorInformationById(doctor);
+        return doctorService.saveDoctor(doctor);
     }
 
     /********************************* 医生标签类别 *********************************************/
