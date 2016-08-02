@@ -35,6 +35,7 @@ public class AppApi {
     private String responseDemo;
     private String openLevel;
     private String auditLevel;
+    private String methodName;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -152,5 +153,14 @@ public class AppApi {
 
     public void setAuditLevel(String auditLevel) {
         this.auditLevel = auditLevel;
+    }
+
+    @Column(name = "method_name", nullable = true)
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
     }
 }

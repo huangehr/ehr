@@ -1,8 +1,6 @@
 package com.yihu.ehr.medicalRecord.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
@@ -12,7 +10,7 @@ import java.sql.Timestamp;
 @javax.persistence.Table(name = "mr_medical_records")
 public class MrMedicalRecordsEntity {
     private int id;
-    private int patientId;
+    private String patientId;
     private Timestamp medicalTime;
     private String doctorId;
     private String medicalDiagnosis;
@@ -27,6 +25,7 @@ public class MrMedicalRecordsEntity {
     private Integer firstRecordId;
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @javax.persistence.Column(name = "ID")
     public int getId() {
         return id;
@@ -38,11 +37,11 @@ public class MrMedicalRecordsEntity {
 
     @Basic
     @javax.persistence.Column(name = "PATIENT_ID")
-    public int getPatientId() {
+    public String getPatientId() {
         return patientId;
     }
 
-    public void setPatientId(int patientId) {
+    public void setPatientId(String patientId) {
         this.patientId = patientId;
     }
 

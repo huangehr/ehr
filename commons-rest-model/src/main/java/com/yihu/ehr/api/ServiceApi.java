@@ -97,8 +97,11 @@ public class ServiceApi {
         public static final String DictEntryBatch               ="/resources/dict/entry/batch";
         public static final String DictCodesExistence            ="/resources/dict/codes/existence";
 
-        public static final String Params                       ="/resources/param";
-        public static final String Param                        ="/resources/param/{id}";
+        public static final String Params                       ="/resources/params";
+        public static final String ParamsNoPage                 ="/resources/params/no_paging";
+        public static final String Param                        ="/resources/param";
+        public static final String ParamById                    ="/resources/param/{id}";
+        public static final String ParamKeyValueExistence       ="/resources/param/key_value_existence";
 
 
         public static final String DictEntries                   ="/resources/dict_entries";
@@ -408,6 +411,7 @@ public class ServiceApi {
 
         public static final String RoleFeature                      = "/roles/role_feature";
         public static final String RoleFeatureId                    = "/roles/role_feature/{id}";
+        public static final String RoleFeatureByRoleId              = "/roles/role_feature/role_id";
         public static final String RoleFeatures                     = "/roles/role_features";
         public static final String RoleFeaturesNoPage               = "/roles/role_features/no_paging";
         public static final String RoleFeatureExistence             = "/roles/role_feature/existence";
@@ -419,6 +423,7 @@ public class ServiceApi {
 
         public static final String RoleApi                          = "/roles/role_api";
         public static final String RoleApiId                        = "/roles/role_api/{id}";
+        public static final String RoleApiByRoleId                  = "/roles/role_api/role_id";
         public static final String RoleApis                         = "/roles/role_apis";
         public static final String RoleApisNoPage                   = "/roles/role_apis/no_paging";
         public static final String RoleApisExistence                = "/roles/role_api/existence";
@@ -508,25 +513,103 @@ public class ServiceApi {
 
     public static class MedicalRecords{
 
-        public static final String MedicalRecordByLastOne                 = "/medicalRecords/medicalRecordByLastOne";
+        //病历
+        public static final String MedicalRecordByLastOne                 = "/medicalRecords/getRecordByLastOne";
         public static final String MedicalRecord                          = "/medicalRecords/medicalRecord";
-        public static final String MedicalReport                          = "/medicalRecords/MedicalReport";
-        public static final String MedicalReportImg                       = "/medicalRecords/MedicalReportImg";
-        public static final String DocTmpByDocId                          = "/medicalRecords/Doctortemplate/{id}";
-        public static final String DoctorDraft                            = "/medicalRecords/DoctorDraft";
-        public static final String MedicalDraft                           = "/medicalRecords/MedicalDraft";
-        public static final String DoctorMedicalRecords                   = "/medicalRecords/DoctorMedicalRecords";
-        public static final String DeleteDoctorMedicalRecords             = "/medicalRecords/DeleteAllDoctorMedicalRecord/{id}";
-        public static final String DoctorDiagnosis                        = "/medicalRecords/DoctorDiagnosis/{doctor_id}";
-        public static final String DoctorInfo                             = "/medicalRecords/DoctorInfo/{demographic_id}";
-        public static final String ChangeDocStatus                        = "/medicalRecords/ChangeDocStatus";
-        public static final String MedicalLabels                          = "/medicalRecords/MedicalLabels/{record_id}";
-        public static final String DiagnosisDict                          = "/medicalRecords/DiagnosisDict/{code}";
-        public static final String SystemDict                             = "/medicalRecords/SystemDict/{dict_code}";
-        public static final String SystemDictEntry                        = "/medicalRecords/SystemDictEntry/{dict_code}/{code}";
-        public static final String Patient                                = "/medicalRecords/Patient/{phone}/{demographic_id}";
+        public static final String MedicalRecordId                        = "/medicalRecords/{id}/record";
+        public static final String MedicalRecordDocId                     = "/medicalRecords/{doctor_id}/record";
+        public static final String MedicalRecordPatId                     = "/medicalRecords/{patient_id}/record";
+        public static final String MedicalRecordCopy                      = "/medicalRecords/medicalRecordCopy";
+
+        //病历报告
+        public static final String MedicalReport                          = "/medicalRecords/{record_id}/report";
+        public static final String DeleteMedicalReport                    = "/medicalRecords/medicalReport/{id}";
+        public static final String MedicalReportImg                       = "/medicalRecords/{report_id}/reportImg";
+        public static final String MedicalReportImgPicture                = "/medicalRecords/medicalReportImgPicture";
+
+        //医生模板
+        public static final String DoctorTemplate                         = "/medicalRecords/doctor/{doctor_id}/template";
+        public static final String DcotorTemplateManage                   = "/medicalRecords/doctor/template";
+
+        //文本草稿
+        public static final String DoctorDraft                            = "/medicalRecords/{doctor_id}/doctorDraft";
+        public static final String CheckDoctorDraft                       = "/medicalRecords/checkDoctorDraft";
+
+        //对话草稿
+        public static final String MedicalDraft                           = "/medicalRecords/{doctor_id}/medicalDraft";
+        public static final String CheckMedicalDraft                      = "/medicalRecords/checkMedicalDraft";
+        public static final String MedicalDraftPicture                    = "/medicalRecords/medicalDraftPicture";
+
+        //医生病历关联
+        public static final String DoctorMedicalRecords                   = "/medicalRecords/{doctor_id}/relation/{record_id}";
+        public static final String DoctorMedicalRecord                    = "/medicalRecords/DoctorMedicalRecord/{record_id}";
+
+        //医生信息
+        public static final String AddDoctor                              = "/medicalRecords/doctor";
+        public static final String DoctorInfo                             = "/medicalRecords/doctor/{doctor_id}";
+        public static final String DcotorInfoManage                       = "/medicalRecords/doctor/info";
+        public static final String DoctorRecords                          = "/medicalRecords/doctor/{doctor_id}/records";
+        public static final String ChangeDocStatus                        = "/medicalRecords/changeDocStatus";
         public static final String PatientDiagnosis                       = "/medicalRecords/PatientDiagnosis";
+        public static final String DcotorICD10                            = "/medicalRecords/doctor/{doctor_id}/icd10";
         public static final String MedicalDrug                            = "/medicalRecords/MedicalDrug/{records_id}";
+
+        //标签
+        public static final String MedicalLabels                          = "/medicalRecords/{record_id}/labels";
+        public static final String DcotorLabelClassManage                 = "/medicalRecords/doctor/labelClass";
+        public static final String DoctorLabelClass                       = "/medicalRecords/doctor/{doctor_id}/labelClass";
+        public static final String DcotorLabelManage                      = "/medicalRecords/doctor/label";
+        public static final String DoctorLabel                            = "/medicalRecords/doctor/{doctor_id}/label";
+        public static final String DoctorLabelUsed                        = " /medicalRecords/doctor/{doctor_id}/labelUsed";
+        public static final String getRecordIdByLabels                     ="/medicalRecords/getRecordIdByLabels";
+        //诊断字典
+        public static final String DiagnosisDict                          = "/medicalRecords/diagnosisDict";
+
+        //系统字典
+        public static final String SystemDict                             = "/medicalRecords/systemDict";
+        public static final String SystemDictEntry                        = "/medicalRecords/systemDictEntry";
+
+        //病人信息
+        public static final String PatientInfoManage                      = "/medicalRecords/patient/info";
+        public static final String PatientInfo                            = "/medicalRecords/patient/{patient_id}/info";
+        public static final String PatientICD10                           = "/medicalRecords/patient/{patient_id}/icd10";
+        public static final String PatientRecords                         = "/medicalRecords/patient/{patient_id}/records";
+        public static final String SearchPatient                          = "/medicalRecords/SearchPatient";
+        public static final String PatientExistence                       = "/medicalRecords/{app_uid}/existence/{app_patient_id}";
+
+        //文件操作
+        public static final String imgFile                                = "/medicalRecords/{id}/imgFile";
+        public static final String file                                   = "/medicalRecords/{id}/file";
+    }
+
+    public static class DailyStatistics{
+        //日常监测
+        public static final String  StatisticsProfile                        = "/statistics/profiles";
+        public static final String  StatisticsOutpatientHospital            = "/statistics/outpatientHospital";
+        public static final String  StatisticsDailyReport                    = "/statistics/dailyReport";
+        public static final String  StatisticsDailyReportFiles                    = "/statistics/dailyReportFiles";
+
+        //住院
+        public static final String  StatisticsHospitalization                    = "/statistics/hospitalization/{orgCode}";
+        public static final String  StatisticsHospitalizationDept                    = "/statistics/hospitalization/{orgCode}/dept";
+        public static final String  StatisticsHospitalizationSex                    = "/statistics/hospitalization/{orgCode}/sex";
+        public static final String  StatisticsHospitalizationDisease                    = "/statistics/hospitalization/{orgCode}/disease";
+
+        //门诊
+        public static final String  StatisticsOutpatient                    = "/statistics/outpatient/{orgCode}";
+        public static final String  StatisticsOutpatientDept                    = "/statistics/outpatient/{orgCode}/dept";
+        public static final String  StatisticsOutpatientSex                    = "/statistics/outpatient/{orgCode}/sex";
+
+        //入库统计
+        public static final String  StatisticsProfileCreateDate                    = "/statistics/profiles/createDate";
+        public static final String  StatisticsProfileEventDate                      = "/statistics/profiles/eventDate";
+        public static final String  StatisticsProfileIdNotNull                       = "/statistics/profiles/idNotNull";
+        public static final String  StatisticsProfileEventDateGroup                   = "/statistics/profiles/eventDateGroup";
+
+
+        //素材
+        public static final String DoctorText             = "/medicalRecords/doctor/{doctor_id}/text";
+        public static final String DoctorImg              = "/medicalRecords/doctor/{doctor_id}/img";
 
     }
 }

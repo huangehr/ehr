@@ -1,6 +1,5 @@
 package com.yihu.ehr.users.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.RoleFeatureRelationModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppFeatureClient;
@@ -16,7 +15,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,6 +65,37 @@ public class RoleFeatureRelationController extends BaseController {
             return success(null);
         }
         return failed("删除权限失败！");
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleFeatureByRoleId,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id删除所配置的应用权限")
+    public Envelop deleteRoleFeatureRelationByRoleId(
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") Long roleId){
+        boolean bo = roleFeatureRelationClient.deleteRoleFeatureRelationByRoleId(roleId);
+        if(bo){
+            return success(null);
+        }
+        return failed("删除权限失败！");
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleFeatures,method = RequestMethod.PUT)
+    @ApiOperation(value = "根据角色组、新增应用权限id、删除应用权限id批量修改,一对多")
+    public Envelop batchUpdateRoleFeatureRelation(
+            @ApiParam(name = "role_id",value = "角色组Id")
+            @RequestParam(value = "role_id") Long roleId,
+            @ApiParam(name = "feature_ids_add",value = "要新增的featureIds",defaultValue = "")
+            @RequestParam(name = "feature_ids_add",required = false) Long[] addFeatureIds,
+            @ApiParam(name = "feature_ids_delete",value = "要删除的featureIds",defaultValue = "")
+            @RequestParam(value = "feature_ids_delete",required = false) String deleteFeatureIds){
+        if(roleId == null){
+            return failed("角色组id不能为空！");
+        }
+        boolean bo = roleFeatureRelationClient.batchUpdateRoleFeatureRelation(roleId,addFeatureIds,deleteFeatureIds);
+        if(bo){
+            return success(null);
+        }
+        return failed("");
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleFeatures,method = RequestMethod.GET)
@@ -127,5 +156,55 @@ public class RoleFeatureRelationController extends BaseController {
         MAppFeature appFeature = appFeatureClient.getAppFeature(m.getFeatureId()+"");
         model.setFeatureName(appFeature == null?"":appFeature.getName());
         return model;
+    }
+
+    @RequestMapping(value = "/roles/role_features_update",method = RequestMethod.PUT)
+    @ApiOperation(value = "根据角色组、应用权限id批量修改,一对多")
+    public Envelop batchUpdateRoleFeatureRelation(
+            @ApiParam(name = "role_id",value = "角色组Id")
+            @RequestParam(value = "role_id") Long roleId,
+            @ApiParam(name = "feature_ids",value = "选择的应用权限ids",defaultValue = "")
+            @RequestParam(name = "feature_ids",required = false) Long[] featureIds){
+        boolean bo = false;
+        //根据传入的参数获取新增、删除ids
+        if(featureIds == null){
+            //删除角色组下配置的所有应用权限
+            bo = roleFeatureRelationClient.deleteRoleFeatureRelationByRoleId(roleId);
+            if(bo)
+                return success(null);
+            return failed("");
+        }
+        Collection<MRoleFeatureRelation> mRoleFeatureRelations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + roleId);
+        if(mRoleFeatureRelations == null || mRoleFeatureRelations.size() == 0){
+            //原角色组不存在配置权限则直接新增
+            bo = roleFeatureRelationClient.batchUpdateRoleFeatureRelation(roleId, featureIds, "");
+            if(bo)
+                return success(null);
+            return failed("");
+        }
+        //获取新增和删除ids
+        List<Long> newFeatureIds = new ArrayList<>();
+        for(int i =0;i<featureIds.length;i++){
+            newFeatureIds.add(featureIds[i]);
+        }
+        String deleteFeatureIds = "";
+        StringBuffer deleteBuffer = new StringBuffer();
+        for(MRoleFeatureRelation m:mRoleFeatureRelations){
+            Long featureId = m.getFeatureId();
+            if(newFeatureIds.contains(featureId)){
+                newFeatureIds.remove(featureId);
+                continue;
+            }
+            deleteBuffer.append(featureId);
+            deleteBuffer.append(",");
+        }
+        if(deleteBuffer.length()>0){
+            deleteFeatureIds = deleteBuffer.substring(0,deleteBuffer.length()-1);
+        }
+        Long[] addFeatureIds = newFeatureIds.toArray(new Long[newFeatureIds.size()]);
+        bo = roleFeatureRelationClient.batchUpdateRoleFeatureRelation(roleId, addFeatureIds, deleteFeatureIds);
+        if(bo)
+            return success(null);
+        return failed("");
     }
 }

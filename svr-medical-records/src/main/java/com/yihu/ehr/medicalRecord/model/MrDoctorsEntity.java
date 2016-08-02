@@ -21,7 +21,6 @@ public class MrDoctorsEntity {
     private String good;
     private String photo;
     private String phone;
-    private String status;
 
     @Id
     @Column(name = "ID")
@@ -141,40 +140,5 @@ public class MrDoctorsEntity {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    @Basic
-    @Column(name = "STATUS")
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MrDoctorsEntity that = (MrDoctorsEntity) o;
-
-        if (id != that.id) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (demographicId != null ? !demographicId.equals(that.demographicId) : that.demographicId != null)
-            return false;
-        if (sex != null ? !sex.equals(that.sex) : that.sex != null) return false;
-        if (birthday != null ? !birthday.equals(that.birthday) : that.birthday != null) return false;
-        if (orgCode != null ? !orgCode.equals(that.orgCode) : that.orgCode != null) return false;
-        if (orgName != null ? !orgName.equals(that.orgName) : that.orgName != null) return false;
-        if (orgDept != null ? !orgDept.equals(that.orgDept) : that.orgDept != null) return false;
-        if (title != null ? !title.equals(that.title) : that.title != null) return false;
-        if (good != null ? !good.equals(that.good) : that.good != null) return false;
-        if (photo != null ? !photo.equals(that.photo) : that.photo != null) return false;
-        if (phone != null ? !phone.equals(that.phone) : that.phone != null) return false;
-        if (status != null ? !status.equals(that.status) : that.status != null) return false;
-
-        return true;
     }
 }

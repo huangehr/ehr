@@ -24,7 +24,7 @@ public class RoleAppRelationService extends BaseJpaService<RoleAppRelation,XRole
         return  roleAppRelationRepository.findRelation(appId, roleId);
     }
 
-    public Page<RoleAppRelation> getRoleUserList(String sorts, int page, int size) {
+    public Page<RoleAppRelation> getRoleAppList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return roleAppRelationRepository.findAll(pageable);
     }

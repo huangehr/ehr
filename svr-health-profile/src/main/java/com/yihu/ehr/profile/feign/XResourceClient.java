@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,10 +61,8 @@ public interface XResourceClient {
                        @RequestParam(value = "version", required = true) String version);
 
     //cda数据
-    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = GET)
-    Map<String,Object> getCDAData(  @RequestParam(value = "masterJson", required = true) String masterJson,
-                                    @RequestParam(value = "masterDatasetCodeList",required = true) String masterDatasetCodeList,
-                                    @RequestParam(value = "multiDatasetCodeList",required = true) String multiDatasetCodeList);
+    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    Map<String,Object> getCDAData(@RequestBody String cdaTransformDtoJson);
 
     //查询主表统计数据
     @RequestMapping(value = ServiceApi.Resources.ResourcesMasterStat, method = GET)

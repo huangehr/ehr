@@ -1,4 +1,4 @@
-package com.yihu.ehr.utils;
+package com.yihu.ehr.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ErrorCode;

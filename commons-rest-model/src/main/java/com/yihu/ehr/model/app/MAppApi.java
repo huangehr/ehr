@@ -25,6 +25,7 @@ public class MAppApi implements Serializable {
     private String responseDemo;
     private String openLevel;
     private String auditLevel;
+    private String methodName;
 
     public int getId() {
         return id;
@@ -132,5 +133,13 @@ public class MAppApi implements Serializable {
 
     public void setAuditLevel(String auditLevel) {
         this.auditLevel = auditLevel;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
     }
 }

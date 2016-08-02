@@ -106,9 +106,11 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @ApiParam(name = "app_id",value = "应用id")
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "name",value = "角色组名称")
-            @RequestParam(value = "name") String name){
-        String[] fields = {"appId","name"};
-        String[] values = {appId,name};
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type") String type){
+        String[] fields = {"appId","name","type"};
+        String[] values = {appId,name,type};
         List<Roles> roles = rolesService.findByFields(fields,values);
         if(roles != null && roles.size() >0){
             return true;
@@ -121,9 +123,11 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @ApiParam(name = "app_id",value = "应用id")
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "code",value = "角色组代码")
-            @RequestParam(value = "code") String code){
-        String[] fields = {"appId","code"};
-        String[] values = {appId,code};
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type") String type){
+        String[] fields = {"appId","code","type"};
+        String[] values = {appId,code,type};
         List<Roles> roles = rolesService.findByFields(fields, values);
         if(roles != null && roles.size() >0){
             return true;

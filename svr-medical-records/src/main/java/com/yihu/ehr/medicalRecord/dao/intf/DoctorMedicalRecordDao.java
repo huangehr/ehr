@@ -11,7 +11,13 @@ import java.util.List;
  */
 public interface DoctorMedicalRecordDao extends PagingAndSortingRepository<MrDoctorMedicalRecordsEntity,String> {
 
-    List<MrDoctorMedicalRecordsEntity> findBydoctorIdAndRecordId(int doctorId, int recordId);
+    List<MrDoctorMedicalRecordsEntity> findBydoctorIdAndRecordId(String doctorId, int recordId);
+
+    List<MrDoctorMedicalRecordsEntity> findBydoctorId(String doctorId);
 
     List<MrDoctorMedicalRecordsEntity> findByrecordId(int recordId);
+
+    List<MrDoctorMedicalRecordsEntity> findBydoctorIdAndPatientId(String doctorId,String patientId);
+
+    MrDoctorMedicalRecordsEntity findByrecordIdAndIsCreator(int recordId, String isCreator);
 }

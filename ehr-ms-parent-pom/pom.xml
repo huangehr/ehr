@@ -33,11 +33,13 @@
         <module>../svr-pack-mgr</module>
         <module>../svr-pack-resolve</module>
         <module>../svr-patient</module>
+        <module>../svr-profile-statistics</module>
         <module>../svr-resource</module>
         <module>../svr-security</module>
         <!--module>../svr-special-dict</module-->
         <module>../svr-standard</module>
         <module>../svr-user</module>
+        <module>../svr-medical-records</module>
         <module>../ag-ehr-admin</module>
         <module>../ag-ehr-cloud</module>
     </modules>

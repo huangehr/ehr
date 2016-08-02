@@ -1,9 +1,6 @@
 package com.yihu.ehr.medicalRecord.dao.intf;
 
 import com.yihu.ehr.medicalRecord.model.MrDoctorDraftEntity;
-import com.yihu.ehr.medicalRecord.model.MrDoctorTemplateEntity;
-import com.yihu.ehr.medicalRecord.model.MrMedicalDraftEntity;
-import com.yihu.ehr.medicalRecord.model.MrMedicalReportEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -19,4 +16,7 @@ public interface DoctorDraftDao extends PagingAndSortingRepository<MrDoctorDraft
 
     MrDoctorDraftEntity findByid(int id);
 
+    MrDoctorDraftEntity findBydoctorIdAndTypeAndContent(String doctorId, String Type, String content);
+
+    List<MrDoctorDraftEntity> findByidIn(List id);
 }
