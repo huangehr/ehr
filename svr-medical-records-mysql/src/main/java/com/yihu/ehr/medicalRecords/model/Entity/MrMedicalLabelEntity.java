@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Table(name = "mr_medical_label", schema = "", catalog = "")
 public class MrMedicalLabelEntity {
     private int id;
-    private String recordsId;
+    private String recordId;
     private String doctorId;
     private String label;
 
@@ -34,13 +34,13 @@ public class MrMedicalLabelEntity {
     }
 
     @Basic
-    @Column(name = "RECORDS_ID")
-    public String getRecordsId() {
-        return recordsId;
+    @Column(name = "RECORD_ID")
+    public String getRecordId() {
+        return recordId;
     }
 
-    public void setRecordsId(String recordsId) {
-        this.recordsId = recordsId;
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 
     @Basic
@@ -61,7 +61,7 @@ public class MrMedicalLabelEntity {
         MrMedicalLabelEntity that = (MrMedicalLabelEntity) o;
 
         if (id != that.id) return false;
-        if (recordsId != that.recordsId) return false;
+        if (recordId != that.recordId) return false;
         if (label != null ? !label.equals(that.label) : that.label != null) return false;
 
         return true;

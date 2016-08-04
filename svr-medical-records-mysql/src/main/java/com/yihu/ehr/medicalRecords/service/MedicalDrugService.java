@@ -1,7 +1,6 @@
 package com.yihu.ehr.medicalRecords.service;
 
-import com.yihu.ehr.medicalRecords.dao.hbaseDao.MedicalDrugDao;
-import com.yihu.ehr.medicalRecords.model.DTO.MedicalDrug;
+import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalDrugEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,13 +14,13 @@ import java.util.List;
 @Service
 public class MedicalDrugService {
 
-    @Autowired
-    MedicalDrugDao medicalDrugDao;
+    /*@Autowired
+    MedicalDrugDao medicalDrugDao;*/
 
     /**
      * 获取用药信息
      */
-    public List<MedicalDrug> getMedicalDrug(String recordId) throws Exception{
+    public List<MrMedicalDrugEntity> getMedicalDrug(String recordId) throws Exception{
 
         return null;
     }
@@ -29,7 +28,7 @@ public class MedicalDrugService {
     /**
      * 导入用药信息
      */
-    public boolean importMedicalPrescription(List<MedicalDrug> list) throws Exception
+    public boolean importMedicalPrescription(List<MrMedicalDrugEntity> list) throws Exception
     {
         return true;
     }
@@ -37,7 +36,7 @@ public class MedicalDrugService {
     /**
      * 保存病历用药记录
      */
-    public boolean saveMedicalDrug(String recordId,MedicalDrug obj) throws Exception
+    public boolean saveMedicalDrug(String recordId,MrMedicalDrugEntity obj) throws Exception
     {
         return true;
     }

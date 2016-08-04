@@ -1,8 +1,6 @@
 package com.yihu.ehr.medicalRecords.service;
 
-import com.yihu.ehr.medicalRecords.dao.hbaseDao.DocumentDao;
-import com.yihu.ehr.medicalRecords.dao.hbaseDao.TextDao;
-import com.yihu.ehr.medicalRecords.model.DTO.Document;
+import com.yihu.ehr.medicalRecords.model.Entity.MrDocumentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +13,11 @@ import java.util.List;
 @Service
 public class MaterialService {
 
-    @Autowired
+    /*@Autowired
     DocumentDao DocumentDao;
 
     @Autowired
-    TextDao textDao;
+    TextDao textDao;*/
 
 
     /**
@@ -52,7 +50,7 @@ public class MaterialService {
     /**
      * 获取图片素材
      */
-    public List<Document> getImgMaterial(String creatorId,String patientId,String dataFrom, int page, int size) throws Exception{
+    public List<MrDocumentEntity> getImgMaterial(String creatorId, String patientId, String dataFrom, int page, int size) throws Exception{
         return null;
     }
 }

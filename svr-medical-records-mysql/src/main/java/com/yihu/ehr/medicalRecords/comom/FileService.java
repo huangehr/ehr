@@ -1,4 +1,4 @@
-package com.yihu.ehr.medicalRecords.service;
+package com.yihu.ehr.medicalRecords.comom;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;

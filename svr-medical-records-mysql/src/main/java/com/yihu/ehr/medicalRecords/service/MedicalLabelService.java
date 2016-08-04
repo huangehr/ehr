@@ -32,7 +32,7 @@ public class MedicalLabelService {
      * 获取病历标签
      */
     public List<MrMedicalLabelEntity> getMedicalLabelByRecordId(String recordId){
-       return medicalLabelDao.findByRecordsId(recordId);
+       return medicalLabelDao.findByRecordId(recordId);
     }
 
     /**
@@ -41,7 +41,7 @@ public class MedicalLabelService {
     @Transactional
     public boolean saveMedicalLabel(String recordId,String doctorId,List<String> list){
         //清空病历标签
-        medicalLabelDao.deleteByRecordsId(recordId);
+        medicalLabelDao.deleteByRecordId(recordId);
         //保存病历标签
         if(list!=null && list.size()>0)
         {
@@ -52,7 +52,7 @@ public class MedicalLabelService {
                 MrMedicalLabelEntity obj = new MrMedicalLabelEntity();
                 obj.setDoctorId(doctorId);
                 obj.setLabel(label);
-                obj.setRecordsId(recordId);
+                obj.setRecordId(recordId);
                 medicalLabelDao.save(obj);
 
                 //医生标签
@@ -70,12 +70,12 @@ public class MedicalLabelService {
         Map<String,Integer>map=new HashMap<>();
         for(int i=0;i<m.size();i++) {
             if (m.get(i) != null) {
-                if (map.get(m.get(i).getRecordsId()) != null) {
-                    String k= m.get(i).getRecordsId();
-                    map.put(m.get(i).getRecordsId(),map.get(k)+1);
+                if (map.get(m.get(i).getRecordId()) != null) {
+                    String k= m.get(i).getRecordId();
+                    map.put(m.get(i).getRecordId(),map.get(k)+1);
                 }
                 else{
-                    map.put(m.get(i).getRecordsId(),1);
+                    map.put(m.get(i).getRecordId(),1);
                 }
 
             }
