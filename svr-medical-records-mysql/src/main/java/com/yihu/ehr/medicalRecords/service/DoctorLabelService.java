@@ -1,10 +1,10 @@
-package com.yihu.ehr.medicalRecord.service;
+package com.yihu.ehr.medicalRecords.service;
 
-import com.yihu.ehr.medicalRecord.dao.DoctorLabelClassDao;
-import com.yihu.ehr.medicalRecord.dao.DoctorLabelDao;
-import com.yihu.ehr.medicalRecord.model.Entity.MrLabelClassEntity;
-import com.yihu.ehr.medicalRecord.model.Entity.MrLabelEntity;
-import com.yihu.ehr.medicalRecord.model.EnumClass;
+import com.yihu.ehr.medicalRecords.dao.DoctorLabelClassDao;
+import com.yihu.ehr.medicalRecords.dao.DoctorLabelDao;
+import com.yihu.ehr.medicalRecords.model.Entity.MrLabelClassEntity;
+import com.yihu.ehr.medicalRecords.model.Entity.MrLabelEntity;
+import com.yihu.ehr.medicalRecords.model.EnumClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Created by shine on 2016/7/27.
+ * Created by hzp on 2016/7/27.
  */
 @Transactional
 @Service

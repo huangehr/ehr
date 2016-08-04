@@ -10,10 +10,9 @@ import java.util.List;
  */
 public interface DoctorLabelDao extends PagingAndSortingRepository<MrLabelEntity,Integer> {
 
-    MrLabelEntity findByid(int id);
-
-    void deleteById(int id);
+    MrLabelEntity findByDoctorIdAndLabel(String id,String label);
 
     List<MrLabelEntity> findByDoctorIdAndLabelType(String doctorId,String labelType);
+
     List<MrLabelEntity> findByDoctorIdAndLabelTypeAndLabelClass(String doctorId,String labelType,String labelClass);
 }

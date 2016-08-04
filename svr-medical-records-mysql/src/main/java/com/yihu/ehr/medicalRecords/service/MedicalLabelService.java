@@ -1,20 +1,20 @@
-package com.yihu.ehr.medicalRecord.service;
+package com.yihu.ehr.medicalRecords.service;
 
-import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecord.dao.DoctorLabelDao;
-import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
-import com.yihu.ehr.medicalRecord.dao.MedicalLabelDao;
-import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorMedicalRecordsEntity;
-import com.yihu.ehr.medicalRecord.model.Entity.MrLabelEntity;
-import com.yihu.ehr.medicalRecord.model.Entity.MrMedicalLabelEntity;
+import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalLabelDao;
+import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorMedicalRecordsEntity;
+import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalLabelEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Created by shine on 2016/7/14.
+ * Created by hzp on 2016/7/14.
  */
 @Service
 public class MedicalLabelService {
