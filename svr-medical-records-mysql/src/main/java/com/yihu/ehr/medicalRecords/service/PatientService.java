@@ -1,6 +1,8 @@
 package com.yihu.ehr.medicalRecords.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.medicalRecords.comom.Message;
+import com.yihu.ehr.medicalRecords.comom.WlyyResponse;
 import com.yihu.ehr.medicalRecords.comom.WlyyService;
 import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecords.dao.PatientDao;
@@ -60,32 +62,32 @@ public class PatientService {
      * @throws Exception
      */
     public MrPatientsEntity getPatientInformation(String patientId) throws Exception {
-        MrPatientsEntity re = patientDao.findById(patientId);
-        if (re == null)
-        {
-            /*String response = wlyyService.queryPatientInfoByID(patientId);
-            if(response.getCode() == 10000)
-            {
-                Map<String,Object> map = (Map<String,Object>)response.getResult();
+        MrPatientsEntity re = new MrPatientsEntity();
 
-                MrPatientsEntity patient = new MrPatientsEntity();
-                patient.setId(patientId);
-                patient.setName(map.get("CName").toString());
-                patient.setDemographicId(map.get("IDNumber").toString());
-                patient.setSex(map.get("Sex").toString());
-                if (map.get("BirthDate") != null && map.get("BirthDate").toString().length() > 0) {
-                    patient.setBirthday(java.sql.Timestamp.valueOf(map.get("BirthDate").toString()));
-                }
-                patient.setMaritalStatus(map.get("IsMarried").toString());
-                patient.setPhoto(map.get("PhotoUri").toString());
-                patient.setPhone(map.get("Phone").toString());
-                patientDao.save(patient);
-                re = patient;
+        WlyyResponse response = wlyyService.queryPatientInfoByID(patientId);
+        //获取患者信息成功
+        if(response.getStatus() == 200)
+        {
+            Map<String,Object> map = (Map<String,Object>)response.getData();
+
+            MrPatientsEntity patient = new MrPatientsEntity();
+            patient.setId(patientId);
+            patient.setName(map.get("name").toString());
+            patient.setDemographicId(map.get("idCard").toString());
+            patient.setSex(map.get("sex").toString());
+            if (map.get("birthday") != null && map.get("birthday").toString().length() > 0) {
+                patient.setBirthday(java.sql.Timestamp.valueOf(map.get("birthday").toString()));
             }
-            else{
-                Message.error(response.getMessage());
-            }*/
+            //patient.setMaritalStatus(map.get("").toString());
+            patient.setPhoto(map.get("photo").toString());
+            patient.setPhone(map.get("mobile").toString());
+            patientDao.save(patient);
+            re = patient;
         }
+        else{
+            re = patientDao.findById(patientId);
+            Message.debug(response.getMsg());
+            }
 
         return re;
     }

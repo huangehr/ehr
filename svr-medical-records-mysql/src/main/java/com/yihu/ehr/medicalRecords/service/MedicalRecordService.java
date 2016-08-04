@@ -2,9 +2,13 @@ package com.yihu.ehr.medicalRecords.service;
 
 
 import com.yihu.ehr.medicalRecords.comom.Message;
+import com.yihu.ehr.medicalRecords.comom.WlyyResponse;
+import com.yihu.ehr.medicalRecords.comom.WlyyService;
 import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalRecordsDao;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorsEntity;
+import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrPatientsEntity;
 import com.yihu.ehr.medicalRecords.model.EnumClass;
 import org.apache.commons.collections.map.HashedMap;
@@ -34,23 +38,22 @@ public class MedicalRecordService{
     @Autowired
     DoctorService doctorService;
 
-   /* @Autowired
-    MedicalRecordsDao medicalRecordsDao;
-
     @Autowired
     WlyyService wlyyService;
-*/
+
+    @Autowired
+    MedicalRecordsDao medicalRecordsDao;
+
     /**
      * 根据医生ID和病人ID获取最近的一次病历
      */
-    public Map<String,Object> medicalRecord(String patientId, String userId, String ticket, String appUid) throws Exception {
-        Map<String, Object> re = new HashMap<>();
-       /* //单点登录校验
-        YihuResponse response = wlyyService.userSessionCheck(userId, ticket, appUid);
-        if (response.getCode() != 10000) {
-            Message.error(response.getMessage());
+    public MrMedicalRecordsEntity systemAccess(String patientId, String userId, String imei, String token) throws Exception {
+        MrMedicalRecordsEntity re = new MrMedicalRecordsEntity();
+       //单点登录校验
+        WlyyResponse response = wlyyService.userSessionCheck(userId,imei,token);
+        if (response.getStatus() != 200) {
+            Message.error(response.getMsg());
         } else {
-
             //获取医生信息
             MrDoctorsEntity doctor = doctorService.getDoctorInformation(userId);
             //获取患者信息
@@ -61,12 +64,12 @@ public class MedicalRecordService{
             //不存在则新增病历
             if (record != null) {
                 //获取病历信息
-                re = medicalRecordsDao.getDataByRowkey(record.getRecordId());
+                re = medicalRecordsDao.findById(record.getRecordId());
             } else {
                 //新增病历信息
                 re = addRecord(doctor, patient);
             }
-        }*/
+        }
         return re;
     }
 
@@ -81,8 +84,8 @@ public class MedicalRecordService{
     /**
      * 新增病历
      */
-    private Map<String,Object> addRecord(MrDoctorsEntity doctor,MrPatientsEntity patient) throws Exception{
-        Map<String,Object> re = new HashedMap();
+    private MrMedicalRecordsEntity addRecord(MrDoctorsEntity doctor,MrPatientsEntity patient) throws Exception{
+        MrMedicalRecordsEntity re = new MrMedicalRecordsEntity();
         /*if(doctor!=null && patient!=null)
         {
             MedicalRecord record = new MedicalRecord();
@@ -120,14 +123,14 @@ public class MedicalRecordService{
      * 新增病历
      */
     @Transactional
-    public Map<String,Object> addRecord(String doctorId, String patientId) throws Exception {
+    public MrMedicalRecordsEntity addRecord(String doctorId, String patientId) throws Exception {
         //获取医生信息
         MrDoctorsEntity doctor = doctorService.getDoctorInformation(doctorId);
         //获取患者信息
         MrPatientsEntity patient = patientService.getPatientInformation(patientId);
 
         //新增病历信息
-        Map<String,Object> re = addRecord(doctor,patient);
+        MrMedicalRecordsEntity re = addRecord(doctor,patient);
 
         if(re!=null)
         {
@@ -135,7 +138,7 @@ public class MedicalRecordService{
             MrDoctorMedicalRecordsEntity dr = new MrDoctorMedicalRecordsEntity();
             dr.setDoctorId(doctorId);
             dr.setPatientId(patientId);
-            dr.setRecordId(re.get("rowkey").toString());
+            dr.setRecordId(String.valueOf(re.getId()));
             dr.setIsCreator("1");
             dr.setRecordType(EnumClass.RecordType.Online);
 

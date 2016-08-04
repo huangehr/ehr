@@ -1,7 +1,13 @@
 package com.yihu.ehr.medicalRecords.comom;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by hzp on 2016/8/4.
@@ -10,29 +16,55 @@ import org.springframework.stereotype.Service;
 @Service
 public class WlyyService {
 
+    @Value("wlyy-service.url")
+    String serviceUrl;
+
+    @Value("wlyy-service.platform")
+    String platform;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     /***
      * 单点登录接口
      */
-    public String userSessionCheck(String userId,String ticket,String appUid)
+    public WlyyResponse userSessionCheck(String uid,String imei,String token) throws Exception
     {
-        return "";
+        String url = serviceUrl + "login/third/login";
+        Map<String, Object> params = new HashMap<>();
+        params.put("uid", uid);
+        params.put("imei", imei);
+        params.put("token", token);
+        params.put("platform", platform);
+        String result = HttpClientUtil.doPost(url, params, null, null);
+
+        return objectMapper.readValue(result, WlyyResponse.class);
     }
 
     /***
      * 获取医生信息
      */
-    public String queryDoctorInfoByID (String userID)
+    public WlyyResponse queryDoctorInfoByID (String code) throws Exception
     {
-        return "";
+        String url = serviceUrl + "doctor/baseinfo";
+        Map<String, Object> params = new HashMap<>();
+        params.put("code", code);
+        String result = HttpClientUtil.doPost(url, params, null, null);
+
+        return objectMapper.readValue(result, WlyyResponse.class);
     }
 
     /***
      * 获取患者信息
      */
-    public String queryPatientInfoByID (String userID)
+    public WlyyResponse queryPatientInfoByID (String code) throws Exception
     {
-        return "";
+        String url = serviceUrl + "doctor/patient_group/patient";
+        Map<String, Object> params = new HashMap<>();
+        params.put("code", code);
+        String result = HttpClientUtil.doPost(url, params, null, null);
+
+        return objectMapper.readValue(result, WlyyResponse.class);
     }
 
 

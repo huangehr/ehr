@@ -112,7 +112,7 @@ public class MrMedicalRecordsEntity {
     }
 
     @Basic
-    @Column(name = "FIRST_RECORD_ID")
+    @Column(name = "CREATE_TIME")
     public Timestamp getCreateTime() {
         return createTime;
     }

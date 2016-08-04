@@ -83,7 +83,7 @@ public class DoctorEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "doctor_id", value = "医生ID")
             @PathVariable(value = "doctor_id") String doctorId) throws Exception
     {
-        return doctorService.getDoctorInformation(doctorId);
+        return doctorService.getDoctor(doctorId);
     }
 
     @ApiOperation("新增医生信息")
