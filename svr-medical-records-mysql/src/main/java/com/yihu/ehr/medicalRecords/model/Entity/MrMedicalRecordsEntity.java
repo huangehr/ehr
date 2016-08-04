@@ -12,11 +12,21 @@ public class MrMedicalRecordsEntity {
     private int id;
     private String patientId;
     private Timestamp medicalTime;
+    private Timestamp createTime;
     private String doctorId;
     private String medicalDiagnosis;
     private String medicalDiagnosisCode;
     private String medicalSuggest;
     private Integer firstRecordId;
+    private String patientName;
+    private String demographicId;
+    private String sex;
+    private String birthday;
+    private String isMarried;
+    private String phone;
+    private String orgName;
+    private String orgDept;
+
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -101,4 +111,93 @@ public class MrMedicalRecordsEntity {
         this.firstRecordId = firstRecordId;
     }
 
+    @Basic
+    @Column(name = "FIRST_RECORD_ID")
+    public Timestamp getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Timestamp createTime) {
+        this.createTime = createTime;
+    }
+
+    @Basic
+    @Column(name = "PATIENT_NAME")
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    @Basic
+    @Column(name = "DEMOGRAPHIC_ID")
+    public String getDemographicId() {
+        return demographicId;
+    }
+
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
+
+    @Basic
+    @Column(name = "SEX")
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    @Basic
+    @Column(name = "BIRTHDAY")
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    @Basic
+    @Column(name = "IS_MARRIED")
+    public String getIsMarried() {
+        return isMarried;
+    }
+
+    public void setIsMarried(String isMarried) {
+        this.isMarried = isMarried;
+    }
+
+    @Basic
+    @Column(name = "PHONE")
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    @Basic
+    @Column(name = "ORG_NAME")
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    @Basic
+    @Column(name = "ORG_DEPT")
+    public String getOrgDept() {
+        return orgDept;
+    }
+
+    public void setOrgDept(String orgDept) {
+        this.orgDept = orgDept;
+    }
 }

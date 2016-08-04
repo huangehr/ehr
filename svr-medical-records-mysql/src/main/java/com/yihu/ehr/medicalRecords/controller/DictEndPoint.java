@@ -3,6 +3,7 @@ package com.yihu.ehr.medicalRecords.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.medicalRecords.model.Entity.MrIcd10DictEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrSystemDictEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrSystemDictEntryEntity;
 import com.yihu.ehr.medicalRecords.service.MrSystemDictEntryService;
@@ -36,9 +37,13 @@ public class DictEndPoint extends BaseRestEndPoint {
     /**************************** 获取诊断字典ICD10 ******************************************/
     @ApiOperation("获取诊断字典ICD10")
     @RequestMapping(value = ServiceApi.MedicalRecords.ICD10Dict, method = RequestMethod.GET)
-    public Map<String,String> getPatientDiagnosis(
-            @ApiParam(name = "filter", value = "过滤")
-            @RequestParam(value = "filter", required = true) String filter) throws Exception{
+    public List<MrIcd10DictEntity> getPatientDiagnosis(
+            @ApiParam(name = "filter", value = "过滤条件")
+            @RequestParam(value = "filter", required = true) String filter,
+            @ApiParam(name = "page", value = "第几页")
+            @RequestParam(value = "page", required = true) Integer page,
+            @ApiParam(name = "size", value = "每页几行")
+            @RequestParam(value = "size", required = true) Integer size) throws Exception{
         return null;
     }
 
@@ -93,9 +98,9 @@ public class DictEndPoint extends BaseRestEndPoint {
     @ApiOperation("查询字典")
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemDictEntry, method = RequestMethod.GET)
     public List<MrSystemDictEntryEntity> searchSystemDictEntry(
-            @ApiParam(name = "filter", value = "过滤")
-            @RequestParam(value = "filter", required = true) String filter)throws  Exception{
-        return systemDictEntryService.searchSystemDictEntry(filter);
+            @ApiParam(name = "dict_code", value = "字典代码")
+            @RequestParam(value = "dict_code", required = true) String dictCode)throws  Exception{
+        return systemDictEntryService.getDict(dictCode);
     }
 
     @ApiOperation("更新系统字典项")
