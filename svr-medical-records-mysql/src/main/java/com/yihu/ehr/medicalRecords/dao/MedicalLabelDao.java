@@ -11,9 +11,9 @@ import java.util.List;
  */
 public interface MedicalLabelDao extends PagingAndSortingRepository<MrMedicalLabelEntity,Integer> {
 
-    List<MrMedicalLabelEntity> findByRecordsId(String id);
+    List<MrMedicalLabelEntity> findByRecordId(String id);
 
-    void deleteByRecordsId(String recordsId);
+    void deleteByRecordId(String recordId);
 
     @Query("select m from MrMedicalLabelEntity m where m.label in (:labels)")
     List<MrMedicalLabelEntity> findByLabels(@Param("labels") String[] labels);

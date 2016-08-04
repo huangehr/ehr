@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Table(name = "mr_label_class", schema = "", catalog = "")
 public class MrLabelClassEntity {
     private int id;
+    private String name;
     private String doctorId;
     private String labelType;
     private int parentId;
@@ -21,6 +22,16 @@ public class MrLabelClassEntity {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Basic
+    @Column(name = "NAME")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Basic

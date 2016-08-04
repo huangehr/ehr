@@ -1,13 +1,12 @@
 package com.yihu.ehr.medicalRecords.service;
 
 import com.yihu.ehr.medicalRecords.comom.Message;
+import com.yihu.ehr.medicalRecords.comom.WlyyService;
 import com.yihu.ehr.medicalRecords.dao.DoctorDao;
 import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
-import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecord;
+import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecords.model.EnumClass;
-import com.yihu.ehr.yihu.UserMgmt;
-import com.yihu.ehr.yihu.YihuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,7 @@ public class DoctorService {
     DoctorDao doctorDao;
 
     @Autowired
-    UserMgmt userMgmt;
+    WlyyService wlyyService;
 
 
     @Autowired
@@ -45,7 +44,7 @@ public class DoctorService {
     public MrDoctorsEntity getDoctorInformation(String doctorId)throws Exception{
         MrDoctorsEntity re = doctorDao.findById(doctorId);
         if(re ==null) {
-            YihuResponse response = userMgmt.queryUserInfoByID(doctorId);
+            /*YihuResponse response = userMgmt.queryUserInfoByID(doctorId);
             if(response.getCode() == 10000)
             {
                 Map<String,Object> map = (Map<String,Object>)response.getResult();
@@ -83,7 +82,7 @@ public class DoctorService {
             else {
                 Message.error(response.getMessage());
             }
-
+*/
         }
         return re;
     }
@@ -150,8 +149,8 @@ public class DoctorService {
     /**
      * 获取医生病历
      */
-    public List<MedicalRecord> getDoctorRecords(String filter, String label, String medicalTimeFrom,
-                                                String medicalTimeEnd, String recordType, String doctorId, int page, int size) throws Exception {
+    public List<MedicalRecordDTO> getDoctorRecords(String filter, String label, String medicalTimeFrom,
+                                                   String medicalTimeEnd, String recordType, String doctorId, int page, int size) throws Exception {
 
         /*List<MrPatientsEntity>patientsEntityList=patientService.searchPatient(filter,1,1000000000);
         List<MedicalRecord> medicalRecordModelList = new ArrayList<>();

@@ -1,13 +1,11 @@
 package com.yihu.ehr.medicalRecords.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.medicalRecords.comom.Message;
+import com.yihu.ehr.medicalRecords.comom.WlyyService;
 import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecords.dao.PatientDao;
-import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecord;
+import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrPatientsEntity;
-import com.yihu.ehr.yihu.UserMgmt;
-import com.yihu.ehr.yihu.YihuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +24,7 @@ public class PatientService {
     PatientDao patientDao;
 
     @Autowired
-    UserMgmt userMgmt;
+    WlyyService wlyyService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -65,7 +63,7 @@ public class PatientService {
         MrPatientsEntity re = patientDao.findById(patientId);
         if (re == null)
         {
-            YihuResponse response = userMgmt.queryUserInfoByID(patientId);
+            /*String response = wlyyService.queryPatientInfoByID(patientId);
             if(response.getCode() == 10000)
             {
                 Map<String,Object> map = (Map<String,Object>)response.getResult();
@@ -86,7 +84,7 @@ public class PatientService {
             }
             else{
                 Message.error(response.getMessage());
-            }
+            }*/
         }
 
         return re;
@@ -161,11 +159,11 @@ public class PatientService {
     /**
      * 获取患者病历
      */
-    public List<MedicalRecord> getPatientRecords(String patientId, String label, String medicalTimeFrom,
-                                                 String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String doctorId) throws Exception {
+    public List<MedicalRecordDTO> getPatientRecords(String patientId, String label, String medicalTimeFrom,
+                                                    String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String doctorId) throws Exception {
 
         /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId, patientId);
-        List<String> recordsIdList = new ArrayList<>();
+        List<String> recordIdList = new ArrayList<>();
         List<MedicalRecord> medicalRecordModelList = new ArrayList<>();
         if (label != null && label.length() > 0) {
             List<String> Ilist = medicalLabelService.getRecordIdByLabels(label.split(","));

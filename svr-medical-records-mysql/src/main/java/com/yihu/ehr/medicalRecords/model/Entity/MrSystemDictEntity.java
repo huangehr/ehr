@@ -8,11 +8,22 @@ import javax.persistence.*;
 @Entity
 @Table(name = "mr_system_dict", schema = "", catalog = "")
 public class MrSystemDictEntity {
+    private int id;
     private String dictCode;
     private String dictName;
     private String description;
 
     @Id
+    @Column(name = "ID")
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Basic
     @Column(name = "DICT_CODE")
     public String getDictCode() {
         return dictCode;

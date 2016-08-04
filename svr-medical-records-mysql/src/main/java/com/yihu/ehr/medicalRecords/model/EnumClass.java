@@ -6,21 +6,7 @@ package com.yihu.ehr.medicalRecords.model;
  * @created 2016.07.27
  */
 public class EnumClass {
-    /**
-     * 文件上传来源
-     */
-    public static class DocumentDataFrom {
-        public static final String DataCollection = "0"; //0 院内采集
-        public static final String BrowserUpload  = "1";// 1 档案浏览器上传
-        public static final String MedicalUpload  = "2";// 2 病历夹上传
-    }
 
-    /**
-     * 病历夹数据来源
-     */
-    public static class RecordDataFrom{
-        public static final String MedicalRecord = "1"; //病历夹
-    }
 
     /**
      * 业务分类
@@ -88,12 +74,4 @@ public class EnumClass {
         public static final String Unknow  = "3";// 未知
     }
 
-    /**
-     * 用户类型
-     */
-    public static class UserType {
-        public static final String Doctor  = "1";// 医生
-        public static final String Employee  = "2";// 员工
-        public static final String Patient  = "3";// 患者
-    }
 }
