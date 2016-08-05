@@ -1,6 +1,7 @@
 package com.yihu.ehr.medicalRecords.controller;
 
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
@@ -48,16 +49,16 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemAccess,method = RequestMethod.GET)
     @ApiOperation("系统接入接口")
     public MrMedicalRecordsEntity systemAccess(
-            @ApiParam(name="patientId",value="病人ID",defaultValue = "")
-            @RequestParam(value="patientId",required = true)String patientId,
-            @ApiParam(name="userId",value="用户ID",defaultValue = "")
-            @RequestParam(value="userId",required = true)String userId,
-            @ApiParam(name="json",value="校验json",defaultValue = "")
+            @ApiParam(name="patient_id",value="病人ID",defaultValue = "350524199208115544")
+            @RequestParam(value="patient_id",required = true)String patientId,
+            @ApiParam(name="doctor_id",value="医生ID",defaultValue = "D20160322000001")
+            @RequestParam(value="doctor_id",required = true)String userId,
+            @ApiParam(name="json",value="校验json",defaultValue = "{\"id\":\"1\",\"imei\":\"864394010501239\",\"token\":\"7e124976b092dd17662fe228e5b63172\"}")
             @RequestParam(value="json",required = true)String json) throws Exception
     {
         try {
             Map<String,String> map =(Map<String,String>)objectMapper.readValue(json,Map.class);
-            return recordService.systemAccess(patientId, userId, map.get("imei"), map.get("token"));
+            return recordService.systemAccess(patientId, userId, map.get("id"), map.get("imei"), map.get("token"));
         }
         catch (Exception ex)
         {
@@ -69,20 +70,22 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.AddRecord,method = RequestMethod.POST)
     @ApiOperation("新增病历")
     public MrMedicalRecordsEntity addRecord(
-            @ApiParam(name="doctor_id",value="医生ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
+            @ApiParam(name="doctor_id",value="医生ID",defaultValue = "D20160322000001")
             @RequestParam(value="doctor_id",required = true)String doctorId,
-            @ApiParam(name="patient_id",value="患者ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
-            @RequestParam(value="patient_id",required = true)String patientId) throws Exception
+            @ApiParam(name="patient_id",value="患者ID",defaultValue = "350524199208115544")
+            @RequestParam(value="patient_id",required = true)String patientId,
+            @ApiParam(name="first_record_id",value="首诊病历ID",defaultValue = "1")
+            @RequestParam(value="first_record_id",required = false)String firstRecordId) throws Exception
     {
-        return recordService.addRecord(doctorId, patientId);
+        return recordService.addRecord(doctorId, patientId,firstRecordId);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.PUT)
     @ApiOperation("修改病历")
     public boolean editRecord(
-            @ApiParam(name="record_id",value="病历ID",defaultValue = "")
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
             @RequestParam(value="record_id",required = true)String recordId,
-            @ApiParam(name="json",value="修改内容",defaultValue = "{}")
+            @ApiParam(name="json",value="修改内容",defaultValue = "{\"medicalSuggest\":\"修改治疗建议\"}")
             @RequestParam(value="json",required = true)String json) throws Exception
     {
         Map<String,String> map = toEntity(json,Map.class);
@@ -100,8 +103,8 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.GET)
     @ApiOperation("获取病历")
-    public Map<String,Object> getMedicalRecord(
-            @ApiParam(name="record_id",value="病历ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870_1_9223370566724625981")
+    public MrMedicalRecordsEntity getMedicalRecord(
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
             @RequestParam(value="record_id",required = true)String recordId) throws Exception
     {
         return recordService.getMedicalRecord(recordId);
@@ -121,23 +124,40 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
         return recordService.shareRecord(recordId,patientId,doctorId);
     }
 
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecordRelated,method = RequestMethod.GET)
+    @ApiOperation("获取关联病历")
+    public List<MrMedicalRecordsEntity> getMedicalRecordRelated(
+            @ApiParam(name="first_record_id",value="首诊病历ID",defaultValue = "1")
+            @RequestParam(value="first_record_id",required = true)String firstRecordId) throws Exception
+    {
+        return recordService.getMedicalRecordRelated(firstRecordId);
+    }
+
     /******************************* 病情信息 ************************************************/
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalInfo,method = RequestMethod.POST)
     @ApiOperation("病情保存")
     public boolean saveMedicalInfo(
-            @ApiParam(name="record_id",value="病历ID",defaultValue = "")
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
             @RequestParam(value="record_id",required = true)String recordId,
-            @ApiParam(name="json",value="病情列表",defaultValue = "")
+            @ApiParam(name="json",value="病情列表",defaultValue = "[{\"code\":\"patient_condition\",\"name\":\"病情主诉\",\"value\":\"病情主诉内容\"},{\"code\":\"patient_history_now\",\"name\":\"现病史\",\"value\":\"现病史内容\"}]")
             @RequestParam(value="json",required = true)String json) throws Exception
     {
-        List<MrMedicalInfoEntity> list=toEntity(json,List.class);
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, MrMedicalInfoEntity.class);
+        List<MrMedicalInfoEntity> list = objectMapper.readValue(json,javaType);
+        if(list!=null)
+        {
+            for(MrMedicalInfoEntity item:list)
+            {
+                item.setRecordId(recordId);
+            }
+        }
         return medicalInfoService.saveMedicalInfo(recordId, list);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalInfo,method = RequestMethod.GET)
     @ApiOperation("获取病情")
     public List<MrMedicalInfoEntity> getMedicalInfo(
-            @ApiParam(name="record_id",value="病历ID",defaultValue = "")
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
             @RequestParam(value="record_id",required = true)String recordId) throws Exception
     {
         return medicalInfoService.getMedicalInfo(recordId);

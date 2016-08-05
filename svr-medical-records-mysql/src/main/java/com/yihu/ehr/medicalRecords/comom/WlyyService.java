@@ -16,10 +16,10 @@ import java.util.Map;
 @Service
 public class WlyyService {
 
-    @Value("wlyy-service.url")
+    @Value("${wlyy-service.url}")
     String serviceUrl;
 
-    @Value("wlyy-service.platform")
+    @Value("${wlyy-service.platform}")
     String platform;
 
     @Autowired
@@ -28,10 +28,11 @@ public class WlyyService {
     /***
      * 单点登录接口
      */
-    public WlyyResponse userSessionCheck(String uid,String imei,String token) throws Exception
+    public WlyyResponse userSessionCheck(String id,String uid,String imei,String token) throws Exception
     {
         String url = serviceUrl + "login/third/login";
         Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
         params.put("uid", uid);
         params.put("imei", imei);
         params.put("token", token);

@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,37 +49,37 @@ public class MedicalRecordService{
     /**
      * 根据医生ID和病人ID获取最近的一次病历
      */
-    public MrMedicalRecordsEntity systemAccess(String patientId, String userId, String imei, String token) throws Exception {
+    public MrMedicalRecordsEntity systemAccess(String patientId, String userId,String id, String imei, String token) throws Exception {
         MrMedicalRecordsEntity re = new MrMedicalRecordsEntity();
        //单点登录校验
-        WlyyResponse response = wlyyService.userSessionCheck(userId,imei,token);
+        /*WlyyResponse response = wlyyService.userSessionCheck(id,userId,imei,token);
         if (response.getStatus() != 200) {
             Message.error(response.getMsg());
-        } else {
+        } else {*/
             //获取医生信息
             MrDoctorsEntity doctor = doctorService.getDoctorInformation(userId);
             //获取患者信息
             MrPatientsEntity patient = patientService.getPatientInformation(patientId);
             //获取最新病历
-            MrDoctorMedicalRecordsEntity record = doctorMedicalRecordDao.getLastRecord(userId, patientId);
+            MrMedicalRecordsEntity record = medicalRecordsDao.getLastRecord(userId, patientId);
 
             //不存在则新增病历
             if (record != null) {
                 //获取病历信息
-                re = medicalRecordsDao.findById(record.getRecordId());
+                re = record;
             } else {
                 //新增病历信息
                 re = addRecord(doctor, patient);
             }
-        }
+        //}
         return re;
     }
 
     /**
      * 获取病历
      */
-    public Map<String,Object> getMedicalRecord(String recordId) throws Exception {
-        return null;//medicalRecordsDao.getDataByRowkey(recordId);
+    public MrMedicalRecordsEntity getMedicalRecord(String recordId) throws Exception {
+        return  medicalRecordsDao.findById(Integer.valueOf(recordId));
     }
 
 
@@ -86,55 +88,31 @@ public class MedicalRecordService{
      */
     private MrMedicalRecordsEntity addRecord(MrDoctorsEntity doctor,MrPatientsEntity patient) throws Exception{
         MrMedicalRecordsEntity re = new MrMedicalRecordsEntity();
-        /*if(doctor!=null && patient!=null)
+        if(doctor!=null && patient!=null)
         {
-            MedicalRecord record = new MedicalRecord();
-            String dataFrom = EnumClass.RecordDataFrom.MedicalRecord;
-            String rowkey = MedicalRecordsFamily.getRowkey(patient.getId(),dataFrom);
-            String datetimeNow = DateTimeUtil.utcDateTimeFormat(new Date());
-            record.setRowkey(rowkey);
+            MrMedicalRecordsEntity record = new MrMedicalRecordsEntity();
+            Timestamp datetimeNow = new Timestamp(System.currentTimeMillis());
+            String doctorId = doctor.getId();
+            String patientId = patient.getId();
+
             record.setCreateTime(datetimeNow);
             record.setMedicalTime(datetimeNow);
-            record.setDoctorId(doctor.getId());
-            record.setDoctorName(doctor.getName());
-            record.setTitle(doctor.getTitle());
+            record.setDoctorId(doctorId);
             record.setOrgDept(doctor.getOrgDept());
             record.setOrgName(doctor.getOrgName());
-            record.setPatientId(patient.getId());
+            record.setPatientId(patientId);
             record.setPatientName(patient.getName());
             record.setDemographicId(patient.getDemographicId());
             record.setSex(patient.getSex());
-            record.setBirthday(DateTimeUtil.utcDateTimeFormat(patient.getBirthday()));
+            record.setBirthday(patient.getBirthday());
             record.setIsMarried(patient.getMaritalStatus());
             record.setPhone(patient.getPhone());
-            record.setDataFrom(EnumClass.RecordDataFrom.MedicalRecord);
 
             medicalRecordsDao.save(record);
 
-            re = medicalRecordsDao.getDataByRowkey(rowkey);
-        }
-        else{
-            Message.error("医生或者患者信息缺失！");
-        }*/
-        return re;
-    }
+            re = record;
 
-    /**
-     * 新增病历
-     */
-    @Transactional
-    public MrMedicalRecordsEntity addRecord(String doctorId, String patientId) throws Exception {
-        //获取医生信息
-        MrDoctorsEntity doctor = doctorService.getDoctorInformation(doctorId);
-        //获取患者信息
-        MrPatientsEntity patient = patientService.getPatientInformation(patientId);
-
-        //新增病历信息
-        MrMedicalRecordsEntity re = addRecord(doctor,patient);
-
-        if(re!=null)
-        {
-            //新增关联
+            //建立医生--病历关联
             MrDoctorMedicalRecordsEntity dr = new MrDoctorMedicalRecordsEntity();
             dr.setDoctorId(doctorId);
             dr.setPatientId(patientId);
@@ -144,9 +122,35 @@ public class MedicalRecordService{
 
             doctorMedicalRecordDao.save(dr);
         }
+        else{
+            Message.error("医生或者患者信息缺失！");
+        }
+        return re;
+    }
+
+    /**
+     * 新增病历
+     */
+    @Transactional
+    public MrMedicalRecordsEntity addRecord(String doctorId, String patientId,String firstRecordId) throws Exception {
+        //获取医生信息
+        MrDoctorsEntity doctor = doctorService.getDoctorInformation(doctorId);
+        //获取患者信息
+        MrPatientsEntity patient = patientService.getPatientInformation(patientId);
+
+        //新增病历信息
+        MrMedicalRecordsEntity re = addRecord(doctor,patient);
+
+        if(firstRecordId!=null && firstRecordId.length()>0)
+        {
+            re.setFirstRecordId(firstRecordId);
+            medicalRecordsDao.save(re);
+        }
 
         return re;
     }
+
+
 
 
     /**
@@ -154,26 +158,86 @@ public class MedicalRecordService{
      */
     @Transactional
     public boolean editRecord(String recordId, Map<String,String> map) throws Exception {
-        boolean re = true;
-        /*if(map!=null)
+        MrMedicalRecordsEntity obj = medicalRecordsDao.findById(Integer.valueOf(recordId));
+        if(obj!=null)
         {
-            for(String key : map.keySet())
+            if(map!=null && map.size()>0)
             {
-                try {
+                for(String key : map.keySet()) {
                     String value = map.get(key);
-                    medicalRecordsDao.update(recordId,key,value);
+                    switch (key) {
+                        case "medicalDiagnosis": //诊断名称
+                        {
+                            obj.setMedicalDiagnosis(value);
+                            break;
+                        }
+                        case "medicalDiagnosisCode": //诊断代码
+                        {
+                            obj.setMedicalDiagnosisCode(value);
+                            break;
+                        }
+                        case "medicalSuggest": //治疗建议
+                        {
+                            obj.setMedicalSuggest(value);
+                            break;
+                        }
+                        case "medicalTime": //就诊时间
+                        {
+                            //obj.setMedicalTime(value);
+                            break;
+                        }
+                        case "orgName": //就诊机构
+                        {
+                            obj.setOrgName(value);
+                            break;
+                        }
+                        case "orgDept": //就诊科室
+                        {
+                            obj.setOrgDept(value);
+                            break;
+                        }
+                        case "patientName": //患者姓名
+                        {
+                            obj.setPatientName(value);
+                            break;
+                        }
+                        case "demographicId": //患者身份证
+                        {
+                            obj.setDemographicId(value);
+                            break;
+                        }
+                        case "sex": //患者性别
+                        {
+                            obj.setSex(value);
+                            break;
+                        }
+                        case "birthday": //患者生日
+                        {
+                            //obj.setBirthday(value);
+                            break;
+                        }
+                        case "isMarried": //是否已婚
+                        {
+                            obj.setIsMarried(value);
+                            break;
+                        }
+                        case "phone": //患者手机
+                        {
+                            obj.setPhone(value);
+                            break;
+                        }
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Message.debug(ex.getMessage());
-                    re = false;
-                }
+                medicalRecordsDao.save(obj);
+            }
+            else{
+                Message.error("无修改项！");
             }
         }
         else{
-            Message.error("修改参数为空！");
-        }*/
-        return re;
+            Message.error("不存在改条就诊记录！recordId:" + recordId);
+        }
+        return true;
     }
 
 
@@ -181,9 +245,17 @@ public class MedicalRecordService{
      * 删除病历
      */
     public boolean deleteRecord(String recordId) throws Exception {
-
-        return true;//medicalRecordsDao.delete(recordId);
+        medicalRecordsDao.delete(Integer.valueOf(recordId));
+        return true;
     }
+
+    /**
+     * 获取关联病历
+     */
+    public List<MrMedicalRecordsEntity> getMedicalRecordRelated(String recordId) throws Exception {
+        return  medicalRecordsDao.findRelatedRecord(recordId);
+    }
+
 
     /**
      * 病历分享

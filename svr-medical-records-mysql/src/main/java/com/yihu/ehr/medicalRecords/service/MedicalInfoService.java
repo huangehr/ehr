@@ -2,6 +2,7 @@ package com.yihu.ehr.medicalRecords.service;
 
 
 import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalInfoDao;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalInfoEntity;
@@ -23,16 +24,19 @@ import java.util.Map;
 @Service
 public class MedicalInfoService {
 
-
+    @Autowired
+    MedicalInfoDao medicalInfoDao;
 
     /**
      * 保存病情
      */
     @Transactional
     public boolean saveMedicalInfo(String recordId, List<MrMedicalInfoEntity> list) throws Exception {
-        boolean re = true;
-
-        return re;
+        List<MrMedicalInfoEntity> oldList = medicalInfoDao.findByRecordId(recordId);
+        //清空数据
+        medicalInfoDao.delete(oldList);
+        medicalInfoDao.save(list);
+        return true;
     }
 
 
@@ -40,8 +44,6 @@ public class MedicalInfoService {
      * 获取病情
      */
     public List<MrMedicalInfoEntity> getMedicalInfo(String recordId) throws Exception {
-
-
-        return null;
+        return medicalInfoDao.findByRecordId(recordId);
     }
 }

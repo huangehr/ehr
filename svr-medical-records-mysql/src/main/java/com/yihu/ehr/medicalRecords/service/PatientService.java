@@ -8,6 +8,7 @@ import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecords.dao.PatientDao;
 import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrPatientsEntity;
+import com.yihu.ehr.medicalRecords.model.EnumClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,7 +79,7 @@ public class PatientService {
             if (map.get("birthday") != null && map.get("birthday").toString().length() > 0) {
                 patient.setBirthday(java.sql.Timestamp.valueOf(map.get("birthday").toString()));
             }
-            //patient.setMaritalStatus(map.get("").toString());
+            patient.setMaritalStatus(EnumClass.IsMarried.Unknow);
             patient.setPhoto(map.get("photo").toString());
             patient.setPhone(map.get("mobile").toString());
             patientDao.save(patient);

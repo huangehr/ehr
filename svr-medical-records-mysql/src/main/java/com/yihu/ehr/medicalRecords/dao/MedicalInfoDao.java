@@ -1,16 +1,16 @@
 package com.yihu.ehr.medicalRecords.dao;
-import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalRecordsEntity;
+import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalInfoEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.List;
+
 /**
  * Created by hzp on 2016/8/4.
- * 病历表操作类
+ * 病历病情操作类
  */
-public interface MedicalInfoDao extends PagingAndSortingRepository<MrMedicalRecordsEntity,Integer> {
+public interface MedicalInfoDao extends PagingAndSortingRepository<MrMedicalInfoEntity,Integer> {
 
-    MrMedicalRecordsEntity findById(int id);
 
-    @Query(value = "select * from mr_medical_records where doctor_id = ?1 and patient_id=?2 order by create_time desc limit 1", nativeQuery = true)
-    MrMedicalRecordsEntity getLastRecord(String doctorId, String patientId);
+    List<MrMedicalInfoEntity> findByRecordId(String recordId);
 }

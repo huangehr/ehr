@@ -517,7 +517,7 @@ public class ServiceApi {
     public static class MedicalRecords{
 
         //公用接口
-        public static final String SystemAccess	 = "/medicalRecords/medicalRecord"; //系统接入接口，通过单点登录获取最新病历
+        public static final String SystemAccess	 = "/medicalRecords/systemAccess"; //系统接入接口，通过单点登录获取最新病历
         public static final String SystemDict  = "/medicalRecords/systemDict";
         public static final String SystemDictEntry = "/medicalRecords/systemDictEntry"; //获取系统字典项
         public static final String ICD10Dict = "/medicalRecords/icd10Dict"; //获取ICD10字典
@@ -526,6 +526,7 @@ public class ServiceApi {
         public static final String AddRecord = "/medicalRecords/record/addRecord"; //新增病历
         public static final String MedicalRecord = "/medicalRecords/record/{record_id}"; //	病历信息管理
         public static final String MedicalInfo = "/medicalRecords/record/{record_id}/medicalInfo"; //	病情信息管理
+        public static final String MedicalRecordRelated= "/medicalRecords/record/{record_id}/related"; //	病历关联记录
         public static final String MedicalLabel = "/medicalRecords/record/{record_id}/label"; //获取病历标签/批量保存病历标签
         public static final String MedicalReport = "/medicalRecords/record/{record_id}/report/{report_id}"; //获取某病历某报告
         public static final String MedicalReportManage = "/medicalRecords/record/{record_id}/report"; //新增/修改/导入报告/删除报告

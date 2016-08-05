@@ -1,6 +1,7 @@
 package com.yihu.ehr.medicalRecords.model.Entity;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.sql.Timestamp;
 
 /**
@@ -11,17 +12,17 @@ import java.sql.Timestamp;
 public class MrMedicalRecordsEntity {
     private int id;
     private String patientId;
-    private Timestamp medicalTime;
+    private Date medicalTime;
     private Timestamp createTime;
     private String doctorId;
     private String medicalDiagnosis;
     private String medicalDiagnosisCode;
     private String medicalSuggest;
-    private Integer firstRecordId;
+    private String firstRecordId;
     private String patientName;
     private String demographicId;
     private String sex;
-    private String birthday;
+    private Date birthday;
     private String isMarried;
     private String phone;
     private String orgName;
@@ -52,11 +53,11 @@ public class MrMedicalRecordsEntity {
 
     @Basic
     @Column(name = "MEDICAL_TIME")
-    public Timestamp getMedicalTime() {
+    public Date getMedicalTime() {
         return medicalTime;
     }
 
-    public void setMedicalTime(Timestamp medicalTime) {
+    public void setMedicalTime(Date medicalTime) {
         this.medicalTime = medicalTime;
     }
 
@@ -103,11 +104,11 @@ public class MrMedicalRecordsEntity {
 
     @Basic
     @Column(name = "FIRST_RECORD_ID")
-    public Integer getFirstRecordId() {
+    public String getFirstRecordId() {
         return firstRecordId;
     }
 
-    public void setFirstRecordId(Integer firstRecordId) {
+    public void setFirstRecordId(String firstRecordId) {
         this.firstRecordId = firstRecordId;
     }
 
@@ -153,11 +154,11 @@ public class MrMedicalRecordsEntity {
 
     @Basic
     @Column(name = "BIRTHDAY")
-    public String getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(String birthday) {
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
 
