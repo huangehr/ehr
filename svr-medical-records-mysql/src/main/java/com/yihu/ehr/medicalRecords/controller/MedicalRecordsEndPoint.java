@@ -114,9 +114,9 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalShare,method = RequestMethod.GET)
     @ApiOperation("病历分享")
     public boolean shareRecord(
-            @ApiParam(name="record_id",value="病历ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870_1_9223370566724625981")
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
             @RequestParam(value="record_id",required = true)String recordId,
-            @ApiParam(name="patient_id",value="患者ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
+            @ApiParam(name="patient_id",value="患者ID",defaultValue = "350524199208115544")
             @RequestParam(value="patient_id",required = true)String patientId,
             @ApiParam(name="doctor_id",value="医生ID")
             @RequestParam(value="doctor_id",required = true)String doctorId) throws Exception
@@ -167,7 +167,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalLabel,method = RequestMethod.GET)
     @ApiOperation("获取病历标签")
     public List<MrMedicalLabelEntity> getMedicalLabelByRecordId(
-            @ApiParam(name="record_id",value="病历ID")
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
             @RequestParam(value="record_id",required = true)String recordId) throws Exception
     {
         return medicalLabelService.getMedicalLabelByRecordId(recordId);
@@ -176,9 +176,9 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalLabel,method = RequestMethod.POST)
     @ApiOperation("批量保存病历标签")
     public boolean saveMedicalLabel(
-            @ApiParam(name="record_id",value="病历ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870_1_9223370566724625981")
+            @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
             @RequestParam(value="record_id",required = true)String recordId,
-            @ApiParam(name="doctor_id",value="医生ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
+            @ApiParam(name="doctor_id",value="医生ID",defaultValue = "D20160322000001")
             @RequestParam(value="doctor_id",required = true)String doctorId,
             @ApiParam(name="list",value="标签列表",defaultValue = "医生标签1")
             @RequestParam(value="list",required = true)List<String> list) throws Exception
