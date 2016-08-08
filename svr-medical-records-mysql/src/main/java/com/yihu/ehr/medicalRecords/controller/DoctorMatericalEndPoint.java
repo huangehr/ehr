@@ -69,10 +69,8 @@ public class DoctorMatericalEndPoint {
                                        @RequestParam(value="patientName",required = false) String patientName,
                                        @ApiParam(name = "jsonData", value = "图片转化后的输入流")
                                        @RequestBody String jsonData) throws Exception{
-        //上传图片
-        String url = "";
 
-        return materialService.uploadImgMaterial();
+        return materialService.uploadImgMaterial(documentName,creatorId,creatorName,patientId,patientName,jsonData);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorImg,method = RequestMethod.GET)
