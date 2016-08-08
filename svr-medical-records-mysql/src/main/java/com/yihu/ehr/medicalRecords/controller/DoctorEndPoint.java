@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.medicalRecords.model.DTO.DictDTO;
 import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorTemplateEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorsEntity;
@@ -47,7 +48,7 @@ public class DoctorEndPoint extends BaseRestEndPoint {
     @ApiOperation("获取医生所有病历")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorRecords, method = RequestMethod.GET)
     public List<MedicalRecordDTO> getPatientRecords(
-            @ApiParam(name = "doctor_id", value = "医生id")
+            @ApiParam(name = "doctor_id", value = "医生id",defaultValue = "D20160322000001")
             @PathVariable(value = "doctor_id") String doctorId,
             @ApiParam(name = "filter", value = "患者信息JSON")
             @RequestParam(value = "filter", required = false) String filter,
@@ -69,8 +70,8 @@ public class DoctorEndPoint extends BaseRestEndPoint {
 
     @ApiOperation("获取医生诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorICD10, method = RequestMethod.GET)
-    public Map<String,String>  getDoctorDiagnosis(
-            @ApiParam(name = "doctor_id", value = "医生ID")
+    public List<DictDTO>  getDoctorDiagnosis(
+            @ApiParam(name = "doctor_id", value = "医生ID",defaultValue = "D20160322000001")
             @PathVariable(value = "doctor_id") String doctorId) throws Exception
     {
         return doctorService.getDoctorDiagnosis(doctorId);
@@ -80,10 +81,10 @@ public class DoctorEndPoint extends BaseRestEndPoint {
     @ApiOperation("获取医生信息")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorInfo, method = RequestMethod.GET)
     public MrDoctorsEntity getDoctorInfo(
-            @ApiParam(name = "doctor_id", value = "医生ID")
+            @ApiParam(name = "doctor_id", value = "医生ID",defaultValue = "D20160322000001")
             @PathVariable(value = "doctor_id") String doctorId) throws Exception
     {
-        return doctorService.getDoctorInformation(doctorId);
+        return doctorService.getDoctor(doctorId);
     }
 
     @ApiOperation("新增医生信息")
@@ -170,7 +171,7 @@ public class DoctorEndPoint extends BaseRestEndPoint {
     @ApiOperation("根据医生ID获取模板")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorTemplate,method = RequestMethod.GET)
     public List<MrDoctorTemplateEntity> getTemplate(
-            @ApiParam(name="doctor_id",value="医生Id")
+            @ApiParam(name="doctor_id",value="医生Id",defaultValue = "D20160322000001")
             @PathVariable(value = "doctor_id") String doctor_id) throws Exception
     {
         return dTService.getTemplateByDoctorId(doctor_id);
@@ -190,7 +191,7 @@ public class DoctorEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorTemplate,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("批量保存模板")
     public boolean saveTemplate(
-            @ApiParam(name="doctor_id",value="医生Id")
+            @ApiParam(name="doctor_id",value="医生Id",defaultValue = "D20160322000001")
             @PathVariable(value = "doctor_id") String doctor_id,
             @ApiParam(name="template_list",value="数据元JSON")
             @RequestBody String templateList) throws Exception

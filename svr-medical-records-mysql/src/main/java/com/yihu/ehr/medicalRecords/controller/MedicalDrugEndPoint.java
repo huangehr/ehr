@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecords.controller;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
@@ -29,7 +30,7 @@ public class MedicalDrugEndPoint extends BaseRestEndPoint {
     @ApiOperation("获取用药信息")
     @RequestMapping(value =  ServiceApi.MedicalRecords.MedicalDrug, method = RequestMethod.GET)
     public List<MrMedicalDrugEntity> getMedicalDrug(
-            @ApiParam(name = "record_id", value = "病历号")
+            @ApiParam(name = "record_id", value = "病历号",defaultValue = "1")
             @PathVariable(value = "record_id")String recordId) throws Exception
     {
             return medicalDrugService.getMedicalDrug(recordId);
@@ -38,38 +39,36 @@ public class MedicalDrugEndPoint extends BaseRestEndPoint {
     @ApiOperation("导入用药信息")
     @RequestMapping(value =  ServiceApi.MedicalRecords.ImportMedicalPrescription, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public boolean importMedicalPrescription(
-            @ApiParam(name = "record_id", value = "病历号")
+            @ApiParam(name = "record_id", value = "病历号",defaultValue = "1")
             @PathVariable(value = "record_id")String recordId,
-            @ApiParam(name = "json", value = "药品集合")
-            @RequestBody String json) throws Exception
+            @ApiParam(name = "json", value = "药品集合",defaultValue = "[{ \"drugName\": \"药品名称1\", \"drugSpecifications\": \"规格\", \"drugUse\": \"用法\", \"drugQuantity\": 1, \"drugUnit\": \"单位\", \"drugDosage\": \"用量\", \"drugFrequency\": \"频次\" },{ \"drugName\": \"药品名称2\", \"drugSpecifications\": \"规格\", \"drugUse\": \"用法\", \"drugQuantity\": 1, \"drugUnit\": \"单位\", \"drugDosage\": \"用量\", \"drugFrequency\": \"频次\" }]")
+            @RequestParam(name = "json",required = true) String json) throws Exception
     {
-        List<Map<String,String>>tmp=toEntity(json,List.class);
-        List<MrMedicalDrugEntity> list = new ArrayList<>();
-        /*for(int i=0;i<tmp.size();i++){
-            if(tmp.get(i)!=null && tmp.get(i).get("recordId")!=null) {
-                MrMedicalDrugEntity mrMedicalDrugEntity = new MrMedicalDrugEntity();
-                mrMedicalDrugEntity.setRecordRowkey(recordId);
-                mrMedicalDrugEntity.setDrugName(tmp.get(i).get("drugName"));
-                mrMedicalDrugEntity.setDrugName(tmp.get(i).get("drugSpecifications"));
-                mrMedicalDrugEntity.setDrugName(tmp.get(i).get("drugUse"));
-                mrMedicalDrugEntity.setDrugName(tmp.get(i).get("drugQuantity"));
-                mrMedicalDrugEntity.setDrugName(tmp.get(i).get("drugDosage"));
-                mrMedicalDrugEntity.setDrugName(tmp.get(i).get("drugFrequency"));
-                list.add(mrMedicalDrugEntity);
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, MrMedicalDrugEntity.class);
+        List<MrMedicalDrugEntity> list = objectMapper.readValue(json,javaType);
+        if(list!=null)
+        {
+            for(MrMedicalDrugEntity item:list)
+            {
+                item.setRecordId(recordId);
             }
-        }*/
-        return  medicalDrugService.importMedicalPrescription(list);
+        }
+        return  medicalDrugService.importMedicalPrescription(recordId,list);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalDrug,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("保存病历用药记录")
     public boolean saveMedicalDrug(
-            @ApiParam(name="record_id",value="病历id")
+            @ApiParam(name="record_id",value="病历id",defaultValue = "1")
             @PathVariable(value="record_id") String recordId,
-            @ApiParam(name="json",value="用药记录JSON")
-            @RequestBody String json) throws Exception
+            @ApiParam(name="json",value="用药记录JSON",defaultValue = "{ \"id\": 1, \"recordId\": \"1\", \"drugName\": \"药品名称\", \"drugSpecifications\": \"规格\", \"drugUse\": \"用法\", \"drugQuantity\": 1, \"drugUnit\": \"单位\", \"drugDosage\": \"用量\", \"drugFrequency\": \"频次\" }")
+            @RequestParam(name = "json",required = true) String json) throws Exception
     {
         MrMedicalDrugEntity obj = toEntity(json,MrMedicalDrugEntity.class);
+        if(obj!=null && obj.getRecordId()==null)
+        {
+            obj.setRecordId(recordId);
+        }
         return  medicalDrugService.saveMedicalDrug(recordId,obj);
     }
 
@@ -77,9 +76,9 @@ public class MedicalDrugEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalDrug,method = RequestMethod.DELETE)
     @ApiOperation("删除病历用药记录")
     public boolean deleteMedicalDrug(
-            @ApiParam(name="record_id",value="病历id")
+            @ApiParam(name="record_id",value="病历id",defaultValue = "1")
             @PathVariable(value="record_id") String recordId,
-            @ApiParam(name="drug_id",value="用药id")
+            @ApiParam(name="drug_id",value="用药id",defaultValue = "1")
             @RequestParam(value="drug_id",required = true) String drugId) throws Exception
     {
         return  medicalDrugService.deleteMedicalDrug(recordId,drugId);

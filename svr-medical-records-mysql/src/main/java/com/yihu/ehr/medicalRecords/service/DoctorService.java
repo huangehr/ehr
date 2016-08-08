@@ -1,16 +1,23 @@
 package com.yihu.ehr.medicalRecords.service;
 
 import com.yihu.ehr.medicalRecords.comom.Message;
+import com.yihu.ehr.medicalRecords.comom.WlyyResponse;
 import com.yihu.ehr.medicalRecords.comom.WlyyService;
 import com.yihu.ehr.medicalRecords.dao.DoctorDao;
 import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalRecordsDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalRecordsQueryDao;
+import com.yihu.ehr.medicalRecords.model.DTO.DictDTO;
 import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorsEntity;
-import com.yihu.ehr.medicalRecords.model.EnumClass;
+import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalRecordsEntity;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,62 +34,53 @@ public class DoctorService {
     @Autowired
     WlyyService wlyyService;
 
-
     @Autowired
     PatientService patientService;
 
     @Autowired
-    DoctorMedicalRecordDao doctorMedicalRecordDao;
+    MedicalRecordsDao medicalRecordsDao;
+
+    @Autowired
+    MedicalRecordsQueryDao medicalRecordsQueryDao;
 
     @Autowired
     MedicalLabelService medicalLabelService;
 
 
     /**
-     * 获取医生信息,不存在则新增
+     * 获取医生信息,不存在则新增，存在则修改
      */
-    public MrDoctorsEntity getDoctorInformation(String doctorId)throws Exception{
-        MrDoctorsEntity re = doctorDao.findById(doctorId);
-        if(re ==null) {
-            /*YihuResponse response = userMgmt.queryUserInfoByID(doctorId);
-            if(response.getCode() == 10000)
-            {
-                Map<String,Object> map = (Map<String,Object>)response.getResult();
-                if (map!=null && map.size()>0) {
-                    String type = map.get("UserType").toString();
-                    if(type.equals(EnumClass.UserType.Doctor))
-                    {
-                        MrDoctorsEntity doctor = new MrDoctorsEntity();
-                        doctor.setId(doctorId);
-                        doctor.setName(map.get("CName").toString());
-                        doctor.setDemographicId(map.get("IDNumber").toString());
-                        doctor.setSex(map.get("Sex").toString());
-                        if (map.get("BirthDate") != null && map.get("BirthDate").toString().length() > 0) {
-                            doctor.setBirthday(java.sql.Timestamp.valueOf(map.get("BirthDate").toString()));
-                        }
-                        doctor.setPhoto(map.get("PhotoUri").toString());
-                        doctor.setPhone(map.get("Phone").toString());
-
-                        if(map.containsKey("Lczc"))
-                        {
-                            doctor.setTitle(map.get("Lczc").toString());
-                        }
-                        if(map.containsKey("Skill"))
-                        {
-                            doctor.setGood(map.get("Skill").toString());
-                        }
-                        doctorDao.save(doctor);
-                        re = doctor;
-                    }
-                    else{
-                        Message.debug("该用户不是医生，id:"+doctorId);
-                    }
+    public MrDoctorsEntity getDoctorInformation(String doctorId)throws Exception
+    {
+        MrDoctorsEntity re = new MrDoctorsEntity();
+        WlyyResponse response = wlyyService.queryDoctorInfoByID(doctorId);
+        //获取医生信息成功
+        if(response.getStatus() == 200)
+        {
+            Map<String,Object> map = (Map<String,Object>)response.getData();
+            if (map!=null && map.size()>0) {
+                MrDoctorsEntity doctor = new MrDoctorsEntity();
+                doctor.setId(doctorId);
+                doctor.setName(map.get("name").toString());
+                //doctor.setDemographicId(map.get("").toString());
+                doctor.setSex(map.get("sex").toString());
+                if (map.get("birthday") != null && map.get("birthday").toString().length() > 0) {
+                    doctor.setBirthday(java.sql.Timestamp.valueOf(map.get("birthday").toString()));
                 }
+                doctor.setPhoto(map.get("photo").toString());
+                doctor.setPhone(map.get("mobile").toString());
+
+                doctor.setTitle(map.get("jobName").toString());
+                doctor.setGood(map.get("expertise").toString());
+                doctor.setOrgName(map.get("hospital_name").toString());
+                doctor.setOrgDept(map.get("dept_name").toString());
+                doctorDao.save(doctor);
+                re = doctor;
             }
-            else {
-                Message.error(response.getMessage());
-            }
-*/
+        }
+        else {
+            re = doctorDao.findById(doctorId);
+            Message.debug(response.getMsg());
         }
         return re;
     }
@@ -108,42 +106,9 @@ public class DoctorService {
     /**
      * 获取医生诊断
      */
-    public Map<String, String> getDoctorDiagnosis(String doctorId)throws Exception {
+    public List<DictDTO> getDoctorDiagnosis(String doctorId)throws Exception {
 
-        /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorId(doctorId);
-        String q="";
-        if (Mlist != null && Mlist.size() > 0) {
-            for (int i = 0; i < Mlist.size(); i++) {
-                if (Mlist.get(i) != null) {
-                    q="rowKey:"+Mlist.get(i).getRecordId()+" or ";
-                }
-            }
-        }
-        q.substring(0,q.length()-4);
-        if("".equals(q)){
-            return null;
-        }
-        Map<String, String> list = new HashMap<>();
-        Page<Map<String, Object>> result = hbaseQuery.queryBySolr(MedicalRecordsFamily.TableName, "rowkey", null, 1, 1000000000);
-
-        if (result.getContent() != null && result.getContent().size() > 0) {
-
-            //遍历所有行
-            for (int i = 0; i < result.getContent().size(); i++) {
-                Map<String, Object> obj = (Map<String, Object>) result.getContent().get(i);
-                if (obj.get("MEDICAL_DIAGNOSIS_CODE") != null) {
-                    if(obj.get("MEDICAL_DIAGNOSIS") != null){
-                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),obj.get("MEDICAL_DIAGNOSIS").toString());
-                    }
-                    else {
-                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),"");
-                    }
-
-                }
-
-            }
-        }*/
-        return null;
+        return  medicalRecordsQueryDao.findDoctorDiagnosis(doctorId);
     }
 
     /**

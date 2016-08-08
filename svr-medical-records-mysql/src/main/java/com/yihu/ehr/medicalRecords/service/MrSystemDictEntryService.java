@@ -29,14 +29,10 @@ public class MrSystemDictEntryService {
         return true;
     }
 
-    public List<MrSystemDictEntryEntity> searchSystemDictEntry(String filter)throws Exception {
-        return mrSystemDictEntryDao.findByLike(filter);
+    public List<MrSystemDictEntryEntity> getDict(String dictCode)throws Exception {
+        return mrSystemDictEntryDao.findByDictCode(dictCode);
     }
 
-    public boolean searchMrSystemDictEntry(Integer id){
-        mrSystemDictEntryDao.findById(id);
-        return true;
-    }
 
     public boolean updataMrSystemDictEntry(MrSystemDictEntryEntity mrSystemDictEntry){
         if(mrSystemDictEntry!=null){
