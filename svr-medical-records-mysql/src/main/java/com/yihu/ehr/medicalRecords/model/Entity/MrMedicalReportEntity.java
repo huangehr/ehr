@@ -27,7 +27,7 @@ public class MrMedicalReportEntity {
     }
 
     @Basic
-    @Column(name = "RECORDS_ID")
+    @Column(name = "RECORD_ID")
     public String getRecordId() {
         return recordId;
     }

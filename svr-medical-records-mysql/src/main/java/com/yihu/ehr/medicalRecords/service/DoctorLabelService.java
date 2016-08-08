@@ -29,9 +29,9 @@ public class DoctorLabelService {
      * @param mrLabelClassEntity
      * @return
      */
-    public  MrLabelClassEntity addDoctorLabelsClass(MrLabelClassEntity mrLabelClassEntity){
-        doctorLabelClassDao.save(mrLabelClassEntity);
-           return mrLabelClassEntity;
+    public  MrLabelClassEntity addDoctorLabelsClass(MrLabelClassEntity mrLabelClassEntity) throws Exception{
+        MrLabelClassEntity mrLabelClassEntityNew = doctorLabelClassDao.save(mrLabelClassEntity);
+        return mrLabelClassEntityNew;
     }
 
     /**
@@ -106,9 +106,9 @@ public class DoctorLabelService {
      * @param labelClass
      * @return
      */
-    public List<MrLabelEntity> getDoctorLabels(String doctorId,String labelType,String labelClass){
-        if(labelClass!=null && labelClass.length()>0){
-            return doctorLabelDao.findByDoctorIdAndLabelTypeAndLabelClass(doctorId,labelType,labelClass);
+    public List<MrLabelEntity> getDoctorLabels(String doctorId,String labelType,Integer labelClass){
+        if(labelClass!=null && labelClass>=0){
+            return doctorLabelDao.findByDoctorIdAndLabelTypeAndLabelClass(doctorId, labelType, labelClass);
         }
         else{
             return  doctorLabelDao.findByDoctorIdAndLabelType(doctorId,labelType);

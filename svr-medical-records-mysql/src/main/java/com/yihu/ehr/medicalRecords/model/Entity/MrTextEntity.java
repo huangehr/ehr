@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 public class MrTextEntity {
     private int id;
     private String creater;
-    private String creatertName;
+    private String createrName;
     private String patientId;
     private String patientName;
     private String businessClass;
@@ -41,13 +41,13 @@ public class MrTextEntity {
     }
 
     @Basic
-    @Column(name = "CREATERT_NAME")
-    public String getCreatertName() {
-        return creatertName;
+    @Column(name = "CREATER_NAME")
+    public String getCreaterName() {
+        return createrName;
     }
 
-    public void setCreatertName(String creatertName) {
-        this.creatertName = creatertName;
+    public void setCreaterName(String createrName) {
+        this.createrName = createrName;
     }
 
     @Basic

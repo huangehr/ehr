@@ -15,7 +15,8 @@ public class MrLabelClassEntity {
     private int parentId;
 
     @Id
-    @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", unique = true, nullable = false)
     public int getId() {
         return id;
     }
