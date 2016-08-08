@@ -14,5 +14,5 @@ public interface DoctorLabelDao extends PagingAndSortingRepository<MrLabelEntity
 
     List<MrLabelEntity> findByDoctorIdAndLabelType(String doctorId, String labelType);
 
-    List<MrLabelEntity> findByDoctorIdAndLabelTypeAndLabelClass(String doctorId, String labelType, String labelClass);
+    List<MrLabelEntity> findByDoctorIdAndLabelTypeAndLabelClass(String doctorId, String labelType, Integer labelClass);
 }
