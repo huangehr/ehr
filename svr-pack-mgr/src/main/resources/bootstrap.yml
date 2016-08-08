@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-pack-mgr
+    name: svr-pack-mgr-hzp
 
 ---
 spring:

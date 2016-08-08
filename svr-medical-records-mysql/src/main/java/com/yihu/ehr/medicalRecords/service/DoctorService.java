@@ -11,6 +11,7 @@ import com.yihu.ehr.medicalRecords.model.DTO.DictDTO;
 import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalRecordsEntity;
+import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -114,51 +115,14 @@ public class DoctorService {
     /**
      * 获取医生病历
      */
-    public List<MedicalRecordDTO> getDoctorRecords(String filter, String label, String medicalTimeFrom,
-                                                   String medicalTimeEnd, String recordType, String doctorId, int page, int size) throws Exception {
+    public Envelop getDoctorRecords(String doctorId, String label, String medicalTimeFrom, String medicalTimeEnd, String recordType, int ageFrom, int ageEnd, String sex, String filter, int page, int size) throws Exception {
 
-        /*List<MrPatientsEntity>patientsEntityList=patientService.searchPatient(filter,1,1000000000);
-        List<MedicalRecord> medicalRecordModelList = new ArrayList<>();
-        if(patientsEntityList!=null && patientsEntityList.size()>0) {
-            for (int l = 0; l < patientsEntityList.size(); l++) {
-                String patientId = patientsEntityList.get(l).getId();
-                List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId, patientId);
-                List<String> recordsIdList = new ArrayList<>();
-                if (label != null && label.length() > 0) {
-                    List<String> Ilist = medicalLabelService.getRecordIdByLabels(label.split(","));
-                    if (Mlist != null && Mlist.size() > 0) {
-                        for (int i = 0; i < Mlist.size(); i++) {
-                            if (Mlist.get(i) != null && Ilist.contains(Mlist.get(i).getId())) {
-                                recordsIdList.add(Mlist.get(i).getRecordId());
-                            }
-                        }
-                    }
+        String sql = "SELECT concat(a.id) as id,a.medical_Time as medicalTime,'0' as medicalType,a.MEDICAL_DIAGNOSIS as medicalDiagnosis,b.name as doctorName,b.org_dept as orgDept,b.org_name as orgName,b.title as doctorTitle,c.medical_info as medicalInfo\n" +
+                "from mr_medical_records a \n" +
+                "left join mr_doctors b on a.DOCTOR_ID=b.ID\n" +
+                "left join (SELECT record_id, GROUP_CONCAT(value) AS medical_info FROM mr_medical_info GROUP BY record_id) c on a.id = c.record_id \n" +
+                "where doctor_id='"+doctorId+"'";
 
-                }
-                /*for (int i = 0; i < recordsIdList.size(); i++) {
-                    Result result = hbaseTemplate.get(MedicalRecordsFamily.TableName, recordsIdList.get(i), new RowMapper<Result>() {
-                        public Result mapRow(Result result, int rowNum) throws Exception {
-                            return result;
-                        }
-                    });
-                    KeyValue[] kv = result.raw();
-
-                    MedicalRecordModel m = objectMapper.readValue(kv.toString(), MedicalRecordModel.class);
-//            for (int j = 0; j< kv.length; j++)
-//            {
-//                // 循环每一列
-//                String qualifier = new String(kv[i].getQualifier());
-//            }
-                    if(m.getCreateTime().toString().compareTo(medicalTimeFrom)>0 && m.getCreateTime().toString().compareTo(medicalTimeEnd)<0 && m.getDataFrom().equals(recordType))
-                        medicalRecordModelList.add(m);
-
-                }
-            }
-
-        }
-
-        return medicalRecordModelList;*/
-        return null;
-
+        return  medicalRecordsQueryDao.queryPage(sql,page,size);
     }
 }

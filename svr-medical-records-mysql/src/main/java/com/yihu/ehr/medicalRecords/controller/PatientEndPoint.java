@@ -7,6 +7,7 @@ import com.yihu.ehr.medicalRecords.model.DTO.DictDTO;
 import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordSimpleDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrPatientsEntity;
 import com.yihu.ehr.medicalRecords.service.PatientService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -40,7 +41,7 @@ public class PatientEndPoint extends BaseRestEndPoint {
 
     @ApiOperation("获取患者所有病历")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientRecords, method = RequestMethod.GET)
-    public List<MedicalRecordSimpleDTO> getPatientRecords(
+    public Envelop getPatientRecords(
             @ApiParam(name = "doctorId", value = "医生id",defaultValue = "D20160322000001")
             @RequestParam(value = "doctorId", required = true) String doctorId,
             @ApiParam(name = "patient_id", value = "患者ID",defaultValue = "350524199208115544")
@@ -56,9 +57,13 @@ public class PatientEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "medical_diagnosis_code", value = "诊断代码")
             @RequestParam(value = "medical_diagnosis_code", required = false) String medicalDiagnosisCode,
             @ApiParam(name = "filter", value = "查询条件")
-            @RequestParam(value = "filter", required = false) String filter) throws Exception{
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "page", value = "page",defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "size",defaultValue = "10")
+            @RequestParam(value = "size", required = false) int size) throws Exception{
 
-        return patientService.getPatientRecords(doctorId,patientId, label,medicalTimeFrom,medicalTimeEnd,recordType,medicalDiagnosisCode,filter);
+        return patientService.getPatientRecords(doctorId,patientId, label,medicalTimeFrom,medicalTimeEnd,recordType,medicalDiagnosisCode,filter,page,size);
     }
 
     /************************* 患者信息 ****************************************/

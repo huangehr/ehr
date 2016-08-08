@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecords.service;
 
+import com.ctc.wstx.util.StringUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.medicalRecords.comom.Message;
 import com.yihu.ehr.medicalRecords.comom.WlyyResponse;
@@ -14,7 +15,9 @@ import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordSimpleDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrPatientsEntity;
 import com.yihu.ehr.medicalRecords.model.EnumClass;
+import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,68 +118,56 @@ public class PatientService {
     /**
      * 获取患者病历
      */
-    public List<MedicalRecordSimpleDTO> getPatientRecords(String doctorId, String patientId, String label, String medicalTimeFrom, String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String filter,int page,int size) throws Exception {
+    public Envelop getPatientRecords(String doctorId, String patientId, String label, String medicalTimeFrom, String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String filter, int page, int size) throws Exception {
 
-        String sql = "select * from ";
-        //选了自定义标签
-
-        /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId, patientId);
-        List<String> recordIdList = new ArrayList<>();
-        List<MedicalRecord> medicalRecordModelList = new ArrayList<>();
-        if (label != null && label.length() > 0) {
-            List<String> Ilist = medicalLabelService.getRecordIdByLabels(label.split(","));
-            if (Mlist != null && Mlist.size() > 0) {
-                for (int i = 0; i < Mlist.size(); i++) {
-                    if (Mlist.get(i) != null && Ilist.contains(Mlist.get(i).getId())) {
-                        recordsIdList.add(Mlist.get(i).getRecordId());
-                    }
-                }
+        String sql = "SELECT concat(a.id) as id,a.medical_Time as medicalTime,'0' as medicalType,a.MEDICAL_DIAGNOSIS as medicalDiagnosis,b.name as doctorName,b.org_dept as orgDept,b.org_name as orgName,b.title as doctorTitle,c.medical_info as medicalInfo\n" +
+                "from mr_medical_records a \n" +
+                "left join mr_doctors b on a.DOCTOR_ID=b.ID\n" +
+                "left join (SELECT record_id, GROUP_CONCAT(value) AS medical_info FROM mr_medical_info GROUP BY record_id) c on a.id = c.record_id \n" +
+                "where a.doctor_id='"+doctorId+"' and a.patient_id='"+patientId+"'";
+        //自定义标签
+        if(label!=null && label.length()>0)
+        {
+            String[] labels = label.split(",");
+            String labelString = "";
+            for(String item:labels)
+            {
+                labelString += "'"+item+"',";
             }
-
+            labelString = labelString.substring(0,labelString.length()-1);
+            sql += " and a.id in ("+labelString+")";
         }
-        for (int i = 0; i < recordsIdList.size(); i++) {
-            Result result = hbaseTemplate.get("", recordsIdList.get(i), new RowMapper<Result>() {
-                public Result mapRow(Result result, int rowNum) throws Exception {
-                    return result;
-                }
-            });
-            KeyValue[] kv = result.raw();
 
-            MedicalRecord m = objectMapper.readValue(kv.toString(), MedicalRecord.class);
-//            for (int j = 0; j< kv.length; j++)
-//            {
-//                // 循环每一列
-//                String qualifier = new String(kv[i].getQualifier());
-//            }
-            if(m.getCreateTime().toString().compareTo(medicalTimeFrom)>0 && m.getCreateTime().toString().compareTo(medicalTimeEnd)<0 && m.getDataFrom().equals(recordType) && m.getMedicalDiagnosisCode().equals(medicalDiagnosisCode))
-            medicalRecordModelList.add(m);
-
+        //就诊开始时间
+        if(!StringUtils.isEmpty(medicalTimeFrom))
+        {
+            sql += "";
         }
-        return medicalRecordModelList;*/
-        return  null;
+
+        //就诊结束时间
+        if(!StringUtils.isEmpty(medicalTimeEnd))
+        {
+            sql += "";
+        }
+
+        //就诊类型
+        if(!StringUtils.isEmpty(recordType) && !recordType.equals(EnumClass.RecordType.Online))
+        {
+            sql += " and 1!=1";
+        }
+
+        //就诊代码
+        if(!StringUtils.isEmpty(medicalDiagnosisCode))
+        {
+            sql += " and a.medical_diagnosis_code = '"+medicalDiagnosisCode+"'";
+        }
+        //过滤条件
+        if(!StringUtils.isEmpty(filter))
+        {
+            sql += " and (a.MEDICAL_DIAGNOSIS like '%"+filter+"%' or b.medical_info like '%"+filter+"%')";
+        }
+
+        return  medicalRecordsQueryDao.queryPage(sql,page,size);
     }
 
-    /**
-     * like：使用"?"来表示，如：name?%医
-     * in：使用"="来表示并用","逗号对值进行分隔，如：status=2,3,4,5
-     * not in：使用"<>"来表示并用","逗号对值进行分隔，如：status=2,3,4,5
-     * =：使用"="来表示，如：status=2
-     * >=：使用大于号和大于等于语法，如：createDate>2012
-     * <=：使用小于号和小于等于语法，如：createDate<=2015
-     * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接 GB/T 2261.2-2003
-     * 多条件组合：使用";"来分隔
-     * *//*
-    public List<MrPatientsEntity> searchPatient(String queryCondition,int page,int size) throws Exception {
-        URLQueryParser queryParser = createQueryParser(null, queryCondition, null);
-        CriteriaQuery query = queryParser.makeCriteriaQuery();
-
-        if(page<1) page=1;
-        if(size<0) size=15;
-
-        return entityManager
-                .createQuery(query)
-                .setFirstResult((page - 1) * size)
-                .setMaxResults(size)
-                .getResultList();
-    }*/
 }
