@@ -123,9 +123,15 @@ public class HBaseUtil {
             public Object doInTable(HTableInterface htable) throws Throwable {
                 Put put = new Put(Bytes.toBytes(rowKey));
                 for (int j = 0; j < columns.length; j++) {
-                    put.addColumn(Bytes.toBytes(family),
-                            Bytes.toBytes(String.valueOf(columns[j])),
-                            Bytes.toBytes(String.valueOf(values[j])));
+                    //为空字段不保存
+                    if(values[j]!=null)
+                    {
+                        String column = String.valueOf(columns[j]);
+                        String value = String.valueOf(values[j]);
+                        put.addColumn(Bytes.toBytes(family),
+                                Bytes.toBytes(column),
+                                Bytes.toBytes(value));
+                    }
                 }
 
                 htable.put(put);
@@ -285,10 +291,12 @@ public class HBaseUtil {
             public Map<String, Object> mapRow(Result result, int rowNum) throws Exception {
                 List<Cell> ceList = result.listCells();
                 Map<String, Object> map = new HashMap<String, Object>();
+                map.put("rowkey",rowKey);
                 if (ceList != null && ceList.size() > 0) {
                     for (Cell cell : ceList) {
-                        map.put(Bytes.toString(cell.getFamilyArray(), cell.getFamilyOffset(), cell.getFamilyLength()) +
-                                        "_" + Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength()),
+                        //默认不加列族
+                        // Bytes.toString(cell.getFamilyArray(), cell.getFamilyOffset(), cell.getFamilyLength()) +"_"
+                        map.put(Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength()),
                                 Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()));
                     }
                 }
@@ -321,11 +329,12 @@ public class HBaseUtil {
                     for(Cell cell:ceList){
                         row =Bytes.toString( cell.getRowArray(), cell.getRowOffset(), cell.getRowLength());
                         String value =Bytes.toString( cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
-                        String family =  Bytes.toString(cell.getFamilyArray(),cell.getFamilyOffset(),cell.getFamilyLength());
                         String quali = Bytes.toString( cell.getQualifierArray(),cell.getQualifierOffset(),cell.getQualifierLength());
-                        map.put(family+"_"+quali, value);
+                        //默认不加列族
+                        //String family =  Bytes.toString(cell.getFamilyArray(),cell.getFamilyOffset(),cell.getFamilyLength());
+                        map.put(quali, value);
                     }
-                    map.put("row",row );
+                    map.put("row",row);
                 }
                 return  map;
             }

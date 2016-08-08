@@ -29,6 +29,14 @@ public class GeographyModel implements Serializable {
 
     private String postalCode;
 
+    private int countryId;
+
+    private int cityId;
+
+    private int provinceId;
+
+    private int districtId;
+
     public String getId() {
         return id;
     }
@@ -100,6 +108,39 @@ public class GeographyModel implements Serializable {
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
+
+    public int getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(int countryId) {
+        this.countryId = countryId;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
+    }
+
+    public int getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(int districtId) {
+        this.districtId = districtId;
+    }
+
     public String fullAddress() {
         String addressStr="";
         if (!StringUtils.isEmpty(province)){
@@ -134,4 +175,6 @@ public class GeographyModel implements Serializable {
                         && StringUtils.isEmpty(street)
                         && StringUtils.isEmpty(extra);
     }
+
+
 }

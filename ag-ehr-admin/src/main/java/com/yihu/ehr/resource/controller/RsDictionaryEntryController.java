@@ -6,7 +6,7 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.resource.MRsDictionaryEntry;
 import com.yihu.ehr.resource.client.RsDictionaryEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.utils.FeignExceptionUtils;
+import com.yihu.ehr.util.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

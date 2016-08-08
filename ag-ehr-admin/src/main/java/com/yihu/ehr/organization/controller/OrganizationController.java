@@ -1,6 +1,8 @@
 package com.yihu.ehr.organization.controller;
 
+import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
@@ -76,6 +78,9 @@ public class OrganizationController extends BaseController {
 
     @Autowired
     private FileResourceClient fileResourceClient;
+
+    @Autowired
+    private AppClient appClient;
 
     @RequestMapping(value = "/organizations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询机构列表")
@@ -231,6 +236,12 @@ public class OrganizationController extends BaseController {
             List<MTemplate> mTemplates = (List<MTemplate>) mTemplateEntity.getBody();
             if(mTemplates.size()>0){
                 return failed("删除失败!该组织机构下面存在模板，请先删除模板！");
+            }
+            //应用
+            ResponseEntity<List<MApp>> mAppEntity = appClient.getApps("", "org=" + orgCode, "", 1, 1);
+            List<MApp> mApps = mAppEntity.getBody();
+            if(mApps.size()>0){
+                return failed("删除失败!该组织机构下面存在应用，请先删除应用！");
             }
             if (!securityClient.deleteKeyByOrgCode(orgCode)) {
                 return failed("删除失败!");
@@ -474,7 +485,7 @@ public class OrganizationController extends BaseController {
             org.setExtra(addr.getExtra());
             org.setProvinceId(geographyToCode(addr.getProvince(),156));
             org.setCityId(geographyToCode(addr.getCity(),org.getProvinceId()));
-            org.setDistrictId(geographyToCode(addr.getCity(),org.getProvinceId()));
+            org.setDistrictId(geographyToCode(addr.getDistrict(),org.getCityId()));
         }
         //获取公钥信息（公钥、有效区间、开始时间）
         MKey security = securityClient.getOrgKey(mOrg.getOrgCode());

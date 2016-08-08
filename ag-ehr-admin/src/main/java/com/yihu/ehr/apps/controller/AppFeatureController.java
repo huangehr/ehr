@@ -159,12 +159,17 @@ public class AppFeatureController extends BaseController {
     @ApiOperation(value = "获取过滤AppFeature列表")
     public Envelop getAppFeatureNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "filters", required = false) String filters){
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "roleId", required = false) String roleId){
         Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage(filters);
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
         for(MAppFeature mAppFeature: mAppFeatures ){
             AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
+            if(StringUtils.isNotBlank(roleId)){
+                appFeatureModel.setRoleId(roleId);
+            }
+            converModelName(appFeatureModel);
             appFeatureModels.add(appFeatureModel);
         }
         envelop.setDetailModelList(appFeatureModels);
@@ -191,8 +196,12 @@ public class AppFeatureController extends BaseController {
             AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
             appFeatureModels.add(appFeatureModel);
         }
-        envelop.setDetailModelList(appFeatureModels);
-        return envelop;
+        if(appFeatureModels.size()>0){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(appFeatureModels);
+            return envelop;
+        }
+        return failed("");
     }
 
     /**
@@ -221,6 +230,8 @@ public class AppFeatureController extends BaseController {
             Collection<MRoleFeatureRelation> mRoleFeatureRelations = responseEntity.getBody();
             if(mRoleFeatureRelations!=null&&mRoleFeatureRelations.size()>0){
                 appFeatureModel.setIschecked(true);
+            }else {
+                appFeatureModel.setIschecked(false);
             }
         }
     }

@@ -121,55 +121,66 @@
             <artifactId>commons-io</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
+
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ehr-constants</artifactId>
-            <scope>compile</scope>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
-            <scope>compile</scope>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-mysql</artifactId>
-            <scope>compile</scope>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-rest-model</artifactId>
-            <scope>compile</scope>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-redis</artifactId>
-            <scope>compile</scope>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-fastdfs</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>happy.fish</groupId>
-            <artifactId>fastDFS</artifactId>
+            <version>${version.ehr}</version>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>
-            <scope>compile</scope>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-redis-keyschema</artifactId>
-            <scope>compile</scope>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-profile-core</artifactId>
-            <scope>compile</scope>
+            <artifactId>commons-data-query</artifactId>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-yihu-services</artifactId>
+            <version>${version.ehr}</version>
+            <scope>${dependency.scope}</scope>
         </dependency>
     </dependencies>
 </project>

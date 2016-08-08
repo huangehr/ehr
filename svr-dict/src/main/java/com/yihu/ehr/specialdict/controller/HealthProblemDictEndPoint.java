@@ -130,17 +130,9 @@ public class HealthProblemDictEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<HealthProblemDict> hpDictPage = hpDictService.getDictList(sorts, page, size);
-            pagedResponse(request, response, hpDictPage.getTotalElements(), page, size);
-            return convertToModels(hpDictPage.getContent(), new ArrayList<>(hpDictPage.getNumber()), MHealthProblemDict.class, fields);
-        } else {
-            List<HealthProblemDict> hpDictList = hpDictService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, hpDictService.getCount(filters), page, size);
-            return convertToModels(hpDictList, new ArrayList<>(hpDictList.size()), MHealthProblemDict.class, fields);
-        }
+        List<HealthProblemDict> hpDictList = hpDictService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, hpDictService.getCount(filters), page, size);
+        return convertToModels(hpDictList, new ArrayList<>(hpDictList.size()), MHealthProblemDict.class, fields);
     }
 
     @RequestMapping(value = "/dict/hp/existence/name" , method = RequestMethod.GET)

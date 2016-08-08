@@ -1,28 +1,32 @@
 package com.yihu.ehr.medicalRecord.service;
 
-import com.yihu.ehr.medicalRecord.dao.intf.MrSystemDictDao;
-import com.yihu.ehr.medicalRecord.dao.intf.MrSystemDictEntryDao;
-import com.yihu.ehr.medicalRecord.model.MrSystemDictEntity;
+import com.yihu.ehr.medicalRecord.dao.SystemDictDao;
+import com.yihu.ehr.medicalRecord.dao.SystemDictEntryDao;
+import com.yihu.ehr.medicalRecord.model.Entity.MrSystemDictEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by shine on 2016/7/14.
  */
+@Transactional
+@Service
 public class MrSystemDictService {
 
     @Autowired
-    MrSystemDictDao mrSystemDictDao;
+    SystemDictDao mrSystemDictDao;
     @Autowired
-    MrSystemDictEntryDao mrSystemDictEntryDao;
+    SystemDictEntryDao mrSystemDictEntryDao;
 
-    public boolean addMrSystemDictEntry(MrSystemDictEntity MrSystemDictEntry){
-        mrSystemDictDao.save(MrSystemDictEntry);
+    public boolean addMrSystemDict(MrSystemDictEntity MrSystemDict){
+        mrSystemDictDao.save(MrSystemDict);
         return true;
     }
 
 
-    public boolean deleteMrSystemDictEntry( String dictCode){
-        if(mrSystemDictEntryDao.findBydictCode(dictCode)!=null)
+    public boolean deleteMrSystemDict( String dictCode){
+        if(mrSystemDictEntryDao.findByDictCode(dictCode)!=null&&mrSystemDictEntryDao.findByDictCode(dictCode).size()>0)//系统字典项无值才可删除
             return false;
         else {
             mrSystemDictDao.deleteBydictCode(dictCode);
@@ -35,7 +39,7 @@ public class MrSystemDictService {
         return true;
     }
 
-    public boolean updataMrSystemDictEntry(MrSystemDictEntity mrSystemDictEntity){
+    public boolean updateMrSystemDict(MrSystemDictEntity mrSystemDictEntity){
         if(mrSystemDictEntity!=null){
             MrSystemDictEntity m=mrSystemDictDao.findBydictCode(mrSystemDictEntity.getDictCode());
             if(m!=null)

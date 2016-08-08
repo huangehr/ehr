@@ -2,6 +2,7 @@ package com.yihu.ehr.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppApiClient;
 import com.yihu.ehr.model.app.MAppApi;
 import com.yihu.ehr.model.org.MOrganization;
@@ -86,6 +87,22 @@ public class AppController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Apps.AppsNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取app列表，不分页")
+    public Envelop getAppsNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件",defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        Collection<MApp> mAppList = appClient.getAppsNoPage(filters);
+        List<AppModel> appModelList = new ArrayList<>();
+        for(MApp app :mAppList){
+            appModelList.add(convertToAppModel(app));
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(appModelList);
+        return envelop;
+    }
+
     /**
      * @param appJson
      * @return
@@ -139,7 +156,7 @@ public class AppController extends BaseController {
                 }
                AppDetailModel appDetailModel =  convertToAppDetailModel(mApp);
                 if(roleMap.keySet().size()>0){
-                    appDetailModel.setRoleJson(toJson(appDetailModel));
+                    appDetailModel.setRoleJson(toJson(roleMap));
                 }
                 envelop.setSuccessFlg(true);
                 envelop.setObj(appDetailModel);

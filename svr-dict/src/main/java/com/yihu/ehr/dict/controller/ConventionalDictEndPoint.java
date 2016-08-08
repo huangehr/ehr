@@ -606,5 +606,10 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
         return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class, null);
     }
 
-
+    @RequestMapping(value = "/dictionaries/cda_type_browser_list", method = RequestMethod.GET)
+    @ApiOperation(value = "浏览器用CDA类别清单", response = MConventionalDict.class)
+    public Collection<MConventionalDict> getCdaTypeForBrowserList() {
+        List<SystemDictEntry> list = dictEntryService.getDictEntries(50, null);
+        return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class, null);
+    }
 }

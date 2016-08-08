@@ -39,10 +39,10 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "创建AppApiParameter")
     public MAppApiParameter createAppApiParameter(
             @ApiParam(name = "AppApiParameter", value = "对象JSON结构体", allowMultiple = true)
-            @RequestBody String AppApiParameterJson) throws Exception {
-        AppApiParameter AppApiParameter = toEntity(AppApiParameterJson, AppApiParameter.class);
-        AppApiParameter = appApiParameterService.createAppApiParameter(AppApiParameter);
-        return convertToModel(AppApiParameter, MAppApiParameter.class);
+            @RequestBody String appApiParameterJson) throws Exception {
+        AppApiParameter appApiParameter = toEntity(appApiParameterJson, AppApiParameter.class);
+        appApiParameter = appApiParameterService.createAppApiParameter(appApiParameter);
+        return convertToModel(appApiParameter, MAppApiParameter.class);
     }
 
     @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameters, method = RequestMethod.GET)
@@ -60,19 +60,11 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<AppApiParameter> appPages = appApiParameterService.getAppApiParameterList(sorts, page, size);
-
-            pagedResponse(request, response, appPages.getTotalElements(), page, size);
-            return convertToModels(appPages.getContent(), new ArrayList<>(appPages.getNumber()), MAppApiParameter.class, fields);
-        } else {
-            List<AppApiParameter> AppApiParameterList = appApiParameterService.search(fields, filters, sorts, page, size);
+            List<AppApiParameter> appApiParameterList = appApiParameterService.search(fields, filters, sorts, page, size);
 
             pagedResponse(request, response, appApiParameterService.getCount(filters), page, size);
-            return convertToModels(AppApiParameterList, new ArrayList<>(AppApiParameterList.size()), MAppApiParameter.class, fields);
-        }
+            return convertToModels(appApiParameterList, new ArrayList<>(appApiParameterList.size()), MAppApiParameter.class, fields);
+
     }
 
     @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameters, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -80,10 +72,10 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
     public MAppApiParameter updateAppApiParameter(
             @ApiParam(name = "AppApiParameter", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson) throws Exception {
-        AppApiParameter AppApiParameter = toEntity(appJson, AppApiParameter.class);
-        if (appApiParameterService.retrieve(AppApiParameter.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
-        appApiParameterService.save(AppApiParameter);
-        return convertToModel(AppApiParameter, MAppApiParameter.class);
+        AppApiParameter appApiParameter = toEntity(appJson, AppApiParameter.class);
+        if (appApiParameterService.retrieve(appApiParameter.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        appApiParameterService.save(appApiParameter);
+        return convertToModel(appApiParameter, MAppApiParameter.class);
     }
 
     @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameter, method = RequestMethod.GET)
@@ -91,8 +83,8 @@ public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
     public MAppApiParameter getAppApiParameter(
             @ApiParam(name = "id", value = "id")
             @PathVariable(value = "id") int id) throws Exception {
-        AppApiParameter AppApiParameter = appApiParameterService.retrieve(id);
-        return convertToModel(AppApiParameter, MAppApiParameter.class);
+        AppApiParameter appApiParameter = appApiParameterService.retrieve(id);
+        return convertToModel(appApiParameter, MAppApiParameter.class);
     }
 
     @RequestMapping(value = ServiceApi.AppApiParameter.AppApiParameter, method = RequestMethod.DELETE)

@@ -1,6 +1,5 @@
 package com.yihu.ehr.users.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.RoleAppRelationModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
@@ -8,7 +7,9 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.user.MRoleAppRelation;
+import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.users.service.RoleAppRelationClient;
+import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +17,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +38,9 @@ public class RoleAppRelationController extends BaseController{
 
     @Autowired
     private AppClient appClient;
+
+    @Autowired
+    private RolesClient rolesClient;
 
     @RequestMapping(value = ServiceApi.Roles.RoleApp,method = RequestMethod.POST)
     @ApiOperation(value = "为角色组配置应用，单个--单个")
@@ -154,6 +157,9 @@ public class RoleAppRelationController extends BaseController{
         //获取应用权限名称
         MApp app = appClient.getApp(m.getAppId());
         model.setAppName(app == null ? "" : app.getName());
+        //获取角色名称
+        MRoles roles = rolesClient.getRolesById(m.getRoleId());
+        model.setRoleName(roles == null?"":roles.getName());
         return model;
     }
 }

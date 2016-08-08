@@ -9,9 +9,7 @@ import com.yihu.ehr.user.service.RoleApiRelationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,25 +53,24 @@ public class RoleApiRelationEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Roles.RoleApis,method = RequestMethod.POST)
-    @ApiOperation(value = "批量新增角色组-api关系,一对多")
-    public boolean batchCreateRoleApiRelation(
-            @ApiParam(name = "api_ids",value = "api的ids,多个用逗号隔开")
-            @RequestParam(value = "api_ids") String apiIds,
-            @ApiParam(name = "role_id",value = "角色组Id")
-            @RequestParam(value = "role_id") String roleId) throws Exception{
-        roleApiRelationService.batchCreateRoleApiRelation(Long.parseLong(roleId),apiIds);
-        return true;
+    @RequestMapping(value = ServiceApi.Roles.RoleApiByRoleId,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id删除所配置的api")
+    public boolean deleteRoleApiRelationByRoleId(
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") Long roleId){
+        return  roleApiRelationService.deleteRoleApiRelationByRoleId(roleId);
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleApis,method = RequestMethod.PUT)
     @ApiOperation(value = "批量修改角色组-api关系,一对多")
     public boolean batchUpdateRoleApiRelation(
             @ApiParam(name = "role_id",value = "角色组Id")
-            @RequestParam(value = "role_id") String roleId,
-            @ApiParam(name = "api_ids",value = "api的ids,多个用逗号隔开")
-            @RequestParam(value = "api_ids") String apiIds) throws Exception{
-        roleApiRelationService.batchUpdateRoleApiRelation(Long.parseLong(roleId),apiIds);
+            @RequestParam(value = "role_id") Long roleId,
+            @ApiParam(name = "api_ids_add",value = "要新增的apiIds",defaultValue = "")
+            @RequestParam(name = "api_ids_add",required = false) Long[] addApiIds,
+            @ApiParam(name = "api_ids_delete",value = "要删除的apiIds",defaultValue = "")
+            @RequestParam(value = "api_ids_delete",required = false) String deleteApiIds) throws Exception{
+        roleApiRelationService.batchUpdateRoleApiRelation(roleId,addApiIds,deleteApiIds);
         return true;
     }
 
@@ -92,16 +89,9 @@ public class RoleApiRelationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-        page = reducePage(page);
-        if (StringUtils.isEmpty(filters)) {
-            Page<RoleApiRelation> roleApiRelationPage = roleApiRelationService.getRoleApiRelationList(sorts, page, size);
-            pagedResponse(request, response, roleApiRelationPage.getTotalElements(), page, size);
-            return convertToModels(roleApiRelationPage.getContent(), new ArrayList<>(roleApiRelationPage.getNumber()), MRoleApiRelation.class, fields);
-        } else {
-            List<RoleApiRelation> roleApiRelationList = roleApiRelationService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, roleApiRelationService.getCount(filters), page, size);
-            return convertToModels(roleApiRelationList, new ArrayList<>(roleApiRelationList.size()), MRoleApiRelation.class, fields);
-        }
+        List<RoleApiRelation> roleApiRelationList = roleApiRelationService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, roleApiRelationService.getCount(filters), page, size);
+        return convertToModels(roleApiRelationList, new ArrayList<>(roleApiRelationList.size()), MRoleApiRelation.class, fields);
     }
     @RequestMapping(value = ServiceApi.Roles.RoleApisNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组与-api关系列表---不分页")

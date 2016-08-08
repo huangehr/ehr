@@ -368,4 +368,9 @@ import java.util.List;
     @RequestMapping(value = "/dictionaries/api_parameter_data_required_list", method = RequestMethod.GET)
     @ApiOperation(value = "API参数必输标识", response = MConventionalDict.class)
      Collection<MConventionalDict> getApiParameterDataRequiredList();
+
+    @RequestMapping(value = "/dictionaries/cda_type_browser_list", method = RequestMethod.GET)
+    @ApiOperation(value = "浏览器用CDA类别清单", response = MConventionalDict.class)
+    Collection<MConventionalDict> getCdaTypeForBrowserList();
+
 }

@@ -1,13 +1,14 @@
 package com.yihu.ehr.users.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.RoleUserModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.user.MRoleUser;
+import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.users.service.RoleUserClient;
+import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -16,7 +17,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +37,9 @@ public class RoleUserController extends BaseController {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private RolesClient rolesClient;
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -68,6 +71,41 @@ public class RoleUserController extends BaseController {
             return success(null);
         }
         return failed("角色组删除人员失败！");
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleUserByUserId,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据人员id，删除其与所有角色组关系")
+    public Envelop deleteRoleUserBuUserId(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId){
+        if(StringUtils.isEmpty(userId)){
+            return failed("人员id不能为空！");
+        }
+        boolean bo = roleUserClient.deleteRoleUserBuUserId(userId);
+        if(bo){
+            return success(null);
+        }
+        return failed("角色组删除人员失败！");
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.DELETE)
+    @ApiOperation(value = "人员id,角色组ids，批量删除人员-角色组关系")
+    public Envelop batchDeleteRoleUserRelation(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_ids",value = "角色组ids")
+            @RequestParam(value = "role_ids") String roleIds){
+        if(StringUtils.isEmpty(userId)){
+            return failed("人员id不能为空！");
+        }
+        if(StringUtils.isEmpty(roleIds)) {
+            return failed("角色组ids不能为空！");
+        }
+        boolean bo = roleUserClient.batchDeleteRoleUserRelation(userId, roleIds);
+        if(bo){
+            return success(null);
+        }
+        return failed("删除失败！");
     }
 
 
@@ -152,11 +190,30 @@ public class RoleUserController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = "/roles/role_user/userRolesIds",method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户所属角色组ids")
+    public Envelop getUserRolesIds(
+            @ApiParam(name = "user_id",value = "用户id")
+            @RequestParam(value = "user_id") String userId){
+        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId="+userId);
+        String roleIds = "";
+        for (MRoleUser m : mRoleUsers){
+            roleIds += m.getRoleId()+",";
+        }
+        if(!StringUtils.isEmpty(roleIds)){
+            roleIds = roleIds.substring(0,roleIds.length()-1);
+        }
+        return success(roleIds);
+    }
+
     private RoleUserModel changeToModel(MRoleUser m) {
         RoleUserModel model = convertToModel(m, RoleUserModel.class);
         //获取用户名
         MUser user = userClient.getUser(m.getUserId());
         model.setUserName(user == null?"":user.getRealName());
+        //获取角色名
+        MRoles roles = rolesClient.getRolesById(m.getRoleId());
+        model.setRoleName(roles == null?"":roles.getName());
         return model;
     }
 }

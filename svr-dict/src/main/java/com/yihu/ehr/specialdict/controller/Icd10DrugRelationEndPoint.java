@@ -123,17 +123,9 @@ public class Icd10DrugRelationEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
 
-        page = reducePage(page);
-
-        if (StringUtils.isEmpty(filters)) {
-            Page<Icd10DrugRelation> icd10DrugRelationPage = icd10DrugRelationService.getRelationList(sorts, page, size);
-            pagedResponse(request, response, icd10DrugRelationPage.getTotalElements(), page, size);
-            return convertToModels(icd10DrugRelationPage.getContent(), new ArrayList<>(icd10DrugRelationPage.getNumber()), MIcd10DrugRelation.class, fields);
-        } else {
-            List<Icd10DrugRelation> icd10DrugRelationList = icd10DrugRelationService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, icd10DrugRelationService.getCount(filters), page, size);
-            return convertToModels(icd10DrugRelationList, new ArrayList<>(icd10DrugRelationList.size()), MIcd10DrugRelation.class, fields);
-        }
+        List<Icd10DrugRelation> icd10DrugRelationList = icd10DrugRelationService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, icd10DrugRelationService.getCount(filters), page, size);
+        return convertToModels(icd10DrugRelationList, new ArrayList<>(icd10DrugRelationList.size()), MIcd10DrugRelation.class, fields);
     }
 
     @RequestMapping(value = "/dict/icd10/drugs/no_paging", method = RequestMethod.GET)

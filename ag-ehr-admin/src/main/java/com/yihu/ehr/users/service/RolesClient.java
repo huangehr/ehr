@@ -68,13 +68,21 @@ public interface RolesClient {
     @RequestMapping(value = ServiceApi.Roles.RoleNameExistence,method = RequestMethod.GET)
     @ApiOperation(value = "角色组名称是否已存在" )
     boolean isNameExistence(
-            @ApiParam(name = "name",value = "角色组名")
-            @RequestParam(value = "name") String name);
+            @ApiParam(name = "app_id",value = "应用id")
+            @RequestParam(value = "app_id") String appId,
+            @ApiParam(name = "name",value = "角色组名称")
+            @RequestParam(value = "name") String name,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type") String type);
 
     @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence,method = RequestMethod.GET)
     @ApiOperation(value = "角色组代码是否已存在" )
     boolean isCodeExistence(
+            @ApiParam(name = "app_id",value = "应用id")
+            @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "code",value = "角色组代码")
-            @RequestParam(value = "code") String code);
+            @RequestParam(value = "code") String code,
+            @ApiParam(name = "type",value = "角色组类别")
+            @RequestParam(value = "type") String type);
 
 }

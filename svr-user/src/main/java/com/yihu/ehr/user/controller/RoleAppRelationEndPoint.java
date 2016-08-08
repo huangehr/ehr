@@ -9,9 +9,7 @@ import com.yihu.ehr.user.service.RoleAppRelationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +35,12 @@ public class RoleAppRelationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "data_json",value = "角色组-应用关系对象Json字符串")
             @RequestBody String dataJson){
         RoleAppRelation roleAppRelation = toEntity(dataJson,RoleAppRelation.class);
+        String[] fields = {"appId","roleId"};
+        String[] values = {roleAppRelation.getAppId(),roleAppRelation.getRoleId()+""};
+        List<RoleAppRelation> roleAppRelations = roleAppRelationService.findByFields(fields, values);
+        if(roleAppRelations != null && roleAppRelations.size() > 0){
+            return convertToModel(roleAppRelations.get(0),MRoleAppRelation.class,null);
+        }
         RoleAppRelation roleAppRelationNew = roleAppRelationService.save(roleAppRelation);
         return convertToModel(roleAppRelationNew,MRoleAppRelation.class,null);
     }
@@ -92,16 +96,9 @@ public class RoleAppRelationEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-        page = reducePage(page);
-        if (StringUtils.isEmpty(filters)) {
-            Page<RoleAppRelation> roleAppRelationPage = roleAppRelationService.getRoleUserList(sorts, page, size);
-            pagedResponse(request, response, roleAppRelationPage.getTotalElements(), page, size);
-            return convertToModels(roleAppRelationPage.getContent(), new ArrayList<>(roleAppRelationPage.getNumber()), MRoleAppRelation.class, fields);
-        } else {
-            List<RoleAppRelation> roleAppRelations = roleAppRelationService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, roleAppRelationService.getCount(filters), page, size);
-            return convertToModels(roleAppRelations, new ArrayList<MRoleAppRelation>(roleAppRelations.size()), MRoleAppRelation.class, fields);
-        }
+        List<RoleAppRelation> roleAppRelations = roleAppRelationService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, roleAppRelationService.getCount(filters), page, size);
+        return convertToModels(roleAppRelations, new ArrayList<MRoleAppRelation>(roleAppRelations.size()), MRoleAppRelation.class, fields);
     }
     @RequestMapping(value = ServiceApi.Roles.RoleAppsNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组-应用关系列表---不分页")

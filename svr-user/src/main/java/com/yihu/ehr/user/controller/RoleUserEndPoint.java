@@ -9,9 +9,7 @@ import com.yihu.ehr.user.service.RoleUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +35,12 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "data_json",value = "角色组-人员关系Json串")
             @RequestBody String dataJson){
         RoleUser roleUser = toEntity(dataJson,RoleUser.class);
+        String[] fields = {"userId","roleId"};
+        String[] values = {roleUser.getUserId(),roleUser.getRoleId()+""};
+        List<RoleUser> roleUserList = roleUserService.findByFields(fields, values);
+        if(roleUserList != null && roleUserList.size() > 0){
+            return convertToModel(roleUserList.get(0), MRoleUser.class);
+        }
         RoleUser roleUserNew = roleUserService.save(roleUser);
         return convertToModel(roleUserNew,MRoleUser.class);
     }
@@ -53,6 +57,30 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             roleUserService.delete(roleUser.getId());
         }
         return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleUserByUserId,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据人员id，删除其与所有角色组关系")
+    public boolean deleteRoleUserBuUserId(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId)throws Exception{
+        Collection<RoleUser> roleUsers = roleUserService.search("userId=" + userId);
+        List<Long> ids = new ArrayList<>();
+        for(RoleUser roleUser : roleUsers){
+            ids.add(roleUser.getId());
+        }
+        roleUserService.delete(ids);
+        return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.DELETE)
+    @ApiOperation(value = "人员id,角色组ids，批量删除人员-角色组关系")
+    public boolean batchDeleteRoleUserRelation(
+            @ApiParam(name = "user_id",value = "人员id")
+            @RequestParam(value = "user_id") String userId,
+            @ApiParam(name = "role_ids",value = "角色组ids")
+            @RequestParam(value = "role_ids") String roleIds) throws Exception{
+        return roleUserService.batchDeleteRoleUserRelation(userId, roleIds);
     }
 
     @RequestMapping(value = ServiceApi.Roles.RoleUsers,method = RequestMethod.POST)
@@ -92,16 +120,9 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception{
-        page = reducePage(page);
-        if (StringUtils.isEmpty(filters)) {
-            Page<RoleUser> roleUserPage = roleUserService.getRoleUserList(sorts, page, size);
-            pagedResponse(request, response, roleUserPage.getTotalElements(), page, size);
-            return convertToModels(roleUserPage.getContent(), new ArrayList<>(roleUserPage.getNumber()), MRoleUser.class, fields);
-        } else {
-            List<RoleUser> roleUserList = roleUserService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, roleUserService.getCount(filters), page, size);
-            return convertToModels(roleUserList, new ArrayList<>(roleUserList.size()), MRoleUser.class, fields);
-        }
+        List<RoleUser> roleUserList = roleUserService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, roleUserService.getCount(filters), page, size);
+        return convertToModels(roleUserList, new ArrayList<>(roleUserList.size()), MRoleUser.class, fields);
     }
     @RequestMapping(value = ServiceApi.Roles.RoleUsersNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组人员关系列表---不分页")
