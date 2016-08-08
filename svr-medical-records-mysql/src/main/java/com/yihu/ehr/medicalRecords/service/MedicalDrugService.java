@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecords.service;
 
+import com.yihu.ehr.medicalRecords.dao.MedicalDrugDao;
 import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalDrugEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,26 +11,29 @@ import java.util.List;
 /**
  * Created by hzp on 2016/7/19.
  */
-@Transactional
 @Service
 public class MedicalDrugService {
 
-    /*@Autowired
-    MedicalDrugDao medicalDrugDao;*/
+    @Autowired
+    MedicalDrugDao medicalDrugDao;
 
     /**
      * 获取用药信息
      */
     public List<MrMedicalDrugEntity> getMedicalDrug(String recordId) throws Exception{
-
-        return null;
+        return medicalDrugDao.findByRecordId(recordId);
     }
 
     /**
-     * 导入用药信息
+     * 导入用药信息(覆盖)
      */
-    public boolean importMedicalPrescription(List<MrMedicalDrugEntity> list) throws Exception
+    @Transactional
+    public boolean importMedicalPrescription(String recordId,List<MrMedicalDrugEntity> list) throws Exception
     {
+        List<MrMedicalDrugEntity> oldList = medicalDrugDao.findByRecordId(recordId);
+        //清空数据
+        medicalDrugDao.delete(oldList);
+        medicalDrugDao.save(list);
         return true;
     }
 
@@ -38,6 +42,7 @@ public class MedicalDrugService {
      */
     public boolean saveMedicalDrug(String recordId,MrMedicalDrugEntity obj) throws Exception
     {
+        medicalDrugDao.save(obj);
         return true;
     }
 
@@ -46,6 +51,7 @@ public class MedicalDrugService {
      */
     public boolean deleteMedicalDrug(String recordId,String drugId) throws Exception
     {
+        medicalDrugDao.delete(Integer.valueOf(drugId));
         return true;
     }
 

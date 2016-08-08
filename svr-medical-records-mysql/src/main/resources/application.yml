@@ -43,9 +43,8 @@ spring:
     password: medical_record
 
 wlyy-service:
-  url: http://service.yihu.com:8085/WSGW/rest
-  clientid: 9000192
-  appuid: KK66VXAFN9QTVLTI7NWJLEX3NXH4BUIRGOV83331O75
+  url: http://172.19.103.85:9090/wlyy/
+  platform: 4
 
 fast-dfs:
   tracker-server: 172.19.103.54:22122
