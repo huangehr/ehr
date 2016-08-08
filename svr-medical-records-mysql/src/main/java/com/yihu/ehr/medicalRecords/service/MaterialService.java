@@ -12,6 +12,7 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -67,8 +68,8 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
     public List<String> getTextMaterial(String creatorId,String businessClass,String patientId,int page, int size) throws Exception{
 
         List<String> testList = new ArrayList<>();
-        page = page - 1;
-        List<MrTextEntity> mrTextEntities = matericalDao.findByCreaterAndBusinessClassAndPatientId(creatorId, businessClass, patientId, new PageRequest(page, size));
+        Sort sort = new Sort(Sort.Direction.DESC,"createTime");
+        List<MrTextEntity> mrTextEntities = matericalDao.findByCreaterAndBusinessClassAndPatientId(creatorId, businessClass, patientId, new PageRequest(page-1, size,sort));
 
         if(mrTextEntities!=null && mrTextEntities.size() > 0)
         {
