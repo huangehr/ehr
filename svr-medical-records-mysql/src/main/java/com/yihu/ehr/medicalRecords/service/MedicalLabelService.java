@@ -39,15 +39,15 @@ public class MedicalLabelService {
      * 批量保存病历标签
      */
     @Transactional
-    public boolean saveMedicalLabel(String recordId,String doctorId,List<String> list){
+    public boolean saveMedicalLabel(String recordId,String doctorId,String[] labels){
         //清空病历标签
         medicalLabelDao.deleteByRecordId(recordId);
         //保存病历标签
-        if(list!=null && list.size()>0)
+        if(labels!=null && labels.length>0)
         {
             MrDoctorMedicalRecordsEntity record = doctorMedicalRecordDao.findByDoctorIdAndRecordId(doctorId,recordId);
 
-            for(String label:list)
+            for(String label:labels)
             {
                 MrMedicalLabelEntity obj = new MrMedicalLabelEntity();
                 obj.setDoctorId(doctorId);
@@ -86,7 +86,18 @@ public class MedicalLabelService {
                 list.add(key);
             }
         }
+
        return list;
     }
+
+    /**
+     * 通过关系id删除病历标签
+     */
+    public boolean deleteMedicalLabelById(Integer id){
+        medicalLabelDao.delete(id);
+        return true;
+    }
+
+
 
 }
