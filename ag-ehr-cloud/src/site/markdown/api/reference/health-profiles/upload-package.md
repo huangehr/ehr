@@ -1,7 +1,7 @@
 档案上传
 ====================
 
-- 作者：温富建，2016.02.18
+- 作者：Sand，2016.02.18
 
 概述
 ---------------------
@@ -141,10 +141,17 @@ ZIP包：
 				"content":
 				[
 					{
+					    "object_id": "文档本身ID，GUID",
 						"mime_type": "必选。文件类型，参见:https://en.wikipedia.org/wiki/MIME",
 						"url": "可选。档案请求路径，使用相对路径，主机名使用机构参数中的回调URL。若路径中含有特殊字符，请使用URL编码，如：冒号，点号等",
 						"url_scope": "可选，与url匹配.Private;Public",
-						"name": "可选。文件名1.扩展名;文件名2.扩展名"
+						"name": "可选。文件名1.扩展名;文件名2.扩展名",
+						"reference" : [
+						    {
+						        "cda_doc_id": "引用的CDA文档ID"
+						        "object_id": "引用的文档对象ID"
+						    }
+						]
 					},
 					{
 						"mime_type": "文件类型，参见:https://en.wikipedia.org/wiki/MIME",

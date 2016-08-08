@@ -13,7 +13,8 @@ public class MrMedicalDrugEntity {
     private String drugName;
     private String drugSpecifications;
     private String drugUse;
-    private String drugQuantity;
+    private int drugQuantity;
+    private String drugUnit;
     private String drugDosage;
     private String drugFrequency;
 
@@ -70,12 +71,22 @@ public class MrMedicalDrugEntity {
 
     @Basic
     @Column(name = "DRUG_QUANTITY")
-    public String getDrugQuantity() {
+    public int getDrugQuantity() {
         return drugQuantity;
     }
 
-    public void setDrugQuantity(String drugQuantity) {
+    public void setDrugQuantity(int drugQuantity) {
         this.drugQuantity = drugQuantity;
+    }
+
+    @Basic
+    @Column(name = "DRUG_UNIT")
+    public String getDrugUnit() {
+        return drugUnit;
+    }
+
+    public void setDrugUnit(String drugUnit) {
+        this.drugUnit = drugUnit;
     }
 
     @Basic
@@ -98,37 +109,5 @@ public class MrMedicalDrugEntity {
         this.drugFrequency = drugFrequency;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
 
-        MrMedicalDrugEntity that = (MrMedicalDrugEntity) o;
-
-        if (id != that.id) return false;
-        if (recordId != that.recordId) return false;
-        if (drugName != null ? !drugName.equals(that.drugName) : that.drugName != null) return false;
-        if (drugSpecifications != null ? !drugSpecifications.equals(that.drugSpecifications) : that.drugSpecifications != null)
-            return false;
-        if (drugUse != null ? !drugUse.equals(that.drugUse) : that.drugUse != null) return false;
-        if (drugQuantity != null ? !drugQuantity.equals(that.drugQuantity) : that.drugQuantity != null) return false;
-        if (drugDosage != null ? !drugDosage.equals(that.drugDosage) : that.drugDosage != null) return false;
-        if (drugFrequency != null ? !drugFrequency.equals(that.drugFrequency) : that.drugFrequency != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (recordId != null ? recordId.hashCode() : 0);
-        result = 31 * result + (drugName != null ? drugName.hashCode() : 0);
-        result = 31 * result + (drugSpecifications != null ? drugSpecifications.hashCode() : 0);
-        result = 31 * result + (drugUse != null ? drugUse.hashCode() : 0);
-        result = 31 * result + (drugQuantity != null ? drugQuantity.hashCode() : 0);
-        result = 31 * result + (drugDosage != null ? drugDosage.hashCode() : 0);
-        result = 31 * result + (drugFrequency != null ? drugFrequency.hashCode() : 0);
-        return result;
-    }
 }

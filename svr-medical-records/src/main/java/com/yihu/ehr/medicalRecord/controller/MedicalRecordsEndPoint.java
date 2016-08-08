@@ -37,7 +37,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
      * 根据医生ID和病人ID获取最近的一次病历
      *
      */
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.SystemAccess,method = RequestMethod.GET)
     @ApiOperation("系统接入接口")
     public Map<String,Object> medicalRecord(
             @ApiParam(name="patientId",value="病人ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870")
@@ -70,7 +70,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
         return recordService.addRecord(doctorId, patientId);
     }
 
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalInfo,method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.PUT)
     @ApiOperation("修改病历")
     public boolean editRecord(
             @ApiParam(name="record_id",value="病历ID",defaultValue = "")
@@ -82,7 +82,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
         return recordService.editRecord(recordId, map);
     }
 
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalInfo,method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.DELETE)
     @ApiOperation("删除病历")
     public boolean deleteRecord(
             @ApiParam(name="record_id",value="病历ID",defaultValue = "")
@@ -91,7 +91,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
         return recordService.deleteRecord(recordId);
     }
 
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalInfo,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.GET)
     @ApiOperation("获取病历")
     public Map<String,Object> getMedicalRecord(
             @ApiParam(name="record_id",value="病历ID",defaultValue = "B834C7A0417E4CA4BEC00FD3524EE870_1_9223370566724625981")

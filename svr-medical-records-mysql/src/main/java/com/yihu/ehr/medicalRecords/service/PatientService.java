@@ -1,15 +1,25 @@
 package com.yihu.ehr.medicalRecords.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.medicalRecords.comom.Message;
+import com.yihu.ehr.medicalRecords.comom.WlyyResponse;
 import com.yihu.ehr.medicalRecords.comom.WlyyService;
 import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalRecordsDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalRecordsQueryDao;
 import com.yihu.ehr.medicalRecords.dao.PatientDao;
+import com.yihu.ehr.medicalRecords.model.DTO.DictDTO;
 import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordDTO;
+import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordSimpleDTO;
+import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrPatientsEntity;
+import com.yihu.ehr.medicalRecords.model.EnumClass;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +40,10 @@ public class PatientService {
     ObjectMapper objectMapper;
 
     @Autowired
-    DoctorMedicalRecordDao doctorMedicalRecordDao;
+    MedicalRecordsDao medicalRecordsDao;
+
+    @Autowired
+    MedicalRecordsQueryDao medicalRecordsQueryDao;
 
     @Autowired
     MedicalLabelService medicalLabelService;
@@ -60,107 +73,52 @@ public class PatientService {
      * @throws Exception
      */
     public MrPatientsEntity getPatientInformation(String patientId) throws Exception {
-        MrPatientsEntity re = patientDao.findById(patientId);
-        if (re == null)
-        {
-            /*String response = wlyyService.queryPatientInfoByID(patientId);
-            if(response.getCode() == 10000)
-            {
-                Map<String,Object> map = (Map<String,Object>)response.getResult();
+        MrPatientsEntity re = new MrPatientsEntity();
 
-                MrPatientsEntity patient = new MrPatientsEntity();
-                patient.setId(patientId);
-                patient.setName(map.get("CName").toString());
-                patient.setDemographicId(map.get("IDNumber").toString());
-                patient.setSex(map.get("Sex").toString());
-                if (map.get("BirthDate") != null && map.get("BirthDate").toString().length() > 0) {
-                    patient.setBirthday(java.sql.Timestamp.valueOf(map.get("BirthDate").toString()));
-                }
-                patient.setMaritalStatus(map.get("IsMarried").toString());
-                patient.setPhoto(map.get("PhotoUri").toString());
-                patient.setPhone(map.get("Phone").toString());
-                patientDao.save(patient);
-                re = patient;
+        WlyyResponse response = wlyyService.queryPatientInfoByID(patientId);
+        //获取患者信息成功
+        if(response.getStatus() == 200)
+        {
+            Map<String,Object> map = (Map<String,Object>)response.getData();
+
+            MrPatientsEntity patient = new MrPatientsEntity();
+            patient.setId(patientId);
+            patient.setName(map.get("name").toString());
+            patient.setDemographicId(map.get("idCard").toString());
+            patient.setSex(map.get("sex").toString());
+            if (map.get("birthday") != null && map.get("birthday").toString().length() > 0) {
+                patient.setBirthday(java.sql.Timestamp.valueOf(map.get("birthday").toString()));
             }
-            else{
-                Message.error(response.getMessage());
-            }*/
+            patient.setMaritalStatus(EnumClass.IsMarried.Unknow);
+            patient.setPhoto(map.get("photo").toString());
+            patient.setPhone(map.get("mobile").toString());
+            patientDao.save(patient);
+            re = patient;
         }
+        else{
+            re = patientDao.findById(patientId);
+            Message.debug(response.getMsg());
+            }
 
         return re;
     }
 
-    /**
-     * like：使用"?"来表示，如：name?%医
-     * in：使用"="来表示并用","逗号对值进行分隔，如：status=2,3,4,5
-     * not in：使用"<>"来表示并用","逗号对值进行分隔，如：status=2,3,4,5
-     * =：使用"="来表示，如：status=2
-     * >=：使用大于号和大于等于语法，如：createDate>2012
-     * <=：使用小于号和小于等于语法，如：createDate<=2015
-     * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接 GB/T 2261.2-2003
-     * 多条件组合：使用";"来分隔
-     * *//*
-    public List<MrPatientsEntity> searchPatient(String queryCondition,int page,int size) throws Exception {
-        URLQueryParser queryParser = createQueryParser(null, queryCondition, null);
-        CriteriaQuery query = queryParser.makeCriteriaQuery();
 
-        if(page<1) page=1;
-        if(size<0) size=15;
-
-        return entityManager
-                .createQuery(query)
-                .setFirstResult((page - 1) * size)
-                .setMaxResults(size)
-                .getResultList();
-    }*/
 
     /**
      * 获取患者诊断
      */
-    public Map<String,String> getPatientDiagnosis(String patientId, String doctorId) throws Exception{
-
-        /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId,patientId);
-        String q="";
-        if (Mlist != null && Mlist.size() > 0) {
-            for (int i = 0; i < Mlist.size(); i++) {
-                if (Mlist.get(i) != null) {
-                    q="rowKey:"+Mlist.get(i).getRecordId()+" or ";
-                }
-            }
-        }
-        q.substring(0,q.length()-4);
-        if("".equals(q)){
-            return null;
-        }
-        Page<Map<String, Object>> result = hbaseQuery.queryBySolr("1", q, null, 1, 1000000000);
-        Map<String, String> list = new HashMap<>();
-        if (result.getContent() != null && result.getContent().size() > 0) {
-
-            //遍历所有行
-            for (int i = 0; i < result.getContent().size(); i++) {
-                Map<String, Object> obj = (Map<String, Object>) result.getContent().get(i);
-                if (obj.get("MEDICAL_DIAGNOSIS_CODE") != null) {
-                    if(obj.get("MEDICAL_DIAGNOSIS") != null){
-                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),obj.get("MEDICAL_DIAGNOSIS").toString());
-                    }
-                    else {
-                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),"");
-                    }
-
-                }
-
-            }
-        }
-        return list;*/
-
-        return null;
+    public List<DictDTO> getPatientDiagnosis(String patientId, String doctorId) throws Exception{
+        return medicalRecordsQueryDao.findPatientDiagnosis(doctorId,patientId);
     }
 
     /**
      * 获取患者病历
      */
-    public List<MedicalRecordDTO> getPatientRecords(String patientId, String label, String medicalTimeFrom,
-                                                    String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String doctorId) throws Exception {
+    public List<MedicalRecordSimpleDTO> getPatientRecords(String doctorId, String patientId, String label, String medicalTimeFrom, String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String filter,int page,int size) throws Exception {
+
+        String sql = "select * from ";
+        //选了自定义标签
 
         /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorIdAndPatientId(doctorId, patientId);
         List<String> recordIdList = new ArrayList<>();
@@ -197,4 +155,28 @@ public class PatientService {
         return medicalRecordModelList;*/
         return  null;
     }
+
+    /**
+     * like：使用"?"来表示，如：name?%医
+     * in：使用"="来表示并用","逗号对值进行分隔，如：status=2,3,4,5
+     * not in：使用"<>"来表示并用","逗号对值进行分隔，如：status=2,3,4,5
+     * =：使用"="来表示，如：status=2
+     * >=：使用大于号和大于等于语法，如：createDate>2012
+     * <=：使用小于号和小于等于语法，如：createDate<=2015
+     * 分组：在条件后面加上空格，并设置分组号，如：createDate>2012 g1，具有相同组名的条件将使用or连接 GB/T 2261.2-2003
+     * 多条件组合：使用";"来分隔
+     * *//*
+    public List<MrPatientsEntity> searchPatient(String queryCondition,int page,int size) throws Exception {
+        URLQueryParser queryParser = createQueryParser(null, queryCondition, null);
+        CriteriaQuery query = queryParser.makeCriteriaQuery();
+
+        if(page<1) page=1;
+        if(size<0) size=15;
+
+        return entityManager
+                .createQuery(query)
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .getResultList();
+    }*/
 }
