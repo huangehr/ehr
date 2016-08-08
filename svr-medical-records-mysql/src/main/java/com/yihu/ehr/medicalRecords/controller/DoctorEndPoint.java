@@ -142,15 +142,25 @@ public class DoctorEndPoint extends BaseRestEndPoint {
 
 
     /********************************* 医生标签 *********************************************/
+    @ApiOperation("保存医生标签,新增/计数")
+    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabel, method = RequestMethod.POST)
+    public boolean saveDoctorLabel(
+            @ApiParam(name = "doctor_id", value = "医生ID")
+            @PathVariable(value = "doctor_id") String doctorId,
+            @ApiParam(name = "label", value = "标签名")
+            @RequestParam(value = "label") String label){
+        return doctorLabelService.saveDoctorLabel(doctorId, label);
+    }
+
     @ApiOperation("获取医生标签")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorLabel, method = RequestMethod.GET)
-    public List<MrLabelEntity> getDoctorLabels(@ApiParam(name = "doctor_id", value = "医生ID")
-                                               @PathVariable(value = "doctor_id") String doctorId,
-                                               @ApiParam(name = "label_type", value = "标签类型",defaultValue = "0")
-                                               @RequestParam(value = "label_type", required = true) String labelType,
-                                               @ApiParam(name = "label_class", value = "标签类别",defaultValue = "0")
-                                               @RequestParam(value = "label_class", required = true) String labelClass) throws Exception
-    {
+    public List<MrLabelEntity> getDoctorLabels(
+            @ApiParam(name = "doctor_id", value = "医生ID")
+            @PathVariable(value = "doctor_id") String doctorId,
+            @ApiParam(name = "label_type", value = "标签类型",defaultValue = "0")
+            @RequestParam(value = "label_type") String labelType,
+            @ApiParam(name = "label_class", value = "标签类别",defaultValue = "0")
+            @RequestParam(value = "label_class") Integer labelClass) throws Exception {
         return doctorLabelService.getDoctorLabels(doctorId, labelType, labelClass);
     }
 
