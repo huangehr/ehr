@@ -3,7 +3,8 @@ package com.yihu.ehr.medicalRecords.controller;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordDTO;
+import com.yihu.ehr.medicalRecords.model.DTO.DictDTO;
+import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordSimpleDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrPatientsEntity;
 import com.yihu.ehr.medicalRecords.service.PatientService;
 import io.swagger.annotations.Api;
@@ -29,40 +30,42 @@ public class PatientEndPoint extends BaseRestEndPoint {
     /***************************************************************************/
     @ApiOperation("获取患者所有诊断")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientICD10, method = RequestMethod.GET)
-    public Map<String,String> getPatientDiagnosis(
-            @ApiParam(name = "patient_id", value = "患者ID")
+    public List<DictDTO> getPatientDiagnosis(
+            @ApiParam(name = "patient_id", value = "患者ID",defaultValue = "350524199208115544")
             @PathVariable(value = "patient_id") String patientId,
-            @ApiParam(name = "doctor_id", value = "医生id")
+            @ApiParam(name = "doctor_id", value = "医生id",defaultValue = "D20160322000001")
             @RequestParam(value = "doctor_id", required = true) String doctorId) throws Exception{
         return patientService.getPatientDiagnosis(patientId, doctorId);
     }
 
     @ApiOperation("获取患者所有病历")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientRecords, method = RequestMethod.GET)
-    public List<MedicalRecordDTO> getPatientRecords(
-            @ApiParam(name = "patient_id", value = "患者ID")
+    public List<MedicalRecordSimpleDTO> getPatientRecords(
+            @ApiParam(name = "doctorId", value = "医生id",defaultValue = "D20160322000001")
+            @RequestParam(value = "doctorId", required = true) String doctorId,
+            @ApiParam(name = "patient_id", value = "患者ID",defaultValue = "350524199208115544")
             @PathVariable(value = "patient_id") String patientId,
             @ApiParam(name = "label", value = "label")
             @RequestParam(value = "label", required = false) String label,
             @ApiParam(name = "medical_time_from", value = "就诊时间范围开始")
-            @RequestParam(value = "medical_time_from", required = true) String medicalTimeFrom,
+            @RequestParam(value = "medical_time_from", required = false) String medicalTimeFrom,
             @ApiParam(name = "medical_time_end", value = "就诊时间范围结束")
-            @RequestParam(value = "medical_time_end", required = true) String medicalTimeEnd,
+            @RequestParam(value = "medical_time_end", required = false) String medicalTimeEnd,
             @ApiParam(name = "record_type", value = "病历类型 0线上诊断")
             @RequestParam(value = "record_type", required = false) String recordType,
             @ApiParam(name = "medical_diagnosis_code", value = "诊断代码")
             @RequestParam(value = "medical_diagnosis_code", required = false) String medicalDiagnosisCode,
-            @ApiParam(name = "doctorId", value = "医生id")
-            @RequestParam(value = "doctorId", required = true) String doctorId) throws Exception{
+            @ApiParam(name = "filter", value = "查询条件")
+            @RequestParam(value = "filter", required = false) String filter) throws Exception{
 
-        return patientService.getPatientRecords(patientId, label,medicalTimeFrom,medicalTimeEnd,recordType,medicalDiagnosisCode,doctorId);
+        return patientService.getPatientRecords(doctorId,patientId, label,medicalTimeFrom,medicalTimeEnd,recordType,medicalDiagnosisCode,filter);
     }
 
     /************************* 患者信息 ****************************************/
     @ApiOperation("获取患者个人信息")
     @RequestMapping(value = ServiceApi.MedicalRecords.PatientInfo, method = RequestMethod.GET)
     public MrPatientsEntity getPatientInformation(
-            @ApiParam(name = "patient_id", value = "患者ID")
+            @ApiParam(name = "patient_id", value = "患者ID",defaultValue = "350524199208115544")
             @PathVariable(value = "patient_id") String patientId)throws Exception{
         return patientService.getPatient(patientId);
     }
@@ -83,10 +86,6 @@ public class PatientEndPoint extends BaseRestEndPoint {
         MrPatientsEntity mrPatientsEntity=toEntity(json,MrPatientsEntity.class);
         return patientService.savePatient(mrPatientsEntity);
     }
-
-
-
-
 
 
 

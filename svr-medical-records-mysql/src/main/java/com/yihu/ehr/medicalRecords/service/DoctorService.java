@@ -5,12 +5,19 @@ import com.yihu.ehr.medicalRecords.comom.WlyyResponse;
 import com.yihu.ehr.medicalRecords.comom.WlyyService;
 import com.yihu.ehr.medicalRecords.dao.DoctorDao;
 import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalRecordsDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalRecordsQueryDao;
+import com.yihu.ehr.medicalRecords.model.DTO.DictDTO;
 import com.yihu.ehr.medicalRecords.model.DTO.MedicalRecordDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorsEntity;
+import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalRecordsEntity;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +38,10 @@ public class DoctorService {
     PatientService patientService;
 
     @Autowired
-    DoctorMedicalRecordDao doctorMedicalRecordDao;
+    MedicalRecordsDao medicalRecordsDao;
+
+    @Autowired
+    MedicalRecordsQueryDao medicalRecordsQueryDao;
 
     @Autowired
     MedicalLabelService medicalLabelService;
@@ -96,42 +106,9 @@ public class DoctorService {
     /**
      * 获取医生诊断
      */
-    public Map<String, String> getDoctorDiagnosis(String doctorId)throws Exception {
+    public List<DictDTO> getDoctorDiagnosis(String doctorId)throws Exception {
 
-        /*List<MrDoctorMedicalRecordsEntity> Mlist = doctorMedicalRecordDao.findBydoctorId(doctorId);
-        String q="";
-        if (Mlist != null && Mlist.size() > 0) {
-            for (int i = 0; i < Mlist.size(); i++) {
-                if (Mlist.get(i) != null) {
-                    q="rowKey:"+Mlist.get(i).getRecordId()+" or ";
-                }
-            }
-        }
-        q.substring(0,q.length()-4);
-        if("".equals(q)){
-            return null;
-        }
-        Map<String, String> list = new HashMap<>();
-        Page<Map<String, Object>> result = hbaseQuery.queryBySolr(MedicalRecordsFamily.TableName, "rowkey", null, 1, 1000000000);
-
-        if (result.getContent() != null && result.getContent().size() > 0) {
-
-            //遍历所有行
-            for (int i = 0; i < result.getContent().size(); i++) {
-                Map<String, Object> obj = (Map<String, Object>) result.getContent().get(i);
-                if (obj.get("MEDICAL_DIAGNOSIS_CODE") != null) {
-                    if(obj.get("MEDICAL_DIAGNOSIS") != null){
-                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),obj.get("MEDICAL_DIAGNOSIS").toString());
-                    }
-                    else {
-                        obj.put(obj.get("MEDICAL_DIAGNOSIS_CODE").toString(),"");
-                    }
-
-                }
-
-            }
-        }*/
-        return null;
+        return  medicalRecordsQueryDao.findDoctorDiagnosis(doctorId);
     }
 
     /**
