@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Created by hzp on 2016/8/1.
  */
@@ -33,6 +35,15 @@ public class MedicalReportsEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value="report_id") String reportId) throws Exception
     {
         return reportService.getMedicalReport(recordId,reportId);
+    }
+
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalReports,method = RequestMethod.GET)
+    @ApiOperation("获取某病历下的所有报告")
+    public List<MedicalReportDTO> getMedicalReports(
+            @ApiParam(name="record_id",value="病历id")
+            @PathVariable(value="record_id") String recordId) throws Exception
+    {
+        return reportService.getMedicalReports(recordId);
     }
 
     /**

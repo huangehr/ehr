@@ -529,6 +529,7 @@ public class ServiceApi {
         public static final String MedicalRecordRelated= "/medicalRecords/record/{record_id}/related"; //	病历关联记录
         public static final String MedicalLabel = "/medicalRecords/record/{record_id}/label"; //获取病历标签/批量保存病历标签
         public static final String MedicalReport = "/medicalRecords/record/{record_id}/report/{report_id}"; //获取某病历某报告
+        public static final String MedicalReports = "/medicalRecords/record/{record_id}/reports"; //获取某病历某报告
         public static final String MedicalReportManage = "/medicalRecords/record/{record_id}/report"; //新增/修改/导入报告/删除报告
         public static final String ImportMedicalPrescription = "/medicalRecords/record/{record_id}/drug/import"; //导入处方
         public static final String MedicalDrug = "/medicalRecords/record/{record_id}/drug"; //新增/修改病历用药记录/删除病历用药记录/获取病历用药记录

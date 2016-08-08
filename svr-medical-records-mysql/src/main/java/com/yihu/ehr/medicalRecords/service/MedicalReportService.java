@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,6 +56,41 @@ public class MedicalReportService {
 
         return medicalReportDTO;
     }
+
+    /**
+     * 获取某病历下所有的辅助检查报告
+     */
+    public List<MedicalReportDTO>  getMedicalReports(String recordId) throws Exception
+    {
+        List<MedicalReportDTO> medicalReportDTOList = new ArrayList<MedicalReportDTO>();
+
+        List<MrMedicalReportEntity> re = medicalReportDao.findByRecordId(recordId);
+        if(re == null || re.size() == 0){
+            return null;
+        }
+
+        for(MrMedicalReportEntity mrMedicalReportEntity :re ){
+            String fileUrlList = "";
+            MedicalReportDTO medicalReportDTO = new MedicalReportDTO();
+            medicalReportDTO.setId(mrMedicalReportEntity.getId());
+            medicalReportDTO.setReportName(mrMedicalReportEntity.getReportName());
+            medicalReportDTO.setRecordId(mrMedicalReportEntity.getRecordId());
+            medicalReportDTO.setReportContent(mrMedicalReportEntity.getReportContent());
+            medicalReportDTO.setReportDatetime(mrMedicalReportEntity.getReportDatetime());
+
+            List<MrDocumentRelationEntity> mrDocumentRelationEntityList = documentRelationDao.findByOwnerId(String.valueOf(mrMedicalReportEntity.getId()) );
+            if(mrDocumentRelationEntityList.size() != 0){
+                for(MrDocumentRelationEntity mrDocumentRelationEntity : mrDocumentRelationEntityList) {
+                    fileUrlList += mrDocumentRelationEntity.getFileId() + ";";
+                };
+            }
+            medicalReportDTO.setFileUrlList(fileUrlList);
+            medicalReportDTOList.add(medicalReportDTO);
+        }
+
+        return medicalReportDTOList;
+    }
+
 
     /**
      * 保存辅助检查报告
