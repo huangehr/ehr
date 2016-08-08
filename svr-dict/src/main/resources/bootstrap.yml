@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-dict
+    name: svr-dict-hzp
 
 ---
 spring:

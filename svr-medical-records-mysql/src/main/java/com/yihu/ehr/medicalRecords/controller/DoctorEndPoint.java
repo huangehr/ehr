@@ -14,6 +14,7 @@ import com.yihu.ehr.medicalRecords.model.Entity.MrLabelEntity;
 import com.yihu.ehr.medicalRecords.service.DoctorLabelService;
 import com.yihu.ehr.medicalRecords.service.DoctorService;
 import com.yihu.ehr.medicalRecords.service.DoctorTemplateService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -47,11 +48,9 @@ public class DoctorEndPoint extends BaseRestEndPoint {
     /*********************************************************************************/
     @ApiOperation("获取医生所有病历")
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorRecords, method = RequestMethod.GET)
-    public List<MedicalRecordDTO> getPatientRecords(
+    public Envelop getPatientRecords(
             @ApiParam(name = "doctor_id", value = "医生id",defaultValue = "D20160322000001")
             @PathVariable(value = "doctor_id") String doctorId,
-            @ApiParam(name = "filter", value = "患者信息JSON")
-            @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "label", value = "标签列表,逗号分隔")
             @RequestParam(value = "label", required = false) String label,
             @ApiParam(name = "medical_time_from", value = "就诊时间范围开始")
@@ -60,12 +59,20 @@ public class DoctorEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "medical_time_end", required = false) String medicalTimeEnd,
             @ApiParam(name = "record_type", value = "病历类型 0线上诊断",defaultValue = "0")
             @RequestParam(value = "record_type", required = true) String recordType,
+            @ApiParam(name = "age_from", value = "年龄起始")
+            @RequestParam(value = "age_from", required = false) int ageFrom,
+            @ApiParam(name = "age_end", value = "年龄结束")
+            @RequestParam(value = "age_end", required = false) int ageEnd,
+            @ApiParam(name = "sex", value = "性别")
+            @RequestParam(value = "sex", required = false) String sex,
+            @ApiParam(name = "filter", value = "过滤条件")
+            @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "page", value = "page")
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "size")
             @RequestParam(value = "size", required = false) int size) throws Exception
     {
-        return doctorService.getDoctorRecords(filter, label, medicalTimeFrom, medicalTimeEnd, recordType, doctorId, page, size);
+        return doctorService.getDoctorRecords(doctorId,label, medicalTimeFrom, medicalTimeEnd, recordType,ageFrom,ageEnd,sex , filter, page, size);
     }
 
     @ApiOperation("获取医生诊断")

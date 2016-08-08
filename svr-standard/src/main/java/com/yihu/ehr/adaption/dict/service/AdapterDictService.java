@@ -35,7 +35,6 @@ public class AdapterDictService extends BaseJpaService<AdapterDict, XAdapterDict
 
     /**
      * 根据方案和字典获取字典项适配
-     *
      */
     @Transactional(propagation = Propagation.NEVER)
     public List<MAdapterRelationship> searchAdapterDict(OrgAdapterPlan orgAdapterPlan, String code, String name, String orders, int page, int rows) {
