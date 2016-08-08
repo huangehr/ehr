@@ -457,7 +457,7 @@
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <scope>${dependency.scope}</scope>
+                    <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
