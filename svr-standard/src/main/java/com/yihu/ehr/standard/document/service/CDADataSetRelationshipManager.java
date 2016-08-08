@@ -40,7 +40,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
     private final static String ENTITY_PRE = "com.yihu.ehr.standard.document.service.CDADataSetRelationship";
 
 
-    public Class getRelationshipServiceEntity(String version){
+    public Class getRelationshipServiceEntity(String version) {
         try {
             return Class.forName(ENTITY_PRE + version);
         } catch (ClassNotFoundException e) {
@@ -49,7 +49,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
     }
 
 
-    public Class getDocumentServiceEntity(String version){
+    public Class getDocumentServiceEntity(String version) {
         try {
             return Class.forName("com.yihu.ehr.standard.document.service.CDADocument" + version);
         } catch (ClassNotFoundException e) {
@@ -69,19 +69,20 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
 
     /**
      * 根据CDAID删除CDA数据集关联关系
+     *
      * @param version
      * @param cdaIds
      */
-    public void deleteRelationshipByCdaIds(String version,String[] cdaIds) {
+    public void deleteRelationshipByCdaIds(String version, String[] cdaIds) {
         Class entityClass = getRelationshipServiceEntity(version);
-        List<BaseCDADataSetRelationship> ls = search(entityClass, "cdaId="+ String.join(",", cdaIds));
+        List<BaseCDADataSetRelationship> ls = search(entityClass, "cdaId=" + String.join(",", cdaIds));
         String ids = "";
-        for(int i = 0;i<ls.size();i++){
+        for (int i = 0; i < ls.size(); i++) {
             BaseCDADataSetRelationship cdaDataSetRelationship = ls.get(i);
-            if(i==0){
-                ids+=cdaDataSetRelationship.getId();
-            }else {
-                ids+=","+cdaDataSetRelationship.getId();
+            if (i == 0) {
+                ids += cdaDataSetRelationship.getId();
+            } else {
+                ids += "," + cdaDataSetRelationship.getId();
             }
             //ids += cdaDataSetRelationship.getId();
         }
@@ -96,6 +97,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
 
     /**
      * 根据CDAID获取关联关系
+     *
      * @param entityClass
      * @param fields
      * @param filters
@@ -104,15 +106,15 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
      * @param page
      * @return
      */
-    public List getCDADataSetRelationships(Class entityClass,String fields,String filters,String sorts,int size,int page) {
+    public List getCDADataSetRelationships(Class entityClass, String fields, String filters, String sorts, int size, int page) {
 
         List ls = search(entityClass, fields, filters, sorts, page, size);
         return ls;
     }
 
-    public List getCDADataSetRelationshipByCDAId(Class entityClass,String cdaId) {
+    public List getCDADataSetRelationshipByCDAId(Class entityClass, String cdaId) {
 
-        List ls = search(entityClass, "cdaId="+cdaId);
+        List ls = search(entityClass, "cdaId=" + cdaId);
         return ls;
     }
 
@@ -144,17 +146,18 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
     /**
      * 保存CDA信息
      * 1.先删除CDA数据集关联关系信息与cda文档XML文件，在新增信息
-     * @param dataSetIds 关联的数据集
-     * @param cdaId  cda文档 ID
+     *
+     * @param dataSetIds  关联的数据集
+     * @param cdaId       cda文档 ID
      * @param versionCode 版本号
-     * @param xmlInfo xml 文件内容
+     * @param xmlInfo     xml 文件内容
      * @return 操作结果
      */
-    public boolean SaveDataSetRelationship(String[] dataSetIds,String cdaId,String versionCode, String xmlInfo) throws Exception {
-        deleteRelationshipByCdaIds(versionCode,new String[]{cdaId});
+    public boolean SaveDataSetRelationship(String[] dataSetIds, String cdaId, String versionCode, String xmlInfo) throws Exception {
+        deleteRelationshipByCdaIds(versionCode, new String[]{cdaId});
 
         Class entityClass = getDocumentServiceEntity(versionCode);
-        List<CDADocument> cdaDocuments = cdaDocumentService.search(entityClass, "id="+ cdaId);
+        List<CDADocument> cdaDocuments = cdaDocumentService.search(entityClass, "id=" + cdaId);
 
         if (cdaDocuments.size() <= 0) return false;
 
@@ -165,7 +168,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
                 && !cdaDocument.getSchema().equals("")) {
             fastDFSUtil.delete(cdaDocument.getFileGroup(), cdaDocument.getSchema());
         }
-        if (dataSetIds==null || dataSetIds.length==0) return true;
+        if (dataSetIds == null || dataSetIds.length == 0) return true;
 
         List<CDADataSetRelationship> infos = new ArrayList<>();
         for (int i = 0; i < dataSetIds.length; i++) {
@@ -176,9 +179,9 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
             infos.add(info);
         }
         //cdaDataSetRelationshipManager.addRelationship(infos,versionCode);
-        if(infos.size()>0){
-            addRelationship(infos,versionCode);
-        }else{
+        if (infos.size() > 0) {
+            addRelationship(infos, versionCode);
+        } else {
             throw new ApiException(ErrorCode.GetStdVersionFailed);
         }
         String strFilePath = SaveCdaFile(xmlInfo, versionCode, cdaId);
@@ -194,7 +197,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
             file.delete();
         }
 
-        boolean bRes = SaveXmlFilePath(new String[]{cdaId}, versionCode, strFileGroup, strSchemePath);
+        boolean bRes = saveXmlFilePath(new String[]{cdaId}, versionCode, strFileGroup, strSchemePath);
         return bRes;
     }
 
@@ -229,11 +232,11 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
         return strXMLFilePath;
     }
 
-    public boolean SaveXmlFilePath(String[] cdaIds, String versionCode, String fileGroup, String filePath) {
+    public boolean saveXmlFilePath(String[] cdaIds, String versionCode, String fileGroup, String filePath) {
 
-        Class entityClass  = getDocumentServiceEntity(versionCode);
+        Class entityClass = getDocumentServiceEntity(versionCode);
 
-        List<CDADocument> cdaDocuments = cdaDocumentService.search(entityClass, "id="+ String.join(",",cdaIds));
+        List<CDADocument> cdaDocuments = cdaDocumentService.search(entityClass, "id=" + String.join(",", cdaIds));
         if (cdaDocuments.size() <= 0) {
             return false;
         }
@@ -249,7 +252,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
     public CDADocument saveCdaInfo(String cdaDocumentJsonData) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         CDADocument cdaInfo = objectMapper.readValue(cdaDocumentJsonData, CDADocument.class);
-        if(cdaDocumentService.isDocumentExist(cdaInfo.getVersionCode(), cdaInfo.getCode(), cdaInfo.getId())){
+        if (cdaDocumentService.isDocumentExist(cdaInfo.getVersionCode(), cdaInfo.getCode(), cdaInfo.getId())) {
             throw new Exception("已存在");
         }
 
@@ -263,7 +266,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
      *
      * @param cdaDatasetRelationships
      */
-    public boolean addRelationship(List<CDADataSetRelationship> cdaDatasetRelationships,String versionCode) {
+    public boolean addRelationship(List<CDADataSetRelationship> cdaDatasetRelationships, String versionCode) {
         Session session = currentSession();
 
         String strTableName = CDAVersionUtil.getCDADatasetRelationshipTableName(versionCode);
@@ -294,11 +297,11 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
         String sql = "SELECT " +
                 " scdsr.id id,scdsr.cda_id cdaId,scdsr.dataset_id dataSetId, sds.CODE dataSetCode,sds.multi_record multiRecord " +
                 "FROM " +
-                " std_cda_data_set_relationship_"+version+" scdsr, " +
-                " std_data_set_"+version+" sds " +
+                " std_cda_data_set_relationship_" + version + " scdsr, " +
+                " std_data_set_" + version + " sds " +
                 "WHERE " +
                 " 1 = 1 " +
-                "AND scdsr.cda_id = '"+cdaId+"' " +
+                "AND scdsr.cda_id = '" + cdaId + "' " +
                 "AND scdsr.dataset_id = sds.id";
         RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(MCdaDataSet.class);
         return this.jdbcTemplate.query(sql, rowMapper);

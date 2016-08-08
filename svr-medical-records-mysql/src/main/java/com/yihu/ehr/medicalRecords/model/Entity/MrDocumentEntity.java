@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 public class MrDocumentEntity {
     private int id;
     private String creater;
-    private String creatertName;
+    private String createrName;
     private Timestamp createTime;
     private String patientId;
     private String patientName;
@@ -42,13 +42,13 @@ public class MrDocumentEntity {
     }
 
     @Basic
-    @Column(name = "CREATERT_NAME")
-    public String getCreatertName() {
-        return creatertName;
+    @Column(name = "CREATER_NAME")
+    public String getCreaterName() {
+        return createrName;
     }
 
-    public void setCreatertName(String creatertName) {
-        this.creatertName = creatertName;
+    public void setCreaterName(String createrName) {
+        this.createrName = createrName;
     }
 
     @Basic

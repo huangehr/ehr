@@ -5,7 +5,6 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.medicalRecords.model.DTO.MedicalReportDTO;
-import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalReportEntity;
 import com.yihu.ehr.medicalRecords.service.MedicalReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,10 +12,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by hzp on 2016/8/1.
@@ -52,7 +47,7 @@ public class MedicalReportsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name="json",value="数据元JSON")
             @RequestBody String json) throws Exception
     {
-        MrMedicalReportEntity obj = toEntity(json,MrMedicalReportEntity.class);
+        MedicalReportDTO obj = toEntity(json,MedicalReportDTO.class);
         return reportService.saveMedicalReport(recordId,obj);
     }
 
