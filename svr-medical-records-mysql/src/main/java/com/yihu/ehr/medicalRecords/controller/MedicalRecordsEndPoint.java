@@ -53,12 +53,11 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value="patient_id",required = true)String patientId,
             @ApiParam(name="doctor_id",value="医生ID",defaultValue = "D20160322000001")
             @RequestParam(value="doctor_id",required = true)String userId,
-            @ApiParam(name="json",value="校验json",defaultValue = "{\"id\":\"1\",\"imei\":\"864394010501239\",\"token\":\"7e124976b092dd17662fe228e5b63172\"}")
+            @ApiParam(name="json",value="校验json",defaultValue = "{\"id\":\"1\",\"uid\":\"D20160322000001\",\"imei\":\"864394010501239\",\"token\":\"7e124976b092dd17662fe228e5b63172\",\"platform\":\"4\"}")
             @RequestParam(value="json",required = true)String json) throws Exception
     {
         try {
-            Map<String,String> map =(Map<String,String>)objectMapper.readValue(json,Map.class);
-            return recordService.systemAccess(patientId, userId, map.get("id"), map.get("imei"), map.get("token"));
+            return recordService.systemAccess(patientId, userId, json);
         }
         catch (Exception ex)
         {
