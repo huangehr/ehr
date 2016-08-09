@@ -49,7 +49,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemAccess,method = RequestMethod.GET)
     @ApiOperation("系统接入接口")
     public MrMedicalRecordsEntity systemAccess(
-            @ApiParam(name="patient_id",value="病人ID",defaultValue = "350524199208115544")
+            @ApiParam(name="patient_id",value="病人ID",defaultValue = "U20160322000004")
             @RequestParam(value="patient_id",required = true)String patientId,
             @ApiParam(name="doctor_id",value="医生ID",defaultValue = "D20160322000001")
             @RequestParam(value="doctor_id",required = true)String userId,

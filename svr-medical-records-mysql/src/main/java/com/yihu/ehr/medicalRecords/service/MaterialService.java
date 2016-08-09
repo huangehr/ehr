@@ -5,9 +5,7 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.medicalRecords.dao.DocumentDao;
 import com.yihu.ehr.medicalRecords.dao.DocumentRelationDao;
 import com.yihu.ehr.medicalRecords.dao.MatericalDao;
-import com.yihu.ehr.medicalRecords.model.Entity.MrDocumentEntity;
-import com.yihu.ehr.medicalRecords.model.Entity.MrDocumentRelationEntity;
-import com.yihu.ehr.medicalRecords.model.Entity.MrTextEntity;
+import com.yihu.ehr.medicalRecords.model.Entity.*;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +33,12 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
     DocumentDao documentDao;
 
     @Autowired
+    DoctorService doctorService;
+
+    @Autowired
+    PatientService patientService;
+
+    @Autowired
     DocumentRelationDao documentRelationDao;
 
     @Autowired
@@ -45,7 +49,7 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
      * @return
      * @throws Exception
      */
-    public boolean uploadTextMaterial(String creator,String creatorName,String businessClass,String content,String patientId,String patientName) throws Exception
+    public boolean uploadTextMaterial(String creator,String businessClass,String content,String patientId) throws Exception
     {
         MrTextEntity mrTextEntity = new MrTextEntity();
 
@@ -53,10 +57,16 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
         mrTextEntity.setBusinessClass(businessClass);
         mrTextEntity.setContent(content);
         mrTextEntity.setCreater(creator);
-        mrTextEntity.setCreaterName(creatorName);
         mrTextEntity.setPatientId(patientId);
-        mrTextEntity.setPatientName(patientName);
         mrTextEntity.setUsageCount(1);
+        MrPatientsEntity patient = patientService.getPatient(patientId);
+        if(patient!=null){
+            mrTextEntity.setPatientName(patient.getName().toString());
+        }
+        MrDoctorsEntity mrDoctorsEntity = doctorService.getDoctor(creator);
+        if(mrDoctorsEntity!=null){
+            mrTextEntity.setCreaterName(mrDoctorsEntity.getName().toString());
+        }
         mrTextEntity = matericalDao.save(mrTextEntity);
 
         return true;
@@ -99,13 +109,19 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
 
         MrDocumentEntity mrDocumentEntity = new MrDocumentEntity();
         mrDocumentEntity.setCreater(creatorId);
-        mrDocumentEntity.setCreaterName(creatorName);
         mrDocumentEntity.setPatientId(patientId);
-        mrDocumentEntity.setPatientName(patientName);
         mrDocumentEntity.setFileUrl(path);
         mrDocumentEntity.setFileType("JPG");
         mrDocumentEntity.setCreateTime(DateUtil.getSysDateTime());
         mrDocumentEntity.setDocumentContent("");
+        MrPatientsEntity patient = patientService.getPatient(patientId);
+        if(patient!=null){
+            mrDocumentEntity.setPatientName(patient.getName().toString());
+        }
+        MrDoctorsEntity mrDoctorsEntity = doctorService.getDoctor(creatorId);
+        if(mrDoctorsEntity!=null){
+            mrDocumentEntity.setCreaterName(mrDoctorsEntity.getName().toString());
+        }
 
         mrDocumentEntity = documentDao.save(mrDocumentEntity);
         if(mrDocumentEntity != null){
@@ -126,12 +142,12 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
     /**
      * 获取图片素材
      */
-    public List<MrDocumentEntity> getImgMaterial(String creatorId, String patientId, String dataFrom, int page, int size) throws Exception{
+    public List<MrDocumentEntity> getImgMaterial(String creatorId, String patientId,  int page, int size) throws Exception{
 
         List<MrDocumentEntity> documentEntityList = new ArrayList<MrDocumentEntity>();
         DocumentDao repo = (DocumentDao) getJpaRepository();
 
-        documentEntityList = repo.findByCreaterAndPatientIdAndCreateTime(creatorId, patientId, dataFrom, new PageRequest(page, size));
+        documentEntityList = repo.findByCreaterAndPatientId(creatorId, patientId, new PageRequest(page, size));
         if(documentEntityList!=null && documentEntityList.size() > 0)
         {
             return documentEntityList;
