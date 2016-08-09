@@ -38,17 +38,17 @@ public class DoctorMatericalEndPoint {
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorText,method = RequestMethod.GET)
     @ApiOperation("获取文本素材")
-    public List<String> getTextMaterial(  @ApiParam(name="creatorId",value="创建者Id")
-                                          @RequestParam(value="creatorId",required = true) String creatorId,
-                                          @ApiParam(name="businessClass",value="素材类型")
-                                          @RequestParam(value="businessClass",required = true) String businessClass,
-                                          @ApiParam(name="patientId",value="患者Id")
-                                          @RequestParam(value="patientId",required = false) String patientId,
+    public List<String> getTextMaterial(  @ApiParam(name="doctor_id",value="创建者Id")
+                                          @PathVariable(value="doctor_id") String doctorId,
+                                          @ApiParam(name="business_class",value="素材类型")
+                                          @RequestParam(value="business_class",required = true) String businessClass,
+                                          @ApiParam(name="patient_id",value="患者Id")
+                                          @RequestParam(value="patient_id",required = false) String patientId,
                                           @ApiParam(name="page",value="page")
                                           @RequestParam(value="page",required = false) int page,
                                           @ApiParam(name="size",value="size")
                                           @RequestParam(value="size",required = false) int size) throws Exception{
-        return materialService.getTextMaterial(creatorId, businessClass, patientId,page,size);
+        return materialService.getTextMaterial(doctorId, businessClass, patientId,page,size);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorImg,method = RequestMethod.POST)
