@@ -142,12 +142,12 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
     /**
      * 获取图片素材
      */
-    public List<MrDocumentEntity> getImgMaterial(String creatorId, String patientId, String dataFrom, int page, int size) throws Exception{
+    public List<MrDocumentEntity> getImgMaterial(String creatorId, String patientId,  int page, int size) throws Exception{
 
         List<MrDocumentEntity> documentEntityList = new ArrayList<MrDocumentEntity>();
         DocumentDao repo = (DocumentDao) getJpaRepository();
 
-        documentEntityList = repo.findByCreaterAndPatientIdAndCreateTime(creatorId, patientId, dataFrom, new PageRequest(page, size));
+        documentEntityList = repo.findByCreaterAndPatientId(creatorId, patientId, new PageRequest(page, size));
         if(documentEntityList!=null && documentEntityList.size() > 0)
         {
             return documentEntityList;

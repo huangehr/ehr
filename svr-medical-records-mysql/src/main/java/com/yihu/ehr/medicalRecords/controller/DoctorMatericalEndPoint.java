@@ -75,13 +75,11 @@ public class DoctorMatericalEndPoint {
                                        @RequestParam(value="creatorId",required = true) String creatorId,
                                                  @ApiParam(name="patientId",value="患者Id")
                                        @RequestParam(value="patientId",required = false) String patientId,
-                                                 @ApiParam(name="dataFrom",value="数据来源")
-                                           @RequestParam(value="dataFrom",required = false) String dataFrom,
                                                  @ApiParam(name="page",value="page")
                                        @RequestParam(value="page",required = false) int page,
                                                  @ApiParam(name="size",value="size")
                                        @RequestParam(value="size",required = false) int size) throws Exception{
 
-        return materialService.getImgMaterial(creatorId, patientId,dataFrom,page,size);
+        return materialService.getImgMaterial(creatorId, patientId,page,size);
     }
 }
