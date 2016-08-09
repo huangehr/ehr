@@ -37,7 +37,7 @@ public class MedicalDrugEndPoint extends BaseRestEndPoint {
     }
 
     @ApiOperation("导入用药信息")
-    @RequestMapping(value =  ServiceApi.MedicalRecords.ImportMedicalPrescription, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value =  ServiceApi.MedicalRecords.ImportMedicalPrescription, method = RequestMethod.POST)
     public boolean importMedicalPrescription(
             @ApiParam(name = "record_id", value = "病历号",defaultValue = "1")
             @PathVariable(value = "record_id")String recordId,
@@ -56,7 +56,7 @@ public class MedicalDrugEndPoint extends BaseRestEndPoint {
         return  medicalDrugService.importMedicalPrescription(recordId,list);
     }
 
-    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalDrug,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalDrug,method = RequestMethod.POST)
     @ApiOperation("保存病历用药记录")
     public boolean saveMedicalDrug(
             @ApiParam(name="record_id",value="病历id",defaultValue = "1")

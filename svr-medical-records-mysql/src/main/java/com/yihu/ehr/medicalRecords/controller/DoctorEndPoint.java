@@ -195,13 +195,13 @@ public class DoctorEndPoint extends BaseRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorTemplate,method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.MedicalRecords.DoctorTemplate,method = RequestMethod.POST)
     @ApiOperation("批量保存模板")
     public boolean saveTemplate(
             @ApiParam(name="doctor_id",value="医生Id",defaultValue = "D20160322000001")
             @PathVariable(value = "doctor_id") String doctor_id,
             @ApiParam(name="template_list",value="数据元JSON")
-            @RequestBody String templateList) throws Exception
+            @RequestParam(value="template_list") String templateList) throws Exception
     {
         List templateInfoList = objectMapper.readValue(templateList, new TypeReference<List>() {});
         dTService.saveTemplate(doctor_id, templateInfoList);
