@@ -81,11 +81,24 @@ public class MedicalRecordsQueryDao {
 
     }
 
+    private int defaultPage = 1;
+    private int defaultSize = 50;
+
     /**
      * 获取分页数据
      */
-    public Envelop queryPage(String sql,int page,int size) {
+    public Envelop queryPage(String sql,Integer page,Integer size) {
         Envelop re = new Envelop();
+
+        if(page==null)
+        {
+            page = defaultPage;
+        }
+        if(size == null)
+        {
+            size = defaultSize;
+        }
+
         re.setCurrPage(page);
         re.setPageSize(size);
         re.setSuccessFlg(true);

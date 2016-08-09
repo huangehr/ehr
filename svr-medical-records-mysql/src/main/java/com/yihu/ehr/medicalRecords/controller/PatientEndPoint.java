@@ -46,22 +46,22 @@ public class PatientEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "doctorId", required = true) String doctorId,
             @ApiParam(name = "patient_id", value = "患者ID",defaultValue = "350524199208115544")
             @PathVariable(value = "patient_id") String patientId,
-            @ApiParam(name = "label", value = "label")
+            @ApiParam(name = "label", value = "label",defaultValue = "牙髓病,发烧")
             @RequestParam(value = "label", required = false) String label,
-            @ApiParam(name = "medical_time_from", value = "就诊时间范围开始")
+            @ApiParam(name = "medical_time_from", value = "就诊时间范围开始",defaultValue = "2016-08-05 00:00:00")
             @RequestParam(value = "medical_time_from", required = false) String medicalTimeFrom,
             @ApiParam(name = "medical_time_end", value = "就诊时间范围结束")
             @RequestParam(value = "medical_time_end", required = false) String medicalTimeEnd,
             @ApiParam(name = "record_type", value = "病历类型 0线上诊断")
             @RequestParam(value = "record_type", required = false) String recordType,
-            @ApiParam(name = "medical_diagnosis_code", value = "诊断代码")
+            @ApiParam(name = "medical_diagnosis_code", value = "诊断代码",defaultValue = "1")
             @RequestParam(value = "medical_diagnosis_code", required = false) String medicalDiagnosisCode,
-            @ApiParam(name = "filter", value = "查询条件")
+            @ApiParam(name = "filter", value = "查询条件",defaultValue = "现病史")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "page", value = "page",defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "size",defaultValue = "10")
-            @RequestParam(value = "size", required = false) int size) throws Exception{
+            @RequestParam(value = "size", required = false) Integer size) throws Exception{
 
         return patientService.getPatientRecords(doctorId,patientId, label,medicalTimeFrom,medicalTimeEnd,recordType,medicalDiagnosisCode,filter,page,size);
     }

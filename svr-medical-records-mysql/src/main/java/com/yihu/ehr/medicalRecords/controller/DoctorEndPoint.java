@@ -51,26 +51,26 @@ public class DoctorEndPoint extends BaseRestEndPoint {
     public Envelop getPatientRecords(
             @ApiParam(name = "doctor_id", value = "医生id",defaultValue = "D20160322000001")
             @PathVariable(value = "doctor_id") String doctorId,
-            @ApiParam(name = "label", value = "标签列表,逗号分隔")
+            @ApiParam(name = "label", value = "标签列表,逗号分隔",defaultValue = "牙髓病,发烧")
             @RequestParam(value = "label", required = false) String label,
-            @ApiParam(name = "medical_time_from", value = "就诊时间范围开始")
+            @ApiParam(name = "medical_time_from", value = "就诊时间范围开始",defaultValue = "2016-08-05 00:00:00")
             @RequestParam(value = "medical_time_from", required = false) String medicalTimeFrom,
             @ApiParam(name = "medical_time_end", value = "就诊时间范围结束")
             @RequestParam(value = "medical_time_end", required = false) String medicalTimeEnd,
-            @ApiParam(name = "record_type", value = "病历类型 0线上诊断",defaultValue = "0")
-            @RequestParam(value = "record_type", required = true) String recordType,
-            @ApiParam(name = "age_from", value = "年龄起始")
-            @RequestParam(value = "age_from", required = false) int ageFrom,
-            @ApiParam(name = "age_end", value = "年龄结束")
-            @RequestParam(value = "age_end", required = false) int ageEnd,
-            @ApiParam(name = "sex", value = "性别")
+            @ApiParam(name = "record_type", value = "病历类型 0线上诊断")
+            @RequestParam(value = "record_type", required = false) String recordType,
+            @ApiParam(name = "age_from", value = "年龄起始",defaultValue = "1")
+            @RequestParam(value = "age_from", required = false) Integer ageFrom,
+            @ApiParam(name = "age_end", value = "年龄结束",defaultValue = "50")
+            @RequestParam(value = "age_end", required = false) Integer ageEnd,
+            @ApiParam(name = "sex", value = "性别",defaultValue = "2")
             @RequestParam(value = "sex", required = false) String sex,
-            @ApiParam(name = "filter", value = "过滤条件")
+            @ApiParam(name = "filter", value = "过滤条件",defaultValue = "现病史")
             @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "page", value = "page")
-            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "size")
-            @RequestParam(value = "size", required = false) int size) throws Exception
+            @RequestParam(value = "size", required = false) Integer size) throws Exception
     {
         return doctorService.getDoctorRecords(doctorId,label, medicalTimeFrom, medicalTimeEnd, recordType,ageFrom,ageEnd,sex , filter, page, size);
     }
