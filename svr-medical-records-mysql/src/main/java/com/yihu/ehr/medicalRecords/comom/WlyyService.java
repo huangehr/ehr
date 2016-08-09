@@ -2,6 +2,8 @@ package com.yihu.ehr.medicalRecords.comom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
+import com.yihu.ehr.util.HttpClientUtil.HttpHelper;
+import com.yihu.ehr.util.HttpClientUtil.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,9 @@ import java.util.Map;
  */
 @Service
 public class WlyyService {
+
+    @Autowired
+    HttpHelper httpHelper;
 
     @Value("${wlyy-service.url}")
     String serviceUrl;
@@ -37,35 +42,63 @@ public class WlyyService {
         params.put("imei", imei);
         params.put("token", token);
         params.put("platform", platform);
-        String result = HttpClientUtil.doPost(url, params, null, null);
+        HttpResponse response = httpHelper.post(url, params);
+        if(response.getStatusCode() == 200)
+        {
+            return objectMapper.readValue(response.getBody(), WlyyResponse.class);
+        }
+        else{
+            Message.error(response.getBody());
+            return null;
+        }
+    }
 
-        return objectMapper.readValue(result, WlyyResponse.class);
+    /**
+     * 获取头部信息
+     */
+    public String getHeadInfo(String id,String uid,String imei,String token)  throws Exception
+    {
+        return "{\"id\":"+id+",\"uid\":\""+uid+"\", \"imei\":\""+imei+"\", \"token\":\""+token+"\",\"platform\":\""+platform+"\"}";
     }
 
     /***
      * 获取医生信息
      */
-    public WlyyResponse queryDoctorInfoByID (String code) throws Exception
+    public WlyyResponse queryDoctorInfoByID (String code,String headInfo) throws Exception
     {
         String url = serviceUrl + "doctor/baseinfo";
-        Map<String, Object> params = new HashMap<>();
-        params.put("code", code);
-        String result = HttpClientUtil.doPost(url, params, null, null);
-
-        return objectMapper.readValue(result, WlyyResponse.class);
+        Map<String, Object> head = new HashMap<>();
+        head.put("User-Agent", headInfo);
+        HttpResponse response = httpHelper.post(url, null,head);
+        if(response.getStatusCode() == 200)
+        {
+            return objectMapper.readValue(response.getBody(), WlyyResponse.class);
+        }
+        else{
+            Message.error(response.getBody());
+            return null;
+        }
     }
 
     /***
      * 获取患者信息
      */
-    public WlyyResponse queryPatientInfoByID (String code) throws Exception
+    public WlyyResponse queryPatientInfoByID (String code,String headInfo) throws Exception
     {
-        String url = serviceUrl + "doctor/patient_group/patient";
+        String url = serviceUrl + "doctor/sign/patient";
         Map<String, Object> params = new HashMap<>();
-        params.put("code", code);
-        String result = HttpClientUtil.doPost(url, params, null, null);
-
-        return objectMapper.readValue(result, WlyyResponse.class);
+        params.put("patient", code);
+        Map<String, Object> head = new HashMap<>();
+        head.put("User-Agent", headInfo);
+        HttpResponse response = httpHelper.post(url, params,head);
+        if(response.getStatusCode() == 200)
+        {
+            return objectMapper.readValue(response.getBody(), WlyyResponse.class);
+        }
+        else{
+            Message.error(response.getBody());
+            return null;
+        }
     }
 
 

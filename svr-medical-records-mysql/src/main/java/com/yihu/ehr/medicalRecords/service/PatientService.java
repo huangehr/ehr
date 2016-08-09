@@ -75,10 +75,10 @@ public class PatientService {
      * @return
      * @throws Exception
      */
-    public MrPatientsEntity getPatientInformation(String patientId) throws Exception {
+    public MrPatientsEntity getPatientInformation(String patientId,String headInfo) throws Exception {
         MrPatientsEntity re = new MrPatientsEntity();
 
-        WlyyResponse response = wlyyService.queryPatientInfoByID(patientId);
+        WlyyResponse response = wlyyService.queryPatientInfoByID(patientId,headInfo);
         //获取患者信息成功
         if(response.getStatus() == 200)
         {
@@ -87,7 +87,7 @@ public class PatientService {
             MrPatientsEntity patient = new MrPatientsEntity();
             patient.setId(patientId);
             patient.setName(map.get("name").toString());
-            patient.setDemographicId(map.get("idCard").toString());
+            patient.setDemographicId(map.get("idcard").toString());
             patient.setSex(map.get("sex").toString());
             if (map.get("birthday") != null && map.get("birthday").toString().length() > 0) {
                 patient.setBirthday(java.sql.Timestamp.valueOf(map.get("birthday").toString()));
@@ -101,7 +101,7 @@ public class PatientService {
         else{
             re = patientDao.findById(patientId);
             Message.debug(response.getMsg());
-            }
+        }
 
         return re;
     }
@@ -118,7 +118,7 @@ public class PatientService {
     /**
      * 获取患者病历
      */
-    public Envelop getPatientRecords(String doctorId, String patientId, String label, String medicalTimeFrom, String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String filter, int page, int size) throws Exception {
+    public Envelop getPatientRecords(String doctorId, String patientId, String label, String medicalTimeFrom, String medicalTimeEnd, String recordType, String medicalDiagnosisCode, String filter, Integer page, Integer size) throws Exception {
 
         String sql = "SELECT concat(a.id) as id,a.medical_Time as medicalTime,'0' as medicalType,a.MEDICAL_DIAGNOSIS as medicalDiagnosis,b.name as doctorName,b.org_dept as orgDept,b.org_name as orgName,b.title as doctorTitle,c.medical_info as medicalInfo\n" +
                 "from mr_medical_records a \n" +
@@ -135,19 +135,19 @@ public class PatientService {
                 labelString += "'"+item+"',";
             }
             labelString = labelString.substring(0,labelString.length()-1);
-            sql += " and a.id in ("+labelString+")";
+            sql += " and a.id in (select l.RECORD_ID from mr_medical_label l where l.LABEL in("+labelString+") and l.doctor_id = '"+doctorId+"')";
         }
 
         //就诊开始时间
         if(!StringUtils.isEmpty(medicalTimeFrom))
         {
-            sql += "";
+            sql += " and unix_timestamp(a.medical_time) >= unix_timestamp('"+medicalTimeFrom+"')";
         }
 
         //就诊结束时间
         if(!StringUtils.isEmpty(medicalTimeEnd))
         {
-            sql += "";
+            sql += " and unix_timestamp(a.medical_time) < unix_timestamp('"+medicalTimeEnd+"')";
         }
 
         //就诊类型
@@ -161,10 +161,11 @@ public class PatientService {
         {
             sql += " and a.medical_diagnosis_code = '"+medicalDiagnosisCode+"'";
         }
+
         //过滤条件
         if(!StringUtils.isEmpty(filter))
         {
-            sql += " and (a.MEDICAL_DIAGNOSIS like '%"+filter+"%' or b.medical_info like '%"+filter+"%')";
+            sql += " and (a.MEDICAL_DIAGNOSIS like '%"+filter+"%' or c.medical_info like '%"+filter+"%')";
         }
 
         return  medicalRecordsQueryDao.queryPage(sql,page,size);

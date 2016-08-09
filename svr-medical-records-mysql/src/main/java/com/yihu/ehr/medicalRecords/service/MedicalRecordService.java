@@ -52,14 +52,16 @@ public class MedicalRecordService{
     public MrMedicalRecordsEntity systemAccess(String patientId, String userId,String id, String imei, String token) throws Exception {
         MrMedicalRecordsEntity re = new MrMedicalRecordsEntity();
        //单点登录校验
-        /*WlyyResponse response = wlyyService.userSessionCheck(id,userId,imei,token);
+        WlyyResponse response = wlyyService.userSessionCheck(id,userId,imei,token);
         if (response.getStatus() != 200) {
             Message.error(response.getMsg());
-        } else {*/
+        } else {
+            String headInfo = wlyyService.getHeadInfo(id,userId,imei,token);
+
             //获取医生信息
-            MrDoctorsEntity doctor = doctorService.getDoctorInformation(userId);
+            MrDoctorsEntity doctor = doctorService.getDoctorInformation(userId,headInfo);
             //获取患者信息
-            MrPatientsEntity patient = patientService.getPatientInformation(patientId);
+            MrPatientsEntity patient = patientService.getPatientInformation(patientId,headInfo);
             //获取最新病历
             MrMedicalRecordsEntity record = medicalRecordsDao.getLastRecord(userId, patientId);
 
@@ -71,7 +73,7 @@ public class MedicalRecordService{
                 //新增病历信息
                 re = addRecord(doctor, patient);
             }
-        //}
+        }
         return re;
     }
 
@@ -134,9 +136,9 @@ public class MedicalRecordService{
     @Transactional
     public MrMedicalRecordsEntity addRecord(String doctorId, String patientId,String firstRecordId) throws Exception {
         //获取医生信息
-        MrDoctorsEntity doctor = doctorService.getDoctorInformation(doctorId);
+        MrDoctorsEntity doctor = doctorService.getDoctor(doctorId);
         //获取患者信息
-        MrPatientsEntity patient = patientService.getPatientInformation(patientId);
+        MrPatientsEntity patient = patientService.getPatient(patientId);
 
         //新增病历信息
         MrMedicalRecordsEntity re = addRecord(doctor,patient);
