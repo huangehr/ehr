@@ -180,11 +180,21 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value="record_id",required = true)String recordId,
             @ApiParam(name="doctor_id",value="医生ID",defaultValue = "D20160322000001")
             @RequestParam(value="doctor_id",required = true)String doctorId,
-            @ApiParam(name="list",value="标签列表",defaultValue = "医生标签1")
-            @RequestParam(value="list",required = true)List<String> list) throws Exception
+            @ApiParam(name="labels",value="标签数组",defaultValue = "医生标签1,测试标签2")
+            @RequestParam(value="labels",required = true)String[] labels) throws Exception
     {
-        return medicalLabelService.saveMedicalLabel(recordId,doctorId,list);
+        return medicalLabelService.saveMedicalLabel(recordId,doctorId,labels);
     }
+
+    @RequestMapping(value = "/medicalRecords/record/label/{id}",method = RequestMethod.DELETE)
+    @ApiOperation("根据病历标签关系id删除病历标签")
+    public boolean deleteMedicalLabelById(
+            @ApiParam(name="id",value="病历标签关系id")
+            @PathVariable(value="id")Integer id) throws Exception
+    {
+        return medicalLabelService.deleteMedicalLabelById(id);
+    }
+
 
 
 }

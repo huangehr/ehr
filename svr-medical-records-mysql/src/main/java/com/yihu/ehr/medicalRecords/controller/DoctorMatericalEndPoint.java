@@ -27,17 +27,13 @@ public class DoctorMatericalEndPoint {
     @ApiOperation("上传文本素材")
     public boolean uploadTextMaterial(@ApiParam(name="creator",value="创建者Id")
                                        @RequestParam(value="creator",required = true) String creator,
-                                       @ApiParam(name="creator_name",value="创建者name")
-                                       @RequestParam(value="creator_name",required = false) String creatorName,
                                        @ApiParam(name="business_class",value="素材类型")
                                        @RequestParam(value="business_class",required = true) String businessClass,
                                        @ApiParam(name="content",value="草稿内容")
                                        @RequestParam(value="content",required = true) String content,
                                        @ApiParam(name="patient_id",value="患者Id")
-                                       @RequestParam(value="patient_id",required = false) String patientId,
-                                       @ApiParam(name="patient_name",value="患者name")
-                                       @RequestParam(value="patient_name",required = false) String patientName) throws Exception{
-        return materialService.uploadTextMaterial(creator,creatorName,businessClass,content,patientId,patientName);
+                                       @RequestParam(value="patient_id",required = false) String patientId)  throws Exception{
+        return materialService.uploadTextMaterial(creator,businessClass,content,patientId);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorText,method = RequestMethod.GET)
