@@ -176,11 +176,5 @@
             <version>${version.ehr}</version>
             <scope>${dependency.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-yihu-services</artifactId>
-            <version>${version.ehr}</version>
-            <scope>${dependency.scope}</scope>
-        </dependency>
     </dependencies>
 </project>

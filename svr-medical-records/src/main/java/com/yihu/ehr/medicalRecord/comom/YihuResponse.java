@@ -1,4 +1,4 @@
-package com.yihu.ehr.yihu;
+package com.yihu.ehr.medicalRecord.comom;
 
 
 /**
