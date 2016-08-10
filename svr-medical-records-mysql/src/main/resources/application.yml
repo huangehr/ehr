@@ -48,7 +48,7 @@ wlyy-service:
 
 fast-dfs:
   tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
+  public-server: http://172.19.103.54:80
 
 
 

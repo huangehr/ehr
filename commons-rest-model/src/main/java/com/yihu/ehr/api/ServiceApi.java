@@ -521,7 +521,7 @@ public class ServiceApi {
         public static final String SystemDict  = "/medicalRecords/systemDict";
         public static final String SystemDictEntry = "/medicalRecords/systemDictEntry"; //获取系统字典项
         public static final String ICD10Dict = "/medicalRecords/icd10Dict"; //获取ICD10字典
-        public static final String fileUpload ="/dossier/files";
+        public static final String ImgList	= "/medicalRecords/imgList"; //图片列表
 
         //病历接口
         public static final String AddRecord = "/medicalRecords/record/addRecord"; //新增病历

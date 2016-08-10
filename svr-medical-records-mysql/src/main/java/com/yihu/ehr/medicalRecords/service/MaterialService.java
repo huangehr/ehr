@@ -1,22 +1,18 @@
 package com.yihu.ehr.medicalRecords.service;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.medicalRecords.comom.FileService;
 import com.yihu.ehr.medicalRecords.dao.DocumentDao;
 import com.yihu.ehr.medicalRecords.dao.DocumentRelationDao;
 import com.yihu.ehr.medicalRecords.dao.MatericalDao;
 import com.yihu.ehr.medicalRecords.model.Entity.*;
-import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 /**
@@ -24,7 +20,7 @@ import java.util.List;
  * 素材管理类
  */
 @Service
-public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> {
+public class MaterialService {
 
     @Autowired
     MatericalDao matericalDao;
@@ -42,7 +38,10 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
     DocumentRelationDao documentRelationDao;
 
     @Autowired
-    FastDFSUtil fastDFSUtil;
+    FileService fileService;
+
+    @Value("${fast-dfs.public-server}")
+    String fastDFSUrl;
 
     /**
      * 上传文本素材
@@ -96,17 +95,12 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
      * @return
      * @throws Exception
      */
-    public boolean uploadImgMaterial(String documentName,String creatorId,String patientId,String jsonData) throws Exception
+    public String uploadImgMaterial(String creatorId,String patientId,String content,String extension) throws Exception
     {
-        //jsonData 直接是图片二进制流,不是JSON格式字串
-        byte[] bytes = Base64.getDecoder().decode(jsonData);
-        InputStream inputStream = new ByteArrayInputStream(bytes);
-        String fileExtension = documentName.substring(documentName.lastIndexOf(".") + 1).toLowerCase();
-        ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, "");
-        String groupName = objectNode.get("groupName").toString();
-        String remoteFileName = objectNode.get("remoteFileName").toString();
-        String path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
+        //上传图片，生成缩略图
+        String path = fileService.uploadImage(content,extension);
 
+        //文件记录
         MrDocumentEntity mrDocumentEntity = new MrDocumentEntity();
         mrDocumentEntity.setCreater(creatorId);
         mrDocumentEntity.setPatientId(patientId);
@@ -114,10 +108,12 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
         mrDocumentEntity.setFileType("1");
         mrDocumentEntity.setCreateTime(DateUtil.getSysDateTime());
         mrDocumentEntity.setDocumentContent("");
+        //患者姓名
         MrPatientsEntity patient = patientService.getPatient(patientId);
         if(patient!=null){
             mrDocumentEntity.setPatientName(patient.getName().toString());
         }
+        //医生姓名
         MrDoctorsEntity mrDoctorsEntity = doctorService.getDoctor(creatorId);
         if(mrDoctorsEntity!=null){
             mrDocumentEntity.setCreaterName(mrDoctorsEntity.getName().toString());
@@ -134,7 +130,7 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
             documentRelationDao.save(mrDocumentRelationEntity);
         }
 
-        return true;
+        return path;
     }
 
 
@@ -145,14 +141,33 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
     public List<MrDocumentEntity> getImgMaterial(String creatorId, String patientId,  int page, int size) throws Exception{
 
         List<MrDocumentEntity> documentEntityList = new ArrayList<MrDocumentEntity>();
-        DocumentDao repo = (DocumentDao) getJpaRepository();
 
-        documentEntityList = repo.findByCreaterAndPatientId(creatorId, patientId, new PageRequest(page, size));
+        documentEntityList = documentDao.findByCreaterAndPatientId(creatorId, patientId, new PageRequest(page, size));
         if(documentEntityList!=null && documentEntityList.size() > 0)
         {
             return documentEntityList;
         }
 
         return null;
+    }
+
+    /**
+     * 通过Ids获取文件列表
+     */
+    public List<MrDocumentEntity> getImgMaterialByIds(String ids) throws Exception{
+        List<MrDocumentEntity> re = documentDao.findByIds(ids.split(","));
+
+        if(re!=null && re.size()>0)
+        {
+            //完整http路径
+            for(MrDocumentEntity item :re)
+            {
+                String url = item.getFileUrl();
+                url = fastDFSUrl + url;
+                item.setFileUrl(url);
+            }
+        }
+
+        return re;
     }
 }

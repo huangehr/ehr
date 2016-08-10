@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.HttpClientUtil;
+package com.yihu.ehr.util.httpClient;
 
 /**
  * add by hzp at 2016-8-9
