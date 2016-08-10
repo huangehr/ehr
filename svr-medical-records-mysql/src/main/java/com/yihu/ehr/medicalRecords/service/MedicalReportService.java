@@ -50,9 +50,9 @@ public class MedicalReportService {
         if(mrDocumentRelationEntityList.size() != 0){
             for(MrDocumentRelationEntity mrDocumentRelationEntity : mrDocumentRelationEntityList) {
                 fileUrlList += mrDocumentRelationEntity.getFileId() + ";";
-            };
+            }
         }
-        medicalReportDTO.setFileUrlList(fileUrlList);
+        medicalReportDTO.setFileUrlList(fileUrlList==""?"":fileUrlList.substring(0,fileUrlList.length()-1));
 
         return medicalReportDTO;
     }

@@ -96,7 +96,7 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
      * @return
      * @throws Exception
      */
-    public boolean uploadImgMaterial(String documentName,String creatorId,String creatorName,String patientId,String patientName,String jsonData) throws Exception
+    public boolean uploadImgMaterial(String documentName,String creatorId,String patientId,String jsonData) throws Exception
     {
         //jsonData 直接是图片二进制流,不是JSON格式字串
         byte[] bytes = Base64.getDecoder().decode(jsonData);
@@ -111,7 +111,7 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
         mrDocumentEntity.setCreater(creatorId);
         mrDocumentEntity.setPatientId(patientId);
         mrDocumentEntity.setFileUrl(path);
-        mrDocumentEntity.setFileType("JPG");
+        mrDocumentEntity.setFileType("1");
         mrDocumentEntity.setCreateTime(DateUtil.getSysDateTime());
         mrDocumentEntity.setDocumentContent("");
         MrPatientsEntity patient = patientService.getPatient(patientId);
