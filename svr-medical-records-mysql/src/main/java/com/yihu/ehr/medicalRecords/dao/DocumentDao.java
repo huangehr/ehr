@@ -15,7 +15,7 @@ public interface DocumentDao extends PagingAndSortingRepository<MrDocumentEntity
 
     MrDocumentEntity findById(String id);
 
-    @Query("select * from MrDocumentEntity m " +
+    @Query("delete from MrDocumentEntity m " +
             "where m.creater =:creatorId" +
             "  and m.patientId =:patientId")
     List<MrDocumentEntity> findByCreaterAndPatientId(@Param("creatorId") String creatorId,
