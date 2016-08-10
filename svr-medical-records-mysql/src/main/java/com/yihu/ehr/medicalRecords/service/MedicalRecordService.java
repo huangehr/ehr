@@ -1,6 +1,7 @@
 package com.yihu.ehr.medicalRecords.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.medicalRecords.comom.Message;
 import com.yihu.ehr.medicalRecords.comom.WlyyResponse;
 import com.yihu.ehr.medicalRecords.comom.WlyyService;
@@ -29,7 +30,8 @@ import java.util.Map;
 @Service
 public class MedicalRecordService{
 
-
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Autowired
     DoctorMedicalRecordDao doctorMedicalRecordDao;
@@ -49,31 +51,41 @@ public class MedicalRecordService{
     /**
      * 根据医生ID和病人ID获取最近的一次病历
      */
-    public MrMedicalRecordsEntity systemAccess(String patientId, String userId,String id, String imei, String token) throws Exception {
+    public MrMedicalRecordsEntity systemAccess(String patientId, String userId,String json) throws Exception {
         MrMedicalRecordsEntity re = new MrMedicalRecordsEntity();
-       //单点登录校验
-        WlyyResponse response = wlyyService.userSessionCheck(id,userId,imei,token);
-        if (response.getStatus() != 200) {
-            Message.error(response.getMsg());
-        } else {
-            String headInfo = wlyyService.getHeadInfo(id,userId,imei,token);
 
-            //获取医生信息
-            MrDoctorsEntity doctor = doctorService.getDoctorInformation(userId,headInfo);
-            //获取患者信息
-            MrPatientsEntity patient = patientService.getPatientInformation(patientId,headInfo);
-            //获取最新病历
-            MrMedicalRecordsEntity record = medicalRecordsDao.getLastRecord(userId, patientId);
+        Map<String,String> map =(Map<String,String>)objectMapper.readValue(json,Map.class);
+        //必传校验参数
+        if(map.containsKey("id") && map.containsKey("uid") && map.containsKey("imei") && map.containsKey("token") && map.containsKey("token"))
+        {
+            //单点登录校验
+            WlyyResponse response = wlyyService.userSessionCheck(json);
+            if (response.getStatus() != 200) {
+                Message.error(response.getMsg());
+            }
+            else {
+                //获取医生信息
+                MrDoctorsEntity doctor = doctorService.getDoctorInformation(userId,json);
+                //获取患者信息
+                MrPatientsEntity patient = patientService.getPatientInformation(patientId,json);
+                //获取最新病历
+                MrMedicalRecordsEntity record = medicalRecordsDao.getLastRecord(userId, patientId);
 
-            //不存在则新增病历
-            if (record != null) {
-                //获取病历信息
-                re = record;
-            } else {
-                //新增病历信息
-                re = addRecord(doctor, patient);
+                //不存在则新增病历
+                if (record != null) {
+                    //获取病历信息
+                    re = record;
+                } else {
+                    //新增病历信息
+                    re = addRecord(doctor, patient);
+                }
             }
         }
+        else{
+            Message.error("缺失校验参数！");
+        }
+
+
         return re;
     }
 
@@ -228,6 +240,11 @@ public class MedicalRecordService{
                             obj.setPhone(value);
                             break;
                         }
+                        case "firstRecordId"  : //修改首诊病历
+                        {
+                            obj.setFirstRecordId(value);
+                            break;
+                        }
                     }
                 }
                 medicalRecordsDao.save(obj);
@@ -257,6 +274,7 @@ public class MedicalRecordService{
     public List<MrMedicalRecordsEntity> getMedicalRecordRelated(String recordId) throws Exception {
         return  medicalRecordsDao.findRelatedRecord(recordId);
     }
+
 
 
     /**
