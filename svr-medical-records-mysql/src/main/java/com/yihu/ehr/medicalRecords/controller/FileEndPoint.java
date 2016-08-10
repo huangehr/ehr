@@ -48,7 +48,7 @@ public class FileEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "json_data",required = false) String jsonData,
             HttpServletRequest request) throws Exception{
             Map<String,Object> dataMap =  objectMapper.readValue(jsonData, Map.class);
-            materialService.uploadImgMaterial(dataMap.get("doucumentName")+"",dataMap.get("creatorId")+"",dataMap.get("patient")+"",fileStr);
+            materialService.uploadImgMaterial(dataMap.get("doucument_name")+"",dataMap.get("creator_id")+"",dataMap.get("patient_id")+"",fileStr);
     }
 
     /**
@@ -59,9 +59,9 @@ public class FileEndPoint extends BaseRestEndPoint {
      */
     @RequestMapping(value = "/dossier/image_view", method = RequestMethod.GET)
     @ApiOperation(value = "下载BASE64文件")
-    public String imageView(@ApiParam(name = "storagePath", value = "文件路径", defaultValue = "")
-                            @RequestParam(value = "storagePath") String storagePath)throws Exception{
-        String s = java.net.URLDecoder.decode(storagePath, "UTF-8");
+    public String imageView(@ApiParam(name = "storage_path", value = "文件路径", defaultValue = "")
+                            @RequestParam(value = "storage_path") String storage_path)throws Exception{
+        String s = java.net.URLDecoder.decode(storage_path, "UTF-8");
         String groupName = s.split(":")[0];
         String remoteFileName = s.split(":")[1];
         byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
