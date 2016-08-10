@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0+"/admin")
-@Api(value = "字典服务", description = "字典服务")
+@Api(value = "文件上传服务", description = "文件上传服务")
 public class FileEndPoint extends BaseRestEndPoint {
 
     @Autowired
@@ -39,7 +39,6 @@ public class FileEndPoint extends BaseRestEndPoint {
     @Autowired
     FastDFSUtil fastDFSUtil;
 
-    /**************************** 获取诊断字典ICD10 ******************************************/
     @ApiOperation("文件上传接口")
     @RequestMapping(value = ServiceApi.MedicalRecords.fileUpload, method = RequestMethod.POST)
     public void uploadImg(
