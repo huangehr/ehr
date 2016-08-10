@@ -527,6 +527,7 @@ public class ServiceApi {
         public static final String AddRecord = "/medicalRecords/record/addRecord"; //新增病历
         public static final String MedicalRecord = "/medicalRecords/record/{record_id}"; //	病历信息管理
         public static final String MedicalInfo = "/medicalRecords/record/{record_id}/medicalInfo"; //	病情信息管理
+        public static final String MedicalTemplate = "/medicalRecords/record/medicalInfo/template"; //	病情信息管理
         public static final String MedicalRecordRelated= "/medicalRecords/record/{record_id}/related"; //	病历关联记录
         public static final String MedicalLabel = "/medicalRecords/record/{record_id}/label"; //获取病历标签/批量保存病历标签
         public static final String MedicalReport = "/medicalRecords/record/{record_id}/report/{report_id}"; //获取某病历某报告
