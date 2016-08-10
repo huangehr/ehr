@@ -23,7 +23,7 @@ public class DoctorTemplateService {
 
     public List<MrDoctorTemplateEntity> getTemplateByDoctorId(String doctorId){
 
-         return  dTDao.findBydoctorId(doctorId);
+         return  dTDao.findByDoctorId(doctorId);
     }
 
     /**
@@ -33,7 +33,7 @@ public class DoctorTemplateService {
 
         Map<String, Object> map;
 
-        List<MrDoctorTemplateEntity> templateList = dTDao.findBydoctorId(doctorId);
+        List<MrDoctorTemplateEntity> templateList = dTDao.findByDoctorId(doctorId);
         dTDao.delete(templateList);
 
         for(int i=1; i<=templateInfoList.size(); i++){
@@ -41,7 +41,8 @@ public class DoctorTemplateService {
 
             MrDoctorTemplateEntity mt = new MrDoctorTemplateEntity();
 
-            mt.setDoctorId((String) map.get("doctorId"));
+            mt.setDoctorId(doctorId);
+            mt.setFieldType((String) map.get("fieldType"));
             mt.setCode((String) map.get("code"));
             mt.setName((String) map.get("name"));
 

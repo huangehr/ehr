@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface DoctorTemplateDao extends PagingAndSortingRepository<MrDoctorTemplateEntity,String> {
 
-    List<MrDoctorTemplateEntity> findBydoctorId(String id);
+    List<MrDoctorTemplateEntity> findByDoctorId(String id);
 
 }
