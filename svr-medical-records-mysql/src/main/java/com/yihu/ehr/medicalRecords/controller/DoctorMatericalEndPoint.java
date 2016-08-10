@@ -25,8 +25,8 @@ public class DoctorMatericalEndPoint {
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorText,method = RequestMethod.POST)
     @ApiOperation("上传文本素材")
-    public boolean uploadTextMaterial(@ApiParam(name="creator",value="创建者Id")
-                                       @RequestParam(value="creator",required = true) String creator,
+    public boolean uploadTextMaterial(@ApiParam(name="doctor_id",value="创建者Id")
+                                       @PathVariable(value="doctor_id") String creator,
                                        @ApiParam(name="business_class",value="素材类型")
                                        @RequestParam(value="business_class",required = true) String businessClass,
                                        @ApiParam(name="content",value="草稿内容")
