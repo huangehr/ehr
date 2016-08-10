@@ -167,7 +167,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("获取病历标签")
     public List<MrMedicalLabelEntity> getMedicalLabelByRecordId(
             @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
-            @RequestParam(value="record_id",required = true)String recordId) throws Exception
+            @PathVariable(value="record_id")String recordId) throws Exception
     {
         return medicalLabelService.getMedicalLabelByRecordId(recordId);
     }
