@@ -1,7 +1,6 @@
 package com.yihu.ehr.medicalRecords.comom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
 import com.yihu.ehr.util.HttpClientUtil.HttpHelper;
 import com.yihu.ehr.util.HttpClientUtil.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +23,6 @@ public class WlyyService {
     @Value("${wlyy-service.url}")
     String serviceUrl;
 
-    @Value("${wlyy-service.platform}")
-    String platform;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -33,15 +30,10 @@ public class WlyyService {
     /***
      * 单点登录接口
      */
-    public WlyyResponse userSessionCheck(String id,String uid,String imei,String token) throws Exception
+    public WlyyResponse userSessionCheck(String json) throws Exception
     {
         String url = serviceUrl + "login/third/login";
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", id);
-        params.put("uid", uid);
-        params.put("imei", imei);
-        params.put("token", token);
-        params.put("platform", platform);
+        Map<String, Object> params = (Map<String, Object>)objectMapper.readValue(json,Map.class);
         HttpResponse response = httpHelper.post(url, params);
         if(response.getStatusCode() == 200)
         {
@@ -53,13 +45,6 @@ public class WlyyService {
         }
     }
 
-    /**
-     * 获取头部信息
-     */
-    public String getHeadInfo(String id,String uid,String imei,String token)  throws Exception
-    {
-        return "{\"id\":"+id+",\"uid\":\""+uid+"\", \"imei\":\""+imei+"\", \"token\":\""+token+"\",\"platform\":\""+platform+"\"}";
-    }
 
     /***
      * 获取医生信息
