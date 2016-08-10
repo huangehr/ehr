@@ -168,8 +168,10 @@ public class DoctorEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "label_type", value = "标签类型",defaultValue = "0")
             @RequestParam(value = "label_type") String labelType,
             @ApiParam(name = "label_class", value = "标签类别",defaultValue = "0")
-            @RequestParam(value = "label_class") Integer labelClass) throws Exception {
-        return doctorLabelService.getDoctorLabels(doctorId, labelType, labelClass);
+            @RequestParam(value = "label_class") Integer labelClass,
+            @ApiParam(name = "label", value = "标签名称",defaultValue = "0")
+            @RequestParam(value = "label") String label) throws Exception {
+        return doctorLabelService.getDoctorLabels(doctorId, labelType, labelClass,label);
     }
 
 
