@@ -2,12 +2,12 @@ package com.yihu.ehr.medicalRecord.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.medicalRecord.comom.Message;
+import com.yihu.ehr.medicalRecord.comom.UserMgmt;
+import com.yihu.ehr.medicalRecord.comom.YihuResponse;
 import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.PatientDao;
 import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
 import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
-import com.yihu.ehr.yihu.UserMgmt;
-import com.yihu.ehr.yihu.YihuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
