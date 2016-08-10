@@ -53,28 +53,28 @@ public class DoctorMatericalEndPoint {
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorImg,method = RequestMethod.POST)
     @ApiOperation("上传图片素材")
-    public boolean uploadImgMaterial(  @ApiParam(name="document_name",value="文件名")
-                                       @RequestParam(value="document_name",required = true) String documentName,
-                                       @ApiParam(name="doctor_id",value="创建者Id")
-                                       @RequestParam(value="doctor_id",required = true) String creator,
-                                       @ApiParam(name="doctor_name",value="创建者name")
-                                       @RequestParam(value="doctor_name",required = true) String creatorName,
-                                       @ApiParam(name="patient_id",value="患者Id")
-                                       @RequestParam(value="patient_id",required = false) String patientId,
-                                       @ApiParam(name="patient_name",value="患者name")
-                                       @RequestParam(value="patient_name",required = false) String patientName,
-                                       @ApiParam(name = "json_data", value = "图片转化后的输入流")
+    public boolean uploadImgMaterial(  @ApiParam(name="documentName",value="文件名")
+                                       @RequestParam(value="documentName",required = true) String documentName,
+                                       @ApiParam(name="creatorId",value="创建者Id")
+                                       @RequestParam(value="creatorId",required = true) String creatorId,
+                                       @ApiParam(name="creatorName",value="创建者name")
+                                       @RequestParam(value="creatorName",required = true) String creatorName,
+                                       @ApiParam(name="patientId",value="患者Id")
+                                       @RequestParam(value="patientId",required = false) String patientId,
+                                       @ApiParam(name="patientName",value="患者name")
+                                       @RequestParam(value="patientName",required = false) String patientName,
+                                       @ApiParam(name = "jsonData", value = "图片转化后的输入流")
                                        @RequestBody String jsonData) throws Exception{
 
-        return materialService.uploadImgMaterial(documentName,creator,patientId,jsonData);
+        return materialService.uploadImgMaterial(documentName,creatorId,patientId,jsonData);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorImg,method = RequestMethod.GET)
     @ApiOperation("获取图片素材")
-    public List<MrDocumentEntity> getImgMaterial(@ApiParam(name="doctor_id",value="创建者Id")
-                                       @RequestParam(value="doctor_id",required = true) String creatorId,
-                                                 @ApiParam(name="patient_id",value="患者Id")
-                                       @RequestParam(value="patient_id",required = false) String patientId,
+    public List<MrDocumentEntity> getImgMaterial(@ApiParam(name="creatorId",value="创建者Id")
+                                       @RequestParam(value="creatorId",required = true) String creatorId,
+                                                 @ApiParam(name="patientId",value="患者Id")
+                                       @RequestParam(value="patientId",required = false) String patientId,
                                                  @ApiParam(name="page",value="page")
                                        @RequestParam(value="page",required = false) int page,
                                                  @ApiParam(name="size",value="size")

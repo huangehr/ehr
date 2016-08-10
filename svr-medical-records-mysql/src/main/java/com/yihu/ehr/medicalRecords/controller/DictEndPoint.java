@@ -52,8 +52,8 @@ public class DictEndPoint extends BaseRestEndPoint {
     @ApiOperation("增加系统字典")
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.POST)
     public boolean addMrSystemDict(
-            @ApiParam(name = "json", value = "系统字典信息")
-            @RequestParam(value = "json", required = true) String json){
+            @ApiParam(name = "SystemDict", value = "系统字典信息")
+            @RequestParam(value = "SystemDict", required = true) String json){
         MrSystemDictEntity mrSystemDictEntity=toEntity(json,MrSystemDictEntity.class);
         return systemDictService.addMrSystemDict(mrSystemDictEntity);
     }
@@ -61,16 +61,16 @@ public class DictEndPoint extends BaseRestEndPoint {
     @ApiOperation("删除系统字典")
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.DELETE)
     public boolean deleteMrSystemDictEntry(
-            @ApiParam(name = "dict_code", value = "系统字典代码")
-            @RequestParam(value = "dict_code", required = true)String dictCode){
+            @ApiParam(name = "MrSystemDictCode", value = "系统字典代码")
+            @RequestParam(value = "MrSystemDictCode", required = true)String dictCode){
         return systemDictService.deleteMrSystemDict(dictCode);
     }
 
     @ApiOperation("更新系统字典")
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemDict, method = RequestMethod.PUT)
     public boolean updateMrSystemDict(
-            @ApiParam(name = "json", value = "系统字典信息")
-            @RequestParam(value = "json", required = true) String json){
+            @ApiParam(name = "SystemDict", value = "系统字典信息")
+            @RequestParam(value = "SystemDict", required = true) String json){
         MrSystemDictEntity mrSystemDictEntity=toEntity(json,MrSystemDictEntity.class);
         return systemDictService.updateMrSystemDict(mrSystemDictEntity);
     }
@@ -79,8 +79,8 @@ public class DictEndPoint extends BaseRestEndPoint {
     @ApiOperation("增加系统字典项")
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemDictEntry, method = RequestMethod.POST)
     public boolean addMrSystemDictEntry(
-            @ApiParam(name = "json", value = "系统字典项信息")
-            @RequestParam(value = "json", required = true) String json){
+            @ApiParam(name = "MrSystemDictEntry", value = "系统字典项信息")
+            @RequestParam(value = "MrSystemDictEntry", required = true) String json){
         MrSystemDictEntryEntity mrSystemDictEntry=toEntity(json,MrSystemDictEntryEntity.class);
         return systemDictEntryService.addMrSystemDictEntry(mrSystemDictEntry);
     }
@@ -88,10 +88,10 @@ public class DictEndPoint extends BaseRestEndPoint {
     @ApiOperation("删除系统字典项")
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemDictEntry, method = RequestMethod.DELETE)
     public boolean deleteMrSystemDictEntry(
-            @ApiParam(name = "dict_code", value = "系统字典代码")
-            @RequestParam(value = "dict_code", required = true)String DictCode,
-            @ApiParam(name = "dict_entry_code", value = "系统字典项代码")
-            @RequestParam(value = "dict_entry_code", required = true)String Code){
+            @ApiParam(name = "MrSystemDictCode", value = "系统字典代码")
+            @RequestParam(value = "MrSystemDictCode", required = true)String DictCode,
+            @ApiParam(name = "MrSystemDictEntryCode", value = "系统字典项代码")
+            @RequestParam(value = "MrSystemDictEntryCode", required = true)String Code){
         return systemDictEntryService.deleteMrSystemDictEntry(DictCode,Code);
     }
 
@@ -106,8 +106,8 @@ public class DictEndPoint extends BaseRestEndPoint {
     @ApiOperation("更新系统字典项")
     @RequestMapping(value = ServiceApi.MedicalRecords.SystemDictEntry, method = RequestMethod.PUT)
     public boolean updateMrSystemDictEntry(
-            @ApiParam(name = "json", value = "系统字典项信息")
-            @RequestParam(value = "json", required = true) String json){
+            @ApiParam(name = "MrSystemDictEntry", value = "系统字典项信息")
+            @RequestParam(value = "MrSystemDictEntry", required = true) String json){
         MrSystemDictEntryEntity mrSystemDictEntry=toEntity(json,MrSystemDictEntryEntity.class);
         return systemDictEntryService.updataMrSystemDictEntry(mrSystemDictEntry);
     }
