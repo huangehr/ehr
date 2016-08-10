@@ -2,8 +2,8 @@ package com.yihu.ehr.medicalRecord.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseRestEndPoint;
-import com.yihu.ehr.yihu.UserMgmt;
-import com.yihu.ehr.yihu.YihuResponse;
+import com.yihu.ehr.medicalRecord.comom.UserMgmt;
+import com.yihu.ehr.medicalRecord.comom.YihuResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

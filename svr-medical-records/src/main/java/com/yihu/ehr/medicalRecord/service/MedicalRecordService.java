@@ -2,6 +2,8 @@ package com.yihu.ehr.medicalRecord.service;
 
 
 import com.yihu.ehr.medicalRecord.comom.Message;
+import com.yihu.ehr.medicalRecord.comom.UserMgmt;
+import com.yihu.ehr.medicalRecord.comom.YihuResponse;
 import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.hbaseDao.MedicalRecordsDao;
 import com.yihu.ehr.medicalRecord.family.MedicalRecordsFamily;
@@ -11,8 +13,6 @@ import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
 import com.yihu.ehr.medicalRecord.model.EnumClass;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.yihu.UserMgmt;
-import com.yihu.ehr.yihu.YihuResponse;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

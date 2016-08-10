@@ -1,7 +1,9 @@
-package com.yihu.ehr.yihu;
+package com.yihu.ehr.medicalRecord.comom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.util.HttpClientUtil.HttpClientUtil;
+import com.yihu.ehr.util.HttpClientUtil.HttpHelper;
+import com.yihu.ehr.util.HttpClientUtil.HttpResponse;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,9 @@ public class YihuHttpService {
     @Value("${yihu-service.clientid}")
     private String clientId;
 
+    @Autowired
+    HttpHelper httpHelper;
+
     /**
      * yihu服务请求
      * @param api 请求api
@@ -47,8 +52,8 @@ public class YihuHttpService {
             params.put("Api", api);
             params.put("Param", parmam);
 
-            String result = HttpClientUtil.doPost(url, params, null, null);
-            Map<String,Object> map = objectMapper.readValue(result, Map.class);
+            HttpResponse result = httpHelper.post(url, params);
+            Map<String,Object> map = objectMapper.readValue(result.getBody(), Map.class);
             objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.ISO8601Pattern));
 
             if(map.containsKey("Code"))

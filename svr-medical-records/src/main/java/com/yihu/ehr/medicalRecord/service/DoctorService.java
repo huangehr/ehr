@@ -1,13 +1,13 @@
 package com.yihu.ehr.medicalRecord.service;
 
 import com.yihu.ehr.medicalRecord.comom.Message;
+import com.yihu.ehr.medicalRecord.comom.UserMgmt;
+import com.yihu.ehr.medicalRecord.comom.YihuResponse;
 import com.yihu.ehr.medicalRecord.dao.DoctorDao;
 import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
 import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecord.model.EnumClass;
-import com.yihu.ehr.yihu.UserMgmt;
-import com.yihu.ehr.yihu.YihuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

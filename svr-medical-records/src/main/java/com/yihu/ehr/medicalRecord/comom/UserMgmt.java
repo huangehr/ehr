@@ -1,7 +1,6 @@
-package com.yihu.ehr.yihu;
+package com.yihu.ehr.medicalRecord.comom;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,7 +16,7 @@ public class UserMgmt {
     /***
      * 健康之路账号登录
      */
-    public YihuResponse userLogin(String loginID,String loginPwd)
+    public YihuResponse userLogin(String loginID, String loginPwd)
     {
         return service.doPost("UserMgmt.Account.userLogin", "{ \"loginID\":\"" + loginID + "\",\"loginPwd\":\"" + loginPwd + "\",\"isNesdSession\": 1 }");
     }
@@ -25,7 +24,7 @@ public class UserMgmt {
     /***
      * 单点登录接口
      */
-    public YihuResponse userSessionCheck(String userId,String ticket,String appUid)
+    public YihuResponse userSessionCheck(String userId, String ticket, String appUid)
     {
         return service.doPost("UserMgmt.Account.userSessionCheck", "{ \"userId\":\"" + userId + "\",\"ticket\":\"" + ticket + "\",\"appUid\": \""+appUid+"\" }");
     }

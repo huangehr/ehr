@@ -1,25 +1,12 @@
 package com.yihu.ehr.medicalRecord.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.medicalRecord.dao.DoctorDao;
-import com.yihu.ehr.medicalRecord.dao.DoctorMedicalRecordDao;
 import com.yihu.ehr.medicalRecord.dao.hbaseDao.DocumentDao;
 import com.yihu.ehr.medicalRecord.dao.hbaseDao.TextDao;
 import com.yihu.ehr.medicalRecord.model.DTO.Document;
-import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
-import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorMedicalRecordsEntity;
-import com.yihu.ehr.medicalRecord.model.Entity.MrDoctorsEntity;
-import com.yihu.ehr.medicalRecord.model.Entity.MrPatientsEntity;
-import com.yihu.ehr.yihu.UserMgmt;
-import com.yihu.ehr.yihu.YihuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by hzp on 2016/8/1.
