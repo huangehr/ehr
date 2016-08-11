@@ -104,7 +104,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("获取病历")
     public MrMedicalRecordsEntity getMedicalRecord(
             @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
-            @RequestParam(value="record_id",required = true)String recordId) throws Exception
+            @PathVariable(value="record_id")String recordId) throws Exception
     {
         return recordService.getMedicalRecord(recordId);
     }
@@ -133,6 +133,28 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     }
 
     /******************************* 病情信息 ************************************************/
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalTemplate,method = RequestMethod.POST)
+    @ApiOperation("新增病历病情模板")
+    public MrMedicalInfoEntity addMedicalTemplate(
+            @ApiParam(name="record_id",value="病历ID")
+            @RequestParam(value="record_id",required = true)String recordId,
+            @ApiParam(name="doctor_id",value="医生id")
+            @RequestParam(value="doctor_id",required = true)String doctorId,
+            @ApiParam(name="json",value="病情列表",defaultValue = "{\"code\":\"patient_condition\",\"name\":\"病情主诉\",\"value\":\"病情主诉内容\"}")
+            @RequestParam(value="json",required = true)String json) throws Exception {
+        MrMedicalInfoEntity entity = objectMapper.readValue(json,MrMedicalInfoEntity.class);
+        entity.setRecordId(recordId);
+        return medicalInfoService.saveTemplate(entity,doctorId);
+    }
+
+    @RequestMapping(value = ServiceApi.MedicalRecords.MedicalTemplate,method = RequestMethod.DELETE)
+    @ApiOperation("删除病历病情模板")
+    public boolean deleteMedicalTemplate(
+            @ApiParam(name="id",value="病情id")
+            @RequestParam(value="id")Integer id){
+        return medicalInfoService.deleteById(id);
+    }
+
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalInfo,method = RequestMethod.POST)
     @ApiOperation("病情保存")
     public boolean saveMedicalInfo(
@@ -167,7 +189,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("获取病历标签")
     public List<MrMedicalLabelEntity> getMedicalLabelByRecordId(
             @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
-            @RequestParam(value="record_id",required = true)String recordId) throws Exception
+            @PathVariable(value="record_id")String recordId) throws Exception
     {
         return medicalLabelService.getMedicalLabelByRecordId(recordId);
     }
