@@ -86,8 +86,11 @@ public class MedicalReportService {
             if(mrDocumentRelationEntityList.size() != 0){
                 for(MrDocumentRelationEntity mrDocumentRelationEntity : mrDocumentRelationEntityList) {
                     MrDocumentEntity mrDocumentEntity =  documentDao.findById(mrDocumentRelationEntity.getFileId());
-                    fileUrlList+=mrDocumentEntity.getFileUrl();
+                    fileUrlList+=mrDocumentEntity.getFileUrl()+",";
                 };
+            }
+            if(fileUrlList.lastIndexOf(",")>0){
+                fileUrlList.substring(0,fileUrlList.lastIndexOf(","));
             }
             medicalReportDTO.setFileUrlList(fileUrlList);
             medicalReportDTOList.add(medicalReportDTO);
