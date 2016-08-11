@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface DocumentDao extends PagingAndSortingRepository<MrDocumentEntity,Integer> {
 
-    MrDocumentEntity findById(String id);
+    MrDocumentEntity findById(int id);
 
     @Query("delete from MrDocumentEntity m " +
             "where m.creater =:creatorId" +
