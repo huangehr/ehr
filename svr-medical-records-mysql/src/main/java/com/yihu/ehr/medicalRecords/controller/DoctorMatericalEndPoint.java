@@ -33,7 +33,9 @@ public class DoctorMatericalEndPoint {
                                        @RequestParam(value="content",required = true) String content,
                                        @ApiParam(name="patient_id",value="患者Id")
                                        @RequestParam(value="patient_id",required = false) String patientId)  throws Exception{
-        return materialService.uploadTextMaterial(creator,businessClass,content,patientId);
+        //return materialService.uploadTextMaterial(creator,businessClass,content,patientId);
+        return materialService.addOrUpdateTextMaterial(creator,businessClass,content,patientId);
+
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorText,method = RequestMethod.GET)

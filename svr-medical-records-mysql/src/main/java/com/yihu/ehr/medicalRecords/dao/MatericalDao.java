@@ -14,5 +14,8 @@ public interface MatericalDao extends PagingAndSortingRepository<MrTextEntity,In
     void deleteById(String reportId);
 
     List<MrTextEntity> findByCreaterAndBusinessClassAndPatientId(String CreatorId,String BusinessClass, String PatientId,Pageable pageable);
+    List<MrTextEntity> findByCreaterAndBusinessClass(String CreatorId,String BusinessClass,Pageable pageable);
+    List<MrTextEntity> findByCreaterAndBusinessClassAndContent(String CreatorId,String BusinessClass,String content);
+
 
 }
