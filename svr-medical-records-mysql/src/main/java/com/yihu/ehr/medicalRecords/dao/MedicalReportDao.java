@@ -17,15 +17,7 @@ public interface MedicalReportDao extends PagingAndSortingRepository<MrMedicalRe
 
     List<MrMedicalReportEntity> findByRecordId(String recordId);
 
-    @Modifying
-    @Query("delete from MrDocumentEntity md " +
-            "where md.id in (" +
-            "      select mr.fileId " +
-            "        from MrDocumentRelationEntity mr " +
-            "       where mr.ownerType = '0' " +
-            "         and mr.ownerId =:reportId)" )
-    void deleteFileById(@Param("reportId") String reportId);
-
     void deleteById(int reportId);
 
+    void deleteByRecordId(String recordId);
 }

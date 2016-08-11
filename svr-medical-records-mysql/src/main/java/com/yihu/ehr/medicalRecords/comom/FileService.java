@@ -33,14 +33,14 @@ public class FileService {
         byte[] bytes = Base64.getDecoder().decode(data);
         InputStream inputStream = new ByteArrayInputStream(bytes);
         ObjectNode objectNode = fastDFSUtil.upload(inputStream, extension, "");
-        String groupName = objectNode.get("groupName").toString();
-        String remoteFileName = objectNode.get("remoteFileName").toString();
-        String path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
+        String groupName = objectNode.get("groupName").asText();
+        String remoteFileName = objectNode.get("remoteFileName").asText();
+        String path = groupName + ":" + remoteFileName;
 
         //保存缩略图
-        byte[] bytesScale = ImageUtil.scale(bytes,scaleWidth,scaleHeight);
-        InputStream inputStreamScale = new ByteArrayInputStream(bytesScale);
-        ObjectNode objectNodeScale = fastDFSUtil.upload(inputStreamScale, extension, "");
+        byte[] bytesScale = ImageUtil.scale(Base64.getDecoder().decode(data),scaleWidth,scaleHeight);
+        String prefixName = "_"+ scaleWidth+"x"+ scaleHeight;
+        ObjectNode objectNodeScale = fastDFSUtil.upload(groupName,remoteFileName,prefixName,bytesScale, extension, null);
 
         return path;
     }

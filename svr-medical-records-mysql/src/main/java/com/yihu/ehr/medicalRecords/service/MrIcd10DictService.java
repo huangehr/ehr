@@ -25,6 +25,6 @@ public class MrIcd10DictService {
      */
     public List<MrIcd10DictEntity> getIcd10List(String filter,Integer page,Integer size){
 
-        return icd10DictDao.findByFilter(filter,new PageRequest(page, size));
+        return icd10DictDao.findByFilter(filter,new PageRequest(page-1, size));
     }
 }

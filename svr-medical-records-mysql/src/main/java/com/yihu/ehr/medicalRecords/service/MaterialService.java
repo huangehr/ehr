@@ -1,18 +1,23 @@
 package com.yihu.ehr.medicalRecords.service;
 
 import com.yihu.ehr.medicalRecords.comom.FileService;
+import com.yihu.ehr.medicalRecords.comom.Message;
 import com.yihu.ehr.medicalRecords.dao.DocumentDao;
 import com.yihu.ehr.medicalRecords.dao.DocumentRelationDao;
 import com.yihu.ehr.medicalRecords.dao.MatericalDao;
 import com.yihu.ehr.medicalRecords.model.Entity.*;
 import com.yihu.ehr.util.datetime.DateUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -34,14 +39,15 @@ public class MaterialService {
     @Autowired
     PatientService patientService;
 
-    @Autowired
-    DocumentRelationDao documentRelationDao;
 
     @Autowired
     FileService fileService;
 
     @Value("${fast-dfs.public-server}")
-    String fastDFSUrl;
+    private String fastDFSUrl;
+
+    private int defaultPage = 1;
+    private int defaultSize = 10;
 
     /**
      * 上传文本素材
@@ -50,23 +56,49 @@ public class MaterialService {
      */
     public boolean uploadTextMaterial(String creator,String businessClass,String content,String patientId) throws Exception
     {
-        MrTextEntity mrTextEntity = new MrTextEntity();
+        if(StringUtils.isEmpty(businessClass) && StringUtils.isEmpty(patientId))
+        {
+            Message.error("素材类型和患者Id不能同时为空！");
+        }
+        else if(!StringUtils.isEmpty(businessClass) && !StringUtils.isEmpty(patientId)){
+            Message.error("素材类型和患者Id不能同时存在！");
+        }
 
+        MrTextEntity mrTextEntity = new MrTextEntity();
         mrTextEntity.setCreateTime(DateUtil.getSysDateTime());
-        mrTextEntity.setBusinessClass(businessClass);
         mrTextEntity.setContent(content);
         mrTextEntity.setCreater(creator);
-        mrTextEntity.setPatientId(patientId);
         mrTextEntity.setUsageCount(1);
-        MrPatientsEntity patient = patientService.getPatient(patientId);
-        if(patient!=null){
-            mrTextEntity.setPatientName(patient.getName().toString());
-        }
+
+
         MrDoctorsEntity mrDoctorsEntity = doctorService.getDoctor(creator);
+        //医生姓名
         if(mrDoctorsEntity!=null){
             mrTextEntity.setCreaterName(mrDoctorsEntity.getName().toString());
         }
-        mrTextEntity = matericalDao.save(mrTextEntity);
+
+        //对话文本
+        if(!StringUtils.isEmpty(patientId)) {
+            mrTextEntity.setPatientId(patientId);
+            MrPatientsEntity patient = patientService.getPatient(patientId);
+            //患者姓名
+            if (patient != null) {
+                mrTextEntity.setPatientName(patient.getName().toString());
+            }
+        }
+        else{  //素材文本
+            //判断是否已经存在
+            MrTextEntity obj =  matericalDao.findByCreaterAndBusinessClassAndContent(creator,businessClass,content);
+            if(obj!=null)
+            {
+                obj.setUsageCount(obj.getUsageCount()+1);
+                mrTextEntity = obj;
+            }
+            else{
+                mrTextEntity.setBusinessClass(businessClass);
+            }
+        }
+        matericalDao.save(mrTextEntity);
 
         return true;
     }
@@ -74,11 +106,20 @@ public class MaterialService {
     /**
      * 获取文本素材
      */
-    public List<String> getTextMaterial(String creatorId,String businessClass,String patientId,int page, int size) throws Exception{
-
+    public List<String> getTextByClass(String creatorId,String businessClass,Integer page, Integer size) throws Exception{
         List<String> testList = new ArrayList<>();
-        Sort sort = new Sort(Sort.Direction.DESC,"createTime");
-        List<MrTextEntity> mrTextEntities = matericalDao.findByCreaterAndBusinessClassAndPatientId(creatorId, businessClass, patientId, new PageRequest(page-1, size,sort));
+
+        if(page==null)
+        {
+            page = defaultPage;
+        }
+        if(size==null)
+        {
+            size = defaultSize;
+        }
+
+        Sort sort = new Sort(Sort.Direction.DESC,"usageCount");
+        List<MrTextEntity> mrTextEntities = matericalDao.findByCreaterAndBusinessClass(creatorId, businessClass, new PageRequest(page-1, size,sort));
 
         if(mrTextEntities!=null && mrTextEntities.size() > 0)
         {
@@ -91,7 +132,27 @@ public class MaterialService {
     }
 
     /**
-     * 上传图片素材,图片上传时就执行图片的保存及与医生的关联的建立。
+     * 获取对话文本
+     */
+    public List<MrTextEntity> getTextByDoctorAndPatient(String doctorId,String patientId,Integer page, Integer size)  throws Exception
+    {
+        if(page==null)
+        {
+            page = defaultPage;
+        }
+        if(size==null)
+        {
+            size = defaultSize;
+        }
+
+        Sort sort = new Sort(Sort.Direction.DESC,"createTime");
+        return matericalDao.findByCreaterAndPatientId(doctorId, patientId, new PageRequest(page-1, size,sort));
+    }
+
+
+    /******************************************************************************************/
+    /**
+     * 上传图片素材
      * @return
      * @throws Exception
      */
@@ -107,7 +168,7 @@ public class MaterialService {
         mrDocumentEntity.setFileUrl(path);
         mrDocumentEntity.setFileType("1");
         mrDocumentEntity.setCreateTime(DateUtil.getSysDateTime());
-        mrDocumentEntity.setDocumentContent("");
+        //mrDocumentEntity.setDocumentContent("");
         //患者姓名
         MrPatientsEntity patient = patientService.getPatient(patientId);
         if(patient!=null){
@@ -119,36 +180,26 @@ public class MaterialService {
             mrDocumentEntity.setCreaterName(mrDoctorsEntity.getName().toString());
         }
 
-        mrDocumentEntity = documentDao.save(mrDocumentEntity);
-        if(mrDocumentEntity != null){
-            MrDocumentRelationEntity mrDocumentRelationEntity = new MrDocumentRelationEntity();
-            mrDocumentRelationEntity.setFileId(mrDocumentEntity.getId());
-            mrDocumentRelationEntity.setOwnerId(creatorId);
-            mrDocumentRelationEntity.setCreateTime(DateUtil.getSysDateTime());
-            mrDocumentRelationEntity.setOwnerType("1"); //素材类型图片
-
-            documentRelationDao.save(mrDocumentRelationEntity);
-        }
+        documentDao.save(mrDocumentEntity);
 
         return path;
     }
 
-
-
     /**
      * 获取图片素材
      */
-    public List<MrDocumentEntity> getImgMaterial(String creatorId, String patientId,  int page, int size) throws Exception{
-
-        List<MrDocumentEntity> documentEntityList = new ArrayList<MrDocumentEntity>();
-
-        documentEntityList = documentDao.findByCreaterAndPatientId(creatorId, patientId, new PageRequest(page, size));
-        if(documentEntityList!=null && documentEntityList.size() > 0)
+    public List<MrDocumentEntity> getImgMaterial(String creatorId, String patientId,  Integer page, Integer size) throws Exception{
+        if(page==null)
         {
-            return documentEntityList;
+            page = defaultPage;
+        }
+        if(size==null)
+        {
+            size = defaultSize;
         }
 
-        return null;
+        Sort sort = new Sort(Sort.Direction.DESC,"createTime");
+        return documentDao.findByCreaterAndPatientId(creatorId, patientId, new PageRequest(page-1, size,sort));
     }
 
     /**
@@ -162,9 +213,14 @@ public class MaterialService {
             //完整http路径
             for(MrDocumentEntity item :re)
             {
-                String url = item.getFileUrl();
-                url = fastDFSUrl + url;
-                item.setFileUrl(url);
+                String[] url = item.getFileUrl().split(":");
+                if(url.length==2)
+                {
+                    item.setFileUrl(fastDFSUrl + "/"+url[0]+"/"+url[1]);
+                }
+                else{
+                    item.setFileUrl( item.getFileUrl());
+                }
             }
         }
 

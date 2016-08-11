@@ -19,7 +19,6 @@ import java.util.List;
  * 辅助检查报告
  */
 @Service
-@Transactional
 public class MedicalReportService {
 
     @Autowired
@@ -81,7 +80,7 @@ public class MedicalReportService {
             medicalReportDTO.setReportContent(mrMedicalReportEntity.getReportContent());
             medicalReportDTO.setReportDatetime(mrMedicalReportEntity.getReportDatetime());
 
-            List<MrDocumentRelationEntity> mrDocumentRelationEntityList = documentRelationDao.findByOwnerId(String.valueOf(mrMedicalReportEntity.getId()) );
+            List<MrDocumentRelationEntity> mrDocumentRelationEntityList = documentRelationDao.findByOwnerId(String.valueOf(mrMedicalReportEntity.getId()));
             if(mrDocumentRelationEntityList.size() != 0){
                 for(MrDocumentRelationEntity mrDocumentRelationEntity : mrDocumentRelationEntityList) {
                     fileUrlList += mrDocumentRelationEntity.getFileId() + ";";
@@ -98,6 +97,7 @@ public class MedicalReportService {
     /**
      * 保存辅助检查报告
      */
+    @Transactional
     public boolean saveMedicalReport(String recordId,MedicalReportDTO obj) throws Exception
     {
         MrMedicalReportEntity mrMedicalReportEntity = new MrMedicalReportEntity();
@@ -130,11 +130,35 @@ public class MedicalReportService {
     /**
      * 根据报告id删除辅助检查报告
      */
+    @Transactional
     public boolean deleteReportById(String recordId,String reportId) throws Exception
     {
         //medicalReportDao.deleteFileByReportId(reportId);
         documentRelationDao.deleteByOwnerId(reportId);
         medicalReportDao.deleteById(Integer.parseInt(reportId));
+        return true;
+    }
+
+    /**
+     * 根据病历id删除辅助检查报告
+     */
+    @Transactional
+    public boolean deleteReportByRecordId(String recordId) throws Exception
+    {
+         //获取所有报告
+        List<MrMedicalReportEntity> reportList = medicalReportDao.findByRecordId(recordId);
+        if(reportList!=null && reportList.size()>0)
+        {
+            String[] ids = new String[reportList.size()];
+            for(Integer i =0;i<reportList.size();i++)
+            {
+                ids[i] = String.valueOf(reportList.get(i).getId());
+            }
+
+            documentRelationDao.deleteByOwnerIds(ids);
+            medicalReportDao.deleteByRecordId(recordId);
+        }
+
         return true;
     }
 }

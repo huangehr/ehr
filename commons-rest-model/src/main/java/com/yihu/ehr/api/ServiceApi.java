@@ -543,6 +543,7 @@ public class ServiceApi {
         public static final String DoctorTemplate	= "/medicalRecords/doctor/{doctor_id}/template"; //获取医生模板/批量保存医生模板
         public static final String DoctorRecords	= "/medicalRecords/doctor/{doctor_id}/records"; //获取医生病历
         public static final String DoctorText	= "/medicalRecords/doctor/{doctor_id}/text"; //上传医生文本素材/获取医生文本素材
+        public static final String DoctorTextDialog	= "/medicalRecords/doctor/{doctor_id}/textDialog"; //获取医生文本对话
         public static final String DoctorImg	= "/medicalRecords/doctor/{doctor_id}/img"; //上传医生图片素材/获取医生图片素材
         public static final String DoctorICD10	= "/medicalRecords/doctor/{doctor_id}/icd10"; //	获取医生ICD10
         public static final String DoctorInfoManage	= "/medicalRecords/doctor/info"; //	新增医生信息/修改医生信息

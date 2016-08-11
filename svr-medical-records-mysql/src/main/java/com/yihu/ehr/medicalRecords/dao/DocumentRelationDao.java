@@ -19,6 +19,11 @@ public interface DocumentRelationDao extends PagingAndSortingRepository<MrDocume
             "  and mr.ownerId =:reportId")
     void deleteByOwnerId(@Param("reportId") String reportId);
 
+    @Query("delete from MrDocumentRelationEntity mr " +
+            "where mr.ownerType = '0' " +
+            "  and mr.ownerId in :ownerIds")
+    void deleteByOwnerIds(@Param("ownerIds") String[] ownerIds);
+
     @Query("select mr " +
             " from MrDocumentRelationEntity mr " +
             "where mr.ownerType = '0' " +

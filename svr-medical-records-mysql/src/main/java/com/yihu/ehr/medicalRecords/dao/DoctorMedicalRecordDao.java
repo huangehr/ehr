@@ -14,4 +14,6 @@ public interface DoctorMedicalRecordDao extends PagingAndSortingRepository<MrDoc
 
     @Query(value = "select * from mr_doctor_medical_records where doctor_id = ?1 and patient_id=?2 and record_type='"+ EnumClass.RecordType.Online+"' limit 1", nativeQuery = true)
     MrDoctorMedicalRecordsEntity getLastRecord(String doctorId, String patientId);
+
+    void deleteByRecordId( String recordId);
 }
