@@ -13,9 +13,9 @@ public interface DoctorLabelDao extends PagingAndSortingRepository<MrLabelEntity
 
     MrLabelEntity findByDoctorIdAndLabel(String id, String label);
 
-    @Query(value = "select * from mr_label where doctor_id = ?1 and label_type=?2 and lable like ?4",nativeQuery = true)
+    @Query(value = "select * from mr_label where doctor_id = ?1 and label_type=?2 and label like ?4",nativeQuery = true)
     List<MrLabelEntity> findByDoctorIdAndLabelType(String doctorId, String labelType,String label);
 
-    @Query(value = "select * from mr_label where doctor_id = ?1 and label_type=?2 and label_class=?3 and lable like ?4",nativeQuery = true)
+    @Query(value = "select * from mr_label where doctor_id = ?1 and label_type=?2 and label_class=?3 and label like ?4",nativeQuery = true)
     List<MrLabelEntity> findByDoctorIdAndLabelTypeAndLabelClass(String doctorId, String labelType, Integer labelClass,String label);
 }
