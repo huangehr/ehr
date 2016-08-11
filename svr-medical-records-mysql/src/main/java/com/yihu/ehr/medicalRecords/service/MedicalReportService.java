@@ -1,5 +1,6 @@
 package com.yihu.ehr.medicalRecords.service;
 
+import com.yihu.ehr.medicalRecords.dao.DocumentDao;
 import com.yihu.ehr.medicalRecords.dao.DocumentRelationDao;
 import com.yihu.ehr.medicalRecords.dao.MedicalReportDao;
 import com.yihu.ehr.medicalRecords.model.DTO.MedicalReportDTO;
@@ -27,6 +28,9 @@ public class MedicalReportService {
 
     @Autowired
     DocumentRelationDao documentRelationDao;
+
+    @Autowired
+    DocumentDao documentDao;
 
     /**
      * 获取辅助检查报告
@@ -81,7 +85,8 @@ public class MedicalReportService {
             List<MrDocumentRelationEntity> mrDocumentRelationEntityList = documentRelationDao.findByOwnerId(String.valueOf(mrMedicalReportEntity.getId()) );
             if(mrDocumentRelationEntityList.size() != 0){
                 for(MrDocumentRelationEntity mrDocumentRelationEntity : mrDocumentRelationEntityList) {
-                    fileUrlList += mrDocumentRelationEntity.getFileId() + ";";
+                    MrDocumentEntity mrDocumentEntity =  documentDao.findById(mrDocumentRelationEntity.getFileId());
+                    fileUrlList+=mrDocumentEntity.getFileUrl();
                 };
             }
             medicalReportDTO.setFileUrlList(fileUrlList);
