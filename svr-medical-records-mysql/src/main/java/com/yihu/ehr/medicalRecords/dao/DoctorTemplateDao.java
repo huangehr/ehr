@@ -11,5 +11,6 @@ import java.util.List;
 public interface DoctorTemplateDao extends PagingAndSortingRepository<MrDoctorTemplateEntity,String> {
 
     List<MrDoctorTemplateEntity> findByDoctorId(String id);
+    List<MrDoctorTemplateEntity> findByDoctorIdAndName(String doctorId,String name);
 
 }

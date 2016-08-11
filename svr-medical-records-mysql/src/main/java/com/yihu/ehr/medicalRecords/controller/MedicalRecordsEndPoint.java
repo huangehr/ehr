@@ -135,12 +135,12 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     /******************************* 病情信息 ************************************************/
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalTemplate,method = RequestMethod.POST)
     @ApiOperation("新增病历病情模板")
-    public MrMedicalInfoEntity addMedicalTemplate(
+    public boolean addMedicalTemplate(
             @ApiParam(name="record_id",value="病历ID")
             @RequestParam(value="record_id",required = true)String recordId,
             @ApiParam(name="doctor_id",value="医生id")
             @RequestParam(value="doctor_id",required = true)String doctorId,
-            @ApiParam(name="json",value="病情列表",defaultValue = "{\"code\":\"patient_condition\",\"name\":\"病情主诉\",\"value\":\"病情主诉内容\"}")
+            @ApiParam(name="json",value="病情列表",defaultValue = "{\"code\":\"\",\"name\":\"病情主诉\",\"value\":\"\"}")
             @RequestParam(value="json",required = true)String json) throws Exception {
         MrMedicalInfoEntity entity = objectMapper.readValue(json,MrMedicalInfoEntity.class);
         entity.setRecordId(recordId);

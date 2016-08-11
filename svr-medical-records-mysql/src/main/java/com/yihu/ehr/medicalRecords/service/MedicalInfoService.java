@@ -3,6 +3,7 @@ package com.yihu.ehr.medicalRecords.service;
 
 import com.yihu.ehr.medicalRecords.dao.DoctorTemplateDao;
 import com.yihu.ehr.medicalRecords.dao.MedicalInfoDao;
+import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorTemplateEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalInfoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,9 +38,22 @@ public class MedicalInfoService {
     /**
      * 保存病情单个
      */
-    public MrMedicalInfoEntity saveTemplate(MrMedicalInfoEntity entity,String doctorId){
+    public boolean saveTemplate(MrMedicalInfoEntity entity,String doctorId){
         //医生病情模板存在否？新增
-        return medicalInfoDao.save(entity);
+        List<MrDoctorTemplateEntity> template = dTDao.findByDoctorIdAndName(doctorId, entity.getName());
+        if(template == null || template.size() ==0){
+            MrDoctorTemplateEntity templateEntity = new MrDoctorTemplateEntity();
+            templateEntity.setDoctorId(doctorId);
+            templateEntity.setCode(entity.getCode());
+            templateEntity.setName(entity.getName());
+            dTDao.save(templateEntity);
+        }
+        List<MrMedicalInfoEntity> entityOld = medicalInfoDao.findByRecordIdAndName(entity.getRecordId(), entity.getName());
+        if(entityOld != null && entityOld.size()>0){
+            return true;
+        }
+        medicalInfoDao.save(entity);
+        return true;
     }
     /**
      * 删除病情单个
