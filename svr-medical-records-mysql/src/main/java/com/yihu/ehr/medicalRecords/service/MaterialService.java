@@ -199,7 +199,29 @@ public class MaterialService {
         }
 
         Sort sort = new Sort(Sort.Direction.DESC,"createTime");
-        return documentDao.findByCreaterAndPatientId(creatorId, patientId, new PageRequest(page-1, size,sort));
+        List<MrDocumentEntity> list = documentDao.findByCreaterAndPatientId(creatorId, patientId, new PageRequest(page-1, size,sort));
+       if(list!=null && list.size()>0)
+       {
+           for(MrDocumentEntity item:list)
+           {
+               item.setFileUrl(getHttpUrl(item.getFileUrl()));
+           }
+       }
+        return list;
+    }
+
+    /**
+     * 获取http图片地址
+     * @return
+     */
+    private String getHttpUrl(String url) throws Exception
+    {
+        String[] urls = url.split(":");
+        if(urls.length==2)
+        {
+            url = fastDFSUrl + "/"+urls[0]+"/"+urls[1];
+        }
+        return url;
     }
 
     /**
@@ -213,14 +235,7 @@ public class MaterialService {
             //完整http路径
             for(MrDocumentEntity item :re)
             {
-                String[] url = item.getFileUrl().split(":");
-                if(url.length==2)
-                {
-                    item.setFileUrl(fastDFSUrl + "/"+url[0]+"/"+url[1]);
-                }
-                else{
-                    item.setFileUrl( item.getFileUrl());
-                }
+                item.setFileUrl(getHttpUrl(item.getFileUrl()));
             }
         }
 

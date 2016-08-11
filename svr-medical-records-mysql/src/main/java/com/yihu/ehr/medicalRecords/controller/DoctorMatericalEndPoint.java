@@ -72,7 +72,7 @@ public class DoctorMatericalEndPoint {
 
     @RequestMapping(value = ServiceApi.MedicalRecords.DoctorImg,method = RequestMethod.POST)
     @ApiOperation("上传图片素材")
-    public String uploadImgMaterial(@ApiParam(name="doctor_id",value="医生Id",defaultValue = "D20160807000001")
+    public String uploadImgMaterial(@ApiParam(name="doctor_id",value="医生Id",defaultValue = "D20160810000001")
                                      @RequestParam(value="doctor_id",required = true) String creator,
                                      @ApiParam(name="patient_id",value="患者Id",defaultValue = "350425198506080016")
                                      @RequestParam(value="patient_id",required = false) String patientId,
@@ -89,7 +89,7 @@ public class DoctorMatericalEndPoint {
     @ApiOperation("获取图片素材")
     public List<MrDocumentEntity> getImgMaterial(@ApiParam(name="doctor_id",value="创建者Id",defaultValue = "D20160810000001")
                                        @RequestParam(value="doctor_id",required = true) String creator,
-                                       @ApiParam(name="patient_id",value="患者Id")
+                                       @ApiParam(name="patient_id",value="患者Id",defaultValue = "350425198506080016")
                                        @RequestParam(value="patient_id",required = false) String patientId,
                                        @ApiParam(name="page",value="page")
                                        @RequestParam(value="page",required = false) Integer page,
