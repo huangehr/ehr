@@ -8,6 +8,7 @@ import com.yihu.ehr.medicalRecords.dao.MatericalDao;
 import com.yihu.ehr.medicalRecords.model.Entity.*;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -73,14 +74,50 @@ public class MaterialService extends BaseJpaService<MrTextEntity, MatericalDao> 
     }
 
     /**
+     * 先判断该医生的文本是否存在（新增或计数）（文本素材上传时也应该判断？）
+     */
+    public boolean addOrUpdateTextMaterial(String creator,String businessClass,String content,String patientId) throws Exception {
+        List<MrTextEntity> mrTextEntities = matericalDao.findByCreaterAndBusinessClassAndContent(creator, businessClass, content);
+        if(mrTextEntities != null && mrTextEntities.size()>0){
+            MrTextEntity entity = mrTextEntities.get(0);
+            entity.setUsageCount(entity.getUsageCount()+1);
+            matericalDao.save(entity);
+            return true;
+        }
+        MrTextEntity mrTextEntity = new MrTextEntity();
+        mrTextEntity.setCreateTime(DateUtil.getSysDateTime());
+        mrTextEntity.setBusinessClass(businessClass);
+        mrTextEntity.setContent(content);
+        mrTextEntity.setCreater(creator);
+        mrTextEntity.setPatientId(patientId);
+        mrTextEntity.setUsageCount(1);
+        MrPatientsEntity patient = patientService.getPatient(patientId);
+        if(patient!=null){
+            mrTextEntity.setPatientName(patient.getName().toString());
+        }
+        MrDoctorsEntity mrDoctorsEntity = doctorService.getDoctor(creator);
+        if(mrDoctorsEntity!=null){
+            mrTextEntity.setCreaterName(mrDoctorsEntity.getName().toString());
+        }
+        mrTextEntity = matericalDao.save(mrTextEntity);
+
+        return true;
+    }
+
+
+    /**
      * 获取文本素材
      */
     public List<String> getTextMaterial(String creatorId,String businessClass,String patientId,int page, int size) throws Exception{
 
         List<String> testList = new ArrayList<>();
-        Sort sort = new Sort(Sort.Direction.DESC,"createTime");
-        List<MrTextEntity> mrTextEntities = matericalDao.findByCreaterAndBusinessClassAndPatientId(creatorId, businessClass, patientId, new PageRequest(page-1, size,sort));
-
+        Sort sort = new Sort(Sort.Direction.DESC,"usageCount");
+        List<MrTextEntity> mrTextEntities = null;
+        if(StringUtils.isEmpty(patientId)){
+            mrTextEntities = matericalDao.findByCreaterAndBusinessClass(creatorId, businessClass, new PageRequest(page - 1, size, sort));
+        }else {
+            mrTextEntities = matericalDao.findByCreaterAndBusinessClassAndPatientId(creatorId, businessClass, patientId, new PageRequest(page - 1, size, sort));
+        }
         if(mrTextEntities!=null && mrTextEntities.size() > 0)
         {
             for(MrTextEntity mrTextEntity : mrTextEntities ){
