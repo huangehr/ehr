@@ -66,7 +66,7 @@ public class MedicalReportService {
 
         List<MrMedicalReportEntity> re = medicalReportDao.findByRecordId(recordId);
         if(re == null || re.size() == 0){
-            return null;
+            return new ArrayList<MedicalReportDTO>();
         }
 
         for(MrMedicalReportEntity mrMedicalReportEntity :re ){
