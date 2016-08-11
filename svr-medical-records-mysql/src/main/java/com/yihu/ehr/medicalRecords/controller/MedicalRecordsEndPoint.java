@@ -95,9 +95,11 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("删除病历")
     public boolean deleteRecord(
             @ApiParam(name="record_id",value="病历ID",defaultValue = "")
-            @PathVariable(value="record_id")String recordId) throws Exception
+            @PathVariable(value="record_id")String recordId,
+            @ApiParam(name="doctor_id",value="医生ID",defaultValue = "")
+            @PathVariable(value="doctor_id")String doctorId) throws Exception
     {
-        return recordService.deleteRecord(recordId);
+        return recordService.deleteRecord(recordId,doctorId);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.GET)

@@ -55,4 +55,12 @@ public class MedicalDrugService {
         return true;
     }
 
+    /**
+     * 删除病历用药记录
+     */
+    public boolean deleteMedicalDrug(String recordId) throws Exception
+    {
+        medicalDrugDao.deleteByRecordId(recordId);
+        return true;
+    }
 }

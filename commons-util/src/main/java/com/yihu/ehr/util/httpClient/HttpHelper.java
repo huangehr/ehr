@@ -1,22 +1,14 @@
-package com.yihu.ehr.util.HttpClientUtil;
+package com.yihu.ehr.util.httpClient;
 
-import org.apache.http.NameValuePair;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.ssl.SSLContexts;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.EncodedResource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by hzp on 2016/8/9.

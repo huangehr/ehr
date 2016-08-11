@@ -6,7 +6,9 @@ import com.yihu.ehr.medicalRecords.comom.Message;
 import com.yihu.ehr.medicalRecords.comom.WlyyResponse;
 import com.yihu.ehr.medicalRecords.comom.WlyyService;
 import com.yihu.ehr.medicalRecords.dao.DoctorMedicalRecordDao;
+import com.yihu.ehr.medicalRecords.dao.MedicalLabelDao;
 import com.yihu.ehr.medicalRecords.dao.MedicalRecordsDao;
+import com.yihu.ehr.medicalRecords.model.DTO.MedicalReportDTO;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalRecordsEntity;
@@ -37,16 +39,30 @@ public class MedicalRecordService{
     DoctorMedicalRecordDao doctorMedicalRecordDao;
 
     @Autowired
+    MedicalRecordsDao medicalRecordsDao;
+
+    @Autowired
     PatientService patientService;
 
     @Autowired
     DoctorService doctorService;
 
     @Autowired
-    WlyyService wlyyService;
+    MedicalInfoService  medicalInfoService;
 
     @Autowired
-    MedicalRecordsDao medicalRecordsDao;
+    MedicalDrugService  medicalDrugService;
+
+    @Autowired
+    MedicalLabelService medicalLabelService;
+
+    @Autowired
+    MedicalReportService  medicalReportService;
+
+    @Autowired
+    WlyyService wlyyService;
+
+
 
     /**
      * 根据医生ID和病人ID获取最近的一次病历
@@ -165,8 +181,6 @@ public class MedicalRecordService{
     }
 
 
-
-
     /**
      * 修改病历
      */
@@ -263,8 +277,32 @@ public class MedicalRecordService{
     /**
      * 删除病历
      */
-    public boolean deleteRecord(String recordId) throws Exception {
-        medicalRecordsDao.delete(Integer.valueOf(recordId));
+    public boolean deleteRecord(String recordId,String doctorId) throws Exception {
+        MrMedicalRecordsEntity record =  medicalRecordsDao.findById(Integer.valueOf(recordId));
+        if(record!=null)
+        {
+            if(record.getDoctorId().equals(doctorId))
+            {
+                medicalRecordsDao.delete(Integer.valueOf(recordId));
+                //删除病历详情
+                medicalInfoService.deleteMedicalInfo(recordId);
+                //删除病历报告
+                medicalReportService.deleteReportByRecordId(recordId);
+                //删除病历用药
+                medicalDrugService.deleteMedicalDrug(recordId);
+                //删除医生病历关联
+                doctorMedicalRecordDao.deleteByRecordId(recordId);
+                //删除病历标签
+                medicalLabelService.deleteMedicalLabelByRecordId(recordId);
+            }
+            else{
+                Message.error("不存在删除权限！");
+            }
+        }
+        else{
+            Message.error("不存在该病历！recordId:"+recordId);
+        }
+
         return true;
     }
 
@@ -274,7 +312,6 @@ public class MedicalRecordService{
     public List<MrMedicalRecordsEntity> getMedicalRecordRelated(String recordId) throws Exception {
         return  medicalRecordsDao.findRelatedRecord(recordId);
     }
-
 
 
     /**

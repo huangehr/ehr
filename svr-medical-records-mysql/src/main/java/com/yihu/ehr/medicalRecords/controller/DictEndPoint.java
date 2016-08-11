@@ -6,6 +6,7 @@ import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.medicalRecords.model.Entity.MrIcd10DictEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrSystemDictEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrSystemDictEntryEntity;
+import com.yihu.ehr.medicalRecords.service.MrIcd10DictService;
 import com.yihu.ehr.medicalRecords.service.MrSystemDictEntryService;
 import com.yihu.ehr.medicalRecords.service.MrSystemDictService;
 import io.swagger.annotations.Api;
@@ -34,6 +35,9 @@ public class DictEndPoint extends BaseRestEndPoint {
     @Autowired
     MrSystemDictEntryService systemDictEntryService;
 
+    @Autowired
+    MrIcd10DictService mrIcd10DictService;
+
     /**************************** 获取诊断字典ICD10 ******************************************/
     @ApiOperation("获取诊断字典ICD10")
     @RequestMapping(value = ServiceApi.MedicalRecords.ICD10Dict, method = RequestMethod.GET)
@@ -44,7 +48,7 @@ public class DictEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "page", required = true) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = true) Integer size) throws Exception{
-        return null;
+        return mrIcd10DictService.getIcd10List(filter,page,size);
     }
 
 
