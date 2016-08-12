@@ -36,7 +36,6 @@
         <module>../commons-redis-mq</module>
         <module>../commons-data-query</module>
         <module>../commons-metrics</module>
-        <module>../commons-yihu-services</module>
         <!--..
         <module>../commons-thrift-services</module>
         <module>../commons-thrift-client</module>

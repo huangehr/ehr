@@ -101,7 +101,7 @@ public class DoctorMatericalEndPoint {
 
     @RequestMapping(value = ServiceApi.MedicalRecords.ImgList,method = RequestMethod.GET)
     @ApiOperation("获取图片素材")
-    public List<MrDocumentEntity> getImgMaterialByIds(@ApiParam(name="ids",value="id列表")
+    public List<MrDocumentEntity> getImgMaterialByIds(@ApiParam(name="ids",value="id列表",defaultValue = "16,17")
                                                       @RequestParam(value="ids",required = true) String ids) throws Exception {
 
         return materialService.getImgMaterialByIds(ids);
