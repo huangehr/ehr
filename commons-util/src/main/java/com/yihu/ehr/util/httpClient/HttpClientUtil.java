@@ -1,4 +1,4 @@
-package com.yihu.ehr.util.HttpClientUtil;
+package com.yihu.ehr.util.httpClient;
 
 import org.apache.http.Consts;
 import org.apache.http.client.CredentialsProvider;

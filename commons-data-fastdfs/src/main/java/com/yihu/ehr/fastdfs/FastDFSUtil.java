@@ -3,12 +3,10 @@ package com.yihu.ehr.fastdfs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.util.log.LogService;
-import org.csource.common.MyException;
 import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 
@@ -53,17 +51,19 @@ public class FastDFSUtil {
      * http://host/healthArchiveGroup/M00/00/00/rBFuH1XdIseAUTZZAA1rIuRd3Es062.jpg?attname=a.jpg
      * @throws Exception
      */
-    public ObjectNode upload(InputStream in, String fileExtension,
-                                    String description) throws Exception {
+    public ObjectNode upload(InputStream in, String fileExtension,String description) throws Exception {
+        NameValuePair[] fileMetaData = new NameValuePair[1];
+        fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
+        return upload(in,fileExtension,fileMetaData);
+    }
+
+    /**
+     * 以输入流的方式上传文件
+     */
+    public ObjectNode upload(InputStream in, String fileExtension,NameValuePair[] fileMetaData) throws Exception {
         StorageClient client = clientPool.getStorageClient();
+        ObjectNode message = new ObjectMapper().createObjectNode();
         try {
-            NameValuePair[] fileMetaData;
-            fileMetaData = new NameValuePair[1];
-            fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
-
-//            ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
-            ObjectNode message = new ObjectMapper().createObjectNode();
-
             byte fileBuffer[] = new byte[in.available()];
             int len = 0;
             int temp = 0;                             //所有读取的内容都使用temp接收
@@ -107,13 +107,60 @@ public class FastDFSUtil {
                 message.put(FileUrlField, fileURl);
                 LogService.getLogger(FastDFSUtil.class).info(client.get_file_info(groupName, remoteFile).toString());
 
-                return message;
-            } else {
-                return null;
             }
         } finally {
             clientPool.releaseStorageClient(client);
         }
+        return message;
+    }
+
+
+
+    /**
+     * 上传文件，从文件
+     */
+    public ObjectNode upload(String group_name, String master_filename, String prefix_name, byte[] file_buff, String file_ext_name,NameValuePair[] meta_list) throws Exception{
+        StorageClient client = clientPool.getStorageClient();
+        ObjectNode message = new ObjectMapper().createObjectNode();
+        try {
+            TrackerServer trackerServer = clientPool.getTrackerServer();
+
+            String[] results = client.upload_file(group_name,master_filename,prefix_name,file_buff, file_ext_name, meta_list);
+            if (results != null) {
+                String fileId;
+                int ts;
+                String token;
+                String fileURl;
+                InetSocketAddress socketAddress;
+
+                String groupName = results[0];
+                String remoteFile = results[1];
+                message.put(GroupField, groupName);
+                message.put(RemoteFileField, remoteFile);
+
+                fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
+                message.put(FileIdField, fileId);
+
+                socketAddress = trackerServer.getInetSocketAddress();
+                fileURl = "http://" + socketAddress.getAddress().getHostAddress();
+                if (ClientGlobal.g_tracker_http_port != 80) {
+                    fileURl += ":" + ClientGlobal.g_tracker_http_port;
+                }
+
+                fileURl += "/" + fileId;
+                if (ClientGlobal.g_anti_steal_token) {
+                    ts = (int) (System.currentTimeMillis() / 1000);
+                    token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
+                    fileURl += "?token=" + token + "&ts=" + ts;
+                }
+
+                message.put(FileUrlField, fileURl);
+                System.out.print(client.get_file_info(groupName, remoteFile).toString());
+            }
+        } finally {
+            clientPool.releaseStorageClient(client);
+        }
+        return message;
     }
 
     /**

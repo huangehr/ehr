@@ -98,6 +98,12 @@ public class MedicalLabelService {
         return true;
     }
 
-
+    /**
+     * 通过关系id删除病历标签
+     */
+    public boolean deleteMedicalLabelByRecordId(String recordId){
+        medicalLabelDao.deleteByRecordId(recordId);
+        return true;
+    }
 
 }

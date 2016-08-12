@@ -63,6 +63,15 @@ public class MedicalInfoService {
         return true;
     }
 
+    /**
+     * 删除病情
+     */
+    @Transactional
+    public boolean deleteMedicalInfo(String recordId) throws Exception {
+
+        medicalInfoDao.deleteByRecordId(recordId);
+        return true;
+    }
 
     /**
      * 获取病情
@@ -70,4 +79,6 @@ public class MedicalInfoService {
     public List<MrMedicalInfoEntity> getMedicalInfo(String recordId) throws Exception {
         return medicalInfoDao.findByRecordId(recordId);
     }
+
+
 }

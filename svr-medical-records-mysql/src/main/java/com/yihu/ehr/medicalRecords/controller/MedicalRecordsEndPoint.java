@@ -84,7 +84,7 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     public boolean editRecord(
             @ApiParam(name="record_id",value="病历ID",defaultValue = "1")
             @PathVariable(value="record_id")String recordId,
-            @ApiParam(name="json",value="修改内容",defaultValue = "{\"medicalSuggest\":\"修改治疗建议\"}")
+            @ApiParam(name="json",value="修改内容",defaultValue = "{\"medicalSuggest\":\"修改治疗建议\",\"medicalTime\":\"2016-06-06\"}")
             @RequestParam(value="json",required = true)String json) throws Exception
     {
         Map<String,String> map = toEntity(json,Map.class);
@@ -95,9 +95,11 @@ public class MedicalRecordsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("删除病历")
     public boolean deleteRecord(
             @ApiParam(name="record_id",value="病历ID",defaultValue = "")
-            @PathVariable(value="record_id")String recordId) throws Exception
+            @PathVariable(value="record_id")String recordId,
+            @ApiParam(name="doctor_id",value="医生ID",defaultValue = "")
+            @PathVariable(value="doctor_id")String doctorId) throws Exception
     {
-        return recordService.deleteRecord(recordId);
+        return recordService.deleteRecord(recordId,doctorId);
     }
 
     @RequestMapping(value = ServiceApi.MedicalRecords.MedicalRecord,method = RequestMethod.GET)

@@ -1,8 +1,8 @@
 package com.yihu.ehr.medicalRecords.comom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.util.HttpClientUtil.HttpHelper;
-import com.yihu.ehr.util.HttpClientUtil.HttpResponse;
+import com.yihu.ehr.util.httpClient.HttpHelper;
+import com.yihu.ehr.util.httpClient.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
