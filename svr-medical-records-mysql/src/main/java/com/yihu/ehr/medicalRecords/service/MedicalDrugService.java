@@ -30,9 +30,9 @@ public class MedicalDrugService {
     @Transactional
     public boolean importMedicalPrescription(String recordId,List<MrMedicalDrugEntity> list) throws Exception
     {
-        List<MrMedicalDrugEntity> oldList = medicalDrugDao.findByRecordId(recordId);
+        //List<MrMedicalDrugEntity> oldList = medicalDrugDao.findByRecordId(recordId);
         //清空数据
-        medicalDrugDao.delete(oldList);
+        //medicalDrugDao.delete(oldList);
         medicalDrugDao.save(list);
         return true;
     }

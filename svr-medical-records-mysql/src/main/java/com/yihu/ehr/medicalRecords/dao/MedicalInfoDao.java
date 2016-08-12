@@ -13,6 +13,5 @@ public interface MedicalInfoDao extends PagingAndSortingRepository<MrMedicalInfo
 
 
     List<MrMedicalInfoEntity> findByRecordId(String recordId);
-
-    void deleteByRecordId(String recordId);
+    List<MrMedicalInfoEntity> findByRecordIdAndName(String recordId,String name);
 }

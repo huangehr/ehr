@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface DocumentDao extends PagingAndSortingRepository<MrDocumentEntity,Integer> {
 
-    MrDocumentEntity findById(String id);
+    MrDocumentEntity findById(int id);
 
     List<MrDocumentEntity> findByCreaterAndPatientId(@Param("creator") String creator,
                                                      @Param("patientId") String patientId,

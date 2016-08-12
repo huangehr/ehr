@@ -106,12 +106,12 @@ public class DoctorLabelService {
      * @param labelClass
      * @return
      */
-    public List<MrLabelEntity> getDoctorLabels(String doctorId,String labelType,Integer labelClass){
+    public List<MrLabelEntity> getDoctorLabels(String doctorId,String labelType,Integer labelClass,String label){
         if(labelClass!=null && labelClass>=0){
-            return doctorLabelDao.findByDoctorIdAndLabelTypeAndLabelClass(doctorId, labelType, labelClass);
+            return doctorLabelDao.findByDoctorIdAndLabelTypeAndLabelClass(doctorId, labelType, labelClass,"%"+label+"%");
         }
         else{
-            return  doctorLabelDao.findByDoctorIdAndLabelType(doctorId,labelType);
+            return  doctorLabelDao.findByDoctorIdAndLabelType(doctorId,labelType,"%"+label+"%");
         }
 
     }

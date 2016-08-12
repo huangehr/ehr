@@ -65,6 +65,9 @@ public class MedicalRecordService{
 
 
 
+    @Autowired
+    MaterialService materialService;
+
     /**
      * 根据医生ID和病人ID获取最近的一次病历
      */
@@ -207,6 +210,8 @@ public class MedicalRecordService{
                         }
                         case "medicalSuggest": //治疗建议
                         {
+                            //新增或统计医生治疗建议
+                            materialService.addOrUpdateTextMaterial(obj.getDoctorId(),"0",value,obj.getPatientId());
                             obj.setMedicalSuggest(value);
                             break;
                         }
