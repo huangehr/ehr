@@ -14,6 +14,7 @@ import com.yihu.ehr.medicalRecords.model.Entity.MrDoctorsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrMedicalRecordsEntity;
 import com.yihu.ehr.medicalRecords.model.Entity.MrPatientsEntity;
 import com.yihu.ehr.medicalRecords.model.EnumClass;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -211,7 +212,7 @@ public class MedicalRecordService{
                         }
                         case "medicalTime": //就诊时间
                         {
-                            //obj.setMedicalTime(value);
+                            obj.setMedicalTime(DateUtil.formatCharDateYMD(value));
                             break;
                         }
                         case "orgName": //就诊机构
