@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface MedicalInfoDao extends PagingAndSortingRepository<MrMedicalInfoEntity,Integer> {
 
-
     List<MrMedicalInfoEntity> findByRecordId(String recordId);
     List<MrMedicalInfoEntity> findByRecordIdAndName(String recordId,String name);
+    void deleteByRecordId(String recordId);
 }

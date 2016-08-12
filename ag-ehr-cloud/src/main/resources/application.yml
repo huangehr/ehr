@@ -1,6 +1,7 @@
 server:
   port: ${ag-ehr-cloud.server.port}
-
+  ssl:
+    key-store: C:/Windows/tomcat.keystore
 management:
   port: ${server.port}
 
