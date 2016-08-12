@@ -19,7 +19,7 @@ public interface DocumentDao extends PagingAndSortingRepository<MrDocumentEntity
                                                      @Param("patientId") String patientId,
                                                      Pageable pageable);
 
-    @Query("select m from MrDocumentEntity m where m.id in (:ids)")
+    @Query(value = "select * from mr_document m where m.id in (:ids)", nativeQuery = true)
     List<MrDocumentEntity> findByIds(@Param("ids") String[] ids);
 
 }
