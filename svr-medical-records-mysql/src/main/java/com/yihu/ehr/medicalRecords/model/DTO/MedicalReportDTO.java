@@ -1,6 +1,8 @@
 package com.yihu.ehr.medicalRecords.model.DTO;
 
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hzp on 2016/8/4.
@@ -13,7 +15,16 @@ public class MedicalReportDTO {
     private String reportName;
     private Timestamp reportDatetime;
     private String reportContent;
-    private String fileUrlList;  // DID列表,以;分隔
+    private String fileIds;  // ID列表,以,分隔
+    private List<Map> fileMaps;  // ID列表,以,分隔
+
+    public List<Map> getFileMaps() {
+        return fileMaps;
+    }
+
+    public void setFileMaps(List<Map> fileMaps) {
+        this.fileMaps = fileMaps;
+    }
 
     public int getId() {
         return id;
@@ -55,11 +66,11 @@ public class MedicalReportDTO {
         this.reportContent = reportContent;
     }
 
-    public String getFileUrlList() {
-        return fileUrlList;
+    public String getFileIds() {
+        return fileIds;
     }
 
-    public void setFileUrlList(String fileUrlList) {
-        this.fileUrlList = fileUrlList;
+    public void setFileIds(String fileIds) {
+        this.fileIds = fileIds;
     }
 }
