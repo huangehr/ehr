@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.provider.NoSuchClientException;
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

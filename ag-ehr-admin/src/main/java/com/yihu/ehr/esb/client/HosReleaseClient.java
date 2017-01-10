@@ -1,10 +1,8 @@
 package com.yihu.ehr.esb.client;
 
-import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.esb.MHosEsbMiniRelease;
-import com.yihu.ehr.model.standard.MStdDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;

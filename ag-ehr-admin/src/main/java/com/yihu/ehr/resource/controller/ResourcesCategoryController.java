@@ -1,6 +1,5 @@
 package com.yihu.ehr.resource.controller;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.agModel.resource.RsCategoryModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
 import com.yihu.ehr.api.ServiceApi;

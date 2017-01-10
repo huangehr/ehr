@@ -2,28 +2,17 @@ package com.yihu.ehr.api.healthprofile.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.feign.HealthProfileClient;
-import com.yihu.ehr.feign.StdDictEntryClient;
 import com.yihu.ehr.model.profile.MMedicationStat;
-import com.yihu.ehr.model.profile.MTemplate;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 

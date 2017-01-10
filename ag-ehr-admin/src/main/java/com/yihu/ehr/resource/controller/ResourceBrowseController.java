@@ -2,12 +2,9 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.RsBrowseModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
-import com.yihu.ehr.agModel.resource.RsResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsCategory;
-import com.yihu.ehr.model.resource.MRsMetadata;
-import com.yihu.ehr.model.resource.MRsResourceMetadata;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.util.rest.Envelop;

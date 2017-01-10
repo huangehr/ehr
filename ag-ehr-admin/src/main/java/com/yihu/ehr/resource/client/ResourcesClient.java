@@ -6,7 +6,6 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsResources;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
