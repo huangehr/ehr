@@ -19,27 +19,27 @@
     </properties>
 
     <modules>
-        <module>../commons-ehr-constants</module>
-        <module>../commons-ui-swagger</module>
-        <module>../commons-util</module>
-        <module>../commons-web</module>
-        <module>../commons-data-fastdfs</module>
-        <module>../commons-data-hbase</module>
-        <module>../commons-data-mysql</module>
-        <module>../commons-data-redis</module>
-        <module>../commons-data-solr</module>
-        <module>../commons-redis-keyschema</module>
-        <module>../commons-profile-core</module>
-        <module>../commons-profile-persist</module>
-        <module>../commons-rest-model</module>
-        <module>../commons-admin-gateway-model</module>
-        <module>../commons-redis-mq</module>
-        <module>../commons-data-query</module>
-        <module>../commons-metrics</module>
+        <module>../commons/commons-ehr-constants</module>
+        <module>../commons/commons-ui-swagger</module>
+        <module>../commons/commons-util</module>
+        <module>../commons/commons-web</module>
+        <module>../commons/commons-data-fastdfs</module>
+        <module>../commons/commons-data-hbase</module>
+        <module>../commons/commons-data-mysql</module>
+        <module>../commons/commons-data-redis</module>
+        <module>../commons/commons-data-solr</module>
+        <module>../commons/commons-redis-keyschema</module>
+        <module>../commons/commons-profile-core</module>
+        <module>../commons/commons-profile-persist</module>
+        <module>../commons/commons-rest-model</module>
+        <module>../commons/commons-admin-gateway-model</module>
+        <module>../commons/commons-redis-mq</module>
+        <module>../commons/commons-data-query</module>
+        <module>../commons/commons-metrics</module>
         <!--..
-        <module>../commons-thrift-services</module>
-        <module>../commons-thrift-client</module>
-        <module>../commons-thrift-server</module>
+        <module>../commons/commons-thrift-services</module>
+        <module>../commons/commons-thrift-client</module>
+        <module>../commons/commons-thrift-server</module>
         -->
     </modules>
 </project>

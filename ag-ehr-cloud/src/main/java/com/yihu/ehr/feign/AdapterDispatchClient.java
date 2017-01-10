@@ -2,7 +2,6 @@ package com.yihu.ehr.feign;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;

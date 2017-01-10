@@ -15,9 +15,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import springfox.documentation.service.*;
 import springfox.documentation.spring.web.DocumentationCache;
 import springfox.documentation.spring.web.json.Json;
-import springfox.documentation.swagger2.web.Swagger2Controller;
 
-import java.net.URI;
 import java.util.*;
 
 /**

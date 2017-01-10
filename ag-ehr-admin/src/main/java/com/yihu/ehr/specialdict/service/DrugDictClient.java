@@ -2,7 +2,6 @@ package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.model.specialdict.MDrugDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
