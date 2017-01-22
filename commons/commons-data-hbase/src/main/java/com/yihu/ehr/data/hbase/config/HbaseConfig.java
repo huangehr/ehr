@@ -1,16 +1,13 @@
 package com.yihu.ehr.data.hbase.config;
 
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HConnectionManager;
-import org.apache.hadoop.hbase.client.HTableInterface;
-import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.hadoop.hbase.HbaseTemplate;
-import org.springframework.data.hadoop.hbase.HbaseUtils;
 import org.springframework.data.hadoop.hbase.TableCallback;
 
 import java.util.*;
@@ -28,6 +25,7 @@ public class HbaseConfig{
     public Map<String, String> getHbaseProperties(){
         return this.hbaseProperties;
     }
+
 
     @Bean
     public org.apache.hadoop.conf.Configuration configuration() {
@@ -54,15 +52,25 @@ public class HbaseConfig{
 
         try
         {
-            /*hbaseTemplate.execute("HealthProfile", new TableCallback<Object>() {
-                @Override
-                public Object doInTable(HTableInterface table) throws Throwable {
-                    Get get = new Get(Bytes.toBytes("connection-init"));
-                    Result result = table.get(get);
+            String tableName = "HealthProfile";
+            Connection connection = ConnectionFactory.createConnection(hbaseTemplate.getConfiguration());
+            Admin admin = connection.getAdmin();
+            boolean ex = admin.tableExists(TableName.valueOf(tableName));
+            //判断是否存在
+            if(ex)
+            {
+                hbaseTemplate.execute(tableName, new TableCallback<Object>() {
+                    @Override
+                    public Object doInTable(HTableInterface table) throws Throwable {
+                        Get get = new Get(Bytes.toBytes("connection-init"));
+                        Result result = table.get(get);
 
-                    return result;
-                }
-            });*/
+                        return result;
+                    }
+                });
+            }
+            admin.close();
+            connection.close();
         }
         catch (Exception ex)
         {

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-resource-hzp
+    name: svr-resource
 
 ---
 spring:

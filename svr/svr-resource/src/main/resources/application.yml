@@ -38,10 +38,10 @@ spring:
     host: 192.168.1.220 # Redis server host.
   data:
     solr:
-      zk-host: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com
+    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 ---
 spring:
   profiles: alpha
@@ -53,10 +53,10 @@ spring:
     host: 192.168.1.220 # Redis server host.
   data:
     solr:
-      zk-host: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com
+    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 ---
 spring:
   profiles: test
@@ -68,10 +68,10 @@ spring:
     host: 172.19.103.47 # Redis server host.
   data:
     solr:
-      zk-host: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.jkzldev.com,node2.jkzldev.com,node4.jkzldev.com
+    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 ---
 spring:
   profiles: prod
