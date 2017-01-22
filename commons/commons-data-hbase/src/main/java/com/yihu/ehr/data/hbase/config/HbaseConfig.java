@@ -54,7 +54,7 @@ public class HbaseConfig{
 
         try
         {
-            hbaseTemplate.execute("HealthProfile", new TableCallback<Object>() {
+            /*hbaseTemplate.execute("HealthProfile", new TableCallback<Object>() {
                 @Override
                 public Object doInTable(HTableInterface table) throws Throwable {
                     Get get = new Get(Bytes.toBytes("connection-init"));
@@ -62,7 +62,7 @@ public class HbaseConfig{
 
                     return result;
                 }
-            });
+            });*/
         }
         catch (Exception ex)
         {

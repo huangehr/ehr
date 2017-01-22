@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MCdaTransformDto;
+import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.resource.dao.ResourcesQueryDao;
 import com.yihu.ehr.resource.service.ResourcesQueryService;
 import com.yihu.ehr.resource.service.ResourcesTransformService;
@@ -130,6 +131,7 @@ public class ResourcesQueryEndPoint {
                                 @ApiParam("version") @RequestParam(value = "version", required = false) String version) throws Exception {
         Page<Map<String, Object>> result = resourcesQueryDao.getEhrCenter(queryParams, page, size);
         Envelop re = new Envelop();
+        re.setSuccessFlg(true);
         re.setCurrPage(result.getNumber());
         re.setPageSize(result.getSize());
         re.setTotalCount(new Long(result.getTotalElements()).intValue());
