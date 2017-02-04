@@ -1,6 +1,8 @@
 package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.user.dao.XUserRepository;
+import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.util.hash.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -55,13 +57,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
      * @param loginCode
      */
     public User getUserByUserName(String loginCode) {
-        List<User> users = userRepository.findByLoginCode(loginCode);
-        if(users.size()>0){
-            return users.get(0);
-            //查询用户权限
-        }else {
-            return null;
-        }
+        return userRepository.findByLoginCode(loginCode);
     }
 
     public User getUserByIdCardNo(String idCardNo) {
@@ -89,7 +85,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         return HashUtil.hash(pwd);
     }
 
-    public boolean isPasswordRight(User user,String pwd) {
+    public boolean isPasswordRight(User user, String pwd) {
         return hashPassword(pwd).equals(user.getPassword());
     }
 

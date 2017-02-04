@@ -1,6 +1,8 @@
 package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.user.dao.XRoleFeatureRelationRepository;
+import com.yihu.ehr.user.entity.RoleFeatureRelation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,7 +29,7 @@ public class RoleFeatureRelationService extends BaseJpaService<RoleFeatureRelati
         return roleFeatureRelationRepository.findAll(pageable);
     }
 
-    public RoleFeatureRelation findRelation(long featureId,long roleId){
+    public RoleFeatureRelation findRelation(long featureId, long roleId){
         return roleFeatureRelationRepository.findRelation(featureId, roleId);
     }
 

@@ -1,5 +1,6 @@
-package com.yihu.ehr.user.service;
+package com.yihu.ehr.user.dao;
 
+import com.yihu.ehr.user.entity.RoleApiRelation;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;

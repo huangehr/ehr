@@ -1,5 +1,6 @@
-package com.yihu.ehr.user.service;
+package com.yihu.ehr.user.dao;
 
+import com.yihu.ehr.user.entity.User;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -16,7 +17,7 @@ public interface XUserRepository extends PagingAndSortingRepository<User, String
 
     List<User>  findByRealName(String userName);
 
-    List<User> findByLoginCode(String loginCode);
+    User findByLoginCode(String loginCode);
 
     List<User> findByIdCardNo(String idCardNo);
 

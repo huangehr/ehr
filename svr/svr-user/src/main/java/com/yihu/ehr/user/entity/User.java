@@ -1,4 +1,4 @@
-package com.yihu.ehr.user.service;
+package com.yihu.ehr.user.entity;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;

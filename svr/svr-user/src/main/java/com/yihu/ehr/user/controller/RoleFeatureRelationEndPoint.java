@@ -4,7 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
-import com.yihu.ehr.user.service.RoleFeatureRelation;
+import com.yihu.ehr.user.entity.RoleFeatureRelation;
 import com.yihu.ehr.user.service.RoleFeatureRelationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
