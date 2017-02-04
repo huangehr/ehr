@@ -1,0 +1,42 @@
+server:
+  port: ${ag-portal-cloud.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: AgAdminService
+    description: EHR platform json app service.
+    version: 1.0.0
+  component: Zuul Server
+
+hystrix:
+  command:
+    default:
+      execution:
+#        timeout:
+#          enabled: false
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 6000
+
+---
+spring:
+  profiles: dev
+
+---
+spring:
+  profiles: alpha
+
+---
+spring:
+  profiles: test
+
+---
+spring:
+  profiles: prod
+
