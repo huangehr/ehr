@@ -1,19 +1,20 @@
-package com.yihu.ehr.user.service;
+package com.yihu.ehr.user.entity;
 
 import javax.persistence.*;
 
 /**
- * Created by yww on 2016/7/7.
+ * Created by yww on 2016/7/8.
  */
 @Entity
-@Table(name = "role_feature_relation")
-@Access(value = AccessType.PROPERTY)
-public class RoleFeatureRelation {
+@Table(name = "role_api_relation")
+@Access(AccessType.PROPERTY)
+public class RoleApiRelation {
     private long id;
     private long roleId;
-    private long featureId;
+    private long apiId;
 
-    public RoleFeatureRelation() {}
+    public RoleApiRelation() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,11 +34,11 @@ public class RoleFeatureRelation {
         this.roleId = roleId;
     }
 
-    @Column(name = "feature_id",nullable = false)
-    public long getFeatureId() {
-        return featureId;
+    @Column(name = "app_api_id",nullable = false)
+    public long getApiId() {
+        return apiId;
     }
-    public void setFeatureId(long featureId) {
-        this.featureId = featureId;
+    public void setApiId(long apiId) {
+        this.apiId = apiId;
     }
 }

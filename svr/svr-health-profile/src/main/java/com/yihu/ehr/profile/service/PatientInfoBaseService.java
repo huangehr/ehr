@@ -602,7 +602,7 @@ public class PatientInfoBaseService {
         //过滤门诊纪录
         if (!StringUtils.isBlank(mzQuery))
         {
-            String queryParams = "{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\"";
+            String queryParams = "{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\"}";
             //门诊诊断纪录
             Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, appId, queryParams.replace(' ', '+'), null, null);
 
@@ -616,7 +616,7 @@ public class PatientInfoBaseService {
             }
         }
         else{
-            String queryParams = "{\"q\":\""+ "(" + rowkeys +")\"";
+            String queryParams = "{\"q\":\""+ "(" + rowkeys +")\"}";
             //门诊诊断纪录
             Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, appId, queryParams.replace(' ', '+'), null, null);
 
@@ -640,7 +640,7 @@ public class PatientInfoBaseService {
         //过滤住院纪录
         if(!StringUtils.isBlank(zyQuery))
         {
-            String queryParams = "{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\"";
+            String queryParams = "{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\"}";
             //门诊诊断纪录
             //住院诊断纪录
             Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,queryParams.replace(' ', '+'), null, null);
@@ -655,7 +655,7 @@ public class PatientInfoBaseService {
             }
         }
         else{
-            String queryParams = "{\"q\":\"" + "(" + rowkeys +")\"";
+            String queryParams = "{\"q\":\"" + "(" + rowkeys +")\"}";
             //门诊诊断纪录
             //住院诊断纪录
             Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,queryParams.replace(' ', '+'), null, null);

@@ -10,7 +10,7 @@ import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.user.feign.ConventionalDictClient;
 import com.yihu.ehr.user.feign.SecurityClient;
-import com.yihu.ehr.user.service.User;
+import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.util.hash.HashUtil;

@@ -1,6 +1,8 @@
 package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.user.dao.XRoleApiRelationRepository;
+import com.yihu.ehr.user.entity.RoleApiRelation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

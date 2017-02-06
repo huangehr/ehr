@@ -1,5 +1,6 @@
-package com.yihu.ehr.user.service;
+package com.yihu.ehr.user.dao;
 
+import com.yihu.ehr.user.entity.Roles;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**

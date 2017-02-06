@@ -1,4 +1,4 @@
-package com.yihu.ehr.user.service;
+package com.yihu.ehr.user.entity;
 
 import javax.persistence.*;
 

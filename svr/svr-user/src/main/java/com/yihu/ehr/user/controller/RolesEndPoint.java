@@ -5,7 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.user.MRoles;
-import com.yihu.ehr.user.service.Roles;
+import com.yihu.ehr.user.entity.Roles;
 import com.yihu.ehr.user.service.RolesService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
