@@ -1,9 +1,9 @@
 package com.yihu.ehr.user.entity;
+
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * @author Sand
@@ -45,6 +45,23 @@ public class User {
 
     private String imgRemotePath;
     private String imgLocalPath;
+
+    private int fertilityStatus;
+    private String secondPhone;
+    private String birthday;
+    private String micard;
+    private String qq;
+    private String ssid;
+    private String familyPhone;
+    private int provinceId;
+    private String provinceName;
+    private int cityId;
+    private String cityName;
+    private int areaId;
+    private String areaName;
+    private String demographicId;
+    private String doctorId;
+    private String realnameFlag;
 
     public User() {
     }
@@ -258,5 +275,133 @@ public class User {
     }
     public void setImgLocalPath(String imgLocalPath) {
         this.imgLocalPath = imgLocalPath;
+    }
+    @Column(name = "fertility_status",  nullable = true)
+    public int getFertilityStatus() {
+        return fertilityStatus;
+    }
+
+    public void setFertilityStatus(int fertilityStatus) {
+        this.fertilityStatus = fertilityStatus;
+    }
+    @Column(name = "second_phone",  nullable = true)
+    public String getSecondPhone() {
+        return secondPhone;
+    }
+
+    public void setSecondPhone(String secondPhone) {
+        this.secondPhone = secondPhone;
+    }
+    @Column(name = "birthday",  nullable = true)
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+    @Column(name = "micard",  nullable = true)
+    public String getMicard() {
+        return micard;
+    }
+
+    public void setMicard(String micard) {
+        this.micard = micard;
+    }
+    @Column(name = "qq",  nullable = true)
+    public String getQq() {
+        return qq;
+    }
+
+    public void setQq(String qq) {
+        this.qq = qq;
+    }
+    @Column(name = "ssid",  nullable = true)
+    public String getSsid() {
+        return ssid;
+    }
+
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
+    }
+    @Column(name = "family_phone",  nullable = true)
+    public String getFamilyPhone() {
+        return familyPhone;
+    }
+
+    public void setFamilyPhone(String familyPhone) {
+        this.familyPhone = familyPhone;
+    }
+    @Column(name = "province_id",  nullable = true)
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
+    }
+    @Column(name = "province_name",  nullable = true)
+    public String getProvinceName() {
+        return provinceName;
+    }
+
+    public void setProvinceName(String provinceName) {
+        this.provinceName = provinceName;
+    }
+    @Column(name = "city_id",  nullable = true)
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+    @Column(name = "city_name",  nullable = true)
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+    @Column(name = "area_id",  nullable = true)
+    public int getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(int areaId) {
+        this.areaId = areaId;
+    }
+    @Column(name = "area_name",  nullable = true)
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
+    }
+    @Column(name = "demographic_id",  nullable = true)
+    public String getDemographicId() {
+        return demographicId;
+    }
+
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
+    @Column(name = "doctor_id",  nullable = true)
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
+    }
+    @Column(name = "realname_flag",  nullable = true)
+    public String getRealnameFlag() {
+        return realnameFlag;
+    }
+
+    public void setRealnameFlag(String realnameFlag) {
+        this.realnameFlag = realnameFlag;
     }
 }

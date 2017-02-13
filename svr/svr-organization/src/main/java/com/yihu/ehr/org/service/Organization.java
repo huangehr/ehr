@@ -72,6 +72,81 @@ public class Organization  {
     @Column(name = "administrative_division",nullable = true)
     private int administrativeDivision;
 
+    @Column(name = "id",nullable = true)
+    private String id;
+
+    @Column(name = "code",nullable = true)
+    private String code;
+
+    @Column(name = "traffic",nullable = true)
+    private String traffic;
+
+    @Column(name = "province_id",nullable = true)
+    private String provinceId;
+
+    @Column(name = "province_name",nullable = true)
+    private String provinceName;
+
+    @Column(name = "city_id",nullable = true)
+    private String cityId;
+
+    @Column(name = "city_name",nullable = true)
+    private String cityName;
+
+    @Column(name = "area_id",nullable = true)
+    private String areaId;
+
+    @Column(name = "area_name",nullable = true)
+    private String areaName;
+
+    @Column(name = "photo",nullable = true)
+    private String photo;
+
+    @Column(name = "hos_type_id",nullable = true)
+    private String hosTypeId;
+
+    @Column(name = "url",nullable = true)
+    private String url;
+
+    @Column(name = "ascription_type",nullable = true)
+    private String ascription_type;
+
+    @Column(name = "phone",nullable = true)
+    private String phone;
+
+    @Column(name = "introduction",nullable = true)
+    private String introduction;
+
+    @Column(name = "legal_person",nullable = true)
+    private String legalPerson;
+
+    @Column(name = "level_id",nullable = true)
+    private String levelId;
+
+    @Column(name = "logo_url",nullable = true)
+    private String logoUrl;
+
+    @Column(name = "sort_no",nullable = true)
+    private String sortNo;
+
+    @Column(name = "parent_hos_id",nullable = true)
+    private String parentHosId;
+
+    @Column(name = "hos_photo",nullable = true)
+    private String hosPhoto;
+
+    @Column(name = "zxy",nullable = true)
+    private String zxy;
+
+    @Column(name = "ing",nullable = true)
+    private String ing;
+
+    @Column(name = "lat",nullable = true)
+    private String lat;
+
+    @Column(name = "update_time",nullable = true)
+    private String updateTime;
+
     public Organization() {
         //tags = new HashSet<>();
     }
@@ -218,5 +293,203 @@ public class Organization  {
         }
     }
 
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getTraffic() {
+        return traffic;
+    }
+
+    public void setTraffic(String traffic) {
+        this.traffic = traffic;
+    }
+
+    public String getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(String provinceId) {
+        this.provinceId = provinceId;
+    }
+
+    public String getProvinceName() {
+        return provinceName;
+    }
+
+    public void setProvinceName(String provinceName) {
+        this.provinceName = provinceName;
+    }
+
+    public String getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(String cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getHosTypeId() {
+        return hosTypeId;
+    }
+
+    public void setHosTypeId(String hosTypeId) {
+        this.hosTypeId = hosTypeId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getAscription_type() {
+        return ascription_type;
+    }
+
+    public void setAscription_type(String ascription_type) {
+        this.ascription_type = ascription_type;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public String getLegalPerson() {
+        return legalPerson;
+    }
+
+    public void setLegalPerson(String legalPerson) {
+        this.legalPerson = legalPerson;
+    }
+
+    public String getLevelId() {
+        return levelId;
+    }
+
+    public void setLevelId(String levelId) {
+        this.levelId = levelId;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
+    }
+
+    public String getSortNo() {
+        return sortNo;
+    }
+
+    public void setSortNo(String sortNo) {
+        this.sortNo = sortNo;
+    }
+
+    public String getParentHosId() {
+        return parentHosId;
+    }
+
+    public void setParentHosId(String parentHosId) {
+        this.parentHosId = parentHosId;
+    }
+
+    public String getHosPhoto() {
+        return hosPhoto;
+    }
+
+    public void setHosPhoto(String hosPhoto) {
+        this.hosPhoto = hosPhoto;
+    }
+
+    public String getZxy() {
+        return zxy;
+    }
+
+    public void setZxy(String zxy) {
+        this.zxy = zxy;
+    }
+
+    public String getIng() {
+        return ing;
+    }
+
+    public void setIng(String ing) {
+        this.ing = ing;
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
+    }
 }

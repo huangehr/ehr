@@ -41,6 +41,11 @@ public class App {
     private String code;
     private int sourceType;
 
+    @Column(name = "icon", nullable = true)
+    private String icon;
+    @Column(name = "release_flag", nullable = true)
+    private int releaseFlag;
+
     @Column(name = "source_type", nullable = true)
     public int getSourceType() {
         return sourceType;
@@ -185,5 +190,21 @@ public class App {
 
     public void setOrg(String org) {
         this.org = org;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public int getReleaseFlag() {
+        return releaseFlag;
+    }
+
+    public void setReleaseFlag(int releaseFlag) {
+        this.releaseFlag = releaseFlag;
     }
 }
