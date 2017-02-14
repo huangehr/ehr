@@ -11,9 +11,7 @@ import java.util.Date;
 @Access(value = AccessType.PROPERTY)
 public class userLoginLog {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id",unique = true,nullable = false)
+
     private long id;
 
     @Column(name = "user_id",nullable = true)
@@ -30,6 +28,10 @@ public class userLoginLog {
 
     public userLoginLog(){}
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id",unique = true,nullable = false)
     public long getId() {
         return id;
     }

@@ -37,6 +37,71 @@ public class MUser implements Serializable{
     private String imgRemotePath;
     private String imgLocalPath;
 
+
+    private int fertilityStatus;
+    private String secondPhone;
+    private String birthday;
+    private String micard;
+    private String qq;
+    private String ssid;
+    private String realnameFlag;
+
+    public int getFertilityStatus() {
+        return fertilityStatus;
+    }
+
+    public void setFertilityStatus(int fertilityStatus) {
+        this.fertilityStatus = fertilityStatus;
+    }
+
+    public String getSecondPhone() {
+        return secondPhone;
+    }
+
+    public void setSecondPhone(String secondPhone) {
+        this.secondPhone = secondPhone;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getMicard() {
+        return micard;
+    }
+
+    public void setMicard(String micard) {
+        this.micard = micard;
+    }
+
+    public String getQq() {
+        return qq;
+    }
+
+    public void setQq(String qq) {
+        this.qq = qq;
+    }
+
+    public String getSsid() {
+        return ssid;
+    }
+
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
+    }
+
+    public String getRealnameFlag() {
+        return realnameFlag;
+    }
+
+    public void setRealnameFlag(String realnameFlag) {
+        this.realnameFlag = realnameFlag;
+    }
+
     public String getId() {
         return id;
     }

@@ -1,48 +1,27 @@
 package com.yihu.ehr.user.controller;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.user.entity.Doctors;
-import com.yihu.ehr.user.entity.User;
-import com.yihu.ehr.user.feign.ConventionalDictClient;
-import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.service.DoctorService;
-import com.yihu.ehr.user.service.UserManager;
-import com.yihu.ehr.util.hash.HashUtil;
-import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.csource.common.MyException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.*;
+import java.util.List;
 
 /**
  * 2017-02-04 add  by hzp
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0)
+@RequestMapping(ApiVersion.Version1_0 + "/doctor")
 @Api(value = "doctor", description = "医生管理接口")
 public class DoctorEndPoint extends EnvelopRestEndPoint {
 

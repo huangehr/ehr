@@ -106,6 +106,16 @@
                 <role>Project programmer</role>
             </roles>
         </developer>
+        <developer>
+            <id>hzy</id>
+            <name>黄志勇</name>
+            <email>hzy@qq.com</email>
+            <organization>JKZL Software, Inc.</organization>
+            <organizationUrl>http://www.yihu.com</organizationUrl>
+            <roles>
+                <role>Project programmer</role>
+            </roles>
+        </developer>
     </developers>
 
     <properties>

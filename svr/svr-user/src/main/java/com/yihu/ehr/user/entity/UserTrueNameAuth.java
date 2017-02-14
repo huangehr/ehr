@@ -10,9 +10,7 @@ import javax.persistence.*;
 @Access(value = AccessType.PROPERTY)
 public class UserTrueNameAuth {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id",unique = true,nullable = false)
+
     private long id;
 
     @Column(name = "user_id",nullable = true)
@@ -32,6 +30,10 @@ public class UserTrueNameAuth {
 
     public UserTrueNameAuth(){}
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id",unique = true,nullable = false)
     public long getId() {
         return id;
     }
