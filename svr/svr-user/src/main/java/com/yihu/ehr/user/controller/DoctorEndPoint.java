@@ -46,7 +46,7 @@ import java.util.*;
 @Api(value = "doctor", description = "医生管理接口")
 public class DoctorEndPoint extends EnvelopRestEndPoint {
 
-    @Autowired
+    /*@Autowired
     DoctorService doctorService;
 
     @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.GET)
@@ -64,22 +64,22 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException {
-        /*List<User> userList = userManager.search(fields, filters, sorts, page, size);
+        *//*List<User> userList = userManager.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, userManager.getCount(filters), page, size);
 
-        return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);*/
+        return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);*//*
 
         return null;
-    }
+    }*/
 
-    @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    /*@RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
     public Boolean createUser(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
             @RequestBody String doctoJsonData) throws Exception {
         doctorService.saveDoctor(doctoJsonData);
         return true;
-    }
+    }*/
 
     /*@RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改用户", notes = "重新绑定用户信息")

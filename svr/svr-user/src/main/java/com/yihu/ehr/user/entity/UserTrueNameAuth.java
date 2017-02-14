@@ -13,22 +13,22 @@ public class UserTrueNameAuth {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id",unique = true,nullable = false)
-    private long id;
+    public long id;
 
     @Column(name = "user_id",nullable = true)
-    private String userId;
+    public String userId;
 
     @Column(name = "id_card_no",nullable = true)
-    private String idCardNo;
+    public String idCardNo;
 
     @Column(name = "name",nullable = true)
-    private String name;
+    public String name;
 
     @Column(name = "auth_time",nullable = true)
-    private String authTime;
+    public String authTime;
 
     @Column(name = "auth_result",nullable = true)
-    private String authResult;
+    public String authResult;
 
     public UserTrueNameAuth(){}
 
