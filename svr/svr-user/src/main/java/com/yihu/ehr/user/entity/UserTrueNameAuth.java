@@ -10,30 +10,28 @@ import javax.persistence.*;
 @Access(value = AccessType.PROPERTY)
 public class UserTrueNameAuth {
 
-
-    private long id;
-
-    @Column(name = "user_id",nullable = true)
-    private String userId;
-
-    @Column(name = "id_card_no",nullable = true)
-    private String idCardNo;
-
-    @Column(name = "name",nullable = true)
-    private String name;
-
-    @Column(name = "auth_time",nullable = true)
-    private String authTime;
-
-    @Column(name = "auth_result",nullable = true)
-    private String authResult;
-
-    public UserTrueNameAuth(){}
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id",unique = true,nullable = false)
+    public long id;
+
+    @Column(name = "user_id",nullable = true)
+    public String userId;
+
+    @Column(name = "id_card_no",nullable = true)
+    public String idCardNo;
+
+    @Column(name = "name",nullable = true)
+    public String name;
+
+    @Column(name = "auth_time",nullable = true)
+    public String authTime;
+
+    @Column(name = "auth_result",nullable = true)
+    public String authResult;
+
+    public UserTrueNameAuth(){}
+
     public long getId() {
         return id;
     }

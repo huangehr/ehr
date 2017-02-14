@@ -1,98 +1,60 @@
 package com.yihu.ehr.org.model;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 /**
- * create by cws 2017-02-07
+ * Created by Dell on 2017/2/13.
  */
 @Entity
-@Table(name = "org_dept_detail")
-@Access(value = AccessType.FIELD)
+@Table(name = "org_dept_detail", schema = "", catalog = "healtharchive")
 public class OrgDeptDetail {
-
+    private int id;
+    private int deptId;
+    private String nationalDeptSn;
+    private String code;
+    private String name;
+    private String phone;
+    private Integer displayStatus;
+    private String gloryId;
+    private String orgId;
+    private String introduction;
+    private Integer sortNo;
+    private String place;
+    private String pyCode;
+    private Integer typeId;
+    private Timestamp insertTime;
+    private Timestamp updateTime;
 
     @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
-    private String id;
-
-    @Column(name = "dept_id",  nullable = true)
-    private String deptId;
-
-    @Column(name = "org_id",nullable = true)
-    private String orgId;
-
-    @Column(name = "code",nullable = true)
-    private String code;
-
-    @Column(name = "name",nullable = true)
-    private String name;
-
-    @Column(name = "national _dept_sn",nullable = true)
-    private int nationalDeptSn;
-
-    @Column(name = "phone",nullable = true)
-    private String phone;
-
-    @Column(name = "display_status",nullable = true)
-    private String displayStatus;
-
-    @Column(name = "glory_id",nullable = true)
-    private String gloryId;
-
-    @Column(name = "insert_time",nullable = true)
-    private String insertTime;
-
-    @Column(name = "introduction",nullable = true)
-    private String introduction;
-
-    @Column(name = "sort_no",nullable = true)
-    private String sortNo;
-
-    @Column(name = "place",nullable = true)
-    private String place;
-
-    @Column(name = "py_code",nullable = true)
-    private String pyCode;
-
-    @Column(name = "type_id",nullable = true)
-    private String typeId;
-
-    @Column(name = "update_time",nullable = true)
-    private String updateTime;
-
-
-    public OrgDeptDetail() {
-        //tags = new HashSet<>();
-    }
-
-    public String getId() {
+    @Column(name = "id", nullable = false, insertable = true, updatable = true)
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getDeptId() {
+    @Column(name = "dept_id", nullable = false, insertable = true, updatable = true)
+    public int getDeptId() {
         return deptId;
     }
 
-    public void setDeptId(String deptId) {
+    public void setDeptId(int deptId) {
         this.deptId = deptId;
     }
 
-    public String getOrgId() {
-        return orgId;
+    @Column(name = "national_dept_sn", nullable = true, insertable = true, updatable = true)
+    public String getNationalDeptSn() {
+        return nationalDeptSn;
     }
 
-    public void setOrgId(String orgId) {
-        this.orgId = orgId;
+    public void setNationalDeptSn(String nationalDeptSn) {
+        this.nationalDeptSn = nationalDeptSn;
     }
 
+    @Column(name = "code", nullable = true, insertable = true, updatable = true)
     public String getCode() {
         return code;
     }
@@ -101,6 +63,7 @@ public class OrgDeptDetail {
         this.code = code;
     }
 
+    @Column(name = "name", nullable = true, insertable = true, updatable = true)
     public String getName() {
         return name;
     }
@@ -109,14 +72,7 @@ public class OrgDeptDetail {
         this.name = name;
     }
 
-    public int getNationalDeptSn() {
-        return nationalDeptSn;
-    }
-
-    public void setNationalDeptSn(int nationalDeptSn) {
-        this.nationalDeptSn = nationalDeptSn;
-    }
-
+    @Column(name = "phone", nullable = true, insertable = true, updatable = true)
     public String getPhone() {
         return phone;
     }
@@ -125,14 +81,16 @@ public class OrgDeptDetail {
         this.phone = phone;
     }
 
-    public String getDisplayStatus() {
+    @Column(name = "display_status", nullable = true, insertable = true, updatable = true)
+    public Integer getDisplayStatus() {
         return displayStatus;
     }
 
-    public void setDisplayStatus(String displayStatus) {
+    public void setDisplayStatus(Integer displayStatus) {
         this.displayStatus = displayStatus;
     }
 
+    @Column(name = "glory_id", nullable = true, insertable = true, updatable = true)
     public String getGloryId() {
         return gloryId;
     }
@@ -141,14 +99,16 @@ public class OrgDeptDetail {
         this.gloryId = gloryId;
     }
 
-    public String getInsertTime() {
-        return insertTime;
+    @Column(name = "org_id", nullable = true, insertable = true, updatable = true)
+    public String getOrgId() {
+        return orgId;
     }
 
-    public void setInsertTime(String insertTime) {
-        this.insertTime = insertTime;
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
     }
 
+    @Column(name = "introduction", nullable = true, insertable = true, updatable = true)
     public String getIntroduction() {
         return introduction;
     }
@@ -157,14 +117,16 @@ public class OrgDeptDetail {
         this.introduction = introduction;
     }
 
-    public String getSortNo() {
+    @Column(name = "sort_no", nullable = true, insertable = true, updatable = true)
+    public Integer getSortNo() {
         return sortNo;
     }
 
-    public void setSortNo(String sortNo) {
+    public void setSortNo(Integer sortNo) {
         this.sortNo = sortNo;
     }
 
+    @Column(name = "place", nullable = true, insertable = true, updatable = true)
     public String getPlace() {
         return place;
     }
@@ -173,6 +135,7 @@ public class OrgDeptDetail {
         this.place = place;
     }
 
+    @Column(name = "py_code", nullable = true, insertable = true, updatable = true)
     public String getPyCode() {
         return pyCode;
     }
@@ -181,19 +144,80 @@ public class OrgDeptDetail {
         this.pyCode = pyCode;
     }
 
-    public String getTypeId() {
+    @Column(name = "type_id", nullable = true, insertable = true, updatable = true)
+    public Integer getTypeId() {
         return typeId;
     }
 
-    public void setTypeId(String typeId) {
+    public void setTypeId(Integer typeId) {
         this.typeId = typeId;
     }
 
-    public String getUpdateTime() {
+    @Column(name = "insert_time", nullable = true, insertable = true, updatable = true)
+    public Timestamp getInsertTime() {
+        return insertTime;
+    }
+
+    public void setInsertTime(Timestamp insertTime) {
+        this.insertTime = insertTime;
+    }
+
+    @Column(name = "update_time", nullable = true, insertable = true, updatable = true)
+    public Timestamp getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(String updateTime) {
+    public void setUpdateTime(Timestamp updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OrgDeptDetail that = (OrgDeptDetail) o;
+
+        if (id != that.id) return false;
+        if (deptId != that.deptId) return false;
+        if (nationalDeptSn != null ? !nationalDeptSn.equals(that.nationalDeptSn) : that.nationalDeptSn != null)
+            return false;
+        if (code != null ? !code.equals(that.code) : that.code != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (phone != null ? !phone.equals(that.phone) : that.phone != null) return false;
+        if (displayStatus != null ? !displayStatus.equals(that.displayStatus) : that.displayStatus != null)
+            return false;
+        if (gloryId != null ? !gloryId.equals(that.gloryId) : that.gloryId != null) return false;
+        if (orgId != null ? !orgId.equals(that.orgId) : that.orgId != null) return false;
+        if (introduction != null ? !introduction.equals(that.introduction) : that.introduction != null) return false;
+        if (sortNo != null ? !sortNo.equals(that.sortNo) : that.sortNo != null) return false;
+        if (place != null ? !place.equals(that.place) : that.place != null) return false;
+        if (pyCode != null ? !pyCode.equals(that.pyCode) : that.pyCode != null) return false;
+        if (typeId != null ? !typeId.equals(that.typeId) : that.typeId != null) return false;
+        if (insertTime != null ? !insertTime.equals(that.insertTime) : that.insertTime != null) return false;
+        if (updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + deptId;
+        result = 31 * result + (nationalDeptSn != null ? nationalDeptSn.hashCode() : 0);
+        result = 31 * result + (code != null ? code.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (phone != null ? phone.hashCode() : 0);
+        result = 31 * result + (displayStatus != null ? displayStatus.hashCode() : 0);
+        result = 31 * result + (gloryId != null ? gloryId.hashCode() : 0);
+        result = 31 * result + (orgId != null ? orgId.hashCode() : 0);
+        result = 31 * result + (introduction != null ? introduction.hashCode() : 0);
+        result = 31 * result + (sortNo != null ? sortNo.hashCode() : 0);
+        result = 31 * result + (place != null ? place.hashCode() : 0);
+        result = 31 * result + (pyCode != null ? pyCode.hashCode() : 0);
+        result = 31 * result + (typeId != null ? typeId.hashCode() : 0);
+        result = 31 * result + (insertTime != null ? insertTime.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        return result;
     }
 }
