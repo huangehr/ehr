@@ -16,6 +16,9 @@ import java.util.List;
 public interface XOrgDeptRepository extends PagingAndSortingRepository<OrgDept, Integer> {
 
     @Query("select org from OrgDept org where org.parentDeptId = :parentDeptId ")
-    List<Organization> searchByParentDeptId(@Param("parentDeptId") Integer parentDeptId);
+    List<OrgDept> searchByParentDeptId(@Param("parentDeptId") Integer parentDeptId);
+
+    @Query("select org from OrgDept org where org.orgId = :orgId ")
+    List<OrgDept> searchByOrgId(@Param("orgId") String orgId);
 
 }
