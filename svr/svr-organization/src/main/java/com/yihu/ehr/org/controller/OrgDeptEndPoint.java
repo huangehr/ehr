@@ -1,7 +1,9 @@
 package com.yihu.ehr.org.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.org.MOrgDept;
+import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.service.OrgDeptService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "orgDept", description = "组织机构部门管理服务", tags = {"部门管理"})
-public class OrgDeptEndPoint {
+public class OrgDeptEndPoint  extends EnvelopRestEndPoint {
 
     @Autowired
     private OrgDeptService orgDeptService;
@@ -33,20 +34,21 @@ public class OrgDeptEndPoint {
     @ApiOperation(value = "根据条件查询机构下的部门列表")
     public List<MOrgDept> searchOrgDepts(
             @ApiParam(name = "orgId", value = "机构ID")
-            @RequestParam(value = "orgId", required = true) String orgId,
-            @ApiParam(name = "sorts", value = "排序 ", defaultValue = "+name")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-//        List<MOrgDept> orgDepts = orgDeptService.search(fields, filters, sorts, page, size);
-        return null;
+            @RequestParam(value = "orgId", required = true) String orgId) throws Exception {
+        List<OrgDept> orgDepts = orgDeptService.searchByOrgId(orgId);
+        return  (List<MOrgDept>) convertToModels(orgDepts, new ArrayList<MOrgDept>(orgDepts.size()), MOrgDept.class, null);
     }
 
 
+    @RequestMapping(value = "/orgDept/childs", method = RequestMethod.POST)
+    @ApiOperation(value = "根据父级部门ID查询其下的子部门列表")
+    public List<MOrgDept> searchChildOrgDepts(
+            @ApiParam(name = "parentDeptId", value = "父级部门ID")
+            @RequestParam(value = "parentDeptId", required = true) Integer parentDeptId
+            ) throws Exception {
+        List<OrgDept> orgDepts = orgDeptService.searchByParentId(parentDeptId);
+        return (List<MOrgDept>) convertToModels(orgDepts, new ArrayList<MOrgDept>(orgDepts.size()), MOrgDept.class, null);
+    }
 
 
 }
