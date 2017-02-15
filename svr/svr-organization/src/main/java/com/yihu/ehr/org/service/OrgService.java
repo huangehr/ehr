@@ -1,6 +1,8 @@
 package com.yihu.ehr.org.service;
 
+import com.yihu.ehr.org.dao.XOrganizationRepository;
 import com.yihu.ehr.org.feign.GeographyClient;
+import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
