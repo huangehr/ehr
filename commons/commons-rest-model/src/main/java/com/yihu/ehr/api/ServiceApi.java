@@ -381,6 +381,13 @@ public class ServiceApi {
         public static final String Dispatches                       = "/std/dispatches";
     }
 
+    public static class Doctors{
+        public static final String Doctors                            = "/doctors";
+        public static final String DoctorsExistence                  = "/doctors/{doctor_code}/existence";
+        public static final String DoctorAdmin                        = "/doctors/admin/{doctor_id}";
+
+    }
+
     public static class Users{
         public static final String Users                            = "/users";
         public static final String User                             = "/users/{user_name}";

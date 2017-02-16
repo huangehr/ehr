@@ -1,14 +1,12 @@
-package com.yihu.ehr.user.entity;
-import javax.persistence.*;
+package com.yihu.ehr.model.user;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 2017-02-04 add by hzp
+ * Created by yeshijie on 2017/2/14.
  */
-@Entity
-@Table(name = "doctors")
-@Access(value = AccessType.PROPERTY)
-public class Doctors {
+public class MDoctor implements Serializable {
     private Long id;
     private String userId;
     private String code;
@@ -32,38 +30,28 @@ public class Doctors {
     private Date insertTime;
     private Date updateTime;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id",unique = true,nullable = false)
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
 
-
-    @Column(name = "userId",  nullable = false)
     public String getUserId() {
         return userId;
     }
+
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    @Column(name = "code",  nullable = false)
     public String getCode() {
         return code;
     }
+
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getName() {
@@ -112,6 +100,14 @@ public class Doctors {
 
     public void setWorkPortal(String workPortal) {
         this.workPortal = workPortal;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPhone() {
