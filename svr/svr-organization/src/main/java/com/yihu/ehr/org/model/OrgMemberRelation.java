@@ -24,7 +24,8 @@ public class OrgMemberRelation {
     private Integer status;
 
     @Id
-    @Column(name = "id", nullable = false, insertable = true, updatable = true)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
     public int getId() {
         return id;
     }
@@ -42,7 +43,7 @@ public class OrgMemberRelation {
         this.orgId = orgId;
     }
 
-    @Column(name = "org_name", nullable = true, insertable = true, updatable = true)
+    @Column(name = "org_name", nullable = true)
     public String getOrgName() {
         return orgName;
     }
@@ -60,7 +61,7 @@ public class OrgMemberRelation {
         this.parentDeptId = parentDeptId;
     }
 
-    @Column(name = "parent_dept_name", nullable = true, insertable = true, updatable = true)
+    @Column(name = "parent_dept_name", nullable = true)
     public String getParentDeptName() {
         return parentDeptName;
     }
@@ -78,7 +79,7 @@ public class OrgMemberRelation {
         this.deptId = deptId;
     }
 
-    @Column(name = "dept_name", nullable = true, insertable = true, updatable = true)
+    @Column(name = "dept_name", nullable = true)
     public String getDeptName() {
         return deptName;
     }
@@ -87,7 +88,7 @@ public class OrgMemberRelation {
         this.deptName = deptName;
     }
 
-    @Column(name = "duty_name", nullable = true, insertable = true, updatable = true)
+    @Column(name = "duty_name", nullable = true)
     public String getDutyName() {
         return dutyName;
     }
@@ -105,7 +106,7 @@ public class OrgMemberRelation {
         this.userId = userId;
     }
 
-    @Column(name = "user_name", nullable = true, insertable = true, updatable = true)
+    @Column(name = "user_name", nullable = true)
     public String getUserName() {
         return userName;
     }
@@ -123,7 +124,7 @@ public class OrgMemberRelation {
         this.parentUserId = parentUserId;
     }
 
-    @Column(name = "parent_user_name", nullable = true, insertable = true, updatable = true)
+    @Column(name = "parent_user_name", nullable = true)
     public String getParentUserName() {
         return parentUserName;
     }
@@ -132,7 +133,7 @@ public class OrgMemberRelation {
         this.parentUserName = parentUserName;
     }
 
-    @Column(name = "remark", nullable = true, insertable = true, updatable = true)
+    @Column(name = "remark", nullable = true)
     public String getRemark() {
         return remark;
     }
@@ -141,7 +142,7 @@ public class OrgMemberRelation {
         this.remark = remark;
     }
 
-    @Column(name = "status", nullable = true, insertable = true, updatable = true)
+    @Column(name = "status", nullable = true)
     public Integer getStatus() {
         return status;
     }

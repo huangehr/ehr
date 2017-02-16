@@ -17,7 +17,8 @@ public class OrgDept {
     private Integer sortNo;
 
     @Id
-    @Column(name = "id", nullable = false, insertable = true, updatable = true)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id",unique = true,nullable = false)
     public int getId() {
         return id;
     }
@@ -44,7 +45,7 @@ public class OrgDept {
         this.orgId = orgId;
     }
 
-    @Column(name = "code", nullable = true, insertable = true, updatable = true)
+    @Column(name = "code", nullable = true)
     public String getCode() {
         return code;
     }
@@ -53,7 +54,7 @@ public class OrgDept {
         this.code = code;
     }
 
-    @Column(name = "name", nullable = true, insertable = true, updatable = true)
+    @Column(name = "name", nullable = true)
     public String getName() {
         return name;
     }
@@ -62,7 +63,7 @@ public class OrgDept {
         this.name = name;
     }
 
-    @Column(name = "del_flag", nullable = true, insertable = true, updatable = true)
+    @Column(name = "del_flag", nullable = true)
     public Integer getDelFlag() {
         return delFlag;
     }
@@ -71,7 +72,7 @@ public class OrgDept {
         this.delFlag = delFlag;
     }
 
-    @Column(name = "sort_no", nullable = true, insertable = true, updatable = true)
+    @Column(name = "sort_no", nullable = true)
     public Integer getSortNo() {
         return sortNo;
     }
