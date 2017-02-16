@@ -41,7 +41,8 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         if(roleUserList != null && roleUserList.size() > 0){
             return convertToModel(roleUserList.get(0), MRoleUser.class);
         }
-        RoleUser roleUserNew = roleUserService.save(roleUser);
+//        RoleUser roleUserNew = roleUserService.save(roleUser);
+        RoleUser roleUserNew = roleUserService.createRoleUser(roleUser);
         return convertToModel(roleUserNew,MRoleUser.class);
     }
 
@@ -54,7 +55,8 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "role_id") String roleId){
         RoleUser roleUser = roleUserService.findRelation(userId,Long.parseLong(roleId));
         if(null != roleUser){
-            roleUserService.delete(roleUser.getId());
+//            roleUserService.delete(roleUser.getId());
+            roleUserService.deleteRoleUser(roleUser);
         }
         return true;
     }
