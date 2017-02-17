@@ -15,10 +15,10 @@ import java.util.List;
  */
 public interface XOrgDeptRepository extends PagingAndSortingRepository<OrgDept, Integer> {
 
-    @Query("select org from OrgDept org where org.parentDeptId = :parentDeptId ")
+    @Query("select dept from OrgDept dept where dept.parentDeptId = :parentDeptId order by dept.sortNo desc ")
     List<OrgDept> searchByParentDeptId(@Param("parentDeptId") Integer parentDeptId);
 
-    @Query("select org from OrgDept org where org.orgId = :orgId ")
+    @Query("select dept from OrgDept dept where dept.orgId = :orgId order by dept.sortNo desc ")
     List<OrgDept> searchByOrgId(@Param("orgId") String orgId);
 
 }

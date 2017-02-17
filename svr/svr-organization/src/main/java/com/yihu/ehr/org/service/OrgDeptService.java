@@ -3,6 +3,7 @@ package com.yihu.ehr.org.service;
 import com.yihu.ehr.org.dao.XOrgDeptRepository;
 import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.query.BaseJpaService;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,7 @@ import java.util.List;
  * Created at 2017/2/15.
  */
 @Service
-@Transactional
+@Transactional(rollbackFor={ServiceException.class})
 public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> {
 
     @Autowired
@@ -51,6 +52,24 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
         dept.setDelFlag(1);
         orgDeptRepository.save(dept);
         return dept;
+    }
+
+    /**
+     *  交换部门排序
+     * @param deptId1
+     * @return
+     */
+    public void changeOrgDeptSort(Integer deptId1,Integer deptId2) {
+        OrgDept orgDept1 = orgDeptRepository.findOne(deptId1);
+        OrgDept orgDept2 = orgDeptRepository.findOne(deptId2);
+
+        Integer sortNo1 = orgDept1.getSortNo();
+        orgDept1.setSortNo(orgDept2.getSortNo());
+        orgDeptRepository.save(orgDept1);
+
+        orgDept2.setSortNo(sortNo1);
+        orgDeptRepository.save(orgDept2);
+
     }
 
 }
