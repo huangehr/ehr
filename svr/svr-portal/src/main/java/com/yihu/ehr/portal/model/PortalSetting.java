@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.service;
+package com.yihu.ehr.portal.model;
 
 import javax.persistence.*;
 

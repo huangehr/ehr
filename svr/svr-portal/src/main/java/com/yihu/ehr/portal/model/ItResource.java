@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.service;
+package com.yihu.ehr.portal.model;
 
 import javax.persistence.*;
 
@@ -6,8 +6,8 @@ import javax.persistence.*;
  * Created by Dell on 2017/2/13.
  */
 @Entity
-@Table(name = "it_resource_download", schema = "", catalog = "healtharchive")
-public class ItResourceDownload {
+@Table(name = "it_resource", schema = "", catalog = "healtharchive")
+public class ItResource {
     private int id;
     private String name;
     private String version;
@@ -16,9 +16,12 @@ public class ItResourceDownload {
     private String description;
     private String developLan;
     private String validateType;
+    private Integer status;
+    private String url;
 
     @Id
-    @Column(name = "id", nullable = false, insertable = true, updatable = true)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", unique = true, nullable = false)
     public int getId() {
         return id;
     }
@@ -27,8 +30,7 @@ public class ItResourceDownload {
         this.id = id;
     }
 
-    @Basic
-    @Column(name = "name", nullable = true, insertable = true, updatable = true)
+    @Column(name = "name", nullable = true)
     public String getName() {
         return name;
     }
@@ -37,8 +39,7 @@ public class ItResourceDownload {
         this.name = name;
     }
 
-    @Basic
-    @Column(name = "version", nullable = true, insertable = true, updatable = true)
+    @Column(name = "version", nullable = true)
     public String getVersion() {
         return version;
     }
@@ -47,8 +48,7 @@ public class ItResourceDownload {
         this.version = version;
     }
 
-    @Basic
-    @Column(name = "platform_type", nullable = true, insertable = true, updatable = true)
+    @Column(name = "platform_type", nullable = true)
     public String getPlatformType() {
         return platformType;
     }
@@ -57,8 +57,7 @@ public class ItResourceDownload {
         this.platformType = platformType;
     }
 
-    @Basic
-    @Column(name = "pakage_type", nullable = true, insertable = true, updatable = true)
+    @Column(name = "pakage_type", nullable = true)
     public String getPakageType() {
         return pakageType;
     }
@@ -67,8 +66,7 @@ public class ItResourceDownload {
         this.pakageType = pakageType;
     }
 
-    @Basic
-    @Column(name = "description", nullable = true, insertable = true, updatable = true)
+    @Column(name = "description", nullable = true)
     public String getDescription() {
         return description;
     }
@@ -77,8 +75,7 @@ public class ItResourceDownload {
         this.description = description;
     }
 
-    @Basic
-    @Column(name = "develop_lan", nullable = true, insertable = true, updatable = true)
+    @Column(name = "develop_lan", nullable = true)
     public String getDevelopLan() {
         return developLan;
     }
@@ -87,8 +84,7 @@ public class ItResourceDownload {
         this.developLan = developLan;
     }
 
-    @Basic
-    @Column(name = "validate_type", nullable = true, insertable = true, updatable = true)
+    @Column(name = "validate_type", nullable = true)
     public String getValidateType() {
         return validateType;
     }
@@ -97,12 +93,30 @@ public class ItResourceDownload {
         this.validateType = validateType;
     }
 
+    @Column(name = "status", nullable = true)
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    @Column(name = "url", nullable = true)
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ItResourceDownload that = (ItResourceDownload) o;
+        ItResource that = (ItResource) o;
 
         if (id != that.id) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
