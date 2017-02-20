@@ -4,7 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.portal.MPortalNotice;
-import com.yihu.ehr.portal.service.PortalNotices;
+import com.yihu.ehr.portal.model.PortalNotices;
 import com.yihu.ehr.portal.service.PortalNoticesService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

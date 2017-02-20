@@ -1,7 +1,7 @@
 package com.yihu.ehr.portal.model;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by Dell on 2017/2/13.
@@ -9,20 +9,22 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "portal_notices", schema = "", catalog = "healtharchive")
 public class PortalNotices {
-    private int id;
+    private Long id;
     private Integer type;
+    private String title;
     private String content;
     private String fileId;
     private String releaseAuthor;
-    private Timestamp releaseDate;
+    private Date releaseDate;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -34,6 +36,16 @@ public class PortalNotices {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    @Basic
+    @Column(name = "title", nullable = true, insertable = true, updatable = true)
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @Basic
@@ -68,11 +80,11 @@ public class PortalNotices {
 
     @Basic
     @Column(name = "release_date", nullable = true, insertable = true, updatable = true)
-    public Timestamp getReleaseDate() {
+    public Date getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Timestamp releaseDate) {
+    public void setReleaseDate(Date releaseDate) {
         this.releaseDate = releaseDate;
     }
 
@@ -94,14 +106,4 @@ public class PortalNotices {
         return true;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (content != null ? content.hashCode() : 0);
-        result = 31 * result + (fileId != null ? fileId.hashCode() : 0);
-        result = 31 * result + (releaseAuthor != null ? releaseAuthor.hashCode() : 0);
-        result = 31 * result + (releaseDate != null ? releaseDate.hashCode() : 0);
-        return result;
-    }
 }

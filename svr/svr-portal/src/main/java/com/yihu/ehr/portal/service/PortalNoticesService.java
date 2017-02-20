@@ -2,6 +2,7 @@ package com.yihu.ehr.portal.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.portal.dao.XPortalNoticesRepository;
+import com.yihu.ehr.portal.model.PortalNotices;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

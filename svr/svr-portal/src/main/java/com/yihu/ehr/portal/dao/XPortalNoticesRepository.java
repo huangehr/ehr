@@ -1,6 +1,6 @@
 package com.yihu.ehr.portal.dao;
 
-import com.yihu.ehr.portal.service.PortalNotices;
+import com.yihu.ehr.portal.model.PortalNotices;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
