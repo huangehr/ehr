@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.service;
+package com.yihu.ehr.portal.model;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -7,15 +7,15 @@ import java.sql.Timestamp;
  * Created by Dell on 2017/2/13.
  */
 @Entity
-@Table(name = "it_resource_software_master", schema = "", catalog = "healtharchive")
-public class ItResourceSoftwareMaster {
+@Table(name = "it_resource_hardware_master", schema = "", catalog = "healtharchive")
+public class ItResourceHardwareMaster {
     private int id;
     private String applyUserId;
     private String applyUserName;
     private String orgId;
     private String applyAppId;
-    private Integer applyType;
-    private String namespace;
+    private Timestamp applyDate;
+    private Integer resourceType;
     private Integer applyStatus;
     private String description;
     private String approver;
@@ -72,23 +72,23 @@ public class ItResourceSoftwareMaster {
     }
 
     @Basic
-    @Column(name = "apply_type", nullable = true, insertable = true, updatable = true)
-    public Integer getApplyType() {
-        return applyType;
+    @Column(name = "apply_date", nullable = true, insertable = true, updatable = true)
+    public Timestamp getApplyDate() {
+        return applyDate;
     }
 
-    public void setApplyType(Integer applyType) {
-        this.applyType = applyType;
+    public void setApplyDate(Timestamp applyDate) {
+        this.applyDate = applyDate;
     }
 
     @Basic
-    @Column(name = "namespace", nullable = true, insertable = true, updatable = true)
-    public String getNamespace() {
-        return namespace;
+    @Column(name = "resource_type", nullable = true, insertable = true, updatable = true)
+    public Integer getResourceType() {
+        return resourceType;
     }
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
+    public void setResourceType(Integer resourceType) {
+        this.resourceType = resourceType;
     }
 
     @Basic
@@ -136,7 +136,7 @@ public class ItResourceSoftwareMaster {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ItResourceSoftwareMaster that = (ItResourceSoftwareMaster) o;
+        ItResourceHardwareMaster that = (ItResourceHardwareMaster) o;
 
         if (id != that.id) return false;
         if (applyUserId != null ? !applyUserId.equals(that.applyUserId) : that.applyUserId != null) return false;
@@ -144,8 +144,8 @@ public class ItResourceSoftwareMaster {
             return false;
         if (orgId != null ? !orgId.equals(that.orgId) : that.orgId != null) return false;
         if (applyAppId != null ? !applyAppId.equals(that.applyAppId) : that.applyAppId != null) return false;
-        if (applyType != null ? !applyType.equals(that.applyType) : that.applyType != null) return false;
-        if (namespace != null ? !namespace.equals(that.namespace) : that.namespace != null) return false;
+        if (applyDate != null ? !applyDate.equals(that.applyDate) : that.applyDate != null) return false;
+        if (resourceType != null ? !resourceType.equals(that.resourceType) : that.resourceType != null) return false;
         if (applyStatus != null ? !applyStatus.equals(that.applyStatus) : that.applyStatus != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (approver != null ? !approver.equals(that.approver) : that.approver != null) return false;
@@ -161,8 +161,8 @@ public class ItResourceSoftwareMaster {
         result = 31 * result + (applyUserName != null ? applyUserName.hashCode() : 0);
         result = 31 * result + (orgId != null ? orgId.hashCode() : 0);
         result = 31 * result + (applyAppId != null ? applyAppId.hashCode() : 0);
-        result = 31 * result + (applyType != null ? applyType.hashCode() : 0);
-        result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
+        result = 31 * result + (applyDate != null ? applyDate.hashCode() : 0);
+        result = 31 * result + (resourceType != null ? resourceType.hashCode() : 0);
         result = 31 * result + (applyStatus != null ? applyStatus.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (approver != null ? approver.hashCode() : 0);

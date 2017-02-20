@@ -1,21 +1,28 @@
 package com.yihu.ehr.org;
 
+import com.yihu.ehr.SvrOrgApplication;
 import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.model.OrgMemberRelation;
 import com.yihu.ehr.org.service.OrgDeptService;
 import com.yihu.ehr.org.service.OrgMemberRelationService;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author HZY
  * @vsrsion 1.0
  * Created at 2017/2/16.
  */
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@SpringApplicationConfiguration(classes = SvrOrgApplication.class)
-//@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-//@Transactional
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = SvrOrgApplication.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Transactional
 public class OrgDeptTests {
 
     @Autowired
@@ -76,6 +83,11 @@ public class OrgDeptTests {
         Integer deptId = 555;
         boolean succ = relationService.hadMemberRelation(deptId);
         System.out.println(succ);
+    }
+
+    @Test
+    public void changeDeptSort(){
+        orgDeptService.changeOrgDeptSort(5,6);
     }
 
 }

@@ -92,6 +92,18 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
+    @RequestMapping(value = "/orgDept/changeSort", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询部门下是否有成员" ,notes = "可以根据前端需求修改该接口，和删除部门接口合并")
+    public boolean changeSort(
+            @ApiParam(name = "preDeptId", value = "第一个部门ID")
+            @RequestParam(value = "preDeptId", required = true) Integer preDeptId,
+            @ApiParam(name = "afterDeptId", value = "第二个部门ID")
+            @RequestParam(value = "afterDeptId", required = true) Integer afterDeptId
+    ) throws Exception {
+        orgDeptService.changeOrgDeptSort(preDeptId,afterDeptId);
+        return true;
+    }
+
 
     @RequestMapping(value = "/orgDept/checkMembers", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "查询部门下是否有成员" ,notes = "可以根据前端需求修改该接口，和删除部门接口合并")
@@ -102,5 +114,7 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
         boolean succ = relationService.hadMemberRelation(deptId);
         return succ;
     }
+
+
 
 }
