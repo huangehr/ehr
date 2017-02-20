@@ -20,6 +20,7 @@ public class PortalFeedback {
     private Date replyDate;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
     public Long getId() {
         return id;
@@ -128,5 +129,5 @@ public class PortalFeedback {
 
         return true;
     }
-    
+
 }
