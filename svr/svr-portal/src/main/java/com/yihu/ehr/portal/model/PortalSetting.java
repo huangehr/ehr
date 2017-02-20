@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "portal_setting", schema = "", catalog = "healtharchive")
 public class PortalSetting {
-    private int id;
+    private Long id;
     private String orgId;
     private String appId;
     private String columnUri;
@@ -18,12 +18,13 @@ public class PortalSetting {
     private String status;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -115,18 +116,5 @@ public class PortalSetting {
         if (status != null ? !status.equals(that.status) : that.status != null) return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (orgId != null ? orgId.hashCode() : 0);
-        result = 31 * result + (appId != null ? appId.hashCode() : 0);
-        result = 31 * result + (columnUri != null ? columnUri.hashCode() : 0);
-        result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
-        result = 31 * result + (columnRequestType != null ? columnRequestType.hashCode() : 0);
-        result = 31 * result + (appApiId != null ? appApiId.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
-        return result;
     }
 }

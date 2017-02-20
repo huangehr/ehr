@@ -1,7 +1,7 @@
 package com.yihu.ehr.portal.model;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by Dell on 2017/2/13.
@@ -9,21 +9,22 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "portal_standards", schema = "", catalog = "healtharchive")
 public class PortalStandards {
-    private int id;
+    private Long id;
     private String name;
     private String mdfilePath;
     private Integer releaseFlag;
     private String version;
     private String releaseAuthor;
-    private Timestamp releaseDate;
+    private Date releaseDate;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -79,11 +80,11 @@ public class PortalStandards {
 
     @Basic
     @Column(name = "release_date", nullable = true, insertable = true, updatable = true)
-    public Timestamp getReleaseDate() {
+    public Date getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Timestamp releaseDate) {
+    public void setReleaseDate(Date releaseDate) {
         this.releaseDate = releaseDate;
     }
 
@@ -106,15 +107,4 @@ public class PortalStandards {
         return true;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (mdfilePath != null ? mdfilePath.hashCode() : 0);
-        result = 31 * result + (releaseFlag != null ? releaseFlag.hashCode() : 0);
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (releaseAuthor != null ? releaseAuthor.hashCode() : 0);
-        result = 31 * result + (releaseDate != null ? releaseDate.hashCode() : 0);
-        return result;
-    }
 }
