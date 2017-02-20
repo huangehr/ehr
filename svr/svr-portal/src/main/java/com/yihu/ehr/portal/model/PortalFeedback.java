@@ -1,7 +1,7 @@
 package com.yihu.ehr.portal.model;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by Dell on 2017/2/13.
@@ -9,23 +9,23 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "portal_feedback", schema = "", catalog = "healtharchive")
 public class PortalFeedback {
-    private int id;
+    private Long id;
     private String clientId;
     private String userId;
     private String content;
-    private Timestamp submitDate;
+    private Date submitDate;
     private Integer flag;
     private String replyContent;
     private String replyUserId;
-    private Timestamp replyDate;
+    private Date replyDate;
 
     @Id
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -61,11 +61,11 @@ public class PortalFeedback {
 
     @Basic
     @Column(name = "submit_date", nullable = true, insertable = true, updatable = true)
-    public Timestamp getSubmitDate() {
+    public Date getSubmitDate() {
         return submitDate;
     }
 
-    public void setSubmitDate(Timestamp submitDate) {
+    public void setSubmitDate(Date submitDate) {
         this.submitDate = submitDate;
     }
 
@@ -101,11 +101,11 @@ public class PortalFeedback {
 
     @Basic
     @Column(name = "reply_date", nullable = true, insertable = true, updatable = true)
-    public Timestamp getReplyDate() {
+    public Date getReplyDate() {
         return replyDate;
     }
 
-    public void setReplyDate(Timestamp replyDate) {
+    public void setReplyDate(Date replyDate) {
         this.replyDate = replyDate;
     }
 
@@ -128,18 +128,5 @@ public class PortalFeedback {
 
         return true;
     }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (clientId != null ? clientId.hashCode() : 0);
-        result = 31 * result + (userId != null ? userId.hashCode() : 0);
-        result = 31 * result + (content != null ? content.hashCode() : 0);
-        result = 31 * result + (submitDate != null ? submitDate.hashCode() : 0);
-        result = 31 * result + (flag != null ? flag.hashCode() : 0);
-        result = 31 * result + (replyContent != null ? replyContent.hashCode() : 0);
-        result = 31 * result + (replyUserId != null ? replyUserId.hashCode() : 0);
-        result = 31 * result + (replyDate != null ? replyDate.hashCode() : 0);
-        return result;
-    }
+    
 }
