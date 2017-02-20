@@ -31,6 +31,13 @@ public class PortalNoticesEndPoint extends EnvelopRestEndPoint {
     @Autowired
     PortalNoticesService portalNoticesService;
 
+    @RequestMapping(value = ServiceApi.PortalNotices.PortalNoticesTop, method = RequestMethod.GET)
+    @ApiOperation(value = "获取通知公告前10数据", notes = "根据日期查询前10的数据在前端表格展示")
+    public List<MPortalNotice> getPortalNoticeTop10(){
+        List<PortalNotices> list = portalNoticesService.getPortalNoticeTop10();
+        return (List<MPortalNotice>) convertToModels(list, new ArrayList<MPortalNotice>(list.size()), MPortalNotice.class, null);
+    }
+
     @RequestMapping(value = ServiceApi.PortalNotices.PortalNotices, method = RequestMethod.GET)
     @ApiOperation(value = "获取通知公告列表", notes = "根据查询条件获取通知公告列表在前端表格展示")
     public List<MPortalNotice> searchPortalNotices(

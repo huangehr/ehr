@@ -235,6 +235,9 @@ public class ServiceApi {
         public static final String AppApiResponses                            = "/appApiResponse";
         public static final String AppApiResponse                    = "/appApiResponse/{id}";
     }
+    public static class UserApp{
+        public static final String UserAppList                       = "/userAppList";
+    }
 
     public static class Dictionaries{
 
@@ -282,6 +285,13 @@ public class ServiceApi {
 
         public static final String Authentications                    = "/patient/authentications";
         public static final String Authentication                    = "/patient/Authentication/{id}";
+    }
+
+    public static class PortalNotices{
+        public static final String PortalNotices                            = "/portalNotices";
+        public static final String PortalNoticesTop                            = "/portalNoticesTop";
+        public static final String PortalNoticeAdmin                        = "/portalNotices/admin/{portalNotice_id}";
+
     }
 
     public static class Securities{

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 通知公告接口实现类.
  * 2017-02-04 add by ysj
@@ -37,5 +39,9 @@ public class PortalNoticesService extends BaseJpaService<PortalNotices, XPortalN
      */
     public void deletePortalNotice(Long portalNoticeId) {
         portalNoticesRepository.delete(portalNoticeId);
+    }
+
+    public List<PortalNotices> getPortalNoticeTop10(){
+        return portalNoticesRepository.getPortalNoticeTop10();
     }
 }
