@@ -33,8 +33,8 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/orgDeptMember/list", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据条件 查询部门下成员列表")
     public List<MOrgMemberRelation> searchOrgDepts(
-            @ApiParam(name = "deptId", value = "部门ID")
-            @RequestParam(value = "deptId", required = true) Integer deptId,
+//            @ApiParam(name = "deptId", value = "部门ID")
+//            @RequestParam(value = "deptId", required = true) Integer deptId,
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,deptId,deptName,dutyName,userName")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -54,7 +54,7 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "/orgDeptMember/save", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/orgDeptMember", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增部门成员")
     public MOrgMemberRelation saveOrgDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = "新增部门成员信息")
@@ -66,7 +66,7 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         return convertToModel(memberRelation, MOrgMemberRelation.class);
     }
 
-    @RequestMapping(value = "/orgDeptMember/update", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/orgDeptMember", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改部门成员")
     public MOrgMemberRelation updateOrgDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = "修改部门成员信息")
