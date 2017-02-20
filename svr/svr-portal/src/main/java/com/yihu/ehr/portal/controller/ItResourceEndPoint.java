@@ -1,7 +1,9 @@
 package com.yihu.ehr.portal.controller;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.portal.MItResource;
 import com.yihu.ehr.portal.model.ItResource;
 import com.yihu.ehr.portal.service.ItResourceService;
@@ -14,7 +16,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -29,6 +37,9 @@ public class ItResourceEndPoint  extends EnvelopRestEndPoint {
 
     @Autowired
     private ItResourceService resourceService;
+
+    @Autowired
+    private FastDFSUtil fastDFSUtil;
 
     @RequestMapping(value = "/itResource/list", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据条件 查询可下载资源列表")
@@ -52,7 +63,7 @@ public class ItResourceEndPoint  extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "/itResource/save", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/itResource", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增-可下载资源信息")
     public MItResource saveItResource(
             @ApiParam(name = "itResourceJsonData", value = "资源信息json数据")
@@ -64,7 +75,7 @@ public class ItResourceEndPoint  extends EnvelopRestEndPoint {
         return convertToModel(itResource, MItResource.class);
     }
 
-    @RequestMapping(value = "/itResource/update", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/itResource", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改-可下载资源信息")
     public MItResource updateItResource(
             @ApiParam(name = "itResourceJsonData", value = "资源json数据")
@@ -84,6 +95,62 @@ public class ItResourceEndPoint  extends EnvelopRestEndPoint {
 
         resourceService.deleteItResource(itResourceId);
         return true;
+    }
+
+    /**
+     * 资质上传
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping(value = "/itResource/upload",method = RequestMethod.POST)
+    @ApiOperation(value = "上传文件,把文件转成流的方式发送")
+    public String uploadFile(
+            @ApiParam(name = "jsonData", value = "文件转化后的输入流")
+            @RequestBody String jsonData ) throws Exception {
+        if(jsonData == null){
+            return null;
+        }
+        String date = URLDecoder.decode(jsonData, "UTF-8");
+
+        String[] fileStreams = date.split(",");
+        String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
+        byte[] in = Base64.getDecoder().decode(is);
+
+        String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
+        String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
+        String description = null;
+        if ((pictureName != null) && (pictureName.length() > 0)) {
+            int dot = pictureName.lastIndexOf('.');
+            if ((dot > -1) && (dot < (pictureName.length()))) {
+                description = pictureName.substring(0, dot);
+            }
+        }
+        InputStream inputStream = new ByteArrayInputStream(in);
+        ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, description);
+        String groupName = objectNode.get("groupName").toString();
+        String remoteFileName = objectNode.get("remoteFileName").toString();
+//        String path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
+        String path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
+        //返回文件路径
+        return path;
+    }
+
+    /**
+     * 机构资质下载
+     * @return
+     */
+    @RequestMapping(value = "/organizations/down",method = RequestMethod.GET)
+    @ApiOperation(value = "下载资源")
+    public String downloadFile(
+            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+            @RequestParam(value = "group_name") String groupName,
+            @ApiParam(name = "remote_file_name", value = "服务器文件名称", defaultValue = "")
+            @RequestParam(value = "remote_file_name") String remoteFileName) throws Exception {
+        byte[] bytes = fastDFSUtil.download(groupName, remoteFileName);
+
+        String fileStream = new String(Base64.getEncoder().encode(bytes));
+        String enFileStream = URLEncoder.encode(fileStream, "UTF-8");
+        return enFileStream;
     }
 
 }

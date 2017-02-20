@@ -52,7 +52,7 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "/orgDept/save", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/orgDept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增部门")
     public MOrgDept saveOrgDept(
             @ApiParam(name = "deptJsonData", value = "新增部门json信息")
@@ -70,7 +70,7 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
         return null;
     }
 
-    @RequestMapping(value = "/orgDept/update", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/orgDept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改部门")
     public MOrgDept updateOrgDept(
             @ApiParam(name = "deptId", value = "部门ID")
