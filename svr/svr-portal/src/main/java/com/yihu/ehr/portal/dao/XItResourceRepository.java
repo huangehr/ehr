@@ -12,7 +12,7 @@ import java.util.List;
  * @vsrsion 1.0
  * Created at 2017/2/17.
  */
-public interface ItResourceRepository extends PagingAndSortingRepository<ItResource,Integer> {
+public interface XItResourceRepository extends PagingAndSortingRepository<ItResource,Integer> {
 
     @Query("select resource from ItResource resource where resource.platformType = :platformType ")
     List<ItResource> searchByPlatformType(@Param("platformType") String platformType);

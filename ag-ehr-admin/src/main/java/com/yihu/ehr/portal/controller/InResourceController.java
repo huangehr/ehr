@@ -37,7 +37,7 @@ public class InResourceController  extends BaseController {
     @Autowired
     private ItResourceClient itResourceClient;
 
-    @RequestMapping(value = "/itResource/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/itResource/list", method = RequestMethod.POST)
     @ApiOperation(value = "获取可下载资源列表", notes = "根据查询条件获取下载资源列表在前端表格展示")
     public Envelop searchItResources(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
@@ -119,7 +119,7 @@ public class InResourceController  extends BaseController {
      * @throws Exception
      */
     @RequestMapping(value = "/itResource" , method = RequestMethod.PUT)
-    @ApiOperation(value = "新增资源信息")
+    @ApiOperation(value = "修改资源信息")
     public Envelop uopdateItResource(
             @ApiParam(name = "itResourceJsonData", value = " 资源信息Json", defaultValue = "")
             @RequestParam(value = "itResourceJsonData", required = false) String itResourceJsonData){
