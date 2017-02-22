@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -240,12 +238,10 @@ public class OrgDeptController  extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @RequestParam(value = "page", required = false) int page) {
         try {
             List<OrgDeptMemberModel> orgMemberModels = new ArrayList<>();
-            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.searchOrgDeptMembers(fields, filters, sorts, size, page,request,response);
+            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.searchOrgDeptMembers(fields, filters, sorts, size, page);
             List<MOrgMemberRelation> members = responseEntity.getBody();
             for (MOrgMemberRelation deptMember : members) {
                 OrgDeptMemberModel memberModel = convertToModel(deptMember,OrgDeptMemberModel.class);

@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,12 +47,10 @@ public class MessageRemindController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @RequestParam(value = "page", required = false) int page) {
         try {
             List<MessageRemindModel> messageModels = new ArrayList<>();
-            ResponseEntity<List<MMessageRemind>> responseEntity = remindClient.searchMessages(fields, filters, sorts, size, page, request, response);
+            ResponseEntity<List<MMessageRemind>> responseEntity = remindClient.searchMessages(fields, filters, sorts, size, page);
             List<MMessageRemind> messages = responseEntity.getBody();
             for (MMessageRemind message : messages) {
                 MessageRemindModel messageModel = convertToModel(message, MessageRemindModel.class);

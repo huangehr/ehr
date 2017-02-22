@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -22,7 +20,7 @@ import java.util.List;
  * @vsrsion 1.0
  * Created at 2017/2/21.
  */
-@FeignClient(name= MicroServices.Portal)
+@FeignClient(name = MicroServices.Portal)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface MessageRemindClient {
@@ -34,9 +32,7 @@ public interface MessageRemindClient {
             @RequestBody(required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response
+            @RequestParam(value = "page", required = false) int page
     );
 
 

@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,12 +47,10 @@ public class InResourceController  extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @RequestParam(value = "page", required = false) int page) {
         try {
             List<ItResourceModel> itResourceModels = new ArrayList<>();
-            ResponseEntity<List<MItResource>> responseEntity = itResourceClient.searchItResources(fields, filters, sorts, size, page, request, response);
+            ResponseEntity<List<MItResource>> responseEntity = itResourceClient.searchItResources(fields, filters, sorts, size, page);
             List<MItResource> itResources = responseEntity.getBody();
             for (MItResource itResource : itResources) {
                 ItResourceModel itResourceModel = convertToModel(itResource,ItResourceModel.class);
@@ -167,4 +163,7 @@ public class InResourceController  extends BaseController {
             return false;
         }
     }
+
+    //上传下载接口使用fileresource中的接口
+
 }
