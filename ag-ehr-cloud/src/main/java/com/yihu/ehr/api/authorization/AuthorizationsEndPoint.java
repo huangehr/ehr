@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.api.model.TokenModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.service.oauth2.EhrClientDetailsService;
-import com.yihu.ehr.service.oauth2.EhrTokenStoreService;
+import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCClientDetailsService;
 import com.yihu.ehr.service.oauth2.EhrUserDetailsService;
+import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCTokenStoreService;
 import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.oauth2.TokenUtil;
 import com.yihu.ehr.utils.BasicAuthorizationExtractor;
@@ -53,13 +53,13 @@ public class AuthorizationsEndPoint {
     ObjectMapper objectMapper;
 
     @Autowired
-    EhrTokenStoreService tokenStoreService;
+    EhrJDBCTokenStoreService tokenStoreService;
 
     @Autowired
     EhrUserDetailsService userDetailsService;
 
     @Autowired
-    EhrClientDetailsService clientDetailsService;
+    EhrJDBCClientDetailsService clientDetailsService;
 
     @ApiOperation(value = "获取用户所有应用授权", notes = "提供用户名/密码作为Basic验证")
     @RequestMapping(value = "", method = RequestMethod.GET)
