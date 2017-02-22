@@ -12,7 +12,7 @@ public class ItResource {
     private String name;
     private String version;
     private String platformType;
-    private String pakageType;
+    private String packageType;
     private String description;
     private String developLan;
     private String validateType;
@@ -57,13 +57,13 @@ public class ItResource {
         this.platformType = platformType;
     }
 
-    @Column(name = "pakage_type", nullable = true)
-    public String getPakageType() {
-        return pakageType;
+    @Column(name = "package_type", nullable = true)
+    public String getPackageType() {
+        return packageType;
     }
 
-    public void setPakageType(String pakageType) {
-        this.pakageType = pakageType;
+    public void setPackageType(String packageType) {
+        this.packageType = packageType;
     }
 
     @Column(name = "description", nullable = true)
@@ -122,7 +122,7 @@ public class ItResource {
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (version != null ? !version.equals(that.version) : that.version != null) return false;
         if (platformType != null ? !platformType.equals(that.platformType) : that.platformType != null) return false;
-        if (pakageType != null ? !pakageType.equals(that.pakageType) : that.pakageType != null) return false;
+        if (packageType != null ? !packageType.equals(that.packageType) : that.packageType != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (developLan != null ? !developLan.equals(that.developLan) : that.developLan != null) return false;
         if (validateType != null ? !validateType.equals(that.validateType) : that.validateType != null) return false;
@@ -136,7 +136,7 @@ public class ItResource {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (platformType != null ? platformType.hashCode() : 0);
-        result = 31 * result + (pakageType != null ? pakageType.hashCode() : 0);
+        result = 31 * result + (packageType != null ? packageType.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (developLan != null ? developLan.hashCode() : 0);
         result = 31 * result + (validateType != null ? validateType.hashCode() : 0);

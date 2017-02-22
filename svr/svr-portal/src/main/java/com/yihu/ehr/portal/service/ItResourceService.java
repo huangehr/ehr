@@ -1,6 +1,6 @@
 package com.yihu.ehr.portal.service;
 
-import com.yihu.ehr.portal.dao.ItResourceRepository;
+import com.yihu.ehr.portal.dao.XItResourceRepository;
 import com.yihu.ehr.portal.model.ItResource;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.service.spi.ServiceException;
@@ -17,10 +17,10 @@ import java.util.List;
  */
 @Service
 @Transactional(rollbackFor = {ServiceException.class})
-public class ItResourceService extends BaseJpaService<ItResource, ItResourceRepository> {
+public class ItResourceService extends BaseJpaService<ItResource, XItResourceRepository> {
 
     @Autowired
-    private ItResourceRepository resourceRepository;
+    private XItResourceRepository resourceRepository;
 
     List<ItResource> searchByPlatformType(String platformType){
         return resourceRepository.searchByPlatformType(platformType);

@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,24 +35,22 @@ public class InResourceController  extends BaseController {
     @Autowired
     private ItResourceClient itResourceClient;
 
-    @RequestMapping(value = "/itResource/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/itResource/list", method = RequestMethod.POST)
     @ApiOperation(value = "获取可下载资源列表", notes = "根据查询条件获取下载资源列表在前端表格展示")
     public Envelop searchItResources(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,url")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @RequestParam(value = "page", required = false) int page) {
         try {
             List<ItResourceModel> itResourceModels = new ArrayList<>();
-            ResponseEntity<List<MItResource>> responseEntity = itResourceClient.searchItResources(fields, filters, sorts, size, page, request, response);
+            ResponseEntity<List<MItResource>> responseEntity = itResourceClient.searchItResources(fields, filters, sorts, size, page);
             List<MItResource> itResources = responseEntity.getBody();
             for (MItResource itResource : itResources) {
                 ItResourceModel itResourceModel = convertToModel(itResource,ItResourceModel.class);
@@ -119,7 +115,7 @@ public class InResourceController  extends BaseController {
      * @throws Exception
      */
     @RequestMapping(value = "/itResource" , method = RequestMethod.PUT)
-    @ApiOperation(value = "新增资源信息")
+    @ApiOperation(value = "修改资源信息")
     public Envelop uopdateItResource(
             @ApiParam(name = "itResourceJsonData", value = " 资源信息Json", defaultValue = "")
             @RequestParam(value = "itResourceJsonData", required = false) String itResourceJsonData){
@@ -167,4 +163,7 @@ public class InResourceController  extends BaseController {
             return false;
         }
     }
+
+    //上传下载接口使用fileresource中的接口
+
 }

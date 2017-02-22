@@ -14,7 +14,7 @@ public class MItResource implements Serializable {
     private String name;
     private String version;
     private String platformType;
-    private String pakageType;
+    private String packageType;
     private String description;
     private String developLan;
     private String validateType;
@@ -53,12 +53,12 @@ public class MItResource implements Serializable {
         this.platformType = platformType;
     }
 
-    public String getPakageType() {
-        return pakageType;
+    public String getPackageType() {
+        return packageType;
     }
 
-    public void setPakageType(String pakageType) {
-        this.pakageType = pakageType;
+    public void setPackageType(String packageType) {
+        this.packageType = packageType;
     }
 
     public String getDescription() {

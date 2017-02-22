@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +61,7 @@ public class OrgDeptController  extends BaseController {
     }
 
     @ApiOperation(value = "根据父级部门ID获取子部门列表")
-    @RequestMapping(value = "/orgDept/childs", method = RequestMethod.GET)
+    @RequestMapping(value = "/orgDept/childs", method = RequestMethod.POST)
     public Envelop searchChildOrgDepts(
             @ApiParam(name = "parentDeptId", value = "父级部门ID" )
             @RequestParam(value = "parentDeptId") Integer parentDeptId) {
@@ -228,24 +226,22 @@ public class OrgDeptController  extends BaseController {
 
     /* ****************************     部门成员相关   ********************************************/
 
-    @RequestMapping(value = "/orgDeptMember/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/orgDeptMember/list", method = RequestMethod.POST)
     @ApiOperation(value = "获取部门下成员列表", notes = "根据查询条件获取部门成员列表在前端表格展示")
     public Envelop searchOrgDeptMembers(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,userName,dutyName")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @RequestParam(value = "page", required = false) int page) {
         try {
             List<OrgDeptMemberModel> orgMemberModels = new ArrayList<>();
-            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.searchOrgDeptMembers(fields, filters, sorts, size, page,request,response);
+            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.searchOrgDeptMembers(fields, filters, sorts, size, page);
             List<MOrgMemberRelation> members = responseEntity.getBody();
             for (MOrgMemberRelation deptMember : members) {
                 OrgDeptMemberModel memberModel = convertToModel(deptMember,OrgDeptMemberModel.class);
