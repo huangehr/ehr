@@ -29,7 +29,7 @@ public interface MessageRemindClient {
     @ApiOperation(value = "根据条件 查询消息列表")
     ResponseEntity<List<MMessageRemind>> searchMessages(
             @RequestParam(value = "fields", required = false) String fields,
-            @RequestBody(required = false) String filters,
+            @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page

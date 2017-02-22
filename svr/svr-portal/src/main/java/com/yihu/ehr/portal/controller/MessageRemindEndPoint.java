@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,11 +35,11 @@ public class MessageRemindEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/messageRemind/list", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据条件 查询消息列表")
     public List<MMessageRemind> searchMessages(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,deptId,deptName,dutyName,userName")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,appId,content,createDate")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestBody(required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序", defaultValue = "+userName,+id")
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "+createDate,+readed")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
@@ -61,6 +62,7 @@ public class MessageRemindEndPoint extends EnvelopRestEndPoint {
     ) throws Exception {
         MessageRemind remind = toEntity(messageJsonData, MessageRemind.class);
         remind.setReaded(0);
+        remind.setCreateDate(new Date());
         remindService.save(remind);
         return convertToModel(remind, MMessageRemind.class);
     }

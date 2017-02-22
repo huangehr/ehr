@@ -29,15 +29,10 @@ public interface ItResourceClient {
     @RequestMapping(value = "/itResource/list", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据条件 查询可下载资源列表")
     ResponseEntity<List<MItResource>> searchItResources(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,deptId,deptName,dutyName,userName")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestBody(required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序", defaultValue = "+userName,+id")
+            @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page
     ) ;
 

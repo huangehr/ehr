@@ -13,10 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +39,7 @@ public class MessageRemindController extends BaseController {
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createDate")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+createDate,+readed")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
@@ -68,7 +65,7 @@ public class MessageRemindController extends BaseController {
     @ApiOperation(value = "新增消息信息")
     public Envelop createMessage(
             @ApiParam(name = "messageJsonData", value = " 消息信息Json", defaultValue = "")
-            @RequestParam(value = "messageJsonData", required = false) String messageJsonData) {
+            @RequestBody( required = true) String messageJsonData) {
         try {
             String errorMsg = "";
             MessageRemindModel messageModel = objectMapper.readValue(messageJsonData, MessageRemindModel.class);
