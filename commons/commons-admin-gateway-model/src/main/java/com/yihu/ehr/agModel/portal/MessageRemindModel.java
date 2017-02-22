@@ -1,5 +1,7 @@
 package com.yihu.ehr.agModel.portal;
 
+import java.util.Date;
+
 /**
  * @author HZY
  * @vsrsion 1.0
@@ -7,94 +9,86 @@ package com.yihu.ehr.agModel.portal;
  */
 public class MessageRemindModel {
 
-    private int id;
-    private String name;
-    private String version;
-    private String platformType;
-    private String pakageType;
-    private String description;
-    private String developLan;
-    private String validateType;
-    private Integer status;
-    private String url;
+    private Integer id;
+    private Integer appId;
+    private String appName;
+    private String fromUserId;
+    private String typeId;
+    private String content;
+    private String workUri;
+    private Integer  readed;
+    private Date createDate;
 
-    public int getId() {
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Integer getAppId() {
+        return appId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAppId(Integer appId) {
+        this.appId = appId;
     }
 
-    public String getVersion() {
-        return version;
+    public String getAppName() {
+        return appName;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
-    public String getPlatformType() {
-        return platformType;
+    public String getFromUserId() {
+        return fromUserId;
     }
 
-    public void setPlatformType(String platformType) {
-        this.platformType = platformType;
+    public void setFromUserId(String fromUserId) {
+        this.fromUserId = fromUserId;
     }
 
-    public String getPakageType() {
-        return pakageType;
+    public String getTypeId() {
+        return typeId;
     }
 
-    public void setPakageType(String pakageType) {
-        this.pakageType = pakageType;
+    public void setTypeId(String typeId) {
+        this.typeId = typeId;
     }
 
-    public String getDescription() {
-        return description;
+    public String getContent() {
+        return content;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public String getDevelopLan() {
-        return developLan;
+    public String getWorkUri() {
+        return workUri;
     }
 
-    public void setDevelopLan(String developLan) {
-        this.developLan = developLan;
+    public void setWorkUri(String workUri) {
+        this.workUri = workUri;
     }
 
-    public String getValidateType() {
-        return validateType;
+    public Integer getReaded() {
+        return readed;
     }
 
-    public void setValidateType(String validateType) {
-        this.validateType = validateType;
+    public void setReaded(Integer readed) {
+        this.readed = readed;
     }
 
-    public Integer getStatus() {
-        return status;
+    public Date getCreateDate() {
+        return createDate;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

@@ -32,7 +32,7 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = "/orgDeptMember/list", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据条件 查询部门下成员列表")
-    public List<MOrgMemberRelation> searchOrgDepts(
+    public List<MOrgMemberRelation> searchOrgDeptMembers(
 //            @ApiParam(name = "deptId", value = "部门ID")
 //            @RequestParam(value = "deptId", required = true) Integer deptId,
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,deptId,deptName,dutyName,userName")

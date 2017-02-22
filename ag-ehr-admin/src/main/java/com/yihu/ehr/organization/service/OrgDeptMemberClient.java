@@ -30,7 +30,7 @@ public interface OrgDeptMemberClient {
     @ApiOperation(value = "根据条件 查询部门下成员列表")
     ResponseEntity<List<MOrgMemberRelation>> searchOrgDeptMembers(
             @RequestParam(value = "fields", required = false) String fields,
-            @RequestBody(required = false) String filters,
+            @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page

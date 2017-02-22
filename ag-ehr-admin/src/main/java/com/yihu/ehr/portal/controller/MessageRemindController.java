@@ -38,11 +38,11 @@ public class MessageRemindController extends BaseController {
     @RequestMapping(value = "/messageRemind/list", method = RequestMethod.POST)
     @ApiOperation(value = "获取消息列表", notes = "根据查询条件获取消息列表在前端表格展示")
     public Envelop searchMessages(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,appId,content,createDate")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createDate")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
