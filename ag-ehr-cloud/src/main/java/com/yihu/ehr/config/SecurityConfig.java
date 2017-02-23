@@ -2,9 +2,11 @@ package com.yihu.ehr.config;
 
 import com.yihu.ehr.service.oauth2.EhrUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,11 +29,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static class AuthorizationApiSecurityConfig extends WebSecurityConfigurerAdapter {
         @Autowired
         private EhrUserDetailsService userDetailsService;
-
+        @Autowired
+        private PasswordEncoder passwordEncoder;
         @Override
         protected void configure(AuthenticationManagerBuilder authBuilder) throws Exception {
             authBuilder.userDetailsService(userDetailsService).passwordEncoder(new Md5PasswordEncoder());
         }
+
         @Override
         public void configure(WebSecurity web) throws Exception {
             web
@@ -44,10 +48,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/webjars/springfox-swagger-ui/**")
                     //swagger-ui界面---end
                     .antMatchers(
-                            "/oauth/rest_token");
+                            "/oauth/accesstoken");
 
 
         }
+
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.csrf().disable().requestMatcher(
@@ -61,6 +66,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .httpBasic();
         }
+
+        @Autowired
+        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+            auth
+                    .userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+            // .passwordEncoder(passwordEncoder());
+
+        }
+    }
+
+    //==========密码加密方式====================
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        PasswordEncoder passwordEncoder = new Md5PasswordEncoder();
+        return passwordEncoder;
     }
 
     @Order(2)
