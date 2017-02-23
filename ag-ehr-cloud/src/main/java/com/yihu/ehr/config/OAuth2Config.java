@@ -55,19 +55,20 @@ public class OAuth2Config {
                     clientDetailsService,
                     new DefaultOAuth2RequestFactory(clientDetailsService));
 
-            endpoints.authenticationManager(authenticationManager);
-            endpoints.authorizationCodeServices(authorizationCodeService);
-            endpoints.tokenServices(tokenServices);
-            endpoints.setClientDetailsService(clientDetailsService);
-            endpoints.exceptionTranslator(new EhrOAuth2ExceptionTranslator());
-            endpoints.tokenGranter(tokenGranter);
-            endpoints.tokenStore(ehrJDBCTokenStoreService);
+            endpoints.authenticationManager(authenticationManager)
+                    .authorizationCodeServices(authorizationCodeService)
+                    .tokenServices(tokenServices)
+                    .tokenStore(ehrJDBCTokenStoreService)
+                    .exceptionTranslator(new EhrOAuth2ExceptionTranslator())
+                    .tokenGranter(tokenGranter)
+                    .setClientDetailsService(clientDetailsService);
         }
 
 
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-            clients.withClientDetails(clientDetailsService);
+            clients
+                    .withClientDetails(clientDetailsService);
         }
     }
 
@@ -94,15 +95,17 @@ public class OAuth2Config {
 
         @Override
         public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-            resources.resourceId(RESOURCE_ID);
-            resources.tokenServices(tokenServices);
-            resources.tokenExtractor(new EhrTokenExtractor());
-            resources.authenticationEntryPoint(new EhrOAuth2AuthenticationEntryPoint());
+            resources
+                    .resourceId(RESOURCE_ID)
+                    .tokenServices(tokenServices)
+                    .tokenExtractor(new EhrTokenExtractor())
+                    .authenticationEntryPoint(new EhrOAuth2AuthenticationEntryPoint());
         }
     }
 
     /**
      * jdbc 客户端服务类
+     *
      * @return
      */
     @Bean
@@ -112,6 +115,7 @@ public class OAuth2Config {
 
     /**
      * jdbc code的服务类
+     *
      * @return
      */
     @Bean
@@ -125,6 +129,7 @@ public class OAuth2Config {
 
         return tokenStoreService;
     }
+
     @Bean
     EhrTokenServices ehrTokenServices(EhrJDBCClientDetailsService clientDetailsService, EhrJDBCTokenStoreService tokenStoreService) {
         EhrTokenServices tokenServices = new EhrTokenServices();
