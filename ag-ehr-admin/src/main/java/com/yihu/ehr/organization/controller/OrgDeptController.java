@@ -78,12 +78,32 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
-    /**
-     * 创建部门
-     * @param orgDeptsJsonData
-     * @return
-     * @throws Exception
-     */
+    @RequestMapping(value = "/orgDept/detail" , method = RequestMethod.POST)
+    @ApiOperation(value = "查询部门&科室详情")
+    public Envelop detail(
+            @ApiParam(name = "deptId", value = "部门ID")
+            @RequestParam(value = "deptId", required = true) Integer deptId
+    ){
+        try {
+            String errorMsg = "";
+
+            if (deptId == null) {
+                errorMsg+="部门不能为空！";
+            }
+
+            MOrgDept mOrgDeptNew = orgDeptClient.searchDeptDetail(deptId);
+            if (mOrgDeptNew == null) {
+                return failed("获取部门详情失败!");
+            }
+            return success(mOrgDeptNew);
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+
     @RequestMapping(value = "/orgDept/save" , method = RequestMethod.POST)
     @ApiOperation(value = "新增机构部门")
     public Envelop create(
@@ -130,11 +150,6 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
-    /**
-     * 修改部门
-     * @return
-     * @throws Exception
-     */
     @RequestMapping(value = "/orgDept/update" , method = RequestMethod.POST)
     @ApiOperation(value = "修改机构部门")
     public Envelop update(

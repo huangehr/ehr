@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
+ *  科室表。。。
  * Created by Dell on 2017/2/13.
  */
 @Entity

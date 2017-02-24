@@ -39,6 +39,13 @@ public interface OrgDeptClient {
     );
 
 
+    @RequestMapping(value = "/orgDept/detail", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询部门&科室详情")
+    public MOrgDept searchDeptDetail(
+            @ApiParam(name = "deptId", value = "部门ID")
+            @RequestParam(value = "deptId", required = true) Integer deptId
+    );
+
     @RequestMapping(value = "/orgDept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增部门")
     MOrgDept saveOrgDept(

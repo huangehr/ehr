@@ -17,6 +17,16 @@ public class MOrgDept implements Serializable {
     private Integer delFlag;
     private Integer sortNo;
 
+    private MOrgDeptDetail deptDetail;
+
+    public MOrgDeptDetail getDeptDetail() {
+        return deptDetail;
+    }
+
+    public void setDeptDetail(MOrgDeptDetail deptDetail) {
+        this.deptDetail = deptDetail;
+    }
+
     public int getId() {
         return id;
     }

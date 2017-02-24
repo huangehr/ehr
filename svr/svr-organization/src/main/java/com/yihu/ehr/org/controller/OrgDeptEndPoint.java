@@ -3,7 +3,10 @@ package com.yihu.ehr.org.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.org.MOrgDept;
+import com.yihu.ehr.model.org.MOrgDeptDetail;
 import com.yihu.ehr.org.model.OrgDept;
+import com.yihu.ehr.org.model.OrgDeptDetail;
+import com.yihu.ehr.org.service.OrgDeptDetailService;
 import com.yihu.ehr.org.service.OrgDeptService;
 import com.yihu.ehr.org.service.OrgMemberRelationService;
 import io.swagger.annotations.Api;
@@ -30,6 +33,9 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
     private OrgDeptService orgDeptService;
     @Autowired
     private OrgMemberRelationService relationService;
+    @Autowired
+    private OrgDeptDetailService deptDetailService;
+
 
     @RequestMapping(value = "/orgDept/list", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据条件查询机构下的部门列表")
@@ -49,6 +55,20 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
     ) throws Exception {
         List<OrgDept> orgDepts = orgDeptService.searchByParentId(parentDeptId);
         return (List<MOrgDept>) convertToModels(orgDepts, new ArrayList<MOrgDept>(orgDepts.size()), MOrgDept.class, null);
+    }
+
+    @RequestMapping(value = "/orgDept/detail", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询部门&科室详情")
+    public MOrgDept searchDeptDetail(
+            @ApiParam(name = "deptId", value = "部门ID")
+            @RequestParam(value = "deptId", required = true) Integer deptId
+    ) throws Exception {
+        OrgDept dept = orgDeptService.searchBydeptId(deptId);
+        MOrgDept mOrgDept = convertToModel(dept, MOrgDept.class);
+        OrgDeptDetail orgDeptDetail = deptDetailService.searchByDeptId(deptId);
+        MOrgDeptDetail mOrgDeptDetail = convertToModel(orgDeptDetail, MOrgDeptDetail.class);
+        mOrgDept.setDeptDetail(mOrgDeptDetail);
+        return mOrgDept;
     }
 
 
@@ -93,7 +113,7 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/orgDept/changeSort", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "查询部门下是否有成员" ,notes = "可以根据前端需求修改该接口，和删除部门接口合并")
+    @ApiOperation(value = "部门排序交换" ,notes = "交换两个部门的排序位置")
     public boolean changeSort(
             @ApiParam(name = "preDeptId", value = "第一个部门ID")
             @RequestParam(value = "preDeptId", required = true) Integer preDeptId,

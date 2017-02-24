@@ -24,6 +24,9 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
     @Autowired
     private XOrgDeptRepository orgDeptRepository;
 
+    public OrgDept searchBydeptId(Integer deptId) {
+        return orgDeptRepository.findOne(deptId);
+    }
 
     public List<OrgDept> searchByOrgId(String orgId) {
         return orgDeptRepository.searchByOrgId(orgId);
