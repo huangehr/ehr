@@ -291,7 +291,21 @@ public class ServiceApi {
         public static final String PortalNotices                            = "/portalNotices";
         public static final String PortalNoticesTop                            = "/portalNoticesTop";
         public static final String PortalNoticeAdmin                        = "/portalNotices/admin/{portalNotice_id}";
+    }
 
+    public static class PortalFeedback{
+        public static final String PortalFeedback                            = "/portalFeedback";
+        public static final String PortalFeedbackAdmin                        = "/portalFeedback/admin/{portalFeedback_id}";
+    }
+
+    public static class PortalSetting{
+        public static final String PortalSetting                            = "/portalSetting";
+        public static final String PortalSettingAdmin                        = "/portalSetting/admin/{portalSetting_id}";
+    }
+
+    public static class PortalStandards{
+        public static final String PortalStandards                            = "/portalStandards";
+        public static final String PortalStandardsAdmin                        = "/portalStandards/admin/{portalStandard_id}";
     }
 
     public static class Securities{

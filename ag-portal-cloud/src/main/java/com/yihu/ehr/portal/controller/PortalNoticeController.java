@@ -1,9 +1,9 @@
-package com.yihu.ehr.api.doctor.controller;
+package com.yihu.ehr.portal.controller;
 
 import com.yihu.ehr.agModel.portal.PortalNoticeDetailModel;
 import com.yihu.ehr.agModel.portal.PortalNoticeModel;
 import com.yihu.ehr.api.ServiceApi;
-import com.yihu.ehr.api.doctor.service.PortalNoticeClient;
+import com.yihu.ehr.portal.service.PortalNoticeClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.portal.MPortalNotice;
