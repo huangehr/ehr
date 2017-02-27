@@ -2,7 +2,7 @@ package com.yihu.ehr.api.app;
 
 import com.yihu.ehr.api.model.TokenModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.service.oauth2.EhrTokenStoreService;
+import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCTokenStoreService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,7 +29,7 @@ import java.util.Date;
 @Api(value = "applications", description = "应用管理服务")
 public class AppsEndPoint {
     @Autowired
-    EhrTokenStoreService tokenStoreService;
+    EhrJDBCTokenStoreService tokenStoreService;
 
     @ApiOperation(value = "检查应用授权", notes = "提供用户名/密码作为Basic验证")
     @RequestMapping(value = "/{client_id}/tokens/{access_token}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.GET)

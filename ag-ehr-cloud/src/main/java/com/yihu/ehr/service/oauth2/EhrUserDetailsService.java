@@ -36,8 +36,6 @@ public class EhrUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException(username);
         }
 
-
-
         return new User(username, user.getPassword(), getGrantedAuthorities(username));
 
         /*if (username.equals("admin")){

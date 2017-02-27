@@ -1,5 +1,8 @@
 package com.yihu.ehr.web;
 
+import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCAuthorizationCodeService;
+import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCClientDetailsService;
+import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCTokenStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -42,18 +45,22 @@ import java.util.*;
 /**
  * 自定义授权入口。由于Spring使用了自带授权入口Bean{@link AuthorizationEndpoint}，但其使用@FrameworkEndpoint标识，
  * 因此用户自定义的Controller不会与之冲突，放心地使用常规方式创建新的Controller即可。
- *
+ * <p>
  * http://stackoverflow.com/questions/29345508/spring-oauth2-custom-oauth-approval-page-at-oauth-authorize
  *
  * @author Sand
  * @version 1.0
  * @created 2016.03.04 10:56
  */
-//@Controller
-//@SessionAttributes("authorizationRequest")
+@Controller
+@SessionAttributes("authorizationRequest")
 public class EhrAuthorizationEndpoint extends AbstractEndpoint {
-
-    private AuthorizationCodeServices authorizationCodeServices = new InMemoryAuthorizationCodeServices();
+    @Autowired
+    private EhrJDBCAuthorizationCodeService authorizationCodeServices;
+    @Autowired
+    private EhrJDBCTokenStoreService ehrJDBCTokenStoreService;
+    @Autowired
+    private EhrJDBCClientDetailsService jdbcClientDetailsService;
 
     private RedirectResolver redirectResolver = new DefaultRedirectResolver();
 
@@ -75,13 +82,17 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
     @PostConstruct
     public void init() throws Exception {
         AuthorizationServerEndpointsConfigurer configurer = configuration.getEndpointsConfigurer();
+        configurer.setClientDetailsService(jdbcClientDetailsService);
+        configurer.tokenStore(ehrJDBCTokenStoreService);
+        configurer.authorizationCodeServices(authorizationCodeServices);
+
         FrameworkEndpointHandlerMapping mapping = configuration.getEndpointsConfigurer().getFrameworkEndpointHandlerMapping();
         this.setUserApprovalPage(extractPath(mapping, "/oauth/confirm_access"));
         this.setProviderExceptionHandler(configurer.getExceptionTranslator());
         this.setErrorPage(extractPath(mapping, "/oauth/error"));
         this.setTokenGranter(configurer.getTokenGranter());
         this.setClientDetailsService(configurer.getClientDetailsService());
-        this.setAuthorizationCodeServices(configurer.getAuthorizationCodeServices());
+        this.setAuthorizationCodeServices(authorizationCodeServices);
         this.setOAuth2RequestFactory(configurer.getOAuth2RequestFactory());
         this.setOAuth2RequestValidator(configurer.getOAuth2RequestValidator());
         this.setUserApprovalHandler(configurer.getUserApprovalHandler());
@@ -91,8 +102,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
     public ModelAndView getAccessConfirmation(Map<String, Object> model, HttpServletRequest request) throws Exception {
         if (request.getAttribute("_csrf") != null) {
             model.put("_csrf", request.getAttribute("_csrf"));
-        }
-        else {
+        } else {
             model.put("_csrf", "");
         }
 
@@ -102,6 +112,20 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         return new ModelAndView("/oauth/confirm_access", model);
     }
 
+    /**
+     * 获取code
+     * 参数
+     *
+     * client_id=zkGuSIm2Fg
+     * redirect_uri=https://www.baidu.com
+     * scope=read&response_type=code
+     *
+     * @param model
+     * @param parameters
+     * @param sessionStatus
+     * @param principal
+     * @return
+     */
     @RequestMapping(value = "/oauth/authorize")
     public ModelAndView authorize(Map<String, Object> model, @RequestParam Map<String, String> parameters,
                                   SessionStatus sessionStatus, Principal principal) {
@@ -133,6 +157,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             // The resolved redirect URI is either the redirect_uri from the parameters or the one from
             // clientDetails. Either way we need to store it on the AuthorizationRequest.
             String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
+
             String resolvedRedirect = redirectResolver.resolveRedirect(redirectUriParameter, client);
             if (!StringUtils.hasText(resolvedRedirect)) {
                 throw new RedirectMismatchException(
@@ -170,14 +195,21 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
 
             return getUserApprovalPageResponse(model, authorizationRequest, (Authentication) principal);
 
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             sessionStatus.setComplete();
             throw e;
         }
 
     }
 
+    /**
+     * 获取access_token
+     * @param approvalParameters
+     * @param model
+     * @param sessionStatus
+     * @param principal
+     * @return
+     */
     @RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = OAuth2Utils.USER_OAUTH_APPROVAL)
     public View approveOrDeny(@RequestParam Map<String, String> approvalParameters, Map<String, ?> model,
                               SessionStatus sessionStatus, Principal principal) {
@@ -210,7 +242,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
 
             ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());
             String registeredUri = client.getRegisteredRedirectUri().iterator().next();
-            if (!authorizationRequest.getRedirectUri().startsWith(registeredUri)){
+            if (!authorizationRequest.getRedirectUri().startsWith(registeredUri)) {
                 authorizationRequest.setRedirectUri(registeredUri);
 
                 return new RedirectView(getUnsuccessfulRedirect(authorizationRequest,
@@ -229,8 +261,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             }*/
 
             return getAuthorizationCodeResponse(authorizationRequest, (Authentication) principal);
-        }
-        finally {
+        } finally {
             sessionStatus.setComplete();
         }
     }
@@ -239,7 +270,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
     public ModelAndView handleError(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<String, Object>();
         Object error = request.getAttribute("error");
-        if (error==null) {
+        if (error == null) {
             error = Collections.singletonMap("summary", "Unknown error");
         }
 
@@ -252,7 +283,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         this.userApprovalPage = userApprovalPage;
     }
 
-    public void setAuthorizationCodeServices(AuthorizationCodeServices authorizationCodeServices) {
+    public void setAuthorizationCodeServices(EhrJDBCAuthorizationCodeService authorizationCodeServices) {
         this.authorizationCodeServices = authorizationCodeServices;
     }
 
@@ -290,10 +321,12 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
 
     private View getAuthorizationCodeResponse(AuthorizationRequest authorizationRequest, Authentication authUser) {
         try {
-            return new RedirectView(getSuccessfulRedirect(authorizationRequest,
-                    generateCode(authorizationRequest, authUser)), false, true, false);
-        }
-        catch (OAuth2Exception e) {
+            //url+code
+            String url=getSuccessfulRedirect(authorizationRequest,
+                    generateCode(authorizationRequest, authUser));
+            //重定向到目标网站
+            return new RedirectView(url,false, true, false);
+        } catch (OAuth2Exception e) {
             return new RedirectView(getUnsuccessfulRedirect(authorizationRequest, e, false), false, true, false);
         }
     }
@@ -344,11 +377,9 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
 
             OAuth2Authentication combinedAuth = new OAuth2Authentication(storedOAuth2Request, authentication);
             String code = authorizationCodeServices.createAuthorizationCode(combinedAuth);
-
             return code;
 
-        }
-        catch (OAuth2Exception e) {
+        } catch (OAuth2Exception e) {
 
             if (authorizationRequest.getState() != null) {
                 e.addAdditionalInformation("state", authorizationRequest.getState());
@@ -414,8 +445,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         try {
             // assume it's encoded to start with (if it came in over the wire)
             redirectUri = builder.build(true).toUri();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // ... but allow client registrations to contain hard-coded non-encoded values
             redirectUri = builder.build().toUri();
             builder = UriComponentsBuilder.fromUri(redirectUri);
@@ -444,8 +474,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             }
             UriComponents encoded = template.build().expand(query).encode();
             builder.fragment(encoded.getFragment());
-        }
-        else {
+        } else {
             for (String key : query.keySet()) {
                 String name = key;
                 if (keys != null && keys.containsKey(key)) {
@@ -473,8 +502,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             }
             return new ModelAndView(new RedirectView(appendAccessToken(authorizationRequest, accessToken), false, true,
                     false));
-        }
-        catch (OAuth2Exception e) {
+        } catch (OAuth2Exception e) {
             return new ModelAndView(new RedirectView(getUnsuccessfulRedirect(authorizationRequest, e, true), false,
                     true, false));
         }

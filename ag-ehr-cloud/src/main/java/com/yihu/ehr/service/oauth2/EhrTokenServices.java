@@ -1,5 +1,6 @@
 package com.yihu.ehr.service.oauth2;
 
+import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCTokenStoreService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -23,7 +24,7 @@ import java.util.UUID;
  * 并取消{@link TokenEnhancer}对Token的二次处理。原功能中使用{@link TokenEnhancer}作为在生成Token后，
  * 在存储之前对Token对二次处理，新实现直接修改生成逻辑。
  *
- * Token存储由 {@link TokenStore} 接口的子类{@link EhrTokenStoreService}实现。
+ * Token存储由 {@link TokenStore} 接口的子类{@link EhrJDBCTokenStoreService}实现。
  *
  * @author Sand
  * @version 1.0

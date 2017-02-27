@@ -57,7 +57,7 @@ public class EhrTokenGranter implements TokenGranter {
      * authorization_code模式Token授权器。
      */
     public static class EhrAuthorizationCodeGranter extends AbstractTokenGranter {
-        static final String GRANT_TYPE = "authorization_code";
+        public static final String GRANT_TYPE = "authorization_code";
 
         private final AuthorizationCodeServices authorizationCodeServices;
 

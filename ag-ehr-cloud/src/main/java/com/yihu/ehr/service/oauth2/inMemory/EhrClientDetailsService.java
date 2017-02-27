@@ -1,7 +1,8 @@
-package com.yihu.ehr.service.oauth2;
+package com.yihu.ehr.service.oauth2.inMemory;
 
 import com.yihu.ehr.feign.AppClient;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.service.oauth2.EhrTokenGranter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
