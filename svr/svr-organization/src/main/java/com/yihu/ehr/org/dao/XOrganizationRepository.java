@@ -1,5 +1,6 @@
-package com.yihu.ehr.org.service;
+package com.yihu.ehr.org.dao;
 
+import com.yihu.ehr.org.model.Organization;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;

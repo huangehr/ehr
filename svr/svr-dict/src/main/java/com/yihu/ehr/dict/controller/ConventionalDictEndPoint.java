@@ -612,4 +612,13 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
         List<SystemDictEntry> list = dictEntryService.getDictEntries(50, null);
         return convertToModels(list, new ArrayList<MConventionalDict>(list.size()), MConventionalDict.class, null);
     }
+
+    @RequestMapping(value = "/dictionaries/portal_notice_list", method = RequestMethod.GET)
+    @ApiOperation(value = "通知公告类别清单", response = MConventionalDict.class)
+    public MConventionalDict getPortalNoticeTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry noticeType = dictEntryService.getDictEntry(55, code);
+        return getDictModel(noticeType);
+    }
 }

@@ -109,7 +109,7 @@ public class AppController extends BaseController {
     @RequestMapping(value = "/apps", method = RequestMethod.POST)
     @ApiOperation(value = "创建App")
     public Envelop createApp(
-            @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
+            @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\",\"icon\": \"\",\"releaseFlag\": \"\"}")
             @RequestParam(value = "app", required = false) String appJson) throws Exception {
         Envelop envelop = new Envelop();
         //传入的appJson里包含userId

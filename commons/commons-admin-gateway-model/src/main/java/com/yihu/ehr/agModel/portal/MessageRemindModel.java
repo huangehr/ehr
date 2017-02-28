@@ -1,0 +1,94 @@
+package com.yihu.ehr.agModel.portal;
+
+import java.util.Date;
+
+/**
+ * @author HZY
+ * @vsrsion 1.0
+ * Created at 2017/2/21.
+ */
+public class MessageRemindModel {
+
+    private Integer id;
+    private Integer appId;
+    private String appName;
+    private String fromUserId;
+    private String typeId;
+    private String content;
+    private String workUri;
+    private Integer  readed;
+    private Date createDate;
+
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getAppId() {
+        return appId;
+    }
+
+    public void setAppId(Integer appId) {
+        this.appId = appId;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getFromUserId() {
+        return fromUserId;
+    }
+
+    public void setFromUserId(String fromUserId) {
+        this.fromUserId = fromUserId;
+    }
+
+    public String getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(String typeId) {
+        this.typeId = typeId;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getWorkUri() {
+        return workUri;
+    }
+
+    public void setWorkUri(String workUri) {
+        this.workUri = workUri;
+    }
+
+    public Integer getReaded() {
+        return readed;
+    }
+
+    public void setReaded(Integer readed) {
+        this.readed = readed;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+}

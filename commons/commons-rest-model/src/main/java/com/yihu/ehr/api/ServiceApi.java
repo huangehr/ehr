@@ -235,6 +235,9 @@ public class ServiceApi {
         public static final String AppApiResponses                            = "/appApiResponse";
         public static final String AppApiResponse                    = "/appApiResponse/{id}";
     }
+    public static class UserApp{
+        public static final String UserAppList                       = "/userAppList";
+    }
 
     public static class Dictionaries{
 
@@ -282,6 +285,27 @@ public class ServiceApi {
 
         public static final String Authentications                    = "/patient/authentications";
         public static final String Authentication                    = "/patient/Authentication/{id}";
+    }
+
+    public static class PortalNotices{
+        public static final String PortalNotices                            = "/portalNotices";
+        public static final String PortalNoticesTop                            = "/portalNoticesTop";
+        public static final String PortalNoticeAdmin                        = "/portalNotices/admin/{portalNotice_id}";
+    }
+
+    public static class PortalFeedback{
+        public static final String PortalFeedback                            = "/portalFeedback";
+        public static final String PortalFeedbackAdmin                        = "/portalFeedback/admin/{portalFeedback_id}";
+    }
+
+    public static class PortalSetting{
+        public static final String PortalSetting                            = "/portalSetting";
+        public static final String PortalSettingAdmin                        = "/portalSetting/admin/{portalSetting_id}";
+    }
+
+    public static class PortalStandards{
+        public static final String PortalStandards                            = "/portalStandards";
+        public static final String PortalStandardsAdmin                        = "/portalStandards/admin/{portalStandard_id}";
     }
 
     public static class Securities{
@@ -379,6 +403,13 @@ public class ServiceApi {
 
         public static final String Dispatch                         = "/std/dispatches/{id}";
         public static final String Dispatches                       = "/std/dispatches";
+    }
+
+    public static class Doctors{
+        public static final String Doctors                            = "/doctors";
+        public static final String DoctorsExistence                  = "/doctors/{doctor_code}/existence";
+        public static final String DoctorAdmin                        = "/doctors/admin/{doctor_id}";
+
     }
 
     public static class Users{

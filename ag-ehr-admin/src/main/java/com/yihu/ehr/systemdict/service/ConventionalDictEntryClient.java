@@ -373,4 +373,10 @@ import java.util.List;
     @ApiOperation(value = "浏览器用CDA类别清单", response = MConventionalDict.class)
     Collection<MConventionalDict> getCdaTypeForBrowserList();
 
+    @RequestMapping(value = "/dictionaries/portal_notice_list", method = RequestMethod.GET)
+    @ApiOperation(value = "通知公告类别清单", response = MConventionalDict.class)
+    MConventionalDict getPortalNoticeTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
 }

@@ -26,6 +26,12 @@ fast-dfs:
 ---
 spring:
   profiles: dev
+#  redis:
+#    host: 192.168.1.220
+#  datasource:
+#    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+#    username: ha
+#    password: ha
 
 ---
 spring:

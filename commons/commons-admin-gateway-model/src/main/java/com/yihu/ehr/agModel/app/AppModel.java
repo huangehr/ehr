@@ -18,6 +18,25 @@ public class AppModel {
     private int sourceType;
     private String role;
     private String roleJson;
+//    应用图标及在线状态
+    private String icon;
+    private int releaseFlag;
+//
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public int getReleaseFlag() {
+        return releaseFlag;
+    }
+
+    public void setReleaseFlag(int releaseFlag) {
+        this.releaseFlag = releaseFlag;
+    }
 
     public String getRole() {
         return role;

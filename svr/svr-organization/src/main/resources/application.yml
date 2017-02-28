@@ -13,7 +13,25 @@ info:
 ---
 spring:
   profiles: dev
-
+#  本地微服务启动配置
+#  redis:
+#    host: 192.168.1.220
+#  datasource:
+#    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+#    username: ha
+#    password: ha
+#fast-dfs:
+#  pool:
+#    init-size: 5
+#    max-size: 20
+#    wait-time: 500
+#  connect-timeout: 2
+#  network-timeout: 30
+#  charset: ISO8859-1
+#  http:
+#    tracker-http-port: 80
+#    anti-steal-token: no
+#    secret-key: FastDFS1234567890
 ---
 spring:
   profiles: alpha

@@ -1,6 +1,4 @@
 package com.yihu.ehr.user.entity;
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.Date;
 
@@ -32,7 +30,7 @@ public class Doctors {
     private String xzzc;
     private String status;
     private Date insertTime;
-
+    private Date updateTime;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -204,4 +202,11 @@ public class Doctors {
         this.insertTime = insertTime;
     }
 
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 }

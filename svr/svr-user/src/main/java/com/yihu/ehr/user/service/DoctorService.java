@@ -8,16 +8,11 @@ import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.util.hash.HashUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 医生管理接口实现类.
@@ -25,7 +20,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class DoctorService extends BaseJpaService<User, XUserRepository> {
+public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
     @Autowired
     XUserRepository userRepository;
@@ -82,21 +77,41 @@ public class DoctorService extends BaseJpaService<User, XUserRepository> {
         return doctor;
     }
 
-    public void deleteDoctor(Long doctorId) throws Exception {
-        Doctors doctor = doctorRepository.findOne(doctorId);
-        if(doctor!=null)
-        {
-            doctorRepository.delete(doctorId);
-            //删除账号
-
-            //删除账号角色
-
-        }
-        else{
-            throw new Exception("not exit doctor:"+doctorId);
-        }
+    /**
+     * 根据code获取医生接口.
+     * @param code
+     */
+    public Doctors getByCode(String code) {
+        return doctorRepository.findByCode(code);
     }
 
+    /**
+     * 根据ID获取医生接口.
+     * @param doctorId
+     */
+    public Doctors getDoctor(Long doctorId) {
+        Doctors doctors = doctorRepository.findOne(doctorId);
+        return doctors;
+    }
 
+    /**
+     * 删除医生
+     * @param doctorId
+     */
+    public void deleteDoctor(Long doctorId) {
+        doctorRepository.delete(doctorId);
+    }
+
+    /**
+     * 更新医生状态
+     * @param doctorId
+     * @param status
+     */
+    public void updDoctorStatus(Long doctorId, String status) {
+        Doctors doctors = doctorRepository.findOne(doctorId);
+        doctors.setStatus(status);
+        doctors.setUpdateTime(new Date());
+        doctorRepository.save(doctors);
+    }
 
 }
