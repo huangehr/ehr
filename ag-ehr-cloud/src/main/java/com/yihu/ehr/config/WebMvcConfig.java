@@ -1,7 +1,5 @@
 package com.yihu.ehr.config;
 
-import com.yihu.ehr.interceptor.RateLimitInterceptor;
-import com.yihu.ehr.interceptor.UserAgentInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -17,11 +15,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
-    @Autowired
-    private RateLimitInterceptor rateLimitInterceptor;
-
-    @Autowired
-    private UserAgentInterceptor userAgentInterceptor;
 
     /**
      * 注册截取器。
