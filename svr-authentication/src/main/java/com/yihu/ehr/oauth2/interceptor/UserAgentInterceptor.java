@@ -1,4 +1,4 @@
-package com.yihu.ehr.interceptor;
+package com.yihu.ehr.oauth2.interceptor;
 
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * @version 1.0
  * @created 2016.02.26 18:04
  */
-//@Component
+@Component
 public class UserAgentInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

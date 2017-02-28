@@ -1,15 +1,11 @@
-package com.yihu.ehr.service.oauth2.jdbc;
+package com.yihu.ehr.oauth2.oauth2.jdbc;
 
-import com.yihu.ehr.feign.AppClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.NoSuchClientException;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 应用信息服务，表示一单个OAuth2应用。

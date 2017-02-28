@@ -1,6 +1,5 @@
-package com.yihu.ehr.service.oauth2;
+package com.yihu.ehr.oauth2.oauth2;
 
-import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCTokenStoreService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;

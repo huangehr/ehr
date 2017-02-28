@@ -1,9 +1,9 @@
-package com.yihu.ehr.config;
+package com.yihu.ehr.oauth2.config;
 
-import com.yihu.ehr.service.oauth2.*;
-import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCAuthorizationCodeService;
-import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCClientDetailsService;
-import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCTokenStoreService;
+import com.yihu.ehr.oauth2.oauth2.*;
+import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCAuthorizationCodeService;
+import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCClientDetailsService;
+import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCTokenStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.*;
+import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
@@ -78,8 +81,8 @@ public class OAuth2Config {
         }
     }
 
-    @Configuration
-    @EnableResourceServer
+    //@Configuration
+   // @EnableResourceServer
     public static class ResourceServer extends ResourceServerConfigurerAdapter {
 
         @Autowired

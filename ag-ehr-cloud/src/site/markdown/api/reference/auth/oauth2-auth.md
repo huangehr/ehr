@@ -70,7 +70,7 @@ Web页面授权流
 
 使用验证码获取Token：
 
-	POST https://ehr.yihu.com/oauth/access_token
+	POST https://ehr.yihu.com/oauth/accesstoken
 	
 **参数**
 <table>
@@ -110,6 +110,14 @@ Web页面授权流
 			上一步发送过来的随机串。
 		</td>
 	</tr>
+	<tr>
+		<td>grant_type</td>
+		<td>authorization_code</td>
+		<td>
+			如果是授权码模式固定传authorization_code
+		</td>
+	</tr>
+	
 </table>
 
 **返回值**
@@ -118,17 +126,12 @@ Web页面授权流
 
 	Accept: application/json
 	{
-		"access_token":"e72e16c7e42f292c6912e7710c838347ae178b4a",
-		 "scope":"user,profile",
-		 "token_type":"bearer"
-	}
-	
-	Accept: application/xml
-	<OAuth>
-	  <token_type>bearer</token_type>
-	  <scope>user,profile</scope>
-	  <access_token>e72e16c7e42f292c6912e7710c838347ae178b4a</access_token>
-	</OAuth>
+        "access_token": "67ce6ef4-97cf-4d5c-a224-61651740280b",
+        "token_type": "bearer",
+        "refresh_token": "23477c94-4fee-4eaa-86de-12415c3daf0f",
+        "expires_in": 43199,
+        "scope": "read"
+    }
 	
 **对比“请求作用域”与“授权作用域”**
 

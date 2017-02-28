@@ -1,6 +1,6 @@
-package com.yihu.ehr.config;
+package com.yihu.ehr.oauth2.config;
 
-import com.yihu.ehr.service.oauth2.EhrUserDetailsService;
+import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -9,9 +9,9 @@
  * it only in accordance with the terms of the license agreement you
  * entered into with MONKEYK Information Technology Co. Ltd.
  */
-package com.yihu.ehr.web;
+package com.yihu.ehr.oauth2.web;
 
-import com.yihu.ehr.service.oauth2.EhrTokenServices;
+import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -35,8 +35,6 @@ import org.springframework.security.oauth2.provider.password.ResourceOwnerPasswo
 import org.springframework.security.oauth2.provider.refresh.RefreshTokenGranter;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestValidator;
-import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;

@@ -1,10 +1,9 @@
-package com.yihu.ehr.web;
+package com.yihu.ehr.oauth2.web;
 
-import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCAuthorizationCodeService;
-import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCClientDetailsService;
-import com.yihu.ehr.service.oauth2.jdbc.EhrJDBCTokenStoreService;
+import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCAuthorizationCodeService;
+import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCClientDetailsService;
+import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCTokenStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -16,8 +15,6 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.approval.DefaultUserApprovalHandler;
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
-import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.endpoint.*;
 import org.springframework.security.oauth2.provider.implicit.ImplicitTokenRequest;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestValidator;

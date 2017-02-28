@@ -1,15 +1,11 @@
-package com.yihu.ehr.service.oauth2.jdbc;
+package com.yihu.ehr.oauth2.oauth2.jdbc;
 
-import org.springframework.asm.Type;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.SqlLobValue;
-import org.springframework.security.oauth2.common.exceptions.ClientAuthenticationException;
-import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.security.oauth2.common.util.SerializationUtils;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.RandomValueAuthorizationCodeServices;
 import org.springframework.util.Assert;
 
@@ -18,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * OAuth2验证码服务 jdbc 版本

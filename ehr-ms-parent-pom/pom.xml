@@ -41,6 +41,7 @@
         <module>../svr/svr-user</module>
         <module>../ag-ehr-admin</module>
         <module>../ag-ehr-cloud</module>
+        <module>../svr-authentication</module>
     </modules>
 
     <build>

@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.oauth2.inMemory;
+package com.yihu.ehr.oauth2.oauth2.inMemory;
 
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
