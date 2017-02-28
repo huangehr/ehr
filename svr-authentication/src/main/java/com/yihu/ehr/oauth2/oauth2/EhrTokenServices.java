@@ -1,6 +1,8 @@
-package com.yihu.ehr.service.oauth2;
+package com.yihu.ehr.oauth2.oauth2;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -8,11 +10,14 @@ import org.springframework.security.oauth2.common.*;
 import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.security.oauth2.common.exceptions.InvalidScopeException;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
+import org.springframework.security.oauth2.common.util.SerializationUtils;
 import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.token.*;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.util.Assert;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -23,7 +28,7 @@ import java.util.UUID;
  * 并取消{@link TokenEnhancer}对Token的二次处理。原功能中使用{@link TokenEnhancer}作为在生成Token后，
  * 在存储之前对Token对二次处理，新实现直接修改生成逻辑。
  *
- * Token存储由 {@link TokenStore} 接口的子类{@link EhrTokenStoreService}实现。
+ * Token存储由 {@link TokenStore} 接口的子类{@link EhrJDBCTokenStoreService}实现。
  *
  * @author Sand
  * @version 1.0
@@ -46,6 +51,9 @@ public class EhrTokenServices implements AuthorizationServerTokenServices, Resou
     private TokenEnhancer accessTokenEnhancer;
 
     private AuthenticationManager authenticationManager;
+
+    private JdbcTemplate jdbcTemplate;
+
 
     /**
      * Initialize these token services. If no random generator is set, one will be created.
@@ -397,4 +405,31 @@ public class EhrTokenServices implements AuthorizationServerTokenServices, Resou
         this.clientDetailsService = clientDetailsService;
     }
 
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public OAuth2AccessToken getAccessTokenByClientId(String client_id) {
+        OAuth2AccessToken accessToken = null;
+        String sql="select token_id, token,max(create_time)  from oauth_access_token where client_id = ? GROUP BY token_id, token,create_time ";
+        try {
+            accessToken = jdbcTemplate.queryForObject(sql,
+                    new RowMapper<OAuth2AccessToken>() {
+                        public OAuth2AccessToken mapRow(ResultSet rs, int rowNum) throws SQLException {
+                            return deserializeAccessToken(rs.getBytes(2));
+                        }
+                    }, client_id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return accessToken;
+    }
+
+    protected OAuth2AccessToken deserializeAccessToken(byte[] token) {
+        return SerializationUtils.deserialize(token);
+    }
 }
