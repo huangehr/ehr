@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  * @version 1.0
  * @created 2016.02.26 15:57
  */
-@Component
+//@Component
 public class RateLimitInterceptor extends HandlerInterceptorAdapter {
     private static final int AuthorizedRateLimit = 5000;
     private static final int UnauthorizedRateLimit = 60;

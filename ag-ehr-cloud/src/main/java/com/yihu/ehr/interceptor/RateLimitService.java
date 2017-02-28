@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Created by Sand Wen on 2016.2.27.
  */
-@Component
+//@Component
 public class RateLimitService {
 
     public static int timeToNextQuarter = 15;
