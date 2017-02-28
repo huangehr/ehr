@@ -38,7 +38,7 @@ public class EhrJDBCTokenStoreService implements TokenStore {
 
     private static final Log LOG = LogFactory.getLog(EhrJDBCTokenStoreService.class);
 
-    private static final String DEFAULT_ACCESS_TOKEN_INSERT_STATEMENT = "insert into oauth_access_token (token_id, token, authentication_id, user_name, client_id, authentication, refresh_token) values (?, ?, ?, ?, ?, ?, ?)";
+    private static final String DEFAULT_ACCESS_TOKEN_INSERT_STATEMENT = "insert into oauth_access_token (token_id, token, authentication_id, user_name, client_id, authentication, refresh_token,create_time) values (?, ?, ?, ?, ?, ?, ?,getDate())";
 
     private static final String DEFAULT_ACCESS_TOKEN_SELECT_STATEMENT = "select token_id, token from oauth_access_token where token_id = ?";
 

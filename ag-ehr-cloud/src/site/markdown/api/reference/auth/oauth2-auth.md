@@ -133,6 +133,42 @@ Web页面授权流
         "scope": "read"
     }
 	
+
+**3 验证accesstoken是否有效**
+
+GET https://ehr.yihu.com/oauth/valid_token
+<table>
+	<tr>
+		<td>名称</td>
+		<td>类型</td>
+		<td>描述</td>
+	</tr>
+	<tr>
+		<td>client_id</td>
+		<td>string</td>
+		<td>必选。开发者在平台上提交的应用Key。</td>
+	</tr>
+	<tr>
+		<td>accesstoken</td>
+		<td>string</td>
+		<td>必选。accesstoken。</td>
+	</tr>
+	
+</table>	
+
+**返回值**
+	
+根据请求头的格式，其返回值格式可能如下：
+    正确格式
+    
+	Accept: application/json
+	{"message":"accesstoken 可以使用","status":"10000"}
+	
+	错误格式
+    
+	Accept: application/json
+	{"message":"accesstoken 已经过期","status":"10001"}
+	
 **对比“请求作用域”与“授权作用域”**
 
 scope属性包含此Token由用户所授权的有效作用域。正常情况下，作用域的范围与你请求的作用域是一致的。但是，用户可能会重新修改此Token的作用域，
