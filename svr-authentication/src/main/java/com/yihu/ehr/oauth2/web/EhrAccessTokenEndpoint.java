@@ -11,7 +11,9 @@
  */
 package com.yihu.ehr.oauth2.web;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -39,13 +41,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p/>
+ * <p>
  * Restful OAuth API
- * <p/>
+ * <p>
  * 扩展默认的OAuth 功能,  提供 Restful API,
  * 可用于在获取access_token时调用
  */
@@ -70,7 +74,12 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
 
     private WebResponseExceptionTranslator providerExceptionHandler = new DefaultWebResponseExceptionTranslator();
 
-
+    /**
+     * 获取accesstoken
+     *
+     * @param parameters
+     * @return
+     */
     @RequestMapping(value = "/oauth/accesstoken", method = RequestMethod.POST)
     public OAuth2AccessToken postAccessToken(@RequestBody Map<String, String> parameters) {
 
@@ -125,6 +134,38 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
         return token;
 
     }
+
+    /**
+     * 判断token是否有效
+     *
+     * @param client_id
+     * @return
+     */
+    @RequestMapping(value = "/oauth/valid_token")
+    @ResponseBody
+    public String postAccessToken(String client_id, String accesstoken) throws Exception {
+        Map<String, String> returnMap = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            returnMap.put("status", "10000");
+            //查找该用户的最新的accesstoken
+            OAuth2AccessToken accessToken = tokenServices.getAccessTokenByClientId(client_id);
+            if (!accessToken.getValue().equals(accesstoken) || accessToken.isExpired()) {
+                returnMap.put("status", "10001");
+                returnMap.put("message", "accesstoken 已经过期");
+                return objectMapper.writeValueAsString(returnMap);
+            }
+            returnMap.put("message", "accesstoken 可以使用");
+            return objectMapper.writeValueAsString(returnMap);
+        } catch (Exception e) {
+
+            returnMap.put("status", "10001");
+            returnMap.put("message", "accesstoken 已经过期");
+            return objectMapper.writeValueAsString(returnMap);
+        }
+
+    }
+
 
     protected TokenGranter getTokenGranter(String grantType) {
 

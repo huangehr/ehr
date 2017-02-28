@@ -7,6 +7,7 @@ import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCTokenStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
@@ -140,12 +141,15 @@ public class OAuth2Config {
     }
 
     @Bean
-    EhrTokenServices ehrTokenServices(EhrJDBCClientDetailsService clientDetailsService, EhrJDBCTokenStoreService tokenStoreService) {
+    EhrTokenServices ehrTokenServices(EhrJDBCClientDetailsService clientDetailsService,
+                                      EhrJDBCTokenStoreService tokenStoreService,
+                                      JdbcTemplate jdbcTemplate) {
         EhrTokenServices tokenServices = new EhrTokenServices();
 
         tokenServices.setReuseRefreshToken(true);
         tokenServices.setSupportRefreshToken(true);
         tokenServices.setTokenStore(tokenStoreService);
+        tokenServices.setJdbcTemplate(jdbcTemplate);
         tokenServices.setClientDetailsService(clientDetailsService);
 
         return tokenServices;
