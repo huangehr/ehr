@@ -20,7 +20,7 @@ public class MicroServices {
     public static final String Package = "svr-pack-mgr";
     public static final String PackageResolve = "svr-pack-resolve";
     public static final String Patient = "svr-patient";
-    public static final String Portal = "svr-portal-hzy";
+    public static final String Portal = "svr-portal";
     public static final String Security = "svr-security";
     public static final String Standard = "svr-standard";
     public static final String User = "svr-user";
