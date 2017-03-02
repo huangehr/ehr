@@ -16,6 +16,17 @@ public class OrgDept {
     private Integer delFlag;
     private Integer sortNo;
 
+    private OrgDeptDetail deptDetail;
+
+    @Transient
+    public OrgDeptDetail getDeptDetail() {
+        return deptDetail;
+    }
+
+    public void setDeptDetail(OrgDeptDetail deptDetail) {
+        this.deptDetail = deptDetail;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id",unique = true,nullable = false)

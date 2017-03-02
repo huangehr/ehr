@@ -1,4 +1,4 @@
-package com.yihu.ehr.model.org;
+package com.yihu.ehr.agModel.org;
 
 import java.sql.Timestamp;
 
@@ -7,7 +7,7 @@ import java.sql.Timestamp;
  * @vsrsion 1.0
  * Created at 2017/2/24.
  */
-public class MOrgDeptDetail {
+public class OrgDeptDetailModel {
     private int id;
     private int deptId;
     private String nationalDeptSn;

@@ -91,14 +91,32 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/orgDept", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改部门")
+    @ApiOperation(value = "修改部门&科室详情")
     public MOrgDept updateOrgDept(
+            @ApiParam(name = "deptJsonData", value = "部门&科室详情json信息")
+            @RequestBody String deptJsonData
+    )  {
+        try {
+            OrgDept dept = toEntity(deptJsonData, OrgDept.class);
+            dept = orgDeptService.updateDept(dept);
+            return convertToModel(dept, MOrgDept.class);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @RequestMapping(value = "/orgDept/resetName", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改部门名称")
+    public MOrgDept resetDeptName(
             @ApiParam(name = "deptId", value = "部门ID")
             @RequestParam(value = "deptId", required = true) Integer deptId,
             @ApiParam(name = "name", value = "新部门名称")
             @RequestParam(value = "name", required = true) String name
     ) throws Exception {
-        OrgDept dept = orgDeptService.updateOrgDept(deptId, name);
+        OrgDept dept = orgDeptService.updateOrgDeptName(deptId, name);
         return convertToModel(dept, MOrgDept.class);
     }
 

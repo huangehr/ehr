@@ -33,8 +33,17 @@ public class MOrganization implements Serializable{
     private String imgRemotePath;
     private String imgLocalPath;
     private int administrativeDivision;
+    private String url; //机构网址
 
     public MOrganization() {
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getOrgCode() {

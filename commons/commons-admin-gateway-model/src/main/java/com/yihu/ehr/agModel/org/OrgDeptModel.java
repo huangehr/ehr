@@ -15,6 +15,16 @@ public class OrgDeptModel {
     private Integer delFlag;
     private Integer sortNo;
 
+    private OrgDeptDetailModel deptDetail;
+
+    public OrgDeptDetailModel getDeptDetail() {
+        return deptDetail;
+    }
+
+    public void setDeptDetail(OrgDeptDetailModel deptDetail) {
+        this.deptDetail = deptDetail;
+    }
+
     public int getId() {
         return id;
     }
