@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.oauth2;
+package com.yihu.ehr.oauth2.oauth2;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

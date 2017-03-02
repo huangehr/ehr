@@ -1,5 +1,7 @@
-package com.yihu.ehr.config;
+package com.yihu.ehr.oauth2.config;
 
+import com.yihu.ehr.oauth2.interceptor.RateLimitInterceptor;
+import com.yihu.ehr.oauth2.interceptor.UserAgentInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -15,6 +17,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
+    @Autowired
+    private RateLimitInterceptor rateLimitInterceptor;
+
+    @Autowired
+    private UserAgentInterceptor userAgentInterceptor;
 
     /**
      * 注册截取器。

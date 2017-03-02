@@ -1,4 +1,4 @@
-package com.yihu.ehr.service.oauth2;
+package com.yihu.ehr.oauth2.oauth2;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;

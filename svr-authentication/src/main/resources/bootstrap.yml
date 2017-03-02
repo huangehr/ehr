@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ag-ehr-cloud
+    name: svr-authentication
 
 ---
 spring:

@@ -37,7 +37,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
     public MApp createApp(
-            @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"}")
+            @ApiParam(name = "app", value = "对象JSON结构体", allowMultiple = true, defaultValue = "{\"name\": \"\", \"url\": \"\", \"catalog\": \"\", \"description\": \"\", \"creator\":\"\"},\"icon\": \"\",\"releaseFlag\": \"\"")
             @RequestBody String appJson) throws Exception {
         App app = toEntity(appJson, App.class);
         app.setId(getObjectId(BizObject.App));
@@ -48,7 +48,7 @@ public class AppEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
     public Collection<MApp> getApps(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime")
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,name,secret,url,createTime,icon,releaseFlag")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters,
