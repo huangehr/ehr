@@ -1,6 +1,6 @@
 package com.yihu.ehr.dict.model;
 
-import com.yihu.ehr.util.PinyinUtil;
+import com.yihu.ehr.util.phonics.PinyinUtil;
 
 import javax.persistence.*;
 import java.io.Serializable;
