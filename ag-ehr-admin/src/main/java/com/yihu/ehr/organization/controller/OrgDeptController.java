@@ -1,11 +1,13 @@
 package com.yihu.ehr.organization.controller;
 
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
+import com.yihu.ehr.agModel.org.OrgDeptDetailModel;
 import com.yihu.ehr.agModel.org.OrgDeptMemberModel;
 import com.yihu.ehr.agModel.org.OrgDeptModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.org.MOrgDept;
+import com.yihu.ehr.model.org.MOrgDeptDetail;
 import com.yihu.ehr.model.org.MOrgMemberRelation;
 import com.yihu.ehr.organization.service.OrgDeptClient;
 import com.yihu.ehr.organization.service.OrgDeptMemberClient;
@@ -121,8 +123,8 @@ public class OrgDeptController  extends BaseController {
             }
 
             OrgDeptModel orgDeptModel = objectMapper.readValue(orgDeptsJsonData, OrgDeptModel.class);
-            
-            MOrgDept mOrgDept = convertToMOrgDept(orgDeptModel);
+            MOrgDept mOrgDept = convertToModel(orgDeptModel, MOrgDept.class);
+
             if (StringUtils.isEmpty(mOrgDept.getCode())) {
                 errorMsg+="部门代码不能为空！";
             }
@@ -151,8 +153,48 @@ public class OrgDeptController  extends BaseController {
     }
 
     @RequestMapping(value = "/orgDept/update" , method = RequestMethod.POST)
-    @ApiOperation(value = "修改机构部门")
+    @ApiOperation(value = "修改部门&科室详情")
     public Envelop update(
+            @ApiParam(name = "orgDeptJsonData", value = " 部门信息Json", defaultValue = "")
+            @RequestParam(value = "orgDeptJsonData", required = false) String orgDeptJsonData){
+        try {
+            String errorMsg = "";
+
+            OrgDeptModel orgDeptModel = objectMapper.readValue(orgDeptJsonData, OrgDeptModel.class);
+            OrgDeptDetailModel deptDetailModel = orgDeptModel.getDeptDetail();
+            MOrgDeptDetail mOrgDeptDetail = convertToModel(deptDetailModel, MOrgDeptDetail.class);
+            MOrgDept mOrgDept = convertToModel(orgDeptModel, MOrgDept.class);
+            mOrgDept.setDeptDetail(mOrgDeptDetail);
+            if (StringUtils.isEmpty(mOrgDept.getCode())) {
+                errorMsg+="部门代码不能为空！";
+            }
+            if (StringUtils.isEmpty(mOrgDept.getName())) {
+                errorMsg+="部门不能为空！";
+            }
+            if (StringUtils.isEmpty(mOrgDept.getOrgId())) {
+                errorMsg+="机构不能为空！";
+            }
+            if(StringUtils.isNotEmpty(errorMsg))
+            {
+                return failed(errorMsg);
+            }
+
+            String mOrganizationJson = objectMapper.writeValueAsString(mOrgDept);
+            MOrgDept mOrgDeptNew = orgDeptClient.updateOrgDept(mOrganizationJson);
+            if (mOrgDeptNew == null) {
+                return failed("保存失败!");
+            }
+            return success(mOrgDeptNew);
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = "/orgDept/resetName" , method = RequestMethod.POST)
+    @ApiOperation(value = "修改机构部们名称")
+    public Envelop resetDeptName(
             @ApiParam(name = "deptId", value = "部门ID")
             @RequestParam(value = "deptId", required = true) Integer deptId,
             @ApiParam(name = "name", value = "新部门名称")
@@ -168,7 +210,7 @@ public class OrgDeptController  extends BaseController {
                 errorMsg+="新部门名称不能为空！";
             }
 
-            MOrgDept mOrgDeptNew = orgDeptClient.updateOrgDept(deptId,name);
+            MOrgDept mOrgDeptNew = orgDeptClient.updateOrgDeptName(deptId, name);
             if (mOrgDeptNew == null) {
                 return failed("修改部门失败!");
             }
@@ -226,16 +268,6 @@ public class OrgDeptController  extends BaseController {
             ex.printStackTrace();
             return false;
         }
-    }
-
-    public MOrgDept convertToMOrgDept(OrgDeptModel orgDeptModel)
-    {
-        if(orgDeptModel==null)
-        {
-            return null;
-        }
-        MOrgDept mOrg = convertToModel(orgDeptModel, MOrgDept.class);
-        return mOrg;
     }
 
 
@@ -375,6 +407,8 @@ public class OrgDeptController  extends BaseController {
             return false;
         }
     }
+
+
 
     
 }

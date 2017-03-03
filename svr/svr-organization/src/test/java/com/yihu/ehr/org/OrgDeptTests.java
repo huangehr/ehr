@@ -45,7 +45,7 @@ public class OrgDeptTests {
     public void updateDept(){
         Integer deptId = 555;
         String deptName = "修改后的部门名称";
-        OrgDept dept = orgDeptService.updateOrgDept(deptId,deptName);
+        OrgDept dept = orgDeptService.updateOrgDeptName(deptId, deptName);
     }
 
     @Test

@@ -54,8 +54,15 @@ public interface OrgDeptClient {
     ) ;
 
     @RequestMapping(value = "/orgDept", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改部门")
-    MOrgDept updateOrgDept(
+    @ApiOperation(value = "修改部门&科室详情")
+    public MOrgDept updateOrgDept(
+            @ApiParam(name = "deptJsonData", value = "部门&科室详情json信息")
+            @RequestBody String deptJsonData
+    ) ;
+
+    @RequestMapping(value = "/orgDept/resetName", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改部门名称")
+    MOrgDept updateOrgDeptName(
             @ApiParam(name = "deptId", value = "部门ID")
             @RequestParam(value = "deptId", required = true) Integer deptId,
             @ApiParam(name = "name", value = "新部门名称")
