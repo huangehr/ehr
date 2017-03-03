@@ -9,15 +9,18 @@ import com.yihu.ehr.org.model.OrgDeptDetail;
 import com.yihu.ehr.org.service.OrgDeptDetailService;
 import com.yihu.ehr.org.service.OrgDeptService;
 import com.yihu.ehr.org.service.OrgMemberRelationService;
+import com.yihu.ehr.util.file.ExcelUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author HZY
@@ -152,6 +155,34 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
         boolean succ = relationService.hadMemberRelation(deptId);
         return succ;
     }
+
+
+    /* ****************************************** excel 导入数据相关 *******************************************************  */
+    //TODO  无用可去除
+    @RequestMapping(value = "/orgDept/importDept", method = RequestMethod.POST)
+    @ApiOperation(value = "导入部门信息", notes = "通过Excel文件导入部门信息到数据库(包含父部门ＩＤ）")
+    public List<Map<Object,Object>> importDeptByExcel(
+            @ApiParam(name = "pack", value = "部门数据excel文件", allowMultiple = true)
+            @RequestPart() MultipartFile pack) throws Exception {
+
+        List<Map<Object,Object>> list = ExcelUtils.readExcel(pack.getInputStream(),pack.getOriginalFilename());
+        boolean b = orgDeptService.importDataByExcel(list);
+        System.out.println(list.toString());
+        return list;
+    }
+
+    @RequestMapping(value = "/orgDept/importDept2", method = RequestMethod.POST)
+    @ApiOperation(value = "导入部门信息", notes = "通过Excel文件导入部门信息到数据库；excel头内容，orgId,parentName,name")
+    public List<Map<Object,Object>> importDeptByExcel2(
+            @ApiParam(name = "pack", value = "部门数据excel文件", allowMultiple = true)
+            @RequestPart() MultipartFile pack) throws Exception {
+
+        List<Map<Object,Object>> list = ExcelUtils.readExcel(pack.getInputStream(),pack.getOriginalFilename());
+        boolean b = orgDeptService.importDataByExce2l(list);
+        System.out.println(list.toString());
+        return list;
+    }
+
 
 
 

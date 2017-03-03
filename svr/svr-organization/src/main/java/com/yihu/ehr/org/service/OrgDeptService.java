@@ -1,5 +1,6 @@
 package com.yihu.ehr.org.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.org.dao.XOrgDeptDetailRepository;
 import com.yihu.ehr.org.dao.XOrgDeptRepository;
 import com.yihu.ehr.org.model.OrgDept;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * 机构- 部门业务类
@@ -31,9 +34,21 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
     @Autowired
     private XOrgDeptDetailRepository deptDetailRepository;
 
+    @Autowired
+    protected ObjectMapper objectMapper;
+
     public OrgDept searchBydeptId(Integer deptId) {
         return orgDeptRepository.findOne(deptId);
     }
+    public OrgDept searchByOrgIdAndName(String orgId,String name) {
+        List<OrgDept> orgDepts = orgDeptRepository.searchByOrgIdAndName(orgId, name);
+        if (orgDepts!=null && !orgDepts.isEmpty()){
+            return orgDepts.get(0);
+        }else {
+            return null;
+        }
+    }
+
 
     public List<OrgDept> searchByOrgId(String orgId) {
         return orgDeptRepository.searchByOrgId(orgId);
@@ -90,17 +105,119 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
     public void changeOrgDeptSort(Integer deptId1, Integer deptId2) {
         OrgDept orgDept1 = orgDeptRepository.findOne(deptId1);
         OrgDept orgDept2 = orgDeptRepository.findOne(deptId2);
-
         Integer sortNo1 = orgDept1.getSortNo();
         orgDept1.setSortNo(orgDept2.getSortNo());
         orgDeptRepository.save(orgDept1);
 
         orgDept2.setSortNo(sortNo1);
         orgDeptRepository.save(orgDept2);
-
     }
 
 
+    //Excel导入部门信息(有deptId的导入）
+    public boolean importDataByExcel(List<Map<Object, Object>> list) {
+        boolean succ = false;
+        if (!list.isEmpty()) {
+            try {
+                for (Map<Object, Object> map : list) {
+                    String mapJson = objectMapper.writeValueAsString(map);
+                    OrgDept dept = objectMapper.readValue(mapJson, OrgDept.class);
+                    orgDeptRepository.save(dept);
+                }
+                succ = true;
+            } catch (Exception e) {
+                succ = false;
+                e.printStackTrace();
+            }
+        }
+        return succ;
+    }
+
+    //Excel导入部门信息(只有部门名称的导入）
+    public boolean importDataByExce2l(List<Map<Object, Object>> list) {
+        boolean succ = false;
+        if (!list.isEmpty()) {
+            try {
+                OrgDept dept = null;
+                for (Map<Object, Object> map : list) {
+                    dept = new OrgDept();
+                    Object parentName = map.get("parentName");
+                    String name = map.get("name").toString();
+                    String orgId =  map.get("orgId").toString();
+                    if (parentName!=null && !parentName.toString().isEmpty()){
+                        //查询父部门ID ,未存在则添加
+                        OrgDept parent = searchByOrgIdAndName(orgId, parentName.toString());
+                        if (parent == null){
+                            parent = new OrgDept();
+                            parent.setOrgId(orgId);
+                            parent.setCode(UUID.randomUUID().toString());
+                            parent.setName(parentName.toString());
+                            parent.setDelFlag(0);
+                            orgDeptRepository.save(parent);
+                        }
+                        dept.setParentDeptId(parent.getId());
+                        //保存部门信息
+                    }
+                    dept.setOrgId(orgId);
+                    dept.setCode(UUID.randomUUID().toString());
+                    dept.setName(name);
+                    dept.setDelFlag(0);
+
+                    orgDeptRepository.save(dept);
+                }
+                succ = true;
+            } catch (Exception e) {
+                succ = false;
+                e.printStackTrace();
+            }
+        }
+        return succ;
+    }
+
+    /**
+     * 导入部门成员关系
+     * @param list
+     * @return
+     */
+    public boolean importDeptMembers(List<Map<Object, Object>> list) {
+        boolean succ = false;
+        if (!list.isEmpty()) {
+            try {
+                OrgDept dept = null;
+                for (Map<Object, Object> map : list) {
+                    dept = new OrgDept();
+                    Object parentDeptName = map.get("parentDeptName");
+                    String deptName = map.get("deptName").toString();
+                    String orgId =  map.get("orgId").toString();
+                    if (parentDeptName!=null && !parentDeptName.toString().isEmpty()){
+                        //查询父部门ID ,未存在则添加
+                        OrgDept parent = searchByOrgIdAndName(orgId, parentDeptName.toString());
+                        if (parent == null){
+                            parent = new OrgDept();
+                            parent.setOrgId(orgId);
+                            parent.setCode(UUID.randomUUID().toString());
+                            parent.setName(parentDeptName.toString());
+                            parent.setDelFlag(0);
+                            orgDeptRepository.save(parent);
+                        }
+                        dept.setParentDeptId(parent.getId());
+                        //保存部门信息
+                    }
+                    dept.setOrgId(orgId);
+                    dept.setCode(UUID.randomUUID().toString());
+                    dept.setName(deptName);
+                    dept.setDelFlag(0);
+
+                    orgDeptRepository.save(dept);
+                }
+                succ = true;
+            } catch (Exception e) {
+                succ = false;
+                e.printStackTrace();
+            }
+        }
+        return succ;
+    }
 
 }
 

@@ -26,9 +26,13 @@ import java.util.Map;
  */
 public class ExcelUtils {
 
-    /** 总行数 */
+    /**
+     * 总行数
+     */
     private int totalRows = 0;
-    /** 总列数 */
+    /**
+     * 总列数
+     */
     private int totalCells = 0;
 
     public int getTotalRows() {
@@ -170,27 +174,34 @@ public class ExcelUtils {
     /* **************************************** Excel 读取 *************************************************************** */
 
     /**
-     *  读取Excel内容
-     * @param excelFile  Excel文件
+     * 读取Excel内容
+     *
+     * @param is       Excel文件流
+     * @param fileName excel文件名，包括后缀
      * @return
      * @throws IOException
      */
-    public static List<Map<String,Object>> readExcel(File excelFile) throws IOException {
-        List<Map<String,Object>> list = null;
-        boolean isExcel2007 = isExcel2007(excelFile.getName());
-        if (isExcel2007){
-            list = readExcel2007(excelFile);
-        }else {
-            list = readExcel2003(excelFile);
+    public static List<Map<Object, Object>> readExcel(InputStream is, String fileName) throws IOException {
+        List<Map<Object, Object>> list = null;
+        boolean isExcel2007 = isExcel2007(fileName);
+        if (isExcel2007) {
+            list = readExcel2007(is);
+        } else {
+            list = readExcel2003(is);
         }
         return list;
     }
-    
-    public static List<Map<String,Object>> readExcel2003(File excelFile) throws IOException {
-        InputStream is = new FileInputStream(excelFile);
+
+    /**
+     *  读取Excel2003内容
+     * @param is  Excel文件流
+     * @return
+     * @throws IOException
+     */
+    public static List<Map<Object, Object>> readExcel2003(InputStream is) throws IOException {
         HSSFWorkbook hssfWorkbook = new HSSFWorkbook(is);
-        Map<String,Object> student = null;
-        List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+        Map<Object, Object> student = null;
+        List<Map<Object, Object>> list = new ArrayList<Map<Object, Object>>();
         // 循环工作表Sheet
         for (int numSheet = 0; numSheet < hssfWorkbook.getNumberOfSheets(); numSheet++) {
             HSSFSheet hssfSheet = hssfWorkbook.getSheetAt(numSheet);
@@ -203,7 +214,7 @@ public class ExcelUtils {
             for (int rowNum = 1; rowNum <= hssfSheet.getLastRowNum(); rowNum++) {
                 HSSFRow hssfRow = hssfSheet.getRow(rowNum);
                 if (hssfRow != null) {
-                    student = setCellVal(columnName,hssfRow);
+                    student = setCellVal(columnName, hssfRow);
                     list.add(student);
                 }
             }
@@ -211,93 +222,110 @@ public class ExcelUtils {
         return list;
     }
 
+    /**
+     * 获取Excel单元格的值
+     * @param hssfCell  单元格对象
+     * @return
+     */
     @SuppressWarnings("static-access")
-    public static String getExcelValue(HSSFCell hssfCell) {
-        if (hssfCell.getCellType() == hssfCell.CELL_TYPE_BOOLEAN) {
+    public static Object getExcelValue(HSSFCell hssfCell) {
+        if(hssfCell==null){
+            return null;
+        }else  if (hssfCell.getCellType() == hssfCell.CELL_TYPE_BOOLEAN) {
             // 返回布尔类型的值
-            return String.valueOf(hssfCell.getBooleanCellValue());
+            return hssfCell.getBooleanCellValue();
         } else if (hssfCell.getCellType() == hssfCell.CELL_TYPE_NUMERIC) {
             // 返回数值类型的值
-            return String.valueOf(hssfCell.getNumericCellValue());
+            return (int)hssfCell.getNumericCellValue();
         } else {
             // 返回字符串类型的值
-            return String.valueOf(hssfCell.getStringCellValue());
+            return hssfCell.getStringCellValue();
         }
     }
 
-    public static List<Map<String,Object>> readExcel2007(File excelFile) throws IOException {
-        InputStream is = new FileInputStream(excelFile);
-        XSSFWorkbook hssfWorkbook = new XSSFWorkbook(is);
-        Map<String,Object> result = null;
-        List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
-        // 循环工作表Sheet
-        for (int numSheet = 0; numSheet < hssfWorkbook.getNumberOfSheets(); numSheet++) {
-            XSSFSheet xssfSheet = hssfWorkbook.getSheetAt(numSheet);
-            if (xssfSheet == null) {
-                continue;
-            }
-            //获取表头字段
-            XSSFRow columnName = xssfSheet.getRow(0);
-            // 循环行Row
-            for (int rowNum = 1; rowNum <= xssfSheet.getLastRowNum(); rowNum++) {
-                XSSFRow hssfRow = xssfSheet.getRow(rowNum);
-                if (hssfRow != null) {
-                    result = setCellVal(columnName,hssfRow);
-                    list.add(result);
+    /**
+     * 获取Excel2007的内容
+     * @param is    输入流
+     * @return
+     */
+    public static List<Map<Object, Object>> readExcel2007(InputStream is) {
+        XSSFWorkbook hssfWorkbook = null;
+        List<Map<Object, Object>> list = new ArrayList<Map<Object, Object>>();
+        try {
+            hssfWorkbook = new XSSFWorkbook(is);
+            Map<Object, Object> result = null;
+            // 循环工作表Sheet
+            for (int numSheet = 0; numSheet < hssfWorkbook.getNumberOfSheets(); numSheet++) {
+                XSSFSheet xssfSheet = hssfWorkbook.getSheetAt(numSheet);
+                if (xssfSheet == null) {
+                    continue;
+                }
+                //获取表头字段
+                XSSFRow columnName = xssfSheet.getRow(0);
+                // 循环行Row
+                for (int rowNum = 1; rowNum <= xssfSheet.getLastRowNum(); rowNum++) {
+                    XSSFRow hssfRow = xssfSheet.getRow(rowNum);
+                    if (hssfRow != null) {
+                        result = setCellVal(columnName, hssfRow);
+                        list.add(result);
+                    }
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return list;
     }
 
     @SuppressWarnings("static-access")
-    public static String getExcelValue(XSSFCell hssfCell) {
-        if (hssfCell.getCellType() == hssfCell.CELL_TYPE_BOOLEAN) {
+    public static Object getExcelValue(XSSFCell xssfCell) {
+        if(xssfCell==null){
+            return null;
+        }else if (xssfCell.getCellType() == xssfCell.CELL_TYPE_BOOLEAN) {
             // 返回布尔类型的值
-            return String.valueOf(hssfCell.getBooleanCellValue());
-        } else if (hssfCell.getCellType() == hssfCell.CELL_TYPE_NUMERIC) {
+            return xssfCell.getBooleanCellValue();
+        } else if (xssfCell.getCellType() == xssfCell.CELL_TYPE_NUMERIC) {
             // 返回数值类型的值
-            return String.valueOf(hssfCell.getNumericCellValue());
+            return (int)xssfCell.getNumericCellValue();
         } else {
             // 返回字符串类型的值
-            return String.valueOf(hssfCell.getStringCellValue());
+            return xssfCell.getStringCellValue();
         }
     }
 
-    public static  Map<String,Object> setCellVal(XSSFRow names,XSSFRow values) {
-        Map<String,Object> map = new HashMap<>();
-        String name =null;
-        String value =null;
-        for (int i=0;i<names.getLastCellNum();i++){
+    public static Map<Object, Object> setCellVal(XSSFRow names, XSSFRow values) {
+        Map<Object, Object> map = new HashMap<>();
+        Object name = null;
+        Object value = null;
+        for (int i = 0; i < names.getLastCellNum(); i++) {
             name = getExcelValue(names.getCell(i));
             value = getExcelValue(values.getCell(i));
-            map.put(name,value);
+            map.put(name, value);
         }
         return map;
     }
 
-    public static  Map<String,Object> setCellVal(HSSFRow names,HSSFRow values) {
-        Map<String,Object> map = new HashMap<>();
-        String name =null;
-        String value =null;
-        for (int i=0;i<names.getLastCellNum();i++){
+    public static Map<Object, Object> setCellVal(HSSFRow names, HSSFRow values) {
+        Map<Object, Object> map = new HashMap<>();
+        Object name = null;
+        Object value = null;
+        for (int i = 0; i < names.getLastCellNum(); i++) {
             name = getExcelValue(names.getCell(i));
             value = getExcelValue(values.getCell(i));
-            map.put(name,value);
+            map.put(name, value);
         }
         return map;
     }
-    
-    public static boolean isExcel2007(String filePath)
-    {
+
+    public static boolean isExcel2007(String filePath) {
         return filePath.matches("^.+\\.(?i)(xlsx)$");
     }
 
 
-
     public static void main(String[] args) throws IOException {
-        String path ="e://test.xlsx";
-        List<Map<String, Object>> list = ExcelUtils.readExcel(new File(path));
+        String path = "e://test.xlsx";
+        InputStream is = new FileInputStream(new File(path));
+        List<Map<Object, Object>> list = ExcelUtils.readExcel(is, path);
         System.out.println(list.toString());
     }
 
