@@ -102,4 +102,11 @@ public interface AddressClient {
             @RequestParam(value = "fields") String[] fields ,
             @ApiParam(name = "values", value = "values", defaultValue = "")
             @RequestParam(value = "values") String[] values);
+
+    @RequestMapping(value = "/geography_entries/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id查询行政区划地址")
+    public MGeographyDict getAddressDictById(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @PathVariable(value = "id") String id) ;
+
 }

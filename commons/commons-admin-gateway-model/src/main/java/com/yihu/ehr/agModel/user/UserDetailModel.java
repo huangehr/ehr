@@ -23,8 +23,12 @@ public class UserDetailModel {
     private String idCardNo;
     private String organization;
     private String organizationName;
-    private String province;
-    private String city;
+
+    private int provinceId;
+    private String provinceName;
+    private int cityId;
+    private String cityName;
+
 
     // 未绑定属性
     private String orgPost;
@@ -353,20 +357,36 @@ public class UserDetailModel {
         this.startTime = startTime;
     }
 
-    public String getProvince() {
-        return province;
+    public int getProvinceId() {
+        return provinceId;
     }
 
-    public void setProvince(String province) {
-        this.province = province;
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
     }
 
-    public String getCity() {
-        return city;
+    public String getProvinceName() {
+        return provinceName;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setProvinceName(String provinceName) {
+        this.provinceName = provinceName;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
     }
 
     public String getNewPassWord() {
