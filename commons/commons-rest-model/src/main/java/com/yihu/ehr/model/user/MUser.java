@@ -38,6 +38,10 @@ public class MUser implements Serializable{
     private String imgLocalPath;
 
 
+    private int provinceId;
+    private String provinceName;
+    private int cityId;
+    private String cityName;
     private int fertilityStatus;
     private String secondPhone;
     private String birthday;
@@ -45,6 +49,39 @@ public class MUser implements Serializable{
     private String qq;
     private String ssid;
     private String realnameFlag;
+
+
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
+    }
+
+    public String getProvinceName() {
+        return provinceName;
+    }
+
+    public void setProvinceName(String provinceName) {
+        this.provinceName = provinceName;
+    }
+
+    public int getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
 
     public int getFertilityStatus() {
         return fertilityStatus;

@@ -81,6 +81,24 @@ public class AddressController extends BaseController{
         return envelop;
     }
 
+    @RequestMapping(value = "/geography_entries/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id查询行政区划地址")
+    public Envelop getAddressDictById(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @PathVariable(value = "id") String id) {
+        Envelop envelop = new Envelop();
+        MGeographyDict addressDict = addressClient.getAddressDictById(id);
+        if(addressDict!=null){
+            envelop.setSuccessFlg(true);
+            envelop.setObj(addressDict);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("根据id查询行政区划失败");
+        }
+
+        return envelop;
+    }
+
 
     @RequestMapping(value = "/geographies/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询地址")

@@ -648,8 +648,8 @@ public class UserController extends BaseController {
             detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
             if(orgModel!=null&&StringUtils.isNotEmpty(orgModel.getLocation())) {
                 MGeography mGeography = addressClient.getAddressById(orgModel.getLocation());
-                detailModel.setProvince(mGeography==null?"":mGeography.getProvince());
-                detailModel.setCity(mGeography==null?"":mGeography.getCity());
+                detailModel.setProvinceName(mGeography==null?"":mGeography.getProvince());
+                detailModel.setCityName(mGeography==null?"":mGeography.getCity());
             }
         }
         //获取秘钥信息
