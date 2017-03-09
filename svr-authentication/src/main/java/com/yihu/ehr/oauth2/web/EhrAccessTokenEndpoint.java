@@ -11,7 +11,6 @@
  */
 package com.yihu.ehr.oauth2.web;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -41,7 +41,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,15 +73,8 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
 
     private WebResponseExceptionTranslator providerExceptionHandler = new DefaultWebResponseExceptionTranslator();
 
-    /**
-     * 获取accesstoken
-     *
-     * @param parameters
-     * @return
-     */
-    @RequestMapping(value = "/oauth/accesstoken", method = RequestMethod.POST)
+    @RequestMapping(value = "/oauth/accesstoken", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public OAuth2AccessToken postAccessToken(@RequestBody Map<String, String> parameters) {
-
 
         String clientId = getClientId(parameters);
         ClientDetails authenticatedClient = clientDetailsService.loadClientByClientId(clientId);
@@ -138,19 +130,18 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
     /**
      * 判断token是否有效
      *
-     * @param client_id
      * @return
      */
-    @RequestMapping(value = "/oauth/valid_token")
-    @ResponseBody
-    public String postAccessToken(String client_id, String accesstoken) throws Exception {
+    @RequestMapping(value = "/oauth/validtoken", method = RequestMethod.GET)
+    public String validToken(@RequestParam(value = "client_id") String clientId,
+                             @RequestParam(value = "access_token") String accessToken) throws Exception {
         Map<String, String> returnMap = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             returnMap.put("status", "10000");
             //查找该用户的最新的accesstoken
-            OAuth2AccessToken accessToken = tokenServices.getAccessTokenByClientId(client_id);
-            if (!accessToken.getValue().equals(accesstoken) || accessToken.isExpired()) {
+            OAuth2AccessToken token = tokenServices.getAccessTokenByClientId(clientId);
+            if (!token.getValue().equals(accessToken) || token.isExpired()) {
                 returnMap.put("status", "10001");
                 returnMap.put("message", "accesstoken 已经过期");
                 return objectMapper.writeValueAsString(returnMap);

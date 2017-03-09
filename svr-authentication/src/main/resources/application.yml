@@ -17,8 +17,8 @@ spring:
 
 server:
   port: ${svr-authentication.server.port}
-  ssl:
-    key-store: C:/Windows/tomcat.keystore
+#  ssl:
+#    key-store: D:/tomcat.keystore
 
 management:
   port: ${server.port}
@@ -35,10 +35,10 @@ spring:
     password: ha
 
 
-server:
-  ssl:
-    key-store-password: 123456
-    key-password: 123456
+#server:
+#  ssl:
+#    key-store-password: 123456
+#    key-password: 123456
 
 ---
 spring:

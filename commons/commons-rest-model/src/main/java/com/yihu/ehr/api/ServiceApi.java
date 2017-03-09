@@ -287,6 +287,12 @@ public class ServiceApi {
         public static final String Authentication                    = "/patient/Authentication/{id}";
     }
 
+    public static class Authentication{
+        public static final String AccessToken                            = "/oauth/accesstoken";
+        public static final String ValidToken                             = "/oauth/validtoken";
+        public static final String RefreshToken                             = "/oauth/refreshtoken";
+    }
+
     public static class PortalNotices{
         public static final String PortalNotices                            = "/portalNotices";
         public static final String PortalNoticesTop                            = "/portalNoticesTop";
@@ -296,6 +302,16 @@ public class ServiceApi {
     public static class PortalFeedback{
         public static final String PortalFeedback                            = "/portalFeedback";
         public static final String PortalFeedbackAdmin                        = "/portalFeedback/admin/{portalFeedback_id}";
+    }
+
+    public static class PortalLogin{
+        public static final String PortalLogin                            = "/login";
+    }
+
+    public static class PortalAuth{
+        public static final String AccessToken                      = "/accessToken";
+        public static final String RefreshToken                     = "/refreshToken";
+        public static final String ValidToken                       = "/validToken";
     }
 
     public static class PortalSetting{
