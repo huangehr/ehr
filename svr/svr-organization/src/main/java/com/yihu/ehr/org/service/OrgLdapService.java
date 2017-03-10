@@ -8,13 +8,16 @@ import com.yihu.ehr.org.model.LdapEntries;
 import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.model.OrgMemberRelation;
 import com.yihu.ehr.org.model.Organization;
+import com.yihu.ehr.util.ldap.LdapUtil;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 机构ldap服务
@@ -35,8 +38,11 @@ public class OrgLdapService  {
     @Autowired
     private XLdapEntriesRepository ldapEntriesRepository;
 
-    private String rootDn = "dc=ehr,dc=jkzl";
+    @Autowired
+    LdapUtil ldapUtil;
 
+    @Value("${spring.ldap.root}")
+    String rootDn;
 
     private void importOrgDept(String orgCode,Integer patientDept,Long parent,String parentDn)
     {
@@ -126,6 +132,7 @@ public class OrgLdapService  {
 
     }
 
+    /**************************************************************************************/
     /**
      * 初始化Ldap数据
      */
@@ -144,6 +151,67 @@ public class OrgLdapService  {
         ldapEntriesRepository.save(root);
 
         importOrgAndDept(root.getId());
+    }
+
+    private String getObjectClass(Integer type)
+    {
+        String objectClass = "*";
+        if(type!=null)
+        {
+            if(type.equals(1))
+            {
+                objectClass = "inetOrgPerson";
+            }
+            else if(type.equals(2))
+            {
+                objectClass = "organizationalUnit";
+            }
+            else if(type.equals(3))
+            {
+                objectClass = "organization";
+            }
+            else{
+                objectClass = "null";
+            }
+        }
+
+        return objectClass;
+    }
+
+    /**
+     *  节点类型，1用户 2科室 3机构 为空全部
+     */
+    public List<Map<String,Object>> queryAllByObjectClass(String searchDN, Integer type) throws Exception
+    {
+        String objectClass = getObjectClass(type);
+        return ldapUtil.queryAllByObjectClass(searchDN,objectClass);
+    }
+
+    /**
+     *  节点类型，1用户 2科室 3机构 为空全部
+     */
+    public List<Map<String,Object>> queryChildren(String searchDN, Integer type) throws Exception
+    {
+        String objectClass = getObjectClass(type);
+        return ldapUtil.queryChildren(searchDN,objectClass);
+    }
+
+    /**
+     *  节点类型，1用户 2科室 3机构 为空全部
+     */
+    public Map<String,Object> queryBase(String searchDN, Integer type) throws Exception
+    {
+        String objectClass = getObjectClass(type);
+        return ldapUtil.queryBase(searchDN,objectClass);
+    }
+
+    /**
+     *  节点类型，1用户 2科室 3机构 为空全部
+     */
+    public List<Map<String,Object>> queryAllWithoutSelf(String searchDN, Integer type) throws Exception
+    {
+        String objectClass = getObjectClass(type);
+        return ldapUtil.queryAllWithoutSelf(searchDN,objectClass);
     }
 }
 
