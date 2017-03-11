@@ -27,6 +27,4 @@ public class MessageRemindService extends BaseJpaService<MessageRemind,XMessageR
         return remind;
     }
 
-
-
 }

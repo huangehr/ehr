@@ -6,7 +6,19 @@ logging:
       springframework:
         web: INFO
       hibernate: ERROR
-      
+
+server:
+  port: ${svr-file-resource.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: PictureService
+    description: EHR platform picture service.
+    version: 1.0.0
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver

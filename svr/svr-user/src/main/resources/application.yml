@@ -7,6 +7,19 @@ logging:
         web: INFO
       hibernate: ERROR
 
+server:
+  port: ${svr-user.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: UserService
+    description: EHR platform user service.
+    version: 1.0.0
+
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver

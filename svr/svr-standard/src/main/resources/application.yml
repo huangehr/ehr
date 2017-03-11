@@ -6,6 +6,18 @@ logging:
       springframework:
         web: INFO
       hibernate: ERROR
+
+server:
+  port: ${svr-standard.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+ app:
+   name: StandardService
+   description: EHR platform standard service.
+   version: 1.0.0
       
 common.query.not.found: 该{0}不存在：{1}
 common.miss.parameter: 参数不能为空：{0}！

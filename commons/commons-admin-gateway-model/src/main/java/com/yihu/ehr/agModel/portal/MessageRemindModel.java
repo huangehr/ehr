@@ -13,12 +13,20 @@ public class MessageRemindModel {
     private Integer appId;
     private String appName;
     private String fromUserId;
+    private String toUserId;
     private String typeId;
     private String content;
     private String workUri;
     private Integer  readed;
     private Date createDate;
 
+    public String getToUserId() {
+        return toUserId;
+    }
+
+    public void setToUserId(String toUserId) {
+        this.toUserId = toUserId;
+    }
 
     public Integer getId() {
         return id;

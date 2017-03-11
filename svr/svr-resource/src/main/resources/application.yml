@@ -6,7 +6,19 @@ logging:
       springframework:
         web: INFO
       hibernate: ERROR
-      
+
+server:
+  port: ${svr-resource.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: ResourceServiceApp
+    description: Resource service.
+    version: 1.0.0
+
 hadoop:
   hbase-properties:
     - hbase.zookeeper.property.clientPort: 2181

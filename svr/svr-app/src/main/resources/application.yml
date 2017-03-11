@@ -6,7 +6,20 @@ logging:
       springframework:
         web: INFO
       hibernate: ERROR
-      
+
+server:
+  port: ${svr-app.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: AppService
+    description: EHR platform open service applicate administrative service.
+    version: 1.0.0
+
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver

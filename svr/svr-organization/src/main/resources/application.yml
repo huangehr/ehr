@@ -7,6 +7,19 @@ logging:
         web: INFO
       hibernate: ERROR
 
+server:
+  port: ${svr-organization.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: OrganizationService
+    description: EHR platform organization service.
+    version: 1.0.0
+
+
 spring:
   # REDIS
   redis:

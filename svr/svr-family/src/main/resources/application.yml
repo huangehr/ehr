@@ -7,6 +7,18 @@ logging:
         web: INFO
       hibernate: ERROR
 
+server:
+  port: ${svr-family.server.port}
+
+management:
+  port: ${server.port}
+
+info:
+  app:
+    name: FamilyService
+    description: EHR platform open service applicate administrative service.
+    version: 1.0.0
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
