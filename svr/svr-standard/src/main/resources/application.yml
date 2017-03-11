@@ -1,24 +1,17 @@
-server:
-  port: ${svr-standard.server.port}
-
-management:
-  port: ${server.port}
-
-info:
- app:
-   name: StandardService
-   description: EHR platform standard service.
-   version: 1.0.0
-
 logging:
   level:
     com:
-      netflix: ERROR
-
+      netflix: INFO
+    org:
+      springframework:
+        web: INFO
+      hibernate: ERROR
+      
 common.query.not.found: 该{0}不存在：{1}
 common.miss.parameter: 参数不能为空：{0}！
 common.notfound.entity: 没有找到{0}实体：{}
 std.version.invalid.stage: 该版本不处于编辑状态！
+
 fast-dfs:
   pool:
     init-size: 5
@@ -27,10 +20,12 @@ fast-dfs:
   connect-timeout: 2
   network-timeout: 30
   charset: ISO8859-1
+
   http:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
+
 spring:
   # REDIS
   redis:
@@ -41,16 +36,18 @@ spring:
     #sentinel:
     #  master: # Name of Redis server.
     #  nodes: # Comma-separated list of host:port pairs.
-
+    
     pool:
       max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
       max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
+
   # SOLR (SolrProperties)
   data:
     solr:
       repositories.enabled: true # Enable Solr repositories.
+
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     max-active: 20
@@ -58,52 +55,77 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
+
 ---
 spring:
   profiles: dev
+
   datasource:
     url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: ha
     password: ha
+
   redis:
     host: 192.168.1.220 # Redis server host.
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
----
-spring:
-  profiles: alpha
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: ha
-    password: ha
-  redis:
-    host: 192.168.1.220 # Redis server host.
+
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
 
+
+
+---
+spring:
+  profiles: alpha
+
+  datasource:
+    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: ha
+    password: ha
+
+  redis:
+    host: 192.168.1.220 # Redis server host.
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
+  public-server: http://172.19.103.54:22122
+
+
+  
 ---
 spring:
   profiles: test
+
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: yuhaihua
-    password: yuhaihua
+    username: weifuwu
+    password: weifuwu
+    #username: chenweishan
+    #password: chenweishan
+
   redis:
+    #host: 172.17.110.193
     host: 172.19.103.47 # Redis server host.
+
 fast-dfs:
-  tracker-server: 172.19.103.54:22122
+  tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+
+
 ---
 spring:
   profiles: prod
+
   datasource:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: ha
     password: jkzlxm
+
   redis:
     host: 11.1.2.20 # Redis server host.
+
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
+
+

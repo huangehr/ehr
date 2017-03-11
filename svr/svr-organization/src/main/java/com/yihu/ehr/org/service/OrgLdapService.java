@@ -25,7 +25,7 @@ import java.util.Map;
 @Service
 @Transactional(rollbackFor = {ServiceException.class})
 public class OrgLdapService  {
-
+/*
     @Autowired
     private XOrganizationRepository organizationRepository;
 
@@ -67,9 +67,9 @@ public class OrgLdapService  {
     }
 
 
-    /**
+    *//**
      * 初始化ldap机构科室数据
-     */
+     *//*
     private void importOrgAndDept(Long rootId) {
         //获取所有有效机构
         List<Organization> orgList = organizationRepository.findAllOrg();
@@ -100,9 +100,9 @@ public class OrgLdapService  {
 
     }
 
-    /**
+    *//**
      * 初始化ldap机构成员数据
-     */
+     *//*
     private void importMember(String orgCode) throws Exception {
         //获取所有有效机构
         List<OrgMemberRelation> memberList = orgMemberRelationRepository.findByOrgId(orgCode);
@@ -132,10 +132,10 @@ public class OrgLdapService  {
 
     }
 
-    /**************************************************************************************/
-    /**
+    *//**************************************************************************************//*
+    *//**
      * 初始化Ldap数据
-     */
+     *//*
     @Transactional
     public void importLdapData() throws Exception
     {
@@ -178,40 +178,40 @@ public class OrgLdapService  {
         return objectClass;
     }
 
-    /**
+    *//**
      *  节点类型，1用户 2科室 3机构 为空全部
-     */
+     *//*
     public List<Map<String,Object>> queryAllByObjectClass(String searchDN, Integer type) throws Exception
     {
         String objectClass = getObjectClass(type);
         return ldapUtil.queryAllByObjectClass(searchDN,objectClass);
     }
 
-    /**
+    *//**
      *  节点类型，1用户 2科室 3机构 为空全部
-     */
+     *//*
     public List<Map<String,Object>> queryChildren(String searchDN, Integer type) throws Exception
     {
         String objectClass = getObjectClass(type);
         return ldapUtil.queryChildren(searchDN,objectClass);
     }
 
-    /**
+    *//**
      *  节点类型，1用户 2科室 3机构 为空全部
-     */
+     *//*
     public Map<String,Object> queryBase(String searchDN, Integer type) throws Exception
     {
         String objectClass = getObjectClass(type);
         return ldapUtil.queryBase(searchDN,objectClass);
     }
 
-    /**
+    *//**
      *  节点类型，1用户 2科室 3机构 为空全部
-     */
+     *//*
     public List<Map<String,Object>> queryAllWithoutSelf(String searchDN, Integer type) throws Exception
     {
         String objectClass = getObjectClass(type);
         return ldapUtil.queryAllWithoutSelf(searchDN,objectClass);
-    }
+    }*/
 }
 

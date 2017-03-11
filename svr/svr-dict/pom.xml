@@ -115,11 +115,6 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-redis</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-redis-keyschema</artifactId>
             <scope>compile</scope>
         </dependency>
@@ -136,12 +131,6 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>svr-standard</artifactId>
-            <version>1.1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

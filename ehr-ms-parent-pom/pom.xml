@@ -32,7 +32,6 @@
         <module>../svr/svr-patient</module>
         <module>../svr/svr-resource</module>
         <module>../svr/svr-security</module>
-        <module>../svr/svr-special-dict</module>
         <module>../svr/svr-standard</module>
         <module>../svr/svr-user</module>
         <module>../svr/svr-portal</module>
