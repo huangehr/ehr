@@ -2,6 +2,7 @@ package com.yihu.ehr.portal.service;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,7 +16,7 @@ import java.util.Map;
 /**
  * Created by yeshijie on 2017/2/21.
  */
-@FeignClient(name= "svr-authentication-zlf")
+@FeignClient(name= MicroServices.Authentication)
 @ApiIgnore
 public interface PortalAuthClient {
 

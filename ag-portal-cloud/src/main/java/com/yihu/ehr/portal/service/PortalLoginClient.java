@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by yeshijie on 2017/2/21.
  */
-@FeignClient(name= "svr-user-zlf")
+@FeignClient(name= MicroServices.User)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface PortalLoginClient {
