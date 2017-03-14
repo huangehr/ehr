@@ -73,6 +73,11 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
 
     private WebResponseExceptionTranslator providerExceptionHandler = new DefaultWebResponseExceptionTranslator();
 
+    /**
+     * 新增用户访问授权
+      * @param parameters
+     * @return
+     */
     @RequestMapping(value = "/oauth/accesstoken", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public OAuth2AccessToken postAccessToken(@RequestBody Map<String, String> parameters) {
 
@@ -111,7 +116,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
             }
         }
 
-
         if (isRefreshTokenRequest(parameters)) {
             // A refresh token has its own default scopes, so we should ignore any added by the factory here.
             tokenRequest.setScope(OAuth2Utils.parseParameterList(parameters.get(OAuth2Utils.SCOPE)));
@@ -139,9 +143,9 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             returnMap.put("status", "10000");
-            //查找该用户的最新的accesstoken
-            OAuth2AccessToken token = tokenServices.getAccessTokenByClientId(clientId);
-            if (!token.getValue().equals(accessToken) || token.isExpired()) {
+            //根据accessToken查询相应的访问授权数据行
+            OAuth2AccessToken auth2AccessToken = tokenServices.readAccessToken(accessToken);
+            if (!auth2AccessToken.getValue().equals(accessToken) || auth2AccessToken.isExpired()) {
                 returnMap.put("status", "10001");
                 returnMap.put("message", "accesstoken 已经过期");
                 return objectMapper.writeValueAsString(returnMap);

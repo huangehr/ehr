@@ -24,7 +24,7 @@ import java.util.Map;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/portal/oauth")
 @RestController
-@Api(value = "portalAuth", description = "portalAuth", tags = {"意见反馈接口"})
+@Api(value = "portalAuth", description = "portalAuth", tags = {"token获取及验证接口"})
 public class PortalAuthController extends BaseController{
 
     @Autowired

@@ -37,12 +37,17 @@ public class PortalLoginController extends BaseController{
             @ApiParam(name = "password", value = "密码", defaultValue = "")
             @RequestParam(value = "password") String password) {
         try {
+            Envelop result = new Envelop();
             MUser user = portalLoginClient.getUserByNameAndPassword(userName, password);
             if (user == null) {
                 return failed("登录失败，用户名密码不正确!");
             }
 
-            return success("登录成功");
+            result.setObj(user);
+            result.setSuccessFlg(true);
+            result.setErrorMsg("登录成功!");
+            return result;
+
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
