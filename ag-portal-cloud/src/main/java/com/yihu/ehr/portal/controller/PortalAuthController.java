@@ -1,5 +1,7 @@
 package com.yihu.ehr.portal.controller;
 
+import net.sf.json.JSONObject;
+import net.sf.json.JSONArray;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
@@ -30,6 +32,13 @@ public class PortalAuthController extends BaseController{
     @Autowired
     private PortalAuthClient portalAuthClient;
 
+    /**
+     * 密码模式，生成token信息
+     * @param userName
+     * @param password
+     * @param clientId
+     * @return
+     */
     @RequestMapping(value = ServiceApi.PortalAuth.AccessToken, method = RequestMethod.POST)
     @ApiOperation(value = "获取token", notes = "获取token")
     Envelop getAccessToken(
@@ -69,11 +78,20 @@ public class PortalAuthController extends BaseController{
             paramMap.put("grant_type", "refresh_token");
             paramMap.put("client_secret", "admin");
             paramMap.put("refresh_token", refreshToken);
-            String tokenJson = portalAuthClient.accessToken(paramMap);
-            if (tokenJson == null) {
+            String refreshRes = portalAuthClient.accessToken(paramMap);
+            if (refreshRes == null) {
                 return failed("刷新失败!");
             }
-            return success(tokenJson);
+            JSONObject myJsonObject = JSONObject.fromObject(refreshRes);
+            String status = myJsonObject.get("status").toString();
+            String msg = myJsonObject.get("message").toString();
+
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(true);
+            envelop.setErrorCode(Integer.parseInt(status));
+            envelop.setErrorMsg(msg);
+            return envelop;
+
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
@@ -88,15 +106,25 @@ public class PortalAuthController extends BaseController{
             @ApiParam(name = "accessToken", value = "accessToken", defaultValue = "")
             @RequestParam(value = "accessToken") String accessToken) {
         try {
-            String tokenJson = portalAuthClient.validToken(clientId, accessToken);
-            if (tokenJson == null) {
-                return failed("刷新失败!");
+            String validRes = portalAuthClient.validToken(clientId, accessToken);
+            if (validRes == null) {
+                return failed("验证失败!");
             }
-            return success(tokenJson);
+
+            JSONObject myJsonObject = JSONObject.fromObject(validRes);
+            String status = myJsonObject.get("status").toString();
+            String msg = myJsonObject.get("message").toString();
+
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(true);
+            envelop.setErrorCode(Integer.parseInt(status));
+            envelop.setErrorMsg(msg);
+
+            return envelop;
+
         } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
     }
-
 }

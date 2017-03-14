@@ -17,4 +17,9 @@ public interface XMessageRemindRepository extends PagingAndSortingRepository<Mes
 
     @Query("select obj from MessageRemind obj where obj.appId = :appId ")
     List<MessageRemind> searchByAppId(@Param("appId") String appId);
+
+    List<MessageRemind> findByToUserId(String userId);
+
+    MessageRemind findById(String id);
+
 }

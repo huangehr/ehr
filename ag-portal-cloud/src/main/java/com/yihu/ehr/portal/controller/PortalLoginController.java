@@ -1,5 +1,6 @@
 package com.yihu.ehr.portal.controller;
 
+import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
@@ -10,6 +11,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,12 +40,24 @@ public class PortalLoginController extends BaseController{
             @RequestParam(value = "password") String password) {
         try {
             Envelop result = new Envelop();
+            UsersModel usersModel = new UsersModel();
             MUser user = portalLoginClient.getUserByNameAndPassword(userName, password);
+
             if (user == null) {
                 return failed("登录失败，用户名密码不正确!");
             }
 
-            result.setObj(user);
+            //允许开放的用户信息
+            usersModel.setId(user.getId());
+            usersModel.setRealName(user.getRealName());
+            usersModel.setEmail(user.getEmail());
+            usersModel.setOrganizationCode(user.getOrganization());
+            usersModel.setTelephone(user.getTelephone());
+            usersModel.setLoginCode(user.getLoginCode());
+            usersModel.setUserTypeName(user.getUserType());
+            usersModel.setActivated(user.getActivated());
+
+            result.setObj(usersModel);
             result.setSuccessFlg(true);
             result.setErrorMsg("登录成功!");
             return result;
@@ -53,5 +67,4 @@ public class PortalLoginController extends BaseController{
             return failedSystem();
         }
     }
-
 }

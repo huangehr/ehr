@@ -126,9 +126,7 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
             throw new UnsupportedGrantTypeException("Unsupported grant type: " + grantType);
         }
 
-
         return token;
-
     }
 
     /**
@@ -161,7 +159,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
 
     }
 
-
     protected TokenGranter getTokenGranter(String grantType) {
 
         if ("authorization_code".equals(grantType)) {
@@ -178,7 +175,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
             throw new UnsupportedGrantTypeException("Unsupport grant_type: " + grantType);
         }
     }
-
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<OAuth2Exception> handleException(Exception e) throws Exception {
@@ -198,7 +194,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
         return getExceptionTranslator().translate(e);
     }
 
-
     private boolean isRefreshTokenRequest(Map<String, String> parameters) {
         return "refresh_token".equals(parameters.get("grant_type")) && parameters.get("refresh_token") != null;
     }
@@ -206,7 +201,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
     private boolean isAuthCodeRequest(Map<String, String> parameters) {
         return "authorization_code".equals(parameters.get("grant_type")) && parameters.get("code") != null;
     }
-
 
     protected String getClientId(Map<String, String> parameters) {
         return parameters.get("client_id");
@@ -228,7 +222,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
     protected WebResponseExceptionTranslator getExceptionTranslator() {
         return providerExceptionHandler;
     }
-
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
