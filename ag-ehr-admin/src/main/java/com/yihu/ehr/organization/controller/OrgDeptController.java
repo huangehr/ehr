@@ -106,7 +106,7 @@ public class OrgDeptController  extends BaseController {
     }
 
 
-    @RequestMapping(value = "/orgDept/save" , method = RequestMethod.POST)
+    @RequestMapping(value = "/orgDept" , method = RequestMethod.POST)
     @ApiOperation(value = "新增机构部门")
     public Envelop create(
             @ApiParam(name = "orgDeptsJsonData", value = " 部门信息Json", defaultValue = "")
@@ -152,7 +152,7 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/orgDept/update" , method = RequestMethod.POST)
+    @RequestMapping(value = "/orgDept" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改部门&科室详情")
     public Envelop update(
             @ApiParam(name = "orgDeptJsonData", value = " 部门信息Json", defaultValue = "")
@@ -311,7 +311,7 @@ public class OrgDeptController  extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/orgDeptMember/save" , method = RequestMethod.POST)
+    @RequestMapping(value = "/orgDeptMember" , method = RequestMethod.POST)
     @ApiOperation(value = "新增部门成员")
     public Envelop createDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = " 部门成员信息Json", defaultValue = "")
@@ -355,7 +355,7 @@ public class OrgDeptController  extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/orgDeptMember/update" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/orgDeptMember" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改部门成员")
     public Envelop updateDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = " 部门成员信息Json", defaultValue = "")
