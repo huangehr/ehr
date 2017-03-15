@@ -1,10 +1,8 @@
 package com.yihu.ehr.portal.dao;
 
-import com.yihu.ehr.portal.model.ItResource;
 import com.yihu.ehr.portal.model.MessageRemind;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -13,13 +11,9 @@ import java.util.List;
  * @vsrsion 1.0
  * Created at 2017/2/21.
  */
-public interface XMessageRemindRepository extends PagingAndSortingRepository<MessageRemind,Integer> {
+public interface XMessageRemindRepository extends PagingAndSortingRepository<MessageRemind,Long> {
 
-    @Query("select obj from MessageRemind obj where obj.appId = :appId ")
-    List<MessageRemind> searchByAppId(@Param("appId") String appId);
-
-    List<MessageRemind> findByToUserId(String userId);
-
-    MessageRemind findById(String id);
+    @Query(value = "select p.* from portal_message_remind p order by p.release_date desc limit 10 ",nativeQuery = true)
+    List<MessageRemind> getMessageRemindTop10();
 
 }
