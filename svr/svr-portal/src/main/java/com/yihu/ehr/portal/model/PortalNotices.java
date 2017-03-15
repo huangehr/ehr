@@ -11,6 +11,7 @@ import java.util.Date;
 public class PortalNotices {
     private Long id;
     private Integer type;
+    private Integer portalType;
     private String title;
     private String content;
     private String fileId;
@@ -37,6 +38,13 @@ public class PortalNotices {
     public void setType(Integer type) {
         this.type = type;
     }
+
+    @Basic
+    @Column(name = "portal_type", nullable = true, insertable = true, updatable = true)
+    public Integer getPortalType() {  return portalType;}
+
+    public void setPortalType(Integer portalType) {this.portalType = portalType;}
+
 
     @Basic
     @Column(name = "title", nullable = true, insertable = true, updatable = true)

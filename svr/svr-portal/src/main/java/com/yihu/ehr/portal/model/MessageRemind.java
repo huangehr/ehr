@@ -13,7 +13,7 @@ import java.util.Date;
 @Table(name = "portal_message_remind", schema = "", catalog = "healtharchive")
 public class MessageRemind {
 
-    private Integer id;
+    private Long id;
     private Integer appId;
     private String appName;
     private String fromUserId;
@@ -27,7 +27,7 @@ public class MessageRemind {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
@@ -40,7 +40,7 @@ public class MessageRemind {
         this.toUserId = toUserId;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
