@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.service;
+package com.yihu.ehr.portal.service.common;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
@@ -22,11 +22,11 @@ public interface PortalAuthClient {
 
     @RequestMapping(value = ServiceApi.Authentication.AccessToken)
     @ApiOperation(value = "获取token", notes = "获取token")
-    String accessToken(@RequestBody Map<String, String> parameters);
+    String accessToken(@RequestBody Map<String, String> parameters) throws Exception;
 
 
     @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.GET)
     @ApiOperation(value = "验证Token", notes = "验证Token")
-    String validToken(@RequestParam(value = "client_id") String client_id,
-                      @RequestParam(value = "access_token") String accessToken);
+    String validToken(@RequestParam(value = "client_id") String clientId,
+                      @RequestParam(value = "access_token") String accessToken) throws Exception;
 }

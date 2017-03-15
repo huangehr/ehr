@@ -11,6 +11,9 @@
  */
 package com.yihu.ehr.oauth2.web;
 
+import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -73,7 +76,12 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
 
     private WebResponseExceptionTranslator providerExceptionHandler = new DefaultWebResponseExceptionTranslator();
 
-    @RequestMapping(value = "/oauth/accesstoken", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    /**
+     * 新增用户访问授权
+      * @param parameters
+     * @return
+     */
+    @RequestMapping(value = ServiceApi.Authentication.AccessToken, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public OAuth2AccessToken postAccessToken(@RequestBody Map<String, String> parameters) {
 
         String clientId = getClientId(parameters);
@@ -111,7 +119,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
             }
         }
 
-
         if (isRefreshTokenRequest(parameters)) {
             // A refresh token has its own default scopes, so we should ignore any added by the factory here.
             tokenRequest.setScope(OAuth2Utils.parseParameterList(parameters.get(OAuth2Utils.SCOPE)));
@@ -122,9 +129,7 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
             throw new UnsupportedGrantTypeException("Unsupported grant type: " + grantType);
         }
 
-
         return token;
-
     }
 
     /**
@@ -132,31 +137,25 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
      *
      * @return
      */
-    @RequestMapping(value = "/oauth/validtoken", method = RequestMethod.GET)
-    public String validToken(@RequestParam(value = "client_id") String clientId,
+    @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.GET)
+    public Result validToken(@RequestParam(value = "client_id") String clientId,
                              @RequestParam(value = "access_token") String accessToken) throws Exception {
-        Map<String, String> returnMap = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            returnMap.put("status", "10000");
-            //查找该用户的最新的accesstoken
-            OAuth2AccessToken token = tokenServices.getAccessTokenByClientId(clientId);
-            if (!token.getValue().equals(accessToken) || token.isExpired()) {
-                returnMap.put("status", "10001");
-                returnMap.put("message", "accesstoken 已经过期");
-                return objectMapper.writeValueAsString(returnMap);
-            }
-            returnMap.put("message", "accesstoken 可以使用");
-            return objectMapper.writeValueAsString(returnMap);
-        } catch (Exception e) {
 
-            returnMap.put("status", "10001");
-            returnMap.put("message", "accesstoken 已经过期");
-            return objectMapper.writeValueAsString(returnMap);
+        try {
+            //根据accessToken查询相应的访问授权数据行
+            OAuth2AccessToken auth2AccessToken = tokenServices.readAccessToken(accessToken);
+            if (!auth2AccessToken.getValue().equals(accessToken) || auth2AccessToken.isExpired()) {
+                return Result.error("accesstoken 已经过期");
+            }
+            else{
+                return Result.success("accesstoken 可以使用");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(e.getMessage());
         }
 
     }
-
 
     protected TokenGranter getTokenGranter(String grantType) {
 
@@ -174,7 +173,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
             throw new UnsupportedGrantTypeException("Unsupport grant_type: " + grantType);
         }
     }
-
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<OAuth2Exception> handleException(Exception e) throws Exception {
@@ -194,7 +192,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
         return getExceptionTranslator().translate(e);
     }
 
-
     private boolean isRefreshTokenRequest(Map<String, String> parameters) {
         return "refresh_token".equals(parameters.get("grant_type")) && parameters.get("refresh_token") != null;
     }
@@ -202,7 +199,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
     private boolean isAuthCodeRequest(Map<String, String> parameters) {
         return "authorization_code".equals(parameters.get("grant_type")) && parameters.get("code") != null;
     }
-
 
     protected String getClientId(Map<String, String> parameters) {
         return parameters.get("client_id");
@@ -224,7 +220,6 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
     protected WebResponseExceptionTranslator getExceptionTranslator() {
         return providerExceptionHandler;
     }
-
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

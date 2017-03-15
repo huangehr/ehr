@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.controller;
+package com.yihu.ehr.portal.controller.system;
 
 import com.yihu.ehr.agModel.portal.PortalFeedbackModel;
 import com.yihu.ehr.constants.ApiVersion;

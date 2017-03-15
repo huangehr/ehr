@@ -62,6 +62,8 @@ public class PortalNoticesController extends BaseController{
             //获取类别字典
             MConventionalDict dict = conventionalDictClient.getPortalNoticeTypeList(String.valueOf(mPortalNotice.getType()));
             portalNoticeModel.setTypeName(dict == null ? "" : dict.getValue());
+            MConventionalDict dict2 = conventionalDictClient.getPortalNoticeTypeList(String.valueOf(mPortalNotice.getPortalType()));
+            portalNoticeModel.setPortalTypeName(dict2 == null ? "" : dict2.getValue());
             portalNoticeModels.add(portalNoticeModel);
         }
 
@@ -96,7 +98,7 @@ public class PortalNoticesController extends BaseController{
     }
 
     @RequestMapping(value = "/portalNotices/admin/{portalNotice_id}", method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除通知公告", notes = "根据通知公告id删除医生")
+    @ApiOperation(value = "删除通知公告", notes = "根据通知公告id")
     public Envelop deletePortalNotice(
             @ApiParam(name = "portalNotice_id", value = "通知公告编号", defaultValue = "")
             @PathVariable(value = "portalNotice_id") String portalNoticeId) {
