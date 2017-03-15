@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Created by ysj on 2017年2月20日
  */
-@RequestMapping(ApiVersion.Version1_0 +"/doctor")
+@RequestMapping(ApiVersion.Version1_0 +"/portal")
 @RestController
 @Api(value = "PortalNotice", description = "PortalNotice", tags = {"通知公告"})
 public class PortalNoticeController extends BaseController {
