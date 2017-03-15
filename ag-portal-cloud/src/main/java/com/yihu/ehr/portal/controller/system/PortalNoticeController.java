@@ -1,8 +1,11 @@
-package com.yihu.ehr.portal.controller;
+package com.yihu.ehr.portal.controller.system;
 
 import com.yihu.ehr.agModel.portal.PortalNoticeDetailModel;
 import com.yihu.ehr.agModel.portal.PortalNoticeModel;
 import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.portal.common.RequestAccess;
 import com.yihu.ehr.portal.service.PortalNoticeClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
@@ -23,7 +26,7 @@ import java.util.List;
 /**
  * Created by ysj on 2017年2月20日
  */
-@RequestMapping(ApiVersion.Version1_0 +"/portal")
+@RequestMapping(ApiVersion.Version1_0 +"/portal/doctor")
 @RestController
 @Api(value = "PortalNotice", description = "PortalNotice", tags = {"通知公告"})
 public class PortalNoticeController extends BaseController {
@@ -33,19 +36,21 @@ public class PortalNoticeController extends BaseController {
 
     @RequestMapping(value = ServiceApi.PortalNotices.PortalNoticesTop, method = RequestMethod.GET)
     @ApiOperation(value = "获取通知公告前10数据", notes = "根据日期查询前10的数据在前端表格展示")
-    public Envelop getPortalNoticeTop10(){
-        ResponseEntity<List<MPortalNotice>> responseEntity = portalNoticeClient.getPortalNoticeTop10();
-        List<MPortalNotice> mPortalNoticeList = responseEntity.getBody();
-        List<PortalNoticeModel> portalNoticeModels = new ArrayList<>();
-        for (MPortalNotice mPortalNotice : mPortalNoticeList) {
-            PortalNoticeModel portalNoticeModel = convertToModel(mPortalNotice, PortalNoticeModel.class);
-            portalNoticeModel.setReleaseDate(mPortalNotice.getReleaseDate() == null?"": DateTimeUtil.simpleDateTimeFormat(mPortalNotice.getReleaseDate()));
+    @RequestAccess(value = "获取通知公告前10数据")
+    public Result getPortalNoticeTop10(){
+        try {
+            ResponseEntity<List<MPortalNotice>> responseEntity = portalNoticeClient.getPortalNoticeTop10();
+            List<MPortalNotice> mPortalNoticeList = responseEntity.getBody();
+            ListResult re = new ListResult(1,10);
+            re.setTotalCount(mPortalNoticeList.size());
+            re.setDetailModelList(mPortalNoticeList);
 
-            portalNoticeModels.add(portalNoticeModel);
+            return re;
         }
-
-        Envelop envelop = getResult(portalNoticeModels, mPortalNoticeList.size(), 1, 10);
-        return envelop;
+        catch (Exception ex)
+        {
+            return Result.error(ex.getMessage());
+        }
     }
 
     @RequestMapping(value = ServiceApi.PortalNotices.PortalNotices, method = RequestMethod.GET)
