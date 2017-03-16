@@ -1,13 +1,6 @@
 package com.yihu.ehr.apps.model;
 
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 /**
  * APP_api对象。
@@ -36,6 +29,11 @@ public class AppApi {
     private String openLevel;
     private String auditLevel;
     private String methodName;
+
+    private String microServiceUri;
+    private String msMethodName;
+    private String microServiceName;
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -162,5 +160,32 @@ public class AppApi {
 
     public void setMethodName(String methodName) {
         this.methodName = methodName;
+    }
+
+    @Column(name = "micro_service_url", nullable = true)
+    public String getMicroServiceUri() {
+        return microServiceUri;
+    }
+
+    public void setMicroServiceUri(String microServiceUri) {
+        this.microServiceUri = microServiceUri;
+    }
+
+    @Column(name = "ms_method_name", nullable = true)
+    public String getMsMethodName() {
+        return msMethodName;
+    }
+
+    public void setMsMethodName(String msMethodName) {
+        this.msMethodName = msMethodName;
+    }
+
+    @Column(name = "micro_service_name", nullable = true)
+    public String getMicroServiceName() {
+        return microServiceName;
+    }
+
+    public void setMicroServiceName(String microServiceName) {
+        this.microServiceName = microServiceName;
     }
 }

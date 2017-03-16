@@ -27,6 +27,34 @@ public class MAppApi implements Serializable {
     private String auditLevel;
     private String methodName;
 
+    private String microServiceUri;
+    private String msMethodName;
+    private String microServiceName;
+
+    public String getMicroServiceUri() {
+        return microServiceUri;
+    }
+
+    public void setMicroServiceUri(String microServiceUri) {
+        this.microServiceUri = microServiceUri;
+    }
+
+    public String getMsMethodName() {
+        return msMethodName;
+    }
+
+    public void setMsMethodName(String msMethodName) {
+        this.msMethodName = msMethodName;
+    }
+
+    public String getMicroServiceName() {
+        return microServiceName;
+    }
+
+    public void setMicroServiceName(String microServiceName) {
+        this.microServiceName = microServiceName;
+    }
+
     public int getId() {
         return id;
     }

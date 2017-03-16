@@ -17,8 +17,6 @@
     <modules>
         <module>../svr-configuration</module>
         <module>../svr-discovery</module>
-        <!--注意：模块添加请按字母顺序-->
-        <module>../svr/svr-adaption</module>
         <module>../svr/svr-app</module>
         <module>../svr/svr-archive-security</module>
         <module>../svr/svr-cipher</module>
@@ -34,14 +32,13 @@
         <module>../svr/svr-patient</module>
         <module>../svr/svr-resource</module>
         <module>../svr/svr-security</module>
-        <module>../svr/svr-special-dict</module>
         <module>../svr/svr-standard</module>
         <module>../svr/svr-user</module>
         <module>../svr/svr-portal</module>
+        <module>../svr-authentication</module>
         <module>../ag-ehr-admin</module>
         <module>../ag-ehr-cloud</module>
         <module>../ag-portal-cloud</module>
-        <module>../svr-authentication</module>
     </modules>
 
     <build>

@@ -1,3 +1,12 @@
+logging:
+  level:
+    com:
+      netflix: INFO
+    org:
+      springframework:
+        web: INFO
+      hibernate: ERROR
+
 server:
   port: ${svr-resource.server.port}
 
@@ -10,15 +19,11 @@ info:
     description: Resource service.
     version: 1.0.0
 
-logging:
-  level:
-    com:
-      netflix: DEBUG
-
 hadoop:
   hbase-properties:
     - hbase.zookeeper.property.clientPort: 2181
     - zookeeper.znode.parent: /hbase-unsecure
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -27,6 +32,7 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
+
 ---
 spring:
   profiles: dev
@@ -83,7 +89,9 @@ spring:
     host: 11.1.2.20 # Redis server host.
   data:
     solr:
-      zk-host: 11.1.2.51,11.1.2.52,11.1.2.53:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      #zk-host: 11.1.2.51,11.1.2.52,11.1.2.53:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      zk-host: node1.hde.jkzlehr.com,node2.hde.jkzlehr.com,node3.hde.jkzlehr.com:2181/solr
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
+

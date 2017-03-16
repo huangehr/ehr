@@ -29,7 +29,7 @@ public class Organization  {
     private String admin;            // 机构管理员
 
     @Column(name = "settled",  nullable = true)
-    private boolean settled;        // 是否已接入,对第三方平台有效.
+    private Boolean settled;        // 是否已接入,对第三方平台有效.
 
     @Column(name = "settled_way",  nullable = true)
     private String settledWay;    // 接入方式：直连/平台接入
@@ -57,7 +57,7 @@ public class Organization  {
     private String location;        // 地址
 
     @Column(name = "activity_flag", unique = true, nullable = true)
-    private int activityFlag;
+    private Integer activityFlag;
 
     @Column(name = "tags",  nullable = true)
     private String tags;
@@ -70,10 +70,10 @@ public class Organization  {
     private String imgLocalPath;
 
     @Column(name = "administrative_division",nullable = true)
-    private int administrativeDivision;
+    private Integer administrativeDivision;
 
     @Column(name = "id",nullable = true)
-    private String id;
+    private Long id;
 
     @Column(name = "code",nullable = true)
     private String code;
@@ -236,18 +236,18 @@ public class Organization  {
     }
 
 
-    public boolean isSettled() {
+    public Boolean isSettled() {
         return settled;
     }
-    public void setSettled(boolean settled) {
+    public void setSettled(Boolean settled) {
         this.settled = settled;
     }
 
 
-    public int getActivityFlag() {
+    public Integer getActivityFlag() {
         return activityFlag;
     }
-    public void setActivityFlag(int activityFlag) {
+    public void setActivityFlag(Integer activityFlag) {
         this.activityFlag = activityFlag;
     }
 
@@ -268,10 +268,10 @@ public class Organization  {
     }
 
 
-    public int getAdministrativeDivision() {
+    public Integer getAdministrativeDivision() {
         return administrativeDivision;
     }
-    public void setAdministrativeDivision(int administrativeDivision) {
+    public void setAdministrativeDivision(Integer administrativeDivision) {
         this.administrativeDivision = administrativeDivision;
     }
 
@@ -293,11 +293,11 @@ public class Organization  {
         }
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

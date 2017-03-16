@@ -7,11 +7,14 @@ public class PortalNoticeModel {
     private Long id;
     private Integer type;
     private String typeName;
+    private Integer portalType;
+    private String portalTypeName;
     private String title;
     private String content;
     private String fileId;
     private String releaseAuthor;
     private String releaseDate;
+
 
     public Long getId() {
         return id;
@@ -28,6 +31,14 @@ public class PortalNoticeModel {
     public void setType(Integer type) {
         this.type = type;
     }
+
+    public Integer getPortalType() { return portalType;}
+
+    public void setPortalType(Integer portalType) {this.portalType = portalType;}
+
+    public String getPortalTypeName() { return portalTypeName;}
+
+    public void setPortalTypeName(String portalTypeName) {this.portalTypeName = portalTypeName;}
 
     public String getTypeName() {
         return typeName;

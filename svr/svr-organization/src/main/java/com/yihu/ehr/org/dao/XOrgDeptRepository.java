@@ -24,4 +24,6 @@ public interface XOrgDeptRepository extends PagingAndSortingRepository<OrgDept, 
     @Query("select dept from OrgDept dept where dept.orgId = :orgId and dept.name=:name order by dept.sortNo desc ")
     List<OrgDept> searchByOrgIdAndName(@Param("orgId") String orgId,@Param("name") String name);
 
+    @Query("select dept from OrgDept dept where dept.orgId=?1 and dept.parentDeptId = ?2 and dept.delFlag = 0 order by dept.sortNo desc ")
+    List<OrgDept> findByOrgIdAndParentDeptId(String orgId,Integer parentDeptId);
 }

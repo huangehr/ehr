@@ -9,22 +9,36 @@ import java.util.Date;
  */
 public class MessageRemindModel {
 
-    private Integer id;
+    private Long id;
     private Integer appId;
     private String appName;
     private String fromUserId;
+    private String toUserId;
+    private String toUserName;
     private String typeId;
+    private String typeName;
     private String content;
     private String workUri;
     private Integer  readed;
     private Date createDate;
 
+    public String getToUserId() {
+        return toUserId;
+    }
 
-    public Integer getId() {
+    public void setToUserId(String toUserId) {
+        this.toUserId = toUserId;
+    }
+
+    public String getToUserName() {return toUserName;}
+
+    public void setToUserName(String toUserName) {this.toUserName = toUserName;}
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -59,6 +73,10 @@ public class MessageRemindModel {
     public void setTypeId(String typeId) {
         this.typeId = typeId;
     }
+
+    public String getTypeName() {return typeName;}
+
+    public void setTypeName(String typeName) {this.typeName = typeName;}
 
     public String getContent() {
         return content;

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-dict-hzp
+    name: svr-dict
 
 ---
 spring:
@@ -9,8 +9,8 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://127.0.0.1:1221
-      #uri: http://192.168.1.221:1221
+      #uri: http://127.0.0.1:1221
+      uri: http://192.168.1.221:1221
       label: dev
 
 ---

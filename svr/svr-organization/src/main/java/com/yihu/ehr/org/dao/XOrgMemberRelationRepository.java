@@ -21,4 +21,6 @@ public interface XOrgMemberRelationRepository extends PagingAndSortingRepository
     @Query("select count(relation.id) from OrgMemberRelation relation where relation.deptId= :deptId")
     public Integer countByDeptId(@Param("deptId") Integer deptId);
 
+    @Query("select r from OrgMemberRelation r where r.status=0 and r.orgId =?1")
+    List<OrgMemberRelation> findByOrgId(String orgId);
 }
