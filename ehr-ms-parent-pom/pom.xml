@@ -35,10 +35,10 @@
         <module>../svr/svr-standard</module>
         <module>../svr/svr-user</module>
         <module>../svr/svr-portal</module>
+        <module>../svr-authentication</module>
         <module>../ag-ehr-admin</module>
         <module>../ag-ehr-cloud</module>
         <module>../ag-portal-cloud</module>
-        <module>../svr-authentication</module>
     </modules>
 
     <build>
