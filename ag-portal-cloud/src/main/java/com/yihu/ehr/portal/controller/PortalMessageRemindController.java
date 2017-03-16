@@ -1,5 +1,6 @@
 package com.yihu.ehr.portal.controller;
 
+import com.yihu.ehr.agModel.portal.MessageRemindModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
@@ -35,11 +36,10 @@ public class PortalMessageRemindController extends BaseController {
     public Envelop getPortalMessageRemindTop10(){
         ResponseEntity<List<MMessageRemind>> responseEntity = portalMessageRemindClient.getMessageRemindTop10();
         List<MMessageRemind> mPortalMessageRemindList = responseEntity.getBody();
-        List<MMessageRemind> portalMessageRemindModels = new ArrayList<>();
+        List<MessageRemindModel> portalMessageRemindModels = new ArrayList<>();
         for (MMessageRemind mPortalMessageRemind : mPortalMessageRemindList) {
-            MMessageRemind portalMessageRemindModel = convertToModel(mPortalMessageRemind, MMessageRemind.class);
-//            portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
-
+            MessageRemindModel portalMessageRemindModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
+            portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
             portalMessageRemindModels.add(portalMessageRemindModel);
         }
 
@@ -65,10 +65,10 @@ public class PortalMessageRemindController extends BaseController {
         String sorts = "+createDate";
         ResponseEntity<List<MMessageRemind>> responseEntity = portalMessageRemindClient.searchMessageRemind(null, filters, sorts, size, page);
         List<MMessageRemind> mPortalMessageRemindList = responseEntity.getBody();
-        List<MMessageRemind> portalMessageRemindModels = new ArrayList<>();
+        List<MessageRemindModel> portalMessageRemindModels = new ArrayList<>();
         for (MMessageRemind mPortalMessageRemind : mPortalMessageRemindList) {
-            MMessageRemind portalMessageRemindModel = convertToModel(mPortalMessageRemind, MMessageRemind.class);
-//            portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
+            MessageRemindModel portalMessageRemindModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
+            portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
             portalMessageRemindModels.add(portalMessageRemindModel);
         }
         //获取总条数
@@ -106,8 +106,8 @@ public class PortalMessageRemindController extends BaseController {
                 return failed("消息提醒信息获取失败!");
             }
 
-            MMessageRemind detailModel = convertToModel(mPortalMessageRemind, MMessageRemind.class);
-//            detailModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
+            MessageRemindModel detailModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
+            detailModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
 
             return success(detailModel);
         }

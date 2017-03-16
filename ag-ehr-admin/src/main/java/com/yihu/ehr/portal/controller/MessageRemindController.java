@@ -57,6 +57,7 @@ public class MessageRemindController extends BaseController {
             List<MMessageRemind> messages = responseEntity.getBody();
             for (MMessageRemind message : messages) {
                 MessageRemindModel messageModel = convertToModel(message, MessageRemindModel.class);
+                messageModel.setCreateDate(message.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(message.getCreateDate()));
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getMessageRemindTypeList(String.valueOf(messageModel.getTypeId()));
                 messageModel.setTypeName(dict == null ? "" : dict.getValue());

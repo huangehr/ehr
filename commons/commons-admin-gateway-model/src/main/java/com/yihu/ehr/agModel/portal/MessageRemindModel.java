@@ -20,7 +20,7 @@ public class MessageRemindModel {
     private String content;
     private String workUri;
     private Integer  readed;
-    private Date createDate;
+    private String createDate;
 
     public String getToUserId() {
         return toUserId;
@@ -102,11 +102,11 @@ public class MessageRemindModel {
         this.readed = readed;
     }
 
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 }
