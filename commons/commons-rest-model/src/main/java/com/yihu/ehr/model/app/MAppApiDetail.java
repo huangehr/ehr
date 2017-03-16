@@ -23,11 +23,15 @@ public class MAppApiDetail implements Serializable {
     private String openLevel;
     private String auditLevel;
     private String methodName;
+    private String microServiceUri;
+    private String msMethodName;
+    private String microServiceName;
+
     private Collection<MAppApiParameter> parameters;
 
     public MAppApiDetail() {
     }
-    
+
     public int getId() {
         return id;
     }
@@ -146,6 +150,30 @@ public class MAppApiDetail implements Serializable {
 
     public void setMethodName(String methodName) {
         this.methodName = methodName;
+    }
+
+    public String getMicroServiceUri() {
+        return microServiceUri;
+    }
+
+    public void setMicroServiceUri(String microServiceUri) {
+        this.microServiceUri = microServiceUri;
+    }
+
+    public String getMsMethodName() {
+        return msMethodName;
+    }
+
+    public void setMsMethodName(String msMethodName) {
+        this.msMethodName = msMethodName;
+    }
+
+    public String getMicroServiceName() {
+        return microServiceName;
+    }
+
+    public void setMicroServiceName(String microServiceName) {
+        this.microServiceName = microServiceName;
     }
 
     public Collection<MAppApiParameter> getParameters() {
