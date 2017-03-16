@@ -302,6 +302,7 @@ public class ServiceApi {
     public static class MessageRemind{
         public static final String MessageRemind                            = "/messageRemind";
         public static final String MessageRemindTop                            = "/messageRemindTop";
+        public static final String MessageRemindCount                         = "/messageRemindCount";
         public static final String MessageRemindAdmin                        = "/messageRemind/admin/{messageRemind_id}";
     }
 
