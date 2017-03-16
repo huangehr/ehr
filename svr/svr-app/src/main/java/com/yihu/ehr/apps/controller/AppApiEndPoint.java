@@ -2,12 +2,15 @@ package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.model.AppApi;
+import com.yihu.ehr.apps.service.AppApiParameterService;
 import com.yihu.ehr.apps.service.AppApiService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.app.MAppApiDetail;
+import com.yihu.ehr.model.app.MAppApiParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,6 +36,8 @@ import java.util.List;
 public class AppApiEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppApiService appApiService;
+    @Autowired
+    private AppApiParameterService appApiParameterService;
 
     @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建AppApi")
@@ -58,9 +64,9 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-            List<AppApi> appApiList = appApiService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, appApiService.getCount(filters), page, size);
-            return convertToModels(appApiList, new ArrayList<>(appApiList.size()), MAppApi.class, fields);
+        List<AppApi> appApiList = appApiService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, appApiService.getCount(filters), page, size);
+        return convertToModels(appApiList, new ArrayList<>(appApiList.size()), MAppApi.class, fields);
     }
 
     @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -98,7 +104,42 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters
     ) throws Exception {
-        List<AppApi> appApiList =  appApiService.search(filters);
-        return convertToModels(appApiList,new ArrayList<>(appApiList.size()),MAppApi.class, "");
+        List<AppApi> appApiList = appApiService.search(filters);
+        return convertToModels(appApiList, new ArrayList<>(appApiList.size()), MAppApi.class, "");
     }
+
+
+    @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppApi列表")
+    Collection<MAppApiDetail> searchApi(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        List<AppApi> appApiList = appApiService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, appApiService.getCount(filters), page, size);
+        Collection<MAppApiDetail> mAppApiDetails = convertToModels(appApiList, new ArrayList<>(appApiList.size()), MAppApiDetail.class, "");
+
+        mAppApiDetails.forEach(appApi -> {
+            try {
+                List apiParams = appApiParameterService.search("appApiId=" + appApi.getId());
+                Collection<MAppApiParameter> mAppApiParameters = convertToModels(apiParams, new ArrayList<>(apiParams.size()), MAppApiParameter.class, "");
+                appApi.setParameters(mAppApiParameters);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return mAppApiDetails;
+    }
+
+
 }
