@@ -220,6 +220,8 @@ public class ServiceApi {
         public static final String AppApis                            = "/appApi";
         public static final String AppApi                             = "/appApi/{id}";
         public static final String AppApisNoPage                        = "/appApiNoPage";
+        public static final String AppApiAuth                        = "/appApiAuth";
+
     }
     public static class AppFeature{
         public static final String AppFeatures                           = "/appFeature";
