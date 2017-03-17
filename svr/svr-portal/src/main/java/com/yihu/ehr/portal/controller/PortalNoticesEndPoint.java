@@ -72,7 +72,7 @@ public class PortalNoticesEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.PortalNotices.PortalNotices, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改通知公告", notes = "重新绑定通知公告信息")
-    public MPortalNotice updateDoctor(
+    public MPortalNotice updatePortalNotice(
             @ApiParam(name = "portalNotice_json_data", value = "", defaultValue = "")
             @RequestBody String portalNoticeJsonData) throws Exception {
         PortalNotices portalNotice = toEntity(portalNoticeJsonData, PortalNotices.class);

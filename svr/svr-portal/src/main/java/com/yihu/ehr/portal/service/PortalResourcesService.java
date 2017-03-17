@@ -40,7 +40,7 @@ public class PortalResourcesService extends BaseJpaService<PortalResources, XPor
         portalResourcesRepository.delete(portalResourcesId);
     }
 
-    public List<PortalResources> getPortalResourcesTop10(){
-        return portalResourcesRepository.getPortalResourcesTop10();
+    public List<PortalResources> getAllPortalResources(){
+        return portalResourcesRepository.getAllPortalResources();
     }
 }

@@ -44,4 +44,5 @@ public class MessageRemindService extends BaseJpaService<MessageRemind, XMessage
     public List<MessageRemind> getMessageRemindTop10(){
         return messageRemindRepository.getMessageRemindTop10();
     }
+
 }

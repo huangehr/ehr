@@ -1,18 +1,18 @@
 package com.yihu.ehr.portal.service;
 
-import com.yihu.ehr.api.ServiceApi;
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.portal.MPortalNotice;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+        import com.yihu.ehr.api.ServiceApi;
+        import com.yihu.ehr.constants.ApiVersion;
+        import com.yihu.ehr.constants.MicroServices;
+        import com.yihu.ehr.model.portal.MPortalNotice;
+        import io.swagger.annotations.ApiOperation;
+        import io.swagger.annotations.ApiParam;
+        import org.springframework.cloud.netflix.feign.FeignClient;
+        import org.springframework.http.MediaType;
+        import org.springframework.http.ResponseEntity;
+        import org.springframework.web.bind.annotation.*;
+        import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.List;
+        import java.util.List;
 
 /**
  * Created by yeshijie on 2017/2/17.
