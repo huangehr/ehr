@@ -221,6 +221,8 @@ public class ServiceApi {
         public static final String AppApi = "/appApi/{id}";
         public static final String AppApisNoPage = "/appApiNoPage";
         public static final String AppApiSearch = "/appApi/search";
+        public static final String AppApiAuth = "/appApiAuth";
+
     }
 
     public static class AppFeature {

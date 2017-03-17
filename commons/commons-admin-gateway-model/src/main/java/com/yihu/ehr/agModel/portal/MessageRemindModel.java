@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.portal;
 
-import java.util.Date;
-
 /**
  * @author HZY
  * @vsrsion 1.0
