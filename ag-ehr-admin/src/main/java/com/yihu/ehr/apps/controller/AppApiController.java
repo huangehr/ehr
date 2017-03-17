@@ -8,6 +8,7 @@ import com.yihu.ehr.apps.service.AppApiResponseClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.app.MAppApiDetail;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.user.MRoleApiRelation;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
@@ -185,16 +186,18 @@ public class AppApiController extends BaseController {
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "")
-            @RequestParam(value = "sort", required = false) String sort,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page
     ) {
-        Envelop envelop = new Envelop();
+        ResponseEntity<List<MAppApiDetail>> responseEntity = appApiClient.searchApi(fields, filters, sorts, size, page);
+        List<MAppApiDetail> mAppApiList = responseEntity.getBody();
 
-        return envelop;
+        Integer totalCount = getTotalCount(responseEntity);
+        return getResult(mAppApiList, totalCount, page, size);
     }
 
     @RequestMapping(value = "/role_app_api/no_paging", method = RequestMethod.GET)

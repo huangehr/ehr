@@ -109,7 +109,7 @@ public class AppApiEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.AppApi.AppApiSearch, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
     Collection<MAppApiDetail> searchApi(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")

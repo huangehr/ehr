@@ -4,6 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.app.MAppApiDetail;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -64,9 +65,9 @@ public interface AppApiClient {
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApis, method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppApi.AppApiSearch, method = RequestMethod.GET)
     @ApiOperation(value = "获取AppApi列表")
-    ResponseEntity<List<MAppApi>> searchApi(
+    ResponseEntity<List<MAppApiDetail>> searchApi(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "")

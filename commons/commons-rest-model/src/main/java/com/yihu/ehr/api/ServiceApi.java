@@ -304,6 +304,18 @@ public class ServiceApi {
         public static final String PortalNoticeAdmin = "/portalNotices/admin/{portalNotice_id}";
     }
 
+    public static class MessageRemind{
+        public static final String MessageRemind                            = "/messageRemind";
+        public static final String MessageRemindTop                            = "/messageRemindTop";
+        public static final String MessageRemindAdmin                        = "/messageRemind/admin/{messageRemind_id}";
+    }
+
+    public static class PortalResources{
+        public static final String PortalResources                            = "/portalResources";
+        public static final String PortalResourcesTop                         = "/portalResourcesTop";
+        public static final String PortalResourcesAdmin                       = "/portalResources/admin/{portalResources_id}";
+    }
+
     public static class PortalFeedback {
         public static final String PortalFeedback = "/portalFeedback";
         public static final String PortalFeedbackAdmin = "/portalFeedback/admin/{portalFeedback_id}";
