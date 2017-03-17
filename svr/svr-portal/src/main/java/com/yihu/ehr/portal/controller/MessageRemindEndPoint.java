@@ -4,10 +4,7 @@ import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.portal.MMessageRemind;
-import com.yihu.ehr.model.portal.MMessageRemind;
 import com.yihu.ehr.portal.model.MessageRemind;
-import com.yihu.ehr.portal.model.MessageRemind;
-import com.yihu.ehr.portal.service.MessageRemindService;
 import com.yihu.ehr.portal.service.MessageRemindService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -76,8 +73,8 @@ public class MessageRemindEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemind, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改提醒消息", notes = "重新绑定提醒消息信息")
-    public MMessageRemind updateDoctor(
+    @ApiOperation(value = "修改通知公告", notes = "重新绑定通知公告信息")
+    public MMessageRemind updateMessageRemind(
             @ApiParam(name = "messageRemind_json_data", value = "", defaultValue = "")
             @RequestBody String messageRemindJsonData) throws Exception {
         MessageRemind messageRemind = toEntity(messageRemindJsonData, MessageRemind.class);
@@ -85,16 +82,6 @@ public class MessageRemindEndPoint extends EnvelopRestEndPoint {
         return convertToModel(messageRemind, MMessageRemind.class);
     }
 
-
-    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindAdmin, method = RequestMethod.GET)
-    @ApiOperation(value = "根据id获取获取提醒消息信息")
-    public MMessageRemind getMessageRemind(
-            @ApiParam(name = "messageRemind_id", value = "", defaultValue = "")
-            @PathVariable(value = "messageRemind_id") Long messageRemindId) {
-        MessageRemind messageRemind = messageRemindService.getMessageRemind(messageRemindId);
-        MMessageRemind messageRemindModel = convertToModel(messageRemind, MMessageRemind.class);
-        return messageRemindModel;
-    }
 
 
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindAdmin, method = RequestMethod.DELETE)
@@ -116,4 +103,23 @@ public class MessageRemindEndPoint extends EnvelopRestEndPoint {
 ////        return convertToModel(remind, MMessageRemind.class);
 //    }
 
+
+    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindAdmin, method = RequestMethod.GET)
+    @ApiOperation(value = "获取消息提醒信息")
+    public MMessageRemind getMessageRemindInfo(
+            @ApiParam(name = "messageRemind_id", value = "", defaultValue = "")
+            @PathVariable(value = "messageRemind_id") Long messageRemindId) {
+        MessageRemind messageRemind = messageRemindService.getMessageRemind(messageRemindId);
+        MMessageRemind messageRemindModel = convertToModel(messageRemind, MMessageRemind.class);
+        return messageRemindModel;
+    }
+
+    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindCount, method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取获取提醒消息信息")
+    public int getMessageRemindCount(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters )throws ParseException {
+        long num  = messageRemindService.getCount(filters);
+        return Integer.parseInt(String.valueOf(num));
+    }
 }

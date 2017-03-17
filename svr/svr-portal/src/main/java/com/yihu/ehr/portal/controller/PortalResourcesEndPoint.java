@@ -32,9 +32,9 @@ public class PortalResourcesEndPoint extends EnvelopRestEndPoint {
     PortalResourcesService portalResourcesService;
 
     @RequestMapping(value = ServiceApi.PortalResources.PortalResourcesTop, method = RequestMethod.GET)
-    @ApiOperation(value = "获取资源前10数据", notes = "根据日期查询前10的数据在前端表格展示")
-    public List<MPortalResources> getPortalResourcesTop10(){
-        List<PortalResources> list = portalResourcesService.getPortalResourcesTop10();
+    @ApiOperation(value = "获取所有资源数据", notes = "查询的数据在前端表格展示")
+    public List<MPortalResources> getAllPortalResources(){
+        List<PortalResources> list = portalResourcesService.getAllPortalResources();
         return (List<MPortalResources>) convertToModels(list, new ArrayList<MPortalResources>(list.size()), MPortalResources.class, null);
     }
 

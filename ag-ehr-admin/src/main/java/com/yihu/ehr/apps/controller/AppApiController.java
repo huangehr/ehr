@@ -8,6 +8,7 @@ import com.yihu.ehr.apps.service.AppApiResponseClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.app.MAppApiDetail;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.user.MRoleApiRelation;
 import com.yihu.ehr.model.user.MRoleAppRelation;
@@ -38,18 +39,19 @@ import java.util.stream.Collectors;
 @Api(value = "AppApi", description = "AppApi", tags = {"AppApi应用"})
 public class AppApiController extends BaseController {
 
+    private static final String DELETE = "delete";
+    private static final String ADD = "add";
+    private static final String UPDATE = "update";
+    private static final String NEW_DATA = "0";
+    private static final String DATA_STATUS = "__status";
     @Autowired
     AppApiClient appApiClient;
-
     @Autowired
     RoleApiRelationClient roleApiRelationClient;
-
     @Autowired
     AppApiParameterClient appApiParameterClient;
-
     @Autowired
     AppApiResponseClient appApiResponseClient;
-
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
 
@@ -183,6 +185,51 @@ public class AppApiController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.AppApi.AppApiSearch, method = RequestMethod.GET)
+    @ApiOperation(value = "查询Api详情")
+    public Envelop searchApi(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page
+    ) {
+        ResponseEntity<List<MAppApiDetail>> responseEntity = appApiClient.searchApi(fields, filters, sorts, size, page);
+        List<MAppApiDetail> mAppApiList = responseEntity.getBody();
+
+        Integer totalCount = getTotalCount(responseEntity);
+        return getResult(mAppApiList, totalCount, page, size);
+    }
+
+    @RequestMapping(value = "/role_app_api/no_paging", method = RequestMethod.GET)
+    @ApiOperation(value = "获取角色组的AppApi列表")
+    public Envelop getRoleAppFeatureNoPage(
+            @ApiParam(name = "role_id", value = "角色组id")
+            @RequestParam(value = "role_id") String roleId) {
+        Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId=" + roleId);
+        String apiIds = "";
+        for (MRoleApiRelation m : mRoleApiRelations) {
+            apiIds += m.getApiId() + ",";
+        }
+        if (!StringUtils.isEmpty(apiIds)) {
+            apiIds = apiIds.substring(0, apiIds.length() - 1);
+        }
+        Collection<MAppApi> mAppApis = appApiClient.getAppApiNoPage("id=" + apiIds);
+        Envelop envelop = new Envelop();
+        List<AppApiModel> appApiModels = new ArrayList<>();
+        for (MAppApi mAppApi : mAppApis) {
+            AppApiModel appApiModel = convertToModel(mAppApi, AppApiModel.class);
+            appApiModels.add(appApiModel);
+        }
+        envelop.setDetailModelList(appApiModels);
+        return envelop;
+    }
+
     /**
      * 格式化字典数据
      *
@@ -261,37 +308,7 @@ public class AppApiController extends BaseController {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-    private static final String DELETE = "delete";
-    private static final String ADD = "add";
-    private static final String UPDATE = "update";
-    private static final String NEW_DATA = "0";
-    private static final String DATA_STATUS = "__status";
-
-    @RequestMapping(value = "/role_app_api/no_paging", method = RequestMethod.GET)
-    @ApiOperation(value = "获取角色组的AppApi列表")
-    public Envelop getRoleAppFeatureNoPage(
-            @ApiParam(name = "role_id", value = "角色组id")
-            @RequestParam(value = "role_id") String roleId) {
-        Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId=" + roleId);
-        String apiIds = "";
-        for (MRoleApiRelation m : mRoleApiRelations) {
-            apiIds += m.getApiId() + ",";
-        }
-        if (!StringUtils.isEmpty(apiIds)) {
-            apiIds = apiIds.substring(0, apiIds.length() - 1);
-        }
-        Collection<MAppApi> mAppApis = appApiClient.getAppApiNoPage("id=" + apiIds);
-        Envelop envelop = new Envelop();
-        List<AppApiModel> appApiModels = new ArrayList<>();
-        for (MAppApi mAppApi : mAppApis) {
-            AppApiModel appApiModel = convertToModel(mAppApi, AppApiModel.class);
-            appApiModels.add(appApiModel);
-        }
-        envelop.setDetailModelList(appApiModels);
-        return envelop;
-    }
-
+    
 
     @RequestMapping(value = ServiceApi.AppApi.AppApiAuth, method = RequestMethod.GET)
     @ApiOperation(value = "验证应用的api调用权限")

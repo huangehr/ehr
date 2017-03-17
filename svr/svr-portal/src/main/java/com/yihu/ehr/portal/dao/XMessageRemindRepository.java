@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface XMessageRemindRepository extends PagingAndSortingRepository<MessageRemind,Long> {
 
-    @Query(value = "select p.* from portal_message_remind p order by p.release_date desc limit 10 ",nativeQuery = true)
+    @Query(value = "select p.* from portal_message_remind p order by p.create_date desc limit 10 ",nativeQuery = true)
     List<MessageRemind> getMessageRemindTop10();
 
 }
