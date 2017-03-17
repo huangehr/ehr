@@ -43,9 +43,15 @@ public class PortalNoticeController extends BaseController {
         try {
             ResponseEntity<List<MPortalNotice>> responseEntity = portalNoticeClient.getPortalNoticeTop10();
             List<MPortalNotice> mPortalNoticeList = responseEntity.getBody();
+            List<PortalNoticeModel> portalNoticeModels = new ArrayList<>();
+            for (MPortalNotice mPortalNotice : mPortalNoticeList) {
+                PortalNoticeModel portalNoticeModel = convertToModel(mPortalNotice, PortalNoticeModel.class);
+                portalNoticeModel.setReleaseDate(mPortalNotice.getReleaseDate() == null?"": DateTimeUtil.simpleDateTimeFormat(mPortalNotice.getReleaseDate()));
+                portalNoticeModels.add(portalNoticeModel);
+            }
             ListResult re = new ListResult(1,10);
-            re.setTotalCount(mPortalNoticeList.size());
-            re.setDetailModelList(mPortalNoticeList);
+            re.setTotalCount(portalNoticeModels.size());
+            re.setDetailModelList(portalNoticeModels);
 
             return re;
         }
