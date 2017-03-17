@@ -2,11 +2,13 @@ package com.yihu.ehr.portal.common;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.portal.service.common.PortalAuthClient;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -16,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 切点类
@@ -25,7 +29,29 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 public  class PortalAspect {
-    //日志服务
+
+    @Value("${spring.ignoreUrls}")
+    private String ignoreUrls;
+
+    private List<String> ignoreUrlsList;
+
+    //忽略列表
+    private List<String> getIgnoreUrls()
+    {
+         if(ignoreUrlsList==null)
+         {
+             ignoreUrlsList = new ArrayList<>();
+             for(String url : ignoreUrls.split(";"))
+             {
+                 if(!StringUtils.isEmpty(url))
+                 {
+                     ignoreUrlsList.add(url);
+                 }
+             }
+         }
+
+        return ignoreUrlsList;
+    }
 
     @Autowired
     private PortalAuthClient portalAuthClient;
@@ -34,7 +60,7 @@ public  class PortalAspect {
     private ObjectMapper objectMapper;
 
     //Controller层切点
-    @Pointcut("@annotation(com.yihu.ehr.portal.common.RequestAccess)")
+    @Pointcut("@annotation(io.swagger.annotations.ApiOperation)")
     public  void controllerAspect() {
     }
 
@@ -45,17 +71,14 @@ public  class PortalAspect {
     public Object checkToken(ProceedingJoinPoint point) throws Throwable {
         Object o = null;
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
 
         String error = "";
         try {
             /******************** 可记录日志 ******************************/
-            System.out.print(getControllerMethodDescription(point));
-
-
+            //System.out.print(getControllerMethodDescription(point));
 
             //校验权限
-            boolean check = isNeedCheckToken(point);
+            boolean check = isNeedCheckToken(request.getRequestURI());
             if(check)
             {
                 String token = request.getHeader("token");
@@ -80,20 +103,7 @@ public  class PortalAspect {
 
         if(!StringUtils.isEmpty(error))
         {
-            response.setStatus(901);
-            response.setContentType("text/html;charset=utf-8");
-            PrintWriter out = null;
-
-            try {
-                out = response.getWriter();
-                out.append(error);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (out != null) {
-                    out.close();
-                }
-            }
+            writeContent(401,error);
             //response.sendRedirect(ApiVersion.Version1_0 + "/portal/error?message="+ java.net.URLEncoder.encode(error));
         }
         else{
@@ -104,6 +114,28 @@ public  class PortalAspect {
 
 
 
+    /**
+     * 将内容输出到浏览器
+     *
+     * @param content 输出内容
+     */
+    private void writeContent(int status,String content) {
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        response.reset();
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Content-Type", "text/plain;charset=UTF-8");
+        response.setHeader("icop-content-type", "exception");
+        response.setStatus(status);
+        PrintWriter writer = null;
+        try {
+            writer = response.getWriter();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        writer.print(content);
+        writer.flush();
+        writer.close();
+    }
 
     /**
      * 获取注解中对方法的描述信息 用于Controller层注解
@@ -112,7 +144,7 @@ public  class PortalAspect {
      * @return 方法描述
      * @throws Exception
      */
-    public  String getControllerMethodDescription(JoinPoint joinPoint)  throws Exception {
+    private String getControllerMethodDescription(JoinPoint joinPoint)  throws Exception {
         String targetName = joinPoint.getTarget().getClass().getName();
         String methodName = joinPoint.getSignature().getName();
         Object[] arguments = joinPoint.getArgs();
@@ -123,7 +155,7 @@ public  class PortalAspect {
             if (method.getName().equals(methodName)) {
                 Class[] clazzs = method.getParameterTypes();
                 if (clazzs.length == arguments.length) {
-                    description = method.getAnnotation(RequestAccess.class).value();
+                    description = method.getAnnotation(ApiOperation.class).value();
                     break;
                 }
             }
@@ -133,12 +165,9 @@ public  class PortalAspect {
 
     /**
      * 获取是否需要校验Token
-     * @param joinPoint
-     * @return
-     * @throws Exception
      */
-    public boolean isNeedCheckToken(JoinPoint joinPoint)  throws Exception {
-        String targetName = joinPoint.getTarget().getClass().getName();
+    private boolean isNeedCheckToken(String url)  throws Exception {
+        /*String targetName = joinPoint.getTarget().getClass().getName();
         String methodName = joinPoint.getSignature().getName();
         Object[] arguments = joinPoint.getArgs();
         Class targetClass = Class.forName(targetName);
@@ -152,8 +181,16 @@ public  class PortalAspect {
                     break;
                 }
             }
+        }*/
+
+        //是否在忽略列表中
+        if(getIgnoreUrls().contains(url))
+        {
+            return false;
         }
-        return check;
+        else{
+            return true;
+        }
     }
 
 

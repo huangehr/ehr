@@ -48,21 +48,15 @@ public class PortalFeedbackController extends BaseController{
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) {
-        try {
-            ResponseEntity<List<MPortalFeedback>> responseEntity = portalFeedbackClient.searchPortalFeedback(fields, filters, sorts, size, page);
-            List<MPortalFeedback> mPortalFeedbackList = responseEntity.getBody();
-            ListResult re = new ListResult(1, 10);
-            re.setTotalCount(mPortalFeedbackList.size());
-            re.setDetailModelList(mPortalFeedbackList);
+            @RequestParam(value = "page", required = false) int page) throws Exception
+    {
+        ResponseEntity<List<MPortalFeedback>> responseEntity = portalFeedbackClient.searchPortalFeedback(fields, filters, sorts, size, page);
+        List<MPortalFeedback> mPortalFeedbackList = responseEntity.getBody();
+        ListResult re = new ListResult(1, 10);
+        re.setTotalCount(mPortalFeedbackList.size());
+        re.setDetailModelList(mPortalFeedbackList);
 
-            return re;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+        return re;
     }
 
 
@@ -70,8 +64,8 @@ public class PortalFeedbackController extends BaseController{
     @ApiOperation(value = "获取意见反馈信息", notes = "意见反馈信息")
     public Result getPortalFeedback(
             @ApiParam(name = "portalFeedback_id", value = "", defaultValue = "")
-            @PathVariable(value = "portalFeedback_id") Long portalFeedbackId) {
-        try {
+            @PathVariable(value = "portalFeedback_id") Long portalFeedbackId) throws Exception {
+
             MPortalFeedback mPortalFeedback = portalFeedbackClient.getPortalFeedback(portalFeedbackId);
             if (mPortalFeedback == null) {
                 return Result.error("意见反馈信息获取失败!");
@@ -80,28 +74,21 @@ public class PortalFeedbackController extends BaseController{
             ObjectResult re = new ObjectResult(true,"通知公告信息获取成功！");
             re.setData(mPortalFeedback);
             return re;
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
     @RequestMapping(value = "/portalFeedback/admin/{portalFeedback_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除意见反馈", notes = "根据意见反馈id删除")
     public Result deletePortalFeedback(
             @ApiParam(name = "portalFeedback_id", value = "意见反馈编号", defaultValue = "")
-            @PathVariable(value = "portalFeedback_id") String portalFeedbackId) {
-        try {
+            @PathVariable(value = "portalFeedback_id") String portalFeedbackId) throws Exception {
+
             boolean result = portalFeedbackClient.deletePortalFeedback(portalFeedbackId);
             if (!result) {
                 return Result.error("删除失败!");
             }
             return Result.success("删除成功!");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 
@@ -109,8 +96,8 @@ public class PortalFeedbackController extends BaseController{
     @ApiOperation(value = "创建意见反馈", notes = "重新绑定意见反馈信息")
     public Result createPortalFeedback(
             @ApiParam(name = "portalFeedback_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "portalFeedback_json_data") String portalFeedbackJsonData) {
-        try {
+            @RequestParam(value = "portalFeedback_json_data") String portalFeedbackJsonData) throws Exception {
+
             MPortalFeedback mPortalFeedback = objectMapper.readValue(portalFeedbackJsonData, MPortalFeedback.class);
 
             portalFeedbackClient.createPortalFeedback(objectMapper.writeValueAsString(mPortalFeedback));
@@ -121,11 +108,7 @@ public class PortalFeedbackController extends BaseController{
             ObjectResult re = new ObjectResult(true,"创建意见反馈成功！");
             re.setData(mPortalFeedback);
             return re;
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 
@@ -133,8 +116,8 @@ public class PortalFeedbackController extends BaseController{
     @ApiOperation(value = "修改意见反馈", notes = "重新绑定意见反馈信息")
     public Result updatePortalFeedback(
             @ApiParam(name = "portalFeedback_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "portalFeedback_json_data") String portalFeedbackJsonData) {
-        try {
+            @RequestParam(value = "portalFeedback_json_data") String portalFeedbackJsonData) throws Exception {
+
             MPortalFeedback mPortalFeedback = objectMapper.readValue(portalFeedbackJsonData, MPortalFeedback.class);
 
             portalFeedbackClient.updatePortalFeedback(objectMapper.writeValueAsString(mPortalFeedback));
@@ -144,11 +127,7 @@ public class PortalFeedbackController extends BaseController{
             ObjectResult re = new ObjectResult(true,"修改意见反馈成功！");
             re.setData(mPortalFeedback);
             return re;
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 

@@ -14,6 +14,7 @@ package com.yihu.ehr.oauth2.web;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.oauth2.model.AccessToken;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -82,7 +83,7 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
      * @return
      */
     @RequestMapping(value = ServiceApi.Authentication.AccessToken, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public OAuth2AccessToken postAccessToken(@RequestBody Map<String, String> parameters) {
+    public AccessToken postAccessToken(@RequestBody Map<String, String> parameters) {
 
         String clientId = getClientId(parameters);
         ClientDetails authenticatedClient = clientDetailsService.loadClientByClientId(clientId);
@@ -124,12 +125,20 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
             tokenRequest.setScope(OAuth2Utils.parseParameterList(parameters.get(OAuth2Utils.SCOPE)));
         }
 
+        AccessToken accessToken = new AccessToken();
         OAuth2AccessToken token = getTokenGranter(grantType).grant(grantType, tokenRequest);
         if (token == null) {
             throw new UnsupportedGrantTypeException("Unsupported grant type: " + grantType);
         }
+        else{
+            System.out.print(token.getValue());
+            accessToken.setAccessToken(token.getValue());
+            accessToken.setRefreshToken(token.getRefreshToken().getValue());
+            accessToken.setTokenType(token.getTokenType());
+            accessToken.setExpiresIn(token.getExpiresIn());
+        }
 
-        return token;
+        return accessToken;
     }
 
     /**
@@ -144,11 +153,16 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
         try {
             //根据accessToken查询相应的访问授权数据行
             OAuth2AccessToken auth2AccessToken = tokenServices.readAccessToken(accessToken);
-            if (!auth2AccessToken.getValue().equals(accessToken) || auth2AccessToken.isExpired()) {
-                return Result.error("accesstoken 已经过期");
+            if (auth2AccessToken == null)
+            {
+                return Result.error("无效accesstoken");
             }
-            else{
-                return Result.success("accesstoken 可以使用");
+            else {
+                if (!auth2AccessToken.getValue().equals(accessToken) || auth2AccessToken.isExpired()) {
+                    return Result.error("accesstoken 已经过期");
+                } else {
+                    return Result.success("accesstoken 可以使用");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
