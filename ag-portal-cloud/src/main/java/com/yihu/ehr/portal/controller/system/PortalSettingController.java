@@ -46,8 +46,8 @@ public class PortalSettingController extends BaseController{
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) {
-        try {
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+
             ResponseEntity<List<MPortalSetting>> responseEntity = portalSettingClient.searchPortalSetting(fields, filters, sorts, size, page);
 
             ListResult re = new ListResult(page, size);
@@ -55,12 +55,7 @@ public class PortalSettingController extends BaseController{
             re.setDetailModelList(responseEntity.getBody());
 
             return re;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 
@@ -68,8 +63,8 @@ public class PortalSettingController extends BaseController{
     @ApiOperation(value = "获取门户配置信息", notes = "门户配置信息")
     public Result getPortalSetting(
             @ApiParam(name = "portalSetting_id", value = "", defaultValue = "")
-            @PathVariable(value = "portalSetting_id") Long portalSettingId) {
-        try {
+            @PathVariable(value = "portalSetting_id") Long portalSettingId) throws Exception {
+
             MPortalSetting mPortalSetting = portalSettingClient.getPortalSetting(portalSettingId);
             if (mPortalSetting == null) {
                 return Result.error("门户配置信息获取失败!");
@@ -78,28 +73,21 @@ public class PortalSettingController extends BaseController{
             ObjectResult re = new ObjectResult(true,"门户配置信息获取成功！");
             re.setData(mPortalSetting);
             return re;
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
     @RequestMapping(value = "/portalSetting/admin/{portalSetting_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除门户配置", notes = "根据门户配置id删除")
     public Result deletePortalSetting(
             @ApiParam(name = "portalSetting_id", value = "门户配置编号", defaultValue = "")
-            @PathVariable(value = "portalSetting_id") String portalSettingId) {
-        try {
+            @PathVariable(value = "portalSetting_id") String portalSettingId) throws Exception {
+
             boolean result = portalSettingClient.deletePortalSetting(portalSettingId);
             if (!result) {
                 return Result.error("删除失败!");
             }
             return Result.success("删除成功!");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 
@@ -107,8 +95,8 @@ public class PortalSettingController extends BaseController{
     @ApiOperation(value = "创建门户配置", notes = "重新绑定门户配置信息")
     public Result createPortalSetting(
             @ApiParam(name = "portalSetting_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "portalSetting_json_data") String portalSettingJsonData) {
-        try {
+            @RequestParam(value = "portalSetting_json_data") String portalSettingJsonData) throws Exception {
+
             MPortalSetting mPortalSetting = portalSettingClient.createPortalSetting(portalSettingJsonData);
             if (mPortalSetting == null) {
                 return Result.error("保存失败!");
@@ -117,10 +105,7 @@ public class PortalSettingController extends BaseController{
             ObjectResult re = new ObjectResult(true,"保存成功！");
             re.setData(mPortalSetting);
             return re;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 
@@ -128,8 +113,8 @@ public class PortalSettingController extends BaseController{
     @ApiOperation(value = "修改门户配置", notes = "重新绑定门户配置信息")
     public Result updatePortalSetting(
             @ApiParam(name = "portalSetting_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "portalSetting_json_data") String portalSettingJsonData) {
-        try {
+            @RequestParam(value = "portalSetting_json_data") String portalSettingJsonData) throws Exception {
+
             MPortalSetting mPortalSetting = portalSettingClient.updatePortalSetting(portalSettingJsonData);
             if(mPortalSetting==null){
                 return Result.error("修改失败!");
@@ -138,11 +123,7 @@ public class PortalSettingController extends BaseController{
             ObjectResult re = new ObjectResult(true,"修改成功！");
             re.setData(mPortalSetting);
             return re;
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 

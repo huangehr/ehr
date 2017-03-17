@@ -48,7 +48,7 @@ public class PortalStandardsController extends BaseController{
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) {
+            @RequestParam(value = "page", required = false) int page) throws Exception {
 
         ResponseEntity<List<MPortalStandards>> responseEntity = portalStandardsClient.searchPortalStandards(fields, filters, sorts, size, page);
 
@@ -65,8 +65,8 @@ public class PortalStandardsController extends BaseController{
     @ApiOperation(value = "获取标准规范管理信息", notes = "标准规范管理信息")
     public Result getPortalStandard(
             @ApiParam(name = "portalStandard_id", value = "", defaultValue = "")
-            @PathVariable(value = "portalStandard_id") Long portalStandardId) {
-        try {
+            @PathVariable(value = "portalStandard_id") Long portalStandardId) throws Exception {
+
             MPortalStandards mPortalStandards = portalStandardsClient.getPortalStandard(portalStandardId);
             if (mPortalStandards == null) {
                 return Result.error("标准规范管理信息获取失败!");
@@ -75,28 +75,21 @@ public class PortalStandardsController extends BaseController{
             ObjectResult re= new ObjectResult(true,"标准规范管理信息获取成功!");
             re.setData(mPortalStandards);
             return re;
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
     @RequestMapping(value = "/portalStandards/admin/{portalStandard_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除标准规范管理", notes = "根据标准规范管理id删除医生")
     public Result deletePortalStandard(
             @ApiParam(name = "portalStandard_id", value = "标准规范管理编号", defaultValue = "")
-            @PathVariable(value = "portalStandard_id") String portalStandardId) {
-        try {
+            @PathVariable(value = "portalStandard_id") String portalStandardId) throws Exception {
+
             boolean result = portalStandardsClient.deletePortalStandard(portalStandardId);
             if (!result) {
                 return Result.error("删除失败!");
             }
             return Result.success("删除成功!");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 
@@ -104,8 +97,8 @@ public class PortalStandardsController extends BaseController{
     @ApiOperation(value = "创建标准规范管理", notes = "重新绑定标准规范管理信息")
     public Result createPortalStandard(
             @ApiParam(name = "portalStandard_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "portalStandard_json_data") String portalStandardJsonData) {
-        try {
+            @RequestParam(value = "portalStandard_json_data") String portalStandardJsonData) throws Exception {
+
             MPortalStandards mPortalStandard = portalStandardsClient.createPortalStandard(portalStandardJsonData);
             if (mPortalStandard == null) {
                 return Result.error("保存失败!");
@@ -114,10 +107,7 @@ public class PortalStandardsController extends BaseController{
             ObjectResult re= new ObjectResult(true,"保存成功!");
             re.setData(mPortalStandard);
             return re;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 
@@ -125,8 +115,8 @@ public class PortalStandardsController extends BaseController{
     @ApiOperation(value = "修改标准规范管理", notes = "重新绑定标准规范管理信息")
     public Result updatePortalStandard(
             @ApiParam(name = "portalStandard_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "portalStandard_json_data") String portalStandardJsonData) {
-        try {
+            @RequestParam(value = "portalStandard_json_data") String portalStandardJsonData) throws Exception {
+
 
             MPortalStandards mPortalStandard = portalStandardsClient.updatePortalStandard(portalStandardJsonData);
             if(mPortalStandard==null){
@@ -136,11 +126,7 @@ public class PortalStandardsController extends BaseController{
             ObjectResult re= new ObjectResult(true,"修改成功!");
             re.setData(mPortalStandard);
             return re;
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
-        }
+
     }
 
 

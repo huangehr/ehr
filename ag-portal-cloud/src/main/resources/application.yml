@@ -23,6 +23,9 @@ hystrix:
 ribbon:
   ReadTimeout: 30000
   ConnectTimeout: 6000
+spring:
+  ignoreUrls:
+    /api/v1.0/portal/oauth/login;/api/v1.0/portal/oauth/accessToken;/api/v1.0/portal/oauth/refreshToken;/api/v1.0/portal/oauth/validToken
 
 ---
 spring:

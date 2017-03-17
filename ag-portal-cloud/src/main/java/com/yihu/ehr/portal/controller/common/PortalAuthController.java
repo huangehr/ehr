@@ -51,7 +51,7 @@ public class PortalAuthController extends BaseController{
             MUser user = portalLoginClient.getUserByNameAndPassword(userName, password);
 
             if (user == null) {
-                return Result.error("登录失败，用户名密码不正确!");
+                return Result.error("登录失败，用户名或密码不正确!");
             }
 
             //允许开放的用户信息
