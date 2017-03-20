@@ -93,15 +93,17 @@ public class MessageRemindEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-//    @RequestMapping(value = "/messageRemind", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-//    @ApiOperation(value = "阅读-消息信息")
-//    public MMessageRemind readMessage(
-//            @ApiParam(name = "messageId", value = "消息ID")
-//            @RequestParam(value = "messageId", required = true) int messageId
-//    ) throws Exception {
-////        MessageRemind remind = remindService.readMessage(messageId);
-////        return convertToModel(remind, MMessageRemind.class);
-//    }
+    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindReaded, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "阅读-消息信息")
+    public MMessageRemind readMessage(
+            @ApiParam(name = "remindId", value = "消息ID")
+            @PathVariable(value = "remindId") Long remindId) throws Exception {
+        MessageRemind remind = messageRemindService.updateRemindReaded(remindId);
+        if(remind == null){
+            return null;
+        }
+        return convertToModel(remind, MMessageRemind.class);
+    }
 
 
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindAdmin, method = RequestMethod.GET)

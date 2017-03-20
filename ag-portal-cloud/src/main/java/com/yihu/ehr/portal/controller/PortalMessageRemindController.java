@@ -117,6 +117,22 @@ public class PortalMessageRemindController extends BaseController {
         }
     }
 
+    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindReaded, method = RequestMethod.GET)
+    @ApiOperation(value = "更新待办事项的阅读状态", notes = "更新待办事项的阅读状态")
+    public Envelop updateMsgRemindReaded(@PathVariable(value = "remindId") Long remindId){
+        try {
+            MMessageRemind mPortalMessageRemind = portalMessageRemindClient.updateMsgRemindReaded(remindId);
+            if (mPortalMessageRemind == null) {
+                return failed("消息状态更新失败!");
+            }
+            return success("消息状态更新成功");
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
     //yyyy-MM-dd HH:mm:ss 转换为yyyy-MM-dd'T'HH:mm:ss'Z 格式
     public String changeToUtc(String datetime) throws Exception{
         Date date = DateTimeUtil.simpleDateTimeParse(datetime);

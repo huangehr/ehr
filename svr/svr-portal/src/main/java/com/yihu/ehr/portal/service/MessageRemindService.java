@@ -45,4 +45,15 @@ public class MessageRemindService extends BaseJpaService<MessageRemind, XMessage
         return messageRemindRepository.getMessageRemindTop10();
     }
 
+    /**
+     * 根据ID,更新待办事项的阅读状态.
+     * @param remindId
+     */
+    public MessageRemind updateRemindReaded(Long remindId) {
+        MessageRemind messageRemind = messageRemindRepository.findOne(remindId);
+        messageRemind.setReaded(1);
+        messageRemindRepository.save(messageRemind);
+        return messageRemind;
+    }
+
 }

@@ -311,6 +311,7 @@ public class ServiceApi {
         public static final String MessageRemindTop                            = "/messageRemindTop";
         public static final String MessageRemindCount                         = "/messageRemindCount";
         public static final String MessageRemindAdmin                        = "/messageRemind/admin/{messageRemind_id}";
+        public static final String MessageRemindReaded                         = "/messageRemind/readed/{remindId}";
     }
 
     public static class PortalResources{
