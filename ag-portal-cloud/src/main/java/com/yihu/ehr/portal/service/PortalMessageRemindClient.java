@@ -5,7 +5,9 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.portal.MMessageRemind;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,5 +45,9 @@ public interface PortalMessageRemindClient {
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindCount, method = RequestMethod.GET)
     @ApiOperation(value = "获取消息提醒信息数量", notes = "消息提醒数量")
     int getMessageRemindCount(@RequestParam(value = "filters") String filters);
+
+    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindReaded, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "阅读-消息信息")
+    MMessageRemind updateMsgRemindReaded( @PathVariable(value = "remindId") Long remindId);
 
 }
