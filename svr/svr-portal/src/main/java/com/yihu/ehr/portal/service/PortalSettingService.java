@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 门户配置表接口实现类.
  * 2017-02-21 add by ysj
@@ -33,5 +35,11 @@ public class PortalSettingService extends BaseJpaService<PortalSetting, XPortalS
      */
     public void deletePortalSetting(Long portalSettingId) {
         portalSettingRepository.delete(portalSettingId);
+    }
+
+
+
+    public List<PortalSetting> getPortalSettingTop10(){
+        return portalSettingRepository.getPortalSettingTop10();
     }
 }
