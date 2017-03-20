@@ -35,6 +35,10 @@ public interface PortalSettingClient {
     @ApiOperation(value = "获取门户配置信息", notes = "门户配置信息")
     MPortalSetting getPortalSetting(@PathVariable(value = "portalSetting_id") Long portalSettingId);
 
+    @RequestMapping(value = ServiceApi.PortalSetting.PortalSettingTop, method = RequestMethod.GET)
+    @ApiOperation(value = "获取通知公告前10数据", notes = "根据日期查询前10的数据在前端表格展示")
+    ResponseEntity<List<MPortalSetting>> getPortalSettingTop10();
+
     @RequestMapping(value = ServiceApi.PortalSetting.PortalSetting, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建门户配置", notes = "重新绑定门户配置信息")
     MPortalSetting createPortalSetting(
@@ -49,5 +53,6 @@ public interface PortalSettingClient {
     @RequestMapping(value = ServiceApi.PortalSetting.PortalSettingAdmin, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除门户配置", notes = "根据门户配置id删除")
     boolean deletePortalSetting(@PathVariable(value = "portalSetting_id") String portalSettingId);
+
 
 }

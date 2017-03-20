@@ -1,22 +1,18 @@
-package com.yihu.ehr.portal.controller.system;
+package com.yihu.ehr.portal.controller;
 
-import com.yihu.ehr.agModel.portal.PortalNoticeDetailModel;
 import com.yihu.ehr.agModel.portal.PortalNoticeModel;
 import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
-import com.yihu.ehr.portal.common.RequestAccess;
-import com.yihu.ehr.portal.service.PortalNoticeClient;
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.portal.MPortalNotice;
+import com.yihu.ehr.portal.service.PortalNoticeClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
-import org.apache.xmlbeans.impl.xb.xsdschema.ListDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +34,6 @@ public class PortalNoticeController extends BaseController {
 
     @RequestMapping(value = ServiceApi.PortalNotices.PortalNoticesTop, method = RequestMethod.GET)
     @ApiOperation(value = "获取通知公告前10数据", notes = "根据日期查询前10的数据在前端表格展示")
-    @RequestAccess(value = "获取通知公告前10数据")
     public Result getPortalNoticeTop10(){
         try {
             ResponseEntity<List<MPortalNotice>> responseEntity = portalNoticeClient.getPortalNoticeTop10();
@@ -98,9 +93,10 @@ public class PortalNoticeController extends BaseController {
             if (mPortalNotice == null) {
                 return Result.error("通知公告信息获取失败!");
             }
-
             ObjectResult re = new ObjectResult(true,"通知公告信息获取成功！");
-            re.setData(mPortalNotice);
+            PortalNoticeModel portalNoticeModel = convertToModel(mPortalNotice, PortalNoticeModel.class);
+            portalNoticeModel.setReleaseDate(mPortalNotice.getReleaseDate() == null?"": DateTimeUtil.simpleDateTimeFormat(mPortalNotice.getReleaseDate()));
+            re.setData(portalNoticeModel);
             return re;
         }
         catch (Exception ex){
