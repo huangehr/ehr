@@ -1,126 +1,130 @@
-package com.yihu.ehr.portal.controller;
+package com.yihu.ehr.portal.controller.system;
 
-import com.yihu.ehr.agModel.portal.MessageRemindModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.agModel.portal.PortalSettingModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.model.portal.MMessageRemind;
-import com.yihu.ehr.portal.service.PortalMessageRemindClient;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.portal.MPortalSetting;
+import com.yihu.ehr.portal.service.PortalSettingClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
- * Created by ysj on 2017年2月20日
+ * Created by yeshijie on 2017/2/21.
  */
-@RequestMapping(ApiVersion.Version1_0 +"/portal")
+@EnableFeignClients
+@RequestMapping(ApiVersion.Version1_0 + "/doctor")
 @RestController
-@Api(value = "PortalMessageRemind", description = "PortalMessageRemind", tags = {"消息提醒"})
-public class PortalSettingController extends BaseController {
+@Api(value = "portalSetting", description = "PortalSetting", tags = {"门户配置接口"})
+public class PortalSettingController extends BaseController{
 
     @Autowired
-    PortalMessageRemindClient portalMessageRemindClient;
+    private PortalSettingClient portalSettingClient;
 
-    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindTop, method = RequestMethod.GET)
-    @ApiOperation(value = "获取消息提醒前10数据", notes = "根据日期查询前10的数据在前端表格展示")
-    public Envelop getPortalMessageRemindTop10(){
-        ResponseEntity<List<MMessageRemind>> responseEntity = portalMessageRemindClient.getMessageRemindTop10();
-        List<MMessageRemind> mPortalMessageRemindList = responseEntity.getBody();
-        List<MessageRemindModel> portalMessageRemindModels = new ArrayList<>();
-        for (MMessageRemind mPortalMessageRemind : mPortalMessageRemindList) {
-            MessageRemindModel portalMessageRemindModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
-            portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
-            portalMessageRemindModels.add(portalMessageRemindModel);
-        }
 
-        Envelop envelop = getResult(portalMessageRemindModels, mPortalMessageRemindList.size(), 1, 10);
-        return envelop;
-    }
-
-    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemind, method = RequestMethod.GET)
-    @ApiOperation(value = "获取消息提醒列表", notes = "根据查询条件获取消息提醒列表在前端表格展示")
-    public Envelop searchPortalMessageRemind(
-            @RequestParam(value = "userId", required = false) String userId,
-            @RequestParam(value = "readed", required = false) String readed,
+    @RequestMapping(value = "/portalSetting", method = RequestMethod.GET)
+    @ApiOperation(value = "获取门户配置列表", notes = "根据查询条件获取门户配置列表在前端表格展示")
+    public Result searchPortalSetting(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page
-    ) throws Exception{
-        String filters = "";
-        if(!StringUtils.isEmpty(userId)){
-            filters += "toUserId="+userId+";";
-        }
-        if(!StringUtils.isEmpty(readed)){
-            filters += "readed="+readed+";";
-        }
-        String sorts = "+createDate";
-        ResponseEntity<List<MMessageRemind>> responseEntity = portalMessageRemindClient.searchMessageRemind(null, filters, sorts, size, page);
-        List<MMessageRemind> mPortalMessageRemindList = responseEntity.getBody();
-        List<MessageRemindModel> portalMessageRemindModels = new ArrayList<>();
-        for (MMessageRemind mPortalMessageRemind : mPortalMessageRemindList) {
-            MessageRemindModel portalMessageRemindModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
-            portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
-            portalMessageRemindModels.add(portalMessageRemindModel);
-        }
-        //获取总条数
-        int totalCount = getTotalCount(responseEntity);
-        Envelop envelop = getResult(portalMessageRemindModels, totalCount, page, size);
-        return envelop;
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+
+        ResponseEntity<List<MPortalSetting>> responseEntity = portalSettingClient.searchPortalSetting(fields, filters, sorts, size, page);
+
+        ListResult re = new ListResult(page, size);
+        re.setTotalCount(getTotalCount(responseEntity));
+        re.setDetailModelList(responseEntity.getBody());
+
+        return re;
+
     }
 
 
-    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindCount, method = RequestMethod.GET)
-    @ApiOperation(value = "获取消息数量", notes = "获取消息数量")
-    public Envelop getPortalMessageRemindCount(
-            @ApiParam(name = "userId", value = "用戶ID", defaultValue = "")
-            @RequestParam(value = "userId") String userId,
-            @ApiParam(name = "readed", value = "阅读标识", defaultValue = "0")
-            @RequestParam(value = "readed") int readed) {
-        String filters = "";
-        if(!StringUtils.isEmpty(userId)){
-            filters += "toUserId="+userId+";";
+    @RequestMapping(value = "portalSetting/admin/{portalSetting_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取门户配置信息", notes = "门户配置信息")
+    public Result getPortalSetting(
+            @ApiParam(name = "portalSetting_id", value = "", defaultValue = "")
+            @PathVariable(value = "portalSetting_id") Long portalSettingId) throws Exception {
+
+        MPortalSetting mPortalSetting = portalSettingClient.getPortalSetting(portalSettingId);
+        if (mPortalSetting == null) {
+            return Result.error("门户配置信息获取失败!");
         }
-        filters += "readed="+readed+";";
-        int num = portalMessageRemindClient.getMessageRemindCount(filters);
-        Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
-        envelop.setObj(num);
-        return envelop;
+
+        ObjectResult re = new ObjectResult(true,"门户配置信息获取成功！");
+        re.setData(mPortalSetting);
+        return re;
+
     }
 
-    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindAdmin, method = RequestMethod.GET)
-    @ApiOperation(value = "获取消息提醒信息", notes = "消息提醒信息")
-    public Envelop getPortalMessageRemind(@PathVariable(value = "portalMessageRemind_id") Long portalMessageRemindId){
-        try {
-            MMessageRemind mPortalMessageRemind = portalMessageRemindClient.getMessageRemind(portalMessageRemindId);
-            if (mPortalMessageRemind == null) {
-                return failed("消息提醒信息获取失败!");
-            }
+    @RequestMapping(value = "/portalSetting/admin/{portalSetting_id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除门户配置", notes = "根据门户配置id删除")
+    public Result deletePortalSetting(
+            @ApiParam(name = "portalSetting_id", value = "门户配置编号", defaultValue = "")
+            @PathVariable(value = "portalSetting_id") String portalSettingId) throws Exception {
 
-            MessageRemindModel detailModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
-            detailModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
+        boolean result = portalSettingClient.deletePortalSetting(portalSettingId);
+        if (!result) {
+            return Result.error("删除失败!");
+        }
+        return Result.success("删除成功!");
 
-            return success(detailModel);
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return failedSystem();
-        }
     }
 
-    //yyyy-MM-dd HH:mm:ss 转换为yyyy-MM-dd'T'HH:mm:ss'Z 格式
-    public String changeToUtc(String datetime) throws Exception{
-        Date date = DateTimeUtil.simpleDateTimeParse(datetime);
-        return DateTimeUtil.utcDateTimeFormat(date);
+
+    @RequestMapping(value = "/portalSetting", method = RequestMethod.POST)
+    @ApiOperation(value = "创建门户配置", notes = "重新绑定门户配置信息")
+    public Result createPortalSetting(
+            @ApiParam(name = "portalSetting_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "portalSetting_json_data") String portalSettingJsonData) throws Exception {
+
+        MPortalSetting mPortalSetting = portalSettingClient.createPortalSetting(portalSettingJsonData);
+        if (mPortalSetting == null) {
+            return Result.error("保存失败!");
+        }
+
+        ObjectResult re = new ObjectResult(true,"保存成功！");
+        re.setData(mPortalSetting);
+        return re;
+
     }
+
+
+    @RequestMapping(value = "/portalSetting", method = RequestMethod.PUT)
+    @ApiOperation(value = "修改门户配置", notes = "重新绑定门户配置信息")
+    public Result updatePortalSetting(
+            @ApiParam(name = "portalSetting_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "portalSetting_json_data") String portalSettingJsonData) throws Exception {
+
+        MPortalSetting mPortalSetting = portalSettingClient.updatePortalSetting(portalSettingJsonData);
+        if(mPortalSetting==null){
+            return Result.error("修改失败!");
+        }
+
+        ObjectResult re = new ObjectResult(true,"修改成功！");
+        re.setData(mPortalSetting);
+        return re;
+
+    }
+
 
 }
