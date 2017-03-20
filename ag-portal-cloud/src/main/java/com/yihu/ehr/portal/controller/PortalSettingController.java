@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.controller.system;
+package com.yihu.ehr.portal.controller;
 
 import com.yihu.ehr.agModel.portal.PortalSettingModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -25,7 +25,7 @@ import java.util.List;
  * Created by yeshijie on 2017/2/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 + "/doctor")
+@RequestMapping(ApiVersion.Version1_0 + "/portal")
 @RestController
 @Api(value = "portalSetting", description = "PortalSetting", tags = {"门户配置接口"})
 public class PortalSettingController extends BaseController{

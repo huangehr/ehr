@@ -402,4 +402,11 @@ import java.util.List;
     MConventionalDict getMessageRemindTypeList(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/portal_columnRequest_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "栏目请求方式清单", response = MConventionalDict.class)
+    MConventionalDict getColumnRequestTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
 }
