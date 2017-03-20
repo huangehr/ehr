@@ -336,7 +336,8 @@ public class ServiceApi {
 
     public static class PortalSetting {
         public static final String PortalSetting = "/portalSetting";
-        public static final String PortalSettingAdmin = "/portalSetting/admin/{portalSetting_id}";
+        public static final String PortalSettingTop  = "/portalSettingTop";
+        public static final String PortalSettingAdmin  = "/portalSetting/admin/{portalSetting_id}";
     }
 
     public static class PortalStandards {
