@@ -10,6 +10,7 @@ public class PortalSettingModel {
     private String columnUri;
     private String columnName;
     private Integer columnRequestType;
+    private String columnRequestTypeName;
     private Integer appApiId;
     private String status;
 
@@ -52,6 +53,10 @@ public class PortalSettingModel {
     public void setColumnName(String columnName) {
         this.columnName = columnName;
     }
+
+    public String getColumnRequestTypeName() {return columnRequestTypeName;}
+
+    public void setColumnRequestTypeName(String columnRequestTypeName) {this.columnRequestTypeName = columnRequestTypeName;}
 
     public Integer getColumnRequestType() {
         return columnRequestType;

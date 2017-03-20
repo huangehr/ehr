@@ -31,6 +31,15 @@ public class PortalSettingEndPoint extends EnvelopRestEndPoint {
     private PortalSettingService portalSettingService;
 
 
+
+    @RequestMapping(value = ServiceApi.PortalSetting.PortalSettingTop, method = RequestMethod.GET)
+    @ApiOperation(value = "获取通知公告前10数据", notes = "根据日期查询前10的数据在前端表格展示")
+    public List<MPortalSetting> getMPortalSettingTop10(){
+        List<PortalSetting> list = portalSettingService.getPortalSettingTop10();
+        return (List<MPortalSetting>) convertToModels(list, new ArrayList<MPortalSetting>(list.size()), MPortalSetting.class, null);
+    }
+
+
     @RequestMapping(value = ServiceApi.PortalSetting.PortalSetting, method = RequestMethod.GET)
     @ApiOperation(value = "获取门户配置列表", notes = "根据查询条件获取门户配置列表在前端表格展示")
     public List<MPortalSetting> searchPortalSetting(
