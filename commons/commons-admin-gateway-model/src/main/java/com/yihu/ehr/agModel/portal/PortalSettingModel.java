@@ -6,7 +6,9 @@ package com.yihu.ehr.agModel.portal;
 public class PortalSettingModel {
     private Long id;
     private String orgId;
+    private String orgName;
     private String appId;
+    private String appName;
     private String columnUri;
     private String columnName;
     private Integer columnRequestType;
@@ -29,6 +31,14 @@ public class PortalSettingModel {
     public void setOrgId(String orgId) {
         this.orgId = orgId;
     }
+
+    public String getOrgName() {return orgName;}
+
+    public void setOrgName(String orgName) {this.orgName = orgName;}
+
+    public String getAppName() {return appName;}
+
+    public void setAppName(String appName) {this.appName = appName;}
 
     public String getAppId() {
         return appId;
