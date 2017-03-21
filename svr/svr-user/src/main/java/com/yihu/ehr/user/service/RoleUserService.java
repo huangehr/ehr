@@ -114,13 +114,13 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
         if("0".equals(roles.getType())){
             String user_id = roleUser.getUserId();
             //应用角色添加人员
-            String sql = "SELECT ra.app_id,a.name app_name,u.id,u.real_name user_name,u.organization org_id,o.short_name org_name " +
-                    "from role_app_relation ra " +
+            String sql = "SELECT DISTINCT ra.app_id,a.name app_name,u.id,u.real_name user_name,u.organization org_id,o.short_name org_name " +
+                    "from roles ra " +
                     "LEFT JOIN apps a on ra.app_id = a.id " +
-                    "LEFT JOIN role_user ru on ra.role_id = ru.role_id " +
+                    "LEFT JOIN role_user ru on ra.id = ru.role_id " +
                     "LEFT JOIN users u on u.id = '"+user_id+"'" +
                     "LEFT JOIN organizations o on u.organization = o.org_code " +
-                    "WHERE ra.role_id = '"+roleUser.getRoleId()+"'";
+                    "WHERE ra.app_id = '"+roles.getAppId()+"'";
             String sql2 = "select id " +
                     "from user_app " +
                     "where ";
