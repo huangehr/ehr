@@ -9,7 +9,7 @@ package com.yihu.ehr.constants;
  */
 public class MicroServices {
     public static final String Adaption = "svr-standard";
-    public static final String Application = "svr-app-lfq";
+    public static final String Application = "svr-app";
     public static final String Configuration = "svr-configuration";
     public static final String Dictionary = "svr-dict";
     public static final String Discovery = "svr-discovery";
