@@ -16,8 +16,15 @@ import java.util.List;
 public interface FileResourceClient {
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload", method = RequestMethod.POST)
-    @ApiOperation(value = "上次图片")
+    @ApiOperation(value = "上传图片")
     String fileUpload(
+            @RequestBody String fileStr,
+            @RequestParam(value = "file_name") String fileName,
+            @RequestParam(value = "json_data") String jsonData);
+
+    @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload_returnUrl", method = RequestMethod.POST)
+    @ApiOperation(value = "上传图片")
+    String fileUploadReturnUrl(
             @RequestBody String fileStr,
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);

@@ -13,7 +13,9 @@ public class MMessageRemind {
     private Integer appId;
     private String appName;
     private String fromUserId;
+    private String fromUserName;
     private String toUserId;
+    private String toUserName;
     private String typeId;
     private String content;
     private String workUri;
@@ -26,6 +28,16 @@ public class MMessageRemind {
 
     public void setToUserId(String toUserId) {
         this.toUserId = toUserId;
+    }
+
+    public String getFromUserName() {return fromUserName;}
+
+    public void setFromUserName(String fromUserName) {this.fromUserName = fromUserName;}
+
+    public String getToUserName() {return toUserName;}
+
+    public void setToUserName(String toUserName) {
+        this.toUserName = toUserName;
     }
 
     public Long getId() {
