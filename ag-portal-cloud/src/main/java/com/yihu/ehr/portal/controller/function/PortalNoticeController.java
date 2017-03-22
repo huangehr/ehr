@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.controller;
+package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.agModel.portal.PortalNoticeModel;
 import com.yihu.ehr.api.ServiceApi;
@@ -8,7 +8,7 @@ import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.portal.MPortalNotice;
-import com.yihu.ehr.portal.service.PortalNoticeClient;
+import com.yihu.ehr.portal.service.function.PortalNoticeClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

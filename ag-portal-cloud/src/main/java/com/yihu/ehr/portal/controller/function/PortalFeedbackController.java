@@ -1,26 +1,20 @@
-package com.yihu.ehr.portal.controller.system;
+package com.yihu.ehr.portal.controller.function;
 
-import com.yihu.ehr.agModel.portal.PortalFeedbackModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.portal.MPortalFeedback;
-import com.yihu.ehr.portal.service.PortalFeedbackClient;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.portal.service.function.PortalFeedbackClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
