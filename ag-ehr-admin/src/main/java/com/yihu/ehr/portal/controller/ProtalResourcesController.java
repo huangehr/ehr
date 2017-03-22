@@ -19,6 +19,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,18 +62,6 @@ public class ProtalResourcesController extends BaseController {
             PortalResourcesModel portalResourcesModel = convertToModel(mPortalResources, PortalResourcesModel.class);
             portalResourcesModel.setUploadTime(mPortalResources.getUploadTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mPortalResources.getUploadTime()));
 
-            if (mPortalResources.getPicUrl() !=null){
-               try{
-                   String storagePath = mPortalResources.getPicUrl();
-                   String picurl = fileResourceClient.imageView(storagePath);
-                   portalResourcesModel.setPicUrl(picurl);
-               }catch (Exception e){
-                   e.getMessage();
-               }
-            }
-
-//            String url = fileResourceClient.imageView(mPortalResources.getUrl());
-//            portalResourcesModel.setUrl(url);
             //获取类别字典
             MConventionalDict dict = conventionalDictClient.getPortalResourcesPlatformTypeList(String.valueOf(mPortalResources.getPlatformType()));
             portalResourcesModel.setPlatformTypeName(dict == null ? "" : dict.getValue());
