@@ -3,6 +3,7 @@ package com.yihu.ehr.portal.controller;
 import com.yihu.ehr.agModel.portal.PortalResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.portal.MPortalResources;
 import com.yihu.ehr.portal.service.PortalResourcesClient;
@@ -35,6 +36,8 @@ public class ProtalResourcesController extends BaseController {
     private PortalResourcesClient portalResourcesClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+    @Autowired
+    private  FileResourceClient fileResourceClient;
 
 
     @RequestMapping(value = "/portalResources", method = RequestMethod.GET)
@@ -58,6 +61,18 @@ public class ProtalResourcesController extends BaseController {
             PortalResourcesModel portalResourcesModel = convertToModel(mPortalResources, PortalResourcesModel.class);
             portalResourcesModel.setUploadTime(mPortalResources.getUploadTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mPortalResources.getUploadTime()));
 
+            if (mPortalResources.getPicUrl() !=null){
+               try{
+                   String storagePath = mPortalResources.getPicUrl();
+                   String picurl = fileResourceClient.imageView(storagePath);
+                   portalResourcesModel.setPicUrl(picurl);
+               }catch (Exception e){
+                   e.getMessage();
+               }
+            }
+
+//            String url = fileResourceClient.imageView(mPortalResources.getUrl());
+//            portalResourcesModel.setUrl(url);
             //获取类别字典
             MConventionalDict dict = conventionalDictClient.getPortalResourcesPlatformTypeList(String.valueOf(mPortalResources.getPlatformType()));
             portalResourcesModel.setPlatformTypeName(dict == null ? "" : dict.getValue());
