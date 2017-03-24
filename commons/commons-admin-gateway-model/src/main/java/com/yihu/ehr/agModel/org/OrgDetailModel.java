@@ -39,10 +39,42 @@ public class OrgDetailModel{
     private String imgRemotePath;
     private String imgLocalPath;
     private int administrativeDivision;
+
+    private Long id;
+    //医院信息
+    private String code;
+    private String traffic;
+    private String photo;
+    private String hosTypeId;
+    private String hosTypeName;
+    private Integer ascriptionType;
+    private String ascriptionTypeName;
+    private String phone;
+    private String introduction;
+    private String legalPerson;
+    private String levelId;
+    private String logoUrl;
+    private Integer sortNo;
+    private Integer parentHosId;
+    private Integer zxy;
+    private String hosPhoto;
+    private String ing;
+    private String lat;
+    private String updateTime;
+
+
     //公钥信息
     String publicKey;
     String validTime;
     String startTime;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getOrgCode() {
         return orgCode;
@@ -307,5 +339,157 @@ public class OrgDetailModel{
 
     public void setDistrictId(int districtId) {
         this.districtId = districtId;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getTraffic() {
+        return traffic;
+    }
+
+    public void setTraffic(String traffic) {
+        this.traffic = traffic;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getHosTypeId() {
+        return hosTypeId;
+    }
+
+    public void setHosTypeId(String hosTypeId) {
+        this.hosTypeId = hosTypeId;
+    }
+
+    public String getHosTypeName() {
+        return hosTypeName;
+    }
+
+    public void setHosTypeName(String hosTypeName) {
+        this.hosTypeName = hosTypeName;
+    }
+
+    public Integer getAscriptionType() {
+        return ascriptionType;
+    }
+
+    public void setAscriptionType(Integer ascriptionType) {
+        this.ascriptionType = ascriptionType;
+    }
+
+    public String getAscriptionTypeName() {
+        return ascriptionTypeName;
+    }
+
+    public void setAscriptionTypeName(String ascriptionTypeName) {
+        this.ascriptionTypeName = ascriptionTypeName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public String getLegalPerson() {
+        return legalPerson;
+    }
+
+    public void setLegalPerson(String legalPerson) {
+        this.legalPerson = legalPerson;
+    }
+
+    public String getLevelId() {
+        return levelId;
+    }
+
+    public void setLevelId(String levelId) {
+        this.levelId = levelId;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
+    }
+
+    public Integer getSortNo() {
+        return sortNo;
+    }
+
+    public void setSortNo(Integer sortNo) {
+        this.sortNo = sortNo;
+    }
+
+    public Integer getParentHosId() {
+        return parentHosId;
+    }
+
+    public void setParentHosId(Integer parentHosId) {
+        this.parentHosId = parentHosId;
+    }
+
+    public String getHosPhoto() {
+        return hosPhoto;
+    }
+
+    public void setHosPhoto(String hosPhoto) {
+        this.hosPhoto = hosPhoto;
+    }
+
+    public Integer getZxy() {
+        return zxy;
+    }
+
+    public void setZxy(Integer zxy) {
+        this.zxy = zxy;
+    }
+
+    public String getIng() {
+        return ing;
+    }
+
+    public void setIng(String ing) {
+        this.ing = ing;
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 }
