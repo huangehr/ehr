@@ -16,6 +16,7 @@ import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.oauth2.model.AccessToken;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
+import org.apache.commons.collections.map.HashedMap;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +162,26 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
                 if (!auth2AccessToken.getValue().equals(accessToken) || auth2AccessToken.isExpired()) {
                     return Result.error("accesstoken 已经过期");
                 } else {
-                    return Result.success("accesstoken 可以使用");
+                    //判断ClientId
+                    OAuth2Authentication authentication = tokenServices.loadAuthentication(accessToken);
+                    String authenticationClientId = authentication.getOAuth2Request().getClientId();
+                    if(authenticationClientId!=null && authenticationClientId.equals(clientId))
+                    {
+                        String authenticationName = authentication.getName();
+                        AccessToken token = new AccessToken();
+                        token.setAccessToken(auth2AccessToken.getValue());
+                        token.setRefreshToken(auth2AccessToken.getRefreshToken().getValue());
+                        token.setTokenType(auth2AccessToken.getTokenType());
+                        token.setExpiresIn(auth2AccessToken.getExpiresIn());
+                        token.setUser(authenticationName);
+
+                        ObjectResult re = new ObjectResult(true,"accesstoken 可以使用");
+                        re.setData(token);
+                        return re;
+                    }
+                    else{
+                        return Result.error("非法ClientId");
+                    }
                 }
             }
         } catch (Exception e) {

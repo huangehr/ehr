@@ -143,13 +143,7 @@ public class PortalAuthController extends BaseController{
             @ApiParam(name = "accessToken", value = "accessToken", defaultValue = "")
             @RequestParam(value = "accessToken") String accessToken) {
         try {
-            String validRes = portalAuthClient.validToken(clientId, accessToken);
-            if (StringUtils.isEmpty(validRes)) {
-                return Result.error("验证失败!");
-            }
-
-            return objectMapper.readValue(validRes,Result.class);
-
+            return portalAuthClient.validToken(clientId, accessToken);
         }
         catch (Exception ex) {
             ex.printStackTrace();

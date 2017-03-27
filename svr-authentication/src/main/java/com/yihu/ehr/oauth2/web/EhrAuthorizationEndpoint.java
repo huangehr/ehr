@@ -151,10 +151,13 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             if (!(principal instanceof Authentication) || !((Authentication) principal).isAuthenticated()) {
                 if(parameters.containsKey("user"))
                 {
-                    principal = new UsernamePasswordAuthenticationToken(parameters.containsKey("user"), "",null);
+                    UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(parameters.get("user"), "",null);
+
                     SecurityContext sc = new SecurityContextImpl();
-                    sc.setAuthentication((Authentication) principal);
+                    sc.setAuthentication((Authentication) userToken);
                     SecurityContextHolder.setContext(sc);
+
+                    principal = userToken;
                 }
                 else {
                     throw new InsufficientAuthenticationException(
