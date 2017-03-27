@@ -30,6 +30,9 @@ public class AppApiService extends BaseJpaService<AppApi, XAppApiRepository> {
     }
 
     public AppApi createAppApi(AppApi appApi) {
+        if ("".equals(appApi.getMethodName())){
+            appApi.setMethodName(null);
+        }
         xAppApiRepository.save(appApi);
         return appApi;
     }

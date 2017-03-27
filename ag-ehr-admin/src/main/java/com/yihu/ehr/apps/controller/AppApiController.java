@@ -322,6 +322,9 @@ public class AppApiController extends BaseController {
             //获取应用和api关系
             Collection<MRoleAppRelation> mRoleAppRelations = roleAppRelationClient.searchRoleAppNoPaging("appId=" + appId);
             String roleIds = mRoleAppRelations.stream().map(MRoleAppRelation::getRoleId).collect(Collectors.toList()).stream().map(roleId -> roleId.toString()).collect(Collectors.joining(","));
+            if("".equals(roleIds)){
+                return failed("应用无该API的访问权限");
+            }
             //获取角色和api关系
             Collection<MRoleApiRelation> mRoleApiRelations = roleApiRelationClient.searchRoleApiRelationNoPaging("roleId=" + roleIds);
             String apiIds = mRoleApiRelations.stream().map(MRoleApiRelation::getApiId).collect(Collectors.toList()).stream().map(apiId -> apiId.toString()).collect(Collectors.joining(","));
