@@ -82,19 +82,19 @@ public class Organization  {
     private String traffic;
 
     @Column(name = "province_id",nullable = true)
-    private String provinceId;
+    private Integer provinceId;
 
     @Column(name = "province_name",nullable = true)
     private String provinceName;
 
     @Column(name = "city_id",nullable = true)
-    private String cityId;
+    private Integer cityId;
 
     @Column(name = "city_name",nullable = true)
     private String cityName;
 
     @Column(name = "area_id",nullable = true)
-    private String areaId;
+    private Integer areaId;
 
     @Column(name = "area_name",nullable = true)
     private String areaName;
@@ -109,7 +109,7 @@ public class Organization  {
     private String url;
 
     @Column(name = "ascription_type",nullable = true)
-    private String ascription_type;
+    private Integer ascriptionType;
 
     @Column(name = "phone",nullable = true)
     private String phone;
@@ -127,16 +127,16 @@ public class Organization  {
     private String logoUrl;
 
     @Column(name = "sort_no",nullable = true)
-    private String sortNo;
+    private Integer sortNo;
 
     @Column(name = "parent_hos_id",nullable = true)
-    private String parentHosId;
+    private Integer parentHosId;
 
     @Column(name = "hos_photo",nullable = true)
     private String hosPhoto;
 
     @Column(name = "zxy",nullable = true)
-    private String zxy;
+    private Integer zxy;
 
     @Column(name = "ing",nullable = true)
     private String ing;
@@ -145,13 +145,20 @@ public class Organization  {
     private String lat;
 
     @Column(name = "update_time",nullable = true)
-    private String updateTime;
+    private Date updateTime;
 
     public Organization() {
         //tags = new HashSet<>();
     }
 
 
+    public Integer getAscriptionType() {
+        return ascriptionType;
+    }
+
+    public void setAscriptionType(Integer ascriptionType) {
+        this.ascriptionType = ascriptionType;
+    }
 
     public String getOrgCode() {
         return orgCode;
@@ -317,11 +324,11 @@ public class Organization  {
         this.traffic = traffic;
     }
 
-    public String getProvinceId() {
+    public Integer getProvinceId() {
         return provinceId;
     }
 
-    public void setProvinceId(String provinceId) {
+    public void setProvinceId(Integer provinceId) {
         this.provinceId = provinceId;
     }
 
@@ -333,11 +340,11 @@ public class Organization  {
         this.provinceName = provinceName;
     }
 
-    public String getCityId() {
+    public Integer getCityId() {
         return cityId;
     }
 
-    public void setCityId(String cityId) {
+    public void setCityId(Integer cityId) {
         this.cityId = cityId;
     }
 
@@ -349,11 +356,11 @@ public class Organization  {
         this.cityName = cityName;
     }
 
-    public String getAreaId() {
+    public Integer getAreaId() {
         return areaId;
     }
 
-    public void setAreaId(String areaId) {
+    public void setAreaId(Integer areaId) {
         this.areaId = areaId;
     }
 
@@ -387,14 +394,6 @@ public class Organization  {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public String getAscription_type() {
-        return ascription_type;
-    }
-
-    public void setAscription_type(String ascription_type) {
-        this.ascription_type = ascription_type;
     }
 
     public String getPhone() {
@@ -437,19 +436,19 @@ public class Organization  {
         this.logoUrl = logoUrl;
     }
 
-    public String getSortNo() {
+    public Integer getSortNo() {
         return sortNo;
     }
 
-    public void setSortNo(String sortNo) {
+    public void setSortNo(Integer sortNo) {
         this.sortNo = sortNo;
     }
 
-    public String getParentHosId() {
+    public Integer getParentHosId() {
         return parentHosId;
     }
 
-    public void setParentHosId(String parentHosId) {
+    public void setParentHosId(Integer parentHosId) {
         this.parentHosId = parentHosId;
     }
 
@@ -461,11 +460,11 @@ public class Organization  {
         this.hosPhoto = hosPhoto;
     }
 
-    public String getZxy() {
+    public Integer getZxy() {
         return zxy;
     }
 
-    public void setZxy(String zxy) {
+    public void setZxy(Integer zxy) {
         this.zxy = zxy;
     }
 
@@ -485,11 +484,11 @@ public class Organization  {
         this.lat = lat;
     }
 
-    public String getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(String updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 }

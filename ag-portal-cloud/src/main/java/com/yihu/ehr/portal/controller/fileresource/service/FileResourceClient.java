@@ -1,4 +1,4 @@
-package com.yihu.ehr.fileresource.service;
+package com.yihu.ehr.portal.controller.fileresource.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;

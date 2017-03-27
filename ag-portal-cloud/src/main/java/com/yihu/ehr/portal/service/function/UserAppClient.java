@@ -1,4 +1,4 @@
-package com.yihu.ehr.api.doctor.service;
+package com.yihu.ehr.portal.service.function;
 
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;

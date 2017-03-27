@@ -25,7 +25,7 @@ ribbon:
   ConnectTimeout: 6000
 spring:
   ignoreUrls:
-    /api/v1.0/portal/oauth/login;/api/v1.0/portal/oauth/accessToken;/api/v1.0/portal/oauth/refreshToken;/api/v1.0/portal/oauth/validToken
+    /api/v1.0/portal/oauth/login;/api/v1.0/portal/oauth/accessToken;/api/v1.0/portal/oauth/refreshToken;/api/v1.0/portal/oauth/validToken;/api/v1.0/portal/portalResourcesTop;/api/v1.0/portal/portalResources
 
 ---
 spring:

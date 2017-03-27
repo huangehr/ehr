@@ -5,8 +5,10 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.portal.MMessageRemind;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.portal.service.MessageRemindClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -37,6 +39,8 @@ public class MessageRemindController extends BaseController {
     private MessageRemindClient remindClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+    @Autowired
+    private UserClient userClient;
 
     @RequestMapping(value = "/messageRemindList", method = RequestMethod.GET)
     @ApiOperation(value = "获取消息列表", notes = "根据查询条件获取消息列表在前端表格展示")
@@ -57,6 +61,14 @@ public class MessageRemindController extends BaseController {
             List<MMessageRemind> messages = responseEntity.getBody();
             for (MMessageRemind message : messages) {
                 MessageRemindModel messageModel = convertToModel(message, MessageRemindModel.class);
+                if (StringUtils.isNotEmpty(message.getFromUserId()) ){
+                    MUser mUser = userClient.getUser(message.getFromUserId());
+                    messageModel.setFromUserName(mUser == null ? "" : mUser.getRealName());
+                }
+                if (StringUtils.isNotEmpty(message.getToUserId()) ){
+                    MUser mUser = userClient.getUser(message.getToUserId());
+                    messageModel.setToUserName(mUser == null ? "" : mUser.getRealName());
+                }
                 messageModel.setCreateDate(message.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(message.getCreateDate()));
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getMessageRemindTypeList(String.valueOf(messageModel.getTypeId()));

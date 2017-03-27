@@ -1,11 +1,11 @@
-package com.yihu.ehr.portal.controller;
+package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.agModel.portal.MessageRemindModel;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.portal.MMessageRemind;
-import com.yihu.ehr.portal.service.PortalMessageRemindClient;
+import com.yihu.ehr.portal.service.function.PortalMessageRemindClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;

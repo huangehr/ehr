@@ -3,6 +3,7 @@ package com.yihu.ehr.portal.controller;
 import com.yihu.ehr.agModel.portal.PortalResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.portal.MPortalResources;
 import com.yihu.ehr.portal.service.PortalResourcesClient;
@@ -18,6 +19,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,8 @@ public class ProtalResourcesController extends BaseController {
     private PortalResourcesClient portalResourcesClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+    @Autowired
+    private  FileResourceClient fileResourceClient;
 
 
     @RequestMapping(value = "/portalResources", method = RequestMethod.GET)
