@@ -84,8 +84,7 @@ public  class PortalAspect {
                 String token = request.getHeader("token");
                 String clientId = request.getHeader("clientId");
                 if(!StringUtils.isEmpty(token)&&!StringUtils.isEmpty(clientId)) {
-                    String re = portalAuthClient.validToken(clientId, token);
-                    Result result = objectMapper.readValue(re,Result.class);
+                    Result result = portalAuthClient.validToken(clientId, token);
                     if(!result.isSuccessFlg())
                     {
                         error = result.getMessage();
