@@ -137,6 +137,7 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
             accessToken.setRefreshToken(token.getRefreshToken().getValue());
             accessToken.setTokenType(token.getTokenType());
             accessToken.setExpiresIn(token.getExpiresIn());
+            accessToken.setUser(parameters.get("username"));
         }
 
         return accessToken;
