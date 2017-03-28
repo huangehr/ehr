@@ -21,7 +21,7 @@ import java.util.List;
  * Created by yeshijie on 2017/2/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 + "/doctor")
+@RequestMapping(ApiVersion.Version1_0 + "/portal")
 @RestController
 @Api(value = "portalStandards", description = "PortalStandards", tags = {"标准规范管理接口"})
 public class PortalStandardsController extends BaseController{

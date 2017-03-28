@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by cws on 2017年2月4日
  */
-@RequestMapping(ApiVersion.Version1_0 +"/doctor")
+@RequestMapping(ApiVersion.Version1_0 +"/portal")
 @RestController
 @Api(value = "UserApp", description = "UserApp", tags = {"用户App关联"})
 public class UserAppController extends BaseController {
