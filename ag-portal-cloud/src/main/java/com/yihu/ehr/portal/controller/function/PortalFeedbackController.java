@@ -21,7 +21,7 @@ import java.util.List;
  * Created by yeshijie on 2017/2/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 + "/doctor")
+@RequestMapping(ApiVersion.Version1_0 + "/portal")
 @RestController
 @Api(value = "portalFeedback", description = "PortalFeedback", tags = {"意见反馈接口"})
 public class PortalFeedbackController extends BaseController{

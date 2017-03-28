@@ -1,7 +1,7 @@
-package com.yihu.ehr.portal.controller.fileresource.controller;
+package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.portal.controller.fileresource.service.FileResourceClient;
+import com.yihu.ehr.portal.service.function.FileResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
