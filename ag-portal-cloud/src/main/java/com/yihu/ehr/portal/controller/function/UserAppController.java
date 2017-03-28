@@ -1,6 +1,8 @@
 package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.portal.service.common.AppClient;
 import com.yihu.ehr.portal.service.function.UserAppClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
@@ -20,13 +22,15 @@ import java.util.List;
 /**
  * Created by cws on 2017年2月4日
  */
-@RequestMapping(ApiVersion.Version1_0 +"/doctor")
+@RequestMapping(ApiVersion.Version1_0 +"/portal")
 @RestController
 @Api(value = "UserApp", description = "UserApp", tags = {"用户App关联"})
 public class UserAppController extends BaseController {
 
     @Autowired
     UserAppClient userAppClient;
+    @Autowired
+    AppClient appClient;
 
     @RequestMapping(value = ServiceApi.UserApp.UserAppList, method = RequestMethod.GET)
     @ApiOperation(value = "根据用户id获取App列表")
@@ -34,6 +38,14 @@ public class UserAppController extends BaseController {
             @ApiParam(name = "userId", value = "用户id", defaultValue = "1")
             @RequestParam(value = "userId", required = true) String userId){
         List<MUserApp> list = userAppClient.getUserAppById(userId);
+        if (list != null && list.size() > 0 ){
+            for (MUserApp mUserApp : list){
+                MApp mapp =  appClient.getApp(mUserApp.getAppId());
+                if (mapp != null){
+                    mUserApp.setLinkUrl(mapp.getUrl());
+                }
+            }
+        }
 
         Envelop envelop = getResult(list,list.size(),1,list.size());
         return envelop;

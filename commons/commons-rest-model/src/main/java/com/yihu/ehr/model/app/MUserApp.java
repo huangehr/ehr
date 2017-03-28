@@ -12,6 +12,7 @@ public class MUserApp {
     private String appId;
     private String appName;
     private Integer status;
+    private String linkUrl;
 
     public int getId() {
         return id;
@@ -75,5 +76,13 @@ public class MUserApp {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getLinkUrl() {
+        return linkUrl;
+    }
+
+    public void setLinkUrl(String linkUrl) {
+        this.linkUrl = linkUrl;
     }
 }
