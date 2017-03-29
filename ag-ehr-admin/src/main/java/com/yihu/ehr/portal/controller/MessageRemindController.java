@@ -155,7 +155,7 @@ public class MessageRemindController extends BaseController {
             return null;
         }
         MMessageRemind mMessageRemind = convertToModel(detailModel,MMessageRemind.class);
-//        mMessageRemind.setReleaseDate(DateTimeUtil.simpleDateTimeParse(detailModel.getReleaseDate()));
+        mMessageRemind.setCreateDate(DateTimeUtil.simpleDateTimeParse(detailModel.getCreateDate()));
         return mMessageRemind;
     }
 
@@ -168,11 +168,15 @@ public class MessageRemindController extends BaseController {
             MMessageRemind mMessageRemind = remindClient.getMessageRemind(messageRemindId);
             if (mMessageRemind == null) {
                 return failed("提醒消息信息获取失败!");
+            }else{
+                if (StringUtils.isNotEmpty(mMessageRemind.getToUserId()) ){
+                    MUser mUser = userClient.getUser(mMessageRemind.getToUserId());
+                    mMessageRemind.setToUserName(mUser == null ? "" : mUser.getRealName());
+                }
             }
 
             MessageRemindModel detailModel = convertToModel(mMessageRemind, MessageRemindModel.class);
-//            detailModel.setCreateDate(mMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mMessageRemind.getCreateDate()));
-
+            detailModel.setCreateDate(mMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mMessageRemind.getCreateDate()));
             return success(detailModel);
         }
         catch (Exception ex){

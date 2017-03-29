@@ -62,7 +62,7 @@ public class PortalNoticesController extends BaseController{
             //获取类别字典
             MConventionalDict dict = conventionalDictClient.getPortalNoticeTypeList(String.valueOf(mPortalNotice.getType()));
             portalNoticeModel.setTypeName(dict == null ? "" : dict.getValue());
-            MConventionalDict dict2 = conventionalDictClient.getPortalNoticeTypeList(String.valueOf(mPortalNotice.getPortalType()));
+            MConventionalDict dict2 = conventionalDictClient.getPortalNoticeProtalTypeList(String.valueOf(mPortalNotice.getPortalType()));
             portalNoticeModel.setPortalTypeName(dict2 == null ? "" : dict2.getValue());
             portalNoticeModels.add(portalNoticeModel);
         }
