@@ -12,6 +12,7 @@ public class MasterResourceFamily extends ResourceFamily {
         public static final String OrgCode = "org_code";
         public static final String OrgName = "org_name";
         public static final String PatientId = "patient_id";
+        public static final String PatientName = "patient_name";  //新增add by hzp at 20170401
         public static final String EventNo = "event_no";
         public static final String EventDate = "event_date";
         public static final String EventType = "event_type";
@@ -33,6 +34,7 @@ public class MasterResourceFamily extends ResourceFamily {
                     BasicColumns.CardId,
                     BasicColumns.OrgCode,
                     BasicColumns.PatientId,
+                    BasicColumns.PatientName,
                     BasicColumns.EventNo,
                     BasicColumns.EventDate,
                     BasicColumns.EventType,

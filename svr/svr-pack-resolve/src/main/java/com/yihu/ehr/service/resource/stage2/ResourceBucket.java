@@ -21,6 +21,7 @@ public class ResourceBucket {
     private String orgName;                             // 机构名称
     private String clientId;                            // 应用来源
     private String patientId;                           // 身份证号
+    private String patientName;                           // 身份证号
     private String eventNo;                             // 事件号
     private Date eventDate;                             // 事件时间，如挂号，出院，体检时间
     private String demographicId;                       // 人口学ID
@@ -93,6 +94,14 @@ public class ResourceBucket {
 
     public void setPatientId(String patientId) {
         this.patientId = patientId;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
     }
 
     public String getEventNo() {
