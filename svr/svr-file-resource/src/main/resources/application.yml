@@ -8,7 +8,7 @@ logging:
       hibernate: ERROR
 
 server:
-  port: ${svr-file-resource.server.port}
+  port: ${svr-workflow.server.port}
 
 management:
   port: ${server.port}

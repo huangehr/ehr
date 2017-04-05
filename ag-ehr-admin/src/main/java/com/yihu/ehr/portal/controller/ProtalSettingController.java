@@ -1,10 +1,17 @@
 package com.yihu.ehr.portal.controller;
 
 import com.yihu.ehr.agModel.portal.PortalSettingModel;
+import com.yihu.ehr.apps.service.AppApiClient;
+import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.app.MAppApi;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.portal.MPortalSetting;
+import com.yihu.ehr.organization.service.OrgDeptClient;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.portal.service.PortalSettingClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -34,6 +41,10 @@ public class ProtalSettingController extends BaseController {
     @Autowired
     private PortalSettingClient portalSettingClient;
     @Autowired
+    AppClient appClient;
+    @Autowired
+    private OrganizationClient organizationClient;
+    @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
 
 
@@ -58,9 +69,21 @@ public class ProtalSettingController extends BaseController {
             PortalSettingModel portalSettingModel = convertToModel(mPortalSetting, PortalSettingModel.class);
             if (mPortalSetting.getColumnRequestType()!=null){
 
-//                //获取类别字典
-//                MConventionalDict dict = conventionalDictClient.getColumnRequestTypeList(String.valueOf(mPortalSetting.getColumnRequestType()));
-//                portalSettingModel.setColumnRequestTypeName(dict == null ? "" : dict.getValue());
+                if(mPortalSetting.getOrgId() != null){
+                    MOrganization mOrganization  = organizationClient.getOrg(mPortalSetting.getOrgId());
+                    portalSettingModel.setOrgName(mOrganization == null ? "" :mOrganization.getFullName());
+                }
+
+                if(mPortalSetting.getAppId() != null){
+                    MApp mApp  = appClient.getApp(mPortalSetting.getAppId());
+                    portalSettingModel.setAppName(mApp == null ? "" :mApp.getName());
+                }
+
+                if(mPortalSetting.getColumnRequestType()!=null){
+                    //获取类别字典
+                    MConventionalDict dict = conventionalDictClient.getColumnRequestTypeList(String.valueOf(mPortalSetting.getColumnRequestType()));
+                    portalSettingModel.setColumnRequestTypeName(dict == null ? "" : dict.getValue());
+                }
             }
             portalSettingModels.add(portalSettingModel);
         }

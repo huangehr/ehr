@@ -1,13 +1,16 @@
-package com.yihu.ehr.fileresource.controller;
+package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.portal.service.function.FileResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -16,7 +19,7 @@ import java.util.List;
  * @author linaz
  * @created 2016.05.11 11:32
  */
-@RequestMapping(ApiVersion.Version1_0+"/admin")
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api(value = "图片上传管理接口", description = "图片上传管理接口")
 public class FileResourceController {

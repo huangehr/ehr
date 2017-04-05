@@ -57,9 +57,9 @@ public class DoctorController extends BaseController {
 
         ResponseEntity<List<MDoctor>> responseEntity = doctorClient.searchDoctors(fields, filters, sorts, size, page);
         List<MDoctor> mDoctors = responseEntity.getBody();
-        List<DoctorsModel> doctorsModels = new ArrayList<>();
+        List<DoctorDetailModel> doctorsModels = new ArrayList<>();
         for (MDoctor mDoctor : mDoctors) {
-            DoctorsModel doctorsModel = convertToModel(mDoctor, DoctorsModel.class);
+            DoctorDetailModel doctorsModel = convertToModel(mDoctor, DoctorDetailModel.class);
             doctorsModel.setInsertTime(mDoctor.getInsertTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
             doctorsModel.setUpdateTime(mDoctor.getUpdateTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getUpdateTime()));
             //性别

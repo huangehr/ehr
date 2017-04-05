@@ -5,8 +5,12 @@ import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCTokenStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.*;
 import org.springframework.security.oauth2.common.util.OAuth2Utils;
@@ -145,8 +149,20 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         try {
 
             if (!(principal instanceof Authentication) || !((Authentication) principal).isAuthenticated()) {
-                throw new InsufficientAuthenticationException(
-                        "User must be authenticated with Spring Security before authorization can be completed.");
+                if(parameters.containsKey("user"))
+                {
+                    UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(parameters.get("user"), "",null);
+
+                    SecurityContext sc = new SecurityContextImpl();
+                    sc.setAuthentication((Authentication) userToken);
+                    SecurityContextHolder.setContext(sc);
+
+                    principal = userToken;
+                }
+                else {
+                    throw new InsufficientAuthenticationException(
+                            "User must be authenticated with Spring Security before authorization can be completed.");
+                }
             }
 
             ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());

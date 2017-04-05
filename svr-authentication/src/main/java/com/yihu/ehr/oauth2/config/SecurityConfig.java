@@ -47,12 +47,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/configuration/**")
                     .antMatchers("/webjars/springfox-swagger-ui/**")
                     //swagger-ui界面---end
-                    .antMatchers(
-                            "/oauth/accesstoken")
-                    .antMatchers(
-                            "/oauth/refreshtoken")
-                    .antMatchers(
-                            "/oauth/validtoken");
+                    .antMatchers("/oauth/accesstoken")
+                    .antMatchers("/oauth/refreshtoken")
+                    .antMatchers("/oauth/validtoken")
+                    .antMatchers("/oauth/confirm_access")
+                    .antMatchers("/oauth/authorize");
 
 
         }

@@ -1,33 +1,27 @@
-package com.yihu.ehr.portal.controller.system;
+package com.yihu.ehr.portal.controller.function;
 
-import com.yihu.ehr.agModel.portal.PortalStandardModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.portal.MPortalStandards;
-import com.yihu.ehr.portal.service.PortalStandardsClient;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.portal.service.function.PortalStandardsClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by yeshijie on 2017/2/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 + "/doctor")
+@RequestMapping(ApiVersion.Version1_0 + "/portal")
 @RestController
 @Api(value = "portalStandards", description = "PortalStandards", tags = {"标准规范管理接口"})
 public class PortalStandardsController extends BaseController{

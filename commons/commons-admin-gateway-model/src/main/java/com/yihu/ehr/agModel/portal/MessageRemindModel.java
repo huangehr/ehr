@@ -11,6 +11,7 @@ public class MessageRemindModel {
     private Integer appId;
     private String appName;
     private String fromUserId;
+    private String fromUserName;
     private String toUserId;
     private String toUserName;
     private String typeId;
@@ -31,6 +32,12 @@ public class MessageRemindModel {
     public String getToUserName() {return toUserName;}
 
     public void setToUserName(String toUserName) {this.toUserName = toUserName;}
+
+    public String getFromUserName() {return fromUserName;}
+
+    public void setFromUserName(String fromUserName) {
+        this.fromUserName = fromUserName;
+    }
 
     public Long getId() {
         return id;

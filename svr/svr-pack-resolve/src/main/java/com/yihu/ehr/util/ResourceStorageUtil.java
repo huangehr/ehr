@@ -34,6 +34,7 @@ public class ResourceStorageUtil {
             map.put(MasterResourceFamily.BasicColumns.OrgCode, profile.getOrgCode());
             map.put(MasterResourceFamily.BasicColumns.OrgName, profile.getOrgName());
             map.put(MasterResourceFamily.BasicColumns.PatientId, profile.getPatientId());
+            map.put(MasterResourceFamily.BasicColumns.PatientName, profile.getPatientName());
             map.put(MasterResourceFamily.BasicColumns.EventNo, profile.getEventNo());
             map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(profile.getEventDate()));
             map.put(MasterResourceFamily.BasicColumns.EventType, Integer.toString(profile.getEventType().ordinal()));

@@ -3,6 +3,8 @@ package com.yihu.ehr.portal.service.common;
 import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,6 +29,6 @@ public interface PortalAuthClient {
 
     @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.GET)
     @ApiOperation(value = "验证Token", notes = "验证Token")
-    String validToken(@RequestParam(value = "client_id") String clientId,
-                      @RequestParam(value = "access_token") String accessToken) throws Exception;
+    ObjectResult validToken(@RequestParam(value = "client_id") String clientId,
+                                   @RequestParam(value = "access_token") String accessToken) throws Exception;
 }

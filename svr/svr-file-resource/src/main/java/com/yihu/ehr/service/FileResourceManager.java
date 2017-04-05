@@ -42,6 +42,21 @@ public class FileResourceManager extends BaseJpaService<FileResource, XFileResou
         return resourceRepository.save(fileResource).getId();
     }
 
+    public String saveFileResourceReturnUrl(String fileStr, String fileName, FileResource fileResource) throws Exception {
+
+        byte[] bytes = Base64.getDecoder().decode(fileStr);
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, "");
+        String groupName = objectNode.get("groupName").toString();
+        String remoteFileName = objectNode.get("remoteFileName").toString();
+        String path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
+        //   保存到resource表中
+        fileResource.setStoragePath(path);
+        resourceRepository.save(fileResource).getId();
+        return path ;
+    }
+
     public List<FileResource> findByObjectId(String objectId) {
         return resourceRepository.findByObjectId(objectId);
     }

@@ -58,6 +58,31 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
 
     }
 
+
+    /**
+     * 上传文件 返回 url
+     *
+     * @param fileStr
+     * @param fileName
+     * @param jsonData
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/files_upload_returnUrl", method = RequestMethod.POST)
+    @ApiOperation(value = "上传文件", notes = "上传文件返回url")
+    public String fileUploadReturnUrl(
+            @ApiParam(name = "file_str", value = "文件字符串")
+            @RequestBody String fileStr,
+            @ApiParam(name = "file_name", value = "文件名")
+            @RequestParam(value = "file_name") String fileName,
+            @ApiParam(name = "json_data", value = "文件资源属性")
+            @RequestParam(value = "json_data") String jsonData) throws Exception {
+        FileResource fileResource = toEntity(jsonData, FileResource.class);
+        fileResource.setId(getObjectId(BizObject.FileResource));
+        return fileResourceManager.saveFileResourceReturnUrl(fileStr, fileName, fileResource);
+
+    }
+
     /**
      * 删除资源表对应关系，并且删除fastdfs相对应当文件
      *
@@ -145,7 +170,6 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
         return filesStrs;
     }
 
-
     /**
      * 下载文件
      *
@@ -154,7 +178,8 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/image_view/{storagePath}", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
-    public String imageView(@ApiParam(name = "storagePath", value = "文件路径", defaultValue = "")
+    public String imageView(
+            @ApiParam(name = "storagePath", value = "文件路径", defaultValue = "")
          @PathVariable(value = "storagePath") String storagePath)throws Exception{
         String s = java.net.URLDecoder.decode(storagePath, "UTF-8");
         String groupName = s.split(":")[0];
@@ -163,4 +188,5 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
         String fileStream = new String(Base64.getEncoder().encode(bytes));
         return fileStream;
     }
+
 }

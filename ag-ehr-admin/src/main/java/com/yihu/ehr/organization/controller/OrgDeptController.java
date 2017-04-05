@@ -9,8 +9,10 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.org.MOrgDept;
 import com.yihu.ehr.model.org.MOrgDeptDetail;
 import com.yihu.ehr.model.org.MOrgMemberRelation;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrgDeptClient;
 import com.yihu.ehr.organization.service.OrgDeptMemberClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,10 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +39,30 @@ public class OrgDeptController  extends BaseController {
 
     @Autowired
     private OrgDeptClient orgDeptClient;
-
     @Autowired
     private OrgDeptMemberClient orgDeptMemberClient;
+    @Autowired
+    private UserClient userClient;
+
+
+
+
+    @ApiOperation(value = "获取所有部门列表")
+    @RequestMapping(value = "/orgDept/getAllOrgDepts", method = RequestMethod.GET)
+    public Envelop getAllOrgDepts() {
+        try {
+            Envelop envelop = new Envelop();
+            envelop.setDetailModelList(orgDeptClient.getAllOrgDepts() );
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
 
     @ApiOperation(value = "根据组织机构ＩＤ获取部门列表")
     @RequestMapping(value = "/orgDept/list", method = RequestMethod.GET)
@@ -292,6 +312,14 @@ public class OrgDeptController  extends BaseController {
             List<MOrgMemberRelation> members = responseEntity.getBody();
             for (MOrgMemberRelation deptMember : members) {
                 OrgDeptMemberModel memberModel = convertToModel(deptMember,OrgDeptMemberModel.class);
+//                if (StringUtils.isNotEmpty(memberModel.getUserId()) ){
+//                    MUser mUser = userClient.getUser(memberModel.getUserId());
+//                    memberModel.setUserName(mUser == null ? "" : mUser.getRealName());
+//                }
+//                if (memberModel.getDeptId()!=null && memberModel.getDeptId()!=0 ){
+//                    MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(memberModel.getDeptId());
+//                    memberModel.setDeptName(mOrgDept == null ? "" : mOrgDept.getName());
+//                }
                 orgMemberModels.add(memberModel);
             }
             int totalCount = getTotalCount(responseEntity);
@@ -299,6 +327,38 @@ public class OrgDeptController  extends BaseController {
         }
         catch (Exception ex)
         {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+
+    @RequestMapping(value = "orgDeptMember/admin/{orgDept_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取部门成员信息", notes = "部门成员信息")
+    public Envelop getOrgMemberRelation(
+            @ApiParam(name = "orgDept_id", value = "", defaultValue = "")
+            @PathVariable(value = "orgDept_id") Long orgDeptId) {
+        try {
+            MOrgMemberRelation mOrgMemberRelation = orgDeptMemberClient.getOrgMemberRelation(orgDeptId);
+            if (mOrgMemberRelation == null) {
+                return failed("提醒消息信息获取失败!");
+            }
+            OrgDeptMemberModel detailModel = convertToModel(mOrgMemberRelation, OrgDeptMemberModel.class);
+            if (StringUtils.isNotEmpty(detailModel.getUserId()) ){
+                MUser mUser = userClient.getUser(detailModel.getUserId());
+                detailModel.setUserName(mUser == null ? "" : mUser.getRealName());
+            }
+            if (StringUtils.isNotEmpty(detailModel.getParentUserId()) ){
+                MUser mUser = userClient.getUser(detailModel.getParentUserId());
+                detailModel.setParentUserName(mUser == null ? "" : mUser.getRealName());
+            }
+            if (detailModel.getDeptId()!=null && detailModel.getDeptId()!=0 ){
+                MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(detailModel.getDeptId());
+                detailModel.setDeptName(mOrgDept == null ? "" : mOrgDept.getName());
+            }
+            return success(detailModel);
+        }
+        catch (Exception ex){
             ex.printStackTrace();
             return failedSystem();
         }
@@ -320,20 +380,29 @@ public class OrgDeptController  extends BaseController {
             String errorMsg = "";
             OrgDeptMemberModel deptMemberModel = objectMapper.readValue(memberRelationJsonData, OrgDeptMemberModel.class);
             MOrgMemberRelation mDeptMember = convertToModel(deptMemberModel, MOrgMemberRelation.class);
-            if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
-                errorMsg+="部门不能为空！";
-            }
+//            if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
+//                errorMsg+="机构不能为空！";
+//            }
             if (StringUtils.isEmpty(mDeptMember.getUserId())) {
                 errorMsg+="用户不能为空！";
             }
             if (mDeptMember.getDeptId() == null){
-                errorMsg+="机构不能为空！";
+                errorMsg+="部门不能为空！";
             }
 
             if(StringUtils.isNotEmpty(errorMsg))
             {
                 return failed(errorMsg);
             }
+
+            MUser mUser = userClient.getUser(mDeptMember.getUserId());
+            mDeptMember.setUserName(mUser == null ? "" : mUser.getRealName());
+
+            MUser mUserp = userClient.getUser(mDeptMember.getParentUserId());
+            mDeptMember.setParentUserName(mUserp == null ? "" : mUserp.getRealName());
+
+            MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(mDeptMember.getDeptId());
+            mDeptMember.setDeptName(mOrgDept == null ? "" : mOrgDept.getName());
 
             String deptMemberJsonStr = objectMapper.writeValueAsString(mDeptMember);
             MOrgMemberRelation deptMember = orgDeptMemberClient.saveOrgDeptMember(deptMemberJsonStr);
@@ -364,20 +433,28 @@ public class OrgDeptController  extends BaseController {
             String errorMsg = "";
             OrgDeptMemberModel deptMemberModel = objectMapper.readValue(memberRelationJsonData, OrgDeptMemberModel.class);
             MOrgMemberRelation mDeptMember = convertToModel(deptMemberModel, MOrgMemberRelation.class);
-            if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
-                errorMsg+="部门不能为空！";
-            }
+//             if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
+//                errorMsg+="机构不能为空！";
+//            }
             if (StringUtils.isEmpty(mDeptMember.getUserId())) {
                 errorMsg+="用户不能为空！";
             }
-            if (mDeptMember.getDeptId() == null) {
-                errorMsg+="机构不能为空！";
+            if (mDeptMember.getDeptId() == null){
+                errorMsg+="部门不能为空！";
             }
 
             if(StringUtils.isNotEmpty(errorMsg))
             {
                 return failed(errorMsg);
             }
+            MUser mUser = userClient.getUser(mDeptMember.getUserId());
+            mDeptMember.setUserName(mUser == null ? "" : mUser.getRealName());
+
+            MUser mUserp = userClient.getUser(mDeptMember.getParentUserId());
+            mDeptMember.setParentUserName(mUserp == null ? "" : mUserp.getRealName());
+
+            MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(mDeptMember.getDeptId());
+            mDeptMember.setDeptName(mOrgDept == null ? "" : mOrgDept.getName());
 
             String deptMemberJsonStr = objectMapper.writeValueAsString(mDeptMember);
             MOrgMemberRelation deptMember = orgDeptMemberClient.saveOrgDeptMember(deptMemberJsonStr);
@@ -392,16 +469,41 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/orgDeptMember/delete" , method = RequestMethod.POST)
-    @ApiOperation(value = "删除机构部门")
-    public boolean deleteDeptMember(
+    @RequestMapping(value = "/orgDeptMember/delete" , method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除机构部门成员")
+    public Envelop deleteDeptMember(
             @ApiParam(name = "memberRelationId", value = "部门成员关系ID")
             @RequestParam(value = "memberRelationId", required = true) Integer memberRelationId
     ){
         try {
             boolean succ = orgDeptMemberClient.deleteOrgDeptMember(memberRelationId);
-            return succ;
+            if (!succ) {
+                return failed("删除失败!");
+            }
+            return success(null);
         } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    /**
+     * 更新成员状态
+     * @param memberRelationId
+     * @return
+     */
+    @RequestMapping(value = "updateStatus" , method = RequestMethod.PUT)
+    @ApiOperation(value = "更新成员状态")
+    public boolean updateStatus(
+            @ApiParam(name = "memberRelationId", value = "memberRelationId", defaultValue = "")
+            @RequestParam(value = "memberRelationId") Integer memberRelationId,
+            @ApiParam(name = "status", value = "状态", defaultValue = "")
+            @RequestParam(value = "status") int status) {
+        try {
+            return orgDeptMemberClient.updateStatusOrgDeptMember(memberRelationId, status);
+        }
+        catch (Exception ex)
         {
             ex.printStackTrace();
             return false;

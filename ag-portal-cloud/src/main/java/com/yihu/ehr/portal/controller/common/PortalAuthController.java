@@ -8,8 +8,7 @@ import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.portal.service.common.PortalAuthClient;
-import com.yihu.ehr.portal.service.PortalLoginClient;
-import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.ehr.portal.service.function.PortalLoginClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -144,13 +143,7 @@ public class PortalAuthController extends BaseController{
             @ApiParam(name = "accessToken", value = "accessToken", defaultValue = "")
             @RequestParam(value = "accessToken") String accessToken) {
         try {
-            String validRes = portalAuthClient.validToken(clientId, accessToken);
-            if (StringUtils.isEmpty(validRes)) {
-                return Result.error("验证失败!");
-            }
-
-            return objectMapper.readValue(validRes,Result.class);
-
+            return portalAuthClient.validToken(clientId, accessToken);
         }
         catch (Exception ex) {
             ex.printStackTrace();

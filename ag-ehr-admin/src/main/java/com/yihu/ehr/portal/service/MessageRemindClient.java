@@ -47,7 +47,7 @@ public interface MessageRemindClient {
                                      @RequestBody String messageRemindJsonData);
 
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindAdmin, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除提醒消息", notes = "根据提醒消息id删除医生")
+    @ApiOperation(value = "删除提醒消息", notes = "根据提醒消息id删除消息信息")
     boolean deleteMessageRemind(@PathVariable(value = "messageRemind_id") String messageRemindId);
 
 }
