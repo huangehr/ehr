@@ -1,0 +1,99 @@
+package com.yihu.ehr.geography.controller;
+
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.geography.service.GeographyDict;
+import com.yihu.ehr.geography.service.GeographyDictService;
+import com.yihu.ehr.model.geography.MGeographyDict;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+/**
+ *
+ */
+@RestController
+@RequestMapping(ApiVersion.Version1_0)
+@Api(value = "Geography-Dict", description = "行政区划地址", tags = {"行政区划地址"})
+public class GeographyDictEndPoint extends EnvelopRestEndPoint {
+
+    @Autowired
+    private GeographyDictService geographyDictService;
+
+    /**
+     * 根据地址等级查询地址信息
+     * @param level
+     * @return
+     */
+    @RequestMapping(value = "/geography_entries/level/{level}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据等级查询行政区划地址")
+    public Collection<MGeographyDict> getAddressByLevel(
+            @ApiParam(name = "level", value = "等级", defaultValue = "")
+            @PathVariable(value = "level") Integer level) {
+        List<GeographyDict> addressDictList = geographyDictService.getLevelToAddr(level);
+        return convertToModels(addressDictList,new ArrayList<>(addressDictList.size()), MGeographyDict.class,"");
+    }
+
+    @RequestMapping(value = "/geography_entries/pid/{pid}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据上级编号查询行政区划地址")
+    public Collection<MGeographyDict> getAddressDictByPid(
+        @ApiParam(name = "pid", value = "上级id", defaultValue = "")
+        @PathVariable(value = "pid") Integer pid) {
+        List<GeographyDict> addressDictList = geographyDictService.getPidToAddr(pid);
+        return convertToModels(addressDictList,new ArrayList<>(addressDictList.size()), MGeographyDict.class,"");
+    }
+
+
+    @RequestMapping(value = "/geography_entries/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id查询行政区划地址")
+    public MGeographyDict getAddressDictById(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @PathVariable(value = "id") String id) {
+        GeographyDict geographyDict =  geographyDictService.findById(id);
+        return convertToModel(geographyDict, MGeographyDict.class);
+    }
+
+    @RequestMapping(value = "/geography_entries_list", method = RequestMethod.POST)
+    public List<MGeographyDict> getAddressDictByIdList(
+            @ApiParam(name = "idList", value = "idList", defaultValue = "")
+            @RequestParam(value = "idList") List<String> idList) {
+        List<MGeographyDict> list=new ArrayList<>();
+        for(int i=0;i<idList.size();i++) {
+            GeographyDict geographyDict = geographyDictService.findById(idList.get(i));
+            list.add(convertToModel(geographyDict, MGeographyDict.class));
+        }
+        return list;
+    }
+
+    @RequestMapping(value = "/geography_entries/CacheAddressDict", method = RequestMethod.POST)
+    @ApiOperation(value = "缓存行政区划地址")
+    public boolean CacheAddressDict( ){
+       return   geographyDictService.CacheAddressDict();
+    }
+
+    @RequestMapping(value = "/geography_entries/GetAddressDictCache/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取缓存行政区划地址")
+    public String GetAddressDictCache(@ApiParam(name = "id", value = "id", defaultValue = "")
+                                           @PathVariable(value = "id") String id ){
+        return   geographyDictService.GetAddressDictCache(id);
+    }
+
+    @RequestMapping(value = "/geography_entries/getAddressDict" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据地址中文名 查询地址编号")
+    Collection<MGeographyDict> getAddressDict(
+            @ApiParam(name = "fields", value = "fields", defaultValue = "")
+            @RequestParam(value = "fields") String[] fields ,
+            @ApiParam(name = "values", value = "values", defaultValue = "")
+            @RequestParam(value = "values") String[] values){
+        List<GeographyDict> geographyDictList = geographyDictService.findByFields(fields,values);
+        return convertToModels(geographyDictList,new ArrayList<>(geographyDictList.size()), MGeographyDict.class,"");
+    }
+
+
+}
