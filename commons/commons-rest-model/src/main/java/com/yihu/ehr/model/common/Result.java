@@ -3,7 +3,7 @@ package com.yihu.ehr.model.common;
 import java.lang.reflect.Field;
 
 /**
- * Created by chenweida on 2015/12/11.
+ * Created by hzp on 2017/03/07.
  * 基础对象
  */
 public class Result {
@@ -65,6 +65,18 @@ public class Result {
         re.successFlg = true;
         re.message = message;
         re.code = 200;
+        return re;
+    }
+
+    /**
+     * 成功消息
+     */
+    public static ObjectResult success(String message,Object data) {
+        ObjectResult re= new ObjectResult();
+        re.successFlg = true;
+        re.message = message;
+        re.code = 200;
+        re.setData(data);
         return re;
     }
 

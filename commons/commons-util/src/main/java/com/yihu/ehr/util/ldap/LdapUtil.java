@@ -30,10 +30,10 @@ import java.util.*;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class LdapUtil {
 
-   /* @Value("${spring.ldap.host}")
+    @Value("${spring.ldap.host}")
     String ldapHost;
 
-    @Value("${spring.ldap.port}")
+    @Value("${spring.ldap.port:0}")
     Integer ldapPort;
 
     @Value("${spring.ldap.bindDn}")
@@ -43,15 +43,13 @@ public class LdapUtil {
     String ldapPassword;
 
 
-
-    // 当前配置信息
-    *//*private static String ldapHost = "172.19.103.87";
-    private static int ldapPort = 389;
+    //*private static String ldapHost = "172.19.103.87";
+    /*private static int ldapPort = 389;
     private static String ldapBindDN = "cn=admin,dc=ehr,dc=jkzl";
-    private static String ldapPassword = "jkzl";*//*
+    private static String ldapPassword = "jkzl"; */
     private LDAPConnection connection = null;
 
-    *//** 连接LDAP *//*
+    //** 连接LDAP *//*
     private void openConnection() throws Exception {
         if (connection == null) {
             try {
@@ -64,7 +62,7 @@ public class LdapUtil {
 
     }
 
-    *//** 创建DC *//*
+    //** 创建DC *//*
     public void createDC(String baseDN, String dc) {
         String entryDN = "dc=" + dc + "," + baseDN;
         try {
@@ -88,7 +86,7 @@ public class LdapUtil {
         }
     }
 
-    *//** 创建组织 *//*
+    //** 创建组织 *//*
     public void createO(String baseDN, String o) {
         String entryDN = "o=" + o + "," + baseDN;
         try {
@@ -111,7 +109,7 @@ public class LdapUtil {
         }
     }
 
-    *//** 创建组织单元 *//*
+    //** 创建组织单元 *//*
     public void createOU(String baseDN, String ou) {
         String entryDN = "ou=" + ou + "," + baseDN;
         try {
@@ -134,8 +132,8 @@ public class LdapUtil {
         }
     }
 
-    *//*************************************** 用户操作 ******************************************************************//*
-    *//** 创建用户 *//*
+    //*************************************** 用户操作 ******************************************************************//*
+    //** 创建用户 *//*
     public void createEntry(String baseDN, String uid) {
         String entryDN = "uid=" + uid + "," + baseDN;
         try {
@@ -158,7 +156,7 @@ public class LdapUtil {
         }
     }
 
-    *//** 修改用户信息 *//*
+    //** 修改用户信息 *//*
     public void modifyEntry(String requestDN, Map<String,String> data) {
         try {
             // 连接LDAP
@@ -182,7 +180,7 @@ public class LdapUtil {
         }
     }
 
-    *//** 删除用户信息 *//*
+    //** 删除用户信息 *//*
     public void deleteEntry(String requestDN) {
         try {
             // 连接LDAP
@@ -201,25 +199,25 @@ public class LdapUtil {
         }
     }
 
-    *//************************************* 查询接口 **********************************************************//*
+    //************************************* 查询接口 **********************************************************//*
 
-    *//**
-     * 根据对象类型查询某节点下所有
-     *//*
+    /**
+      根据对象类型查询某节点下所有
+     */
     public List<Map<String,Object>> queryAllByObjectClass(String searchDN, String objectClass) {
         return queryLdap(SearchScope.SUB,searchDN,objectClass);
     }
 
-    *//**
-     * 查询一级子节点
-     *//*
+    /*
+      查询一级子节点
+     */
     public List<Map<String,Object>> queryChildren(String searchDN, String objectClass) {
         return queryLdap(SearchScope.ONE,searchDN,objectClass);
     }
 
-    *//**
+    /**
      * 查询单个子节点
-     *//*
+     */
     public Map<String,Object> queryBase(String searchDN, String objectClass) {
         List<Map<String,Object>> list = queryLdap(SearchScope.BASE,searchDN,objectClass);
         if(list!=null && list.size()>0)
@@ -231,14 +229,14 @@ public class LdapUtil {
         }
     }
 
-    *//**
+    /**
      * 查询所有子节点(不包含自己)
-     *//*
+     */
     public List<Map<String,Object>> queryAllWithoutSelf(String searchDN, String objectClass) {
         return queryLdap(SearchScope.SUBORDINATE_SUBTREE,searchDN,objectClass);
     }
 
-    *//** 查询接口 *//*
+    /** 查询接口 */
     private List<Map<String,Object>> queryLdap(SearchScope searchScope,String searchDN, String objectClass) {
         List<Map<String,Object>> re = new ArrayList<>();
         try {
@@ -273,7 +271,7 @@ public class LdapUtil {
         }
 
         return re;
-    }*/
+    }
 
 
 }
