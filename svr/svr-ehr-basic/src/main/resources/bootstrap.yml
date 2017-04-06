@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-ehr-basic-cws
+    name: svr-ehr-basic
 
 ---
 spring:
