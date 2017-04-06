@@ -39,8 +39,8 @@ public class StandardPackage {
     private String demographicId;                       // 人口学ID
     private Date createDate;                            // 包创建时间
     private String cdaVersion;
-    private ProfileType profileType;
-    private EventType eventType;
+    private ProfileType profileType; //1结构化档案，文件档案，链接档案
+    private EventType eventType; // 0门诊 1住院 2体检
 
     protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 

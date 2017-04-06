@@ -15,6 +15,7 @@ import java.util.Date;
 @Access(value = AccessType.PROPERTY)
 public class User {
     private String id;
+    private String userSerial;
     private Date createDate;
     private Date lastLoginTime;
     private String email;
@@ -75,6 +76,15 @@ public class User {
     }
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Column(name = "user_serial")
+    public String getUserSerial() {
+        return userSerial;
+    }
+
+    public void setUserSerial(String userSerial) {
+        this.userSerial = userSerial;
     }
 
     @Column(name = "create_date",  nullable = true)

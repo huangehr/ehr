@@ -3,8 +3,7 @@ package com.yihu.ehr.constants;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * @author Sand
- * @created 2016.04.26 19:43
+ * 0门诊 1住院 2体检
  */
 public enum EventType {
     Clinic(0),              // 门诊
