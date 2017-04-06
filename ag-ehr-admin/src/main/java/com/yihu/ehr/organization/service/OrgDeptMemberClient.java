@@ -8,10 +8,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -36,6 +33,9 @@ public interface OrgDeptMemberClient {
             @RequestParam(value = "page", required = false) int page
     ) ;
 
+    @RequestMapping(value = "orgDeptMember/admin/{orgDept_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取部门成员信息", notes = "部门成员信息")
+    MOrgMemberRelation getOrgMemberRelation(@PathVariable(value = "orgDept_id") Long orgDeptId);
 
     @RequestMapping(value = "/orgDeptMember/save", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增部门成员")
@@ -49,6 +49,15 @@ public interface OrgDeptMemberClient {
     MOrgMemberRelation updateOrgDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = "修改部门成员信息")
             @RequestBody String memberRelationJsonData
+    ) ;
+
+    @RequestMapping(value = "/orgDeptMember/updateStatus", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改部门成员状态" )
+    boolean updateStatusOrgDeptMember(
+            @ApiParam(name = "memberRelationId", value = "部门成员ID")
+            @RequestParam(value = "memberRelationId", required = true) Integer memberRelationId,
+            @ApiParam(name = "status", value = "状态", defaultValue = "")
+            @RequestParam(value = "status") int status
     ) ;
 
     @RequestMapping(value = "/orgDeptMember/delete", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

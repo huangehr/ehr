@@ -91,4 +91,7 @@ public interface OrgDeptClient {
             @RequestParam(value = "afterDeptId", required = true) Integer afterDeptId
     );
 
+    @RequestMapping(value = "/orgDept/getAllOrgDepts", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有的部门列表")
+    List getAllOrgDepts();
 }

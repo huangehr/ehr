@@ -39,11 +39,19 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
         }
     }
 
-    public OrgMemberRelation deleteDeptMember(Integer memRelationId){
+    public OrgMemberRelation updateStatusDeptMember(Integer memRelationId,int status){
         OrgMemberRelation relation = relationRepository.findOne(memRelationId);
-        relation.setStatus(1);
+        relation.setStatus(status);
         relationRepository.save(relation);
         return relation;
     }
 
+    public void deleteDeptMember(Integer memRelationId){
+        relationRepository.delete(memRelationId);
+    }
+
+    public OrgMemberRelation getOrgMemberRelation(Long memRelationId) {
+        OrgMemberRelation relation = relationRepository.findOne(Integer.valueOf( String.valueOf(memRelationId) ) );
+        return relation;
+    }
 }
