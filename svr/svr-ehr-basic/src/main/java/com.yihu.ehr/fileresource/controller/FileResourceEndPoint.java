@@ -85,6 +85,29 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     }
 
     /**
+     * 上传文件 返回 整个http url
+     *
+     * @param fileStr
+     * @param fileName
+     * @param jsonData
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/files_upload_returnHttpUrl", method = RequestMethod.POST)
+    @ApiOperation(value = "上传文件", notes = "上传文件返回url")
+    public String fileUploadReturnHttpUrl(
+            @ApiParam(name = "file_str", value = "文件字符串")
+            @RequestBody String fileStr,
+            @ApiParam(name = "file_name", value = "文件名")
+            @RequestParam(value = "file_name") String fileName,
+            @ApiParam(name = "json_data", value = "文件资源属性")
+            @RequestParam(value = "json_data") String jsonData) throws Exception {
+        FileResource fileResource = toEntity(jsonData, FileResource.class);
+        fileResource.setId(getObjectId(BizObject.FileResource));
+        return fileResourceManager.saveFileResourceReturnHttpUrl(fileStr, fileName, fileResource);
+    }
+
+    /**
      * 删除资源表对应关系，并且删除fastdfs相对应当文件
      *
      * @param objectId
