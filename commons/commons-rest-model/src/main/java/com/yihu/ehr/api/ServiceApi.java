@@ -282,14 +282,34 @@ public class ServiceApi {
         public static final String Scheduler = "/scheduler";
     }
 
-    public static class Patients {
 
+    public static class Patients {
+        public static final String CardApply = "/patientCards/apply";	 //卡认证申请
+        public static final String CardList = "/patientCards/list";  //	个人账号列表
+        public static final String CardApplyListManager = "/patientCards/manager/applyList";//	管理员--卡认证列表
+        public static final String CardVerifyManager = "/patientCards/manager/verify";//	管理员--卡认证审核操作
+        public static final String CardBindManager = "/patientCards/manager/bind";//	管理员--后台绑卡操作
+
+        public static final String ArchiveApply = "/patientArchive/apply";//	档案认领申请（临时卡）
+        public static final String ArchiveApplyList = "/patientArchive/applyList";//	个人档案认领列表
+        public static final String ArchiveList = "/patientArchive/list";//个人档案列表
+        public static final String ArchiveUnbind = "/patientArchive/unbind";//	管理员--通过卡号获取未认领档案
+        public static final String ArchiveApplyListManager = "/patientArchive/manager/applyList";//	管理员--档案认领列表
+        public static final String ArchiveVerifyManager = "/patientArchive/manager/verify";//	管理员--档案认领审核操作
+
+        public static final String Authentications = "/patient/authentications";
+        public static final String Authentication = "/patient/Authentication/{id}";
+
+
+
+        /******************************* 旧接口 **********************************************************/
         public static final String ArApplications = "/archive/applications";
         public static final String ArApplication = "/archive/applications/{id}";
 
         public static final String ArRelations = "/archive/relations";
         public static final String ArRelation = "/archive/relation/{id}";
         public static final String ArRelationsExistence = "/archive/relations/existence";
+        /******************************* 旧接口 **********************************************************/
 
         public static final String Authentications = "/patient/authentications";
         public static final String Authentication = "/patient/Authentication/{id}";
