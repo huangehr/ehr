@@ -1,3 +1,9 @@
+server:
+  port: ${svr-organization.server.port}
+
+management:
+  port: ${server.port}
+
 logging:
   level:
     com:
@@ -6,19 +12,6 @@ logging:
       springframework:
         web: INFO
       hibernate: ERROR
-
-server:
-  port: ${svr-organization.server.port}
-
-management:
-  port: ${server.port}
-
-info:
-  app:
-    name: OrganizationService
-    description: EHR platform organization service.
-    version: 1.0.0
-
 
 spring:
   # REDIS
@@ -30,6 +23,7 @@ spring:
     #sentinel:
     #  master: # Name of Redis server.
     #  nodes: # Comma-separated list of host:port pairs.
+
     pool:
       max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
@@ -70,11 +64,16 @@ spring:
   redis:
     host: 192.168.1.220 # Redis server host.
 
+  ldap:
+    host: 172.19.103.87
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
-
-
   password: ha
 
 ---
@@ -127,5 +126,3 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
-
-
