@@ -30,14 +30,6 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private OrgMemberRelationService relationService;
 
-    @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "查询所有成员列表")
-    public List<MOrgMemberRelation> getAllOrgDeptMember() throws Exception {
-        List<OrgMemberRelation> orgMemberRelations = relationService.search(null);
-        return (List<MOrgMemberRelation>) convertToModels(orgMemberRelations, new ArrayList<MOrgMemberRelation>(orgMemberRelations.size()), MOrgMemberRelation.class, null);
-    }
-
-
     @RequestMapping(value = "/orgDeptMember/list", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据条件 查询部门下成员列表")
     public List<MOrgMemberRelation> searchOrgDeptMembers(
@@ -60,18 +52,7 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value ="orgDeptMember/admin/{orgDept_id}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取部门成员信息")
-    public MOrgMemberRelation getMessageRemindInfo(
-            @ApiParam(name = "orgDept_id", value = "", defaultValue = "")
-            @PathVariable(value = "orgDept_id") Long orgDeptId) {
-        OrgMemberRelation orgMemberRelation = relationService.getOrgMemberRelation(orgDeptId);
-        MOrgMemberRelation mOrgMemberRelation   = convertToModel(orgMemberRelation, MOrgMemberRelation.class);
-        return mOrgMemberRelation;
-    }
-
-
-    @RequestMapping(value = "/orgDeptMember/save", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/orgDeptMember", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增部门成员")
     public MOrgMemberRelation saveOrgDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = "新增部门成员信息")
@@ -83,7 +64,7 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         return convertToModel(memberRelation, MOrgMemberRelation.class);
     }
 
-    @RequestMapping(value = "/orgDeptMember/update", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/orgDeptMember", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改部门成员")
     public MOrgMemberRelation updateOrgDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = "修改部门成员信息")
@@ -94,27 +75,17 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         return convertToModel(memberRelation, MOrgMemberRelation.class);
     }
 
-    @RequestMapping(value = "/orgDeptMember/updateStatus", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改部门成员状态" )
-    public boolean updateStatusOrgDeptMember(
-            @ApiParam(name = "memberRelationId", value = "部门成员ID")
-            @RequestParam(value = "memberRelationId", required = true) Integer memberRelationId,
-            @ApiParam(name = "status", value = "状态", defaultValue = "")
-            @RequestParam(value = "status") int status
-    ) throws Exception {
-        relationService.updateStatusDeptMember(memberRelationId, status);
-        return true;
-    }
-
     @RequestMapping(value = "/orgDeptMember/delete", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "删除部门成员" )
     public boolean deleteOrgDeptMember(
             @ApiParam(name = "memberRelationId", value = "部门成员ID")
             @RequestParam(value = "memberRelationId", required = true) Integer memberRelationId
     ) throws Exception {
+
         relationService.deleteDeptMember(memberRelationId);
         return true;
     }
+
 
 
 
