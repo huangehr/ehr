@@ -310,9 +310,6 @@ public class ServiceApi {
         public static final String ArRelation = "/archive/relation/{id}";
         public static final String ArRelationsExistence = "/archive/relations/existence";
         /******************************* 旧接口 **********************************************************/
-
-        public static final String Authentications = "/patient/authentications";
-        public static final String Authentication = "/patient/Authentication/{id}";
     }
 
     public static class Authentication {
