@@ -29,7 +29,7 @@ public class Zipper {
      * @return 解压后文件数组
      * @throws ZipException 压缩文件有损坏或者解压缩失败抛出
      */
-    public File[] unzip(String zip, String dest, String passwd) throws ZipException {
+    public File[] unzip(String zip, String dest, String passwd) throws Exception {
         File zipFile = new File(zip);
         return unzip(zipFile, dest, passwd);
     }
@@ -42,7 +42,7 @@ public class Zipper {
      * @return 解压后文件数组
      * @throws ZipException 压缩文件有损坏或者解压缩失败抛出
      */
-    public File[] unzip(String zip, String pwd) throws ZipException {
+    public File[] unzip(String zip, String pwd) throws Exception {
         File zipFile = new File(zip);
         File parentDir = zipFile.getParentFile();
         return unzip(zipFile, parentDir.getAbsolutePath(), pwd);
@@ -58,7 +58,7 @@ public class Zipper {
      * @return 解压后文件数组
      * @throws ZipException 压缩文件有损坏或者解压缩失败抛出
      */
-    public File[] unzip(File zipFile, String dest, String passwd) throws ZipException {
+    public File[] unzip(File zipFile, String dest, String passwd) throws Exception {
         ZipFile zFile = new ZipFile(zipFile);
         zFile.setFileNameCharset("GBK");
         if (!zFile.isValidZipFile()) {
@@ -91,7 +91,7 @@ public class Zipper {
      * @return 成功-File 失败-null
      * @throws ZipException
      */
-    public File zipFile(File unzipFile, String zipFileName) throws ZipException {
+    public File zipFile(File unzipFile, String zipFileName) throws Exception {
         return zipFile(unzipFile, zipFileName, null);
     }
 
@@ -102,7 +102,7 @@ public class Zipper {
      * @return 成功-File 失败-null
      * @throws ZipException
      */
-    public File zipFile(File unzipFile, String zipFileName, String pwd) throws ZipException {
+    public File zipFile(File unzipFile, String zipFileName, String pwd) throws Exception {
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
         parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
@@ -139,7 +139,7 @@ public class Zipper {
      * @return 成功-File 失败-null
      * @throws ZipException
      */
-    public File unzipFile(File zipFile, String unzipDirectory) throws ZipException {
+    public File unzipFile(File zipFile, String unzipDirectory) throws Exception {
         return unzipFile(zipFile, unzipDirectory, null);
     }
 
@@ -150,7 +150,7 @@ public class Zipper {
      * @return 成功-File 失败-null
      * @throws ZipException
      */
-    public File unzipFile(File zipFile, String unzipDirectory, String pwd) throws ZipException {
+    public File unzipFile(File zipFile, String unzipDirectory, String pwd) throws Exception {
         ZipFile zFile = new ZipFile(zipFile);
         zFile.setFileNameCharset("GBK");
         if (!zFile.isValidZipFile()) {
