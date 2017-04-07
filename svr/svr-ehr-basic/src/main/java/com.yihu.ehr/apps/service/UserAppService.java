@@ -17,5 +17,4 @@ public class UserAppService extends BaseJpaService<UserApp, XUserAppRepository> 
     @Autowired
     private XUserAppRepository userAppRepository;
 
-
 }

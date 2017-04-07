@@ -19,9 +19,18 @@ import java.util.List;
 @FeignClient(name=MicroServices.Application)
 public interface UserAppClient {
 
-    @RequestMapping(value =  ApiVersion.Version1_0 +ServiceApi.UserApp.UserAppList, method = RequestMethod.GET)
+    @RequestMapping(value =  ApiVersion.Version1_0 + ServiceApi.UserApp.UserAppList, method = RequestMethod.GET)
     @ApiOperation(value = "根据用户id获取App列表")
-    public List<MUserApp> getUserAppById(
+    List<MUserApp> getUserAppById(
             @ApiParam(name = "userId", value = "用户id")
             @RequestParam(value = "userId", required = true) String userId);
+
+
+    @RequestMapping(value = ApiVersion.Version1_0 +  ServiceApi.UserApp.UserAppShow, method = RequestMethod.GET)
+    @ApiOperation(value = "更新用户权限应用的云门户展示状态")
+    MUserApp updateUserAppShowFlag(
+            @ApiParam(name = "id", value = "用户APP关联ID")
+            @RequestParam(value = "id", required = true) String id,
+            @ApiParam(name = "flag", value = "要更新的展示状态", defaultValue = "1")
+            @RequestParam(value = "flag", required = true) String flag);
 }

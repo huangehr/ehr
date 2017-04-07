@@ -43,21 +43,23 @@ public class UserAppEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = ServiceApi.UserApp.UserAppShow, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.UserApp.UserAppShow, method = RequestMethod.GET)
     @ApiOperation(value = "更新用户权限应用的云门户展示状态")
-    public Boolean updateUserAppShowFlag(
+    public MUserApp updateUserAppShowFlag(
             @ApiParam(name = "id", value = "用户APP关联ID")
             @RequestParam(value = "id", required = true) String id,
-            @ApiParam(name = "flag", value = "用户id", defaultValue = "1")
-            @RequestParam(value = "flag", required = true) Integer flag) throws Exception {
+            @ApiParam(name = "flag", value = "要更新的展示状态", defaultValue = "1")
+            @RequestParam(value = "flag", required = true) String flag) throws Exception {
 
-        UserApp userApp = userAppService.retrieve(id);
-        if(userApp != null){
-            userApp.setShowFlag(flag);
-            userAppService.save(userApp);
-            return true;
-        }else{
-            return false;
+            List<UserApp> userAppList = userAppService.findByField("id", id);
+            UserApp userApp = new UserApp();
+            if(userAppList != null){
+                userApp = userAppList.get(0);
+                userApp.setShowFlag(Integer.parseInt(flag));
+                MUserApp mUserApp = convertToModel(userAppService.save(userApp),MUserApp.class);
+                return mUserApp;
+            }else{
+                return null;
         }
     }
 }

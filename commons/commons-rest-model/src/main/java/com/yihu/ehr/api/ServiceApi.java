@@ -244,6 +244,7 @@ public class ServiceApi {
 
     public static class UserApp {
         public static final String UserAppList = "/userAppList";
+        public static final String UserAppShow = "/userApp/show";
     }
 
     public static class Dictionaries {
