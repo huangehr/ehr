@@ -111,10 +111,6 @@
             <artifactId>mysql-connector-java</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-security</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -155,31 +151,6 @@
             <artifactId>commons-ui-swagger</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-rest-model</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-profile-core</artifactId>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.yihu.ehr</groupId>
-                    <artifactId>commons-data-redis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.yihu.ehr</groupId>
-                    <artifactId>commons-redis-keyschema</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!--<dependency>-->
-        <!--<groupId>com.yihu.ehr</groupId>-->
-        <!--<artifactId>commons-metrics</artifactId>-->
-        <!--<scope>compile</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>
