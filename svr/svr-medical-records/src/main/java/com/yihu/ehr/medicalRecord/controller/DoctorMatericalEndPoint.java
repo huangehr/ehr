@@ -1,6 +1,6 @@
 package com.yihu.ehr.medicalRecord.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.medicalRecord.model.DTO.Document;
 import com.yihu.ehr.medicalRecord.service.MaterialService;

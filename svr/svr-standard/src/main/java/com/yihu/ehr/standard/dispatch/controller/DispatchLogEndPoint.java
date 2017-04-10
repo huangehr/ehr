@@ -1,6 +1,6 @@
 package com.yihu.ehr.standard.dispatch.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.standard.MDispatchLog;
 import com.yihu.ehr.standard.commons.ExtendEndPoint;

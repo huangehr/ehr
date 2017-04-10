@@ -1,7 +1,7 @@
 package com.yihu.ehr.portal.controller.common;
 
 import com.yihu.ehr.agModel.user.UsersModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ObjectResult;

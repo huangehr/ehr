@@ -1,6 +1,6 @@
 package com.yihu.ehr.portal.controller.function;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.portal.service.common.AppClient;
 import com.yihu.ehr.portal.service.function.UserAppClient;

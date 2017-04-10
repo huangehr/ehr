@@ -1,6 +1,6 @@
 package com.yihu.ehr.apps.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.model.AppApi;
 import com.yihu.ehr.apps.service.AppApiParameterService;
 import com.yihu.ehr.apps.service.AppApiService;
