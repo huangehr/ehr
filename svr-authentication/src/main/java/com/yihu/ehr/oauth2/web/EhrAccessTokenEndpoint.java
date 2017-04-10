@@ -11,6 +11,7 @@
  */
 package com.yihu.ehr.oauth2.web;
 
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.oauth2.model.AccessToken;
 import com.yihu.ehr.oauth2.model.ObjectResult;
 import com.yihu.ehr.oauth2.model.Result;
@@ -82,7 +83,7 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
       * @param parameters
      * @return
      */
-    @RequestMapping(value = "/oauth/accesstoken", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value =ServiceApi.Authentication.AccessToken, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public AccessToken postAccessToken(@RequestBody Map<String, String> parameters) {
 
         String clientId = getClientId(parameters);
@@ -147,7 +148,7 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
      *
      * @return
      */
-    @RequestMapping(value = "/oauth/validtoken", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.GET)
     public Result validToken(@RequestParam(value = "client_id") String clientId,
                              @RequestParam(value = "access_token") String accessToken) throws Exception {
 
