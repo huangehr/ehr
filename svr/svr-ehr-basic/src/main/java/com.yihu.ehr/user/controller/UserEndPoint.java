@@ -1,7 +1,7 @@
 package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;

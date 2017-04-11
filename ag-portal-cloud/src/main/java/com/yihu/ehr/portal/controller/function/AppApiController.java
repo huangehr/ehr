@@ -1,7 +1,7 @@
 package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.agModel.app.AppApiModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.portal.service.function.AppApiClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;

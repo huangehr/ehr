@@ -1,6 +1,6 @@
 package com.yihu.ehr.security.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.security.feign.AppClient;

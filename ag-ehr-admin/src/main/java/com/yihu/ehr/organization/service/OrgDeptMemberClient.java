@@ -55,7 +55,7 @@ public interface OrgDeptMemberClient {
     @ApiOperation(value = "修改部门成员状态" )
     boolean updateStatusOrgDeptMember(
             @ApiParam(name = "memberRelationId", value = "部门成员ID")
-            @RequestParam(value = "memberRelationId", required = true) Integer memberRelationId,
+            @RequestParam(value = "memberRelationId", required = true) int memberRelationId,
             @ApiParam(name = "status", value = "状态", defaultValue = "")
             @RequestParam(value = "status") int status
     ) ;
@@ -66,4 +66,8 @@ public interface OrgDeptMemberClient {
             @ApiParam(name = "memberRelationId", value = "部门成员ID")
             @RequestParam(value = "memberRelationId", required = true) Integer memberRelationId
     ) ;
+
+    @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有成员列表")
+    ResponseEntity<List<MOrgMemberRelation>> getAllOrgDeptMember();
 }

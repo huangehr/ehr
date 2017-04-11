@@ -2,7 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.RsAppResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.TreeModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.app.MApp;

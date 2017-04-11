@@ -1,6 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.resource.client.AdaptionCacheClient;
 import com.yihu.ehr.util.rest.Envelop;

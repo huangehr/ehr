@@ -332,6 +332,33 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
+    @ApiOperation(value = "获取所有成员列表")
+    @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET)
+    public Envelop getAllOrgDeptMember() {
+        try {
+            Envelop envelop = new Envelop();
+            List<MOrgMemberRelation> memberRelationList = new ArrayList<MOrgMemberRelation>();
+            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.getAllOrgDeptMember();
+            memberRelationList = responseEntity.getBody();
+            if (memberRelationList !=null && memberRelationList.size() > 0 ){
+                for (MOrgMemberRelation  memberRelation : memberRelationList){
+                    if (StringUtils.isNotEmpty(memberRelation.getUserId() ) && StringUtils.isEmpty(memberRelation.getUserName() ) ) {
+                        MUser mUser = userClient.getUser(memberRelation.getUserId());
+                        memberRelation.setUserName(mUser == null ? "" : mUser.getRealName());
+                    }
+                }
+            }
+            envelop.setDetailModelList( memberRelationList );
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
 
     @RequestMapping(value = "orgDeptMember/admin/{orgDept_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取部门成员信息", notes = "部门成员信息")
@@ -493,13 +520,13 @@ public class OrgDeptController  extends BaseController {
      * @param memberRelationId
      * @return
      */
-    @RequestMapping(value = "updateStatus" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/orgDeptMember/updateStatus" , method = RequestMethod.PUT)
     @ApiOperation(value = "更新成员状态")
-    public boolean updateStatus(
+    public boolean updateDeptMemberStatus(
             @ApiParam(name = "memberRelationId", value = "memberRelationId", defaultValue = "")
             @RequestParam(value = "memberRelationId") Integer memberRelationId,
             @ApiParam(name = "status", value = "状态", defaultValue = "")
-            @RequestParam(value = "status") int status) {
+            @RequestParam(value = "status") Integer status) {
         try {
             return orgDeptMemberClient.updateStatusOrgDeptMember(memberRelationId, status);
         }

@@ -128,7 +128,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
      * @return
      * @throws Exception
      */
-    public String CDAToImage(Map<String, Object> model, String type, int width, int height) throws Exception {
+    private String CDAToImage(Map<String, Object> model, String type, int width, int height) throws Exception {
         try {
             //返回文件路径
             String filePath = "";
@@ -257,7 +257,7 @@ public class ThridPrescriptionService extends BaseJpaService<Template, XTemplate
      * @return
      * @throws Exception
      */
-    public String fillTemplate(String fileString, Object model) throws Exception {
+    private String fillTemplate(String fileString, Object model) throws Exception {
         try {
             //模板文件
             File tempFile = new File(fileString);

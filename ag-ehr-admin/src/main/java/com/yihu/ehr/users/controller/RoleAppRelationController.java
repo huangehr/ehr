@@ -1,7 +1,7 @@
 package com.yihu.ehr.users.controller;
 
 import com.yihu.ehr.agModel.user.RoleAppRelationModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;

@@ -1,6 +1,6 @@
 package com.yihu.ehr.archivrsecurity.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.archivrsecurity.dao.model.SmsMessageReply;
 import com.yihu.ehr.archivrsecurity.service.SmsMessageReplyService;
 import com.yihu.ehr.constants.ApiVersion;

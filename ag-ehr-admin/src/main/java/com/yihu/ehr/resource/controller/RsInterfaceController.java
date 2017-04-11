@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.RsInterfaceModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsInterface;
 import com.yihu.ehr.resource.client.RsInterfaceClient;

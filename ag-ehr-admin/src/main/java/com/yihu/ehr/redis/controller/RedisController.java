@@ -1,6 +1,6 @@
 package com.yihu.ehr.redis.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.redis.service.HpIcd10Cache;
