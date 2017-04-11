@@ -61,6 +61,15 @@ public class AppController extends BaseController {
     @Autowired
     private AppApiClient appApiClient;
 
+
+    @RequestMapping(value = "test", method = RequestMethod.GET)
+    @ApiOperation(value = "获取app列表，不分页")
+    public Envelop test() throws Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+    
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
     public Envelop getApps(
