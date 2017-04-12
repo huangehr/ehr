@@ -130,18 +130,9 @@ public class OrgDeptController  extends BaseController {
     @ApiOperation(value = "新增机构部门")
     public Envelop create(
             @ApiParam(name = "orgDeptsJsonData", value = " 部门信息Json", defaultValue = "")
-            @RequestParam(value = "orgDeptsJsonData", required = false) String orgDeptsJsonData,
-            @ApiParam(name = "geographyModelJsonData", value = "地址信息json", defaultValue = "")
-            @RequestParam(value = "geographyModelJsonData", required = false) String geographyModelJsonData){
+            @RequestParam(value = "orgDeptsJsonData", required = false) String orgDeptsJsonData){
         try {
             String errorMsg = "";
-
-            GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData,GeographyModel.class);
-
-            if (geographyModel.nullAddress()) {
-                errorMsg+="地址不能为空！";
-            }
-
             OrgDeptModel orgDeptModel = objectMapper.readValue(orgDeptsJsonData, OrgDeptModel.class);
             MOrgDept mOrgDept = convertToModel(orgDeptModel, MOrgDept.class);
 

@@ -42,7 +42,9 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/orgDept/getAllOrgDepts", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "查询所有部门列表")
     public List<MOrgDept> getAllOrgDepts() throws Exception {
-        List<OrgDept> orgDepts = orgDeptService.search(null);
+        String filters = "delFlag=0";
+        String sorts = "+sortNo";
+        List<OrgDept> orgDepts = orgDeptService.search(filters,sorts);
         return (List<MOrgDept>) convertToModels(orgDepts, new ArrayList<MOrgDept>(orgDepts.size()), MOrgDept.class, null);
     }
 
