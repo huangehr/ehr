@@ -1,5 +1,6 @@
 package com.yihu.ehr.data.hbase;
 
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
@@ -10,8 +11,10 @@ import org.springframework.data.hadoop.hbase.TableCallback;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Bean使用原型模式。
@@ -79,4 +82,86 @@ public class HBaseDao extends AbstractHBaseClient {
             }
         });
     }
+
+
+
+    /**
+     * 根据 rowkey删除一条记录
+     */
+    public void delete(String tableName, String rowkey)  {
+        hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
+
+            public Object[] doInTable(HTableInterface table) throws Throwable {
+                Delete d = new Delete(rowkey.getBytes());
+
+                table.delete(d);
+
+                return null;
+            }
+        });
+    }
+
+    /**
+     * 通过表名  key 和 列族 和列 获取一个数据
+     */
+    public String get(String tableName ,String rowkey, String familyName, String qualifier) {
+        return hbaseTemplate.get(tableName, rowkey,familyName,qualifier ,new RowMapper<String>(){
+            public String mapRow(Result result, int rowNum) throws Exception {
+                List<Cell> ceList =   result.listCells();
+                String res = "";
+                if(ceList!=null&&ceList.size()>0){
+                    for(Cell cell:ceList){
+                        res = Bytes.toString( cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
+                    }
+                }
+                return res;
+            }
+        });
+    }
+
+    /**
+     * 修改某行某列值
+     */
+    public void put(String tableName ,String rowkey, String familyName, String qualifier,String value) throws Exception
+    {
+        hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
+
+            public Object[] doInTable(HTableInterface table) throws Throwable {
+                Put p = new Put(rowkey.getBytes());
+                p.add(familyName.getBytes(), qualifier.getBytes(), value.getBytes());
+
+                table.put(p);
+
+                return null;
+            }
+        });
+    }
+
+    /**
+     * 新增行
+     */
+    public void add(String tableName , String rowkey, Map<String,Map<String,String>> family) throws Exception
+    {
+        hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
+
+            public Object[] doInTable(HTableInterface table) throws Throwable {
+
+                Put p = new Put(rowkey.getBytes());
+                for(String familyName : family.keySet())
+                {
+                    Map<String,String> map = family.get(familyName);
+
+                    for (String qualifier : map.keySet())
+                    {
+                        String value = map.get(qualifier);
+                        p.add(familyName.getBytes(), qualifier.getBytes(), value.getBytes());
+                    }
+                }
+                table.put(p);
+
+                return null;
+            }
+        });
+    }
+
 }

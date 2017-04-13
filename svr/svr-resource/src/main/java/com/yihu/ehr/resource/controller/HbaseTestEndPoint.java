@@ -150,7 +150,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("获取单条数据")
     @RequestMapping(value = "getOneResult",method = RequestMethod.POST)
-    public String getOneResult(@ApiParam(value="表名",defaultValue = "HH")
+    public String getOneResult(@ApiParam(value="表名",defaultValue = "HealthProfile")
                                @RequestParam String tableName,
                                @ApiParam(value="主键",defaultValue = "1")
                                @RequestParam String rowKey)

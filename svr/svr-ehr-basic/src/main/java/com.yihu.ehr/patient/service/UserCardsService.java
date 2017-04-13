@@ -24,6 +24,8 @@ public class UserCardsService {
 
     @Autowired
     private XUserCardsDao userCardsDao;
+    @Autowired
+    private ArchiveRelationService archiveRelationService;
 
     /**
      * 获取个人卡列表
@@ -112,6 +114,12 @@ public class UserCardsService {
             return Result.error("该数据不存在！");
         }
         else{
+
+            if(StringUtils.isEmpty(card.getCardNo())||StringUtils.isEmpty(card.getOwnerName())||StringUtils.isEmpty(card.getOwnerIdcard()))
+            {
+                return Result.error("卡信息不完整！");
+            }
+
             card.setStatus(status);
             card.setAuditor(auditor);
             card.setAuditDate(new Date());
@@ -119,7 +127,7 @@ public class UserCardsService {
             userCardsDao.save(card);
 
             //hbase操作
-
+            archiveRelationService.relationByCardNoAndName(card.getCardNo(),card.getOwnerName(),card.getOwnerIdcard());
 
             return Result.success("卡认证审核成功！");
         }
@@ -129,10 +137,14 @@ public class UserCardsService {
      * 管理员--后台绑卡操作
      */
     public UserCards cardBindManager(UserCards card) throws Exception{
-        card = userCardsDao.save(card);
+
+        if(StringUtils.isEmpty(card.getCardNo())||StringUtils.isEmpty(card.getOwnerName())||StringUtils.isEmpty(card.getOwnerIdcard()))
+        {
+           throw new Exception("卡信息不完整！");
+        }
 
         //hbase操作
-
+        archiveRelationService.relationByCardNoAndName(card.getCardNo(),card.getOwnerName(),card.getOwnerIdcard());
 
         return card;
     }

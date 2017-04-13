@@ -6,6 +6,7 @@ import com.yihu.ehr.model.patient.ArchiveApply;
 import com.yihu.ehr.model.patient.ArchiveRelation;
 import com.yihu.ehr.patient.dao.XArchiveApplyDao;
 import com.yihu.ehr.patient.dao.XArchiveRelationDao;
+import com.yihu.ehr.patient.feign.PatientArchiveClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,8 @@ public class ArchiveApplyService {
     private XArchiveApplyDao archiveApplyDao;
     @Autowired
     private XArchiveRelationDao archiveRelationDao;
+    @Autowired
+    private PatientArchiveClient patientArchiveClient;
 
     /**
      * 个人档案认领列表
@@ -102,41 +105,59 @@ public class ArchiveApplyService {
     /**
      * 管理员--档案认领审核操作
      */
-    public Result archiveVerifyManager(Long id,String status, String auditor,String auditReason, Long archiveRelationId) throws Exception{
+    public Result archiveVerifyManager(Long id,String status, String auditor,String auditReason, String archiveRelationIds) throws Exception{
 
         ArchiveApply apply = archiveApplyDao.findOne(id);
 
         if(apply!=null)
         {
-            ArchiveRelation relation = archiveRelationDao.findOne(archiveRelationId);
+            String[] ids = archiveRelationIds.replace("，",",").split(",");
+            String msg = "";
 
-            if(relation!=null)
+            for(String idString :ids)
             {
-                //档案认领审批
-                apply.setStatus(status);
-                apply.setAuditDate(new Date());
-                apply.setAuditor(auditor);
-                apply.setAuditReason(auditReason);
-                archiveApplyDao.save(apply);
+                ArchiveRelation relation = archiveRelationDao.findOne(Long.valueOf(idString));
 
-                if("1".equals(apply.getStatus()))  //审批通过
+                if(relation!=null)
                 {
-                    //档案关联绑定
-                    relation.setIdCardNo(apply.getIdCard());
-                    relation.setStatus("1");
-                    relation.setRelationDate(new Date());
-                    relation.setApplyId(apply.getId());
-                    archiveRelationDao.save(relation);
+                    try {
+                        if ("1".equals(apply.getStatus()))  //审批通过
+                        {
+                            //操作hbase
+                            patientArchiveClient.archiveRelation(relation.getProfileId(), apply.getIdCard());
 
-                    //操作hbase
-
+                            //档案关联绑定
+                            relation.setIdCardNo(apply.getIdCard());
+                            relation.setStatus("1");
+                            relation.setRelationDate(new Date());
+                            relation.setApplyId(apply.getId());
+                            archiveRelationDao.save(relation);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.out.print(ex.getMessage());
+                        msg += "";
+                    }
                 }
+                else{
+                    return Result.error("不存在该份档案记录！");
+                }
+            }
 
-                return Result.error("档案认领审核成功！");
+            //档案认领审批
+            apply.setStatus(status);
+            apply.setAuditDate(new Date());
+            apply.setAuditor(auditor);
+            apply.setAuditReason(auditReason);
+            archiveApplyDao.save(apply);
+
+            if(!StringUtils.isEmpty(msg))
+            {
+                return Result.error("archiveRelationId:"+msg+" ");
             }
-            else{
-                return Result.error("不存在该份档案记录！");
-            }
+
+            return Result.success("档案认领审核成功！");
         }
         else{
             return Result.error("不存在该条申请记录！");

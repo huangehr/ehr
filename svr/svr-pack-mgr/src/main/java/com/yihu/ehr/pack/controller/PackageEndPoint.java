@@ -110,11 +110,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return packageList;
     }
 
-    /**
-     * 接收档案包。
-     *
-     * @param packageCrypto zip密码密文, file 请求体中文件参数名
-     */
+
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
     public void savePackageWithOrg(
@@ -140,12 +136,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 
-    /**
-     * 获取档案包信息。
-     *
-     * @param id
-     * @return
-     */
+
     @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.GET})
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息，若ID为OLDEST，则获取最早，还没解析的档案包")
     public ResponseEntity<MPackage> getPackage(
@@ -164,14 +155,9 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return new ResponseEntity<>(convertToModel(aPackage, MPackage.class), HttpStatus.OK);
     }
 
-    /**
-     * 修改档案包状态。
-     *
-     * @param id
-     * @return
-     */
+
     @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.PUT})
-    @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
+    @ApiOperation(value = "修改档案包状态", notes = "修改档案包状态")
     public ResponseEntity<MPackage> reportStatus(@ApiParam(value = "档案包编号")
                                                  @PathVariable(value = "id") String id,
                                                  @ApiParam(value = "状态")
@@ -196,27 +182,16 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return new ResponseEntity<>((MPackage) null, HttpStatus.OK);
     }
 
-    /**
-     * 删除档案包。
-     *
-     * @param id
-     * @return
-     */
+
     @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.DELETE})
-    @ApiOperation(value = "删除档案", response = Object.class, notes = "删除一个数据包")
+    @ApiOperation(value = "删除档案包", response = Object.class, notes = "删除一个数据包")
     public void deletePackage(@ApiParam(name = "id", value = "档案包编号")
                               @PathVariable(value = "id") String id) {
         packService.deletePackage(id);
     }
 
-    /**
-     * 下载档案包。
-     *
-     * @param id
-     * @return
-     */
     @RequestMapping(value = ServiceApi.Packages.PackageDownloads, method = {RequestMethod.GET})
-    @ApiOperation(value = "获取档案包", notes = "获取档案包的信息")
+    @ApiOperation(value = "下载档案包", notes = "下载档案包")
     public ResponseEntity<MPackage> downloadPackage(@ApiParam(name = "id", value = "档案包编号")
                                                     @PathVariable(value = "id") String id,
                                                     HttpServletResponse response) throws Exception {
@@ -236,13 +211,9 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    /**
-     * 接收档案包(兼容旧接口)
-     *
-     * @param packageCrypto zip密码密文, file 请求体中文件参数名
-     */
+
     @RequestMapping(value = ServiceApi.Packages.LegacyPackages, method = RequestMethod.POST)
-    @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包(兼容旧接口)")
+    @ApiOperation(value = "接收档案(兼容旧接口)", notes = "从集成开放平台接收健康档案数据包(兼容旧接口)")
     @Deprecated
     public void savePackageWithUser(
             @ApiParam(name = "package", value = "档案包", allowMultiple = true) MultipartHttpServletRequest pack,

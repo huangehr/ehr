@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.annotation.Table;
-import com.yihu.ehr.util.ResourceStorageUtil;
+import com.yihu.ehr.profile.core.ResourceCore;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.TreeMap;
  * @author Sand
  * @created 2015.08.16 10:44
  */
-@Table(ResourceStorageUtil.MasterTable)
+@Table(ResourceCore.MasterTable)
 public class FilePackage extends StandardPackage {
     public FilePackage() {
         setProfileType(ProfileType.File);

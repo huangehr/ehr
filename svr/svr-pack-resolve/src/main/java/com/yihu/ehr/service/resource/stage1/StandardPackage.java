@@ -7,12 +7,12 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.annotation.Column;
 import com.yihu.ehr.profile.annotation.Table;
+import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.service.resource.stage1.extractor.EventExtractor;
 import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
 import com.yihu.ehr.profile.util.ProfileId;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.util.ResourceStorageUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +25,7 @@ import java.util.*;
  * @author Sand
  * @created 2015.08.16 10:44
  */
-@Table(ResourceStorageUtil.MasterTable)
+@Table(ResourceCore.MasterTable)
 public class StandardPackage {
     protected ObjectMapper objectMapper =  SpringContext.getApplicationContext().getBean(ObjectMapper.class);
 
