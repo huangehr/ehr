@@ -6,6 +6,7 @@ import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.family.ResourceFamily;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -23,7 +24,16 @@ public class ArchiveRelationService {
      */
     public void archiveRelation(String profileId,String idCardNo) throws Exception
     {
-        hbaseDao.put(ResourceCore.MasterTable,profileId,ResourceFamily.Basic,"name",idCardNo);
+        //判断记录是否存在
+        String re =hbaseDao.get(ResourceCore.MasterTable,profileId);
+
+        if(!StringUtils.isEmpty(re))
+        {
+            hbaseDao.put(ResourceCore.MasterTable,profileId,ResourceFamily.Basic,MasterResourceFamily.BasicColumns.DemographicId,idCardNo);
+        }
+        else{
+            throw new Exception("不存在改条记录");
+        }
     }
 
 
