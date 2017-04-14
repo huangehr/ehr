@@ -31,4 +31,14 @@ public interface XOrganizationRepository extends PagingAndSortingRepository<Orga
 
     @Query("select org from Organization org where org.activityFlag=1")
     List<Organization> findAllOrg();
+
+    @Query("select org from Organization org where org.id=:orgId")
+    List<Organization> findOrgById(@Param("orgId") long orgId);
+
+    @Query("select org from Organization org where org.orgCode=:orgCode")
+    List<Organization> findOrgByCode(@Param("orgCode") String orgCode);
+
+    @Query("select org from Organization org where org.id=:orgId and org.parentHosId=:orgPId")
+    List<Organization> checkSunOrg(@Param("orgPId") int orgPId,@Param("orgId")  long orgId);
+
 }

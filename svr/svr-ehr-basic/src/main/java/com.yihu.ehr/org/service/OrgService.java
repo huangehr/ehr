@@ -30,7 +30,21 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     }
 
     public Organization getOrg(String orgCode) {
-        return organizationRepository.findOne(orgCode);
+        List<Organization> list =  organizationRepository.findOrgByCode(orgCode);
+        if (list.size()>0){
+            return list.get(0);
+        }else {
+            return null;
+        }
+    }
+
+    public Organization getOrgById(String orgId) {
+        List<Organization> list =  organizationRepository.findOrgById(Long.valueOf(orgId));
+        if (list.size()>0){
+            return list.get(0);
+        }else {
+            return null;
+        }
     }
 
     public Organization getOrgByAdminLoginCode(String orgCode,String adminLoginCode) {
@@ -51,6 +65,14 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     public Boolean isExistOrg(String orgCode){
         Organization org = organizationRepository.findOne(orgCode);
         return org!=null;
+    }
+
+    public Boolean checkSunOrg(String orgPid,String orgId){
+        List<Organization> orgs = organizationRepository.checkSunOrg(Integer.valueOf(orgPid), Long.valueOf(orgId));
+        if(orgs!=null && orgs.size() >0){
+            return  true;
+        }
+        return false;
     }
 
 

@@ -120,7 +120,7 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/orgDeptMember/getCountByUserId", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "检查机构下部门相同名称的个数")
+    @ApiOperation(value = "检查机构下部门相同用户的个数")
     public int getCountByUserId(
             @ApiParam(name = "orgId", value = "机构ID")
             @RequestParam(value = "orgId", required = true) Integer orgId,

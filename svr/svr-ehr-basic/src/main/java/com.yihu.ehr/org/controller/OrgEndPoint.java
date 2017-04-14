@@ -47,6 +47,15 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
+
+    @RequestMapping(value = "/organizations/getAllOrgs", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有机构列表")
+    public List<MOrganization> getAllOrgs() throws Exception {
+        List<MOrganization> orgs = orgService.search(null);
+        return (List<MOrganization>) convertToModels(orgs, new ArrayList<MOrganization>(orgs.size()), MOrganization.class, null);
+    }
+
+
     /**
      * 机构列表查询
      *
@@ -138,6 +147,22 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode) throws Exception {
         Organization org = orgService.getOrg(orgCode);
+        MOrganization orgModel = convertToModel(org, MOrganization.class);
+        return orgModel;
+    }
+
+    /**
+     * 根据机构ID获取机构
+     *
+     * @param orgId
+     * @return
+     */
+    @RequestMapping(value = "/organizations/getOrgById/{org_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构ID获取机构")
+    public MOrganization getOrgById(
+            @ApiParam(name = "org_id", value = "机构代码", defaultValue = "")
+            @PathVariable(value = "org_id") String orgId) throws Exception {
+        Organization org = orgService.getOrgById(orgId);
         MOrganization orgModel = convertToModel(org, MOrganization.class);
         return orgModel;
     }
@@ -273,6 +298,16 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "org_code", value = "org_code", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode) {
         return orgService.isExistOrg(orgCode);
+    }
+
+    @RequestMapping(value = "/organizations/checkSunOrg" , method = RequestMethod.PUT)
+    @ApiOperation(value = "判断机构是否已经是子机构")
+    boolean checkSunOrg(
+            @ApiParam(name = "org_pId", value = "org_pId", defaultValue = "")
+            @RequestParam(value = "org_pId") String orgPid,
+            @ApiParam(name = "org_id", value = "org_id", defaultValue = "")
+            @RequestParam(value = "org_id") String orgId) {
+        return orgService.checkSunOrg(orgPid,orgId);
     }
 
 
