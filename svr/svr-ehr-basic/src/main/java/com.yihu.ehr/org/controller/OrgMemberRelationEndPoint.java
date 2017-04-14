@@ -30,6 +30,15 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private OrgMemberRelationService relationService;
 
+
+    @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有成员列表")
+    public List<MOrgMemberRelation> getAllOrgDeptMember() throws Exception {
+        String filters = "status=0";
+        List<OrgMemberRelation> orgMemberRelations = relationService.search(filters);
+        return (List<MOrgMemberRelation>) convertToModels(orgMemberRelations, new ArrayList<MOrgMemberRelation>(orgMemberRelations.size()), MOrgMemberRelation.class, null);
+    }
+
     @RequestMapping(value = "/orgDeptMember/list", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据条件 查询部门下成员列表")
     public List<MOrgMemberRelation> searchOrgDeptMembers(
@@ -49,6 +58,17 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         List<OrgMemberRelation> orgMemRelations = relationService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, relationService.getCount(filters), page, size);
         return (List<MOrgMemberRelation>) convertToModels(orgMemRelations, new ArrayList<MOrgMemberRelation>(orgMemRelations.size()), MOrgMemberRelation.class, fields);
+    }
+
+
+    @RequestMapping(value ="orgDeptMember/admin/{memRelationId}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取部门成员信息")
+    public MOrgMemberRelation getMessageRemindInfo(
+            @ApiParam(name = "memRelationId", value = "", defaultValue = "")
+            @PathVariable(value = "memRelationId") Long memRelationId) {
+        OrgMemberRelation orgMemberRelation = relationService.getOrgMemberRelation(memRelationId);
+        MOrgMemberRelation mOrgMemberRelation   = convertToModel(orgMemberRelation, MOrgMemberRelation.class);
+        return mOrgMemberRelation;
     }
 
 
@@ -75,6 +95,19 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         return convertToModel(memberRelation, MOrgMemberRelation.class);
     }
 
+    @RequestMapping(value = "/orgDeptMember/updateStatus", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改部门成员状态" )
+    public boolean updateStatusOrgDeptMember(
+            @ApiParam(name = "memberRelationId", value = "部门成员ID")
+            @RequestParam(value = "memberRelationId", required = true) Integer memberRelationId,
+            @ApiParam(name = "status", value = "状态", defaultValue = "")
+            @RequestParam(value = "status") int status
+    ) throws Exception {
+        relationService.updateStatusDeptMember(memberRelationId,status);
+        return true;
+    }
+
+
     @RequestMapping(value = "/orgDeptMember/delete", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "删除部门成员" )
     public boolean deleteOrgDeptMember(
@@ -84,6 +117,17 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
 
         relationService.deleteDeptMember(memberRelationId);
         return true;
+    }
+
+    @RequestMapping(value = "/orgDeptMember/getCountByUserId", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "检查机构下部门相同名称的个数")
+    public int getCountByUserId(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId", required = true) Integer orgId,
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId", required = true) String userId
+    ) throws Exception {
+        return relationService.getCountByOrgIdAndUserId(orgId.toString(), userId);
     }
 
 

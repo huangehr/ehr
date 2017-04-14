@@ -49,6 +49,14 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
         }
     }
 
+    public int getCountByOrgIdAndName(String orgId,String name) {
+        List<OrgDept> orgDepts = orgDeptRepository.searchByOrgIdAndName(orgId, name);
+        if (orgDepts!=null && !orgDepts.isEmpty()){
+            return orgDepts.size();
+        }else {
+            return 0;
+        }
+    }
 
     public List<OrgDept> searchByOrgId(String orgId) {
         return orgDeptRepository.searchByOrgId(orgId);

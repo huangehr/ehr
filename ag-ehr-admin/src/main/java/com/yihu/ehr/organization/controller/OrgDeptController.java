@@ -203,6 +203,38 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/orgDept/checkDeptName" , method = RequestMethod.PUT)
+    @ApiOperation(value = "检查机构下部门名称是否唯一")
+    public Envelop checkDeptName(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId", required = true) Integer orgId,
+            @ApiParam(name = "name", value = "新部门名称")
+            @RequestParam(value = "name", required = true) String name
+    ){
+        try {
+            Envelop envelop = new Envelop();
+            String errorMsg = "";
+            if (orgId == null) {
+                envelop.setErrorMsg("机构不能为空！");
+            }
+            if (StringUtils.isEmpty(name)) {
+                envelop.setErrorMsg("新部门名称不能为空！");
+            }
+            int num = orgDeptClient.getCountByDeptName(orgId, name);
+            if (num > 0) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("所在机构已经存在此部门!");
+            }else{
+                envelop.setSuccessFlg(true);
+            }
+            return envelop;
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
     @RequestMapping(value = "/orgDept/resetName" , method = RequestMethod.POST)
     @ApiOperation(value = "修改机构部们名称")
     public Envelop resetDeptName(
@@ -351,13 +383,47 @@ public class OrgDeptController  extends BaseController {
     }
 
 
-    @RequestMapping(value = "orgDeptMember/admin/{orgDept_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/orgDept/checkUser" , method = RequestMethod.PUT)
+    @ApiOperation(value = "检查机构下用户是否唯一")
+    public Envelop checkUser(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId", required = true) Integer orgId,
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId", required = true) String userId
+    ){
+        try {
+            Envelop envelop = new Envelop();
+            String errorMsg = "";
+            if (orgId == null) {
+                errorMsg+="机构不能为空！";
+                envelop.setErrorMsg(errorMsg);
+            }
+            if (StringUtils.isEmpty(userId)) {
+                errorMsg+="用户不能为空！";
+                envelop.setErrorMsg(errorMsg);
+            }
+            int num = orgDeptClient.getCountByUserId(orgId, userId);
+            if (num > 0) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("所在机构已经存在此用户!");
+            }else{
+                envelop.setSuccessFlg(true);
+            }
+            return envelop;
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = "orgDeptMember/admin/{memRelationId}", method = RequestMethod.GET)
     @ApiOperation(value = "获取部门成员信息", notes = "部门成员信息")
     public Envelop getOrgMemberRelation(
-            @ApiParam(name = "orgDept_id", value = "", defaultValue = "")
-            @PathVariable(value = "orgDept_id") Long orgDeptId) {
+            @ApiParam(name = "memRelationId", value = "", defaultValue = "")
+            @PathVariable(value = "memRelationId") Long memRelationId) {
         try {
-            MOrgMemberRelation mOrgMemberRelation = orgDeptMemberClient.getOrgMemberRelation(orgDeptId);
+            MOrgMemberRelation mOrgMemberRelation = orgDeptMemberClient.getOrgMemberRelation(memRelationId);
             if (mOrgMemberRelation == null) {
                 return failed("提醒消息信息获取失败!");
             }
@@ -398,9 +464,9 @@ public class OrgDeptController  extends BaseController {
             String errorMsg = "";
             OrgDeptMemberModel deptMemberModel = objectMapper.readValue(memberRelationJsonData, OrgDeptMemberModel.class);
             MOrgMemberRelation mDeptMember = convertToModel(deptMemberModel, MOrgMemberRelation.class);
-//            if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
-//                errorMsg+="机构不能为空！";
-//            }
+            if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
+                errorMsg+="机构不能为空！";
+            }
             if (StringUtils.isEmpty(mDeptMember.getUserId())) {
                 errorMsg+="用户不能为空！";
             }
@@ -451,9 +517,9 @@ public class OrgDeptController  extends BaseController {
             String errorMsg = "";
             OrgDeptMemberModel deptMemberModel = objectMapper.readValue(memberRelationJsonData, OrgDeptMemberModel.class);
             MOrgMemberRelation mDeptMember = convertToModel(deptMemberModel, MOrgMemberRelation.class);
-//             if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
-//                errorMsg+="机构不能为空！";
-//            }
+             if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
+                errorMsg+="机构不能为空！";
+            }
             if (StringUtils.isEmpty(mDeptMember.getUserId())) {
                 errorMsg+="用户不能为空！";
             }

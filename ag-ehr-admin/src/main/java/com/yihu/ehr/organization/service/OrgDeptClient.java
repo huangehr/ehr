@@ -60,6 +60,24 @@ public interface OrgDeptClient {
             @RequestBody String deptJsonData
     ) ;
 
+    @RequestMapping(value = "/orgDept/getCountByDeptName", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "检查机构下部门相同名称的个数")
+    int getCountByDeptName(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId", required = true) Integer orgId,
+            @ApiParam(name = "name", value = "新部门名称")
+            @RequestParam(value = "name", required = true) String name
+    );
+
+    @RequestMapping(value = "/orgDeptMember/getCountByUserId", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "检查机构下部门成员相同的个数")
+    int getCountByUserId(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId", required = true) Integer orgId,
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId", required = true) String userId
+    );
+
     @RequestMapping(value = "/orgDept/resetName", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改部门名称")
     MOrgDept updateOrgDeptName(
