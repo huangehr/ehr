@@ -21,13 +21,16 @@ public class ResourceBucket {
     private String orgName;                             // 机构名称
     private String clientId;                            // 应用来源
     private String patientId;                           // 身份证号
-    private String patientName;                           // 身份证号
     private String eventNo;                             // 事件号
     private Date eventDate;                             // 事件时间，如挂号，出院，体检时间
     private String demographicId;                       // 人口学ID
     private String cdaVersion;
     private ProfileType profileType;
     private EventType eventType;
+
+    //add by hzp
+    private String cardType;                              // 就诊时用的就诊卡类型
+    private String patientName;                           // 患者姓名
 
     protected MasterRecord masterRecord;                // 主记录
     protected SubRecords subRecords;                    // 子记录
@@ -62,6 +65,14 @@ public class ResourceBucket {
 
     public void setCardId(String cardId) {
         this.cardId = cardId;
+    }
+
+    public String getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
     }
 
     public String getOrgCode() {

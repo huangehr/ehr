@@ -20,9 +20,10 @@ public class ArchiveRelation extends IdEntity {
     private String orgCode;//机构代码
     private String orgName;//机构名称
     private String idCardNo;//身份证号码
+    private String cardType;//就诊卡类型
     private String cardNo;//就诊卡号
     private String eventNo;//就诊事件号
-    private String eventDate;//就诊时间
+    private Date eventDate;//就诊时间
     private String eventType;//就诊类型 0门诊 1住院 2体检
     private String profileId;//关联档案号
     private String status;//关联状态 0未关联 1已关联
@@ -74,6 +75,15 @@ public class ArchiveRelation extends IdEntity {
         this.cardNo = cardNo;
     }
 
+    @Column(name = "card_type")
+    public String getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
+    }
+
     @Column(name = "event_no")
     public String getEventNo() {
         return eventNo;
@@ -84,12 +94,12 @@ public class ArchiveRelation extends IdEntity {
     }
 
     @Column(name = "event_date")
-    public String getEventDate() {
+    public Date getEventDate() {
         return eventDate;
     }
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
-    public void setEventDate(String eventDate) {
+    public void setEventDate(Date eventDate) {
         this.eventDate = eventDate;
     }
 
@@ -147,4 +157,6 @@ public class ArchiveRelation extends IdEntity {
     public void setApplyId(Long applyId) {
         this.applyId = applyId;
     }
+
+
 }

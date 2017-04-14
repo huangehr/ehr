@@ -159,26 +159,6 @@
             <artifactId>commons-web</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-keyschema</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-profile-core</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-hbase</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-solr</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
         <!--html转图片工具类-->
         <dependency>
             <groupId>net.sf.cssbox</groupId>

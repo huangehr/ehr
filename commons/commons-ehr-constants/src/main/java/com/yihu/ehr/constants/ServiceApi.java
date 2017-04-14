@@ -276,6 +276,9 @@ public class ServiceApi {
         public static final String MessageTimer = "/message/timer";
 
         public static final String LegacyPackages = "/json_package";
+
+        public static final String Prescription = "/prescription"; //处方笺维护
+        public static final String  ArchiveRelation = "/archiveRelation"; //档案关联
     }
 
     public static class PackageResolve {
@@ -296,6 +299,8 @@ public class ServiceApi {
         public static final String ArchiveUnbind = "/patientArchive/unbind";//	管理员--通过卡号获取未认领档案
         public static final String ArchiveApplyListManager = "/patientArchive/manager/applyList";//	管理员--档案认领列表
         public static final String ArchiveVerifyManager = "/patientArchive/manager/verify";//	管理员--档案认领审核操作
+        public static final String ArchiveRelation = "/patientArchive/archiveRelation";//新建档案关联
+
 
         public static final String Authentications = "/patient/authentications";
         public static final String Authentication = "/patient/Authentication/{id}";

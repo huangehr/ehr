@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.patient.ArchiveApply;
+import com.yihu.ehr.model.patient.ArchiveRelation;
 import com.yihu.ehr.patient.service.ArchiveApplyService;
 import com.yihu.ehr.patient.service.ArchiveRelationService;
 import io.swagger.annotations.Api;
@@ -105,11 +107,11 @@ public class PatientArchiveEndPoint extends EnvelopRestEndPoint {
             @RequestParam String auditor,
             @ApiParam(name = "auditReason", value = "审核不通过原因", defaultValue = "")
             @RequestParam(required = false) String auditReason,
-            @ApiParam(name = "archiveRelationId", value = "档案关联ID", defaultValue = "")
-            @RequestParam Long archiveRelationId) throws Exception{
+            @ApiParam(name = "archiveRelationId", value = "档案关联ID，多条用逗号分隔", defaultValue = "")
+            @RequestParam String archiveRelationIds) throws Exception{
 
 
-        return archiveApplyService.archiveVerifyManager(id,status, auditor,auditReason,archiveRelationId);
+        return archiveApplyService.archiveVerifyManager(id,status, auditor,auditReason,archiveRelationIds);
     }
 
 
@@ -140,6 +142,17 @@ public class PatientArchiveEndPoint extends EnvelopRestEndPoint {
         return archiveRelationService.archiveUnbind(cardNo,page, rows);
     }
 
+    @RequestMapping(value = ServiceApi.Patients.ArchiveRelation,method = RequestMethod.POST)
+    @ApiOperation(value = "新建档案关联")
+    public Result archiveRelation(
+            @ApiParam(name = "data", value = "json数据", defaultValue = "")
+            @RequestBody String data) throws Exception{
 
+        ArchiveRelation relation = objectMapper.readValue(data,ArchiveRelation.class);
+
+        archiveRelationService.archiveRelation(relation);
+
+        return ObjectResult.success("新建档案关联成功！",relation);
+    }
 
 }

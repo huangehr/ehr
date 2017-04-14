@@ -1,7 +1,9 @@
-package com.yihu.ehr.profile.service;
+package com.yihu.ehr.service.profile;
 
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.TableBundle;
+import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.util.ResourceStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +17,13 @@ import java.util.Map;
  * Created by lyr on 2016/6/22.
  */
 @Service
-public class PrescriptionPersistService {
+public class PrescriptionService {
 
     @Autowired
     HBaseDao hbaseDao;
 
     /**
      * 保存处方笺到HABSE
-     * @param profileId 主表rowkey
-     * @return
-     * @throws Exception
      */
     public List<Map<String,Object>>  savePrescription(String profileId,List<Map<String,String>> dataList,int existed) throws Exception
     {
@@ -52,7 +51,7 @@ public class PrescriptionPersistService {
         if(rowkeys.size() > 0)
         {
             bundle.addRows(rowkeys.toArray(new String[rowkeys.size()]));
-            hbaseDao.delete("HealthProfileSub", bundle);
+            hbaseDao.delete(ResourceCore.SubTable, bundle);
         }
 
         for (Map<String,String> data : dataList)
@@ -76,7 +75,7 @@ public class PrescriptionPersistService {
         }
 
         //保存数据到HBASE
-        hbaseDao.save("HealthProfileSub", bundle);
+        hbaseDao.save(ResourceCore.SubTable, bundle);
 
         return returnMapList;
     }
