@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "doctors", description = "医生管理接口")
+@Api(value = "doctors", description = "医生管理接口", tags = {"基础信息-医生管理"})
 public class DoctorEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

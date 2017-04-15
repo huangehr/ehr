@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "families", description = "家庭关系管理接口")
+@Api(value = "families", description = "家庭关系管理接口", tags = {"人口管理-家庭关系管理接口"})
 public class FamiliesEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

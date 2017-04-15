@@ -26,7 +26,7 @@ import java.util.List;
  * @created 2016.05.23 17:11
  */
 @RestController
-@Api(value = "ResourceMetadata", description = "资源数据元")
+@Api(value = "ResourceMetadata", description = "资源数据元", tags = {"资源管理-资源数据元"})
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 public class ResourceMetadataController extends BaseController {
 

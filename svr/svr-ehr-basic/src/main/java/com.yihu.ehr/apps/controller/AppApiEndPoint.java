@@ -32,7 +32,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "AppApi", description = "平台应用", tags = {"平台应用"})
+@Api(value = "AppApi", description = "平台应用接口管理", tags = {"平台应用-接口管理"})
 public class AppApiEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppApiService appApiService;

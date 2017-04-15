@@ -23,7 +23,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/portal")
 @RestController
-@Api(value = "portalFeedback", description = "PortalFeedback", tags = {"意见反馈接口"})
+@Api(value = "portalFeedback", description = "PortalFeedback", tags = {"云门户-意见反馈接口"})
 public class PortalFeedbackController extends BaseController{
 
     @Autowired

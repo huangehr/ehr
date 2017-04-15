@@ -27,7 +27,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "metadata", description = "数据元服务接口")
+@Api(value = "metadata", description = "数据元服务接口", tags = {"资源管理-数据元服务接口"})
 public class MetadataController extends BaseController {
 
     @Autowired

@@ -23,7 +23,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0+"/admin" )
 @RestController
-@Api(value = "AppApiResponse", description = "AppApiResponse", tags = {"AppApiResponse应用"})
+@Api(value = "AppApiResponse", description = "应用开放接口返回值管理", tags = {"应用管理-应用开放接口返回值管理"})
 public class AppApiResponseController extends BaseController {
 
     @Autowired

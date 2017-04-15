@@ -28,7 +28,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
-@Api(value = "roleFeature",description = "角色组功能权限配置",tags = "")
+@Api(value = "roleFeature",description = "角色组功能权限配置", tags = {"安全管理-角色组功能权限配置"})
 public class RoleFeatureRelationController extends BaseController {
     @Autowired
     private RoleFeatureRelationClient roleFeatureRelationClient;

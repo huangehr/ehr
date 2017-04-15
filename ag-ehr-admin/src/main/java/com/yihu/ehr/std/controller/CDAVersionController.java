@@ -9,6 +9,7 @@ import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.util.datetime.DateUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/version")
 @RestController
+@Api(value = "CDA", description = "CDA版本管理", tags = {"标准中心-CDA版本管理"})
 public class CDAVersionController extends BaseController {
     @Autowired
     private CDAVersionClient cdaVersionClient;

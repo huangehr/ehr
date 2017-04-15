@@ -20,7 +20,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "Geography-Dict", description = "行政区划地址", tags = {"行政区划地址"})
+@Api(value = "Geography-Dict", description = "行政区划地址", tags = {"基础信息-行政区划地址"})
 public class GeographyDictEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

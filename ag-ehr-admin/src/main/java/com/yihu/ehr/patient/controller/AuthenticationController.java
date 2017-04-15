@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(protocols = "https", value = "Authentication", description = "人口身份认证", tags = {"人口身份认证"})
+@Api(protocols = "https", value = "Authentication", description = "人口身份认证", tags = {"人口管理-人口身份认证"})
 public class AuthenticationController extends ExtendController<AuthenticationModel> {
 
     @Autowired

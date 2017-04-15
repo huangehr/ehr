@@ -26,7 +26,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "resourceCategory", description = "资源分类服务接口")
+@Api(value = "resourceCategory", description = "资源分类服务接口", tags = {"资源管理-资源分类服务接口"})
 public class ResourcesCategoryController extends BaseController {
 
     @Autowired

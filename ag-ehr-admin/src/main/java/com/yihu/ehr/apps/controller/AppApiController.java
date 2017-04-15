@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "AppApi", description = "AppApi", tags = {"AppApi应用"})
+@Api(value = "AppApi", description = "应用开放接口维护", tags = {"应用管理-应用开放接口维护"})
 public class AppApiController extends BaseController {
 
     private static final String DELETE = "delete";

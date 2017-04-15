@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "systemDictionaries", description = "系统字典服务接口")
+@Api(value = "systemDictionaries", description = "系统字典服务接口", tags = {"资源管理-系统字典服务接口"})
 public class RsSystemDictionaryController extends BaseController {
 
     @Autowired

@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "messageRemind", description = "消息提醒管理服务", tags = {"消息管理"})
+@Api(value = "messageRemind", description = "消息提醒管理服务", tags = {"云门户-待办事项"})
 public class MessageRemindEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 +"/portal")
 @RestController
-@Api(value = "UserApp", description = "UserApp", tags = {"用户App关联"})
+@Api(value = "UserApp", description = "UserApp", tags = {"云门户-用户App关联"})
 public class UserAppController extends BaseController {
 
     @Autowired

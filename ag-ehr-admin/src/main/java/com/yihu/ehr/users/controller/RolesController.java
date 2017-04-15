@@ -33,7 +33,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
-@Api(value = "roles",description = "角色管理",tags = "")
+@Api(value = "roles",description = "角色管理", tags = {"安全管理-角色管理"})
 public class RolesController extends BaseController {
     @Autowired
     private RolesClient rolesClient;

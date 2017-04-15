@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "org", description = "组织机构数据缓存服务", tags = {"缓存"})
+@Api(value = "org", description = "组织机构数据缓存服务", tags = {"机构管理-组织机构数据缓存服务"})
 public class OrgCacheEndPoint {
     @Autowired
     OrgCache orgCache;

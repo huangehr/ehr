@@ -29,7 +29,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0+"/admin" )
 @RestController
-@Api(value = "AppFeature", description = "菜单功能维护列表AppFeature", tags = {"平台应用"})
+@Api(value = "AppFeature", description = "应用功能列表维护", tags = {"应用管理-应用功能列表维护"})
 public class AppFeatureController extends BaseController {
 
     @Autowired

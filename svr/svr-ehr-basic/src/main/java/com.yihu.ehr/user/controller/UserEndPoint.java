@@ -41,7 +41,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "users", description = "用户管理接口")
+@Api(value = "user", description = "用户管理", tags = {"用户管理"})
 public class UserEndPoint extends EnvelopRestEndPoint {
 
     @Value("${default.password}")

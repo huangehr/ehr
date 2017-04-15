@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 +"/admin")
 @RestController
+@Api(value = "systemDict", description = "系统字典项管理", tags = {"配置管理-系统字典项管理"})
 public class ConventionalDictEntryController extends BaseController{
 
     @Autowired

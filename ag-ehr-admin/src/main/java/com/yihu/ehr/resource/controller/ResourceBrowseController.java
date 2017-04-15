@@ -27,7 +27,7 @@ import java.util.List;
  */
 
 @RestController
-@Api(value = "ResourceBrowse", description = "资源浏览")
+@Api(value = "ResourceBrowse", description = "资源浏览", tags = {"资源管理-资源浏览"})
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 public class ResourceBrowseController extends BaseController {
 

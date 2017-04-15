@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "interfaces", description = "资源服务接口")
+@Api(value = "interfaces", description = "资源服务接口", tags = {"资源管理-资源服务接口"})
 public class RsInterfaceController extends BaseController {
     @Autowired
     private RsInterfaceClient rsInterfaceClient;

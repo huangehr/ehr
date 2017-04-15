@@ -23,7 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "Conventional-Dictionaries", description = "获取常用字典项", tags = {"惯用字典"})
+@Api(value = "Conventional-Dictionaries", description = "获取常用字典项", tags = {"系统字典-惯用字典"})
 public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

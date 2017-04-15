@@ -31,7 +31,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "adapterSchema", description = "适配方案服务")
+@Api(value = "adapterSchema", description = "适配方案服务", tags = {"资源管理-适配方案服务"})
 public class AdapterSchemaController extends BaseController {
 
     @Autowired

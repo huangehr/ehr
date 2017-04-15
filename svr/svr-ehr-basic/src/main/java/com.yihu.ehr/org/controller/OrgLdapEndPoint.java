@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "/org/ldap/", description = "组织Ldap服务")
+@Api(value = "/org/ldap/", description = "组织Ldap服务", tags = {"机构管理-组织Ldap服务"})
 public class OrgLdapEndPoint {
     @Autowired
     OrgLdapService orgLdapService;

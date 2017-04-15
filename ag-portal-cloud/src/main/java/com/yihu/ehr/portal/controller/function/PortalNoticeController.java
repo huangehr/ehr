@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 +"/portal/doctor")
 @RestController
-@Api(value = "PortalNotice", description = "PortalNotice", tags = {"通知公告"})
+@Api(value = "PortalNotice", description = "PortalNotice", tags = {"云门户-通知公告"})
 public class PortalNoticeController extends BaseController {
 
     @Autowired

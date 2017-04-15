@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "portalFeedback", description = "意见反馈接口")
+@Api(value = "portalFeedback", description = "意见反馈接口", tags = {"云门户-意见反馈接口"})
 public class PortalFeedbackEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

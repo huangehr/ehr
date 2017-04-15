@@ -11,6 +11,7 @@ import com.yihu.ehr.std.service.CDAClient;
 import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/cda")
 @RestController
+@Api(value = "CDA", description = "CDA管理", tags = {"标准中心-CDA管理"})
 public class CDAController extends BaseController {
 
     @Autowired

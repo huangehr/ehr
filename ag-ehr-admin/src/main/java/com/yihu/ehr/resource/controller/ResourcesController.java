@@ -28,7 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "resources", description = "资源服务接口")
+@Api(value = "resources", description = "资源服务接口", tags = {"资源管理-资源服务接口"})
 public class ResourcesController extends BaseController {
     @Autowired
     private ResourcesClient resourcesClient;

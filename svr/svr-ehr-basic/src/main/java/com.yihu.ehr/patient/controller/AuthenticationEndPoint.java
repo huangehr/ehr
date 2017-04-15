@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "authentication", description = "人口身份认证申请")
+@Api(value = "authentication", description = "人口身份认证申请", tags = {"人口管理-成人口身份认证申请"})
 public class AuthenticationEndPoint extends EnvelopRestEndPoint {
     @Autowired
     AuthenticationService authenticationService;

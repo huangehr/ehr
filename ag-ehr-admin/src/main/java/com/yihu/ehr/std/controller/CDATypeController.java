@@ -16,6 +16,7 @@ import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,7 @@ import java.util.*;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/cda_type")
 @RestController
+@Api(value = "CDA", description = "CDA类型管理", tags = {"标准中心-CDA类型管理"})
 public class CDATypeController extends BaseController {
 
     @Autowired

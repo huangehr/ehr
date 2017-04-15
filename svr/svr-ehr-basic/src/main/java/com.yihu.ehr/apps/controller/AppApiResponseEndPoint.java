@@ -28,7 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "AppApiResponse", description = "平台应用响应参数", tags = {"平台应用"})
+@Api(value = "AppApiResponse", description = "平台应用响应参数", tags = {"平台应用-平台应用响应参数"})
 public class AppApiResponseEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppApiResponseService AppApiResponseService;

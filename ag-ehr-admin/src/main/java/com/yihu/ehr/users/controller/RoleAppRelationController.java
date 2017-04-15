@@ -31,7 +31,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
-@Api(value = "roleApp",description = "角色组-应用关系管理",tags = "")
+@Api(value = "roleApp",description = "角色组-应用关系管理", tags = {"安全管理-角色组-应用关系管理"})
 public class RoleAppRelationController extends BaseController{
     @Autowired
     private RoleAppRelationClient roleAppRelationClient;

@@ -1,4 +1,4 @@
-package com.yihu.ehr.patient.service;
+package com.yihu.ehr.patient.service.arapply;
 
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.patient.ArchiveRelation;

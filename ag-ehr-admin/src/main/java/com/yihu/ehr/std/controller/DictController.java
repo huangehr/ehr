@@ -12,6 +12,7 @@ import com.yihu.ehr.std.service.DataSetClient;
 import com.yihu.ehr.std.service.DictClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/std")
 @RestController
+@Api(value = "CDA", description = "字典管理", tags = {"标准中心-字典管理"})
 public class DictController extends BaseController {
 
     @Autowired

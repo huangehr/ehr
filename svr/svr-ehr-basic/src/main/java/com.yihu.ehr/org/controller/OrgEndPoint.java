@@ -35,7 +35,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "org", description = "组织机构管理服务", tags = {"机构管理"})
+@Api(value = "org", description = "组织机构管理服务", tags = {"机构管理-机构管理服务"})
 public class OrgEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

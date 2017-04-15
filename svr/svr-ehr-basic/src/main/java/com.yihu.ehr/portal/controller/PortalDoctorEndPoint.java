@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "portal", description = "医生端云门户", tags = {"医生端云门户"})
+@Api(value = "portal", description = "医生端云门户", tags = {"云门户-医生端云门户"})
 public class PortalDoctorEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = "/doctor", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

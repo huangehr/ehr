@@ -1,52 +1,45 @@
 package com.yihu.ehr.patient.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.apps.model.App;
-import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.patient.MedicalCards;
 import com.yihu.ehr.model.patient.UserCards;
-import com.yihu.ehr.patient.service.arapply.MedicalCardsService;
-import com.yihu.ehr.patient.service.arapply.UserCardsService;
+import com.yihu.ehr.patient.service.PatientCardsClient;
+import com.yihu.ehr.systemdict.service.SystemDictClient;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by hzp on 2017/04/01.
+ * Created by AndyCai on 2016/1/21.
  */
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@RequestMapping(ApiVersion.Version1_0)
-@Api(description = "用户卡管理", tags = {"人口管理-就诊卡管理"})
-public class PatientCardsEndPoint extends EnvelopRestEndPoint {
+@Api(value = "card", description = "就诊卡管理及卡认领接口", tags = {"人口管理-就诊卡管理及卡认领接口"})
+public class PatientCardsController extends ExtendController<UserCards> {
 
     @Autowired
-    UserCardsService userCardsService;
-
+    PatientCardsClient patientCardsClient;
     @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    MedicalCardsService medicalCardsService;
-
+    SystemDictClient systemDictClient;
 
     @RequestMapping(value = ServiceApi.Patients.CardList,method = RequestMethod.GET)
     @ApiOperation(value = "获取个人卡列表")
-    public ListResult cardList(
+    public Envelop cardList(
             @ApiParam(name = "userId", value = "用户ID", defaultValue = "")
             @RequestParam(value = "userId",required = false) String userId,
             @ApiParam(name = "cardType", value = "卡类别", defaultValue = "")
@@ -56,55 +49,57 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows",required = false) Integer rows) throws Exception{
 
-        return userCardsService.cardList(userId, cardType, page, rows);
+        ListResult result = patientCardsClient.cardList(userId, cardType, page, rows);
+        List<Map<String,Object>> list = result.getDetailModelList();
+        list = convertCardModels(list);
+        return getResult(list, result.getTotalCount(), result.getCurrPage(), result.getPageSize());
     }
 
     @RequestMapping(value = ServiceApi.Patients.CardApply,method = RequestMethod.GET)
     @ApiOperation(value = "卡认证详情")
-    public ObjectResult getCardApply(
+    public Envelop getCardApply(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @RequestParam(value = "id",required = false) Long id) throws Exception{
-        UserCards card = userCardsService.getCardApply(id);
-        return Result.success("获取卡认证详情成功！",card);
+        ObjectResult objectResult = patientCardsClient.getCardApply(id);
+        if(objectResult.getData() != null){
+            Map<String,Object> info = (HashMap)objectResult.getData();
+            info = convertCardModel(info);
+            return successObj(info);
+        }
+        return null;
     }
 
     @RequestMapping(value = ServiceApi.Patients.CardApply,method = RequestMethod.POST)
     @ApiOperation(value = "卡认证申请新增/修改")
-    public ObjectResult cardApply(
+    public Envelop cardApply(
             @ApiParam(name = "data", value = "json数据", defaultValue = "")
             @RequestBody String data,
             @ApiParam(name = "operator", value = "操作者", defaultValue = "")
             @RequestParam(value = "operator",required = false) String operator) throws Exception{
-        UserCards card = objectMapper.readValue(data,UserCards.class);
-        //新增
-        if(card.getId()==null)
-        {
-            card.setCreater(operator);
-            card.setCreateDate(new Date());
+        ObjectResult objectResult = patientCardsClient.cardApply(data,operator);
+        if(objectResult.getCode() == 200){
+            return successObj(objectResult.getData());
+        }else{
+            return null;
         }
-        else{
-            card.setUpdater(operator);
-            card.setUpdateDate(new Date());
-        }
-        card.setStatus("0");
-
-        card = userCardsService.cardApply(card);
-
-        return Result.success("保存卡认证申请成功！",card);
     }
 
     @RequestMapping(value = ServiceApi.Patients.CardApply,method = RequestMethod.DELETE)
     @ApiOperation(value = "卡认证申请删除")
-    public Result cardApplyDelete(
+    public Envelop cardApplyDelete(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @RequestParam(value = "id",required = false) Long id) throws Exception{
-        userCardsService.cardApplyDelete(id);
-        return Result.success("卡认证申请删除成功！");
+        Result result = patientCardsClient.cardApplyDelete(id);
+        if(result.getCode() == 200){
+            return successMsg(result.getMessage());
+        }else{
+            return failed("档案认领申请删除失败！");
+        }
     }
 
     @RequestMapping(value = ServiceApi.Patients.CardApplyListManager,method = RequestMethod.GET)
     @ApiOperation(value = "管理员--卡认证列表")
-    public ListResult cardApplyListManager(
+    public Envelop cardApplyListManager(
             @ApiParam(name = "status", value = "卡状态 -1审核不通过 0待审核 1审核通过", defaultValue = "0")
             @RequestParam(value = "status",required = false) String status,
             @ApiParam(name = "cardType", value = "卡类别", defaultValue = "")
@@ -113,13 +108,15 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page",required = false) Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows",required = false) Integer rows) throws Exception{
-
-        return userCardsService.cardApplyListManager(status, cardType, page, rows);
+        ListResult result = patientCardsClient.cardApplyListManager(status, cardType, page, rows);
+        List<Map<String,Object>> list = result.getDetailModelList();
+        list = convertCardModels(list);
+        return getResult(list, result.getTotalCount(), result.getCurrPage(), result.getPageSize());
     }
 
     @RequestMapping(value = ServiceApi.Patients.CardVerifyManager,method = RequestMethod.POST)
     @ApiOperation(value = "管理员--卡认证审核操作")
-    public Result cardVerifyManager(
+    public Envelop cardVerifyManager(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @RequestParam(value = "id",required = false) Long id,
             @ApiParam(name = "status", value = "status", defaultValue = "")
@@ -129,35 +126,37 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "auditReason", value = "审核不通过原因", defaultValue = "")
             @RequestParam(value = "auditReason",required = false) String auditReason) throws Exception{
 
-        return userCardsService.cardVerifyManager(id,status,auditor,auditReason);
+        Result result = patientCardsClient.cardVerifyManager(id, status, auditor, auditReason);
+        if (result.getCode() == 200){
+            return successMsg(result.getMessage());
+        }else{
+            return failed(result.getMessage());
+        }
     }
-
 
     @RequestMapping(value = ServiceApi.Patients.CardBindManager,method = RequestMethod.POST)
     @ApiOperation(value = "管理员--后台绑卡操作")
-    public ObjectResult cardBindManager(
+    public Envelop cardBindManager(
             @ApiParam(name = "data", value = "json数据", defaultValue = "")
             @RequestBody String data,
             @ApiParam(name = "operator", value = "操作者", defaultValue = "")
             @RequestParam(value = "operator",required = false) String operator) throws Exception{
-        UserCards card = objectMapper.readValue(data,UserCards.class);
 
-        card.setStatus("1");
-        card.setCreater(operator);
-        card.setCreateDate(new Date());
-        card.setAuditor(operator);
-        card.setAuditDate(new Date());
-
-        card = userCardsService.cardBindManager(card);
-        return Result.success("后台绑卡成功！",card);
+        ObjectResult objectResult = patientCardsClient.cardBindManager(data,operator);
+        if(objectResult.getCode() == 200){
+            Map<String,Object> info = (HashMap)objectResult.getData();
+            info = convertCardModel(info);
+            return successObj(info);
+        }else{
+            return failed(objectResult.getMessage());
+        }
     }
 
+    // ------------------------------ 就诊卡基础信息管理 --------------------------------------
 
-
-    // ----------------------- 就诊卡基本信息管理 ------------------------------
     @RequestMapping(value = ServiceApi.Patients.GetMCards, method = RequestMethod.GET)
     @ApiOperation(value = "获取就诊卡列表信息")
-    public Collection<MedicalCards> getMCards(
+    public Envelop getMCards(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
@@ -167,53 +166,85 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        List<MedicalCards> cards = medicalCardsService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, medicalCardsService.getCount(filters), page, size);
-        return convertToModels(cards, new ArrayList<>(cards.size()), MedicalCards.class, fields);
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+
+        List<MedicalCards> medicalCards = new ArrayList<>();
+        ResponseEntity<List<MedicalCards>> responseEntity = patientCardsClient.getMCards(fields, filters, sorts, size, page);
+        Integer totalCount = getTotalCount(responseEntity);
+        if(totalCount > 0){
+            medicalCards = responseEntity.getBody();
+            Envelop envelop = getResult(medicalCards, totalCount, page, size);
+            return envelop;
+        }
+        return null;
     }
+
 
     @RequestMapping(value = ServiceApi.Patients.GetMCard,method = RequestMethod.GET)
     @ApiOperation(value = "就诊卡详情")
-    public ObjectResult getMCard(
+    public Envelop getMCard(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @RequestParam(value = "id",required = false) Long id) throws Exception{
-        MedicalCards card = medicalCardsService.getMCard(id);
-        return Result.success("获取卡认证详情成功！",card);
+
+        ObjectResult objectResult = patientCardsClient.getMCard(id);
+        if(objectResult.getData() != null){
+            Map<String,Object> info = (HashMap)objectResult.getData();
+            info = convertCardModel(info);
+            return successObj(info);
+        }
+        return null;
     }
 
     @RequestMapping(value = ServiceApi.Patients.MCardSave,method = RequestMethod.POST)
     @ApiOperation(value = "就诊卡新增/修改")
-    public ObjectResult mCardSave(
+    public Envelop mCardSave(
             @ApiParam(name = "data", value = "json数据", defaultValue = "")
             @RequestBody String data,
             @ApiParam(name = "operator", value = "操作者", defaultValue = "")
             @RequestParam(value = "operator",required = false) String operator) throws Exception{
-        MedicalCards card = objectMapper.readValue(data,MedicalCards.class);
-        if(card.getId()==null)
-        {
-            card.setCreater(operator);
-            card.setCreateDate(new Date());
+        ObjectResult objectResult = patientCardsClient.mCardSave(data,operator);
+        if(objectResult.getCode() == 200){
+            return successObj(objectResult.getData());
+        }else{
+            return null;
         }
-        else{
-            card.setUpdater(operator);
-            card.setUpdateDate(new Date());
-        }
-        card.setStatus("0");
-
-        card = medicalCardsService.save(card);
-
-        return Result.success("保存就诊卡成功！",card);
     }
 
     @RequestMapping(value = ServiceApi.Patients.MCardDel,method = RequestMethod.DELETE)
     @ApiOperation(value = "卡认证申请删除")
-    public Result mCardDel(
+    public Envelop mCardDel(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @RequestParam(value = "id",required = false) Long id) throws Exception{
-        medicalCardsService.delete(id);
-        return Result.success("就诊卡删除成功！");
+        Result result = patientCardsClient.cardApplyDelete(id);
+        if(result.getCode() == 200){
+            return successMsg(result.getMessage());
+        }else{
+            return failed("档案认领申请删除失败！");
+        }
     }
+
+    private Map<String,Object> convertCardModel(Map<String,Object> userCard){
+        List<MDictionaryEntry> statusDicts = systemDictClient.getDictEntries("", "dictId=43", "", 10, 1).getBody();
+        Map<String, String> statusMap = new HashMap<>();
+        for(MDictionaryEntry entry : statusDicts){
+            statusMap.put(entry.getCode(), entry.getValue());
+        }
+        userCard.put("statusName",statusMap.get(userCard.get("status")));
+
+        return userCard;
+    }
+    private List convertCardModels(List<Map<String,Object>> userCards){
+        List<MDictionaryEntry> statusDicts = systemDictClient.getDictEntries("", "dictId=43", "", 10, 1).getBody();
+        Map<String, String> statusMap = new HashMap<>();
+        for(MDictionaryEntry entry : statusDicts){
+            statusMap.put(entry.getCode(), entry.getValue());
+        }
+        for(Map<String,Object> info : userCards){
+            info.put("statusName",statusMap.get(info.get("status")));
+        }
+
+        return userCards;
+    }
+
+
 }

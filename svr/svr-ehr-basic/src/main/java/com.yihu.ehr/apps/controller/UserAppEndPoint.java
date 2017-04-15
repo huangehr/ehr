@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "UserApp", description = "用户应用关联", tags = {"用户应用关联"})
+@Api(value = "UserApp", description = "用户应用关联", tags = {"平台应用-用户应用关联"})
 public class UserAppEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private UserAppService userAppService;

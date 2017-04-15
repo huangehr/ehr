@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/cache")
 @RestController
-@Api(value = "cache", description = "数据缓存")
+@Api(value = "cache", description = "数据缓存", tags = {"数据缓存"})
 public class RedisController {
     @Autowired
     AdaptionCacheClient adaptionCacheClient;

@@ -36,7 +36,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "resourceGrant", description = "资源授权服务接口")
+@Api(value = "resourceGrant", description = "资源授权服务接口", tags = {"资源管理-资源授权服务接口"})
 public class ResourcesGrantController extends BaseController {
 
     @Autowired

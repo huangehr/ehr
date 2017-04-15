@@ -35,7 +35,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "portalSetting", description = "门户配置接口", tags = {"门户配置接口"})
+@Api(value = "portalSetting", description = "应用功能页面展示", tags = {"云门户-应用功能页面展示"})
 public class ProtalSettingController extends BaseController {
 
     @Autowired

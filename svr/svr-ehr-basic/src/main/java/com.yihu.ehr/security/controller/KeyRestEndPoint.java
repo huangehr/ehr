@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "securities", description = "安全管理接口", tags = {"用户,企业,应用,安全"})
+@Api(value = "securities", description = "安全管理接口", tags = {"安全管理-用户,企业,应用,安全"})
 public class KeyRestEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

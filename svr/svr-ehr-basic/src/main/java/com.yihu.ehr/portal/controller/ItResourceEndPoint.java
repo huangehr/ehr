@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "itResource", description = "可下载资源管理服务", tags = {"下载资源管理"})
+@Api(value = "itResource", description = "可下载资源管理服务", tags = {"云门户-下载资源管理"})
 public class ItResourceEndPoint  extends EnvelopRestEndPoint {
 
     @Autowired

@@ -1,8 +1,10 @@
-package com.yihu.ehr.patient.service;
+package com.yihu.ehr.patient.service.arapply;
 
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.patient.MedicalCards;
 import com.yihu.ehr.model.patient.UserCards;
+import com.yihu.ehr.patient.dao.XMedicalCardsDao;
 import com.yihu.ehr.patient.dao.XUserCardsDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,12 +22,14 @@ import java.util.Date;
  */
 @Transactional
 @Service
-public class UserCardsService {
+    public class UserCardsService {
 
     @Autowired
     private XUserCardsDao userCardsDao;
     @Autowired
     private ArchiveRelationService archiveRelationService;
+    @Autowired
+    private XMedicalCardsDao medicalCardsDao;
 
     /**
      * 获取个人卡列表
@@ -148,6 +152,5 @@ public class UserCardsService {
 
         return card;
     }
-
 
 }

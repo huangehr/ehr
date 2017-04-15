@@ -32,7 +32,7 @@ import java.util.*;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "home_relationship", description = "家庭关系管理", tags = {"家庭庴管理"})
+@Api(value = "home_relationship", description = "家庭关系管理", tags = {"人口管理-家庭关系管理"})
 public class HomeRelationshipController extends BaseController {
 
     @Autowired

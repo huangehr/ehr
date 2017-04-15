@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0+"/doctor" )
 @RestController
-@Api(value = "AppApi", description = "AppApi", tags = {"AppApi应用"})
+@Api(value = "AppApi", description = "AppApi", tags = {"应用管理-AppApi应用"})
 public class AppApiController extends BaseController {
 
     @Autowired

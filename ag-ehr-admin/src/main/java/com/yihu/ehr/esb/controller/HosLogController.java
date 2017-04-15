@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/esb")
 @RestController
-@Api(value = "上传日志管理接口", description = "上传日志管理接口" ,tags = {"上传日志管理接口"})
+@Api(value = "上传日志管理接口", description = "上传日志管理接口" ,tags = {"ESB管理 -上传日志管理接口"})
 public class HosLogController extends BaseController {
 
     @Autowired

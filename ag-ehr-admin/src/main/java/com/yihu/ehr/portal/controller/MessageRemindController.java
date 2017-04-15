@@ -32,7 +32,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "messageRemind", description = "消息管理接口", tags = {"消息管理接口"})
+@Api(value = "messageRemind", description = "待办事项管理", tags = {"云门户-待办事项管理"})
 public class MessageRemindController extends BaseController {
 
     @Autowired

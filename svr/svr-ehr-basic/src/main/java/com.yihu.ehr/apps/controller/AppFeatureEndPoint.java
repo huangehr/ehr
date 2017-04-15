@@ -28,7 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "AppFeature", description = "功能管理", tags = {"平台应用"})
+@Api(value = "AppFeature", description = "功能管理", tags = {"平台应用-功能管理"})
 public class AppFeatureEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppFeatureService appFeatureService;

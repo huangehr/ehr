@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "roleApi",description ="角色组Api关系管理",tags = "")
+@Api(value = "roleApi",description = "角色组-Api关系管理", tags = {"安全管理 - 角色组-Api关系管理"})
 public class RoleApiRelationEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RoleApiRelationService roleApiRelationService;

@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 +"/portal")
 @RestController
-@Api(value = "PortalMessageRemind", description = "PortalMessageRemind", tags = {"消息提醒"})
+@Api(value = "PortalMessageRemind", description = "PortalMessageRemind", tags = {"云门户-待办事项"})
 public class PortalMessageRemindController extends BaseController {
 
     @Autowired

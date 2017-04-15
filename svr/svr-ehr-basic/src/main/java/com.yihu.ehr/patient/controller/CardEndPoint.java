@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "cards", description = "卡管理", tags = {"卡管理"})
+@Api(value = "cards", description = "卡管理", tags = {"人口管理-就诊卡管理（旧）"})
 public class CardEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private CardManager cardManager;

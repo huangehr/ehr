@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "roleUser",description = "角色组人员配置")
+@Api(value = "roles",description = "角色管理", tags = {"安全管理-角色管理"})
 public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RoleUserService roleUserService;

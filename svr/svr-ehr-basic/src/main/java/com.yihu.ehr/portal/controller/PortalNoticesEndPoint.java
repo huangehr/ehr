@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "portalNotices", description = "通知公告接口")
+@Api(value = "portalNotices", description = "通知公告接口", tags = {"云门户-通知公告接口"})
 public class PortalNoticesEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

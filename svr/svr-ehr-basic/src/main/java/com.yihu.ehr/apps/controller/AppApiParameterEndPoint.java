@@ -28,7 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "AppApiParameter", description = "API应用请求参数", tags = {"平台应用"})
+@Api(value = "AppApiParameter", description = "API应用请求参数", tags = {"平台应用-API应用请求参数"})
 public class AppApiParameterEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppApiParameterService appApiParameterService;

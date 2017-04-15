@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "files", description = "文件管理管理接口")
+@Api(value = "files", description = "文件管理管理接口", tags = {"文件管理管理接口"})
 public class FileResourceEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

@@ -30,7 +30,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "doctor", description = "医生管理接口，用于医生信息管理", tags = {"医生管理接口"})
+@Api(value = "doctor", description = "医生管理接口", tags = {"基础信息 - 医生管理接口"})
 public class DoctorController extends BaseController {
 
     @Autowired

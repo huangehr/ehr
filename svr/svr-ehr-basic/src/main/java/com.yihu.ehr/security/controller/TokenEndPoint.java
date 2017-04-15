@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "securities", description = "Token接口")
+@Api(value = "securities", description = "Token接口", tags = {"安全管理-Token接口"})
 public class TokenEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private KeyManager keyManager;

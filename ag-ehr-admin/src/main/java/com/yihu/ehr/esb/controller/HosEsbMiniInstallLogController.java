@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/esb")
 @RestController
-@Api(value = "程序版本发布信息管理接口", description = "程序版本发布信息管理接口" ,tags = {"程序版本发布信息管理接口"})
+@Api(value = "程序版本发布信息管理接口", description = "程序版本发布信息管理接口" ,tags = {"ESB管理 -程序版本发布信息管理接口"})
 public class HosEsbMiniInstallLogController extends BaseController {
 
     @Autowired

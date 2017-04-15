@@ -30,7 +30,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "sys_dict", description = "系统字典接口，用于系统全局字典管理", tags = {"系统字典接口"})
+@Api(value = "sys_dict", description = "系统字典", tags = {"配置管理-系统字典"})
 public class SystemDictController extends BaseController {
 
     @Autowired

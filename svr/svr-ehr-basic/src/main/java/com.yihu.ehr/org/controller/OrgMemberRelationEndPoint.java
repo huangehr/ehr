@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "orgDeptMember", description = "组织机构部门成员管理服务", tags = {"部门成员管理"})
+@Api(value = "orgDeptMember", description = "组织机构部门成员管理服务", tags = {"机构管理-部门成员管理"})
 public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

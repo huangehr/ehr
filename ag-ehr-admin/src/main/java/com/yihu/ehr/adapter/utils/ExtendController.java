@@ -78,6 +78,20 @@ public class ExtendController<T> extends BaseController {
         return envelop;
     }
 
+    public Envelop successMsg(String msg){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setErrorMsg(msg);
+        return envelop;
+    }
+
+    public Envelop successObj(Object object){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(object);
+        return envelop;
+    }
+
     protected ValidateResult validate(T dataModel) {
 
         try {

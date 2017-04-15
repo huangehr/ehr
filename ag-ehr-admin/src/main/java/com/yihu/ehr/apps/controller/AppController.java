@@ -40,7 +40,7 @@ import java.util.*;
 
 @RequestMapping(ApiVersion.Version1_0+"/admin" )
 @RestController
-@Api(value = "app", description = "应用管理接口，用于接入应用管理", tags = {"应用管理接口"})
+@Api(value = "app", description = "应用管理接口", tags = {"应用管理接口"})
 public class AppController extends BaseController {
     @Autowired
     private AppClient appClient;

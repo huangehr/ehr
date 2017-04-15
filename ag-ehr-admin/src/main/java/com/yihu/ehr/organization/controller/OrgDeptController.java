@@ -34,7 +34,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
-@Api(value = "orgDept", description = "组织结构-部门管理接口，用于部门信息管理", tags = {"机构部门信息管理接口"})
+@Api(value = "orgDept", description = "机构信息部门管理", tags = {"机构管理 - 机构部门管理"})
 public class OrgDeptController  extends BaseController {
 
     @Autowired
