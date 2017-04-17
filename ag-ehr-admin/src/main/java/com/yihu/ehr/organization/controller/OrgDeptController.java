@@ -357,11 +357,13 @@ public class OrgDeptController  extends BaseController {
 
     @ApiOperation(value = "获取所有成员列表")
     @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET)
-    public Envelop getAllOrgDeptMember() {
+    public Envelop getAllOrgDeptMember(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) {
         try {
             Envelop envelop = new Envelop();
             List<MOrgMemberRelation> memberRelationList = new ArrayList<MOrgMemberRelation>();
-            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.getAllOrgDeptMember();
+            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.getAllOrgDeptMember(filters);
             memberRelationList = responseEntity.getBody();
             if (memberRelationList !=null && memberRelationList.size() > 0 ){
                 for (MOrgMemberRelation  memberRelation : memberRelationList){

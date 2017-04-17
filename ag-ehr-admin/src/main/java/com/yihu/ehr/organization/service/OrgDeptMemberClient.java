@@ -69,5 +69,6 @@ public interface OrgDeptMemberClient {
 
     @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "查询所有成员列表")
-    ResponseEntity<List<MOrgMemberRelation>> getAllOrgDeptMember();
+    ResponseEntity<List<MOrgMemberRelation>> getAllOrgDeptMember(
+            @RequestParam(value = "filters", required = false) String filters);
 }

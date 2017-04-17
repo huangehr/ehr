@@ -33,8 +33,11 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "查询所有成员列表")
-    public List<MOrgMemberRelation> getAllOrgDeptMember() throws Exception {
-        String filters = "status=0";
+    public List<MOrgMemberRelation> getAllOrgDeptMember(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters",required = false) String filters
+    ) throws Exception {
+        filters= filters +";status=0";
         List<OrgMemberRelation> orgMemberRelations = relationService.search(filters);
         return (List<MOrgMemberRelation>) convertToModels(orgMemberRelations, new ArrayList<MOrgMemberRelation>(orgMemberRelations.size()), MOrgMemberRelation.class, null);
     }
