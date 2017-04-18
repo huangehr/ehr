@@ -126,12 +126,18 @@ public interface PatientCardsClient {
             @RequestParam(value = "operator",required = false) String operator);
 
     @RequestMapping(value = ServiceApi.Patients.MCardDel,method = RequestMethod.DELETE)
-    @ApiOperation(value = "卡认证申请删除")
-    Result mCardDel(
+    @ApiOperation(value = "就诊卡删除")
+    Result mCardDelete(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @RequestParam(value = "id",required = false) Long id);
 
 
+    @RequestMapping(value = ServiceApi.Patients.MCardCheckCardNo, method = RequestMethod.PUT)
+    @ApiOperation(value = "校验卡是否唯一")
+    int getCountByCardNo(
+            @ApiParam(name = "cardNo", value = "卡号")
+            @RequestParam(value = "cardNo", required = true) String cardNo
+    );
 
 
 

@@ -1,35 +1,35 @@
-package com.yihu.ehr.model.patient;
+package com.yihu.ehr.agModel.patient;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.yihu.ehr.model.common.IdEntity;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.util.Date;
 
 /**
- * �û�������
- * Created by cws on 2017/04/14.
+ * Created by janseny on 2017/4/17.
  */
-@Entity
-@Table(name="medical_cards")
-public class MedicalCards extends IdEntity {
+public class MedicalCardsModel {
 
+    private Long id;
     private String cardType;//'卡类别【字典】',
+    private String cardTypeName;
     private String cardNo;//'就诊卡号',
     private String releaseOrg;//发卡机构',
-    private Date releaseDate;//发卡时间',
-    private Date validityDateBegin;//'有效期起始时间',
-    private Date validityDateEnd;//有效期截止时间',
+    private String releaseDate;//发卡时间',
+    private String validityDateBegin;//'有效期起始时间',
+    private String validityDateEnd;//有效期截止时间',
     private String description;//描述',
     private String status;//卡状态 0无效 1有效',
-    private Date createDate;//'创建时间',
+    private String createDate;//'创建时间',
     private String creater;//创建者',
-    private Date updateDate;//修改时间',
+    private String updateDate;//修改时间',
     private String updater;//修改者'
 
-    @Column(name = "card_type")
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getCardType() {
         return cardType;
     }
@@ -38,7 +38,14 @@ public class MedicalCards extends IdEntity {
         this.cardType = cardType;
     }
 
-    @Column(name = "card_no")
+    public String getCardTypeName() {
+        return cardTypeName;
+    }
+
+    public void setCardTypeName(String cardTypeName) {
+        this.cardTypeName = cardTypeName;
+    }
+
     public String getCardNo() {
         return cardNo;
     }
@@ -47,7 +54,6 @@ public class MedicalCards extends IdEntity {
         this.cardNo = cardNo;
     }
 
-    @Column(name = "release_org")
     public String getReleaseOrg() {
         return releaseOrg;
     }
@@ -56,33 +62,27 @@ public class MedicalCards extends IdEntity {
         this.releaseOrg = releaseOrg;
     }
 
-    @Column(name = "release_date")
-    public Date getReleaseDate() {
+    public String getReleaseDate() {
         return releaseDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    @Column(name = "validity_date_begin")
-    public Date getValidityDateBegin() {
+    public String getValidityDateBegin() {
         return validityDateBegin;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
-    public void setValidityDateBegin(Date validityDateBegin) {
+    public void setValidityDateBegin(String validityDateBegin) {
         this.validityDateBegin = validityDateBegin;
     }
 
-    @Column(name = "validity_date_end")
-    public Date getValidityDateEnd() {
+    public String getValidityDateEnd() {
         return validityDateEnd;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
-    public void setValidityDateEnd(Date validityDateEnd) {
+    public void setValidityDateEnd(String validityDateEnd) {
         this.validityDateEnd = validityDateEnd;
     }
 
@@ -94,7 +94,6 @@ public class MedicalCards extends IdEntity {
         this.description = description;
     }
 
-    @Column(name = "status")
     public String getStatus() {
         return status;
     }
@@ -103,13 +102,11 @@ public class MedicalCards extends IdEntity {
         this.status = status;
     }
 
-    @Column(name = "create_date")
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
@@ -121,13 +118,11 @@ public class MedicalCards extends IdEntity {
         this.creater = creater;
     }
 
-    @Column(name = "update_date")
-    public Date getUpdateDate() {
+    public String getUpdateDate() {
         return updateDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
-    public void setUpdateDate(Date updateDate) {
+    public void setUpdateDate(String updateDate) {
         this.updateDate = updateDate;
     }
 

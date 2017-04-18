@@ -303,8 +303,9 @@ public class ServiceApi {
 
         public static final String MCardSave = "/medicalCards/save";// 就诊卡新增&保存
         public static final String MCardDel = "/medicalCards/del";//	就诊卡删除
-        public static final String GetMCard = "/medicalCards/{id}/get";//就诊卡详情
+        public static final String GetMCard = "/medicalCards/get";//就诊卡详情
         public static final String GetMCards = "/getMedicalCards";//	就诊卡列表
+        public static final String MCardCheckCardNo = "/medicalCards/checkCardNo";//	校验卡是否唯一
 
         public static final String Authentications = "/patient/authentications";
         public static final String Authentication = "/patient/Authentication/{id}";

@@ -1,20 +1,25 @@
 package com.yihu.ehr.patient.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.patient.MedicalCardsModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.patient.MedicalCards;
 import com.yihu.ehr.model.patient.UserCards;
 import com.yihu.ehr.patient.service.PatientCardsClient;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +41,8 @@ public class PatientCardsController extends ExtendController<UserCards> {
     PatientCardsClient patientCardsClient;
     @Autowired
     SystemDictClient systemDictClient;
+    @Autowired
+    private ConventionalDictEntryClient conventionalDictClient;
 
     @RequestMapping(value = ServiceApi.Patients.CardList,method = RequestMethod.GET)
     @ApiOperation(value = "获取个人卡列表")
@@ -168,12 +175,24 @@ public class PatientCardsController extends ExtendController<UserCards> {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
-        List<MedicalCards> medicalCards = new ArrayList<>();
+        List<MedicalCardsModel> medicalCardsModelList = new ArrayList<>();
         ResponseEntity<List<MedicalCards>> responseEntity = patientCardsClient.getMCards(fields, filters, sorts, size, page);
+        List<MedicalCards> medicalCardss = responseEntity.getBody();
+        for (MedicalCards medicalCards : medicalCardss) {
+            MedicalCardsModel medicalCardsModel = convertToModel(medicalCards, MedicalCardsModel.class);
+            medicalCardsModel.setCreateDate(medicalCards.getCreateDate() == null?"": DateTimeUtil.simpleDateTimeFormat(medicalCards.getCreateDate()).substring(0, 10) );
+            medicalCardsModel.setReleaseDate(medicalCards.getReleaseDate() == null?"": DateTimeUtil.simpleDateTimeFormat(medicalCards.getReleaseDate()).substring(0,10) );
+            medicalCardsModel.setValidityDateBegin(medicalCards.getValidityDateBegin() == null ? "" : DateTimeUtil.simpleDateTimeFormat(medicalCards.getValidityDateBegin()).substring(0, 10) );
+            medicalCardsModel.setValidityDateEnd(medicalCards.getValidityDateEnd() == null ? "" : DateTimeUtil.simpleDateTimeFormat(medicalCards.getValidityDateEnd()).substring(0, 10) );
+
+            MConventionalDict dict = conventionalDictClient.getPortalNoticeTypeList(String.valueOf(medicalCards.getCardType()));
+            medicalCardsModel.setCardTypeName(dict == null ? "" : dict.getValue());
+            medicalCardsModelList.add(medicalCardsModel);
+        }
+
         Integer totalCount = getTotalCount(responseEntity);
         if(totalCount > 0){
-            medicalCards = responseEntity.getBody();
-            Envelop envelop = getResult(medicalCards, totalCount, page, size);
+            Envelop envelop = getResult(medicalCardsModelList, totalCount, page, size);
             return envelop;
         }
         return null;
@@ -199,7 +218,7 @@ public class PatientCardsController extends ExtendController<UserCards> {
     @ApiOperation(value = "就诊卡新增/修改")
     public Envelop mCardSave(
             @ApiParam(name = "data", value = "json数据", defaultValue = "")
-            @RequestBody String data,
+            @RequestParam(value = "data") String data,
             @ApiParam(name = "operator", value = "操作者", defaultValue = "")
             @RequestParam(value = "operator",required = false) String operator) throws Exception{
         ObjectResult objectResult = patientCardsClient.mCardSave(data,operator);
@@ -211,15 +230,43 @@ public class PatientCardsController extends ExtendController<UserCards> {
     }
 
     @RequestMapping(value = ServiceApi.Patients.MCardDel,method = RequestMethod.DELETE)
-    @ApiOperation(value = "卡认证申请删除")
+    @ApiOperation(value = "就诊卡删除")
     public Envelop mCardDel(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @RequestParam(value = "id",required = false) Long id) throws Exception{
-        Result result = patientCardsClient.cardApplyDelete(id);
+        Result result = patientCardsClient.mCardDelete(id);
         if(result.getCode() == 200){
             return successMsg(result.getMessage());
         }else{
-            return failed("档案认领申请删除失败！");
+            return failed("就诊卡删除失败！");
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.MCardCheckCardNo , method = RequestMethod.PUT)
+    @ApiOperation(value = "校验卡是否唯一")
+    public Envelop checkUser(
+            @ApiParam(name = "cardNo", value = "卡号")
+            @RequestParam(value = "cardNo", required = true) String cardNo
+    ){
+        try {
+            Envelop envelop = new Envelop();
+            String errorMsg = "";
+            if (cardNo == null) {
+                errorMsg+="卡号不能为空！";
+                envelop.setErrorMsg(errorMsg);
+            }
+            int num = patientCardsClient.getCountByCardNo(cardNo);
+            if (num > 0) {
+                envelop.setSuccessFlg(true);
+                envelop.setErrorMsg("卡号已存在!");
+            }else{
+                envelop.setSuccessFlg(false);
+            }
+            return envelop;
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
         }
     }
 

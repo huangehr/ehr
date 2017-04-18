@@ -17,10 +17,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -192,28 +194,41 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "operator", value = "操作者", defaultValue = "")
             @RequestParam(value = "operator",required = false) String operator) throws Exception{
         MedicalCards card = objectMapper.readValue(data,MedicalCards.class);
-        if(card.getId()==null)
+        if(card.getId()==null || card.getId()==0 )
         {
             card.setCreater(operator);
             card.setCreateDate(new Date());
-        }
-        else{
+            card.setStatus("0");
+        }else{
             card.setUpdater(operator);
             card.setUpdateDate(new Date());
         }
-        card.setStatus("0");
-
         card = medicalCardsService.save(card);
 
         return Result.success("保存就诊卡成功！",card);
     }
 
     @RequestMapping(value = ServiceApi.Patients.MCardDel,method = RequestMethod.DELETE)
-    @ApiOperation(value = "卡认证申请删除")
-    public Result mCardDel(
+    @ApiOperation(value = "就诊卡删除")
+    public Result mCardDelete(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @RequestParam(value = "id",required = false) Long id) throws Exception{
         medicalCardsService.delete(id);
         return Result.success("就诊卡删除成功！");
     }
+
+    @RequestMapping(value = ServiceApi.Patients.MCardCheckCardNo, method = RequestMethod.PUT)
+    @ApiOperation(value = "校验卡是否唯一")
+    int getCountByCardNo(
+            @ApiParam(name = "cardNo", value = "卡号")
+            @RequestParam(value = "cardNo", required = true) String cardNo){
+        try {
+            String filters = "cardNo="+cardNo;
+            return (int)medicalCardsService.getCount(filters);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 1;
+    };
+
 }
