@@ -56,44 +56,37 @@ public class ResolveEndPoint {
     ObjectMapper objectMapper;
 
     @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为OLDEST，则取最旧的未解析档案包")
-    @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
     public ResponseEntity<String> resolve(
-            @ApiParam(value = "id", defaultValue = "OLDEST")
-            @PathVariable("id") String packageId,
+            @ApiParam(value = "id", defaultValue = "")
+            @RequestParam(required = false) String packageId,
             @ApiParam(value = "模拟应用ID", defaultValue = "FBIWarning911")
             @RequestParam("clientId") String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
-            @RequestParam("echo") boolean echo) throws Throwable {
-        try {
-            MPackage pack = packageMgrClient.getPackage(packageId);
-            if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
+            @RequestParam("echo") boolean echo) throws Throwable
+    {
+        MPackage pack = packageMgrClient.acquirePackage(packageId);
+        if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
 
-            long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
-            if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
-            String zipFile = downloadTo(pack.getRemotePath());
+        if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
+        String zipFile = downloadTo(pack.getRemotePath());
 
-            StandardPackage standardPackage = packResolveEngine.doResolve(pack, zipFile);
-            ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
-            resourceService.save(resourceBucket);
+        StandardPackage standardPackage = packResolveEngine.doResolve(pack, zipFile);
+        ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
+        resourceService.save(resourceBucket);
 
-            packageMgrClient.reportStatus(pack.getId(),
-                    ArchiveStatus.Finished,
-                    String.format("Profile: %s, identity: %s", standardPackage.getId(), standardPackage.getDemographicId()));
+        packageMgrClient.reportStatus(pack.getId(),
+                ArchiveStatus.Finished,
+                String.format("Profile: %s, identity: %s", standardPackage.getId(), standardPackage.getDemographicId()));
 
-            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
+        getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
-            if (echo) {
-                return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("", HttpStatus.OK);
-            }
-        } catch (LegacyPackageException e) {
-            packageMgrClient.reportStatus(packageId, ArchiveStatus.LegacyIgnored, e.getMessage());
-
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        } catch (Exception e) {
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        if (echo) {
+            return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("", HttpStatus.OK);
         }
     }
 
