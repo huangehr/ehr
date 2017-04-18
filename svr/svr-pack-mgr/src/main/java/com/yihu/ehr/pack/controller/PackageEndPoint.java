@@ -136,21 +136,26 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 
+    @RequestMapping(value = ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
+    @ApiOperation(value = "处理档案包(更新状态)")
+    public ResponseEntity<MPackage> acquirePackage(
+            @ApiParam(name = "id", value = "档案包编号", defaultValue = "")
+            @RequestParam(required = false) String id) throws IOException {
+        Package aPackage = null;packService.acquirePackage(id);
 
-    @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.GET})
+        if (aPackage == null) return new ResponseEntity<>((MPackage)  new MPackage(), HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(convertToModel(aPackage, MPackage.class), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
     @ApiOperation(value = "获取档案包", notes = "获取档案包的信息，若ID为OLDEST，则获取最早，还没解析的档案包")
     public ResponseEntity<MPackage> getPackage(
             @ApiParam(name = "id", value = "档案包编号", defaultValue = "OLDEST")
             @PathVariable(value = "id") String id) throws IOException {
-        Package aPackage;
-        if (id.equals("OLDEST")) {
-            // only use for svr-pack-resolve, it will change pack status internal
-            aPackage = packService.acquirePackage(id);
-        } else {
-            aPackage = packService.getPackage(id);
-        }
+        Package aPackage = packService.getPackage(id);
 
-        if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
+        if (aPackage == null) return new ResponseEntity<>((MPackage) new MPackage(), HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(convertToModel(aPackage, MPackage.class), HttpStatus.OK);
     }

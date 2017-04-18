@@ -12,7 +12,7 @@ public class MicroServices {
     public static final String Configuration = "svr-configuration";
 
     //以下几个微服务聚合svr-ehr-basic
-    /*public static final String Application = "svr-ehr-basic";
+    public static final String Application = "svr-ehr-basic";
     public static final String Geography = "svr-ehr-basic";
     public static final String Patient = "svr-ehr-basic";
     public static final String Portal = "svr-ehr-basic";
@@ -22,20 +22,7 @@ public class MicroServices {
     public static final String FileResource = "svr-ehr-basic";
     public static final String Dictionary = "svr-ehr-basic";
     public static final String Organization = "svr-ehr-basic";
-
-    public static final String Authentication = "svr-authentication";*/
-
-    public static final String Application = "svr-ehr-basic-cws";
-    public static final String Geography = "svr-ehr-basic-cws";
-    public static final String Patient = "svr-ehr-basic-cws";
-    public static final String Portal = "svr-ehr-basic-cws";
-    public static final String Security = "svr-ehr-basic-cws";
-    public static final String User = "svr-ehr-basic-cws";
-    public static final String Family = "svr-ehr-basic-cws";
-    public static final String FileResource = "svr-ehr-basic-cws";
-    public static final String Dictionary = "svr-ehr-basic-cws";
-    public static final String Organization = "svr-ehr-basic-cws";
-    public static final String Authentication = "svr-authentication-cws";
+    public static final String Authentication = "svr-authentication";
 
     //以下几个微服务聚合svr-standard
     public static final String Adaption = "svr-standard";
