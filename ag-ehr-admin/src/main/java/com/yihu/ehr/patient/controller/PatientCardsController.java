@@ -185,7 +185,7 @@ public class PatientCardsController extends ExtendController<UserCards> {
             medicalCardsModel.setValidityDateBegin(medicalCards.getValidityDateBegin() == null ? "" : DateTimeUtil.simpleDateTimeFormat(medicalCards.getValidityDateBegin()).substring(0, 10) );
             medicalCardsModel.setValidityDateEnd(medicalCards.getValidityDateEnd() == null ? "" : DateTimeUtil.simpleDateTimeFormat(medicalCards.getValidityDateEnd()).substring(0, 10) );
 
-            MConventionalDict dict = conventionalDictClient.getPortalNoticeTypeList(String.valueOf(medicalCards.getCardType()));
+            MConventionalDict dict = conventionalDictClient.getMedicalCardTypeList(String.valueOf(medicalCards.getCardType()));
             medicalCardsModel.setCardTypeName(dict == null ? "" : dict.getValue());
             medicalCardsModelList.add(medicalCardsModel);
         }
