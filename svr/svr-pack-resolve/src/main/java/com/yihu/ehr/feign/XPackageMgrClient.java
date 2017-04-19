@@ -23,7 +23,7 @@ import java.util.*;
 @FeignClient(name = MicroServices.Package)
 public interface XPackageMgrClient {
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
-    MPackage acquirePackage(@RequestParam(value = "id") String id);
+    String acquirePackage(@RequestParam(value = "id") String id);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.Package, method = RequestMethod.PUT)
     void reportStatus(@PathVariable(value = "id") String id,
