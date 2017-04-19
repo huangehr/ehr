@@ -4,8 +4,11 @@ import com.yihu.ehr.model.patient.MedicalCards;
 import com.yihu.ehr.patient.dao.XMedicalCardsDao;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 卡管理实现类.
@@ -38,4 +41,8 @@ public class MedicalCardsService extends BaseJpaService<MedicalCards, XMedicalCa
         return medicalCardsDao.findOne(id);
     }
 
+    public ResponseEntity<List<MedicalCards>> getBycardNoStr(String cardNoStr) {
+        List<MedicalCards> medicalCardses = medicalCardsDao.getBycardNoStr(cardNoStr);
+        return null;
+    }
 }

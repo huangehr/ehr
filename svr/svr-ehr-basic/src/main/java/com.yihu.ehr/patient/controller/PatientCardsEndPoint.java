@@ -1,5 +1,6 @@
 package com.yihu.ehr.patient.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.apps.model.App;
 import com.yihu.ehr.constants.ServiceApi;
@@ -17,16 +18,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by hzp on 2017/04/01.
@@ -229,6 +230,51 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
             e.printStackTrace();
         }
         return 1;
+    };
+
+    @RequestMapping(value = ServiceApi.Patients.MCardGetMutiCardNo, method = RequestMethod.PUT)
+    @ApiOperation(value = "查询导入时重复卡列表")
+    ResponseEntity<List<MedicalCards>> getBycardNoStr(
+            @ApiParam(name = "cardNoStr", value = "卡号字符串")
+            @RequestParam(value = "cardNoStr", required = true) String cardNoStr
+    ){
+            return medicalCardsService.getBycardNoStr(cardNoStr);
+    };
+
+
+    @RequestMapping(value = ServiceApi.Patients.MCarddataBatch, method = RequestMethod.POST)
+    @ApiOperation("批量创建就诊卡")
+    boolean createPatientCardsPatch(
+            @RequestBody String medicalCars,
+            @ApiParam(name = "operator", value = "操作者", defaultValue = "")
+    @RequestParam(value = "operator",required = false) String operator) throws Exception{
+        List<Map<String, String>> models = new ArrayList<>();
+        models = objectMapper.readValue(medicalCars, new TypeReference<List>() {});
+        Map<String, String> map = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        for(int i=1; i<=models.size(); i++) {
+            MedicalCards cards = new MedicalCards();
+            map.clear();
+            map = models.get(i - 1);
+            cards.setCardType(map.get("cardType"));
+            cards.setCardNo(map.get("cardNo"));
+            cards.setReleaseOrg(map.get("releaseOrg"));
+            if(!StringUtils.isEmpty(map.get("releaseDate"))){
+                cards.setReleaseDate(sdf.parse(map.get("releaseDate")));
+            }
+            if(!StringUtils.isEmpty(map.get("validityDateBegin"))){
+                cards.setValidityDateBegin(sdf.parse(map.get("validityDateBegin")));
+            }
+            if(!StringUtils.isEmpty(map.get("validityDateEnd"))){
+                cards.setValidityDateEnd(sdf.parse(map.get("validityDateEnd")));
+            }
+            cards.setDescription(map.get("description"));
+            cards.setStatus(map.get("status"));
+            cards.setCreateDate(new Date());
+            cards.setCreater(operator);
+            medicalCardsService.save(cards);
+        }
+        return true;
     };
 
 }

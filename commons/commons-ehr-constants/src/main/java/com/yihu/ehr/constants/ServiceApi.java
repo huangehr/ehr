@@ -308,6 +308,8 @@ public class ServiceApi {
         public static final String GetMCard = "/medicalCards/get";//就诊卡详情
         public static final String GetMCards = "/getMedicalCards";//	就诊卡列表
         public static final String MCardCheckCardNo = "/medicalCards/checkCardNo";//	校验卡是否唯一
+        public static final String MCardGetMutiCardNo = "/medicalCards/getMutiCard";//	获取重复的卡列表
+        public static final String MCarddataBatch = "/medicalCards/batch";//	批量添加
 
         public static final String Authentications = "/patient/authentications";
         public static final String Authentication = "/patient/Authentication/{id}";

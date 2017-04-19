@@ -244,7 +244,7 @@ public class PatientCardsController extends ExtendController<UserCards> {
 
     @RequestMapping(value = ServiceApi.Patients.MCardCheckCardNo , method = RequestMethod.PUT)
     @ApiOperation(value = "校验卡是否唯一")
-    public Envelop checkUser(
+    public Envelop checkCard(
             @ApiParam(name = "cardNo", value = "卡号")
             @RequestParam(value = "cardNo", required = true) String cardNo
     ){
@@ -268,6 +268,55 @@ public class PatientCardsController extends ExtendController<UserCards> {
             ex.printStackTrace();
             return failedSystem();
         }
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.MCardGetMutiCardNo , method = RequestMethod.PUT)
+    @ApiOperation(value = "查询导入时重复卡列表")
+    public Envelop getMutiCard(
+            @ApiParam(name = "cardNoStr", value = "卡号字符串")
+            @RequestParam(value = "cardNoStr", required = true) String cardNoStr
+    ){
+        try {
+            List<MedicalCardsModel> medicalCardsModelList = new ArrayList<>();
+            Envelop envelop = new Envelop();
+            String errorMsg = "";
+            if (cardNoStr == null) {
+                errorMsg+="卡号不能为空！";
+                envelop.setErrorMsg(errorMsg);
+            }
+            ResponseEntity<List<MedicalCards>> responseEntity = patientCardsClient.getBycardNoStr(cardNoStr);
+            List<MedicalCards> medicalCardss = responseEntity.getBody();
+            for (MedicalCards medicalCards : medicalCardss) {
+                MedicalCardsModel medicalCardsModel = convertToModel(medicalCards, MedicalCardsModel.class);
+                medicalCardsModelList.add(medicalCardsModel);
+            }
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(medicalCardsModelList);
+            return envelop;
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.MCarddataBatch, method = RequestMethod.POST)
+    @ApiOperation("批量创建就诊卡")
+    public Envelop createPatientCardsPatch(
+            @ApiParam(name = "medicalCars", value = "就诊卡JSON", defaultValue = "")
+            @RequestParam(value = "medicalCars") String medicalCars,
+            @ApiParam(name = "operator", value = "操作者", defaultValue = "")
+            @RequestParam(value = "operator",required = false) String operator) throws Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try{
+            patientCardsClient.createPatientCardsPatch(medicalCars,operator);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
+        }
+        return envelop;
     }
 
     private Map<String,Object> convertCardModel(Map<String,Object> userCard){
