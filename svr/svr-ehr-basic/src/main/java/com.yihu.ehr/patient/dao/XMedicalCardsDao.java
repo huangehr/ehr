@@ -3,6 +3,7 @@ package com.yihu.ehr.patient.dao;
 import com.yihu.ehr.model.patient.MedicalCards;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -11,8 +12,8 @@ import java.util.List;
  */
 public interface XMedicalCardsDao extends PagingAndSortingRepository<MedicalCards,Long> {
 
-    @Query("from MedicalCards where cardNo in (?1)")
-    List<MedicalCards> getBycardNoStr(String cardNoStr);
+    @Query("select mc from MedicalCards mc where mc.cardNo in (:cardNoStr)")
+    List<MedicalCards> getBycardNoStr(@Param("cardNoStr") String[] cardNoStr);
 
 
 }

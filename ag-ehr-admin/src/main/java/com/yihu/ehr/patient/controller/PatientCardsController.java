@@ -284,8 +284,7 @@ public class PatientCardsController extends ExtendController<UserCards> {
                 errorMsg+="卡号不能为空！";
                 envelop.setErrorMsg(errorMsg);
             }
-            ResponseEntity<List<MedicalCards>> responseEntity = patientCardsClient.getBycardNoStr(cardNoStr);
-            List<MedicalCards> medicalCardss = responseEntity.getBody();
+            List<MedicalCards> medicalCardss = patientCardsClient.getBycardNoStr(cardNoStr);
             for (MedicalCards medicalCards : medicalCardss) {
                 MedicalCardsModel medicalCardsModel = convertToModel(medicalCards, MedicalCardsModel.class);
                 medicalCardsModelList.add(medicalCardsModel);

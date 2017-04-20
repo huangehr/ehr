@@ -234,7 +234,7 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Patients.MCardGetMutiCardNo, method = RequestMethod.PUT)
     @ApiOperation(value = "查询导入时重复卡列表")
-    ResponseEntity<List<MedicalCards>> getBycardNoStr(
+    List<MedicalCards> getBycardNoStr(
             @ApiParam(name = "cardNoStr", value = "卡号字符串")
             @RequestParam(value = "cardNoStr", required = true) String cardNoStr
     ){

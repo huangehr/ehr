@@ -41,8 +41,9 @@ public class MedicalCardsService extends BaseJpaService<MedicalCards, XMedicalCa
         return medicalCardsDao.findOne(id);
     }
 
-    public ResponseEntity<List<MedicalCards>> getBycardNoStr(String cardNoStr) {
-        List<MedicalCards> medicalCardses = medicalCardsDao.getBycardNoStr(cardNoStr);
-        return null;
+    public List<MedicalCards> getBycardNoStr(String cardNoStr) {
+        String [] cardNos = cardNoStr.split(",");
+        List<MedicalCards> medicalCardses = medicalCardsDao.getBycardNoStr(cardNos);
+        return medicalCardses;
     }
 }
