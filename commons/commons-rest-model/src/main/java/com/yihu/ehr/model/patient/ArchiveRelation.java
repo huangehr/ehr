@@ -13,7 +13,7 @@ import java.util.Date;
  * Created by hzp on 2017/04/05.
  */
 @Entity
-@Table(name="archive_apply")
+@Table(name="archive_relation")
 public class ArchiveRelation extends IdEntity {
 
     private String name;//姓名',

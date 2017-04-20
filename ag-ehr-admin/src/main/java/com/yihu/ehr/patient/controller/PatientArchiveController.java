@@ -32,6 +32,69 @@ public class PatientArchiveController extends ExtendController<ArchiveApply> {
     @Autowired
     SystemDictClient systemDictClient;
 
+    @RequestMapping(value = ServiceApi.Patients.GetArchiveList, method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件查询档案列表(arApply)")
+    public Envelop getMCards(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+
+        ListResult listResult = patientArchiveClient.getApplyList(fields, filters, sorts, size, page);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            list = convertArApplyModels(list);
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else{
+            return successMsg("查询无数据");
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.GetArchiveRelationList, method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件查询档案关联列表(arRelation)")
+    public Envelop getArRelationList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+
+        ListResult listResult = patientArchiveClient.getArRelationList(fields, filters, sorts, size, page);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            list = convertArRelaModels(list);
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else{
+            return successMsg("查询无数据");
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.GetArchiveRelation,method = RequestMethod.GET)
+    @ApiOperation(value = "档案关联详情")
+    public Envelop getArRelation(
+            @ApiParam(name = "applyId", value = "applyId", defaultValue = "")
+            @PathVariable(value = "applyId") Long applyId) throws Exception{
+        ObjectResult objectResult = patientArchiveClient.getArRelation(applyId);
+        if(objectResult.getData() != null){
+            Map<String,Object> info = (HashMap)objectResult.getData();
+            info = convertArRelaModel(info);
+            return successObj(info);
+        }
+        return null;
+    }
+
+
     @RequestMapping(value = ServiceApi.Patients.ArchiveApplyList,method = RequestMethod.GET)
     @ApiOperation(value = "居民查看提交的档案申请列表")
     public Envelop archiveApplyList(
@@ -228,7 +291,6 @@ public class PatientArchiveController extends ExtendController<ArchiveApply> {
         for(Map<String,Object> info : arApplies){
             info.put("statusName",statusMap.get(info.get("status")));
         }
-
         return arApplies;
     }
 
