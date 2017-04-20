@@ -666,4 +666,13 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
         SystemDictEntry noticeType = dictEntryService.getDictEntry(60, code);
         return getDictModel(noticeType);
     }
+
+    @RequestMapping(value = "/dictionaries/medicalCard_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "就诊卡类型", response = MConventionalDict.class)
+    public MConventionalDict getMedicalCardTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry noticeType = dictEntryService.getDictEntry(66, code);
+        return getDictModel(noticeType);
+    }
 }

@@ -139,7 +139,18 @@ public interface PatientCardsClient {
             @RequestParam(value = "cardNo", required = true) String cardNo
     );
 
+    @RequestMapping(value = ServiceApi.Patients.MCardGetMutiCardNo, method = RequestMethod.PUT)
+    @ApiOperation(value = "查询导入时重复卡列表")
+    List<MedicalCards> getBycardNoStr(
+            @ApiParam(name = "cardNoStr", value = "卡号字符串")
+            @RequestParam(value = "cardNoStr", required = true) String cardNoStr
+    );
 
 
-
+    @RequestMapping(value = ServiceApi.Patients.MCarddataBatch, method = RequestMethod.POST)
+    @ApiOperation("批量创建就诊卡")
+    boolean createPatientCardsPatch(
+            @RequestBody String medicalCars,
+            @ApiParam(name = "operator", value = "操作者", defaultValue = "")
+            @RequestParam(value = "operator",required = false) String operator);
 }
