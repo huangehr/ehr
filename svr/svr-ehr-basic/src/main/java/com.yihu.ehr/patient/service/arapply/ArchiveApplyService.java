@@ -7,6 +7,7 @@ import com.yihu.ehr.model.patient.ArchiveRelation;
 import com.yihu.ehr.patient.dao.XArchiveApplyDao;
 import com.yihu.ehr.patient.dao.XArchiveRelationDao;
 import com.yihu.ehr.patient.feign.PatientArchiveClient;
+import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +25,7 @@ import java.util.Date;
  */
 @Transactional
 @Service
-public class ArchiveApplyService {
+public class ArchiveApplyService extends BaseJpaService<ArchiveApply, XArchiveApplyDao> {
 
     @Autowired
     private XArchiveApplyDao archiveApplyDao;

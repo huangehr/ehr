@@ -20,4 +20,6 @@ public interface XArchiveRelationDao extends PagingAndSortingRepository<ArchiveR
     @Query("select a from ArchiveRelation a where a.status=0 and a.cardNo=:cardNo and a.name = :name")
     List<ArchiveRelation> findByCardNoAndName(String cardNo, String name);
 
+    ArchiveRelation findByApplyId(long applyId);
+
 }

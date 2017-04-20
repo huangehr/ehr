@@ -302,6 +302,9 @@ public class ServiceApi {
         public static final String ArchiveApplyListManager = "/patientArchive/manager/applyList";//	管理员--档案认领列表
         public static final String ArchiveVerifyManager = "/patientArchive/manager/verify";//	管理员--档案认领审核操作
         public static final String ArchiveRelation = "/patientArchive/archiveRelation";//新建档案关联
+        public static final String GetArchiveList = "/patientArchive/getApplyList";//根据查询条件查询个人档案申请列表
+        public static final String GetArchiveRelationList = "/patientArchive/getArRelationList";//根据查询条件查询个人档案申请列表
+        public static final String GetArchiveRelation = "/patientArchive/{applyId}/getArRelation";//根据查询条件查询个人档案申请列表
 
         public static final String MCardSave = "/medicalCards/save";// 就诊卡新增&保存
         public static final String MCardDel = "/medicalCards/del";//	就诊卡删除

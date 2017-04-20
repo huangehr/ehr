@@ -1,8 +1,8 @@
 package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
@@ -17,7 +17,10 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -36,6 +39,79 @@ public class PatientArchiveEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @RequestMapping(value = ServiceApi.Patients.GetArchiveList, method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件查询档案列表（arApply）")
+    public ListResult getApplyList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        ListResult listResult = new ListResult();
+        List<ArchiveApply> applyList = archiveApplyService.search(fields, filters, sorts, page, size);
+        if(applyList != null){
+            listResult.setDetailModelList(applyList);
+            listResult.setTotalCount((int)archiveApplyService.getCount(filters));
+            listResult.setCode(200);
+            listResult.setCurrPage(page);
+            listResult.setPageSize(size);
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
+        }
+        return listResult;
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.GetArchiveRelationList, method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件查询档案关联列表(arRelation)")
+    public ListResult getArRelationList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        ListResult listResult = new ListResult();
+        List<ArchiveRelation> arRelationList = archiveRelationService.search(fields, filters, sorts, page, size);
+        if(arRelationList != null){
+            listResult.setDetailModelList(arRelationList);
+            listResult.setTotalCount((int)archiveApplyService.getCount(filters));
+            listResult.setCode(200);
+            listResult.setCurrPage(page);
+            listResult.setPageSize(size);
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
+        }
+        return listResult;
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.GetArchiveRelation,method = RequestMethod.GET)
+    @ApiOperation(value = "档案关联详情")
+    public ObjectResult getArRelation(
+            @ApiParam(name = "applyId", value = "applyId", defaultValue = "")
+            @PathVariable(value = "applyId") long applyId) throws Exception{
+        ObjectResult obj = archiveRelationService.getArRelation(applyId);
+        return Result.success("获取档案关联详情成功！",obj);
+    }
 
     @RequestMapping(value = ServiceApi.Patients.ArchiveApplyList,method = RequestMethod.GET)
     @ApiOperation(value = "个人档案认领列表")

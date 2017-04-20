@@ -1,9 +1,11 @@
 package com.yihu.ehr.patient.service.arapply;
 
 import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.patient.ArchiveRelation;
 import com.yihu.ehr.patient.dao.XArchiveRelationDao;
 import com.yihu.ehr.patient.feign.PatientArchiveClient;
+import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,12 +22,27 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class ArchiveRelationService {
+public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XArchiveRelationDao> {
 
     @Autowired
     private XArchiveRelationDao archiveRelationDao;
     @Autowired
     private PatientArchiveClient patientArchiveClient;
+
+    /**
+     * 根据申请ID查询档案关联信息
+     * @param applyId
+     * @return
+     * @throws Exception
+     */
+    public ObjectResult getArRelation(long applyId) throws Exception{
+        ObjectResult re = new ObjectResult();
+        ArchiveRelation result = archiveRelationDao.findByApplyId(applyId);
+        if(result!=null) {
+            re.setData(result);
+        }
+        return re;
+    }
 
     /**
      * 个人档案列表
