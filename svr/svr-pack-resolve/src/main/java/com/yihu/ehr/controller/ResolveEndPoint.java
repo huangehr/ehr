@@ -65,8 +65,14 @@ public class ResolveEndPoint {
             @ApiParam(value = "返回档案数据", defaultValue = "true")
             @RequestParam("echo") boolean echo) throws Throwable
     {
-        MPackage pack = packageMgrClient.acquirePackage(packageId);
-        if (pack == null) throw new ApiException(HttpStatus.NOT_FOUND, "Package not found.");
+        String packString = packageMgrClient.acquirePackage(packageId);
+
+        if(StringUtils.isEmpty(packString))
+        {
+            throw new Exception("Package not found.");
+        }
+
+        MPackage pack = objectMapper.readValue(packString,MPackage.class);
 
         long start = System.currentTimeMillis();
 

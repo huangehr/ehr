@@ -138,14 +138,12 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
     @ApiOperation(value = "处理档案包(更新状态)")
-    public ResponseEntity<MPackage> acquirePackage(
+    public String acquirePackage(
             @ApiParam(name = "id", value = "档案包编号", defaultValue = "")
-            @RequestParam(required = false) String id) throws IOException {
-        Package aPackage = null;packService.acquirePackage(id);
+            @RequestParam(required = false) String id) throws Exception {
+        Package aPackage = packService.acquirePackage(id);
 
-        if (aPackage == null) return new ResponseEntity<>((MPackage)  new MPackage(), HttpStatus.NOT_FOUND);
-
-        return new ResponseEntity<>(convertToModel(aPackage, MPackage.class), HttpStatus.OK);
+        return objectMapper.writeValueAsString(aPackage);
     }
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
