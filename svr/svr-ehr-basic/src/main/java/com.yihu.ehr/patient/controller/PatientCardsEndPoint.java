@@ -2,7 +2,6 @@ package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.apps.model.App;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -18,7 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +44,26 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
     @Autowired
     MedicalCardsService medicalCardsService;
 
+    // ----------------------- 就诊卡基本信息管理 ------------------------------
+    @RequestMapping(value = ServiceApi.Patients.GetUserCards, method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户卡认证列表信息")
+    public Collection<UserCards> getUserCards(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        List<UserCards> cards = userCardsService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, userCardsService.getCount(filters), page, size);
+        return convertToModels(cards, new ArrayList<>(cards.size()), UserCards.class, fields);
+    }
 
     @RequestMapping(value = ServiceApi.Patients.CardList,method = RequestMethod.GET)
     @ApiOperation(value = "获取个人卡列表")
@@ -80,16 +98,17 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "operator",required = false) String operator) throws Exception{
         UserCards card = objectMapper.readValue(data,UserCards.class);
         //新增
-        if(card.getId()==null)
+        if(card.getId()==null || card.getId()==0)
         {
             card.setCreater(operator);
             card.setCreateDate(new Date());
+            card.setAuditStatus("0");
+            card.setStatus("0");
         }
         else{
             card.setUpdater(operator);
             card.setUpdateDate(new Date());
         }
-        card.setStatus("0");
 
         card = userCardsService.cardApply(card);
 

@@ -289,6 +289,7 @@ public class ServiceApi {
 
 
     public static class Patients {
+        public static final String GetUserCards = "/getUserCards";// 就诊卡列表
         public static final String CardApply = "/patientCards/apply";	 //卡认证申请
         public static final String CardList = "/patientCards/list";  //	个人账号列表
         public static final String CardApplyListManager = "/patientCards/manager/applyList";//	管理员--卡认证列表
@@ -313,6 +314,9 @@ public class ServiceApi {
 
         public static final String Authentications = "/patient/authentications";
         public static final String Authentication = "/patient/Authentication/{id}";
+
+
+
 
 
 

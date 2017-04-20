@@ -6,6 +6,7 @@ import com.yihu.ehr.model.patient.MedicalCards;
 import com.yihu.ehr.model.patient.UserCards;
 import com.yihu.ehr.patient.dao.XMedicalCardsDao;
 import com.yihu.ehr.patient.dao.XUserCardsDao;
+import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +23,7 @@ import java.util.Date;
  */
 @Transactional
 @Service
-    public class UserCardsService {
+    public class UserCardsService  extends BaseJpaService<UserCards, XUserCardsDao> {
 
     @Autowired
     private XUserCardsDao userCardsDao;
@@ -124,7 +125,7 @@ import java.util.Date;
                 return Result.error("卡信息不完整！");
             }
 
-            card.setStatus(status);
+            card.setAuditStatus(status);
             card.setAuditor(auditor);
             card.setAuditDate(new Date());
             card.setAuditReason(auditReason);

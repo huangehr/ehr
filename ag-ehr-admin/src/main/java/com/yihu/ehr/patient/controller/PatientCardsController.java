@@ -2,6 +2,7 @@ package com.yihu.ehr.patient.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.patient.MedicalCardsModel;
+import com.yihu.ehr.agModel.patient.UserCardsModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
@@ -44,6 +45,45 @@ public class PatientCardsController extends ExtendController<UserCards> {
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
 
+    @RequestMapping(value = ServiceApi.Patients.GetUserCards, method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户关联卡列表", notes = "根据查询条件获取用户关联卡列表在前端表格展示")
+    public Envelop searchPatientUserCards(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,ownerName,cardNo,createDate")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
+
+        List<UserCardsModel> userCardsModelList = new ArrayList<>();
+        ResponseEntity<List<UserCards>> responseEntity = patientCardsClient.getUserCardList(fields, filters, sorts, size, page);
+        List<UserCards> userCardss = responseEntity.getBody();
+        for (UserCards userCard : userCardss) {
+            UserCardsModel userCardsModel = convertToModel(userCard, UserCardsModel.class);
+            userCardsModel.setCreateDate(userCard.getCreateDate() == null?"": DateTimeUtil.simpleDateTimeFormat(userCard.getCreateDate()).substring(0, 10) );
+            userCardsModel.setReleaseDate(userCard.getReleaseDate() == null?"": DateTimeUtil.simpleDateTimeFormat(userCard.getReleaseDate()).substring(0,10) );
+            userCardsModel.setValidityDateBegin(userCard.getValidityDateBegin() == null ? "" : DateTimeUtil.simpleDateTimeFormat(userCard.getValidityDateBegin()).substring(0, 10) );
+            userCardsModel.setValidityDateEnd(userCard.getValidityDateEnd() == null ? "" : DateTimeUtil.simpleDateTimeFormat(userCard.getValidityDateEnd()).substring(0, 10) );
+
+            MConventionalDict dict = conventionalDictClient.getMedicalCardTypeList(String.valueOf(userCard.getCardType()));
+            userCardsModel.setCardTypeName(dict == null ? "" : dict.getValue());
+            userCardsModelList.add(userCardsModel);
+        }
+
+        Integer totalCount = getTotalCount(responseEntity);
+        if(totalCount > 0){
+            Envelop envelop = getResult(userCardsModelList, totalCount, page, size);
+            return envelop;
+        }
+        return null;
+    }
+
+
+
     @RequestMapping(value = ServiceApi.Patients.CardList,method = RequestMethod.GET)
     @ApiOperation(value = "获取个人卡列表")
     public Envelop cardList(
@@ -80,7 +120,7 @@ public class PatientCardsController extends ExtendController<UserCards> {
     @ApiOperation(value = "卡认证申请新增/修改")
     public Envelop cardApply(
             @ApiParam(name = "data", value = "json数据", defaultValue = "")
-            @RequestBody String data,
+            @RequestParam String data,
             @ApiParam(name = "operator", value = "操作者", defaultValue = "")
             @RequestParam(value = "operator",required = false) String operator) throws Exception{
         ObjectResult objectResult = patientCardsClient.cardApply(data,operator);
@@ -320,11 +360,16 @@ public class PatientCardsController extends ExtendController<UserCards> {
 
     private Map<String,Object> convertCardModel(Map<String,Object> userCard){
         List<MDictionaryEntry> statusDicts = systemDictClient.getDictEntries("", "dictId=43", "", 10, 1).getBody();
+        List<MDictionaryEntry> typeDicts = systemDictClient.getDictEntries("", "dictId=66", "", 10, 1).getBody();
         Map<String, String> statusMap = new HashMap<>();
         for(MDictionaryEntry entry : statusDicts){
             statusMap.put(entry.getCode(), entry.getValue());
         }
+        for(MDictionaryEntry entry : typeDicts){
+            statusMap.put(entry.getCode(), entry.getValue());
+        }
         userCard.put("statusName",statusMap.get(userCard.get("status")));
+        userCard.put("cardTypeName",statusMap.get(userCard.get("cardType")));
 
         return userCard;
     }

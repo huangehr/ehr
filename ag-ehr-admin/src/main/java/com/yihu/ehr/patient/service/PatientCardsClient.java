@@ -8,6 +8,7 @@ import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.patient.MedicalCards;
+import com.yihu.ehr.model.patient.UserCards;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -29,6 +30,21 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface PatientCardsClient {
+
+    @RequestMapping(value = ServiceApi.Patients.GetUserCards, method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户卡关联列表信息")
+    ResponseEntity<List<UserCards>> getUserCardList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page);
+
 
     @RequestMapping(value = ServiceApi.Patients.CardList,method = RequestMethod.GET)
     @ApiOperation(value = "获取个人卡列表")
