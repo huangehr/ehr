@@ -33,14 +33,18 @@ public class StandardPackage {
     private String cardId;                              // 就诊时用的就诊卡ID
     private String orgCode;                             // 机构代码
     private String clientId;                            // 应用来源
-    private String patientId;                           // 身份证号
+    private String patientId;                           // 人口学ID
     private String eventNo;                             // 事件号
     private Date eventDate;                             // 事件时间，如挂号，出院体检时间
-    private String demographicId;                       // 人口学ID
+    private String demographicId;                       // 身份证号
     private Date createDate;                            // 包创建时间
     private String cdaVersion;
-    private ProfileType profileType; //1结构化档案，文件档案，链接档案
+    private ProfileType profileType; //1结构化档案，2文件档案，3链接档案
     private EventType eventType; // 0门诊 1住院 2体检
+
+    //add by hzp
+    private String cardType;                              // 就诊时用的就诊卡类型
+    private String patientName;                           // 患者姓名
 
     protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 
@@ -59,15 +63,15 @@ public class StandardPackage {
                 throw new IllegalArgumentException("Build profile id failed, organization code is empty.");
             }
 
-            if (StringUtils.isEmpty(patientId) || StringUtils.isEmpty(eventNo)) {
-                throw new IllegalArgumentException("Build profile id failed, patient index is empty.");
+            if (StringUtils.isEmpty(eventNo)) {
+                throw new IllegalArgumentException("Build profile id failed, eventNo is empty.");
             }
 
             if (eventDate == null) {
                 throw new IllegalArgumentException("Build profile id failed, unable to get event date.");
             }
 
-            this.profileId = ProfileId.get(orgCode, patientId, eventNo, eventDate);
+            this.profileId = ProfileId.get(orgCode, eventNo, eventDate);
         }
 
         return profileId.toString();
@@ -200,6 +204,22 @@ public class StandardPackage {
         this.clientId = clientId;
     }
 
+    public String getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
     public String toJson() {
         ObjectNode node = jsonFormat();
         return node.toString();
@@ -218,6 +238,8 @@ public class StandardPackage {
         root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
         root.put("eventType", this.getEventType().toString());
         root.put("profileType", this.getProfileType().toString());
+        root.put("cardType", this.getCardType());
+        root.put("patientName", this.getPatientName());
 
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {
