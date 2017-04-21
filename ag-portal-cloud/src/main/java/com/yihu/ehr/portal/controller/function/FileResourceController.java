@@ -21,7 +21,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "图片上传管理接口", description = "图片上传管理接口")
+@Api(value = "文件管理", description = "文件管理", tags = {"文件管理"})
 public class FileResourceController {
 
     @Autowired

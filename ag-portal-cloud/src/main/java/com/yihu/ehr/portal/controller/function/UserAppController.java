@@ -1,6 +1,6 @@
 package com.yihu.ehr.portal.controller.function;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.portal.service.common.AppClient;
 import com.yihu.ehr.portal.service.function.UserAppClient;
@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 +"/portal")
 @RestController
-@Api(value = "UserApp", description = "UserApp", tags = {"用户App关联"})
+@Api(value = "UserApp", description = "UserApp", tags = {"云门户-用户App关联"})
 public class UserAppController extends BaseController {
 
     @Autowired
@@ -48,6 +48,24 @@ public class UserAppController extends BaseController {
         }
 
         Envelop envelop = getResult(list,list.size(),1,list.size());
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.UserApp.UserAppShow, method = RequestMethod.GET)
+    @ApiOperation(value = "根据ID更新APP的展示状态")
+    public Envelop updateUserAppShowFlag(
+            @ApiParam(name = "id", value = "用户APP关联ID")
+            @RequestParam(value = "id", required = true) String id,
+            @ApiParam(name = "flag", value = "用户id", defaultValue = "1")
+            @RequestParam(value = "flag", required = true) String flag){
+
+        Envelop envelop = new Envelop();
+        MUserApp mUserApp = userAppClient.updateUserAppShowFlag(id,flag);
+        if(mUserApp == null){
+            envelop = success("");
+        }else{
+            envelop = failed("状态更新失败。");
+        }
         return envelop;
     }
 }

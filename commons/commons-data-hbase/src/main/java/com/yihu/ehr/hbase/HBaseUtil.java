@@ -289,15 +289,17 @@ public class HBaseUtil {
     public Map<String, Object> getResultMap(String tableName, String rowKey) throws Exception {
         return hbaseTemplate.get(tableName, rowKey, new RowMapper<Map<String, Object>>() {
             public Map<String, Object> mapRow(Result result, int rowNum) throws Exception {
-                List<Cell> ceList = result.listCells();
                 Map<String, Object> map = new HashMap<String, Object>();
-                map.put("rowkey",rowKey);
-                if (ceList != null && ceList.size() > 0) {
-                    for (Cell cell : ceList) {
-                        //默认不加列族
-                        // Bytes.toString(cell.getFamilyArray(), cell.getFamilyOffset(), cell.getFamilyLength()) +"_"
-                        map.put(Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength()),
-                                Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()));
+                if(result!=null) {
+                    List<Cell> ceList = result.listCells();
+                    map.put("rowkey", rowKey);
+                    if (ceList != null && ceList.size() > 0) {
+                        for (Cell cell : ceList) {
+                            //默认不加列族
+                            // Bytes.toString(cell.getFamilyArray(), cell.getFamilyOffset(), cell.getFamilyLength()) +"_"
+                            map.put(Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength()),
+                                    Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()));
+                        }
                     }
                 }
                 return map;

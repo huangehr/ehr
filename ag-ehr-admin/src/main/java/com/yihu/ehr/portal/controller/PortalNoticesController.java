@@ -29,7 +29,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "portalNotices", description = "通知公告接口", tags = {"通知公告接口"})
+@Api(value = "portalNotices", description = "通知公告接口", tags = {"云门户-通知公告接口"})
 public class PortalNoticesController extends BaseController{
 
     @Autowired

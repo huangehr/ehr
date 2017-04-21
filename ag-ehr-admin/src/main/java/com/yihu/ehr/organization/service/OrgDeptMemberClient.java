@@ -33,18 +33,18 @@ public interface OrgDeptMemberClient {
             @RequestParam(value = "page", required = false) int page
     ) ;
 
-    @RequestMapping(value = "orgDeptMember/admin/{orgDept_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "orgDeptMember/admin/{memRelationId}", method = RequestMethod.GET)
     @ApiOperation(value = "获取部门成员信息", notes = "部门成员信息")
-    MOrgMemberRelation getOrgMemberRelation(@PathVariable(value = "orgDept_id") Long orgDeptId);
+    MOrgMemberRelation getOrgMemberRelation(@PathVariable(value = "memRelationId") Long memRelationId);
 
-    @RequestMapping(value = "/orgDeptMember/save", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/orgDeptMember", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增部门成员")
     MOrgMemberRelation saveOrgDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = "新增部门成员信息")
             @RequestBody String memberRelationJsonData
     );
 
-    @RequestMapping(value = "/orgDeptMember/update", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/orgDeptMember", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改部门成员")
     MOrgMemberRelation updateOrgDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = "修改部门成员信息")
@@ -55,7 +55,7 @@ public interface OrgDeptMemberClient {
     @ApiOperation(value = "修改部门成员状态" )
     boolean updateStatusOrgDeptMember(
             @ApiParam(name = "memberRelationId", value = "部门成员ID")
-            @RequestParam(value = "memberRelationId", required = true) Integer memberRelationId,
+            @RequestParam(value = "memberRelationId", required = true) int memberRelationId,
             @ApiParam(name = "status", value = "状态", defaultValue = "")
             @RequestParam(value = "status") int status
     ) ;
@@ -66,4 +66,9 @@ public interface OrgDeptMemberClient {
             @ApiParam(name = "memberRelationId", value = "部门成员ID")
             @RequestParam(value = "memberRelationId", required = true) Integer memberRelationId
     ) ;
+
+    @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有成员列表")
+    ResponseEntity<List<MOrgMemberRelation>> getAllOrgDeptMember(
+            @RequestParam(value = "filters", required = false) String filters);
 }

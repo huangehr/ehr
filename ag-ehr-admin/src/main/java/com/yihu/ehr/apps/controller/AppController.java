@@ -1,7 +1,7 @@
 package com.yihu.ehr.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppApiClient;
 import com.yihu.ehr.model.app.MAppApi;
 import com.yihu.ehr.model.org.MOrganization;
@@ -40,7 +40,7 @@ import java.util.*;
 
 @RequestMapping(ApiVersion.Version1_0+"/admin" )
 @RestController
-@Api(value = "app", description = "应用管理接口，用于接入应用管理", tags = {"应用管理接口"})
+@Api(value = "app", description = "应用管理接口", tags = {"应用管理接口"})
 public class AppController extends BaseController {
     @Autowired
     private AppClient appClient;
@@ -61,6 +61,15 @@ public class AppController extends BaseController {
     @Autowired
     private AppApiClient appApiClient;
 
+
+    @RequestMapping(value = "test", method = RequestMethod.GET)
+    @ApiOperation(value = "获取app列表，不分页")
+    public Envelop test() throws Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+    
     @RequestMapping(value = "/apps", method = RequestMethod.GET)
     @ApiOperation(value = "获取App列表")
     public Envelop getApps(

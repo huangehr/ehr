@@ -18,7 +18,6 @@ import java.util.Map;
  * @created 2016.04.15
  */
 public class FileTableUtil {
-    public static final String Table = "RawFiles";
 
     public static Map<String, String> getBasicFamilyCellMap(ResourceBucket profile) {
         Map<String, String> map = new HashMap<>();

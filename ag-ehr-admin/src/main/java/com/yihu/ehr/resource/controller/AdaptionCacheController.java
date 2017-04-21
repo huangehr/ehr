@@ -1,6 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.resource.client.AdaptionCacheClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "adaption_cache", description = "适配数据缓存")
+@Api(value = "adaption_cache", description = "适配数据缓存", tags = {"资源管理-适配数据缓存"})
 public class AdaptionCacheController extends BaseController {
     @Autowired
     private AdaptionCacheClient adaptionCacheClient;

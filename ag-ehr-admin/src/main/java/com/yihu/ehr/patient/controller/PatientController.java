@@ -33,7 +33,7 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "patient", description = "人口管理接口，用于人口信息管理", tags = {"人口管理接口"})
+@Api(value = "patient", description = "人口管理", tags = {"人口管理"})
 public class PatientController extends BaseController {
 
     @Autowired

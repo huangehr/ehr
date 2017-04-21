@@ -11,10 +11,10 @@
  */
 package com.yihu.ehr.oauth2.web;
 
-import com.yihu.ehr.api.ServiceApi;
-import com.yihu.ehr.model.common.ObjectResult;
-import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.oauth2.model.AccessToken;
+import com.yihu.ehr.oauth2.model.ObjectResult;
+import com.yihu.ehr.oauth2.model.Result;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
 import org.apache.commons.collections.map.HashedMap;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -83,7 +83,7 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
       * @param parameters
      * @return
      */
-    @RequestMapping(value = ServiceApi.Authentication.AccessToken, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value =ServiceApi.Authentication.AccessToken, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public AccessToken postAccessToken(@RequestBody Map<String, String> parameters) {
 
         String clientId = getClientId(parameters);

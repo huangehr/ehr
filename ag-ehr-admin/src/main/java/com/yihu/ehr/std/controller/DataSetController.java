@@ -8,6 +8,7 @@ import com.yihu.ehr.model.standard.*;
 import com.yihu.ehr.std.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import java.util.*;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/std")
 @RestController
+@Api(value = "CDA", description = "数据集管理", tags = {"标准中心-数据集管理"})
 public class DataSetController extends BaseController {
 
     @Autowired

@@ -2,7 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.agModel.resource.RsAdapterSchemaModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.adaption.MAdapterOrg;
 import com.yihu.ehr.model.dict.MConventionalDict;
@@ -31,7 +31,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "adapterSchema", description = "适配方案服务")
+@Api(value = "adapterSchema", description = "适配方案服务", tags = {"资源管理-适配方案服务"})
 public class AdapterSchemaController extends BaseController {
 
     @Autowired

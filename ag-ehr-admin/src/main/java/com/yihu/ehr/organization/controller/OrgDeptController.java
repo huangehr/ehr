@@ -34,7 +34,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
-@Api(value = "orgDept", description = "组织结构-部门管理接口，用于部门信息管理", tags = {"机构部门信息管理接口"})
+@Api(value = "orgDept", description = "机构信息部门管理", tags = {"机构管理 - 机构部门管理"})
 public class OrgDeptController  extends BaseController {
 
     @Autowired
@@ -130,18 +130,9 @@ public class OrgDeptController  extends BaseController {
     @ApiOperation(value = "新增机构部门")
     public Envelop create(
             @ApiParam(name = "orgDeptsJsonData", value = " 部门信息Json", defaultValue = "")
-            @RequestParam(value = "orgDeptsJsonData", required = false) String orgDeptsJsonData,
-            @ApiParam(name = "geographyModelJsonData", value = "地址信息json", defaultValue = "")
-            @RequestParam(value = "geographyModelJsonData", required = false) String geographyModelJsonData){
+            @RequestParam(value = "orgDeptsJsonData", required = false) String orgDeptsJsonData){
         try {
             String errorMsg = "";
-
-            GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData,GeographyModel.class);
-
-            if (geographyModel.nullAddress()) {
-                errorMsg+="地址不能为空！";
-            }
-
             OrgDeptModel orgDeptModel = objectMapper.readValue(orgDeptsJsonData, OrgDeptModel.class);
             MOrgDept mOrgDept = convertToModel(orgDeptModel, MOrgDept.class);
 
@@ -205,6 +196,38 @@ public class OrgDeptController  extends BaseController {
                 return failed("保存失败!");
             }
             return success(mOrgDeptNew);
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = "/orgDept/checkDeptName" , method = RequestMethod.PUT)
+    @ApiOperation(value = "检查机构下部门名称是否唯一")
+    public Envelop checkDeptName(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId", required = true) Integer orgId,
+            @ApiParam(name = "name", value = "新部门名称")
+            @RequestParam(value = "name", required = true) String name
+    ){
+        try {
+            Envelop envelop = new Envelop();
+            String errorMsg = "";
+            if (orgId == null) {
+                envelop.setErrorMsg("机构不能为空！");
+            }
+            if (StringUtils.isEmpty(name)) {
+                envelop.setErrorMsg("新部门名称不能为空！");
+            }
+            int num = orgDeptClient.getCountByDeptName(orgId, name);
+            if (num > 0) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("所在机构已经存在此部门!");
+            }else{
+                envelop.setSuccessFlg(true);
+            }
+            return envelop;
         } catch (Exception ex)
         {
             ex.printStackTrace();
@@ -332,14 +355,77 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
+    @ApiOperation(value = "获取所有成员列表")
+    @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET)
+    public Envelop getAllOrgDeptMember(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) {
+        try {
+            Envelop envelop = new Envelop();
+            List<MOrgMemberRelation> memberRelationList = new ArrayList<MOrgMemberRelation>();
+            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.getAllOrgDeptMember(filters);
+            memberRelationList = responseEntity.getBody();
+            if (memberRelationList !=null && memberRelationList.size() > 0 ){
+                for (MOrgMemberRelation  memberRelation : memberRelationList){
+                    if (StringUtils.isNotEmpty(memberRelation.getUserId() ) && StringUtils.isEmpty(memberRelation.getUserName() ) ) {
+                        MUser mUser = userClient.getUser(memberRelation.getUserId());
+                        memberRelation.setUserName(mUser == null ? "" : mUser.getRealName());
+                    }
+                }
+            }
+            envelop.setDetailModelList( memberRelationList );
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
 
-    @RequestMapping(value = "orgDeptMember/admin/{orgDept_id}", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/orgDept/checkUser" , method = RequestMethod.PUT)
+    @ApiOperation(value = "检查机构下用户是否唯一")
+    public Envelop checkUser(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId", required = true) Integer orgId,
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId", required = true) String userId
+    ){
+        try {
+            Envelop envelop = new Envelop();
+            String errorMsg = "";
+            if (orgId == null) {
+                errorMsg+="机构不能为空！";
+                envelop.setErrorMsg(errorMsg);
+            }
+            if (StringUtils.isEmpty(userId)) {
+                errorMsg+="用户不能为空！";
+                envelop.setErrorMsg(errorMsg);
+            }
+            int num = orgDeptClient.getCountByUserId(orgId, userId);
+            if (num > 0) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("所在机构已经存在此用户!");
+            }else{
+                envelop.setSuccessFlg(true);
+            }
+            return envelop;
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = "orgDeptMember/admin/{memRelationId}", method = RequestMethod.GET)
     @ApiOperation(value = "获取部门成员信息", notes = "部门成员信息")
     public Envelop getOrgMemberRelation(
-            @ApiParam(name = "orgDept_id", value = "", defaultValue = "")
-            @PathVariable(value = "orgDept_id") Long orgDeptId) {
+            @ApiParam(name = "memRelationId", value = "", defaultValue = "")
+            @PathVariable(value = "memRelationId") Long memRelationId) {
         try {
-            MOrgMemberRelation mOrgMemberRelation = orgDeptMemberClient.getOrgMemberRelation(orgDeptId);
+            MOrgMemberRelation mOrgMemberRelation = orgDeptMemberClient.getOrgMemberRelation(memRelationId);
             if (mOrgMemberRelation == null) {
                 return failed("提醒消息信息获取失败!");
             }
@@ -380,9 +466,9 @@ public class OrgDeptController  extends BaseController {
             String errorMsg = "";
             OrgDeptMemberModel deptMemberModel = objectMapper.readValue(memberRelationJsonData, OrgDeptMemberModel.class);
             MOrgMemberRelation mDeptMember = convertToModel(deptMemberModel, MOrgMemberRelation.class);
-//            if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
-//                errorMsg+="机构不能为空！";
-//            }
+            if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
+                errorMsg+="机构不能为空！";
+            }
             if (StringUtils.isEmpty(mDeptMember.getUserId())) {
                 errorMsg+="用户不能为空！";
             }
@@ -433,9 +519,9 @@ public class OrgDeptController  extends BaseController {
             String errorMsg = "";
             OrgDeptMemberModel deptMemberModel = objectMapper.readValue(memberRelationJsonData, OrgDeptMemberModel.class);
             MOrgMemberRelation mDeptMember = convertToModel(deptMemberModel, MOrgMemberRelation.class);
-//             if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
-//                errorMsg+="机构不能为空！";
-//            }
+             if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
+                errorMsg+="机构不能为空！";
+            }
             if (StringUtils.isEmpty(mDeptMember.getUserId())) {
                 errorMsg+="用户不能为空！";
             }
@@ -493,13 +579,13 @@ public class OrgDeptController  extends BaseController {
      * @param memberRelationId
      * @return
      */
-    @RequestMapping(value = "updateStatus" , method = RequestMethod.PUT)
+    @RequestMapping(value = "/orgDeptMember/updateStatus" , method = RequestMethod.PUT)
     @ApiOperation(value = "更新成员状态")
-    public boolean updateStatus(
+    public boolean updateDeptMemberStatus(
             @ApiParam(name = "memberRelationId", value = "memberRelationId", defaultValue = "")
             @RequestParam(value = "memberRelationId") Integer memberRelationId,
             @ApiParam(name = "status", value = "状态", defaultValue = "")
-            @RequestParam(value = "status") int status) {
+            @RequestParam(value = "status") Integer status) {
         try {
             return orgDeptMemberClient.updateStatusOrgDeptMember(memberRelationId, status);
         }

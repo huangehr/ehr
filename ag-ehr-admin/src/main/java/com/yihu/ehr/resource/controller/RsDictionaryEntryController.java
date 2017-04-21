@@ -1,6 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.resource.MRsDictionaryEntry;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "dictionaryEntries", description = "标准字典项服务接口")
+@Api(value = "dictionaryEntries", description = "标准字典项服务接口", tags = {"资源管理-标准字典项服务接口"})
 public class RsDictionaryEntryController extends BaseController {
     @Autowired
     private RsDictionaryEntryClient rsDictionaryEntryClient;

@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
-@Api(value = "DrugDict", description = "药品字典管理", tags = {"药品字典"})
+@Api(value = "DrugDict", description = "药品字典管理", tags = {"特殊字典-药品字典管理"})
 public class DrugDictController extends BaseController {
 
     @Autowired

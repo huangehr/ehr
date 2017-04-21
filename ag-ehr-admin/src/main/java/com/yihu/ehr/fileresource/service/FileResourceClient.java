@@ -29,6 +29,13 @@ public interface FileResourceClient {
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);
 
+    @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload_returnHttpUrl", method = RequestMethod.POST)
+    @ApiOperation(value = "上传图片返回整个httpUrl")
+    String fileUploadReturnHttpUrl(
+            @RequestBody String fileStr,
+            @RequestParam(value = "file_name") String fileName,
+            @RequestParam(value = "json_data") String jsonData);
+
     @RequestMapping(value = ApiVersion.Version1_0 + "/files", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源表对应关系，并且删除fastdfs相对应当文件")
     boolean filesDelete(

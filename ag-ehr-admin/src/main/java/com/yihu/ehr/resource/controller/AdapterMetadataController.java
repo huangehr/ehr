@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.RsAdapterMetadataModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.resource.MRsAdapterMetadata;
@@ -30,7 +30,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "adapterMetadata", description = "适配数据元服务")
+@Api(value = "adapterMetadata", description = "适配数据元服务", tags = {"资源管理-适配数据元服务"})
 public class AdapterMetadataController extends BaseController {
 
     @Autowired

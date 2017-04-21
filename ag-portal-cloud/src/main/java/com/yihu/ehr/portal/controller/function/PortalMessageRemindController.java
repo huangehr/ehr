@@ -1,7 +1,7 @@
 package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.agModel.portal.MessageRemindModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.portal.MMessageRemind;
@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 +"/portal")
 @RestController
-@Api(value = "PortalMessageRemind", description = "PortalMessageRemind", tags = {"消息提醒"})
+@Api(value = "PortalMessageRemind", description = "PortalMessageRemind", tags = {"云门户-待办事项"})
 public class PortalMessageRemindController extends BaseController {
 
     @Autowired

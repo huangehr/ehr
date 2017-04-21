@@ -34,7 +34,7 @@ import java.util.*;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/adapter")
 @RestController
-@Api(protocols = "https", value = "adapter", description = "字典", tags = {"字典"})
+@Api(protocols = "https", value = "adapter", description = "字典适配", tags = {"适配管理-字典适配"})
 public class AdapterDictController extends ExtendController<AdapterDictModel> {
 
     @Autowired

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-authentication-hzp
+    name: svr-authentication
 
 ---
 spring:

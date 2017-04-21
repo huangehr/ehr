@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/adapter/org")
 @RestController
-@Api(protocols = "https", value = "adapter", description = "数据集", tags = {"数据集"})
+@Api(protocols = "https", value = "adapter", description = "数据集", tags = {"第三方标准-数据集"})
 public class OrgDataSetController extends BaseController {
 
     @Autowired

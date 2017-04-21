@@ -1,11 +1,16 @@
 package com.yihu.ehr.service.resource.stage2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.feign.ArchiveClient;
+import com.yihu.ehr.model.patient.ArchiveRelation;
 import com.yihu.ehr.service.resource.stage2.repo.FileResourceRepository;
 import com.yihu.ehr.service.resource.stage2.repo.MasterResourceRepository;
 import com.yihu.ehr.service.resource.stage2.repo.SubResourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.Date;
 
 /**
  * 资源服务。
@@ -26,6 +31,9 @@ public class ResourceService {
     FileResourceRepository fileResRepo;
 
     @Autowired
+    ArchiveClient archiveClient;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     public void save(ResourceBucket resourceBucket) throws Throwable {
@@ -37,5 +45,35 @@ public class ResourceService {
 
         // 存储文件记录
         fileResRepo.save(resourceBucket);
+
+        //保存MYSQL关联记录
+        try {
+            ArchiveRelation relation = new ArchiveRelation();
+            relation.setName(resourceBucket.getPatientName());
+            relation.setOrgCode(resourceBucket.getOrgCode());
+            relation.setOrgName(resourceBucket.getOrgName());
+            relation.setCardType(resourceBucket.getCardType());
+            relation.setCardNo(resourceBucket.getCardId());
+            relation.setEventNo(resourceBucket.getEventNo());
+            relation.setEventDate(resourceBucket.getEventDate());
+            relation.setEventType(String.valueOf(resourceBucket.getEventType()));
+            relation.setProfileId(resourceBucket.getId());
+            relation.setCreateDate(new Date());
+
+            String idCardNo = resourceBucket.getDemographicId();
+            if (!StringUtils.isEmpty(idCardNo)) {
+                relation.setIdCardNo(idCardNo);
+                relation.setStatus("1");
+                relation.setRelationDate(new Date());
+            } else {
+                relation.setStatus("0");
+            }
+
+            archiveClient.archiveRelation(objectMapper.writeValueAsString(relation));
+        }
+        catch (Exception ex)
+        {
+            System.out.print("Create relation fail!"+ex.getMessage());
+        }
     }
 }

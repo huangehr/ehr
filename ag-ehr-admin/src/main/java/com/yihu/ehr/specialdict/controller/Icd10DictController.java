@@ -26,7 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
-@Api(value = "Icd10Dict", description = "Icd10字典管理", tags = {"Icd10字典"})
+@Api(value = "Icd10Dict", description = "Icd10字典管理", tags = {"特殊字典-Icd10字典管理"})
 public class Icd10DictController extends BaseController {
 
     @Autowired

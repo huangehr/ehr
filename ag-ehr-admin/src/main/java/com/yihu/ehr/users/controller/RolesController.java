@@ -3,7 +3,7 @@ package com.yihu.ehr.users.controller;
 import com.yihu.ehr.agModel.user.PlatformAppRolesModel;
 import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
 import com.yihu.ehr.agModel.user.RolesModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.ApiVersion;
@@ -33,7 +33,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
-@Api(value = "roles",description = "角色管理",tags = "")
+@Api(value = "roles",description = "角色管理", tags = {"安全管理-角色管理"})
 public class RolesController extends BaseController {
     @Autowired
     private RolesClient rolesClient;

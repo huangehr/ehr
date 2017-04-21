@@ -32,7 +32,7 @@ import java.util.*;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(protocols = "https", value = "template", description = "模版管理")
+@Api(protocols = "https", value = "template", description = "模版管理", tags = {"健康档案-模版管理"})
 public class TemplateController extends ExtendController<TemplateModel> {
 
     @Autowired

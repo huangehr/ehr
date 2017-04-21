@@ -1,6 +1,5 @@
 package com.yihu.ehr.oauth2.oauth2;
 
-import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.oauth2.model.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;

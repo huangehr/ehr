@@ -1,7 +1,7 @@
 package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.agModel.portal.PortalResourcesModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.portal.MPortalResources;
@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 +"/portal")
 @RestController
-@Api(value = "PortalResources", description = "PortalResources", tags = {"资源信息"})
+@Api(value = "PortalResources", description = "PortalResources", tags = {"云门户-资源中心"})
 public class PortalResourcesController extends BaseController {
 
     @Autowired

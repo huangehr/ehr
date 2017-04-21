@@ -1,6 +1,6 @@
 package com.yihu.ehr.users.service;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;

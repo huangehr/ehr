@@ -13,6 +13,7 @@ public class MasterResourceFamily extends ResourceFamily {
         public static final String OrgName = "org_name";
         public static final String PatientId = "patient_id";
         public static final String PatientName = "patient_name";  //新增add by hzp at 20170401
+        public static final String CardType = "card_type";  //新增add by hzp at 20170411
         public static final String EventNo = "event_no";
         public static final String EventDate = "event_date";
         public static final String EventType = "event_type";
@@ -32,6 +33,7 @@ public class MasterResourceFamily extends ResourceFamily {
         if (family.equals(Basic)) {
             return new String[]{
                     BasicColumns.CardId,
+                    BasicColumns.CardType,
                     BasicColumns.OrgCode,
                     BasicColumns.PatientId,
                     BasicColumns.PatientName,

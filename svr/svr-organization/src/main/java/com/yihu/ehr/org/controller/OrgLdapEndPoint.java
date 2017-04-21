@@ -1,7 +1,7 @@
 package com.yihu.ehr.org.controller;
 
 import com.netflix.discovery.converters.Auto;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.org.MOrganization;
@@ -28,7 +28,7 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "/org/ldap/", description = "组织Ldap服务")
 public class OrgLdapEndPoint {
-  /*  @Autowired
+    @Autowired
     OrgLdapService orgLdapService;
 
     @ApiOperation("缓存机构数据")
@@ -71,5 +71,5 @@ public class OrgLdapEndPoint {
                                                   @ApiParam(value = "节点类型，1用户 2科室 3机构 为空全部", defaultValue = "")
                                                   @RequestParam(required = false) Integer type) throws Exception {
         return orgLdapService.queryAllWithoutSelf(dn,type);
-    }*/
+    }
 }

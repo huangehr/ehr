@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "adapterDictionary", description = "适配字典项服务")
+@Api(value = "adapterDictionary", description = "适配字典项服务", tags = {"资源管理-适配字典项服务"})
 public class AdapterDictionaryController extends BaseController {
 
     @Autowired

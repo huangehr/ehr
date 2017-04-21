@@ -1,7 +1,7 @@
 package com.yihu.ehr.profile.controller;
 
 import com.google.common.io.Files;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.profile.MTemplate;

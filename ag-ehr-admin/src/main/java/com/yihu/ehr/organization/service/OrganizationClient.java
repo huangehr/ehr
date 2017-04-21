@@ -1,6 +1,6 @@
 package com.yihu.ehr.organization.service;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.org.MOrganization;
@@ -23,6 +23,12 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface OrganizationClient {
+
+
+    @RequestMapping(value = "/organizations/getAllOrgs", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有的机构列表")
+    List getAllOrgs();
+
 
     @RequestMapping(value = "/organizations/list", method = RequestMethod.POST)
     @ApiOperation(value = "根据条件查询机构列表")
@@ -83,6 +89,17 @@ public interface OrganizationClient {
             @ApiParam(name = "org_code", value = "机构代码", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode) ;
 
+    /**
+     * 根据机构ID获取机构
+     * @param orgId
+     * @return
+     */
+    @RequestMapping(value = "/organizations/getOrgById/{org_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构ID获取机构")
+    MOrganization getOrgById(
+            @ApiParam(name = "org_id", value = "机构代码", defaultValue = "")
+            @PathVariable(value = "org_id") String orgId) ;
+
 
     /**
      * 根据name获取机构ids
@@ -138,6 +155,14 @@ public interface OrganizationClient {
     boolean isOrgCodeExists(
             @ApiParam(name = "org_code", value = "org_code", defaultValue = "")
             @PathVariable(value = "org_code") String orgCode);
+
+    @RequestMapping(value = "/organizations/checkSunOrg" , method = RequestMethod.PUT)
+    @ApiOperation(value = "判断机构是否已经是子机构")
+    boolean checkSunOrg(
+            @ApiParam(name = "org_pId", value = "org_pId", defaultValue = "")
+            @RequestParam(value = "org_pId") String orgPid,
+            @ApiParam(name = "org_id", value = "org_id", defaultValue = "")
+            @RequestParam(value = "org_id") String orgId);
 
     @RequestMapping(value = "/organizations/images" , method = RequestMethod.POST)
     @ApiOperation(value = "机构资质图片上传")

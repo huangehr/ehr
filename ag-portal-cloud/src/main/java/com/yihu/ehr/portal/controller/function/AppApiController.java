@@ -1,7 +1,7 @@
 package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.agModel.app.AppApiModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.portal.service.function.AppApiClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0+"/doctor" )
 @RestController
-@Api(value = "AppApi", description = "AppApi", tags = {"AppApi应用"})
+@Api(value = "AppApi", description = "AppApi", tags = {"应用管理-AppApi应用"})
 public class AppApiController extends BaseController {
 
     @Autowired

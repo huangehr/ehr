@@ -102,6 +102,15 @@ public class BaseJpaService<T, R> {
                 .getResultList();
     }
 
+    public List search(String filters,String sorts) throws ParseException {
+        URLQueryParser queryParser = createQueryParser("", filters, sorts);
+        CriteriaQuery query = queryParser.makeCriteriaQuery();
+
+        return entityManager
+                .createQuery(query)
+                .getResultList();
+    }
+
     public long getCount(String filters) throws ParseException {
         URLQueryParser queryParser = createQueryParser(filters);
         CriteriaQuery query = queryParser.makeCriteriaCountQuery();

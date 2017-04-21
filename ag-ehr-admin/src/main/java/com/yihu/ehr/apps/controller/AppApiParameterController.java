@@ -1,7 +1,7 @@
 package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.agModel.app.AppApiParameterModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppApiParameterClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0+"/admin" )
 @RestController
-@Api(value = "AppApiParameter", description = "AppApiParameter", tags = {"AppApiParameter应用"})
+@Api(value = "AppApiParameter", description = "应用开放接口参数管理", tags = {"应用管理-应用开放接口参数管理"})
 public class AppApiParameterController extends BaseController {
 
     @Autowired

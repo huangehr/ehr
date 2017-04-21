@@ -17,8 +17,6 @@ import java.util.Map;
  * @created 2015.08.23 18:11
  */
 public class ResourceStorageUtil {
-    public static final String MasterTable = "HealthProfile";
-    public static final String SubTable = "HealthProfileSub";
 
     /**
      * 取得主表的单元格记录。
@@ -31,6 +29,7 @@ public class ResourceStorageUtil {
 
         if (family.equals(MasterResourceFamily.Basic)){
             map.put(MasterResourceFamily.BasicColumns.CardId, profile.getCardId());
+            map.put(MasterResourceFamily.BasicColumns.CardType, profile.getCardType());
             map.put(MasterResourceFamily.BasicColumns.OrgCode, profile.getOrgCode());
             map.put(MasterResourceFamily.BasicColumns.OrgName, profile.getOrgName());
             map.put(MasterResourceFamily.BasicColumns.PatientId, profile.getPatientId());

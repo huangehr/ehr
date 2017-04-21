@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.ResourceDefaultParamModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.controller.BaseController;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0+"/admin")
-@Api(value = "resourceDefaultParam", description = "资源默认参数配置")
+@Api(value = "resourceDefaultParam", description = "资源默认参数配置", tags = {"资源管理-资源默认参数配置"})
 public class ResourceDefaultParamController extends BaseController {
     @Autowired
     private ResourceDefaultParamClient rsDefaultParamclient;

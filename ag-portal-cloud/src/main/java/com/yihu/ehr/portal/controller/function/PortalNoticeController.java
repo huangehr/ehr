@@ -1,7 +1,7 @@
 package com.yihu.ehr.portal.controller.function;
 
 import com.yihu.ehr.agModel.portal.PortalNoticeModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ListResult;
@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 +"/portal/doctor")
 @RestController
-@Api(value = "PortalNotice", description = "PortalNotice", tags = {"通知公告"})
+@Api(value = "PortalNotice", description = "PortalNotice", tags = {"云门户-通知公告"})
 public class PortalNoticeController extends BaseController {
 
     @Autowired

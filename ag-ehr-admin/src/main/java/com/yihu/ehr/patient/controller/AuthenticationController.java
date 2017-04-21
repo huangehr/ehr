@@ -2,7 +2,7 @@ package com.yihu.ehr.patient.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.patient.AuthenticationModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.patient.MAuthentication;
@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(protocols = "https", value = "Authentication", description = "人口身份认证", tags = {"人口身份认证"})
+@Api(protocols = "https", value = "Authentication", description = "人口身份认证", tags = {"人口管理-人口身份认证"})
 public class AuthenticationController extends ExtendController<AuthenticationModel> {
 
     @Autowired

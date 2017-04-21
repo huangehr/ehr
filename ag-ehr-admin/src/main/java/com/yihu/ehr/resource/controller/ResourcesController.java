@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.model.resource.MRsInterface;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "resources", description = "资源服务接口")
+@Api(value = "resources", description = "资源服务接口", tags = {"资源管理-资源服务接口"})
 public class ResourcesController extends BaseController {
     @Autowired
     private ResourcesClient resourcesClient;

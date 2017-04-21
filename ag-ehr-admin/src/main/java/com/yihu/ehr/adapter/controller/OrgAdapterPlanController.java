@@ -35,7 +35,7 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/adapter")
 @RestController
-@Api(protocols = "https", value = "adapter", description = "适配方案", tags = {"适配方案"})
+@Api(protocols = "https", value = "adapter", description = "适配方案", tags = {"适配管理-适配方案"})
 public class OrgAdapterPlanController extends ExtendController<AdapterPlanModel> {
 
     @Autowired

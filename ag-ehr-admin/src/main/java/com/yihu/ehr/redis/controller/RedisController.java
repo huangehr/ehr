@@ -1,6 +1,6 @@
 package com.yihu.ehr.redis.controller;
 
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.redis.service.HpIcd10Cache;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/cache")
 @RestController
-@Api(value = "cache", description = "数据缓存")
+@Api(value = "cache", description = "数据缓存", tags = {"数据缓存"})
 public class RedisController {
     @Autowired
     AdaptionCacheClient adaptionCacheClient;

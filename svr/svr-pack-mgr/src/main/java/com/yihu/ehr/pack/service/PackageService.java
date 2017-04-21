@@ -8,6 +8,7 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,8 +58,8 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
 
     public Package acquirePackage(String id) {
         Package aPackage = null;
-        if (id.equals("OLDEST")){
-            Pageable pageable = new PageRequest(1, 1);
+        if (StringUtils.isEmpty(id)){
+            Pageable pageable = new PageRequest(0, 1);
             List<Package> packages = getRepo().findEarliestOne(pageable);
 
             if(packages.size() > 0) aPackage = packages.get(0);

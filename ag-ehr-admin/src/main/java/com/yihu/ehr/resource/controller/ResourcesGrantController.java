@@ -2,7 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.RsAppResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.TreeModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.app.MApp;
@@ -36,7 +36,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "resourceGrant", description = "资源授权服务接口")
+@Api(value = "resourceGrant", description = "资源授权服务接口", tags = {"资源管理-资源授权服务接口"})
 public class ResourcesGrantController extends BaseController {
 
     @Autowired

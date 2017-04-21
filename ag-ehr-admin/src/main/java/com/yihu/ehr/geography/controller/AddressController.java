@@ -24,7 +24,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
-@Api(value = "address", description = "地址信息管理接口，用于地址信息管理", tags = {"地址信息管理接口"})
+@Api(value = "address", description = "地址信息管理", tags = {"基础信息"})
 public class AddressController extends BaseController{
     @Autowired
     private AddressClient addressClient;

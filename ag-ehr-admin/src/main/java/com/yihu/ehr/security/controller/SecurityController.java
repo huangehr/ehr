@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 +"/admin")
 @RestController
-@Api(value = "sec", description = "安全管理接口，用于安全验证管理", tags = {"安全管理接口"})
+@Api(value = "sec", description = "用户公钥管理", tags = {"用户管理-用户公钥管理"})
 public class SecurityController extends BaseController{
 
     @Autowired

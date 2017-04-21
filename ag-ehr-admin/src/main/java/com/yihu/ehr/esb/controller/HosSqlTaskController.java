@@ -23,7 +23,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/esb")
 @RestController
-@Api(value = "his穿透管理接口", description = "his穿透管理接口" ,tags = {"his穿透管理接口"})
+@Api(value = "his穿透管理接口", description = "his穿透管理接口" ,tags = {"ESB管理 -his穿透管理接口"})
 public class HosSqlTaskController extends BaseController {
 
     @Autowired

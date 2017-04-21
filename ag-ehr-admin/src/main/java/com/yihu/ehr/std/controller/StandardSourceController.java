@@ -12,6 +12,7 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.util.datetime.DateUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,7 @@ import java.util.*;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/standard_source")
 @RestController
+@Api(value = "CDA", description = "标准来源管理", tags = {"标准中心-标准来源管理"})
 public class StandardSourceController extends BaseController {
 
     @Autowired

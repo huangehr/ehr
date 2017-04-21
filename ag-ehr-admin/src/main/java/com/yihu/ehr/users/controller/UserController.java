@@ -47,7 +47,7 @@ import java.util.Map;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "user", description = "用户管理接口，用于用户信息管理", tags = {"用户管理接口"})
+@Api(value = "user", description = "用户管理", tags = {"用户管理"})
 public class UserController extends BaseController {
 
     @Autowired

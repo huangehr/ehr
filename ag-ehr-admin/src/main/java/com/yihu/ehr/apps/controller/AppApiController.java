@@ -1,11 +1,11 @@
 package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.agModel.app.AppApiModel;
-import com.yihu.ehr.api.ServiceApi;
 import com.yihu.ehr.apps.service.AppApiClient;
 import com.yihu.ehr.apps.service.AppApiParameterClient;
 import com.yihu.ehr.apps.service.AppApiResponseClient;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppApi;
 import com.yihu.ehr.model.app.MAppApiDetail;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "AppApi", description = "AppApi", tags = {"AppApi应用"})
+@Api(value = "AppApi", description = "应用开放接口维护", tags = {"应用管理-应用开放接口维护"})
 public class AppApiController extends BaseController {
 
     private static final String DELETE = "delete";

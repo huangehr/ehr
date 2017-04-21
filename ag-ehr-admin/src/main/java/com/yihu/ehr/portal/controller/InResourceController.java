@@ -26,7 +26,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "itResource", description = "可下载资源管理接口", tags = {"资源下载管理接口"})
+@Api(value = "itResource", description = "可下载资源管理", tags = {"云门户-可下载资源管理"})
 public class InResourceController  extends BaseController {
 
     @Autowired

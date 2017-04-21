@@ -23,7 +23,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/portal")
 @RestController
-@Api(value = "portalSetting", description = "PortalSetting", tags = {"门户配置接口"})
+@Api(value = "portalSetting", description = "PortalSetting", tags = {"云门户-门户配置接口"})
 public class PortalSettingController extends BaseController{
 
     @Autowired

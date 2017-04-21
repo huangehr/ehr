@@ -28,7 +28,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "card", description = "卡管理接口，用于卡信息管理", tags = {"卡管理接口"})
+@Api(value = "card", description = "就诊卡管理（旧）", tags = {"就诊卡管理（旧）"})
 public class CardController extends BaseController {
 
     @Autowired

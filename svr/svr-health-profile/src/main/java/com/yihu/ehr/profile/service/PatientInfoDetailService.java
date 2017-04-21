@@ -2,12 +2,8 @@ package com.yihu.ehr.profile.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.model.specialdict.MDrugDict;
-import com.yihu.ehr.profile.feign.XCDADocumentClient;
-import com.yihu.ehr.profile.feign.XDictClient;
-import com.yihu.ehr.profile.feign.XResourceClient;
-import com.yihu.ehr.profile.feign.XTransformClient;
+import com.yihu.ehr.profile.feign.*;
 import com.yihu.ehr.profile.model.MedicationStat;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
@@ -46,14 +42,12 @@ public class PatientInfoDetailService {
     @Autowired
     XTransformClient transform;
 
-    @Autowired
-    HBaseDao hBaseDao;
 
     @Autowired
     ThridPrescriptionService thridPrescriptionService;
 
     @Autowired
-    PrescriptionPersistService presPersistService;
+    XProflieClient proflieClient;
 
     /**
      * fastDfs服务器地址
@@ -304,7 +298,8 @@ public class PatientInfoDetailService {
                     if (dataList.size() > 0) {
                         LogService.getLogger("prescription").info("prescription saving");
                         //处方笺保存到HBASE
-                        List<Map<String, Object>> savedDataList = presPersistService.savePrescription(profileId, dataList, returnMap.size());
+                        String listString = proflieClient.savePrescription(profileId, objectMapper.writeValueAsString(dataList), returnMap.size());
+                        List<Map<String, Object>> savedDataList =  objectMapper.readValue(listString,List.class);
                         returnMap.addAll(savedDataList);
                         LogService.getLogger("prescription").info("prescription saved");
                     }

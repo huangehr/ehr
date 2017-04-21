@@ -2,6 +2,7 @@ package com.yihu.ehr.service.resource.stage2.repo;
 
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.TableBundle;
+import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.util.ResourceStorageUtil;
@@ -24,10 +25,10 @@ public class MasterResourceRepository {
         TableBundle bundle = new TableBundle();
 
         // delete legacy data if they are exist
-        String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceStorageUtil.MasterTable, "^" + resBucket.getId());
+        String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, "^" + resBucket.getId());
         if (legacyRowKeys != null && legacyRowKeys.length > 0){
             bundle.addRows(legacyRowKeys);
-            hbaseDao.delete(ResourceStorageUtil.MasterTable, bundle);
+            hbaseDao.delete(ResourceCore.MasterTable, bundle);
         }
 
         // now save the data to hbase
@@ -39,6 +40,6 @@ public class MasterResourceRepository {
                 MasterResourceFamily.Data,
                 ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Data, resBucket));
 
-        hbaseDao.save(ResourceStorageUtil.MasterTable, bundle);
+        hbaseDao.save(ResourceCore.MasterTable, bundle);
     }
 }

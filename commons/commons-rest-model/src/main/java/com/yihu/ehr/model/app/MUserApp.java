@@ -13,6 +13,7 @@ public class MUserApp {
     private String appName;
     private Integer status;
     private String linkUrl;
+    private Integer showFlag;
 
     public int getId() {
         return id;
@@ -84,5 +85,13 @@ public class MUserApp {
 
     public void setLinkUrl(String linkUrl) {
         this.linkUrl = linkUrl;
+    }
+
+    public Integer getShowFlag() {
+        return showFlag;
+    }
+
+    public void setShowFlag(Integer showFlag) {
+        this.showFlag = showFlag;
     }
 }

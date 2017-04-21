@@ -409,4 +409,10 @@ import java.util.List;
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
 
+    @RequestMapping(value = "/dictionaries/medicalCard_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "就诊卡类型", response = MConventionalDict.class)
+    MConventionalDict getMedicalCardTypeList (
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+             @RequestParam(value = "code") String code);
+
 }

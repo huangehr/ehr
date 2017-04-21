@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin/esb")
 @RestController
-@Api(value = "补采任务管理接口", description = "补采任务管理接口" ,tags = {"补采任务管理接口"})
+@Api(value = "补采任务管理接口", description = "补采任务管理接口" ,tags = {"ESB管理 -补采任务管理接口"})
 public class HosAcqTaskController extends BaseController {
 
     @Autowired

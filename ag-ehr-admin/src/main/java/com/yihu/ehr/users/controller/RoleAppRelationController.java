@@ -1,7 +1,7 @@
 package com.yihu.ehr.users.controller;
 
 import com.yihu.ehr.agModel.user.RoleAppRelationModel;
-import com.yihu.ehr.api.ServiceApi;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
@@ -31,7 +31,7 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0+"/admin")
 @RestController
-@Api(value = "roleApp",description = "角色组-应用关系管理",tags = "")
+@Api(value = "roleApp",description = "角色组-应用关系管理", tags = {"安全管理-角色组-应用关系管理"})
 public class RoleAppRelationController extends BaseController{
     @Autowired
     private RoleAppRelationClient roleAppRelationClient;

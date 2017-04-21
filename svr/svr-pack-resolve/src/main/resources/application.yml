@@ -10,28 +10,190 @@ info:
     description: EHR platform package resolve service.
     version: 1.1.0
 
-hystrix:
-  command:
-    default:
-      execution:
-#        timeout:
-#          enabled: false
-        isolation:
-          thread:
-            timeoutInMilliseconds: 120000
+logging:
+  level:
+    com:
+      netflix: INFO
+    org:
+      springframework:
+        web: INFO
+      hibernate: ERROR
+
+spring:
+  # REDIS
+  redis:
+    database: 0 # Database index used by the connection factory.
+    port: 6379 # Redis server port.
+    password: # Login password of the redis server.
+    timeout: 0 # Connection timeout in milliseconds.
+    #sentinel:
+    #  master: # Name of Redis server.
+    #  nodes: # Comma-separated list of host:port pairs.
+
+    pool:
+      max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
+      max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
+      max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
+      min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
+
+  # SOLR (SolrProperties)
+  data:
+    solr:
+      repositories.enabled: true # Enable Solr repositories.
+
+fast-dfs:
+  pool:
+    init-size: 5
+    max-size: 20
+    wait-time: 500
+
+  connect-timeout: 2
+  network-timeout: 30
+  charset: ISO8859-1
+
+  http:
+    tracker-http-port: 80
+    anti-steal-token: no
+    secret-key: FastDFS1234567890
+
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.property.clientPort: 2181
+    - zookeeper.znode.parent: /hbase-unsecure
+
+ehr:
+  # 档案包数据提取器参数，从数据集中提取摘要、事件时间与身份标识
+  pack-extractor:
+    # 事件提取参数,用于生成事件摘要
+    # 门诊从“门诊摘要”与“挂号”数据集提取事件
+    # 住院从“病人摘要”，“入院记录”与“病案首页”提取事件
+    event:
+      data-sets:
+        - HDSC01_01: Clinic
+        - HDSC01_02: Clinic
+        - HDSC02_01: Resident
+        - HDSC02_02: Resident
+        - HDSC02_09: Resident
+      meta-data:
+        - HDSD00_01_457 # 挂号时间
+        - HDSD00_01_575 # 入院时间
+    # 身份提取参数，从人口学提取
+    identity:
+      data-sets:
+        - HDSA00_01
+      meta-data:
+        id-card-no: HDSA00_01_017     # 身份标识
+        id-card-type: HDSA00_01_016   # 身份类型
+    # 卡提取参数，从就诊摘要提取
+    card:
+      data-sets:
+        - HDSC01_01: 门诊-病人摘要
+        - HDSC01_02: 门诊-挂号
+        - HDSC02_01: 住院-病人摘要
+        - HDSC02_02: 住院-首页
+      meta-data:
+        - CARD_NO
+        - CARD_TYPE
+
+#error code and message
 
 ---
 spring:
   profiles: dev
 
+  redis:
+    host: 192.168.1.220 # Redis server host.
+
+  data:
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+
+  metrics:
+    export:
+      statsd:
+        host: 192.168.1.221
+        port: 8125
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
+  public-server: http://172.19.103.54:22122
+
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+
 ---
 spring:
   profiles: alpha
+
+  redis:
+    host: 192.168.1.220 # Redis server host.
+
+  data:
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+
+  metrics:
+    export:
+      statsd:
+        host: 192.168.1.221
+        port: 8125
+
+fast-dfs:
+  tracker-server: 172.19.103.54:22122
+  public-server: http://172.19.103.54:22122
+
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
 
 ---
 spring:
   profiles: test
 
+  redis:
+    host: 172.19.103.47 # Redis server host.
+
+  data:
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+
+
+  metrics:
+    export:
+      statsd:
+        host: 192.168.1.221
+        port: 8125
+
+fast-dfs:
+  tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
+
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+
 ---
 spring:
   profiles: prod
+
+  redis:
+    host: 11.1.2.20 # Redis server host.
+
+  data:
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+
+  metrics:
+    export:
+      statsd:
+        host: localhost
+        port: 8125
+
+fast-dfs:
+  tracker-server: 11.1.2.9:22122
+  public-server: http://ds.ehr.yihu.com:22122
+
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
