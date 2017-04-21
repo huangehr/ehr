@@ -18,7 +18,6 @@ public class PackModelFactory {
     public final static String OriginFolder = "origin";
     public final static String DocumentFolder = "documents";
     public final static String DocumentsFile = "documents.json";
-    public final static String LinkFolder = "index";
     public final static String LinkFile = "link.json";
 
     /**

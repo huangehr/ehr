@@ -38,7 +38,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
     private final static Pattern Pattern = java.util.regex.Pattern.compile("([\\da-zA-Z\\-]+)_([\\da-zA-Z\\-]+)_([\\da-zA-Z\\-]+)_(\\d+)");
 
     private final String orgCode;
-    private final String patientId;
+    //private final String patientId;
     private final String eventNo;
     private final long timestamp;
 
@@ -47,13 +47,13 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
      *
      * @return 新创建的ID对象.
      */
-    public static ProfileId get(final String orgId, final String patientId, final String eventNo, final Date timestamp) {
-        return new ProfileId(orgId, patientId, eventNo, timestamp);
+    public static ProfileId get(final String orgId, final String eventNo, final Date timestamp) {
+        return new ProfileId(orgId, eventNo, timestamp);
     }
 
-    public ProfileId(final String orgCode, final String patientId, final String eventNo, final Date timestamp) {
+    public ProfileId(final String orgCode, final String eventNo, final Date timestamp) {
         this.orgCode = orgCode;
-        this.patientId = patientId;
+        //this.patientId = patientId;
         this.eventNo = eventNo;
         this.timestamp = timestamp.getTime();
     }
@@ -71,7 +71,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
         }
 
         Matcher matcher = Pattern.matcher(id);
-        return matcher.matches() && matcher.groupCount() == 4;
+        return matcher.matches() && matcher.groupCount() == 3;
     }
 
     /**
@@ -81,11 +81,10 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
      */
     public ProfileId(final String id) {
         Matcher matcher = Pattern.matcher(id);
-        if(matcher.find() && matcher.groupCount() == 4){
+        if(matcher.find() && matcher.groupCount() == 3){
             orgCode = matcher.group(1);
-            patientId = matcher.group(2);
-            eventNo = matcher.group(3);
-            timestamp = Long.parseLong(matcher.group(4));
+            eventNo = matcher.group(2);
+            timestamp = Long.parseLong(matcher.group(3));
         } else {
             throw new IllegalArgumentException("无效ID");
         }
@@ -112,9 +111,6 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
             return false;
         }
 
-        if (patientId != objectId.patientId) {
-            return false;
-        }
 
         if (eventNo != objectId.eventNo) {
             return false;
@@ -129,7 +125,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(orgCode, patientId, eventNo, timestamp);
+        return Objects.hash(orgCode, eventNo, timestamp);
     }
 
     @Override
@@ -143,9 +139,8 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
 
     @Override
     public String toString() {
-        return new StringBuilderEx("%1_%2_%3_%4")
+        return new StringBuilderEx("%1_%2_%3")
                 .arg(orgCode)
-                .arg(patientId)
                 .arg(eventNo)
                 .arg(timestamp)
                 .toString();

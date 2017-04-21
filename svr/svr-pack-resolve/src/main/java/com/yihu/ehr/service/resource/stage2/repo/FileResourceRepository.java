@@ -3,6 +3,7 @@ package com.yihu.ehr.service.resource.stage2.repo;
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.data.hbase.HBaseDao;
 import com.yihu.ehr.data.hbase.TableBundle;
+import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.FileFamily;
 import com.yihu.ehr.service.resource.stage1.CdaDocument;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
@@ -33,7 +34,7 @@ public class FileResourceRepository {
                 bundle.addRows(rowkey);
             }
 
-            hbaseDao.delete(FileTableUtil.Table,bundle);
+            hbaseDao.delete(ResourceCore.FileTable,bundle);
 
             for (String rowkey : cdaDocuments.keySet()){
                 CdaDocument cdaDocument = cdaDocuments.get(rowkey);
@@ -41,7 +42,7 @@ public class FileResourceRepository {
                 bundle.addValues(rowkey, FileFamily.Data, FileTableUtil.getFileFamilyCellMap(cdaDocument));
             }
 
-            hbaseDao.save(FileTableUtil.Table, bundle);
+            hbaseDao.save(ResourceCore.FileTable, bundle);
         }
     }
 

@@ -4,6 +4,8 @@ import com.yihu.ehr.profile.util.PackageDataSet;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * 卡号提取。
