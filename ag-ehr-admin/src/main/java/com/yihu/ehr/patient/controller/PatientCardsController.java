@@ -12,9 +12,11 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.patient.MedicalCards;
 import com.yihu.ehr.model.patient.UserCards;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.patient.service.PatientCardsClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -43,6 +45,8 @@ public class PatientCardsController extends ExtendController<UserCards> {
     SystemDictClient systemDictClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+    @Autowired
+    UserClient userClient;
 
     @RequestMapping(value = ServiceApi.Patients.GetUserCards, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户关联卡列表", notes = "根据查询条件获取用户关联卡列表在前端表格展示")
@@ -360,6 +364,12 @@ public class PatientCardsController extends ExtendController<UserCards> {
     private Map<String,Object> convertCardModel(Map<String,Object> userCard){
         List<MDictionaryEntry> statusDicts = systemDictClient.getDictEntries("", "dictId=43", "", 10, 1).getBody();
         List<MDictionaryEntry> typeDicts = systemDictClient.getDictEntries("", "dictId=66", "", 10, 1).getBody();
+        if(userCard.get("auditor") != null){
+            MUser user = userClient.getUser(userCard.get("auditor").toString());
+            if(user!=null){
+                userCard.put("auditor",user.getRealName());
+            }
+        }
         Map<String, String> statusMap = new HashMap<>();
         for(MDictionaryEntry entry : statusDicts){
             statusMap.put(entry.getCode(), entry.getValue());

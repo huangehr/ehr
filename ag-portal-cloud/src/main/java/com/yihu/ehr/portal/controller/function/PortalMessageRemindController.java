@@ -5,7 +5,9 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.portal.MMessageRemind;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.portal.service.function.PortalMessageRemindClient;
+import com.yihu.ehr.portal.service.function.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -30,6 +32,8 @@ public class PortalMessageRemindController extends BaseController {
 
     @Autowired
     PortalMessageRemindClient portalMessageRemindClient;
+    @Autowired
+    private UserClient userClient;
 
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindTop, method = RequestMethod.GET)
     @ApiOperation(value = "获取消息提醒前10数据", notes = "根据日期查询前10的数据在前端表格展示")
@@ -40,6 +44,10 @@ public class PortalMessageRemindController extends BaseController {
         for (MMessageRemind mPortalMessageRemind : mPortalMessageRemindList) {
             MessageRemindModel portalMessageRemindModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
             portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
+            if (StringUtils.isNotEmpty(portalMessageRemindModel.getFromUserId()) ){
+                MUser mUser = userClient.getUser(portalMessageRemindModel.getFromUserId());
+                mPortalMessageRemind.setFromUserName(mUser == null ? "" : mUser.getRealName());
+            }
             portalMessageRemindModels.add(portalMessageRemindModel);
         }
 
@@ -69,6 +77,10 @@ public class PortalMessageRemindController extends BaseController {
         for (MMessageRemind mPortalMessageRemind : mPortalMessageRemindList) {
             MessageRemindModel portalMessageRemindModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
             portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
+            if (StringUtils.isNotEmpty(portalMessageRemindModel.getFromUserId()) ){
+                MUser mUser = userClient.getUser(portalMessageRemindModel.getFromUserId());
+                mPortalMessageRemind.setFromUserName(mUser == null ? "" : mUser.getRealName());
+            }
             portalMessageRemindModels.add(portalMessageRemindModel);
         }
         //获取总条数

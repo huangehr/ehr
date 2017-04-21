@@ -73,7 +73,7 @@ public class MessageRemindEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemind, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改通知公告", notes = "重新绑定通知公告信息")
+    @ApiOperation(value = "修改提醒消息", notes = "重新绑定提醒消息")
     public MMessageRemind updateMessageRemind(
             @ApiParam(name = "messageRemind_json_data", value = "", defaultValue = "")
             @RequestBody String messageRemindJsonData) throws Exception {
