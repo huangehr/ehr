@@ -14,9 +14,9 @@ public class FileResource {
 
     private String id;                   // objectId
     private String storagePath;          // FDS path
-    private String mime;                 // user/org/patient 冗余字段，后继图片管理用
-    private String objectId;             // userId/orgCode/patientId 各类编号都是唯一
-    private String purpose;                // face/credentials  用途 头像 资质认证
+    private String mime;                 // user/org/patient/openfire 冗余字段，后继图片管理用
+    private String objectId;             // userId/orgCode/patientId 各类编号都是唯一(openfire用jid的node即user的loginCode)
+    private String purpose;                // face/credentials/openfire  用途 头像 资质认证
     private Date createDate;
     private String createUser;
     private Date updateDate;
