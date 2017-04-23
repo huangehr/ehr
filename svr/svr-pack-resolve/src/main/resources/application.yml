@@ -66,7 +66,7 @@ ehr:
   pack-extractor:
     # 事件提取参数,用于生成事件摘要
     # 门诊从“门诊摘要”与“挂号”数据集提取事件
-    # 住院从“病人摘要”，“入院记录”与“病案首页”提取事件
+    # 住院从“病人摘要”，“入院记录”与“病案首页”提取事件    Clinic 0门诊 Resident 1住院  MedicalExam 2体检
     event:
       data-sets:
         - HDSC01_01: Clinic
@@ -84,6 +84,7 @@ ehr:
       meta-data:
         id-card-no: HDSA00_01_017     # 身份标识
         id-card-type: HDSA00_01_016   # 身份类型
+        patient-name: HDSD00_01_002  # 姓名
     # 卡提取参数，从就诊摘要提取
     card:
       data-sets:
@@ -92,8 +93,8 @@ ehr:
         - HDSC02_01: 住院-病人摘要
         - HDSC02_02: 住院-首页
       meta-data:
-        - CARD_NO
-        - CARD_TYPE
+        - card-no: CARD_NO #就诊卡号
+        - card-type: CARD_TYPE  #就诊卡类型
 
 #error code and message
 

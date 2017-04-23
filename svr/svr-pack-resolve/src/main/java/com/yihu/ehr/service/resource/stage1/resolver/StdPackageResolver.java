@@ -1,6 +1,8 @@
 package com.yihu.ehr.service.resource.stage1.resolver;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.yihu.ehr.constants.EventType;
+import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage1.PackModelFactory;
@@ -13,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -24,7 +27,7 @@ import java.util.Properties;
 @Component
 public class StdPackageResolver extends PackageResolver {
     @Override
-    public void resolve(StandardPackage profile, File root) throws IOException, ParseException {
+    public void resolve(StandardPackage profile, File root) throws IOException, Exception {
         File standardFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.StandardFolder);
         parseFiles(profile, standardFolder.listFiles(), false);
 
@@ -35,7 +38,7 @@ public class StdPackageResolver extends PackageResolver {
     /**
      * 结构化档案包解析JSON文件中的数据。
      */
-    private void parseFiles(StandardPackage profile, File[] files, boolean origin) throws ParseException, IOException {
+    private void parseFiles(StandardPackage profile, File[] files, boolean origin) throws Exception, IOException {
         for (File file : files) {
             PackageDataSet dataSet = generateDataSet(file, origin);
 
@@ -44,20 +47,42 @@ public class StdPackageResolver extends PackageResolver {
 
             // Extract key data from data set if exists
             if (!origin) {
+                //就诊卡信息
                 if (StringUtils.isEmpty(profile.getCardId())) {
-                    Object object = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
-                    if (null != object) {
-                        Properties properties = (Properties) object;
-                        profile.setCardId(properties.getProperty("CardNo"));
+                    Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
+                    String cardId = String.valueOf(properties.get(MasterResourceFamily.BasicColumns.CardId));
+                    if(!StringUtils.isEmpty(cardId))
+                    {
+                        profile.setCardId(cardId);
+                        profile.setCardType(String.valueOf(properties.get(MasterResourceFamily.BasicColumns.CardType)));
                     }
                 }
 
-                if (StringUtils.isEmpty(profile.getDemographicId())) {
-                    profile.setDemographicId((String) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo));
+                //身份信息
+                if (StringUtils.isEmpty(profile.getDemographicId()) || StringUtils.isEmpty(profile.getPatientName())) {
+                    Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo);
+
+                    String demographicId = String.valueOf(properties.get(MasterResourceFamily.BasicColumns.DemographicId));
+                    if(!StringUtils.isEmpty(demographicId) &&StringUtils.isEmpty(profile.getDemographicId())) {
+                        profile.setDemographicId(demographicId);
+                    }
+
+                    String patientName = String.valueOf(properties.get(MasterResourceFamily.BasicColumns.PatientName));
+                    if(!StringUtils.isEmpty(patientName) &&StringUtils.isEmpty(profile.getPatientName())) {
+                        profile.setPatientName(patientName);
+                    }
                 }
 
+                //就诊事件信息
                 if (profile.getEventDate() == null) {
-                    profile.setEventDate((Date) extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventDate));
+                    Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);
+                    Date eventDate = (Date)properties.get(MasterResourceFamily.BasicColumns.EventDate);
+                    if(eventDate!=null)
+                    {
+                        profile.setEventDate(eventDate);
+                        profile.setEventType((EventType) properties.get(MasterResourceFamily.BasicColumns.EventType));
+                    }
+
                 }
             }
 

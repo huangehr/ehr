@@ -14,11 +14,10 @@ import java.text.ParseException;
 public abstract class KeyDataExtractor {
 
     public enum Filter{
-        CardInfo,
-        DemographicInfo,
-        EventDate,
-        EventType
+        CardInfo,        //就診卡号和就诊卡类型
+        DemographicInfo,   //身份证和姓名
+        EventInfo     //事件时间和事件类型
     }
 
-    public abstract Object extract(PackageDataSet dataSet, Filter filter) throws ParseException;
+    public abstract Object extract(PackageDataSet dataSet) throws Exception;
 }

@@ -56,7 +56,7 @@ public class ResourceService {
             relation.setCardNo(resourceBucket.getCardId());
             relation.setEventNo(resourceBucket.getEventNo());
             relation.setEventDate(resourceBucket.getEventDate());
-            relation.setEventType(String.valueOf(resourceBucket.getEventType()));
+            relation.setEventType(String.valueOf(resourceBucket.getEventType().getType()));
             relation.setProfileId(resourceBucket.getId());
             relation.setCreateDate(new Date());
 

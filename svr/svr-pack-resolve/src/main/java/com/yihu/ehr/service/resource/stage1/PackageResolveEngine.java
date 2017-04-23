@@ -75,7 +75,7 @@ public class PackageResolveEngine {
             packageResolver.resolve(profile, root);
             profile.setClientId(pack.getClientId());
             profile.regularRowKey();
-            profile.determineEventType();
+            //profile.determineEventType();
             return profile;
         } finally {
             houseKeep(zipFile, root);

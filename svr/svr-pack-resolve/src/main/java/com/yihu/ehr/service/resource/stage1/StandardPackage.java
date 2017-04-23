@@ -9,8 +9,6 @@ import com.yihu.ehr.profile.annotation.Column;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.service.resource.stage1.extractor.EventExtractor;
-import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
 import com.yihu.ehr.profile.util.ProfileId;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -263,17 +261,5 @@ public class StandardPackage {
         }
     }
 
-    public void determineEventType() throws ParseException {
-        if (getEventType() != null) return;
 
-        EventExtractor eventExtractor = SpringContext.getService(EventExtractor.class);
-        for (String dataSetCode : dataSets.keySet()) {
-            PackageDataSet dataSet = dataSets.get(dataSetCode);
-            EventType eventType = (EventType) eventExtractor.extract(dataSet, KeyDataExtractor.Filter.EventType);
-            if (eventType != null) {
-                setEventType(eventType);
-                break;
-            }
-        }
-    }
 }
