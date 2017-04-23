@@ -1,28 +1,38 @@
 package com.yihu.ehr.service.resource.stage1.extractor;
 
+import com.yihu.ehr.profile.family.MasterResourceFamily;
+import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
+import org.apache.commons.collections.map.HashedMap;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 /**
- * 卡号提取。
+ * 就诊卡信息提取。
  *
- * @author Sand
- * @version 1.0
- * @created 2015.10.13 9:23
+ * @author hzp
+ * @version 2.0
+ * @created 2017.04.23
  */
 @Component
+@ConfigurationProperties(prefix="ehr.pack-extractor.card")
 public class CardInfoExtractor extends KeyDataExtractor {
-    private String CardInfoContainedDataSet;
+    private List<String> dataSets = new ArrayList<>();        // 包含卡信息的数据集
 
-    private String InnerCodeCardType = "";
+    @Value("${ehr.pack-extractor.card.meta-data.card-no}")
+    private String CardType;
 
-    private String InnerCodeCardNo = "";
+    @Value("${ehr.pack-extractor.card.meta-data.card-no}")
+    private String CardId;
 
-    private String DictEntryCodeCardInfo = "";
 
     /**
      * 获取此数据集中的卡信息.
@@ -30,23 +40,30 @@ public class CardInfoExtractor extends KeyDataExtractor {
      * @return
      */
     @Override
-    public Object extract(PackageDataSet dataSet, Filter filter) throws ParseException {
-        return null;
+    public Map<String,Object> extract(PackageDataSet dataSet) throws Exception {
+        Map<String,Object> properties = new HashedMap();
 
-        /*if (filter == Filter.CardInfo && CardInfoContainedDataSet.contains(dataSet.getCode())) {
+        String cardId = "";
+        String cardType = "";
+        //获取就诊卡号和卡类型
+        if (dataSets.contains(dataSet.getCode())) {
             for (String key : dataSet.getRecordKeys()) {
-                Map<String, String> record = dataSet.getRecord(key);
-                String value = record.get(InnerCodeCardType);
-                if (value != null) {
-                    if (DictEntryCodeCardInfo.contains(value)) {
-                        Properties properties = new Properties();
-                        properties.setProperty("CardNo", record.get(InnerCodeCardNo));
-                        properties.setProperty("CardType", record.get(InnerCodeCardType));
+                MetaDataRecord record = dataSet.getRecord(key);
 
-                        return properties;
+                //获取就诊卡号
+                if(StringUtils.isEmpty(cardId)) {
+                    String val = record.getMetaData(CardId);
+                    if (val != null) {
+                        cardId = val;
+                        cardType = record.getMetaData(CardType);
+                        break;
                     }
                 }
             }
-        }*/
+        }
+
+        properties.put(MasterResourceFamily.BasicColumns.CardId,cardId);
+        properties.put(MasterResourceFamily.BasicColumns.CardType,cardType);
+        return properties;
     }
 }

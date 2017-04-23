@@ -1,39 +1,43 @@
 package com.yihu.ehr.service.resource.stage1.extractor;
 
 import com.yihu.ehr.profile.util.PackageDataSet;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.text.ParseException;
+import java.util.Map;
+import java.util.Properties;
 
 /**
- * @author Sand
- * @version 1.0
- * @created 2016.03.25 15:02
+ * @author hzp
+ * @version 2.0
+ * @created 2017.04.23
  */
 @Component
 public class ExtractorChain {
     @Autowired
     private ApplicationContext context;
 
-    private KeyDataExtractor[] extractors;
+    public Map<String,Object> doExtract(PackageDataSet dataSet, KeyDataExtractor.Filter filter) throws Exception {
 
-    @PostConstruct
-    private void initChain(){
-        extractors = new KeyDataExtractor[3];
-        extractors[0] = context.getBean(IdentityExtractor.class);
-        extractors[1] = context.getBean(EventExtractor.class);
-        extractors[2] = context.getBean(CardInfoExtractor.class);
-    }
-
-    public Object doExtract(PackageDataSet dataSet, KeyDataExtractor.Filter filter) throws ParseException {
-        for (KeyDataExtractor extractor : extractors){
-            Object data = extractor.extract(dataSet, filter);
-            if (data != null) return data;
+        Map<String,Object> re = new HashedMap();
+        //就診卡号和就诊卡类型
+        if(filter.equals(KeyDataExtractor.Filter.CardInfo))
+        {
+            re = context.getBean(CardInfoExtractor.class).extract(dataSet);
+        }
+        //事件时间和事件类型
+        else if(filter.equals(KeyDataExtractor.Filter.EventInfo))
+        {
+            re = context.getBean(EventInfoExtractor.class).extract(dataSet);
+        }
+        //身份证和姓名
+        else if(filter.equals(KeyDataExtractor.Filter.DemographicInfo))
+        {
+            re = context.getBean(IdentityExtractor.class).extract(dataSet);
         }
 
-        return null;
+        return re;
     }
 }

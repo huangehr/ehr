@@ -1,16 +1,17 @@
 package com.yihu.ehr.service.resource.stage1.extractor;
 
 import com.yihu.ehr.constants.EventType;
+import com.yihu.ehr.profile.family.MasterResourceFamily;
+import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -22,36 +23,49 @@ import java.util.*;
  */
 @Component
 @ConfigurationProperties(prefix = "ehr.pack-extractor.event")
-public class EventExtractor extends KeyDataExtractor {
+public class EventInfoExtractor extends KeyDataExtractor {
     private Map<String, String> dataSets = new HashMap<>();       // 事件界定数据集
     private List<String> metaData = new ArrayList<>();            // 事件时间数据元
 
     @Override
-    public Object extract(PackageDataSet dataSet, Filter filter) throws ParseException {
+    public Map<String,Object> extract(PackageDataSet dataSet) throws Exception {
+        Map<String,Object> properties = new HashedMap();
+
+        Date eventDate = null;
+        EventType eventType = null;
         if (dataSets.containsKey(dataSet.getCode())) {
-            if (filter == Filter.EventDate) {
-                for (String rowKey : dataSet.getRecordKeys()) {
-                    MetaDataRecord record = dataSet.getRecord(rowKey);
+            for (String rowKey : dataSet.getRecordKeys()) {
+                MetaDataRecord record = dataSet.getRecord(rowKey);
+
+                //获取就诊时间
+                if(eventDate == null) {
                     for (String metaDataCode : metaData) {
-                        if (StringUtils.isNotEmpty(record.getMetaData(metaDataCode))) {
-                            String value = record.getMetaData(metaDataCode);
+                        String value = record.getMetaData(metaDataCode);
+                        if (StringUtils.isNotEmpty(value)) {
                             if(value.contains("T") && value.contains("Z"))
                             {
-                                return DateTimeUtil.utcDateTimeParse(value);
+                                eventDate = DateTimeUtil.utcDateTimeParse(value);
                             }
                             else
                             {
-                                return DateTimeUtil.simpleDateTimeParse(value);
+                                eventDate = DateTimeUtil.simpleDateTimeParse(value);
                             }
+                        }
+
+                        if(eventDate != null) {
+                            eventType = EventType.valueOf(dataSets.get(dataSet.getCode()));
+                            break;
                         }
                     }
                 }
-            } else if (filter == Filter.EventType){
-                return EventType.valueOf(dataSets.get(dataSet.getCode()));
             }
+
         }
 
-        return null;
+        properties.put(MasterResourceFamily.BasicColumns.EventDate,eventDate);
+        properties.put(MasterResourceFamily.BasicColumns.EventType,eventType);
+
+        return properties;
     }
 
     @PostConstruct
