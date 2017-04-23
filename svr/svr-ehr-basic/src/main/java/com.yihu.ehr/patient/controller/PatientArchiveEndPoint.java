@@ -178,7 +178,7 @@ public class PatientArchiveEndPoint extends EnvelopRestEndPoint {
     public Result archiveVerifyManager(
             @ApiParam(name = "id", value = "档案认领ID", defaultValue = "")
             @RequestParam(value = "id", required = false) Long id,
-            @ApiParam(name = "status", value = "审核状态 -1审核不通过 0待审核 1审核通过", defaultValue = "")
+            @ApiParam(name = "status", value = "审核状态 2 审核不通过 0待审核 1审核通过", defaultValue = "")
             @RequestParam(value = "status", required = false) String status,
             @ApiParam(name = "auditor", value = "审核者", defaultValue = "")
             @RequestParam(value = "auditor", required = false) String auditor,
