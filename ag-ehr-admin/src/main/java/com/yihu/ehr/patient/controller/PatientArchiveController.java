@@ -265,9 +265,17 @@ public class PatientArchiveController extends ExtendController<ArchiveApply> {
         for(MDictionaryEntry entry : relaStatusDicts){
             relaStatusMap.put(entry.getCode(), entry.getValue());
         }
+
+        List<MDictionaryEntry>  cardTypeDicts = systemDictClient.getDictEntries("", "dictId=66", "", 10, 1).getBody();
+        Map<String, String>  cardTypeMap = new HashMap<>();
+        for(MDictionaryEntry entry : cardTypeDicts){
+            cardTypeMap.put(entry.getCode(), entry.getValue());
+        }
+
         for(Map<String,Object> ArRela : ArRelaL){
             ArRela.put("eventTypeName",eventTypeMap.get(ArRela.get("eventType")));
             ArRela.put("statusName",relaStatusMap.get(ArRela.get("status")));
+            ArRela.put("cardTypeName",cardTypeMap.get(ArRela.get("cardType")));
         }
 
         return ArRelaL;

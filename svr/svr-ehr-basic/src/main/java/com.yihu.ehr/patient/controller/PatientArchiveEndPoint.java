@@ -92,8 +92,7 @@ public class PatientArchiveEndPoint extends EnvelopRestEndPoint {
         List<ArchiveRelation> arRelationList = archiveRelationService.search(fields, filters, sorts, page, size);
         if(arRelationList != null){
             listResult.setDetailModelList(arRelationList);
-            filters = filters.replace("idCardNo","idCard");
-            listResult.setTotalCount((int)archiveApplyService.getCount(filters));
+            listResult.setTotalCount((int)archiveRelationService.getCount(filters));
             listResult.setCode(200);
             listResult.setCurrPage(page);
             listResult.setPageSize(size);
