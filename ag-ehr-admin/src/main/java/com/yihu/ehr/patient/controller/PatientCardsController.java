@@ -184,6 +184,21 @@ public class PatientCardsController extends ExtendController<UserCards> {
         }
     }
 
+    @RequestMapping(value = ServiceApi.Patients.ArchiveRelationManager,method = RequestMethod.GET)
+    @ApiOperation(value = "管理员--卡关联档案审核操作")
+    public Envelop archiveRelationManager(
+            @ApiParam(name = "cardId", value = "cardId", defaultValue = "")
+            @RequestParam(value = "cardId",required = false) Long cardId,
+            @ApiParam(name = "archiveRelationIds", value = "档案关联ID，多条用逗号分隔", defaultValue = "")
+            @RequestParam(value = "archiveRelationIds", required = false) String archiveRelationIds) throws Exception{
+        Result result = patientCardsClient.archiveRelationManager(cardId,archiveRelationIds);
+        if(result.getCode() == 200){
+            return successMsg(result.getMessage());
+        }else{
+            return failed(result.getMessage());
+        }
+    }
+
     @RequestMapping(value = ServiceApi.Patients.CardBindManager,method = RequestMethod.POST)
     @ApiOperation(value = "管理员--后台绑卡操作")
     public Envelop cardBindManager(

@@ -295,6 +295,7 @@ public class ServiceApi {
         public static final String CardApplyListManager = "/patientCards/manager/applyList";//	管理员--卡认证列表
         public static final String CardVerifyManager = "/patientCards/manager/verify";//	管理员--卡认证审核操作
         public static final String CardBindManager = "/patientCards/manager/bind";//	管理员--后台绑卡操作
+        public static final String ArchiveRelationManager = "/patientCards/manager/archiveRelation";//	管理员--卡档案关联审核
 
         public static final String ArchiveApply = "/patientArchive/apply";//	档案认领申请（临时卡）
         public static final String ArchiveApplyList = "/patientArchive/applyList";//	个人档案认领列表

@@ -154,6 +154,16 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
     }
 
 
+    @RequestMapping(value = ServiceApi.Patients.ArchiveRelationManager,method = RequestMethod.GET)
+    @ApiOperation(value = "管理员--卡关联档案审核操作")
+    Result archiveRelationManager(
+            @ApiParam(name = "cardId", value = "cardId", defaultValue = "")
+            @RequestParam(value = "cardId",required = false) Long cardId,
+            @ApiParam(name = "archiveRelationIds", value = "档案关联ID，多条用逗号分隔", defaultValue = "")
+            @RequestParam(value = "archiveRelationIds", required = false) String archiveRelationIds)throws Exception{
+        return userCardsService.archiveRelationManager(cardId,archiveRelationIds);
+    };
+
     @RequestMapping(value = ServiceApi.Patients.CardBindManager,method = RequestMethod.POST)
     @ApiOperation(value = "管理员--后台绑卡操作")
     public ObjectResult cardBindManager(

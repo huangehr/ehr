@@ -30,6 +30,7 @@ public class ArchiveRelation extends IdEntity {
     private Date relationDate;//关联时间
     private Date createDate;//创建时间
     private Long applyId;//关联档案申请id
+    private Long cardId;//申领卡ID
 
     public String getName() {
         return name;
@@ -158,5 +159,12 @@ public class ArchiveRelation extends IdEntity {
         this.applyId = applyId;
     }
 
+    @Column(name = "card_id")
+    public Long getCardId() {
+        return cardId;
+    }
 
+    public void setCardId(Long cardId) {
+        this.cardId = cardId;
+    }
 }

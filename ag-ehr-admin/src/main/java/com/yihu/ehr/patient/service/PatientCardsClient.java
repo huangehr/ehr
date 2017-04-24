@@ -102,6 +102,15 @@ public interface PatientCardsClient {
             @ApiParam(name = "auditReason", value = "审核不通过原因", defaultValue = "")
             @RequestParam(value = "auditReason",required = false) String auditReason);
 
+    @RequestMapping(value = ServiceApi.Patients.ArchiveRelationManager,method = RequestMethod.GET)
+    @ApiOperation(value = "管理员--卡与档案关联审核操作")
+    Result archiveRelationManager(
+            @ApiParam(name = "cardId", value = "cardId", defaultValue = "")
+            @RequestParam(value = "cardId",required = false) Long cardId,
+            @ApiParam(name = "archiveRelationIds", value = "档案关联ID，多条用逗号分隔", defaultValue = "")
+            @RequestParam(value = "archiveRelationIds", required = false) String archiveRelationIds);
+
+
 
     @RequestMapping(value = ServiceApi.Patients.CardBindManager,method = RequestMethod.POST)
     @ApiOperation(value = "管理员--后台绑卡操作")

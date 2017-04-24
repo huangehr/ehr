@@ -2,10 +2,13 @@ package com.yihu.ehr.patient.service.arapply;
 
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.patient.ArchiveRelation;
 import com.yihu.ehr.model.patient.MedicalCards;
 import com.yihu.ehr.model.patient.UserCards;
+import com.yihu.ehr.patient.dao.XArchiveRelationDao;
 import com.yihu.ehr.patient.dao.XMedicalCardsDao;
 import com.yihu.ehr.patient.dao.XUserCardsDao;
+import com.yihu.ehr.patient.feign.PatientArchiveClient;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +34,10 @@ import java.util.Date;
     private ArchiveRelationService archiveRelationService;
     @Autowired
     private XMedicalCardsDao medicalCardsDao;
+    @Autowired
+    private XArchiveRelationDao archiveRelationDao;
+    @Autowired
+    private PatientArchiveClient patientArchiveClient;
 
     /**
      * 获取个人卡列表
@@ -154,4 +161,18 @@ import java.util.Date;
         return card;
     }
 
+    public Result archiveRelationManager(long cardId,String archiveRelationIds) {
+        String[] ids = archiveRelationIds.replace("，",",").split(",");
+        for(String idString :ids){
+            if(!StringUtils.isEmpty(idString)){
+                ArchiveRelation relation = archiveRelationDao.findOne(Long.valueOf(idString));
+                relation.setCardId(cardId);
+                relation.setStatus("1");
+                relation.setRelationDate(new Date());
+                archiveRelationDao.save(relation);
+            }
+        }
+        return Result.success("卡关联档案审核成功！");
+
+    }
 }
