@@ -110,39 +110,33 @@ public class ArchiveApplyService extends BaseJpaService<ArchiveApply, XArchiveAp
 
         ArchiveApply apply = archiveApplyDao.findOne(id);
 
-        if(apply!=null)
-        {
+        if(apply!=null){
             String[] ids = archiveRelationIds.replace("，",",").split(",");
             String msg = "";
 
-            for(String idString :ids)
-            {
-                ArchiveRelation relation = archiveRelationDao.findOne(Long.valueOf(idString));
+            for(String idString :ids){
+                if(!StringUtils.isEmpty(idString)) {
+                    ArchiveRelation relation = archiveRelationDao.findOne(Long.valueOf(idString));
+                    if (relation != null) {
+                        try {
+                            if ("1".equals(apply.getStatus())) {  //审批通过
+                                //操作hbase
+                                patientArchiveClient.archiveRelation(relation.getProfileId(), apply.getIdCard());
 
-                if(relation!=null)
-                {
-                    try {
-                        if ("1".equals(apply.getStatus()))  //审批通过
-                        {
-                            //操作hbase
-                            patientArchiveClient.archiveRelation(relation.getProfileId(), apply.getIdCard());
-
-                            //档案关联绑定
-                            relation.setIdCardNo(apply.getIdCard());
-                            relation.setStatus("1");
-                            relation.setRelationDate(new Date());
-                            relation.setApplyId(apply.getId());
-                            archiveRelationDao.save(relation);
+                                //档案关联绑定
+                                relation.setIdCardNo(apply.getIdCard());
+                                relation.setStatus("1");
+                                relation.setRelationDate(new Date());
+                                relation.setApplyId(apply.getId());
+                                archiveRelationDao.save(relation);
+                            }
+                        } catch (Exception ex) {
+                            System.out.print(ex.getMessage());
+                            msg += "";
                         }
+                    } else {
+                        return Result.error("不存在该份档案记录！");
                     }
-                    catch (Exception ex)
-                    {
-                        System.out.print(ex.getMessage());
-                        msg += "";
-                    }
-                }
-                else{
-                    return Result.error("不存在该份档案记录！");
                 }
             }
 
@@ -153,14 +147,12 @@ public class ArchiveApplyService extends BaseJpaService<ArchiveApply, XArchiveAp
             apply.setAuditReason(auditReason);
             archiveApplyDao.save(apply);
 
-            if(!StringUtils.isEmpty(msg))
-            {
+            if(!StringUtils.isEmpty(msg)){
                 return Result.error("archiveRelationId:"+msg+" ");
             }
 
             return Result.success("档案认领审核成功！");
-        }
-        else{
+        }else{
             return Result.error("不存在该条申请记录！");
         }
     }
