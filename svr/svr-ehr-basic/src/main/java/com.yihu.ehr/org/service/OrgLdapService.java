@@ -24,7 +24,7 @@ import java.util.Map;
  */
 @Service
 @Transactional(rollbackFor = {ServiceException.class})
-public class OrgLdapService {
+public class OrgLdapService  {
 
     @Autowired
     private XOrganizationRepository organizationRepository;
@@ -44,9 +44,9 @@ public class OrgLdapService {
     @Value("${spring.ldap.root}")
     String rootDn;
 
-    private void importOrgDept(String orgCode,Integer patientDept,Long parent,String parentDn)
+    private void importOrgDept(String orgId,Integer patientDept,Long parent,String parentDn)
     {
-         List<OrgDept> deptList = orgDeptRepository.findByOrgIdAndParentDeptId(orgCode,patientDept);
+        List<OrgDept> deptList = orgDeptRepository.findByOrgIdAndParentDeptId(orgId,patientDept);
 
         if(deptList!=null && deptList.size()>0)
         {
@@ -61,7 +61,7 @@ public class OrgLdapService {
                 item.setKeyval(Long.valueOf(dept.getId()));
                 ldapEntriesRepository.save(item);
 
-                importOrgDept(orgCode,dept.getId(),item.getId(),dn);
+                importOrgDept(orgId,dept.getId(),item.getId(),dn);
             }
         }
     }
@@ -88,12 +88,12 @@ public class OrgLdapService {
                     item.setKeyval(org.getId());
                     ldapEntriesRepository.save(item);
 
-                    importOrgDept(org.getOrgCode(), 0, item.getId(), dn);
-                    importMember(org.getOrgCode());
+                    importOrgDept(String.valueOf(org.getId()), 0, item.getId(), dn);
+                    importMember(String.valueOf(org.getId()));
                 }
                 catch (Exception ex)
                 {
-                     System.out.print("机构"+org.getOrgCode()+"导入失败！"+ ex.getMessage());
+                    System.out.print("机构"+org.getOrgCode()+"导入失败！"+ ex.getMessage());
                 }
             }
         }
@@ -103,9 +103,9 @@ public class OrgLdapService {
     /**
      *  初始化ldap机构成员数据
      */
-    private void importMember(String orgCode) throws Exception {
+    private void importMember(String orgId) throws Exception {
         //获取所有有效机构
-        List<OrgMemberRelation> memberList = orgMemberRelationRepository.findByOrgId(orgCode);
+        List<OrgMemberRelation> memberList = orgMemberRelationRepository.findByOrgId(orgId);
         if(memberList!=null && memberList.size()>0)
         {
             List<LdapEntries> newList = new ArrayList<>();
@@ -124,7 +124,7 @@ public class OrgLdapService {
                     newList.add(newEntries);
                 }
                 else{
-                    System.out.print("导入成员"+member.getUserId()+"失败,机构"+orgCode+"科室"+member.getDeptId()+"不存在！");
+                    System.out.print("导入成员"+member.getUserId()+"失败,机构"+orgId+"科室"+member.getDeptId()+"不存在！");
                 }
             }
             ldapEntriesRepository.save(newList);
@@ -134,14 +134,14 @@ public class OrgLdapService {
 
     //**************************************************************************************//*
     /**
-      初始化Ldap数据
+     初始化Ldap数据
      */
     @Transactional
     public void importLdapData() throws Exception
     {
         //清空数据
         ldapEntriesRepository.deleteAll();
-        ldapEntriesRepository.findAll();
+
         //创建根节点
         LdapEntries root = new LdapEntries();
         root.setDn(rootDn);
@@ -179,7 +179,7 @@ public class OrgLdapService {
     }
 
     /**
-       节点类型，1用户 2科室 3机构 为空全部
+     节点类型，1用户 2科室 3机构 为空全部
      */
     public List<Map<String,Object>> queryAllByObjectClass(String searchDN, Integer type) throws Exception
     {
@@ -188,7 +188,7 @@ public class OrgLdapService {
     }
 
     /**
-       节点类型，1用户 2科室 3机构 为空全部
+     节点类型，1用户 2科室 3机构 为空全部
      */
     public List<Map<String,Object>> queryChildren(String searchDN, Integer type) throws Exception
     {
@@ -196,8 +196,8 @@ public class OrgLdapService {
         return ldapUtil.queryChildren(searchDN,objectClass);
     }
 
-     /**
-       节点类型，1用户 2科室 3机构 为空全部
+    /**
+     节点类型，1用户 2科室 3机构 为空全部
      */
     public Map<String,Object> queryBase(String searchDN, Integer type) throws Exception
     {
@@ -206,7 +206,7 @@ public class OrgLdapService {
     }
 
     /**
-       节点类型，1用户 2科室 3机构 为空全部
+     节点类型，1用户 2科室 3机构 为空全部
      */
     public List<Map<String,Object>> queryAllWithoutSelf(String searchDN, Integer type) throws Exception
     {
