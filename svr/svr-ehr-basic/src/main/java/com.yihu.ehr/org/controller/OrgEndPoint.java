@@ -52,7 +52,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "查询所有机构列表")
     public List<MOrganization> getAllOrgs() throws Exception {
         List<MOrganization> orgs = orgService.search(null);
-        return (List<MOrganization>) convertToModels(orgs, new ArrayList<MOrganization>(orgs.size()), MOrganization.class, null);
+        return orgs;
     }
 
 
