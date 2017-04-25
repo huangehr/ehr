@@ -141,9 +141,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     public String acquirePackage(
             @ApiParam(name = "id", value = "档案包编号", defaultValue = "")
             @RequestParam(required = false) String id) throws Exception {
+        String re = "";
         Package aPackage = packService.acquirePackage(id);
-
-        return objectMapper.writeValueAsString(aPackage);
+        if(aPackage!=null)
+        {
+            re = objectMapper.writeValueAsString(aPackage);
+        }
+        return re;
     }
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.GET)
