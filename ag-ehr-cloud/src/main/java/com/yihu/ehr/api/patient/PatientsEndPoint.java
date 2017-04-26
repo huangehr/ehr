@@ -93,7 +93,7 @@ public class PatientsEndPoint {
                 demoInfo.setTelephoneNo(record.getMetaData("HDSD00_01_008"));
             }
 
-            patientClient.createPatient(objectMapper.writeValueAsString(demoInfo));
+            patientClient.registerPatient(objectMapper.writeValueAsString(demoInfo));
 
             break;
         }

@@ -1,11 +1,13 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.constants.*;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.org.MOrganization;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -34,5 +36,31 @@ public interface OrganizationClient {
             @RequestParam(value = "sorts") String sorts,
             @RequestParam(value = "page") int page,
             @RequestParam(value = "size") int size);
+
+    /**
+     * 创建机构
+     * @param orgModelJsonData
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = ApiVersion.Version1_0 + "/organizations" , method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "创建机构")
+    MOrganization create(
+            @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
+            @RequestBody String orgModelJsonData ) ;
+
+
+    @RequestMapping(value =ApiVersion.Version1_0 +  "/organizations" , method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改机构")
+    MOrganization update(
+            @ApiParam(name = "mOrganizationJsonData", value = "机构代码", defaultValue = "")
+            @RequestBody String orgModelJsonData ) ;
+
+
+    @RequestMapping(value = ApiVersion.Version1_0 + "/organizations/images" , method = RequestMethod.POST)
+    @ApiOperation(value = "机构资质图片上传")
+    public String uploadPicture(
+            @ApiParam(name = "jsonData", value = "jsonData", defaultValue = "")
+            @RequestBody String jsonData);
 
 }

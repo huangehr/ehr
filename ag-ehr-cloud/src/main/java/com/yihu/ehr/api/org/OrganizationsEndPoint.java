@@ -57,7 +57,7 @@ public class OrganizationsEndPoint extends BaseController {
             @RequestParam(value = "sorts",required = false) String sorts,
             @RequestParam(value = "page",required = false) int page,
             @RequestParam(value = "size",required = false) int size) {
-           return organizationClient.search(fields,filters,sorts,page,size);
+        return organizationClient.search(fields,filters,sorts,page,size);
     }
 
     @RequestMapping(value = "/{org_code}/administrator", method = RequestMethod.GET)
