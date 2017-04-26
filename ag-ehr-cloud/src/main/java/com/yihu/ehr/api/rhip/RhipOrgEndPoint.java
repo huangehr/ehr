@@ -146,8 +146,8 @@ public class RhipOrgEndPoint extends BaseController {
     @RequestMapping(value = "/organizations" , method = RequestMethod.PUT)
     @ApiOperation(value = "修改机构")
     public Envelop update(
-            @ApiParam(name = "mOrganizationJsonDatas", value = "机构信息Json", defaultValue = "")
-            @RequestParam(value = "mOrganizationJsonDatas", required = true) String mOrganizationJsonData,
+            @ApiParam(name = "mOrganizationJsonData", value = "机构信息Json", defaultValue = "")
+            @RequestParam(value = "mOrganizationJsonData", required = true) String mOrganizationJsonData,
             @ApiParam(name = "geography_model_json_data",value = "地址信息Json",defaultValue = "")
             @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData,
             @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
