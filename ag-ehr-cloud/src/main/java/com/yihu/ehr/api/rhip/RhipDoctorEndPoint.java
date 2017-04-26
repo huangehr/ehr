@@ -1,4 +1,4 @@
-package com.yihu.ehr.api.user;
+package com.yihu.ehr.api.rhip;
 
 import com.yihu.ehr.agModel.user.DoctorDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -24,10 +24,10 @@ import java.text.ParseException;
  * Created at 2017/4/24.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 + "/doctors")
+@RequestMapping(ApiVersion.Version1_0 + "/rhip")
 @RestController
-@Api(value = "doctor", description = "医生管理接口", tags = {"基础信息 - 医生管理接口"})
-public class DoctorEndPoint extends BaseController {
+@Api(value = "doctor", description = "区域卫生信息平台-医生管理接口", tags = {"区域卫生信息平台-医生管理接口"})
+public class RhipDoctorEndPoint extends BaseController {
 
     @Autowired
     private DoctorClient doctorClient;
@@ -35,7 +35,7 @@ public class DoctorEndPoint extends BaseController {
     @Autowired
     private FileResourceClient fileResourceClient;
 
-    @RequestMapping(value = "doctors/admin/{doctor_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "doctor/{doctor_id}", method = RequestMethod.GET)
     @ApiOperation(value = "获取医生信息", notes = "医生信息")
     public Envelop getUser(
             @ApiParam(name = "doctor_id", value = "", defaultValue = "")
@@ -58,7 +58,7 @@ public class DoctorEndPoint extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/doctors/admin/{doctor_id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/doctor/{doctor_id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除医生", notes = "根据医生id删除医生")
     public Envelop deleteDoctor(
             @ApiParam(name = "doctor_id", value = "医生编号", defaultValue = "")

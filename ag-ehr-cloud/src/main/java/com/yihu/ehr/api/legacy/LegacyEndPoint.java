@@ -325,7 +325,7 @@ public class LegacyEndPoint {
             demoInfo.setEmail(email);
 
             String demoInfoJsonData = objectMaper.writeValueAsString(demoInfo);
-            patientClient.createPatient(demoInfoJsonData);
+            patientClient.registerPatient(demoInfoJsonData);
             RestEcho restEcho = new RestEcho().success();
             restEcho.putMessage("Patient register success.");
             return restEcho;

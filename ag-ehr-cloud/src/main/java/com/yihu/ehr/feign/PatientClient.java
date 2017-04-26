@@ -17,7 +17,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public interface PatientClient {
 
     @RequestMapping(value = ApiVersion.Version1_0+"/populations",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    void createPatient(@RequestBody String jsonData);
+    void registerPatient(@RequestBody String jsonData);
 
 
     @RequestMapping(value = ApiVersion.Version1_0+"/populations/{id_card_no}/register",method = RequestMethod.GET)
@@ -35,5 +35,31 @@ public interface PatientClient {
     MDemographicInfo getPatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) ;
+
+
+    /**
+     * 根据前端传回来的json修改人口信息
+     * @param patientModelJsonData
+
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations",method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据前端传回来的json修改人口信息")
+    MDemographicInfo updatePatient(
+            @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
+            @RequestBody String patientModelJsonData);
+
+    /**
+     * 根据前端传回来的json新增一个人口信息
+     * @param jsonData
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据前端传回来的json创建一个人口信息")
+    MDemographicInfo createPatient(
+            @ApiParam(name = "json_data", value = "病人信息", defaultValue = "")
+            @RequestBody String jsonData) ;
 
 }
