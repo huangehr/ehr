@@ -52,7 +52,7 @@ public class OrgLdapService  {
         {
             for(OrgDept dept :deptList)
             {
-                String dn = "ou="+dept.getCode()+","+parentDn;
+                String dn = "ou="+dept.getId()+","+parentDn;
 
                 LdapEntries item = new LdapEntries();
                 item.setDn(dn);
@@ -79,7 +79,7 @@ public class OrgLdapService  {
             for(Organization org:orgList)
             {
                 try {
-                    String dn = "o=" + org.getOrgCode() + "," + rootDn;
+                    String dn = "o=" + org.getId() + "," + rootDn;
 
                     LdapEntries item = new LdapEntries();
                     item.setDn(dn);
