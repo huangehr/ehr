@@ -1,6 +1,9 @@
 package com.yihu.ehr.feign;
 
 import com.yihu.ehr.constants.*;
+import com.yihu.ehr.model.patient.MDemographicInfo;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -19,4 +22,18 @@ public interface PatientClient {
 
     @RequestMapping(value = ApiVersion.Version1_0+"/populations/{id_card_no}/register",method = RequestMethod.GET)
     boolean isRegistered(@PathVariable(value = "id_card_no") String idCardNo);
+
+
+    /**
+     * 根据身份证号查找人
+     * @param idCardNo
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations/{id_card_no}",method = RequestMethod.GET)
+    @ApiOperation(value = "根据身份证号查找人")
+    MDemographicInfo getPatient(
+            @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
+            @PathVariable(value = "id_card_no") String idCardNo) ;
+
 }

@@ -1,0 +1,184 @@
+package com.yihu.ehr.api.user;
+
+import com.yihu.ehr.agModel.user.DoctorDetailModel;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.feign.DoctorClient;
+import com.yihu.ehr.feign.FileResourceClient;
+import com.yihu.ehr.model.user.MDoctor;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.rest.Envelop;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
+
+/**
+ * @author HZY
+ * @vsrsion 1.0
+ * Created at 2017/4/24.
+ */
+@EnableFeignClients
+@RequestMapping(ApiVersion.Version1_0 + "/doctors")
+@RestController
+@Api(value = "doctor", description = "医生管理接口", tags = {"基础信息 - 医生管理接口"})
+public class DoctorEndPoint extends BaseController {
+
+    @Autowired
+    private DoctorClient doctorClient;
+
+    @Autowired
+    private FileResourceClient fileResourceClient;
+
+    @RequestMapping(value = "doctors/admin/{doctor_id}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取医生信息", notes = "医生信息")
+    public Envelop getUser(
+            @ApiParam(name = "doctor_id", value = "", defaultValue = "")
+            @PathVariable(value = "doctor_id") Long doctorId) {
+        try {
+            MDoctor mDoctor = doctorClient.getDoctor(doctorId);
+            if (mDoctor == null) {
+                return failed("医生信息获取失败!");
+            }
+
+            DoctorDetailModel detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
+            detailModel.setInsertTime(mDoctor.getInsertTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
+            detailModel.setUpdateTime(mDoctor.getUpdateTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getUpdateTime()));
+
+            return success(detailModel);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = "/doctors/admin/{doctor_id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除医生", notes = "根据医生id删除医生")
+    public Envelop deleteDoctor(
+            @ApiParam(name = "doctor_id", value = "医生编号", defaultValue = "")
+            @PathVariable(value = "doctor_id") String doctorId) {
+        try {
+            boolean result = doctorClient.deleteDoctor(doctorId);
+            if (!result) {
+                return failed("删除失败!");
+            }
+            try{
+                fileResourceClient.filesDelete(doctorId);
+            }catch (Exception e){
+                return success("数据删除成功！头像图片删除失败！");
+            }
+            return success(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+
+    @RequestMapping(value = "/doctor", method = RequestMethod.POST)
+    @ApiOperation(value = "创建医生", notes = "重新绑定医生信息")
+    public Envelop createDoctor(
+            @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "doctor_json_data") String doctorJsonData) {
+        try {
+            DoctorDetailModel detailModel = objectMapper.readValue(doctorJsonData, DoctorDetailModel.class);
+
+            String errorMsg = null;
+
+            if (StringUtils.isEmpty(detailModel.getCode())) {
+                errorMsg += "账户不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getName())) {
+                errorMsg += "姓名不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getSkill())) {
+                errorMsg += "医生专长不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getEmail())) {
+                errorMsg += "邮箱不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getPhone())) {
+                errorMsg += "手机-主号码不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getOfficeTel())) {
+                errorMsg += "办公电话不能为空!";
+            }
+
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+            MDoctor mDoctor = convertToMDoctor(detailModel);
+            mDoctor = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor));
+            if (mDoctor == null) {
+                return failed("保存失败!");
+            }
+
+            detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
+            return success(detailModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+
+    @RequestMapping(value = "/doctor", method = RequestMethod.PUT)
+    @ApiOperation(value = "修改医生", notes = "重新绑定医生信息")
+    public Envelop updateDoctor(
+            @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
+            @RequestParam(value = "doctor_json_data") String doctorJsonData) {
+        try {
+            DoctorDetailModel detailModel = toEntity(doctorJsonData, DoctorDetailModel.class);
+            String errorMsg = null;
+            if (StringUtils.isEmpty(detailModel.getName())) {
+                errorMsg += "姓名不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getSkill())) {
+                errorMsg += "医生专长不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getEmail())) {
+                errorMsg += "邮箱不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getPhone())) {
+                errorMsg += "手机-主号码不能为空!";
+            }
+            if (StringUtils.isEmpty(detailModel.getOfficeTel())) {
+                errorMsg += "办公电话不能为空!";
+            }
+            if (StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+            MDoctor mDoctor = convertToMDoctor(detailModel);
+            mDoctor = doctorClient.updateDoctor(objectMapper.writeValueAsString(mDoctor));
+            if(mDoctor==null){
+                return failed("保存失败!");
+            }
+
+            detailModel = convertToModel(mDoctor, DoctorDetailModel.class);
+            return success(detailModel);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    public MDoctor convertToMDoctor(DoctorDetailModel detailModel) throws ParseException {
+        if(detailModel==null)
+        {
+            return null;
+        }
+        MDoctor mDoctor = convertToModel(detailModel,MDoctor.class);
+        mDoctor.setUpdateTime(DateTimeUtil.simpleDateTimeParse(detailModel.getUpdateTime()));
+        mDoctor.setInsertTime(DateTimeUtil.simpleDateTimeParse(detailModel.getInsertTime()));
+
+        return mDoctor;
+    }
+
+}
