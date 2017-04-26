@@ -249,11 +249,11 @@ public class PatientCardsController extends ExtendController<UserCards> {
         }
 
         Integer totalCount = getTotalCount(responseEntity);
+        Envelop envelop = new Envelop();
         if(totalCount > 0){
-            Envelop envelop = getResult(medicalCardsModelList, totalCount, page, size);
-            return envelop;
+            envelop = getResult(medicalCardsModelList, totalCount, page, size);
         }
-        return null;
+        return envelop;
     }
 
 
