@@ -17,14 +17,14 @@ public class OrgModel {
     private String tel;
     private String location;
     private String locationStrName;
-    private int activityFlag;
+    private Integer activityFlag;
     private String activityFlagName;
     private String settledWay;
     private String settledWayName;
     private String createDate;
     private String imgRemotePath;
     private String imgLocalPath;
-    private int administrativeDivision;
+    private Integer administrativeDivision;
 
     private Long id;
     private String code;        //内部用机构编码
@@ -127,11 +127,11 @@ public class OrgModel {
         this.locationStrName = locationStrName;
     }
 
-    public int getActivityFlag() {
+    public Integer getActivityFlag() {
         return activityFlag;
     }
 
-    public void setActivityFlag(int activityFlag) {
+    public void setActivityFlag(Integer activityFlag) {
         this.activityFlag = activityFlag;
     }
 
@@ -183,11 +183,11 @@ public class OrgModel {
         this.imgLocalPath = imgLocalPath;
     }
 
-    public int getAdministrativeDivision() {
+    public Integer getAdministrativeDivision() {
         return administrativeDivision;
     }
 
-    public void setAdministrativeDivision(int administrativeDivision) {
+    public void setAdministrativeDivision(Integer administrativeDivision) {
         this.administrativeDivision = administrativeDivision;
     }
 

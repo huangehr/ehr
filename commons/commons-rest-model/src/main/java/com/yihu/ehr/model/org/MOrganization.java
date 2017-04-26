@@ -28,11 +28,11 @@ public class MOrganization implements Serializable{
     private String tel;                // 机构电话
     private Date createDate;        // 创建日期
     private String location;        // 地址
-    private int activityFlag;
+    private Integer activityFlag;
     private String tags;
     private String imgRemotePath;
     private String imgLocalPath;
-    private int administrativeDivision;
+    private Integer administrativeDivision;
     private String url; //机构网址
 
     private Long id;
@@ -147,11 +147,11 @@ public class MOrganization implements Serializable{
         this.settled = settled;
     }
 
-    public int getActivityFlag() {
+    public Integer getActivityFlag() {
         return activityFlag;
     }
 
-    public void setActivityFlag(int activityFlag) {
+    public void setActivityFlag(Integer activityFlag) {
         this.activityFlag = activityFlag;
     }
 
@@ -171,11 +171,11 @@ public class MOrganization implements Serializable{
         this.imgLocalPath = imgLocalPath;
     }
 
-    public int getAdministrativeDivision() {
+    public Integer getAdministrativeDivision() {
         return administrativeDivision;
     }
 
-    public void setAdministrativeDivision(int administrativeDivision) {
+    public void setAdministrativeDivision(Integer administrativeDivision) {
         this.administrativeDivision = administrativeDivision;
     }
 
