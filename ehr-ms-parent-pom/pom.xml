@@ -40,6 +40,7 @@
         <module>../ag-ehr-admin</module>
         <module>../ag-ehr-cloud</module>
         <module>../ag-portal-cloud</module>
+        <module>../svr/svr-redis</module>
     </modules>
 
     <build>
