@@ -101,7 +101,6 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         if (user == null) {
             return null;
         }
-
         boolean result = isPasswordRight(user,psw);
         if(result) {
             return user;
