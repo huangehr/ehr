@@ -123,7 +123,7 @@ public class PortalNoticesController extends BaseController{
         try {
             PortalNoticeDetailModel detailModel = objectMapper.readValue(portalNoticeJsonData, PortalNoticeDetailModel.class);
 
-            String errorMsg = null;
+            String errorMsg = "";
 
             if (StringUtils.isEmpty(detailModel.getTitle())) {
                 errorMsg += "标题不能为空!";
@@ -157,7 +157,7 @@ public class PortalNoticesController extends BaseController{
             @RequestParam(value = "portalNotice_json_data") String portalNoticeJsonData) {
         try {
             PortalNoticeDetailModel detailModel = toEntity(portalNoticeJsonData, PortalNoticeDetailModel.class);
-            String errorMsg = null;
+            String errorMsg = "";
             if (StringUtils.isEmpty(detailModel.getTitle())) {
                 errorMsg += "标题不能为空!";
             }

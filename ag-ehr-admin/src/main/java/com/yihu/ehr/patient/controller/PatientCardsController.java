@@ -76,13 +76,12 @@ public class PatientCardsController extends ExtendController<UserCards> {
             userCardsModel.setCardTypeName(dict == null ? "" : dict.getValue());
             userCardsModelList.add(userCardsModel);
         }
-
+        Envelop envelop =new Envelop();
         Integer totalCount = getTotalCount(responseEntity);
         if(totalCount > 0){
-            Envelop envelop = getResult(userCardsModelList, totalCount, page, size);
-            return envelop;
+            envelop = getResult(userCardsModelList, totalCount, page, size);
         }
-        return null;
+        return envelop;
     }
 
 

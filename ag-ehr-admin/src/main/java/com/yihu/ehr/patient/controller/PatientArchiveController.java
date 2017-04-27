@@ -8,8 +8,10 @@ import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.patient.ArchiveApply;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.patient.service.PatientArchiveClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +33,8 @@ public class PatientArchiveController extends ExtendController<ArchiveApply> {
     PatientArchiveClient patientArchiveClient;
     @Autowired
     SystemDictClient systemDictClient;
+    @Autowired
+    UserClient userClient;
 
     @RequestMapping(value = ServiceApi.Patients.GetArchiveList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询档案列表(arApply)")
@@ -52,7 +56,8 @@ public class PatientArchiveController extends ExtendController<ArchiveApply> {
             list = convertArApplyModels(list);
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
-            return successMsg("查询无数据");
+            Envelop envelop = new Envelop();
+            return envelop;
         }
     }
 
@@ -76,7 +81,8 @@ public class PatientArchiveController extends ExtendController<ArchiveApply> {
             list = convertArRelaModels(list);
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
-            return successMsg("查询无数据");
+            Envelop envelop = new Envelop();
+            return envelop;
         }
     }
 
@@ -297,6 +303,12 @@ public class PatientArchiveController extends ExtendController<ArchiveApply> {
             statusMap.put(entry.getCode(), entry.getValue());
         }
         for(Map<String,Object> info : arApplies){
+            if(info.get("auditor") != null){
+                MUser user = userClient.getUser(info.get("auditor").toString());
+                if(user!=null){
+                    info.put("auditor",user.getRealName());
+                }
+            }
             info.put("statusName",statusMap.get(info.get("status")));
         }
         return arApplies;
