@@ -29,12 +29,6 @@ management:
 spring:
   profiles: dev
 
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: ha
-    password: ha
-
-
 #server:
 #  ssl:
 #    key-store-password: 123456
