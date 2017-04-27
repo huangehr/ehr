@@ -85,12 +85,15 @@ public class RedisService {
     }
 
 
+    /******************************************* 资源化相关Redis *******************************************************************/
     /**
      *获取指标 redis
      * @return
      */
     /*public String getIndicatorsRedis(String key)
     {
-        return resourceAdaptionDictSchema.get(key);
+        return resourceAdaptionDictSchema.getMetaData(key);
     }*/
+
+
 }

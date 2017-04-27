@@ -102,15 +102,12 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
             card.setCreater(operator);
             card.setCreateDate(new Date());
             card.setAuditStatus("0");
-            card.setStatus("0");
         }
         else{
             card.setUpdater(operator);
             card.setUpdateDate(new Date());
         }
-
         card = userCardsService.cardApply(card);
-
         return Result.success("保存卡认证申请成功！",card);
     }
 

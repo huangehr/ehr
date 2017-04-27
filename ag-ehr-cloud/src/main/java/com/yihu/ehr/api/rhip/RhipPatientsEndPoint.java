@@ -1,5 +1,6 @@
 package com.yihu.ehr.api.rhip;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
@@ -26,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +64,7 @@ public class RhipPatientsEndPoint extends BaseController {
             @ApiParam(value = "身份证号")
             @PathVariable("demographic_id") String demographicId,
             @ApiParam(name = "json", value = "患者人口学数据集")
-            @RequestParam(value = "json", required = true) String patientInfo) throws Exception {
+            @RequestParam(value = "json", required = true) String patientInfo) throws Exception{
 
         if (isPatientRegistered(demographicId)) {
             throw new ApiException(HttpStatus.NOT_FOUND, ErrorCode.PatientRegisterFailedForExist);
@@ -99,14 +101,14 @@ public class RhipPatientsEndPoint extends BaseController {
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
-        if (!geographyModel.nullAddress()) {
+        if (geographyModel != null && !geographyModel.nullAddress()) {
             String addressId = geographyClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setHomeAddress(addressId);
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
         detailModel.setBirthPlace("");
-        if (!geographyModel.nullAddress()) {
+        if (geographyModel !=null  && !geographyModel.nullAddress()) {
             String addressId = geographyClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setBirthPlace(addressId);
         }
@@ -114,20 +116,29 @@ public class RhipPatientsEndPoint extends BaseController {
         //新增工作地址信息
         geographyModel = detailModel.getWorkAddressInfo();
         detailModel.setWorkAddress("");
-        if (!geographyModel.nullAddress()) {
+        if (geographyModel!= null && !geographyModel.nullAddress()) {
             String addressId = geographyClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setWorkAddress(addressId);
         }
 
         //新增人口信息
         MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
-        info.setBirthday(DateTimeUtil.simpleDateTimeParse(detailModel.getBirthday()));
-        info = patientClient.createPatient(objectMapper.writeValueAsString(info));
-        if (info == null) {
-            return failed("保存失败!");
+        try {
+            info.setBirthday(DateTimeUtil.simpleDateTimeParse(detailModel.getBirthday()));
+            info = patientClient.createPatient(objectMapper.writeValueAsString(info));
+            if (info == null) {
+                return failed("保存失败!");
+            }
+            detailModel = convertToPatientDetailModel(info);
+            return success(detailModel);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return failed("保存失败,出生日期格式有误!");
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return failed("保存人口学信息失败!");
         }
-        detailModel = convertToPatientDetailModel(info);
-        return success(detailModel);
+
 
     }
 
@@ -138,8 +149,9 @@ public class RhipPatientsEndPoint extends BaseController {
                                 @ApiParam(name = "json", value = "患者人口学数据集")
                                 @RequestParam(value = "json", required = true) String patient) throws Exception {
 
-        if (isPatientRegistered(demographicId)) {
-            throw new ApiException(HttpStatus.NOT_FOUND, ErrorCode.PatientRegisterFailedForExist);
+        if (!isPatientRegistered(demographicId)) {
+//            throw new ApiException(HttpStatus.NOT_FOUND, ErrorCode.PatientRegisterFailedForExist);
+            return failed("病人信息未注册!");
         }
 
         PatientDetailModel detailModel = objectMapper.readValue(patient, PatientDetailModel.class);
@@ -166,14 +178,14 @@ public class RhipPatientsEndPoint extends BaseController {
         //新增家庭地址信息
         GeographyModel geographyModel = detailModel.getHomeAddressInfo();
         detailModel.setHomeAddress("");
-        if (!geographyModel.nullAddress()) {
+        if (geographyModel !=null && !geographyModel.nullAddress()) {
             String addressId = geographyClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setHomeAddress(addressId);
         }
         //新增户籍地址信息
         geographyModel = detailModel.getBirthPlaceInfo();
         detailModel.setBirthPlace("");
-        if (!geographyModel.nullAddress()) {
+        if (geographyModel !=null && !geographyModel.nullAddress()) {
             String addressId = geographyClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setBirthPlace(addressId);
         }
@@ -181,14 +193,19 @@ public class RhipPatientsEndPoint extends BaseController {
         //新增工作地址信息
         geographyModel = detailModel.getWorkAddressInfo();
         detailModel.setWorkAddress("");
-        if (!geographyModel.nullAddress()) {
+        if (geographyModel != null && !geographyModel.nullAddress()) {
             String addressId = geographyClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
             detailModel.setWorkAddress(addressId);
         }
 
         //修改人口信息
         MDemographicInfo info = (MDemographicInfo) convertToModel(detailModel, MDemographicInfo.class);
-        info.setBirthday(DateTimeUtil.simpleDateTimeParse(detailModel.getBirthday()));
+        try {
+            info.setBirthday(DateTimeUtil.simpleDateTimeParse(detailModel.getBirthday()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return failed("保存失败,出生日期格式有误!");
+        }
         info = patientClient.updatePatient(objectMapper.writeValueAsString(info));
         if (info == null) {
             return failed("保存失败!");

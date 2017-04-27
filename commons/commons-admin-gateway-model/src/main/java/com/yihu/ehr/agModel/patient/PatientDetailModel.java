@@ -2,6 +2,8 @@ package com.yihu.ehr.agModel.patient;
 
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 
+import java.util.Date;
+
 /**
  * Created by AndyCai on 2016/2/25.
  */
@@ -31,6 +33,16 @@ public class PatientDetailModel {
     private String telephoneNo ;                     // 电话号码，之前是个电话号码列表
     private String picPath = "";
     private String localPath = "";
+    private Date registerTime;   //注册时间
+
+
+    public Date getRegisterTime() {
+        return registerTime;
+    }
+
+    public void setRegisterTime(Date registerTime) {
+        this.registerTime = registerTime;
+    }
 
     public String getIdCardNo() {
         return idCardNo;
