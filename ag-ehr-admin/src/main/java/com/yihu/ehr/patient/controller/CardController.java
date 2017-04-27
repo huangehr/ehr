@@ -10,6 +10,7 @@ import com.yihu.ehr.patient.service.CardClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.patient.MAbstractCard;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -119,7 +120,7 @@ public class CardController extends BaseController {
         for (MAbstractCard info : mAbstractCards){
 
             CardModel cardModel = convertToModel(info, CardModel.class);
-            cardModel.setCreateDate(DateToString(info.getCreateDate(),AgAdminConstants.DateFormat));
+            cardModel.setCreateDate(info.getCreateDate() == null?"": DateTimeUtil.simpleDateTimeFormat(info.getCreateDate()).substring(0, 10) );
             MConventionalDict dict =null;
             if(!StringUtils.isEmpty(cardModel.getCardType())) {
                 dict = conventionalDictEntryClient.getCardType(cardModel.getCardType());
