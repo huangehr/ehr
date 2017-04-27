@@ -126,12 +126,6 @@ import java.util.Date;
             return Result.error("该数据不存在！");
         }
         else{
-
-            if(StringUtils.isEmpty(card.getCardNo())||StringUtils.isEmpty(card.getOwnerName())||StringUtils.isEmpty(card.getOwnerIdcard()))
-            {
-                return Result.error("卡信息不完整！");
-            }
-
             card.setAuditStatus(status);
             card.setAuditor(auditor);
             card.setAuditDate(new Date());
