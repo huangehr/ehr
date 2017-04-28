@@ -29,7 +29,8 @@ public class SwaggerConfig {
                 .forCodeGeneration(true)
                 .pathMapping("/")
                 .select()
-                .paths(or(regex("/api.*")))
+                .paths(or(regex("/api.*"),
+                        regex("/oauth/.*")))
                 .build()
                 .apiInfo(publicApiInfo());
     }

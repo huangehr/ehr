@@ -11,11 +11,14 @@
  */
 package com.yihu.ehr.oauth2.web;
 
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.oauth2.model.AccessToken;
 import com.yihu.ehr.oauth2.model.ObjectResult;
 import com.yihu.ehr.oauth2.model.Result;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -79,68 +82,83 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
     private WebResponseExceptionTranslator providerExceptionHandler = new DefaultWebResponseExceptionTranslator();
 
     /**
-     * 新增用户访问授权
-      * @param parameters
-     * @return
+     * 密码模式校验
      */
-    @RequestMapping(value =ServiceApi.Authentication.AccessToken, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public AccessToken postAccessToken(@RequestBody Map<String, String> parameters) {
+    @RequestMapping(value =ServiceApi.Authentication.AccessToken, method = RequestMethod.POST)
+    @ApiOperation(value = "密码模式校验")
+    public Result accessToken(@ApiParam(name = "userName", value = "登录账号", defaultValue = "")
+                                       @RequestParam(value = "userName") String userName,
+                                       @ApiParam(name = "password", value = "密码", defaultValue = "")
+                                       @RequestParam(value = "password") String password,
+                                       @ApiParam(name = "clientId", value = "应用ID", defaultValue = "")
+                                       @RequestParam(value = "clientId") String clientId)
+    {
+        try {
+            //校验应用是否存在
+            ClientDetails authenticatedClient = clientDetailsService.loadClientByClientId(clientId);
 
-        String clientId = getClientId(parameters);
-        ClientDetails authenticatedClient = clientDetailsService.loadClientByClientId(clientId);
+            if (StringUtils.isEmpty(clientId)) {
+                throw new InvalidClientException("client id can not be null!");
+            }
 
-        TokenRequest tokenRequest = oAuth2RequestFactory.createTokenRequest(parameters, authenticatedClient);
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("grant_type", "password");
+            parameters.put("client_id", clientId);
+            parameters.put("username", userName);
+            parameters.put("password", password);
+            TokenRequest tokenRequest = oAuth2RequestFactory.createTokenRequest(parameters, authenticatedClient);
 
-        if (clientId != null && !"".equals(clientId)) {
-            // Only validate the client details if a client authenticated during this
-            // request.
+            //校验 client_id 是否一致
             if (!clientId.equals(tokenRequest.getClientId())) {
-                // double check to make sure that the client ID in the token request is the same as that in the
-                // authenticated client
-                throw new InvalidClientException(" client ID does not match authenticated client");
+                throw new InvalidClientException("client ID does not match authenticated client.");
             }
-        }
 
-        if (authenticatedClient != null) {
-            oAuth2RequestValidator.validateScope(tokenRequest, authenticatedClient);
-        }
 
-        final String grantType = tokenRequest.getGrantType();
-        if (!StringUtils.hasText(grantType)) {
-            throw new InvalidRequestException("Missing grant type");
-        }
-        if ("implicit".equals(grantType)) {
-            throw new InvalidGrantException("Implicit grant type not supported from token endpoint");
-        }
-
-        if (isAuthCodeRequest(parameters)) {
-            // The scope was requested or determined during the authorization step
-            if (!tokenRequest.getScope().isEmpty()) {
-                LOG.debug("Clearing scope of incoming token request");
-                tokenRequest.setScope(Collections.<String>emptySet());
+            if (authenticatedClient != null) {
+                oAuth2RequestValidator.validateScope(tokenRequest, authenticatedClient);
             }
-        }
 
-        if (isRefreshTokenRequest(parameters)) {
-            // A refresh token has its own default scopes, so we should ignore any added by the factory here.
-            tokenRequest.setScope(OAuth2Utils.parseParameterList(parameters.get(OAuth2Utils.SCOPE)));
-        }
+            final String grantType = tokenRequest.getGrantType();
+            if (!StringUtils.hasText(grantType)) {
+                throw new InvalidRequestException("Missing grant type");
+            }
+            if ("implicit".equals(grantType)) {
+                throw new InvalidGrantException("Implicit grant type not supported from token endpoint");
+            }
 
-        AccessToken accessToken = new AccessToken();
-        OAuth2AccessToken token = getTokenGranter(grantType).grant(grantType, tokenRequest);
-        if (token == null) {
-            throw new UnsupportedGrantTypeException("Unsupported grant type: " + grantType);
-        }
-        else{
-            System.out.print(token.getValue());
-            accessToken.setAccessToken(token.getValue());
-            accessToken.setRefreshToken(token.getRefreshToken().getValue());
-            accessToken.setTokenType(token.getTokenType());
-            accessToken.setExpiresIn(token.getExpiresIn());
-            accessToken.setUser(parameters.get("username"));
-        }
+            if (isAuthCodeRequest(parameters)) {
+                // The scope was requested or determined during the authorization step
+                if (!tokenRequest.getScope().isEmpty()) {
+                    LOG.debug("Clearing scope of incoming token request");
+                    tokenRequest.setScope(Collections.<String>emptySet());
+                }
+            }
 
-        return accessToken;
+            if (isRefreshTokenRequest(parameters)) {
+                // A refresh token has its own default scopes, so we should ignore any added by the factory here.
+                tokenRequest.setScope(OAuth2Utils.parseParameterList(parameters.get(OAuth2Utils.SCOPE)));
+            }
+
+            AccessToken accessToken = new AccessToken();
+            OAuth2AccessToken token = getTokenGranter(grantType).grant(grantType, tokenRequest);
+            if (token == null) {
+                throw new UnsupportedGrantTypeException("Unsupported grant type: " + grantType);
+            } else {
+                System.out.print(token.getValue());
+                accessToken.setAccessToken(token.getValue());
+                accessToken.setRefreshToken(token.getRefreshToken().getValue());
+                accessToken.setTokenType(token.getTokenType());
+                accessToken.setExpiresIn(token.getExpiresIn());
+                accessToken.setUser(parameters.get("username"));
+            }
+
+            return Result.success("get access token success!",accessToken);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return Result.error(ex.getMessage());
+        }
     }
 
     /**
@@ -148,9 +166,12 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
      *
      * @return
      */
-    @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.GET)
-    public Result validToken(@RequestParam(value = "client_id") String clientId,
-                             @RequestParam(value = "access_token") String accessToken) throws Exception {
+    @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.POST)
+    @ApiOperation(value = "验证token", notes = "验证token")
+    public Result validToken(@ApiParam(name = "clientId", value = "应用ID", defaultValue = "")
+                              @RequestParam(value = "clientId") String clientId,
+                              @ApiParam(name = "accessToken", value = "accessToken", defaultValue = "")
+                              @RequestParam(value = "accessToken") String accessToken) throws Exception {
 
         try {
             //根据accessToken查询相应的访问授权数据行
@@ -191,6 +212,89 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
         }
 
     }
+
+
+    @RequestMapping(value = ServiceApi.Authentication.RefreshToken, method = RequestMethod.POST)
+    @ApiOperation(value = "刷新token", notes = "刷新token")
+    Result refreshToken(
+            @ApiParam(name = "clientId", value = "应用ID", defaultValue = "")
+            @RequestParam(value = "clientId") String clientId,
+            @ApiParam(name = "refreshToken", value = "刷新Token", defaultValue = "")
+            @RequestParam(value = "refreshToken") String refreshToken) {
+        try {
+            //校验应用是否存在
+            ClientDetails authenticatedClient = clientDetailsService.loadClientByClientId(clientId);
+
+            if (clientId != null && !"".equals(clientId)) {
+                throw new InvalidClientException("client ID does not exist.");
+            }
+
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("client_id", clientId);
+            parameters.put("grant_type", "refresh_token");
+            parameters.put("client_secret", "admin");
+            parameters.put("refresh_token", refreshToken);
+            TokenRequest tokenRequest = oAuth2RequestFactory.createTokenRequest(parameters, authenticatedClient);
+
+            //校验 client_id 是否一致
+            if (!clientId.equals(tokenRequest.getClientId())) {
+                throw new InvalidClientException("client ID does not match authenticated client.");
+            }
+
+
+            if (authenticatedClient != null) {
+                oAuth2RequestValidator.validateScope(tokenRequest, authenticatedClient);
+            }
+
+            final String grantType = tokenRequest.getGrantType();
+            if (!StringUtils.hasText(grantType)) {
+                throw new InvalidRequestException("Missing grant type");
+            }
+            if ("implicit".equals(grantType)) {
+                throw new InvalidGrantException("Implicit grant type not supported from token endpoint");
+            }
+
+            if (isAuthCodeRequest(parameters)) {
+                // The scope was requested or determined during the authorization step
+                if (!tokenRequest.getScope().isEmpty()) {
+                    LOG.debug("Clearing scope of incoming token request");
+                    tokenRequest.setScope(Collections.<String>emptySet());
+                }
+            }
+
+            if (isRefreshTokenRequest(parameters)) {
+                // A refresh token has its own default scopes, so we should ignore any added by the factory here.
+                tokenRequest.setScope(OAuth2Utils.parseParameterList(parameters.get(OAuth2Utils.SCOPE)));
+            }
+
+            AccessToken accessToken = new AccessToken();
+            OAuth2AccessToken token = getTokenGranter(grantType).grant(grantType, tokenRequest);
+            if (token == null) {
+                throw new UnsupportedGrantTypeException("Unsupported grant type: " + grantType);
+            } else {
+                System.out.print(token.getValue());
+                accessToken.setAccessToken(token.getValue());
+                accessToken.setRefreshToken(token.getRefreshToken().getValue());
+                accessToken.setTokenType(token.getTokenType());
+                accessToken.setExpiresIn(token.getExpiresIn());
+                accessToken.setUser(parameters.get("username"));
+            }
+
+            return Result.success("get access token success!",accessToken);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return Result.error(ex.getMessage());
+        }
+
+    }
+
+
+
+
+
+
 
     protected TokenGranter getTokenGranter(String grantType) {
 
