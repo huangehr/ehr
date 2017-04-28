@@ -115,12 +115,6 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
 
     /**
      * 获取code
-     * 参数
-     *
-     * client_id=zkGuSIm2Fg
-     * redirect_uri=https://www.baidu.com
-     * scope=read&response_type=code
-     *
      * @param model
      * @param parameters
      * @param sessionStatus
@@ -213,70 +207,6 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             throw e;
         }
 
-    }
-
-    /**
-     * 获取access_token
-     * @param approvalParameters
-     * @param model
-     * @param sessionStatus
-     * @param principal
-     * @return
-     */
-    @RequestMapping(value = "/oauth/authorize", method = RequestMethod.POST, params = OAuth2Utils.USER_OAUTH_APPROVAL)
-    public View approveOrDeny(@RequestParam Map<String, String> approvalParameters, Map<String, ?> model,
-                              SessionStatus sessionStatus, Principal principal) {
-
-        if (!(principal instanceof Authentication)) {
-            sessionStatus.setComplete();
-            throw new InsufficientAuthenticationException("用户必须先登录才能对应用授权");
-        }
-
-        AuthorizationRequest authorizationRequest = (AuthorizationRequest) model.get("authorizationRequest");
-
-        if (authorizationRequest == null) {
-            sessionStatus.setComplete();
-            throw new InvalidRequestException("用户未登录，无法授权");
-        }
-
-        try {
-            Set<String> responseTypes = authorizationRequest.getResponseTypes();
-
-            authorizationRequest.setApprovalParameters(approvalParameters);
-            authorizationRequest = userApprovalHandler.updateAfterApproval(authorizationRequest, (Authentication) principal);
-
-            boolean approved = userApprovalHandler.isApproved(authorizationRequest, (Authentication) principal);
-            authorizationRequest.setApproved(approved);
-
-            if (authorizationRequest.getRedirectUri() == null) {
-                sessionStatus.setComplete();
-                throw new InvalidRequestException("未提供重定向URI，无法授权");
-            }
-
-            ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());
-            String registeredUri = client.getRegisteredRedirectUri().iterator().next();
-            if (!authorizationRequest.getRedirectUri().startsWith(registeredUri)) {
-                authorizationRequest.setRedirectUri(registeredUri);
-
-                return new RedirectView(getUnsuccessfulRedirect(authorizationRequest,
-                        new RedirectMismatchException("重定向URI必须与应用注册回调URI一致"), false),
-                        false, true, false);
-            }
-
-            if (!authorizationRequest.isApproved()) {
-                return new RedirectView(getUnsuccessfulRedirect(authorizationRequest,
-                        new UserDeniedAuthorizationException("用户拒绝授权"), false),
-                        false, true, false);
-            }
-
-            /*if (responseTypes.contains("token")) {
-                return getImplicitGrantResponse(authorizationRequest).getView();
-            }*/
-
-            return getAuthorizationCodeResponse(authorizationRequest, (Authentication) principal);
-        } finally {
-            sessionStatus.setComplete();
-        }
     }
 
     @RequestMapping("/oauth/error")

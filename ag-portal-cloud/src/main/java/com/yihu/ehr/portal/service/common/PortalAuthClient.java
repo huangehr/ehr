@@ -22,11 +22,6 @@ import java.util.Map;
 @ApiIgnore
 public interface PortalAuthClient {
 
-    @RequestMapping(value = ServiceApi.Authentication.AccessToken)
-    @ApiOperation(value = "获取token", notes = "获取token")
-    String accessToken(@RequestBody Map<String, String> parameters) throws Exception;
-
-
     @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.GET)
     @ApiOperation(value = "验证Token", notes = "验证Token")
     ObjectResult validToken(@RequestParam(value = "client_id") String clientId,

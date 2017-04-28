@@ -1,7 +1,7 @@
 package com.yihu.ehr.oauth2.model;
 
 /**
- * Created by zhenglingfeng on 2017/3/8.
+ * Created by hzp on 2017/4/27.
  */
 public class AccessToken {
     private String accessToken;

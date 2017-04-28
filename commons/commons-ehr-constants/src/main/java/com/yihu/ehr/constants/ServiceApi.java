@@ -335,9 +335,9 @@ public class ServiceApi {
     }
 
     public static class Authentication {
-        public static final String AccessToken = "/oauth/accesstoken";
-        public static final String ValidToken = "/oauth/validtoken";
-        public static final String RefreshToken = "/oauth/refreshtoken";
+        public static final String AccessToken = "/oauth/accessToken";
+        public static final String ValidToken = "/oauth/validToken";
+        public static final String RefreshToken = "/oauth/refreshToken";
     }
 
     public static class PortalNotices {
@@ -369,11 +369,6 @@ public class ServiceApi {
         public static final String PortalLogin = "/login";
     }
 
-    public static class PortalAuth {
-        public static final String AccessToken = "/accessToken";
-        public static final String RefreshToken = "/refreshToken";
-        public static final String ValidToken = "/validToken";
-    }
 
     public static class PortalSetting {
         public static final String PortalSetting = "/portalSetting";
