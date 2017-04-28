@@ -79,7 +79,7 @@ public class PortalMessageRemindController extends BaseController {
             portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
             if (StringUtils.isNotEmpty(portalMessageRemindModel.getFromUserId()) ){
                 MUser mUser = userClient.getUser(portalMessageRemindModel.getFromUserId());
-                mPortalMessageRemind.setFromUserName(mUser == null ? "" : mUser.getRealName());
+                portalMessageRemindModel.setFromUserName(mUser == null ? "" : mUser.getRealName());
             }
             portalMessageRemindModels.add(portalMessageRemindModel);
         }
