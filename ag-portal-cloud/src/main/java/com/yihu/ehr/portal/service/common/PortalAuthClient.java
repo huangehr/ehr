@@ -1,19 +1,14 @@
 package com.yihu.ehr.portal.service.common;
 
-import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ObjectResult;
-import com.yihu.ehr.model.common.Result;
-import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
 
 /**
  * Created by yeshijie on 2017/2/21.
@@ -22,8 +17,8 @@ import java.util.Map;
 @ApiIgnore
 public interface PortalAuthClient {
 
-    @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Authentication.ValidToken, method = RequestMethod.POST)
     @ApiOperation(value = "验证Token", notes = "验证Token")
-    ObjectResult validToken(@RequestParam(value = "client_id") String clientId,
-                                   @RequestParam(value = "access_token") String accessToken) throws Exception;
+    ObjectResult validToken(@RequestParam(value = "clientId") String clientId,
+                                   @RequestParam(value = "accessToken") String accessToken) throws Exception;
 }
