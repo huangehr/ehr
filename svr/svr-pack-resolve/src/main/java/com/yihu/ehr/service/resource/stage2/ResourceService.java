@@ -1,7 +1,7 @@
 package com.yihu.ehr.service.resource.stage2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.feign.ArchiveClient;
+import com.yihu.ehr.feign.XArchiveClient;
 import com.yihu.ehr.model.patient.ArchiveRelation;
 import com.yihu.ehr.service.resource.stage2.repo.FileResourceRepository;
 import com.yihu.ehr.service.resource.stage2.repo.MasterResourceRepository;
@@ -31,7 +31,7 @@ public class ResourceService {
     FileResourceRepository fileResRepo;
 
     @Autowired
-    ArchiveClient archiveClient;
+    XArchiveClient archiveClient;
 
     @Autowired
     ObjectMapper objectMapper;

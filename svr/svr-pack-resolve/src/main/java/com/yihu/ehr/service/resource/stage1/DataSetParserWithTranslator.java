@@ -1,10 +1,8 @@
 package com.yihu.ehr.service.resource.stage1;
 
-import com.yihu.ehr.cache.CacheReader;
-import com.yihu.ehr.schema.StdMetaDataKeySchema;
+import com.yihu.ehr.feign.XRedisServiceClient;
 import com.yihu.ehr.profile.util.DataSetParser;
 import com.yihu.ehr.profile.util.QualifierTranslator;
-import com.yihu.ehr.schema.StdDataSetKeySchema;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataSetParserWithTranslator extends DataSetParser {
     @Autowired
-    CacheReader cacheReader;
-
-    @Autowired
-    StdDataSetKeySchema dataSetKeySchema;
-
-    @Autowired
-    StdMetaDataKeySchema metaDataKeySchema;
+    XRedisServiceClient redisServiceClient;
 
     /**
      * 翻译数据元。
@@ -47,7 +39,7 @@ public class DataSetParserWithTranslator extends DataSetParser {
                                          boolean isOriginDataSet) {
         if (StringUtils.isEmpty(actualData)) return null;
 
-        String metaDataType = cacheReader.read(metaDataKeySchema.metaDataType(cdaVersion, dataSetCode, metaData));
+        String metaDataType = redisServiceClient.getMetaDataType(cdaVersion, dataSetCode, metaData);
         if (StringUtils.isEmpty(metaDataType)) {
             String msg = "Meta data %1 in data set %2 is not found in version %3. FORGET cache standards?"
                     .replace("%1", metaData)
@@ -61,14 +53,14 @@ public class DataSetParserWithTranslator extends DataSetParser {
         actualData = actualData.trim();
 
         // only translate meta that bind with dict
-        long dictId = cacheReader.read(metaDataKeySchema.metaDataDict(cdaVersion, dataSetCode, metaData));
+        Long dictId = Long.valueOf(redisServiceClient.getMetaDataDict(cdaVersion, dataSetCode, metaData));
         if (!isOriginDataSet && StringUtils.isNotEmpty(actualData) && dictId > 0) {
             String[] tempQualifiers = QualifierTranslator.splitMetaData(metaData);
 
             String codeQualifier = tempQualifiers[0];   /*QualifierTranslator.hBaseQualifier(tempQualifiers[0], metaDataType);*/
             String valueQualifier = tempQualifiers[1];  /*QualifierTranslator.hBaseQualifier(tempQualifiers[1], metaDataType);*/
 
-            String value = cacheReader.read(metaDataKeySchema.dictEntryValue(cdaVersion, Long.toString(dictId), actualData));
+            String value = redisServiceClient.getDictEntryValue(cdaVersion, Long.toString(dictId), actualData);
 
             return new String[]{codeQualifier, actualData, valueQualifier, value == null ? "" : value};
         } else {

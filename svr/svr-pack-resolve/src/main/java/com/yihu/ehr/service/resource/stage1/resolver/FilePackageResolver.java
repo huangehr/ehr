@@ -3,10 +3,10 @@ package com.yihu.ehr.service.resource.stage1.resolver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.constants.UrlScope;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.feign.XRedisServiceClient;
 import com.yihu.ehr.profile.exception.LegacyPackageException;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
@@ -34,13 +34,7 @@ import java.util.*;
 @Component
 public class FilePackageResolver extends PackageResolver {
     @Autowired
-    CacheReader cacheReader;
-
-    @Autowired
-    StdDataSetKeySchema dataSetKeySchema;
-
-    @Autowired
-    StdMetaDataKeySchema metaDataKeySchema;
+    XRedisServiceClient redisServiceClient;
 
     @Autowired
     FastDFSUtil fastDFSUtil;
@@ -181,7 +175,7 @@ public class FilePackageResolver extends PackageResolver {
     protected String translateMetaDataCode(String cdaVersion,
                                            String dataSetCode,
                                            String metaData) {
-        String metaDataType = cacheReader.read(metaDataKeySchema.metaDataType(cdaVersion, dataSetCode, metaData));
+        String metaDataType = redisServiceClient.getMetaDataType(cdaVersion, dataSetCode, metaData);
         if (StringUtils.isEmpty(metaDataType)) {
             String msg = "Meta data %1 in data set %2 is not found in version %3. FORGET cache standards or it's INVALID?"
                     .replace("%1", metaData)

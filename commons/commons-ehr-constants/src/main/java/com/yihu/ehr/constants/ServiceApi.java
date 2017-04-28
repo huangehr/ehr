@@ -534,21 +534,6 @@ public class ServiceApi {
 
     }
 
-    public static class Redis {
-        public static final String StandardVersions = "/std/versions";
-        public static final String StandardDataSetsCount = "/std/data_sets/count";
-        public static final String StandardMetaDatasCount = "/std/meta_datas/count";
-        public static final String StandardDictionariesCount = "/std/dictionaries/count";
-        public static final String StandardDictionaryEntriesCount = "/std/dictionary/{id}/entries/count";
-
-        public static final String Organizations = "/organizations";
-        public static final String Organization = "/organizations/{id}";
-
-        public static final String DemographicIdToProfileIdCache = "/Redis/DemographicIdToProfileId";
-        public static final String GetDemographicIdToProfileIdCache = "/Redis/GetDemographicIdToProfileIdCache/{demographic_id}";
-        public static final String TreatmentAreaCache = "/Redis/TreatmentAreaCache";
-        public static final String GetTreatmentAreaCache = "/Redis/GetTreatmentAreaCache/{demographic_id}";
-    }
 
     public static class HealthProfile {
         public static final String Profiles = "/health_profiles";
@@ -689,4 +674,32 @@ public class ServiceApi {
 
 
     }
+
+
+    /**
+     *Redis服务
+     */
+    public static class Redis {
+        public static final String AddressRedis = "/redis/addressRedis";
+        public static final String HealthProblemRedis = "/redis/healthProblemRedis";
+        public static final String Icd10HpRelationRedis = "/redis/icd10HpRelationRedis";
+        public static final String IndicatorsRedis = "/redis/indicatorsRedis";
+        public static final String OrgRedis = "/redis/orgRedis";
+
+        /******************************************* 资源化相关Redis *******************************************************************/
+        public static final String RsAdaptionDict = "/redis/rsAdaptionDict";
+        public static final String RsAdaptionMetaData = "/redis/rsAdaptionMetaData";
+        public static final String RsMetaData = "/redis/rsMetaData";
+
+        /******************************************* 标准相关Redis *******************************************************************/
+        public static final String StdVersion = "/redis/stdVersion";
+        public static final String DataSetCode = "/redis/dataSetCode";
+        public static final String DataSetName = "/redis/dataSetName";
+        public static final String DataSetNameByCode = "/redis/dataSetNameByCode";
+        public static final String DataSetMultiRecord = "/redis/dataSetMultiRecord";
+        public static final String MetaDataType = "/redis/metaDataType";
+        public static final String MetaDataDict = "/redis/metaDataDict";
+        public static final String DictEntryValue = "/redis/dictEntryValue";
+    }
+
 }

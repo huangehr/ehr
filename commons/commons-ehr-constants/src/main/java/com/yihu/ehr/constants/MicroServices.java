@@ -37,6 +37,7 @@ public class MicroServices {
     public static final String Package = "svr-pack-mgr";
     public static final String Cipher = "svr-cipher";
     public static final String ArchiveSecurity = "svr-archive-security";
+    public static final String Redis = "svr-redis";
 
 
 }

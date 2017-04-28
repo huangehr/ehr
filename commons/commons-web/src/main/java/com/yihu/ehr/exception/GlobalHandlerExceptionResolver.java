@@ -1,4 +1,4 @@
-package com.yihu.ehr.patient.common;
+package com.yihu.ehr.exception;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;

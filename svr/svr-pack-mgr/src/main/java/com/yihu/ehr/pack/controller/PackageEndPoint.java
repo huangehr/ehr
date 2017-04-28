@@ -110,6 +110,21 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return packageList;
     }
 
+    @RequestMapping(value = "/PackageCrypto", method = RequestMethod.POST)
+    @ApiOperation(value = "档案包密码加密")
+    public String getPackageCrypto(@ApiParam(name = "org_code", value = "机构代码")
+                                 @RequestParam(value = "org_code") String orgCode,
+                                 @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
+                                 @RequestParam(value = "package_crypto") String packageCrypto) throws Exception
+    {
+        MKey key = securityClient.getOrgKey(orgCode);
+        if (key == null ||  key.getPublicKey()==null) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
+        }
+
+        return RSA.encrypt(packageCrypto,RSA.genPublicKey(key.getPublicKey()));
+    }
+
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
@@ -125,15 +140,16 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request) throws Exception {
 
         MKey key = securityClient.getOrgKey(orgCode);
-        String privateKey = key.getPrivateKey();
-        if (null == privateKey) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid public key, maybe you miss the organization code?");
+
+        if (key == null ||  key.getPrivateKey()==null) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
         }
 
-        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
+        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(key.getPrivateKey()));
         Package aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
+        throw new Exception("1");
     }
 
     @RequestMapping(value = ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)

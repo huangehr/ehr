@@ -1,8 +1,6 @@
 package com.yihu.ehr.org.controller;
 
-import com.netflix.discovery.converters.Auto;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.cache.CacheReader;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.org.OrgCache;
@@ -30,9 +28,6 @@ import java.util.List;
 public class OrgCacheEndPoint {
     @Autowired
     OrgCache orgCache;
-
-    @Auto
-    CacheReader cacheReader;
 
     @ApiOperation("缓存机构数据")
     @RequestMapping(value = ServiceApi.Caches.Organizations, method = RequestMethod.PUT)
