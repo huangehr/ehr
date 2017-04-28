@@ -48,6 +48,10 @@ public class PortalAuthController extends BaseController{
 
             if (user == null) {
                 return Result.error("登录失败，用户名或密码不正确!");
+            }else {
+                if(!user.getActivated()){
+                    return Result.error("该账户已被锁定，请联系系统管理员重新生效!");
+                }
             }
 
             //允许开放的用户信息
