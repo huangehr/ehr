@@ -410,4 +410,46 @@ public class PatientCardsController extends ExtendController<UserCards> {
     }
 
 
+
+
+    @RequestMapping(value = ServiceApi.Patients.FindArchiveRelation,method = RequestMethod.POST)
+    @ApiOperation(value = "档案关联详情")
+    public Envelop findArchiveRelation(
+            @ApiParam(name = "id", value = "档案关联ID", defaultValue = "")
+            @RequestParam(value = "id",required = false) Long id) throws Exception{
+        ObjectResult objectResult = patientCardsClient.findArchiveRelation(id);
+        if(objectResult.getData() != null){
+            Map<String,Object> info = (HashMap)objectResult.getData();
+            info = convertCardModel(info);
+            return successObj(info);
+        }
+        return null;
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.UpdateArchiveRelation,method = RequestMethod.POST)
+    @ApiOperation(value = "档案关联新增/修改")
+    public Envelop updateArchiveRelation(
+            @ApiParam(name = "data", value = "json数据", defaultValue = "")
+            @RequestParam String data){
+        ObjectResult objectResult = patientCardsClient.updateArchiveRelation(data);
+        if(objectResult.getCode() == 200){
+            return successObj(objectResult.getData());
+        }else{
+            return null;
+        }
+    }
+
+    @RequestMapping(value =  ServiceApi.Patients.DelArchiveRelation, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除档案关联", notes = "根据档案关联id")
+    public Envelop delArchiveRelation(
+            @ApiParam(name = "id", value = "档案关联ID", defaultValue = "")
+            @RequestParam(value = "id") Long id) {
+                Result result = patientCardsClient.delArchiveRelation(id);
+                if(result.getCode() == 200){
+                    return successMsg(result.getMessage());
+                }else{
+                    return failed("档案关联删除失败！");
+                }
+        }
+
 }

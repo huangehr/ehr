@@ -3,7 +3,6 @@ package com.yihu.ehr.patient.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -13,10 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
@@ -178,4 +174,27 @@ public interface PatientCardsClient {
             @RequestBody String medicalCars,
             @ApiParam(name = "operator", value = "操作者", defaultValue = "")
             @RequestParam(value = "operator",required = false) String operator);
+
+
+
+
+    @RequestMapping(value = ServiceApi.Patients.FindArchiveRelation,method = RequestMethod.POST)
+    @ApiOperation(value = "档案关联详情")
+    ObjectResult findArchiveRelation(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @RequestParam(value = "id",required = false) Long id);
+
+    @RequestMapping(value = ServiceApi.Patients.UpdateArchiveRelation,method = RequestMethod.POST)
+    @ApiOperation(value = "档案关联新增/修改")
+    ObjectResult updateArchiveRelation(
+            @ApiParam(name = "data", value = "", defaultValue = "")
+            @RequestBody String portalNoticeJsonData);
+
+    @RequestMapping(value =  ServiceApi.Patients.DelArchiveRelation, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除档案关联", notes = "根据档案关联id")
+    Result delArchiveRelation(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @RequestParam(value = "id",required = false) Long id);
+    
+    
 }

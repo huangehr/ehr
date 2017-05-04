@@ -9,8 +9,10 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.patient.ArchiveRelation;
 import com.yihu.ehr.model.patient.MedicalCards;
 import com.yihu.ehr.model.patient.UserCards;
+import com.yihu.ehr.patient.service.arapply.ArchiveRelationService;
 import com.yihu.ehr.patient.service.arapply.MedicalCardsService;
 import com.yihu.ehr.patient.service.arapply.UserCardsService;
 import io.swagger.annotations.Api;
@@ -42,6 +44,9 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     MedicalCardsService medicalCardsService;
+
+    @Autowired
+    ArchiveRelationService archiveRelationService;
 
     // ----------------------- 就诊卡基本信息管理 ------------------------------
     @RequestMapping(value = ServiceApi.Patients.GetUserCards, method = RequestMethod.GET)
@@ -301,5 +306,40 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
         }
         return true;
     };
+
+
+
+    @RequestMapping(value = ServiceApi.Patients.FindArchiveRelation,method = RequestMethod.POST)
+    @ApiOperation(value = "档案关联详情")
+    ObjectResult findArchiveRelation(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @RequestParam(value = "id",required = false) Long id) throws Exception{
+        ArchiveRelation archiveRelation = archiveRelationService.findOne(id);
+        return Result.success("获取档案关联详情成功！",archiveRelation);
+    }
+
+    @RequestMapping(value = ServiceApi.Patients.UpdateArchiveRelation,method = RequestMethod.POST)
+    @ApiOperation(value = "档案关联新增/修改")
+    ObjectResult updateArchiveRelation(
+            @ApiParam(name = "data", value = "", defaultValue = "")
+            @RequestBody String data)throws Exception{
+        ArchiveRelation archiveRelation= objectMapper.readValue(data,ArchiveRelation.class);
+        archiveRelation = archiveRelationService.save(archiveRelation);
+        return Result.success("保存档案关联成功！",archiveRelation);
+    }
+
+    @RequestMapping(value =  ServiceApi.Patients.DelArchiveRelation, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除档案关联", notes = "根据档案关联id")
+    Result delArchiveRelation(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @RequestParam(value = "id",required = false) Long id) throws Exception{
+        archiveRelationService.delete(id);
+        return Result.success("档案关联删除成功！");
+    }
+
+
+
+
+
 
 }

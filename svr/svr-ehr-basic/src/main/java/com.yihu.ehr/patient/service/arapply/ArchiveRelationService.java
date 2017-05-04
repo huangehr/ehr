@@ -88,6 +88,9 @@ public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XAr
         return relation;
     }
 
+    public ArchiveRelation findOne(Long id) {
+        return   archiveRelationDao.findOne(id);
+    }
 
 
 
@@ -115,4 +118,6 @@ public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XAr
               archiveRelationDao.save(list);
         }
     }
+
+
 }
