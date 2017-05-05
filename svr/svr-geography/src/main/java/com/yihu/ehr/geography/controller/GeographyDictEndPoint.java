@@ -71,18 +71,6 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
         return list;
     }
 
-    @RequestMapping(value = "/geography_entries/CacheAddressDict", method = RequestMethod.POST)
-    @ApiOperation(value = "缓存行政区划地址")
-    public boolean CacheAddressDict( ){
-       return   geographyDictService.CacheAddressDict();
-    }
-
-    @RequestMapping(value = "/geography_entries/GetAddressDictCache/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取缓存行政区划地址")
-    public String GetAddressDictCache(@ApiParam(name = "id", value = "id", defaultValue = "")
-                                           @PathVariable(value = "id") String id ){
-        return   geographyDictService.GetAddressDictCache(id);
-    }
 
     @RequestMapping(value = "/geography_entries/getAddressDict" , method = RequestMethod.GET)
     @ApiOperation(value = "根据地址中文名 查询地址编号")
