@@ -2,9 +2,8 @@ package com.yihu.ehr.patient.service.arapply;
 
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.Result;
-import com.yihu.ehr.model.patient.ArchiveRelation;
-import com.yihu.ehr.model.patient.MedicalCards;
-import com.yihu.ehr.model.patient.UserCards;
+import com.yihu.ehr.entity.patient.ArchiveRelation;
+import com.yihu.ehr.entity.patient.UserCards;
 import com.yihu.ehr.patient.dao.XArchiveRelationDao;
 import com.yihu.ehr.patient.dao.XMedicalCardsDao;
 import com.yihu.ehr.patient.dao.XUserCardsDao;

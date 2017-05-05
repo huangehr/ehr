@@ -2,7 +2,7 @@ package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.RedisClient;
-import com.yihu.ehr.schema.IndicatorsDictKeySchema;
+import com.yihu.ehr.redis.schema.IndicatorsDictKeySchema;
 import com.yihu.ehr.specialdict.model.IndicatorsDict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,14 +27,10 @@ import java.util.List;
 @Service
 public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndicatorsDictRepository>{
 
-    @PersistenceContext
-    protected EntityManager entityManager;
     @Autowired
     private XIndicatorsDictRepository indicatorsDictRepo;
     @Autowired
     private XIcd10IndicatorRelationRepository icd10IndicatorReRepo;
-    @Autowired
-    private RedisClient redisClient;
     @Autowired
     private IndicatorsDictKeySchema indicatorsDictKeySchema;
 
@@ -79,7 +75,6 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
     public void CacheIndicatorsDict() {
         try {
             for (IndicatorsDict m :findAllIndicatorsDict()) {
-                String redisKey = indicatorsDictKeySchema.KeySchemaFormCode(m.getCode());
                 HashMap<String,String> map=new HashMap<>();
                 map.put("id",String.valueOf(m.getId()));
                 map.put("code",m.getCode());
@@ -90,7 +85,7 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
                 map.put("LowerLimit",m.getLowerLimit());
                 map.put("UpperLimit",m.getUpperLimit());
                 map.put("Description",m.getDescription());
-                redisClient.set(redisKey, map);
+                indicatorsDictKeySchema.set(m.getCode(), map);
             }
         }catch (Exception e)
         {
@@ -101,6 +96,6 @@ public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndic
 
     public HashMap<String,String> getIndicatorsDictByCode(String code) {
 
-        return  redisClient.get(indicatorsDictKeySchema.KeySchemaFormCode(code));
+        return  indicatorsDictKeySchema.get(code);
     }
 }

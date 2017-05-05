@@ -20,11 +20,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
@@ -111,12 +106,12 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-keyschema</artifactId>
+            <artifactId>commons-rest-model</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-rest-model</artifactId>
+            <artifactId>commons-entity</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -144,12 +139,6 @@
             <scope>${dependency.scope}</scope>
         </dependency>
 
-        <!-- Geography -->
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-redis</artifactId>
-            <version>1.1.0</version>
-        </dependency>
 
         <dependency>
             <groupId>com.yihu.ehr</groupId>

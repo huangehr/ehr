@@ -1,11 +1,10 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.RedisClient;
+import com.yihu.ehr.redis.schema.ResourceMetadataSchema;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.dao.intf.RsMetadataDao;
 import com.yihu.ehr.resource.model.RsMetadata;
-import com.yihu.ehr.schema.ResourceMetadataSchema;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +35,6 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
     @Autowired
     private ResourceMetadataSchema keySchema;
 
-    @Autowired
-    private RedisClient redisClient;
 
     /**
      * 删除数据元
@@ -183,8 +180,7 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
                 continue;
             }
 
-            String redisKey = keySchema.metaData(meta.getId());
-            redisClient.set(redisKey,meta.getDictCode());
+            keySchema.set(meta.getId(),meta.getDictCode());
         }
     }
 }

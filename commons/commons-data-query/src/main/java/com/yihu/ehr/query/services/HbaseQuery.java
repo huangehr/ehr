@@ -2,7 +2,7 @@ package com.yihu.ehr.query.services;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.hbase.HBaseUtil;
+import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.query.common.enums.Logical;
 import com.yihu.ehr.query.common.enums.Operation;
 import com.yihu.ehr.query.common.model.QueryCondition;
@@ -33,7 +33,7 @@ public class HbaseQuery {
 	SolrUtil solr;
 
 	@Autowired
-	HBaseUtil hbu;
+	HBaseDao hbaseDao;
 
 	/**
 	 * 排序转换
@@ -254,7 +254,7 @@ public class HbaseQuery {
 	 */
 	public Map<String,Object> queryByRowkey(String table,String rowkey) throws Exception
 	{
-		Result rs = hbu.getResult(table, rowkey);
+		Result rs = hbaseDao.getResult(table, rowkey);
 		return resultToMap(rs, "");
 	}
 
@@ -388,7 +388,7 @@ public class HbaseQuery {
 			}
 		}
 
-		Result[] resultList = hbu.getResultList(table,list); //hbase结果集
+		Result[] resultList = hbaseDao.getResultList(table,list); //hbase结果集
 		if(resultList!=null&&resultList.length>0){
 			for (Result result :resultList) {
 				Map<String,Object> obj = resultToMap(result, fl);

@@ -1,6 +1,6 @@
 package com.yihu.ehr.service.profile;
 
-import com.yihu.ehr.data.hbase.HBaseDao;
+import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.family.ResourceFamily;

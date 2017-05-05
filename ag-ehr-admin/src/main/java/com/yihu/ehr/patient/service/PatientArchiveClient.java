@@ -6,12 +6,9 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
-import com.yihu.ehr.model.patient.ArchiveApply;
-import com.yihu.ehr.model.patient.MedicalCards;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 

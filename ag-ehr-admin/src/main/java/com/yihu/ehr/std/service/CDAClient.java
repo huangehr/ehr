@@ -154,7 +154,7 @@ public interface CDAClient {
             @RequestParam(value = "version") String version);
 
     @ApiOperation("缓存标准")
-    @RequestMapping(value = ServiceApi.Caches.Versions, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Redis.Versions, method = RequestMethod.PUT)
     void versions(@ApiParam(value = "版本列表，使用逗号分隔", defaultValue = "000000000000,568ce002559f")
                          @RequestParam("versions") String versions,
                          @ApiParam(value = "强制清除再缓存", defaultValue = "true")

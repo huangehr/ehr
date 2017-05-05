@@ -178,13 +178,4 @@ public interface OrganizationClient {
             @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
             @RequestParam(value = "remote_file_name") String remoteFileName);
 
-    @ApiOperation("缓存机构数据")
-    @RequestMapping(value = ServiceApi.Caches.Organizations, method = RequestMethod.PUT)
-     void cache(@ApiParam(value = "reload", defaultValue = "true")
-                      @RequestParam("reload") boolean reload);
-
-    @ApiOperation("缓存机构区域代码")
-    @RequestMapping(value = ServiceApi.Caches.OrganizationsArea, method = RequestMethod.PUT)
-    void CacheAreaCode(@ApiParam(value = "reload", defaultValue = "true")
-                              @RequestParam("reload") boolean reload) ;
 }

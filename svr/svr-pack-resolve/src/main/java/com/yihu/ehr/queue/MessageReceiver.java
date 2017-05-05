@@ -12,14 +12,13 @@ import org.springframework.stereotype.Component;
  * @created 2016.03.31 17:03
  */
 @Component
-public class MessageReceiver implements XReceiver {
+public class MessageReceiver  {
     @Autowired
     MessageBuffer messageBuffer;
 
     @Autowired
     ObjectMapper objectMapper;
 
-    @Override
     public void receive(Object message) {
         try {
             MPackage pack = objectMapper.readValue((String)message, MPackage.class);

@@ -398,6 +398,11 @@
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-entity</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-web</artifactId>
                 <version>${version.ehr}</version>
             </dependency>

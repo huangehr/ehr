@@ -3,9 +3,7 @@ package com.yihu.ehr.redis.service;
 
 
 import com.yihu.ehr.redis.schema.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -85,6 +83,14 @@ public class RedisService {
        return orgKeySchema.get(key);
     }
 
+    /**
+     *获取机构redis
+     * @return
+     */
+    public String getOrgAreaRedis(String key)
+    {
+        return orgKeySchema.getOrgArea(key);
+    }
 
     /******************************************* 资源化相关Redis *******************************************************************/
 
@@ -147,7 +153,7 @@ public class RedisService {
     /**
      *获取标准数据集--主从表 redis
      */
-    public String getDataSetMultiRecord(String version, String code){
+    public boolean getDataSetMultiRecord(String version, String code){
         return stdDataSetKeySchema.dataSetMultiRecord(version, code);
     }
 

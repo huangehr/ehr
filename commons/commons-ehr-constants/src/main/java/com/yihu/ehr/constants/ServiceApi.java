@@ -9,14 +9,7 @@ package com.yihu.ehr.constants;
  * @created 2015.09.09 15:04
  */
 public class ServiceApi {
-    public static class Caches {
-        public static final String Organizations = "/caches/organizations";
-        public static final String OrganizationsArea = "/caches/OrganizationsArea";
-        public static final String GetOrganizationsArea = "/caches/organizationsArea/{orgs_code}";
-        public static final String Organization = "/caches/organizations/{org_code}";
-        public static final String Versions = "/caches/standards/versions";
-        public static final String Version = "/caches/standards/versions/{version}";
-    }
+
 
     public static class Adaptions {
         public static final String Cache = "/adaptions/{id}/cache";
@@ -257,9 +250,7 @@ public class ServiceApi {
         public static final String DeleteHosLogs = "/deleteHosLogs";
     }
 
-    public static class Geography {
 
-    }
 
     public static class Organizations {
 
@@ -690,6 +681,7 @@ public class ServiceApi {
         public static final String Icd10HpRelationRedis = "/redis/icd10HpRelationRedis";
         public static final String IndicatorsRedis = "/redis/indicatorsRedis";
         public static final String OrgRedis = "/redis/orgRedis";
+        public static final String OrgAreaRedis = "/redis/orgAreaRedis";
 
         /******************************************* 资源化相关Redis *******************************************************************/
         public static final String RsAdaptionDict = "/redis/rsAdaptionDict";
@@ -705,6 +697,26 @@ public class ServiceApi {
         public static final String MetaDataType = "/redis/metaDataType";
         public static final String MetaDataDict = "/redis/metaDataDict";
         public static final String DictEntryValue = "/redis/dictEntryValue";
+
+
+        public static final String Versions = "/caches/standards/versions";
+        public static final String Version = "/caches/standards/versions/{version}";
     }
 
+    /**
+     * 行政区划服务
+     */
+    public static class Geography {
+        public static final String Address = "/geographies/{id}";//根据地址编号查询地址
+        public static final String AddressCanonical = "geographies/{id}/canonical";//根据地址编号获取地址中文字符串全拼
+        public static final String Geographies = "/geographies"; //地址增改查
+        public static final String GeographiesDelete = "geographies/{id}";
+        public static final String GeographiesNull = "/geographies/is_null";//判断是否是个空地址
+        public static final String AddressDictByLevel = "/geography_entries/level/{level}";//根据等级查询行政区划地址
+        public static final String AddressDictByPid = "/geography_entries/pid/{pid}";//根据上级编号查询行政区划地址
+        public static final String AddressDict = "/geography_entries/{id}";//根据id查询行政区划地址
+        public static final String AddressDictList = "/geography_entries_list";  //获取多条行政区划地址
+        public static final String AddressDictAll = "/geography_entries/all";    //获取全部行政区划地址
+        public static final String AddressDictByFields = "/geography_entries/getAddressDict";     //根据地址中文名 查询地址编号
+    }
 }

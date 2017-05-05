@@ -1,6 +1,6 @@
 package com.yihu.ehr.patient.dao;
 
-import com.yihu.ehr.model.patient.MedicalCards;
+import com.yihu.ehr.entity.patient.MedicalCards;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;

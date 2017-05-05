@@ -1,9 +1,8 @@
 package com.yihu.ehr.service.profile;
 
-import com.yihu.ehr.data.hbase.HBaseDao;
-import com.yihu.ehr.data.hbase.TableBundle;
+import com.yihu.ehr.hbase.HBaseDao;
+import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.profile.core.ResourceCore;
-import com.yihu.ehr.util.ResourceStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

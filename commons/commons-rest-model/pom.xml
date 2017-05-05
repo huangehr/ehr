@@ -43,11 +43,5 @@
             <version>${version.ehr}</version>
             <scope>${dependency.scope}</scope>
         </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-mysql</artifactId>
-            <version>${version.ehr}</version>
-            <scope>${dependency.scope}</scope>
-        </dependency>
     </dependencies>
 </project>

@@ -1,6 +1,5 @@
 package com.yihu.ehr.medicalRecord.dao.hbaseDao;
 
-import com.yihu.ehr.hbase.HBaseUtil;
 import com.yihu.ehr.medicalRecord.family.MedicalDrugFamily;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,12 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class MedicalDrugDao extends HbaseDao {
+public class MedicalDrugDao {
 
-    @Autowired
-    HBaseUtil hbase;
 
-    @Override
     protected String getTableName(){
         return MedicalDrugFamily.TableName;
     }

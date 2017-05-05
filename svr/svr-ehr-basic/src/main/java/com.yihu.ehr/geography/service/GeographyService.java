@@ -1,6 +1,7 @@
 package com.yihu.ehr.geography.service;
 
 
+import com.yihu.ehr.entity.geography.Geography;
 import com.yihu.ehr.geography.dao.XGeographyRepository;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.Query;

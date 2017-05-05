@@ -60,6 +60,8 @@ hadoop:
   hbase-properties:
     - hbase.zookeeper.property.clientPort: 2181
     - zookeeper.znode.parent: /hbase-unsecure
+  user:
+    name: root
 
 ehr:
   # 档案包数据提取器参数，从数据集中提取摘要、事件时间与身份标识

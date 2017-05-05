@@ -188,16 +188,5 @@ public class HealthProblemDictEndPoint extends EnvelopRestEndPoint {
         return convertToModels(list, new ArrayList<>(list.size()), MIcd10Dict.class,null);
     }
 
-    @RequestMapping(value = "/dict/hp//CacheIcd10byHpCode", method = RequestMethod.POST)
-    @ApiOperation(value = "缓存Icd10byHpCode")
-    public boolean CacheAddressDict( ){
-        return   hpDictService.CacheIcd10ByHpCode();
-    }
 
-    @RequestMapping(value = "/dict/hp//GetAddressDictCache/{code}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取缓存行政区划地址")
-    public String GetAddressDictCache(@ApiParam(name = "code", value = "code", defaultValue = "")
-                                      @PathVariable(value = "code") String code ){
-        return   hpDictService.GetIcd10ByHpCodeCache(code);
-    }
 }

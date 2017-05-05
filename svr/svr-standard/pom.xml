@@ -129,11 +129,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-keyschema</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>happy.fish</groupId>
             <artifactId>fastDFS</artifactId>
             <scope>${dependency.scope}</scope>

@@ -1,7 +1,6 @@
 package com.yihu.ehr.medicalRecord.service;
 
 import com.yihu.ehr.medicalRecord.dao.hbaseDao.DocumentDao;
-import com.yihu.ehr.medicalRecord.dao.hbaseDao.TextDao;
 import com.yihu.ehr.medicalRecord.model.DTO.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,6 @@ public class MaterialService {
     @Autowired
     DocumentDao DocumentDao;
 
-    @Autowired
-    TextDao textDao;
 
 
     /**

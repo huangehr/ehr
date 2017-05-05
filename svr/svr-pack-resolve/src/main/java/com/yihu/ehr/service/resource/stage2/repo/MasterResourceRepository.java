@@ -1,7 +1,7 @@
 package com.yihu.ehr.service.resource.stage2.repo;
 
-import com.yihu.ehr.data.hbase.HBaseDao;
-import com.yihu.ehr.data.hbase.TableBundle;
+import com.yihu.ehr.hbase.HBaseDao;
+import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;

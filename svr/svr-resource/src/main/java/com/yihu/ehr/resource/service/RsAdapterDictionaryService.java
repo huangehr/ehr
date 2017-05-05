@@ -2,11 +2,11 @@ package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.redis.RedisClient;
+import com.yihu.ehr.redis.schema.ResourceAdaptionDictSchema;
 import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
 import com.yihu.ehr.resource.dao.intf.RsAdapterDictionaryDao;
 import com.yihu.ehr.resource.model.RsAdapterDictionary;
 import com.yihu.ehr.resource.model.RsAdapterScheme;
-import com.yihu.ehr.schema.ResourceAdaptionDictSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +24,6 @@ public class RsAdapterDictionaryService extends BaseJpaService<RsAdapterDictiona
 
     @Autowired
     private ResourceAdaptionDictSchema keySchema;
-
-    @Autowired
-    private RedisClient redisClient;
 
     @Autowired
     private AdapterSchemeDao schemaDao;
@@ -53,8 +50,7 @@ public class RsAdapterDictionaryService extends BaseJpaService<RsAdapterDictiona
                     continue;
                 }
 
-                String redisKey = keySchema.metaData(schema.getAdapterVersion(),dict.getDictCode(),dict.getSrcDictEntryCode());
-                redisClient.set(redisKey,dict.getDictEntryCode() + "&" + dict.getSrcDictEntryName());
+                keySchema.setMetaData(schema.getAdapterVersion(),dict.getDictCode(),dict.getSrcDictEntryCode(),dict.getDictEntryCode() + "&" + dict.getSrcDictEntryName());
             }
         }
     }

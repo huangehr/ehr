@@ -28,17 +28,6 @@ public class Icd10HpRelationCacheEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private Icd10HpRelationCacheService icd10HpRelationCacheService;
 
-    /**
-     * 缓存单个
-     * @param icd10Id
-     */
-    @RequestMapping(value = "/hp_icd10_relation_cache/one", method = RequestMethod.POST)
-    @ApiOperation(value = "缓存单个")
-    public void cacheOne(
-            @ApiParam(name = "icd10_id", value = "icd10_id")
-            @RequestParam(value = "icd10_id") long icd10Id) {
-        icd10HpRelationCacheService.cacheOne(icd10Id);
-    }
 
     /**
      * 缓存所有
@@ -46,7 +35,7 @@ public class Icd10HpRelationCacheEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/hp_icd10_relation_cache/all", method = RequestMethod.POST)
     @ApiOperation(value = "缓存所有")
-    public void cacheAll(boolean force) {
+    public void cacheAll(boolean force) throws Exception {
         icd10HpRelationCacheService.cacheAll(force);
     }
 
@@ -60,7 +49,7 @@ public class Icd10HpRelationCacheEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取单个缓存")
     public HealthProblemDict healthProblemDict(
             @ApiParam(name = "icd10_id", value = "icd10_id")
-            @RequestParam(value = "icd10_id") String icd10Id) {
+            @RequestParam(value = "icd10_id") String icd10Id) throws Exception {
         return icd10HpRelationCacheService.healthProblemDict(icd10Id);
     }
 
@@ -68,7 +57,7 @@ public class Icd10HpRelationCacheEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取缓存列表")
     public List<HealthProblemDict> healthProblemDict(
             @ApiParam(name = "icd10_id", value = "icd10_idList")
-            @RequestParam(value = "icd10_idList",required = true) List<String> icd10IdList) {
+            @RequestParam(value = "icd10_idList",required = true) List<String> icd10IdList) throws Exception {
         List<HealthProblemDict> list=new ArrayList<>();
         for(int i=0;i<icd10IdList.size();i++){
             list.add(icd10HpRelationCacheService.healthProblemDict(icd10IdList.get(i)));
@@ -82,7 +71,7 @@ public class Icd10HpRelationCacheEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/hp_icd10_relation_cache/all", method = RequestMethod.GET)
     @ApiOperation(value = "获取所有缓存")
-    public List<HealthProblemDict> healthProblemDictList(){
+    public List<HealthProblemDict> healthProblemDictList() throws Exception{
         //icd10HpRelationCacheService.cacheAll(true);
         return icd10HpRelationCacheService.healthProblemDictList();
     }
@@ -92,7 +81,7 @@ public class Icd10HpRelationCacheEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/hp_icd10_relation_cache/all", method = RequestMethod.DELETE)
     @ApiOperation(value = "清除所有缓存")
-    public void clean() {
+    public void clean() throws Exception {
         icd10HpRelationCacheService.clean();
     }
 

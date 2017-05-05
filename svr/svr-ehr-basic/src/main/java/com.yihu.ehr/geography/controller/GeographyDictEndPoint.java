@@ -1,8 +1,9 @@
 package com.yihu.ehr.geography.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.geography.service.GeographyDict;
+import com.yihu.ehr.entity.geography.GeographyDict;
 import com.yihu.ehr.geography.service.GeographyDictService;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import io.swagger.annotations.Api;
@@ -31,7 +32,7 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
      * @param level
      * @return
      */
-    @RequestMapping(value = "/geography_entries/level/{level}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Geography.AddressDictByLevel, method = RequestMethod.GET)
     @ApiOperation(value = "根据等级查询行政区划地址")
     public Collection<MGeographyDict> getAddressByLevel(
             @ApiParam(name = "level", value = "等级", defaultValue = "")
@@ -40,7 +41,7 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
         return convertToModels(addressDictList,new ArrayList<>(addressDictList.size()), MGeographyDict.class,"");
     }
 
-    @RequestMapping(value = "/geography_entries/pid/{pid}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Geography.AddressDictByPid, method = RequestMethod.GET)
     @ApiOperation(value = "根据上级编号查询行政区划地址")
     public Collection<MGeographyDict> getAddressDictByPid(
         @ApiParam(name = "pid", value = "上级id", defaultValue = "")
@@ -50,7 +51,7 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "/geography_entries/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Geography.AddressDict, method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询行政区划地址")
     public MGeographyDict getAddressDictById(
             @ApiParam(name = "id", value = "id", defaultValue = "")
@@ -59,7 +60,8 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
         return convertToModel(geographyDict, MGeographyDict.class);
     }
 
-    @RequestMapping(value = "/geography_entries_list", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Geography.AddressDictList, method = RequestMethod.POST)
+    @ApiOperation(value = "获取多条行政区划地址")
     public List<MGeographyDict> getAddressDictByIdList(
             @ApiParam(name = "idList", value = "idList", defaultValue = "")
             @RequestParam(value = "idList") List<String> idList) {
@@ -71,20 +73,15 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
         return list;
     }
 
-    @RequestMapping(value = "/geography_entries/CacheAddressDict", method = RequestMethod.POST)
-    @ApiOperation(value = "缓存行政区划地址")
-    public boolean CacheAddressDict( ){
-       return   geographyDictService.CacheAddressDict();
+    @RequestMapping(value = ServiceApi.Geography.AddressDictAll, method = RequestMethod.POST)
+    @ApiOperation(value = "获取全部行政区划地址")
+    public List<GeographyDict> getAllAddressDict(){
+       return geographyDictService.getAllAddressDict();
     }
 
-    @RequestMapping(value = "/geography_entries/GetAddressDictCache/{id}", method = RequestMethod.GET)
-    @ApiOperation(value = "获取缓存行政区划地址")
-    public String GetAddressDictCache(@ApiParam(name = "id", value = "id", defaultValue = "")
-                                           @PathVariable(value = "id") String id ){
-        return   geographyDictService.GetAddressDictCache(id);
-    }
 
-    @RequestMapping(value = "/geography_entries/getAddressDict" , method = RequestMethod.GET)
+
+    @RequestMapping(value = ServiceApi.Geography.AddressDictByFields, method = RequestMethod.GET)
     @ApiOperation(value = "根据地址中文名 查询地址编号")
     Collection<MGeographyDict> getAddressDict(
             @ApiParam(name = "fields", value = "fields", defaultValue = "")

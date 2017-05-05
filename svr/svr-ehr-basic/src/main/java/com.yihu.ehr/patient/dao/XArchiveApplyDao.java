@@ -1,6 +1,6 @@
 package com.yihu.ehr.patient.dao;
 
-import com.yihu.ehr.model.patient.ArchiveApply;
+import com.yihu.ehr.entity.patient.ArchiveApply;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;

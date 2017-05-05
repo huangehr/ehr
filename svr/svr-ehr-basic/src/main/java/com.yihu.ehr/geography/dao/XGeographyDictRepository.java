@@ -1,6 +1,6 @@
 package com.yihu.ehr.geography.dao;
 
-import com.yihu.ehr.geography.service.GeographyDict;
+import com.yihu.ehr.entity.geography.GeographyDict;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;

@@ -1,8 +1,7 @@
 package com.yihu.ehr.service.resource.stage2;
 
 import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.redis.RedisClient;
-import com.yihu.ehr.schema.*;
+import com.yihu.ehr.feign.XRedisServiceClient;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.service.resource.stage1.FilePackage;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
@@ -27,22 +26,8 @@ import java.util.Set;
 public class PackMill {
 
     @Autowired
-    private RedisClient redisClient;
+    private XRedisServiceClient redisServiceClient;
 
-    @Autowired
-    private ResourceMetadataSchema metadataSchema;
-
-    @Autowired
-    private ResourceAdaptionDictSchema dictSchema;
-
-    @Autowired
-    private ResourceAdaptionKeySchema resAdaptionKeySchema;
-
-    @Autowired
-    StdDataSetKeySchema dataSetKeySchema;
-
-    @Autowired
-    OrgKeySchema orgKeySchema;
 
     /**
      * 将解析好的档案拆解成资源。
@@ -56,7 +41,7 @@ public class PackMill {
 
         if(!StringUtils.isBlank(resourceBucket.getOrgCode()))
         {
-            String orgName = redisClient.get(orgKeySchema.name(resourceBucket.getOrgCode()));
+            String orgName = redisServiceClient.getOrgRedis(resourceBucket.getOrgCode());
 
             if(!StringUtils.isBlank(orgName))
             {
@@ -73,7 +58,7 @@ public class PackMill {
             if(DataSetUtil.isOriginDataSet(dataSet.getCode())) continue;
 
             Set<String> keys = dataSet.getRecordKeys();
-            Boolean isMultiRecord = redisClient.get(dataSetKeySchema.dataSetMultiRecord(dataSet.getCdaVersion(), dataSet.getCode()));
+            Boolean isMultiRecord = Boolean.valueOf(redisServiceClient.getDataSetMultiRecord(dataSet.getCdaVersion(), dataSet.getCode()));
             if (isMultiRecord == null || !isMultiRecord){
                 MasterRecord masterRecord = resourceBucket.getMasterRecord();
 
@@ -138,8 +123,8 @@ public class PackMill {
             metaDataCode = metaDataCode.substring(0, metaDataCode.indexOf("_VALUE"));
         }
 
-         String resMetaDataKey = resAdaptionKeySchema.metaData(cdaVersion, dataSetCode, metaDataCode);
-         String resMetaData = redisClient.get(resMetaDataKey);
+         String resMetaData = redisServiceClient.getRsAdaptionMetaData(cdaVersion, dataSetCode, metaDataCode);
+
          if (StringUtils.isEmpty(resMetaData)){
              LogService.getLogger().error(
                      String.format("Unable to get resource meta data code for ehr meta data %s of %s in %s, forget to cache them?",
@@ -196,9 +181,7 @@ public class PackMill {
      */
     public String getMetadataDict(String metadataId)
     {
-        String key = metadataSchema.metaData(metadataId);
-        String dictCode = redisClient.get(key);
-
+        String dictCode = redisServiceClient.getRsMetaData(metadataId);
         return dictCode;
     }
 
@@ -211,8 +194,7 @@ public class PackMill {
      */
     public String[] getDict(String version,String dictCode,String srcDictEntryCode)
     {
-        String key = dictSchema.metaData(version,dictCode,srcDictEntryCode);
-        String dict = redisClient.get(key);
+        String dict = redisServiceClient.getRsAdaptionMetaData(version,dictCode,srcDictEntryCode);
 
         if(dict != null)
         {

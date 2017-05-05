@@ -1,12 +1,11 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.RedisClient;
+import com.yihu.ehr.redis.schema.ResourceAdaptionKeySchema;
 import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
 import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
 import com.yihu.ehr.resource.model.RsAdapterScheme;
-import com.yihu.ehr.schema.ResourceAdaptionKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -21,9 +20,6 @@ import javax.transaction.Transactional;
 public class AdapterCacheService extends BaseJpaService<RsAdapterScheme,AdapterSchemeDao>{
     @Autowired
     private ResourceAdaptionKeySchema keySchema;
-
-    @Autowired
-    private RedisClient redisClient;
 
     @Autowired
     private AdapterSchemeDao schemaDao;
@@ -47,21 +43,8 @@ public class AdapterCacheService extends BaseJpaService<RsAdapterScheme,AdapterS
                 continue;
             }
 
-
-            String redisKey = keySchema.metaData(schema.getAdapterVersion(), meta.getSrcDatasetCode(), meta.getSrcMetadataCode());
-
-            redisClient.set(redisKey, meta.getMetadataId());
+            keySchema.setMetaData(schema.getAdapterVersion(), meta.getSrcDatasetCode(), meta.getSrcMetadataCode(), meta.getMetadataId());
         }
     }
 
-    /**
-     * 获取缓存
-     *
-     * @param key String 缓存KEY
-     * @return
-     */
-    public String getCache(String key)
-    {
-        return redisClient.get(key);
-    }
 }

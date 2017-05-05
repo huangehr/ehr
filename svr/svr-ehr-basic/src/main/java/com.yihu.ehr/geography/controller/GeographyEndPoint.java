@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.geography.service.Geography;
+import com.yihu.ehr.entity.geography.Geography;
 import com.yihu.ehr.geography.service.GeographyService;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -31,7 +32,7 @@ public class GeographyEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private GeographyService geographyService;
 
-    @RequestMapping(value = "/geographies/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Geography.Address, method = RequestMethod.GET)
     @ApiOperation(value = "根据地址编号查询地址")
     public MGeography getAddressById(
             @ApiParam(name = "id", value = "地址编号", defaultValue = "")
@@ -41,7 +42,7 @@ public class GeographyEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "geographies/{id}/canonical", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Geography.AddressCanonical, method = RequestMethod.GET)
     @ApiOperation(value = "根据地址编号获取地址中文字符串全拼")
     public String getCanonicalAddress(
             @ApiParam(name = "id", value = "地址代码", defaultValue = "")
@@ -58,7 +59,7 @@ public class GeographyEndPoint extends EnvelopRestEndPoint {
      * 地址检查并保存
      * @return
      */
-    @RequestMapping(value = "/geographies", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Geography.Geographies, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "地址检查,如果地址在数据库中不存在，这新增这条记录，否则返回地址id")
     public String saveAddress(
             @ApiParam(name = "json_data", value = "地址json字符串")
@@ -90,7 +91,7 @@ public class GeographyEndPoint extends EnvelopRestEndPoint {
      * @param district
      * @return
      */
-    @RequestMapping(value = "/geographies" , method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Geography.Geographies , method = RequestMethod.GET)
     @ApiOperation(value = "根据省市县查询地址并返回地址编号列表")
     public List<String> search(
             @ApiParam(name = "province", value = "省", defaultValue = "")
@@ -108,7 +109,7 @@ public class GeographyEndPoint extends EnvelopRestEndPoint {
      * @param id
      * @return
      */
-    @RequestMapping(value = "geographies/{id}" , method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.Geography.GeographiesDelete , method = RequestMethod.DELETE)
     @ApiOperation(value = "根据地址编号删除地址")
     public boolean delete(
             @ApiParam(name = "id" , value = "地址代码" ,defaultValue = "")
@@ -122,7 +123,7 @@ public class GeographyEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "/geographies/is_null" , method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Geography.GeographiesNull , method = RequestMethod.GET)
     @ApiOperation(value = "判断是否是个空地址")
     public boolean isNullAddress(
             @ApiParam(name = "json_data", value = "地址json字符串")

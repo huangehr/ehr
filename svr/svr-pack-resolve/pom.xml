@@ -24,11 +24,6 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -115,11 +110,6 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-redis</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-hbase</artifactId>
             <scope>compile</scope>
         </dependency>
@@ -150,7 +140,7 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-keyschema</artifactId>
+            <artifactId>commons-entity</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -172,11 +162,6 @@
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-solr</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-keyschema</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>

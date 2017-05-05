@@ -71,6 +71,14 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
         return redisService.getOrgRedis(key);
     }
 
+    @ApiOperation("获取机构redis")
+    @RequestMapping(value = ServiceApi.Redis.OrgAreaRedis, method = RequestMethod.GET)
+    public String OrgAreaRedis(@ApiParam(value = "key", defaultValue = "")
+                              @RequestParam("key") String key)
+    {
+        return redisService.getOrgAreaRedis(key);
+    }
+
 
     /******************************************* 资源化相关Redis *******************************************************************/
 
@@ -150,7 +158,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("获取标准数据集--主从表 redis")
     @RequestMapping(value = ServiceApi.Redis.DataSetMultiRecord, method = RequestMethod.GET)
-    public String getDataSetMultiRecord(@ApiParam(value = "version", defaultValue = "")
+    public boolean getDataSetMultiRecord(@ApiParam(value = "version", defaultValue = "")
                                             @RequestParam("version") String version,
                                         @ApiParam(value = "code", defaultValue = "")
                                             @RequestParam("code") String code){

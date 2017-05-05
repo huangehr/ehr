@@ -2,7 +2,7 @@ package com.yihu.ehr.patient.service.arapply;
 
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
-import com.yihu.ehr.model.patient.ArchiveRelation;
+import com.yihu.ehr.entity.patient.ArchiveRelation;
 import com.yihu.ehr.patient.dao.XArchiveRelationDao;
 import com.yihu.ehr.patient.feign.PatientArchiveClient;
 import com.yihu.ehr.query.BaseJpaService;

@@ -20,8 +20,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping(ApiVersion.Version1_0)
 public interface XRedisServiceClient {
 
-    @RequestMapping(value = ServiceApi.Patients.ArchiveRelation, method = RequestMethod.POST)
-    Result archiveRelation(@RequestBody String data);
 
     //("获取地址redis")
     @RequestMapping(value = ServiceApi.Redis.AddressRedis, method = RequestMethod.GET)

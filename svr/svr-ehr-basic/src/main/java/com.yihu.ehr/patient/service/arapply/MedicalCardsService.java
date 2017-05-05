@@ -1,6 +1,6 @@
 package com.yihu.ehr.patient.service.arapply;
 
-import com.yihu.ehr.model.patient.MedicalCards;
+import com.yihu.ehr.entity.patient.MedicalCards;
 import com.yihu.ehr.patient.dao.XMedicalCardsDao;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;

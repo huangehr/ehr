@@ -1,28 +1,16 @@
 package com.yihu.ehr.resource.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.hbase.HBaseUtil;
-import com.yihu.ehr.model.resource.MRsResources;
-import com.yihu.ehr.query.services.HbaseQuery;
-import com.yihu.ehr.resource.model.RsResources;
-import com.yihu.ehr.resource.service.ResourcesService;
+import com.yihu.ehr.hbase.HBaseAdmin;
+import com.yihu.ehr.hbase.HBaseDao;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +23,10 @@ import java.util.Map;
 @Api(value = "hbaseTest", description = "habse测试接口")
 public class HbaseTestEndPoint extends EnvelopRestEndPoint {
     @Autowired
-    HBaseUtil hbaseUtil;
+    HBaseAdmin hbaseAdmin;
+
+    @Autowired
+    HBaseDao hbaseDao;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -49,7 +40,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         try {
             String re = "data:[";
 
-            List<String> list = hbaseUtil.getTableList(regex, true);
+            List<String> list = hbaseAdmin.getTableList(regex, true);
             if (list != null && list.size() > 0) {
                 for (String item : list) {
                     re += item + "; ";
@@ -73,7 +64,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
             @RequestParam String tableName)
     {
         try {
-            if (hbaseUtil.isTableExists(tableName)) {
+            if (hbaseAdmin.isTableExists(tableName)) {
                 return "true";
             } else {
                 return "false";
@@ -95,7 +86,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
     {
         try {
             String[] cols = columnFamilies.split(",");
-            hbaseUtil.createTable(tableName,cols);
+            hbaseAdmin.createTable(tableName,cols);
             return "Success create table "+tableName+".";
         }
         catch (Exception ex)
@@ -111,7 +102,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
                               @RequestParam String tableName)
     {
         try {
-            hbaseUtil.dropTable(tableName);
+            hbaseAdmin.dropTable(tableName);
             return "Success drop table "+tableName+".";
         }
         catch (Exception ex)
@@ -138,7 +129,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         try {
             Object[] cols = columns.split(",");
             Object[] vals = values.split(",");
-            hbaseUtil.insertRecord(tableName,rowKey,family,cols, vals);
+            hbaseDao.add(tableName,rowKey,family,cols, vals);
             return "Success insert record For "+tableName+".";
         }
         catch (Exception ex)
@@ -157,7 +148,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
     {
         try {
 
-            Map<String, Object> re = hbaseUtil.getResultMap(tableName,rowKey);
+            Map<String, Object> re = hbaseDao.getResultMap(tableName,rowKey);
             return objectMapper.writeValueAsString(re);
         }
         catch (Exception ex)

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ag-portal-cloud
+    name: ag-portal-cloud-hzp
 
 ---
 spring:

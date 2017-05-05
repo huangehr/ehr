@@ -1,6 +1,6 @@
 package com.yihu.ehr.medicalRecord.dao.hbaseDao;
 
-import com.yihu.ehr.hbase.HBaseUtil;
+import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.medicalRecord.family.MedicalRecordsFamily;
 import com.yihu.ehr.medicalRecord.model.DTO.MedicalRecord;
 import org.omg.CORBA.Object;
@@ -16,12 +16,11 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class MedicalRecordsDao extends HbaseDao {
+public class MedicalRecordsDao  {
 
     @Autowired
-    HBaseUtil hbase;
+    HBaseDao hbase;
 
-    @Override
     protected String getTableName(){
         return MedicalRecordsFamily.TableName;
     }
@@ -31,7 +30,7 @@ public class MedicalRecordsDao extends HbaseDao {
      */
     public boolean save(MedicalRecord obj) throws Exception
     {
-        hbase.insertRecord(getTableName(), obj.getRowkey(), MedicalRecordsFamily.Data,obj.getColumns(), obj.getValues());
+        hbase.add(getTableName(), obj.getRowkey(), MedicalRecordsFamily.Data,obj.getColumns(), obj.getValues());
         return true;
     }
 
@@ -40,7 +39,7 @@ public class MedicalRecordsDao extends HbaseDao {
      */
     public boolean update(String rowkey, String column, String value) throws Exception
     {
-        hbase.updateRecord(getTableName(), rowkey, MedicalRecordsFamily.Data,column,value);
+        hbase.put(getTableName(), rowkey, MedicalRecordsFamily.Data,column,value);
         return true;
     }
 
@@ -49,7 +48,7 @@ public class MedicalRecordsDao extends HbaseDao {
      */
     public boolean updateDynamic(String rowkey, String column, String value) throws Exception
     {
-        hbase.updateRecord(getTableName(), rowkey, MedicalRecordsFamily.Dynamic,column,value);
+        hbase.put(getTableName(), rowkey, MedicalRecordsFamily.Dynamic,column,value);
         return true;
     }
 

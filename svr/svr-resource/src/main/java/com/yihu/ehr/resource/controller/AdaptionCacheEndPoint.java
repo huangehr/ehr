@@ -33,12 +33,4 @@ public class AdaptionCacheEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value=ServiceApi.Adaptions.CacheGet,method = RequestMethod.GET)
-    @ApiOperation("获取适配数据")
-    public String getCache(
-            @ApiParam(name="key",value="key",defaultValue = "")
-            @PathVariable(value="key") String key)
-    {
-        return adapterCacheService.getCache(key);
-    }
 }
