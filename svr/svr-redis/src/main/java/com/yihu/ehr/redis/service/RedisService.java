@@ -153,7 +153,7 @@ public class RedisService {
     /**
      *获取标准数据集--主从表 redis
      */
-    public boolean getDataSetMultiRecord(String version, String code){
+    public Boolean getDataSetMultiRecord(String version, String code){
         return stdDataSetKeySchema.dataSetMultiRecord(version, code);
     }
 

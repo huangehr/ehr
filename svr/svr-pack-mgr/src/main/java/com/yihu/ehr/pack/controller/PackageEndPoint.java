@@ -149,7 +149,6 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         Package aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
-        throw new Exception("1");
     }
 
     @RequestMapping(value = ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)

@@ -20,7 +20,7 @@ public class OrgKeySchema extends KeySchema {
      */
     public String getOrgArea(String key)
     {
-          return get(makeKey(table,"Code_Area:"+key,column));
+          return get("Code_Area:"+key);
     }
 
     /**
@@ -28,6 +28,6 @@ public class OrgKeySchema extends KeySchema {
      */
     public void setOrgArea(String key,String value)
     {
-        set(makeKey(table,"Code_Area:"+key,column),value);
+        set("Code_Area:"+key,value);
     }
 }

@@ -25,34 +25,34 @@ public class StdDataSetKeySchema extends KeySchema {
     private String DataSetIsMultiRecordColumn = "multi_record";
 
     public String dataSetCode(String version, String id){
-        return get(makeKey(DataSetTable + version, id, DataSetCodeColumn));
+        return redisClient.get(makeKey(DataSetTable + version, id, DataSetCodeColumn));
     }
 
     public void setDataSetCode(String version, String id,String value){
-        set(makeKey(DataSetTable + version, id, DataSetCodeColumn),value);
+        redisClient.set(makeKey(DataSetTable + version, id, DataSetCodeColumn),value);
     }
 
     public String dataSetName(String version, String id){
-        return get(makeKey(DataSetTable + version, id, DataSetNameColumn));
+        return redisClient.get(makeKey(DataSetTable + version, id, DataSetNameColumn));
     }
 
     public void setDataSetName(String version, String id,String value){
-        set(makeKey(DataSetTable + version, id, DataSetNameColumn),value);
+        redisClient.set(makeKey(DataSetTable + version, id, DataSetNameColumn),value);
     }
 
     public String dataSetNameByCode(String version, String code){
-        return get(makeKey(DataSetTable + version, code, DataSetNameColumn));
+        return redisClient.get(makeKey(DataSetTable + version, code, DataSetNameColumn));
     }
 
     public void setDataSetNameByCode(String version, String code,String value){
-        set(makeKey(DataSetTable + version, code, DataSetNameColumn),value);
+        redisClient.set(makeKey(DataSetTable + version, code, DataSetNameColumn),value);
     }
 
-    public boolean dataSetMultiRecord(String version, String code){
-        return get(makeKey(DataSetTable + version, code, DataSetIsMultiRecordColumn));
+    public Boolean dataSetMultiRecord(String version, String code){
+        return redisClient.get(makeKey(DataSetTable + version, code, DataSetIsMultiRecordColumn));
     }
 
     public void setDataSetMultiRecord(String version, String code,boolean value){
-        set(makeKey(DataSetTable + version, code, DataSetIsMultiRecordColumn),value);
+        redisClient.set(makeKey(DataSetTable + version, code, DataSetIsMultiRecordColumn),value);
     }
 }

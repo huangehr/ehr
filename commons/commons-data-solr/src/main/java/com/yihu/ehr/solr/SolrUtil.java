@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Solr底层操作类
+ * Solr底层查询类
  *
  * @author hzp
  * @version 1.0
@@ -39,8 +39,6 @@ public class SolrUtil {
     private int getQtime() {
         return qtime;
     }
-
-    /************************* 基础操作 **************************************************/
 
 
     /************************** 查询操作 *****************************************************/

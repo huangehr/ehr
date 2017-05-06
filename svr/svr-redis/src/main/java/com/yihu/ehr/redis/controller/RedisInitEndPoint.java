@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -27,6 +28,7 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("缓存行政地址Redis")
     @RequestMapping(value = ServiceApi.Redis.AddressRedis, method = RequestMethod.POST)
+    @ResponseBody
     public String cacheAddressDict() throws Exception
     {
         redisInitService.cacheAddressDict();
@@ -35,6 +37,7 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("缓存健康问题Redis")
     @RequestMapping(value = ServiceApi.Redis.HealthProblemRedis, method = RequestMethod.POST)
+    @ResponseBody
     public String cacheIcd10ByHpCode() throws Exception
     {
         redisInitService.cacheIcd10ByHpCode();
@@ -43,6 +46,7 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("缓存机构名称Redis")
     @RequestMapping(value = ServiceApi.Redis.OrgRedis, method = RequestMethod.POST)
+    @ResponseBody
     public String cacheOrgName() throws Exception
     {
         redisInitService.cacheOrgName();
@@ -51,6 +55,7 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("缓存机构区域Redis")
     @RequestMapping(value = ServiceApi.Redis.OrgAreaRedis, method = RequestMethod.POST)
+    @ResponseBody
     public String cacheOrgArea() throws Exception
     {
         redisInitService.cacheOrgArea();
