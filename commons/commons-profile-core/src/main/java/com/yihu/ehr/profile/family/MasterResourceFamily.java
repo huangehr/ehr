@@ -11,6 +11,7 @@ public class MasterResourceFamily extends ResourceFamily {
         public static final String CardId = "card_id";
         public static final String OrgCode = "org_code";
         public static final String OrgName = "org_name";
+        public static final String OrgArea = "org_area";
         public static final String PatientId = "patient_id";
         public static final String PatientName = "patient_name";  //新增add by hzp at 20170401
         public static final String CardType = "card_type";  //新增add by hzp at 20170411

@@ -240,21 +240,7 @@ public class ServiceApi {
         public static final String UserAppShow = "/userApp/show";
     }
 
-    public static class Dictionaries {
 
-    }
-
-    public static class ESB {
-        public static final String SearchHosLogs = "/searchHosLogs";
-
-        public static final String DeleteHosLogs = "/deleteHosLogs";
-    }
-
-
-
-    public static class Organizations {
-
-    }
 
     public static class Packages {
         public static final String Packages = "/packages";
@@ -393,9 +379,6 @@ public class ServiceApi {
         public static final String Tokens = "/securities/tokens/{id}";
     }
 
-    public static class SpecialDictionaries {
-
-    }
 
     public static class Standards {
         public static final String Sources = "/std/sources";

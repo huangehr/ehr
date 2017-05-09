@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public final class ProfileId implements Comparable<ProfileId>, Serializable {
     private static final long serialVersionUID = 5121234589654483072L;
 
-    private final static Pattern Pattern = java.util.regex.Pattern.compile("([\\da-zA-Z\\-]+)_([\\da-zA-Z\\-]+)_([\\da-zA-Z\\-]+)_(\\d+)");
+    private final static Pattern Pattern = java.util.regex.Pattern.compile("([\\da-zA-Z\\-]+)_([\\da-zA-Z\\-]+)_(\\d+)");
 
     private final String orgCode;
     //private final String patientId;

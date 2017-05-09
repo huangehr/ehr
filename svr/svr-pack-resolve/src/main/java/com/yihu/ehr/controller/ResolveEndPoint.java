@@ -17,11 +17,13 @@ import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage2.PackMill;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.ResourceService;
+import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.HashMapChangeSet;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -57,7 +61,7 @@ public class ResolveEndPoint {
 
     @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为OLDEST，则取最旧的未解析档案包")
     @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
-    public ResponseEntity<String> resolve(
+    public String resolve(
             @ApiParam(value = "id", defaultValue = "")
             @RequestParam(required = false) String packageId,
             @ApiParam(value = "模拟应用ID", defaultValue = "FBIWarning911")
@@ -72,27 +76,45 @@ public class ResolveEndPoint {
             throw new Exception("Package not found.");
         }
 
-        MPackage pack = objectMapper.readValue(packString,MPackage.class);
+        MPackage pack = objectMapper.readValue(packString,MPackage.class);  //已修改包状态为1 正在入库库
+        String packId = pack.getId();
+        try {
+            long start = System.currentTimeMillis();
+            if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
+            String zipFile = downloadTo(pack.getRemotePath());
 
-        long start = System.currentTimeMillis();
+            StandardPackage standardPackage = packResolveEngine.doResolve(pack, zipFile);
+            ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
+            resourceService.save(resourceBucket);
 
-        if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
-        String zipFile = downloadTo(pack.getRemotePath());
+            //回填入库状态
+            Map<String,String> map = new HashMap();
+            map.put("profileId",standardPackage.getId());
+            map.put("demographicId",standardPackage.getDemographicId());
+            map.put("eventType",String.valueOf(standardPackage.getEventType().getType()));
+            map.put("eventNo",standardPackage.getEventNo());
+            map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
+            map.put("patientId",standardPackage.getPatientId());
 
-        StandardPackage standardPackage = packResolveEngine.doResolve(pack, zipFile);
-        ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
-        resourceService.save(resourceBucket);
+            packageMgrClient.reportStatus(packId,
+                    ArchiveStatus.Finished,
+                    objectMapper.writeValueAsString(map));
 
-        packageMgrClient.reportStatus(pack.getId(),
-                ArchiveStatus.Finished,
-                String.format("Profile: %s, identity: %s", standardPackage.getId(), standardPackage.getDemographicId()));
 
-        getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
+            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
-        if (echo) {
-            return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("", HttpStatus.OK);
+            if (echo) {
+                return standardPackage.toJson();
+            } else {
+                return "档案包入库成功！";
+            }
+        }
+        catch (Exception ex)
+        {
+            packageMgrClient.reportStatus(packId,
+                    ArchiveStatus.Failed,
+                    ex.getMessage());
+            throw ex;
         }
     }
 

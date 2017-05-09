@@ -15,6 +15,7 @@ import com.yihu.ehr.pack.service.Package;
 import com.yihu.ehr.pack.service.PackageService;
 import com.yihu.ehr.pack.task.MessageBuffer;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
@@ -34,10 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 档案包控制器。
@@ -185,7 +183,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
                                                  @ApiParam(value = "状态")
                                                  @RequestParam(value = "status") ArchiveStatus status,
                                                  @ApiParam(value = "消息")
-                                                 @RequestParam(value = "message") String message) {
+                                                 @RequestBody String message) throws Exception {
         Package aPackage = packService.getPackage(id);
         if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
 
@@ -193,9 +191,20 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         //资源化状态，0未入库 1已入库
         aPackage.setResourced(true);
         aPackage.setMessage(message);
-        if (status != ArchiveStatus.Failed) {
+        if (status == ArchiveStatus.Finished) {
+            //入库成功
+            Map<String,String> map = objectMapper.readValue(message,Map.class);
+            aPackage.setEventType(map.get("eventType"));
+            aPackage.setEventNo(map.get("eventNo"));
+            aPackage.setEventDate(DateUtil.strToDate(map.get("eventDate")));
+            aPackage.setPatientId(map.get("patientId"));
             aPackage.setFinishDate(new Date());
-        } else {
+        }
+        else if(status == ArchiveStatus.Acquired)
+        {
+            aPackage.setParseDate(new Date()); //入库执行时间
+        }
+        else {
             aPackage.setFinishDate(null);
         }
 

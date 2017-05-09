@@ -41,15 +41,18 @@ public class PackMill {
 
         if(!StringUtils.isBlank(resourceBucket.getOrgCode()))
         {
+            //获取机构名称
             String orgName = redisServiceClient.getOrgRedis(resourceBucket.getOrgCode());
-
             if(!StringUtils.isBlank(orgName))
             {
                 resourceBucket.setOrgName(orgName);
             }
-            else
+
+            //获取机构区域
+            String orgArea = redisServiceClient.getOrgAreaRedis(resourceBucket.getOrgCode());
+            if(!StringUtils.isBlank(orgArea))
             {
-                resourceBucket.setOrgName("");
+                resourceBucket.setOrgArea(orgArea);
             }
         }
 

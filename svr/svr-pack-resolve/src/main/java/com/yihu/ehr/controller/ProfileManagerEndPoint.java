@@ -1,41 +1,19 @@
 package com.yihu.ehr.controller;
 
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.config.MetricNames;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.feign.XPackageMgrClient;
-import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.common.Result;
-import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.exception.LegacyPackageException;
 import com.yihu.ehr.service.profile.ArchiveRelationService;
 import com.yihu.ehr.service.profile.PrescriptionService;
-import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
-import com.yihu.ehr.service.resource.stage1.StandardPackage;
-import com.yihu.ehr.service.resource.stage2.PackMill;
-import com.yihu.ehr.service.resource.stage2.ResourceBucket;
-import com.yihu.ehr.service.resource.stage2.ResourceService;
+import com.yihu.ehr.service.resource.stage2.index.IndexService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +47,9 @@ public class ProfileManagerEndPoint {
 
         return objectMapper.writeValueAsString(re);
     }
+
+    @Autowired
+    IndexService dimensionService;
 
     @ApiOperation(value = "档案关联（单条）")
     @RequestMapping(value = ServiceApi.Packages.ArchiveRelation, method = RequestMethod.POST)

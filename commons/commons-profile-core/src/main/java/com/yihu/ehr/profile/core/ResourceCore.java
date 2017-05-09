@@ -9,4 +9,5 @@ public class ResourceCore {
     public static final String MasterTable = "HealthProfile";
     public static final String SubTable = "HealthProfileSub";
     public static final String FileTable = "RawFiles";
+    public static final String IndexTable = "HealthArchives";
 }
