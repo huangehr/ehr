@@ -719,4 +719,23 @@ public class ServiceApi {
         public static final String AddressDictAll = "/geography_entries/all";    //获取全部行政区划地址
         public static final String AddressDictByFields = "/geography_entries/getAddressDict";     //根据地址中文名 查询地址编号
     }
+
+
+    public static class Report {
+
+        public static final String GetQcDailyReportList = "/report/getQcDailyReportList";
+        public static final String QcDailyReport = "/report/qcDailyReport";
+
+        public static final String GetQcDailyReportDatasetsList = "/report/getQcDailyReportDatasetsList";
+        public static final String QcDailyReportDatasets = "/report/qcDailyReportDatasets";
+
+        public static final String GetQcDailyReportDatasetList = "/report/getQcDailyReportDatasetList";
+        public static final String QcDailyReportDataset = "/report/qcDailyReportDataset";
+
+        public static final String GetQcDailyReportMetadataList = "/report/getQcDailyReportMetadataList";
+        public static final String QcDailyReportMetadata = "/report/qcDailyReportMetadata";
+
+    }
+
+
 }
