@@ -43,10 +43,10 @@ public interface QcDailyReportMetadataClient {
 
     @RequestMapping(value = ServiceApi.Report.QcDailyReportMetadata, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除质控包数据元日报")
-    boolean delete(@PathVariable(value = "id") String id);
+    boolean delete(@RequestParam(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Report.QcDailyReportMetadata, method = RequestMethod.GET)
     @ApiOperation(value = "获取数据元日报信息")
-    MQcDailyReportMetadata getInfo(@PathVariable(value = "id") String id) ;
+    MQcDailyReportMetadata getInfo(@RequestParam(value = "id") String id) ;
 
 }

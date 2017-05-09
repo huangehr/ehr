@@ -3,7 +3,9 @@ package com.yihu.ehr.report.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.entity.report.QcDailyReportDetail;
 import com.yihu.ehr.model.report.MQcDailyReport;
+import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
@@ -43,10 +45,20 @@ public interface QcDailyReportClient {
 
     @RequestMapping(value = ServiceApi.Report.QcDailyReport, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除质控包数据完整性日报")
-    boolean delete(@PathVariable(value = "id") String id);
+    boolean delete(@RequestParam(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Report.QcDailyReport, method = RequestMethod.GET)
     @ApiOperation(value = "获取质控包数据完整性日报信息")
-    MQcDailyReport getInfo(@PathVariable(value = "id") String id) ;
+    MQcDailyReport getInfo(@RequestParam(value = "id") String id) ;
+
+
+    @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增质控包数据完整性详细数据日报")
+    void addQcDailyReportDetailList(@RequestBody String models ) ;
+
+
+    @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增质控包数据完整性详细数据日报")
+    MQcDailyReportDetail addQcDailyReportDetail(@RequestBody String model) ;
 
 }

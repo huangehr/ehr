@@ -1,12 +1,17 @@
 package com.yihu.ehr.report.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.report.EventDetailModel;
+import com.yihu.ehr.agModel.report.EventsModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.report.QcDailyReport;
+import com.yihu.ehr.entity.report.QcDailyReportDetail;
 import com.yihu.ehr.model.report.MQcDailyReport;
+import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.report.service.QcDailyReportClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -86,7 +93,7 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
     @ApiOperation(value = "删除质控包数据完整性日报")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @RequestParam(value = "id") String id) {
         try {
             qcDailyReportClient.delete(id);
             return success("");
@@ -101,7 +108,7 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
     @ApiOperation(value = "获取质控包数据完整性日报信息")
     public Envelop getInfo(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @RequestParam(value = "id") String id) {
         try {
             MQcDailyReport qcDailyReportDatasets = qcDailyReportClient.getInfo(id);
             if(qcDailyReportDatasets == null)
@@ -111,6 +118,78 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
             e.printStackTrace();
             return failed("获取信息出错！");
         }
+    }
+
+
+
+    @RequestMapping(value = ServiceApi.Report.GetEventDataReport, method = RequestMethod.POST)
+    @ApiOperation(value = "日报数据采集上传")
+    public Envelop  getEventDataReport(
+            @ApiParam(name = "eventsData", value = "采集json数据", defaultValue = "")
+            @RequestParam("eventsData") String collectionData) {
+        try {
+
+            EventsModel eventsModel = objectMapper.readValue(collectionData, EventsModel.class);
+
+            MQcDailyReport qcDailyReport = new MQcDailyReport();
+            List<MQcDailyReportDetail> list = new ArrayList<MQcDailyReportDetail>();
+            if(eventsModel != null){
+                if(StringUtils.isEmpty(eventsModel.getCreate_date())){
+                    return failed("采集时间不能为空");
+                }
+                if(StringUtils.isEmpty(eventsModel.getOrg_code())){
+                    return failed("机构编码不能为空");
+                }
+                Date createDate = DateUtil.parseDate(eventsModel.getCreate_date(), "yyyy-MM-dd hh:mm:ss");
+                qcDailyReport.setOrgCode(eventsModel.getOrg_code());
+                qcDailyReport.setCreateDate(createDate );
+                qcDailyReport.setInnerVersion(eventsModel.getInner_version());
+                qcDailyReport.setRealHospitalNum(eventsModel.getReal_hospital_num());
+                qcDailyReport.setTotalHospitalNum(eventsModel.getTotal_hospital_num());
+                qcDailyReport.setRealOutpatientNum(eventsModel.getReal_outpatient_num());
+                qcDailyReport.setTotalOutpatientNum(eventsModel.getTotal_outpatient_num());
+                qcDailyReport = qcDailyReportClient.add(objectMapper.writeValueAsString(qcDailyReport));
+                if(eventsModel.getTotal_hospital() != null){
+                    addList(list,eventsModel.getTotal_hospital(),qcDailyReport.getId(),createDate);
+                }
+                if(eventsModel.getReal_hospital() != null){
+                    addList(list,eventsModel.getReal_hospital(),qcDailyReport.getId(),createDate);
+                }
+                if(eventsModel.getTotal_outpatient() != null){
+                    addList(list,eventsModel.getTotal_outpatient(),qcDailyReport.getId(),createDate);
+                }
+                if(eventsModel.getReal_outpatient() != null){
+                    addList(list,eventsModel.getReal_outpatient(),qcDailyReport.getId(),createDate);
+                }
+
+                qcDailyReportClient.addQcDailyReportDetailList(objectMapper.writeValueAsString(list));
+            }
+            return success("");
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed(FeignExceptionUtils.getErrorMsg(e));
+        }
+    }
+
+    public List<MQcDailyReportDetail> addList(List<MQcDailyReportDetail> list,List<EventDetailModel> modelList,String qcDailyReportId,Date createTime){
+        for(EventDetailModel eventDetailModel : modelList){
+            MQcDailyReportDetail qcDailyReportDetail = new MQcDailyReportDetail();
+            qcDailyReportDetail.setEventNo(eventDetailModel.getEvent_no());
+            qcDailyReportDetail.setEventTime(DateUtil.parseDate(eventDetailModel.getEvent_time(), "yyyy-MM-dd hh:mm:ss"));
+            qcDailyReportDetail.setPatientId(eventDetailModel.getPatient_id());
+            qcDailyReportDetail.setReportId(qcDailyReportId);
+            qcDailyReportDetail.setArchiveType("");
+            qcDailyReportDetail.setAcqFlag(1);
+            int day = 0;
+            if(StringUtils.isNotEmpty(eventDetailModel.getEvent_time())){
+                Date eventDate = DateUtil.parseDate(eventDetailModel.getEvent_time(), "yyyy-MM-dd hh:mm:ss");
+                long intervalMilli = DateUtil.compareDateTime(createTime ,eventDate);
+                day = (int) (intervalMilli / (24 * 60 * 60 * 1000));
+            }
+            qcDailyReportDetail.setTimelyFlag(day>2?1:0);
+            list.add(qcDailyReportDetail);
+        }
+        return list;
     }
 
 }

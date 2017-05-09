@@ -86,7 +86,7 @@ public class QcDailyReportMetaDataController extends ExtendController<QcDailyRep
     @ApiOperation(value = "删除质控包数据元日报")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @RequestParam(value = "id") String id) {
         try {
             qcDailyReportMetadataClient.delete(id);
             return success("");
@@ -101,7 +101,7 @@ public class QcDailyReportMetaDataController extends ExtendController<QcDailyRep
     @ApiOperation(value = "获取质控包数据元日报信息")
     public Envelop getInfo(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") String id) {
+            @RequestParam(value = "id") String id) {
         try {
             MQcDailyReportMetadata qcDailyReportDatasets = qcDailyReportMetadataClient.getInfo(id);
             if(qcDailyReportDatasets == null)
