@@ -83,7 +83,7 @@ public class QcDailyReportMetadataEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除目标数据日报")
     public boolean delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception{
+            @RequestParam(value = "id") String id) throws Exception{
         qcDailyReportMetaDataService.delete(id);
         return true;
     }

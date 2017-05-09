@@ -1,8 +1,8 @@
 package com.yihu.ehr.report.service;
 
-import com.yihu.ehr.entity.report.QcDailyReportDataset;
+import com.yihu.ehr.entity.report.QcDailyReportDetail;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.report.dao.XQcDailyReportDatasetRepository;
+import com.yihu.ehr.report.dao.XQcDailyReportDetailRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class QcDailyReportDatasetService extends BaseJpaService<QcDailyReportDataset, XQcDailyReportDatasetRepository> {
+public class QcDailyReportDetailService extends BaseJpaService<QcDailyReportDetail, XQcDailyReportDetailRepository> {
 
 
 }

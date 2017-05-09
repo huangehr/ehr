@@ -86,10 +86,11 @@ public class QcDailyReportDatasetEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除质控包数据集详情")
     public boolean delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception{
+            @RequestParam(value = "id") String id) throws Exception{
         qcDailyReportDatasetService.delete(id);
         return true;
     }
+
 
     protected MQcDailyReportDataset getModel(QcDailyReportDataset o){
         return convertToModel(o, MQcDailyReportDataset.class);
