@@ -31,6 +31,10 @@ public class Package {
     private Date finishDate;
     private boolean resourced;                          // 是否已经资源化处理
     private ArchiveStatus archiveStatus;
+    private String eventType;//就诊事件类型 0门诊 1住院 2体检',
+    private String eventNo;//就诊事件no',
+    private Date eventDate;//就诊时间',
+    private String patientId;//医院患者ID'
 
     @Id
     @Column(name = "id", unique = true, nullable = false)
@@ -141,23 +145,39 @@ public class Package {
         this.resourced = resourced;
     }
 
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Package that = (Package) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (pwd != null ? !pwd.equals(that.pwd) : that.pwd != null) return false;
-        if (remotePath != null ? !remotePath.equals(that.remotePath) : that.remotePath != null) return false;
-
-        return true;
+    @Column(name = "event_type")
+    public String getEventType() {
+        return eventType;
     }
 
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (pwd != null ? pwd.hashCode() : 0);
-        result = 31 * result + (remotePath != null ? remotePath.hashCode() : 0);
-        return result;
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    @Column(name = "event_no")
+    public String getEventNo() {
+        return eventNo;
+    }
+
+    public void setEventNo(String eventNo) {
+        this.eventNo = eventNo;
+    }
+
+    @Column(name = "event_date")
+    public Date getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    @Column(name = "patient_id")
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 }

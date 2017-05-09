@@ -6,10 +6,7 @@ import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.*;
@@ -28,7 +25,9 @@ public interface XPackageMgrClient {
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.Package, method = RequestMethod.PUT)
     void reportStatus(@PathVariable(value = "id") String id,
                       @RequestParam(value = "status") ArchiveStatus status,
-                      @RequestParam(value = "message") String message);
+                      @RequestBody String message);
+
+
 
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.ResolveMessage, method = RequestMethod.PUT)

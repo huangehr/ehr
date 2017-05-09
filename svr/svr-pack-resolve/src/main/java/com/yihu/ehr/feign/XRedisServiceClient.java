@@ -45,6 +45,9 @@ public interface XRedisServiceClient {
     @RequestMapping(value = ServiceApi.Redis.OrgRedis, method = RequestMethod.GET)
     public String getOrgRedis(@RequestParam("key") String key);
 
+    //("获取机构区域redis")
+    @RequestMapping(value = ServiceApi.Redis.OrgAreaRedis, method = RequestMethod.GET)
+    public String getOrgAreaRedis(@RequestParam("key") String key);
 
     /******************************************* 资源化相关Redis *******************************************************************/
     //("获取资源化字典映射 redis")

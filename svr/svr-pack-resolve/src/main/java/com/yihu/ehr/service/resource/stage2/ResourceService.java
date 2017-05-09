@@ -3,6 +3,7 @@ package com.yihu.ehr.service.resource.stage2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.feign.XArchiveClient;
 import com.yihu.ehr.entity.patient.ArchiveRelation;
+import com.yihu.ehr.service.resource.stage2.index.IndexService;
 import com.yihu.ehr.service.resource.stage2.repo.FileResourceRepository;
 import com.yihu.ehr.service.resource.stage2.repo.MasterResourceRepository;
 import com.yihu.ehr.service.resource.stage2.repo.SubResourceRepository;
@@ -31,6 +32,9 @@ public class ResourceService {
     FileResourceRepository fileResRepo;
 
     @Autowired
+    IndexService indexService;
+
+    @Autowired
     XArchiveClient archiveClient;
 
     @Autowired
@@ -45,6 +49,10 @@ public class ResourceService {
 
         // 存储文件记录
         fileResRepo.save(resourceBucket);
+
+        // 保存维度索引
+        //indexService.save(resourceBucket);
+
 
         //保存MYSQL关联记录
         try {

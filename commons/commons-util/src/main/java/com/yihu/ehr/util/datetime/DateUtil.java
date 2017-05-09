@@ -16,14 +16,11 @@ package com.yihu.ehr.util.datetime;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.Date;
+
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.*;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 public class DateUtil {
 
@@ -48,6 +45,69 @@ public class DateUtil {
     public static final String DEFAULT_NOW_STRING_FORMAT = "yyyyMMddHHmmssSSS";
     public static final String DATE_MDY_FORMAT = "MMddyyyy";
     public static final String DATE_MY_FORMAT = "MMyyyy";
+    public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
+
+
+
+    /**
+     * 字符串转时间格式
+     */
+    public static java.util.Date strToDate(String strDate) {
+        if (StringUtils.isEmpty(strDate)) {
+            return null;
+        }
+        else{
+            int length = strDate.length();
+            if(strDate.contains("/"))
+            {
+                strDate = strDate.replace("/","-");
+            }
+
+            if(strDate.contains("-"))
+            {
+                if(length == 10)
+                {
+                    return strToDate(strDate,DEFAULT_DATE_YMD_FORMAT);
+                }
+                else if(length == 19)
+                {
+                    return strToDate(strDate,DEFAULT_YMDHMSDATE_FORMAT);
+                }
+            }
+            else{
+                if(length == 8)
+                {
+                    return strToDate(strDate,DEFAULT_CHAR_DATE_YMD_FORMAT);
+                }
+                else if(length == 14)
+                {
+                    return strToDate(strDate,YYYYMMDDHHMMSS);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 字符串转时间格式
+     */
+    public static Date strToDate(String strDate, String format) {
+        if (StringUtils.isEmpty(strDate)) {
+            return null;
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
+        ParsePosition pos = new ParsePosition(0);
+        return formatter.parse(strDate, pos);
+    }
+
+    /**
+     * 时间转字符串 yyyy-MM-dd HH:mm:ss
+     */
+    public static String toStringLong(Date date)
+    {
+        return toString(date,DEFAULT_YMDHMSDATE_FORMAT);
+    }
 
     public static String changeFormat(String changeDate, String beforeFormat, String afterFormat) {
 
@@ -180,18 +240,10 @@ public class DateUtil {
     }
 
     public static String toString(Date date) {
-        return toString((java.util.Date) date);
-    }
-
-    public static String toString(java.util.Date date) {
         return toString(date, DEFAULT_DATE_YMD_FORMAT);
     }
 
     public static String toString(Date date, String format) {
-        return toString((java.util.Date) date, format);
-    }
-
-    public static String toString(java.util.Date date, String format) {
 
         if (date == null) {
             return null;
@@ -409,9 +461,6 @@ public class DateUtil {
         return Integer.toString(age);
     }
 
-    public static Date addDate(int add, java.util.Date d) {
-        return addDate(add, new Date(d.getTime()));
-    }
 
     public static Date addDate(int add, Date d) {
 
@@ -436,9 +485,6 @@ public class DateUtil {
         return formatDate(addDate(add, formatCharDateYMD(sDate, DEFAULT_CHAR_DATE_YMD_FORMAT)), DEFAULT_CHAR_DATE_YMD_FORMAT);
     }
 
-    public static Date addMonth(int add, java.util.Date d) {
-        return addMonth(add, new Date(d.getTime()));
-    }
 
     public static Date addMonth(int add, Date d) {
 
@@ -463,9 +509,6 @@ public class DateUtil {
         return formatDate(addMonth(add, formatCharDateYMD(sDate, DEFAULT_CHAR_DATE_YMD_FORMAT)), DEFAULT_CHAR_DATE_YMD_FORMAT);
     }
 
-    public static Date addYear(int add, java.util.Date d) {
-        return addYear(add, new Date(d.getTime()));
-    }
 
     public static Date addYear(int add, Date d) {
 
