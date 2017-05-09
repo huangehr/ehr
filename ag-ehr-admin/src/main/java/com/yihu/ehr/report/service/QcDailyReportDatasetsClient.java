@@ -23,7 +23,7 @@ import java.util.List;
 @ApiIgnore
 public interface QcDailyReportDatasetsClient {
 
-    @RequestMapping(value = ServiceApi.Report.GetQcDailyReportList, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Report.GetQcDailyReportDatasetsList, method = RequestMethod.GET)
     @ApiOperation(value = "质控包数据集汇总日报列表")
     ResponseEntity<List<MQcDailyReportDatasets>> search(
             @RequestParam(value = "fields", required = false) String fields,
@@ -46,7 +46,7 @@ public interface QcDailyReportDatasetsClient {
     boolean delete( @PathVariable(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Report.QcDailyReportDatasets, method = RequestMethod.GET)
-    @ApiOperation(value = "获取认证申请信息")
+    @ApiOperation(value = "获取质控包数据集汇总日报信息")
     MQcDailyReportDatasets getInfo( @PathVariable(value = "id") String id) ;
 
 }
