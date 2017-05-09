@@ -32,7 +32,7 @@ public class QcDailyReportDatasetsController extends ExtendController<QcDailyRep
     QcDailyReportDatasetsClient qcDailyReportDatasetsClient;
 
 
-    @RequestMapping(value = ServiceApi.Report.GetQcDailyReportList, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Report.GetQcDailyReportDatasetsList, method = RequestMethod.GET)
     @ApiOperation(value = "质控包数据集汇总日报列表")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
