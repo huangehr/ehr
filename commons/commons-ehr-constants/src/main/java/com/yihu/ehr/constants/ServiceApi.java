@@ -723,6 +723,12 @@ public class ServiceApi {
         public static final String GetQcDailyReportMetadataList = "/report/getQcDailyReportMetadataList";
         public static final String QcDailyReportMetadata = "/report/qcDailyReportMetadata";
 
+        public static final String GetQcQuotaDictList = "/report/getQcQuotaDictList";
+        public static final String QcQuotaDict = "/report/qcQuotaDict";
+
+        public static final String GetQcQuotaResultList = "/report/getQcQuotaResultList";
+        public static final String QcQuotaResult = "/report/qcQuotaResult";
+
     }
 
 
