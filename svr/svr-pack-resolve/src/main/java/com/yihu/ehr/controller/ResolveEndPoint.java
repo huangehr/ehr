@@ -59,13 +59,13 @@ public class ResolveEndPoint {
     @Autowired
     ObjectMapper objectMapper;
 
-    @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为OLDEST，则取最旧的未解析档案包")
+    @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析档案包")
     @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
     public String resolve(
             @ApiParam(value = "id", defaultValue = "")
             @RequestParam(required = false) String packageId,
-            @ApiParam(value = "模拟应用ID", defaultValue = "FBIWarning911")
-            @RequestParam("clientId") String clientId,
+            @ApiParam(value = "模拟应用ID", defaultValue = "")
+            @RequestParam(required = false) String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
             @RequestParam("echo") boolean echo) throws Throwable
     {

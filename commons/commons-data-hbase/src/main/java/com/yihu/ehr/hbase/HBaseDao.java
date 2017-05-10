@@ -127,11 +127,12 @@ public class HBaseDao extends AbstractHBaseClient {
     public Map<String, Object> getResultMap(String tableName, String rowKey) throws Exception {
         return hbaseTemplate.get(tableName, rowKey, new RowMapper<Map<String, Object>>() {
             public Map<String, Object> mapRow(Result result, int rowNum) throws Exception {
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = null;
                 if(result!=null) {
                     List<Cell> ceList = result.listCells();
-                    map.put("rowkey", rowKey);
                     if (ceList != null && ceList.size() > 0) {
+                        map = new HashMap<String, Object>();
+                        map.put("rowkey", rowKey);
                         for (Cell cell : ceList) {
                             //默认不加列族
                             // Bytes.toString(cell.getFamilyArray(), cell.getFamilyOffset(), cell.getFamilyLength()) +"_"

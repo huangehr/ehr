@@ -5,12 +5,14 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
+import com.yihu.ehr.solr.SolrAdmin;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +29,9 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     HBaseDao hbaseDao;
+
+    @Autowired
+    SolrAdmin solrAdmin;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -96,7 +101,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @ApiOperation("删除表")
+    /*@ApiOperation("删除表")
     @RequestMapping(value = "dropTable",method = RequestMethod.POST)
     public String dropTable(@ApiParam(value="表名",defaultValue = "HH")
                               @RequestParam String tableName)
@@ -137,7 +142,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
             ex.printStackTrace();
             return "Fail!"+ex.getMessage();
         }
-    }
+    }*/
 
     @ApiOperation("获取单条数据")
     @RequestMapping(value = "getOneResult",method = RequestMethod.POST)
@@ -158,4 +163,48 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         }
     }
 
+   /* @ApiOperation("清空Hbase数据成功")
+    @RequestMapping(value = "truncateHbaseTable",method = RequestMethod.POST)
+    public String truncateHbaseTable(@ApiParam(value="core",defaultValue = "HealthProfile")
+                             @RequestParam String core)
+    {
+        try {
+            List<String> list = new ArrayList<>();
+            list.add(core);
+            hbaseAdmin.truncate(list);
+            return "清空Hbase数据成功！";
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return ex.getMessage();
+        }
+    }*/
+
+    /********************************** solr操作 ********************************************/
+    @ApiOperation("删除Solr")
+    @RequestMapping(value = "deleteSolr",method = RequestMethod.POST)
+    public String deleteSolr(@ApiParam(value="core",defaultValue = "HealthProfile")
+                             @RequestParam String core,
+                             @ApiParam(value="key",defaultValue = "")
+                             @RequestParam String key)
+    {
+        try {
+            if(solrAdmin.delete(core,key))
+            {
+
+                return "删除Solr成功！";
+            }
+            else{
+
+
+                return "删除Solr失败！";
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return ex.getMessage();
+        }
+    }
 }
