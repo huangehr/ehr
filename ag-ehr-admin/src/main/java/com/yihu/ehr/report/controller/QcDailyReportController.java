@@ -21,9 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author janseny
@@ -128,11 +130,10 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
             @ApiParam(name = "eventsData", value = "采集json数据", defaultValue = "")
             @RequestParam("eventsData") String collectionData) {
         try {
-
             EventsModel eventsModel = objectMapper.readValue(collectionData, EventsModel.class);
-
             MQcDailyReport qcDailyReport = new MQcDailyReport();
-            List<MQcDailyReportDetail> list = new ArrayList<MQcDailyReportDetail>();
+            List<MQcDailyReportDetail> totalList = new ArrayList<>();
+            List<MQcDailyReportDetail> realList = new ArrayList<>();
             if(eventsModel != null){
                 if(StringUtils.isEmpty(eventsModel.getCreate_date())){
                     return failed("采集时间不能为空");
@@ -150,19 +151,23 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
                 qcDailyReport.setTotalOutpatientNum(eventsModel.getTotal_outpatient_num());
                 qcDailyReport = qcDailyReportClient.add(objectMapper.writeValueAsString(qcDailyReport));
                 if(eventsModel.getTotal_hospital() != null){
-                    addList(list,eventsModel.getTotal_hospital(),qcDailyReport.getId(),createDate);
+                    addList(totalList, eventsModel.getTotal_hospital(), qcDailyReport.getId(), createDate, "hospital");
                 }
                 if(eventsModel.getReal_hospital() != null){
-                    addList(list,eventsModel.getReal_hospital(),qcDailyReport.getId(),createDate);
+                    addList(realList,eventsModel.getReal_hospital(),qcDailyReport.getId(),createDate,"hospital");
                 }
                 if(eventsModel.getTotal_outpatient() != null){
-                    addList(list,eventsModel.getTotal_outpatient(),qcDailyReport.getId(),createDate);
+                    addList(totalList, eventsModel.getTotal_outpatient(), qcDailyReport.getId(), createDate, "outpatient");
                 }
                 if(eventsModel.getReal_outpatient() != null){
-                    addList(list,eventsModel.getReal_outpatient(),qcDailyReport.getId(),createDate);
+                    addList(realList,eventsModel.getReal_outpatient(),qcDailyReport.getId(),createDate,"outpatient");
                 }
-
-                qcDailyReportClient.addQcDailyReportDetailList(objectMapper.writeValueAsString(list));
+                List<QcDailyReportDetail> totalDetails = null;
+                totalDetails = qcDailyReportClient.addQcDailyReportDetailList(objectMapper.writeValueAsString(totalList));
+                String realListStr =  objectMapper.writeValueAsString(checkRealListFromTotal(totalDetails, realList));
+                if(realListStr.length()>2){
+                    qcDailyReportClient.updateQcDailyReportDetailList(realListStr);
+                }
             }
             return success("");
         }catch (Exception e){
@@ -171,18 +176,19 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
         }
     }
 
-    public List<MQcDailyReportDetail> addList(List<MQcDailyReportDetail> list,List<EventDetailModel> modelList,String qcDailyReportId,Date createTime){
+    //应踩数据
+    protected List<MQcDailyReportDetail> addList(List<MQcDailyReportDetail> list,List<EventDetailModel> modelList,String qcDailyReportId,Date createTime,String archiveType){
         for(EventDetailModel eventDetailModel : modelList){
             MQcDailyReportDetail qcDailyReportDetail = new MQcDailyReportDetail();
             qcDailyReportDetail.setEventNo(eventDetailModel.getEvent_no());
-            qcDailyReportDetail.setEventTime(DateUtil.parseDate(eventDetailModel.getEvent_time(), "yyyy-MM-dd hh:mm:ss"));
+            qcDailyReportDetail.setEventTime(eventDetailModel.getEvent_time());
             qcDailyReportDetail.setPatientId(eventDetailModel.getPatient_id());
             qcDailyReportDetail.setReportId(qcDailyReportId);
-            qcDailyReportDetail.setArchiveType("");
-            qcDailyReportDetail.setAcqFlag(1);
+            qcDailyReportDetail.setArchiveType(archiveType);
+            qcDailyReportDetail.setAcqFlag(0);
             int day = 0;
             if(StringUtils.isNotEmpty(eventDetailModel.getEvent_time())){
-                Date eventDate = DateUtil.parseDate(eventDetailModel.getEvent_time(), "yyyy-MM-dd hh:mm:ss");
+                Date eventDate = DateUtil.parseDate(eventDetailModel.getEvent_time(), "yyyy-MM-dd HH:mm:ss");
                 long intervalMilli = DateUtil.compareDateTime(createTime ,eventDate);
                 day = (int) (intervalMilli / (24 * 60 * 60 * 1000));
             }
@@ -191,5 +197,33 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
         }
         return list;
     }
+
+    //检验是否采集
+    protected List<MQcDailyReportDetail> checkRealListFromTotal(List<QcDailyReportDetail> qcDailyReportDetails,List<MQcDailyReportDetail> realList){
+
+        List<MQcDailyReportDetail> realQcDailyReportDetailList = new ArrayList<>();
+        for (MQcDailyReportDetail mqcDailyReportDetail: realList){
+            for (QcDailyReportDetail qcDailyReportDetail: qcDailyReportDetails){
+                boolean eventNoFlag = mqcDailyReportDetail.getEventNo().equals(qcDailyReportDetail.getEventNo());
+                boolean eventTimeFlag = true;
+                if(mqcDailyReportDetail.getEventTime() !=null && qcDailyReportDetail.getEventTime() != null){
+                    long intervalMilli = DateUtil.compareDateTime(DateUtil.formatCharDateYMDHMS(mqcDailyReportDetail.getEventTime()) ,qcDailyReportDetail.getEventTime());
+                    eventTimeFlag  = intervalMilli==0;
+                }
+                boolean patientIdFlag = mqcDailyReportDetail.getPatientId().equals(qcDailyReportDetail.getPatientId());
+                if(eventNoFlag && eventTimeFlag && patientIdFlag){
+                    mqcDailyReportDetail.setId(qcDailyReportDetail.getId());
+                    mqcDailyReportDetail.setAcqFlag(1);
+                    realQcDailyReportDetailList.add(mqcDailyReportDetail);
+                    break;
+                }
+            }
+        }
+        return realQcDailyReportDetailList;
+    }
+
+
+
+
 
 }

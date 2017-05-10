@@ -54,11 +54,16 @@ public interface QcDailyReportClient {
 
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
-    void addQcDailyReportDetailList(@RequestBody String models ) ;
+    List<QcDailyReportDetail> addQcDailyReportDetailList(@RequestBody String models ) ;
 
 
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
     MQcDailyReportDetail addQcDailyReportDetail(@RequestBody String model) ;
+
+
+    @RequestMapping(value = ServiceApi.Report.UpdateQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改质控包数据完整性详细数据日报")
+    void updateQcDailyReportDetailList(@RequestBody String models ) ;
 
 }

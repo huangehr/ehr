@@ -108,16 +108,43 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
-    void addQcDailyReportDetailList(@RequestBody String details ) throws IOException {
+    List<QcDailyReportDetail> addQcDailyReportDetailList(@RequestBody String details ) throws IOException {
+        List<QcDailyReportDetail> resultList =  new ArrayList<>();
+        List<QcDailyReportDetail> list =  getModelList(details);
+        for(QcDailyReportDetail qcDailyReportDetail:list){
+            qcDailyReportDetail = qcDailyReportDetailService.save(qcDailyReportDetail);
+            resultList.add(qcDailyReportDetail);
+        }
+        return resultList;
+    }
+
+
+    @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增质控包数据完整性详细数据日报")
+    MQcDailyReportDetail addQcDailyReportDetail(@RequestBody QcDailyReportDetail model){
+        return getModelDetail(qcDailyReportDetailService.save(model) );
+    }
+
+    @RequestMapping(value = ServiceApi.Report.UpdateQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改质控包数据完整性详细数据日报")
+    void updateQcDailyReportDetailList(@RequestBody String details )throws IOException {
+        List<QcDailyReportDetail> list =  getModelList(details);
+        for(QcDailyReportDetail qcDailyReportDetail:list){
+            qcDailyReportDetailService.save(qcDailyReportDetail);
+        }
+    } ;
+
+
+    protected List<QcDailyReportDetail> getModelList(String modelStr) throws IOException {
         List<Map<String, Object>> models = new ArrayList<>();
-        models = objectMapper.readValue(details, new TypeReference<List>() {});
+        models = objectMapper.readValue(modelStr, new TypeReference<List>() {});
         List<QcDailyReportDetail> list =  new ArrayList<>();
         for(int i=0; i < models.size(); i++) {
             QcDailyReportDetail qcDailyReportDetail = new QcDailyReportDetail();
             Map<String, Object> model = models.get(i);
             qcDailyReportDetail.setEventNo(model.get("eventNo").toString());
             if( !StringUtils.isEmpty(model.get("eventTime"))){
-                qcDailyReportDetail.setEventTime(DateUtil.parseDate(model.get("eventTime").toString(),"yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+                qcDailyReportDetail.setEventTime(DateUtil.parseDate(model.get("eventTime").toString(),"yyyy-MM-dd HH:mm:ss"));
             }
             qcDailyReportDetail.setPatientId(model.get("patientId").toString());
             qcDailyReportDetail.setReportId(model.get("reportId").toString());
@@ -132,15 +159,9 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
                 int tf = Integer.valueOf(model.get("acqFlag").toString());
                 qcDailyReportDetail.setTimelyFlag(tf);
             }
-            qcDailyReportDetailService.save(qcDailyReportDetail);
+            list.add(qcDailyReportDetail);
         }
-    }
-
-
-    @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增质控包数据完整性详细数据日报")
-    MQcDailyReportDetail addQcDailyReportDetail(@RequestBody QcDailyReportDetail model){
-        return getModelDetail(qcDailyReportDetailService.save(model) );
+        return  list;
     }
 
     protected MQcDailyReport getModel(QcDailyReport o){
