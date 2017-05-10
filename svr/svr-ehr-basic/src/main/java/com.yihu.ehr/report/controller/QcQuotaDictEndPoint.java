@@ -6,7 +6,8 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.report.QcQuotaDict;
 import com.yihu.ehr.model.common.ListResult;
-import com.yihu.ehr.model.report.MQcQuotaDict;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.report.service.QcQuotaDictService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -66,34 +67,23 @@ public class QcQuotaDictEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Report.QcQuotaDict, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增数据统计指标")
-    public MQcQuotaDict add(
+    @ApiOperation(value = "新增&修改统计指标")
+    public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestBody QcQuotaDict model) throws Exception{
-        return getModel( qcQuotaDictService.save(model) );
+            @RequestBody String model) throws Exception{
+
+        QcQuotaDict obj = objectMapper.readValue(model,QcQuotaDict.class);
+        obj = qcQuotaDictService.save(obj);
+        return Result.success("统计指标更新成功！", obj);
     }
 
-
-    @RequestMapping(value = ServiceApi.Report.QcQuotaDict, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改数据统计指标")
-    public MQcQuotaDict update(
-            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestBody QcQuotaDict model) throws Exception{
-        return getModel(qcQuotaDictService.save(model));
-    }
 
     @RequestMapping(value = ServiceApi.Report.QcQuotaDict, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据统计指标")
-    public boolean delete(
+    public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) throws Exception{
         qcQuotaDictService.delete(id);
-        return true;
+        return Result.success("统计指标删除成功！");
     }
-
-
-    protected MQcQuotaDict getModel(QcQuotaDict o){
-        return convertToModel(o, MQcQuotaDict.class);
-    }
-
 }

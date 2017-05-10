@@ -4,22 +4,23 @@ import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.report.QcQuotaDict;
-import com.yihu.ehr.model.report.MQcQuotaDict;
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.report.service.QcQuotaDictClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author janseny
@@ -49,8 +50,15 @@ public class QcQuotaDictController extends ExtendController<QcQuotaDict> {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
 
-        ResponseEntity<List<MQcQuotaDict>> responseEntity = qcQuotaDictClient.search(fields, filters, sorts, size, page);
-        return getResult(responseEntity.getBody(), getTotalCount(responseEntity), page, size);
+        ListResult listResult = qcQuotaDictClient.search(fields, filters, sorts, size, page);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+           /* list = convertArApplyModels(list);*/
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else{
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
     }
 
 
@@ -60,26 +68,13 @@ public class QcQuotaDictController extends ExtendController<QcQuotaDict> {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
         try {
-            return success(qcQuotaDictClient.add(model) );
-        }catch (Exception e){
-            e.printStackTrace();
-            return failed(FeignExceptionUtils.getErrorMsg(e));
-        }
-    }
-
-
-    @RequestMapping(value = ServiceApi.Report.QcQuotaDict, method = RequestMethod.PUT)
-    @ApiOperation(value = "修改数据统计指标")
-    public Envelop update(
-            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestParam("model") String model) {
-        try {
-            MQcQuotaDict qcQuotaDict = convertToMModel(model, MQcQuotaDict.class);
-
-            if( qcQuotaDict.getId()==0 )
-                return failed("编号不能为空");
-            return success(qcQuotaDictClient.update(qcQuotaDict) );
-        }catch (Exception e){
+            ObjectResult objectResult = qcQuotaDictClient.add(model);
+            if (objectResult.getCode() == 200) {
+                return successObj(objectResult.getData());
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
@@ -91,13 +86,15 @@ public class QcQuotaDictController extends ExtendController<QcQuotaDict> {
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) {
         try {
-            qcQuotaDictClient.delete(id);
-            return success("");
+            Result result = qcQuotaDictClient.delete(id);
+            if(result.getCode() == 200){
+                return successMsg(result.getMessage());
+            }else{
+                return failed("统计指标删除失败！");
+            }
         }catch (Exception e){
             e.printStackTrace();
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
-
-
 }

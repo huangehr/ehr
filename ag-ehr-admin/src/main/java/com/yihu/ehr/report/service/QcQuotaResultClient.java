@@ -3,18 +3,17 @@ package com.yihu.ehr.report.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.report.MQcQuotaResult;
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.List;
 
 /**
  * @author lincl
@@ -28,7 +27,7 @@ public interface QcQuotaResultClient {
 
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaResultList, method = RequestMethod.GET)
     @ApiOperation(value = "数据统计指标结果列表")
-    ResponseEntity<List<MQcQuotaResult>> search(
+    ListResult search(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
@@ -38,14 +37,10 @@ public interface QcQuotaResultClient {
 
     @RequestMapping(value = ServiceApi.Report.QcQuotaResult, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增数据统计指标结果")
-    MQcQuotaResult add(@RequestBody String model) ;
-
-    @RequestMapping(value = ServiceApi.Report.QcQuotaResult, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改数据统计指标结果")
-    MQcQuotaResult update(@RequestBody MQcQuotaResult model);
+    ObjectResult add(@RequestBody String model) ;
 
     @RequestMapping(value = ServiceApi.Report.QcQuotaResult, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据统计指标结果")
-    boolean delete(@RequestParam(value = "id") String id);
+    Result delete(@RequestParam(value = "id") String id);
 
 }

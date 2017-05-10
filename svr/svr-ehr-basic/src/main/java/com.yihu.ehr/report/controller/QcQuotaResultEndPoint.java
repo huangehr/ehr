@@ -6,7 +6,8 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.report.QcQuotaResult;
 import com.yihu.ehr.model.common.ListResult;
-import com.yihu.ehr.model.report.MQcQuotaResult;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.report.service.QcQuotaResultService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -66,34 +67,22 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Report.QcQuotaResult, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增数据统计指标结果")
-    public MQcQuotaResult add(
+    @ApiOperation(value = "新增统计指标统计结果")
+    public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestBody QcQuotaResult model) throws Exception{
-        return getModel( qcQuotaResultService.save(model) );
+            @RequestBody String model) throws Exception{
+        QcQuotaResult obj = objectMapper.readValue(model,QcQuotaResult.class);
+        obj = qcQuotaResultService.save(obj);
+        return Result.success("指标统计更新成功！", obj);
     }
 
-
-    @RequestMapping(value = ServiceApi.Report.QcQuotaResult, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改数据统计指标结果")
-    public MQcQuotaResult update(
-            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestBody QcQuotaResult model) throws Exception{
-        return getModel(qcQuotaResultService.save(model));
-    }
 
     @RequestMapping(value = ServiceApi.Report.QcQuotaResult, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据统计指标结果")
-    public boolean delete(
+    public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) throws Exception{
         qcQuotaResultService.delete(id);
-        return true;
+        return Result.success("统计指标删除成功！");
     }
-
-
-    protected MQcQuotaResult getModel(QcQuotaResult o){
-        return convertToModel(o, MQcQuotaResult.class);
-    }
-
 }

@@ -24,7 +24,7 @@ public class QcQuotaDict {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false, length = 32)
+    @Column(name = "id", unique = true, nullable = false, length = 11)
     public Long getId() {
         return id;
     }
@@ -71,6 +71,7 @@ public class QcQuotaDict {
     public void setType(String type) {
         this.type = type;
     }
+
     @Basic
     @Column(name = "create_time")
     public Date getCreateTime() {
