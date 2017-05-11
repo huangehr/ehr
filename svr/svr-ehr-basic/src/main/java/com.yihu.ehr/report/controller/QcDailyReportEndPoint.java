@@ -42,7 +42,7 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     ObjectMapper objectMapper;
-    
+
     @Autowired
     QcDailyReportService qcDailyReportService;
     @Autowired
@@ -110,12 +110,9 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
     boolean addQcDailyReportDetailList(@RequestBody String details ) throws IOException {
-        List<QcDailyReportDetail> resultList =  new ArrayList<QcDailyReportDetail>();
         List<QcDailyReportDetail> list =  getModelList(details);
         for(QcDailyReportDetail qcDailyReportDetail:list){
-            qcDailyReportDetail.setAddDate(new Date());
-            qcDailyReportDetail = qcDailyReportDetailService.save(qcDailyReportDetail);
-            resultList.add(qcDailyReportDetail);
+            qcDailyReportDetailService.save(qcDailyReportDetail);
         }
         return true;
     }
@@ -126,16 +123,6 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     MQcDailyReportDetail addQcDailyReportDetail(@RequestBody QcDailyReportDetail model){
         return getModelDetail(qcDailyReportDetailService.save(model) );
     }
-
-    @RequestMapping(value = ServiceApi.Report.UpdateQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改质控包数据完整性详细数据日报")
-    void updateQcDailyReportDetailList(@RequestBody String details )throws IOException {
-        List<QcDailyReportDetail> list =  getModelList(details);
-        for(QcDailyReportDetail qcDailyReportDetail:list){
-            qcDailyReportDetailService.save(qcDailyReportDetail);
-        }
-    } ;
-
 
     protected List<QcDailyReportDetail> getModelList(String modelStr) throws IOException {
         List<Map<String, Object>> models = new ArrayList<>();
@@ -158,9 +145,10 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
                 qcDailyReportDetail.setAcqFlag(af);
             }
             if( !StringUtils.isEmpty(model.get("timelyFlag"))){
-                int tf = Integer.valueOf(model.get("acqFlag").toString());
+                int tf = Integer.valueOf(model.get("timelyFlag").toString());
                 qcDailyReportDetail.setTimelyFlag(tf);
             }
+            qcDailyReportDetail.setAddDate(new Date());
             list.add(qcDailyReportDetail);
         }
         return  list;

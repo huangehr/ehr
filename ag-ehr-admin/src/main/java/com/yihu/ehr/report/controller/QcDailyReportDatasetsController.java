@@ -97,20 +97,4 @@ public class QcDailyReportDatasetsController extends ExtendController<QcDailyRep
     }
 
 
-    @RequestMapping(value = ServiceApi.Report.QcDailyReportDatasets, method = RequestMethod.GET)
-    @ApiOperation(value = "获取质控包数据集汇总日报信息")
-    public Envelop getInfo(
-            @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") String id) {
-        try {
-            MQcDailyReportDatasets qcDailyReportDatasets = qcDailyReportDatasetsClient.getInfo(id);
-            if(qcDailyReportDatasets == null)
-                return failed("没有找到该质控包数据集汇总日报信息！");
-            return success(qcDailyReportDatasets);
-        }catch (Exception e){
-            e.printStackTrace();
-            return failed("获取信息出错！");
-        }
-    }
-
 }

@@ -719,9 +719,12 @@ public class ServiceApi {
 
         public static final String GetQcDailyReportDatasetList = "/report/getQcDailyReportDatasetList";
         public static final String QcDailyReportDataset = "/report/qcDailyReportDataset";
+        public static final String AddQcDailyDatasetDetailList = "/report/addQcDailyDatasetDetailList";
 
         public static final String GetQcDailyReportMetadataList = "/report/getQcDailyReportMetadataList";
         public static final String QcDailyReportMetadata = "/report/qcDailyReportMetadata";
+        public static final String AddQcDailyMetadataDetailList = "/report/addQcDailyMetadataDetailList";
+
 
         public static final String GetQcQuotaDictList = "/report/getQcQuotaDictList";
         public static final String QcQuotaDict = "/report/qcQuotaDict";

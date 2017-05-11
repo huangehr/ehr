@@ -1,5 +1,6 @@
 package com.yihu.ehr.report.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -8,17 +9,22 @@ import com.yihu.ehr.entity.report.QcDailyReportMetadata;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.report.MQcDailyReportMetadata;
 import com.yihu.ehr.report.service.QcDailyReportMetadataService;
+import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by janseny on 2017/5/8.
@@ -90,8 +96,54 @@ public class QcDailyReportMetadataEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.Report.AddQcDailyMetadataDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增质控包数据元日报列表")
+    boolean addDailyDatasetMetadataList(@RequestBody String models ) throws IOException {
+        List<QcDailyReportMetadata> list =  getModelList(models);
+        for(QcDailyReportMetadata qcDailyReportMetadata:list){
+            qcDailyReportMetaDataService.save(qcDailyReportMetadata);
+        }
+        return true;
+    }
+
     protected MQcDailyReportMetadata getModel(QcDailyReportMetadata o){
         return convertToModel(o, MQcDailyReportMetadata.class);
+    }
+
+    protected List<QcDailyReportMetadata> getModelList(String modelStr) throws IOException {
+        List<Map<String, Object>> models = new ArrayList<>();
+        models = objectMapper.readValue(modelStr, new TypeReference<List>() {});
+        List<QcDailyReportMetadata> list =  new ArrayList<>();
+        for(int i=0; i < models.size(); i++) {
+            QcDailyReportMetadata qcDailyReportDetail = new QcDailyReportMetadata();
+            Map<String, Object> model = models.get(i);
+            if( StringUtils.isNotEmpty(model.get("eventTime").toString())){
+                qcDailyReportDetail.setEventTime(DateUtil.parseDate(model.get("eventTime").toString(), "yyyy-MM-dd HH:mm:ss"));
+            }
+            if( StringUtils.isNotEmpty(model.get("createDate").toString())){
+                qcDailyReportDetail.setCreateDate(DateUtil.parseDate(model.get("createDate").toString(), "yyyy-MM-dd HH:mm:ss"));
+            }
+            qcDailyReportDetail.setOrgCode(model.get("orgCode").toString());
+            qcDailyReportDetail.setMetadate(model.get("metadate").toString());
+            qcDailyReportDetail.setDatasetId(model.get("datasetId").toString());
+            qcDailyReportDetail.setInnerVersion(model.get("innerVersion").toString());
+            qcDailyReportDetail.setDataset(model.get("dataset").toString());
+            if( !StringUtils.isEmpty(model.get("totalQty").toString())){
+                qcDailyReportDetail.setTotalQty(model.get("totalQty").toString());
+            }
+            if( !StringUtils.isEmpty(model.get("errorQty").toString())){
+                int tf = Integer.valueOf(model.get("errorQty").toString());
+                qcDailyReportDetail.setErrorQty(tf);
+            }
+            if( !StringUtils.isEmpty(model.get("acqFlag").toString())){
+                int af = Integer.valueOf(model.get("acqFlag").toString());
+                qcDailyReportDetail.setAcqFlag(af);
+            }
+            qcDailyReportDetail.setErrCode(model.get("errCode").toString());
+            qcDailyReportDetail.setAddDate(new Date());
+            list.add(qcDailyReportDetail);
+        }
+        return  list;
     }
 
 }

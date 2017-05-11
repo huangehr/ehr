@@ -7,47 +7,49 @@ import java.util.List;
  */
 public class QcDailyMetadataModel {
 
-    private  String org_code ;      //机构编码
-    private  String  event_time;    //事件时间
-    private  String create_date ;   //采集时间
-    private  String inner_version ; //适配版本
+    private  String orgCode ;      //机构编码
+    private  String  eventTime;    //事件时间
+    private  String createDate ;   //采集时间
+    private  String innerVersion ; //适配版本
     private  String  dataset;   //数据集编码
     private Integer totalQty;//应采数据元数量
     private Integer errorQty;//错误数据元数量
     private String errCode;//错误代码
     private String metadate;//数据元inner_code
+    private Integer acqFlag;
+    private String datasetId;
 
 
-    public String getOrg_code() {
-        return org_code;
+    public String getOrgCode() {
+        return orgCode;
     }
 
-    public void setOrg_code(String org_code) {
-        this.org_code = org_code;
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
     }
 
-    public String getEvent_time() {
-        return event_time;
+    public String getEventTime() {
+        return eventTime;
     }
 
-    public void setEvent_time(String event_time) {
-        this.event_time = event_time;
+    public void setEventTime(String eventTime) {
+        this.eventTime = eventTime;
     }
 
-    public String getCreate_date() {
-        return create_date;
+    public String getCreateDate() {
+        return createDate;
     }
 
-    public void setCreate_date(String create_date) {
-        this.create_date = create_date;
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
     }
 
-    public String getInner_version() {
-        return inner_version;
+    public String getInnerVersion() {
+        return innerVersion;
     }
 
-    public void setInner_version(String inner_version) {
-        this.inner_version = inner_version;
+    public void setInnerVersion(String innerVersion) {
+        this.innerVersion = innerVersion;
     }
 
     public String getDataset() {
@@ -88,5 +90,21 @@ public class QcDailyMetadataModel {
 
     public void setMetadate(String metadate) {
         this.metadate = metadate;
+    }
+
+    public String getDatasetId() {
+        return datasetId;
+    }
+
+    public void setDatasetId(String datasetId) {
+        this.datasetId = datasetId;
+    }
+
+    public Integer getAcqFlag() {
+        return acqFlag;
+    }
+
+    public void setAcqFlag(Integer acqFlag) {
+        this.acqFlag = acqFlag;
     }
 }

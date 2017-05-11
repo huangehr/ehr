@@ -38,12 +38,12 @@ public class QcDatasetsParser {
         String totalNum = root.get("total_num").asText();
         String realNum = root.get("real_num").asText();
         try {
-            datasetsModel.setOrg_code(orgCode);
-            datasetsModel.setEvent_time(eventTime);
-            datasetsModel.setCreate_date(createTime);
-            datasetsModel.setInner_version(version);
-            datasetsModel.setTotal_hospital_num(Integer.valueOf(totalNum));
-            datasetsModel.setReal_hospital_num(Integer.valueOf(realNum));
+            datasetsModel.setOrgCode(orgCode);
+            datasetsModel.setEventTime(eventTime);
+            datasetsModel.setCreateDate(createTime);
+            datasetsModel.setInnerVersion(version);
+            datasetsModel.setTotalHospitalNum(Integer.valueOf(totalNum));
+            datasetsModel.setRealHospitalNum(Integer.valueOf(realNum));
 
             List<QcDailyDatasetModel> qcDailyDatasetModels = new ArrayList<>();
             JsonNode totalDataNode = root.get("total");
@@ -71,21 +71,4 @@ public class QcDatasetsParser {
         return datasetsModel;
     }
 
-    /**
-     * 翻译数据元。
-     *
-     * @param innerVersion
-     * @param datasetsModelCode
-     * @param isOrigin
-     * @param metaData
-     * @param actualData
-     * @return
-     */
-    protected String[] translateMetaData(String innerVersion,
-                                         String datasetsModelCode,
-                                         String metaData,
-                                         String actualData,
-                                         boolean isOrigin) {
-        return new String[]{metaData, actualData};
-    }
 }

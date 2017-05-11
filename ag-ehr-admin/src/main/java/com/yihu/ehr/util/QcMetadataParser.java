@@ -40,10 +40,10 @@ public class QcMetadataParser {
             JsonNode data = root.get("data");
             for (int i = 0; i < data.size(); ++i) {
                 QcDailyMetadataModel metadataModel = new QcDailyMetadataModel();
-                metadataModel.setOrg_code(orgCode);
-                metadataModel.setEvent_time(eventTime);
-                metadataModel.setCreate_date(createTime);
-                metadataModel.setInner_version(version);
+                metadataModel.setOrgCode(orgCode);
+                metadataModel.setEventTime(eventTime);
+                metadataModel.setCreateDate(createTime);
+                metadataModel.setInnerVersion(version);
                 metadataModel.setDataset(dataset);
                 JsonNode recordNode = data.get(i);
                 Iterator<Map.Entry<String, JsonNode>> iterator = recordNode.fields();

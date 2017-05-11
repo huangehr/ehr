@@ -68,20 +68,21 @@ public class QcDailyReportDatasetsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Report.QcDailyReportDatasets, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据集汇总日报")
-    public MQcDailyReportDatasets add(
+    public QcDailyReportDatasets add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody QcDailyReportDatasets model) throws Exception{
-        model.setAddDate(new Date());
-        return getModel( qcDailyReportDatasetsService.save(model) );
+         model.setAddDate(new Date());
+         model = qcDailyReportDatasetsService.save(model) ;
+        return model;
     }
 
 
     @RequestMapping(value = ServiceApi.Report.QcDailyReportDatasets, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改质控包数据集汇总日报")
-    public MQcDailyReportDatasets update(
+    public QcDailyReportDatasets update(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody QcDailyReportDatasets model) throws Exception{
-        return getModel(qcDailyReportDatasetsService.save(model));
+        return qcDailyReportDatasetsService.save(model);
     }
 
     @RequestMapping(value = ServiceApi.Report.QcDailyReportDatasets, method = RequestMethod.DELETE)

@@ -38,7 +38,7 @@ public class QcDailyReportDataset {
         this.reportId = reportId;
     }
     @Basic
-    @Column(name = "data_set")
+    @Column(name = "dataset")
     public String getDataset() {
         return dataset;
     }
