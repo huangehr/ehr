@@ -92,11 +92,7 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
                             }
                         }
                         datasetMap = qcDailyReportDatasetClient.addDailyDatasetModelList(objectMapper.writeValueAsString(qcDailyDatasetModelList));
-                        try {
-                            FileUtils.deleteQuietly(file);
-                        } catch (Exception e) {
-                            LogService.getLogger(QcDailyReportResolveController.class).warn("file delete failed after json file resolve: " + e.getMessage());
-                        }
+                        file.delete();
                     }
                 }
                 for (File file :filse){
@@ -109,18 +105,13 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
                             }
                         }
                         qcDailyReportMetadataClient.addDailyDatasetMetadataList(objectMapper.writeValueAsString(metadataList));
-                        try {
-                            FileUtils.deleteQuietly(file);
-                        } catch (Exception e) {
-                            LogService.getLogger(QcDailyReportResolveController.class).warn("file delete failed after json file resolve: " + e.getMessage());
-                        }
+                        file.delete();
                     }
                 }
-                rj.resolveContent(filePath);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return success("入库成功");
+            return success("解析并入库成功");
         }catch (Exception e){
             e.printStackTrace();
             return failed(FeignExceptionUtils.getErrorMsg(e));

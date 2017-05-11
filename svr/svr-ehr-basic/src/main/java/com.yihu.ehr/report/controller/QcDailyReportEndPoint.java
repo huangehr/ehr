@@ -132,19 +132,23 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
             QcDailyReportDetail qcDailyReportDetail = new QcDailyReportDetail();
             Map<String, Object> model = models.get(i);
             qcDailyReportDetail.setEventNo(model.get("eventNo").toString());
-            if( !StringUtils.isEmpty(model.get("eventTime"))){
-                qcDailyReportDetail.setEventTime(DateUtil.parseDate(model.get("eventTime").toString(),"yyyy-MM-dd HH:mm:ss"));
+            if(model.get("eventTime") != null){
+                qcDailyReportDetail.setEventTime(DateUtil.parseDate(model.get("eventTime").toString(), "yyyy-MM-dd HH:mm:ss"));
             }
-            qcDailyReportDetail.setPatientId(model.get("patientId").toString());
-            qcDailyReportDetail.setReportId(model.get("reportId").toString());
-            if( !StringUtils.isEmpty(model.get("archiveType"))){
+            if(model.get("patientId") != null){
+                qcDailyReportDetail.setPatientId(model.get("patientId").toString());
+            }
+            if(model.get("reportId") != null){
+                qcDailyReportDetail.setReportId(model.get("reportId").toString());
+            }
+            if(model.get("archiveType") != null){
                 qcDailyReportDetail.setArchiveType(model.get("archiveType").toString());
             }
-            if( !StringUtils.isEmpty(model.get("acqFlag").toString())){
+            if(model.get("acqFlag") != null){
                 int af = Integer.valueOf(model.get("acqFlag").toString());
                 qcDailyReportDetail.setAcqFlag(af);
             }
-            if( !StringUtils.isEmpty(model.get("timelyFlag"))){
+            if(model.get("timelyFlag") != null){
                 int tf = Integer.valueOf(model.get("timelyFlag").toString());
                 qcDailyReportDetail.setTimelyFlag(tf);
             }

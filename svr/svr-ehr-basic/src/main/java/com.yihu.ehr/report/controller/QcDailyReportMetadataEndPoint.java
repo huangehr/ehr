@@ -117,29 +117,41 @@ public class QcDailyReportMetadataEndPoint extends EnvelopRestEndPoint {
         for(int i=0; i < models.size(); i++) {
             QcDailyReportMetadata qcDailyReportDetail = new QcDailyReportMetadata();
             Map<String, Object> model = models.get(i);
-            if( StringUtils.isNotEmpty(model.get("eventTime").toString())){
+            if(model.get("eventTime") != null){
                 qcDailyReportDetail.setEventTime(DateUtil.parseDate(model.get("eventTime").toString(), "yyyy-MM-dd HH:mm:ss"));
             }
-            if( StringUtils.isNotEmpty(model.get("createDate").toString())){
+            if(model.get("createDate") != null){
                 qcDailyReportDetail.setCreateDate(DateUtil.parseDate(model.get("createDate").toString(), "yyyy-MM-dd HH:mm:ss"));
             }
-            qcDailyReportDetail.setOrgCode(model.get("orgCode").toString());
-            qcDailyReportDetail.setMetadate(model.get("metadate").toString());
-            qcDailyReportDetail.setDatasetId(model.get("datasetId").toString());
-            qcDailyReportDetail.setInnerVersion(model.get("innerVersion").toString());
-            qcDailyReportDetail.setDataset(model.get("dataset").toString());
-            if( !StringUtils.isEmpty(model.get("totalQty").toString())){
+            if(model.get("orgCode") != null){
+                qcDailyReportDetail.setOrgCode(model.get("orgCode").toString());
+            }
+            if(model.get("metadate") != null){
+                qcDailyReportDetail.setMetadate(model.get("metadate").toString());
+            }
+            if(model.get("datasetId") != null){
+                qcDailyReportDetail.setDatasetId(model.get("datasetId").toString());
+            }
+            if(model.get("innerVersion") != null){
+                qcDailyReportDetail.setInnerVersion(model.get("innerVersion").toString());
+            }
+            if(model.get("dataset") != null){
+                qcDailyReportDetail.setDataset(model.get("dataset").toString());
+            }
+            if(model.get("totalQty") != null){
                 qcDailyReportDetail.setTotalQty(model.get("totalQty").toString());
             }
-            if( !StringUtils.isEmpty(model.get("errorQty").toString())){
+            if(model.get("totalQty") != null){
                 int tf = Integer.valueOf(model.get("errorQty").toString());
                 qcDailyReportDetail.setErrorQty(tf);
             }
-            if( !StringUtils.isEmpty(model.get("acqFlag").toString())){
+            if(model.get("acqFlag") != null){
                 int af = Integer.valueOf(model.get("acqFlag").toString());
                 qcDailyReportDetail.setAcqFlag(af);
             }
-            qcDailyReportDetail.setErrCode(model.get("errCode").toString());
+            if(model.get("errCode") != null){
+                qcDailyReportDetail.setErrCode(model.get("errCode").toString());
+            }
             qcDailyReportDetail.setAddDate(new Date());
             list.add(qcDailyReportDetail);
         }
