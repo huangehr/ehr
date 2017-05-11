@@ -3,7 +3,7 @@ package com.yihu.ehr.agModel.report;
 /**
  * Created by janseny on 2017/5/9.
  */
-public class EventDetailModel {
+public class QcDailyEventDetailModel {
 
     private  String  patient_id;   //病人id
     private  String  event_no;      //事件号

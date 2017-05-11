@@ -5,14 +5,17 @@ import java.util.List;
 /**
  * Created by janseny on 2017/5/9.
  */
-public class MetadataModel {
+public class QcDailyMetadataModel {
 
     private  String org_code ;      //机构编码
     private  String  event_time;    //事件时间
     private  String create_date ;   //采集时间
     private  String inner_version ; //适配版本
     private  String  dataset;   //数据集编码
-    private  List data;
+    private Integer totalQty;//应采数据元数量
+    private Integer errorQty;//错误数据元数量
+    private String errCode;//错误代码
+    private String metadate;//数据元inner_code
 
 
     public String getOrg_code() {
@@ -55,11 +58,35 @@ public class MetadataModel {
         this.dataset = dataset;
     }
 
-    public List getData() {
-        return data;
+    public Integer getTotalQty() {
+        return totalQty;
     }
 
-    public void setData(List data) {
-        this.data = data;
+    public void setTotalQty(Integer totalQty) {
+        this.totalQty = totalQty;
+    }
+
+    public Integer getErrorQty() {
+        return errorQty;
+    }
+
+    public void setErrorQty(Integer errorQty) {
+        this.errorQty = errorQty;
+    }
+
+    public String getErrCode() {
+        return errCode;
+    }
+
+    public void setErrCode(String errCode) {
+        this.errCode = errCode;
+    }
+
+    public String getMetadate() {
+        return metadate;
+    }
+
+    public void setMetadate(String metadate) {
+        this.metadate = metadate;
     }
 }

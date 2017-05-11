@@ -85,6 +85,7 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     public MQcDailyReport add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody QcDailyReport model) throws Exception{
+        model.setAddDate(new Date());
         return getModel( qcDailyReportService.save(model) );
     }
 
@@ -108,14 +109,15 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
-    List<QcDailyReportDetail> addQcDailyReportDetailList(@RequestBody String details ) throws IOException {
-        List<QcDailyReportDetail> resultList =  new ArrayList<>();
+    boolean addQcDailyReportDetailList(@RequestBody String details ) throws IOException {
+        List<QcDailyReportDetail> resultList =  new ArrayList<QcDailyReportDetail>();
         List<QcDailyReportDetail> list =  getModelList(details);
         for(QcDailyReportDetail qcDailyReportDetail:list){
+            qcDailyReportDetail.setAddDate(new Date());
             qcDailyReportDetail = qcDailyReportDetailService.save(qcDailyReportDetail);
             resultList.add(qcDailyReportDetail);
         }
-        return resultList;
+        return true;
     }
 
 

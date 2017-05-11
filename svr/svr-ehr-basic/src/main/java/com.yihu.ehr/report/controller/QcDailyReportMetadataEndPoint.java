@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -68,6 +69,7 @@ public class QcDailyReportMetadataEndPoint extends EnvelopRestEndPoint {
     public MQcDailyReportMetadata add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody QcDailyReportMetadata model) throws Exception{
+        model.setAddDate(new Date());
         return getModel( qcDailyReportMetaDataService.save(model) );
     }
 

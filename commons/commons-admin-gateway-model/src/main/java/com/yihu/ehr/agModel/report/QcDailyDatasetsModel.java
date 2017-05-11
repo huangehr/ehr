@@ -1,11 +1,12 @@
 package com.yihu.ehr.agModel.report;
 
+import java.util.Date;
 import java.util.List;
 
 /**
- * Created by janseny on 2017/5/9.
+ * Created by janseny on 2017/5/8.
  */
-public class DatasetsModel {
+public class QcDailyDatasetsModel {
 
     private  String org_code ;      //机构编码
     private  String create_date ;   //采集时间
@@ -13,8 +14,7 @@ public class DatasetsModel {
     private  String  event_time;    //事件时间
     private  int  total_hospital_num;   //应采数据集数
     private  int  real_hospital_num ;   //实采数据集数
-    private  List total;
-    private  List real;
+    private List<QcDailyDatasetModel> qcDailyDatasetModels;
 
     public String getOrg_code() {
         return org_code;
@@ -64,19 +64,11 @@ public class DatasetsModel {
         this.real_hospital_num = real_hospital_num;
     }
 
-    public List getTotal() {
-        return total;
+    public List<QcDailyDatasetModel> getQcDailyDatasetModels() {
+        return qcDailyDatasetModels;
     }
 
-    public void setTotal(List total) {
-        this.total = total;
-    }
-
-    public List getReal() {
-        return real;
-    }
-
-    public void setReal(List real) {
-        this.real = real;
+    public void setQcDailyDatasetModels(List<QcDailyDatasetModel> qcDailyDatasetModels) {
+        this.qcDailyDatasetModels = qcDailyDatasetModels;
     }
 }

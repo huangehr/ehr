@@ -20,7 +20,7 @@ public class QcDailyReport {
     private Integer totalHospitalNum;            //门诊实收数
     private Integer totalOutpatientNum;            //住院应收数
     private Integer realHospitalNum;            //住院实收数
-
+    private Date addDate;                     //添加时间
 
     @Id
     @GenericGenerator(name="systemUUID",strategy="uuid")
@@ -100,4 +100,13 @@ public class QcDailyReport {
         this.realHospitalNum = realHospitalNum;
     }
 
+    @Basic
+    @Column(name = "add_date")
+    public Date getAddDate() {
+        return addDate;
+    }
+
+    public void setAddDate(Date addDate) {
+        this.addDate = addDate;
+    }
 }
