@@ -9,15 +9,19 @@ import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.report.service.QcQuotaResultService;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -84,5 +88,63 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "id") String id) throws Exception{
         qcQuotaResultService.delete(id);
         return Result.success("统计指标删除成功！");
+    }
+
+    @RequestMapping(value = ServiceApi.Report.QcQuotaList, method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域获取统计指标列表")
+    public ListResult getQuotaByOrg(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime) throws Exception{
+
+        ListResult result = new ListResult();
+        List quotaList = new ArrayList<>();
+        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
+        Date endDate = DateTimeUtil.simpleDateTimeParse(endTime);
+        if(!StringUtils.isEmpty(orgCode)){
+            //按机构查询整体统计结果
+            quotaList = qcQuotaResultService.getQuotaListByOrgCode(orgCode, startDate, endDate);
+            if(quotaList.size() > 0){
+                result.setDetailModelList(quotaList);
+                result.setSuccessFlg(true);
+                result.setCode(200);
+                return result;
+            }else {
+                return null;
+            }
+        }
+        if(!StringUtils.isEmpty(quotaId)){
+            //区域整体统计结果 - 按机构及指标划分，
+            quotaList = qcQuotaResultService.getQuotaListByLocationGBOrg(location, Long.parseLong(quotaId),startDate, endDate);
+            if(quotaList.size() > 0){
+                result.setDetailModelList(quotaList);
+                result.setSuccessFlg(true);
+                result.setCode(200);
+                return result;
+            }else {
+                return null;
+            }
+        }
+        if(StringUtils.isEmpty(orgCode) && StringUtils.isEmpty(quotaId)){
+            //区域整体统计结果 - 按机构及指标划分，
+            quotaList = qcQuotaResultService.getQuotaListByLocation(location, startDate, endDate);
+            if(quotaList.size() > 0){
+                result.setDetailModelList(quotaList);
+                result.setSuccessFlg(true);
+                result.setCode(200);
+                return result;
+            }else {
+                return null;
+            }
+        }
+
+        return null;
     }
 }

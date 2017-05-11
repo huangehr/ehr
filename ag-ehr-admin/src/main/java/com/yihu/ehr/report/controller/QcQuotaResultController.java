@@ -61,6 +61,8 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
         }
     }
 
+
+
     @RequestMapping(value = ServiceApi.Report.QcQuotaResult, method = RequestMethod.POST)
     @ApiOperation(value = "新增数据统计指标结果")
     public Envelop add(
@@ -96,4 +98,12 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
+
+
+
+
+
+
+
+
 }

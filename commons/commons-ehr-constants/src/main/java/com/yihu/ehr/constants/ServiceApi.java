@@ -732,8 +732,9 @@ public class ServiceApi {
         public static final String GetQcQuotaResultList = "/report/getQcQuotaResultList";
         public static final String QcQuotaResult = "/report/qcQuotaResult";
 
-
         public static final String QcDailyReportReolve = "/report/qcDailyReportReolve";
+
+        public static final String QcQuotaList = "/report/qcQuotaList";
 
     }
 
