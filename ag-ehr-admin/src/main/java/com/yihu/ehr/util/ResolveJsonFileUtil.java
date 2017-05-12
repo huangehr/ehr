@@ -85,6 +85,20 @@ public class ResolveJsonFileUtil {
         return filse;
     }
 
+
+    public File[] unzip(File zipFile,String pwd) throws Exception {
+        File[] filse = null;
+        try {
+            filse = new Zipper().unzip( zipFile, TempPath + FilePath, pwd);
+            if (filse == null  || filse.length == 0) {
+                throw new RuntimeException("Invalid package file error, no file ");
+            }
+        }catch (Exception e){
+            LogService.getLogger(ResolveJsonFileUtil.class).warn("unzip failed resolve: " + e.getMessage());
+        }
+        return filse;
+    }
+
     private void houseKeep(String zipFile, File root) {
         try {
             FileUtils.deleteQuietly(new File(zipFile));
