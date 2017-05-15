@@ -19,7 +19,7 @@ public class QcDailyReportDatasets {
     private Date eventTime;//事件时间
     private Integer totalNum;//数据集应收数
     private Integer realNum;//数据集实收数
-
+    private Date addDate;   //添加时间
 
     @Id
     @GenericGenerator(name="systemUUID",strategy="uuid")
@@ -87,5 +87,15 @@ public class QcDailyReportDatasets {
 
     public void setRealNum(Integer realNum) {
         this.realNum = realNum;
+    }
+
+    @Basic
+    @Column(name = "add_date")
+    public Date getAddDate() {
+        return addDate;
+    }
+
+    public void setAddDate(Date addDate) {
+        this.addDate = addDate;
     }
 }

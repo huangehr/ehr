@@ -42,7 +42,7 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     ObjectMapper objectMapper;
-    
+
     @Autowired
     QcDailyReportService qcDailyReportService;
     @Autowired
@@ -85,6 +85,7 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     public MQcDailyReport add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody QcDailyReport model) throws Exception{
+        model.setAddDate(new Date());
         return getModel( qcDailyReportService.save(model) );
     }
 
@@ -108,14 +109,12 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
-    List<QcDailyReportDetail> addQcDailyReportDetailList(@RequestBody String details ) throws IOException {
-        List<QcDailyReportDetail> resultList =  new ArrayList<>();
+    boolean addQcDailyReportDetailList(@RequestBody String details ) throws IOException {
         List<QcDailyReportDetail> list =  getModelList(details);
         for(QcDailyReportDetail qcDailyReportDetail:list){
-            qcDailyReportDetail = qcDailyReportDetailService.save(qcDailyReportDetail);
-            resultList.add(qcDailyReportDetail);
+            qcDailyReportDetailService.save(qcDailyReportDetail);
         }
-        return resultList;
+        return true;
     }
 
 
@@ -125,16 +124,6 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
         return getModelDetail(qcDailyReportDetailService.save(model) );
     }
 
-    @RequestMapping(value = ServiceApi.Report.UpdateQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改质控包数据完整性详细数据日报")
-    void updateQcDailyReportDetailList(@RequestBody String details )throws IOException {
-        List<QcDailyReportDetail> list =  getModelList(details);
-        for(QcDailyReportDetail qcDailyReportDetail:list){
-            qcDailyReportDetailService.save(qcDailyReportDetail);
-        }
-    } ;
-
-
     protected List<QcDailyReportDetail> getModelList(String modelStr) throws IOException {
         List<Map<String, Object>> models = new ArrayList<>();
         models = objectMapper.readValue(modelStr, new TypeReference<List>() {});
@@ -143,22 +132,27 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
             QcDailyReportDetail qcDailyReportDetail = new QcDailyReportDetail();
             Map<String, Object> model = models.get(i);
             qcDailyReportDetail.setEventNo(model.get("eventNo").toString());
-            if( !StringUtils.isEmpty(model.get("eventTime"))){
-                qcDailyReportDetail.setEventTime(DateUtil.parseDate(model.get("eventTime").toString(),"yyyy-MM-dd HH:mm:ss"));
+            if(model.get("eventTime") != null){
+                qcDailyReportDetail.setEventTime(DateUtil.parseDate(model.get("eventTime").toString(), "yyyy-MM-dd HH:mm:ss"));
             }
-            qcDailyReportDetail.setPatientId(model.get("patientId").toString());
-            qcDailyReportDetail.setReportId(model.get("reportId").toString());
-            if( !StringUtils.isEmpty(model.get("archiveType"))){
+            if(model.get("patientId") != null){
+                qcDailyReportDetail.setPatientId(model.get("patientId").toString());
+            }
+            if(model.get("reportId") != null){
+                qcDailyReportDetail.setReportId(model.get("reportId").toString());
+            }
+            if(model.get("archiveType") != null){
                 qcDailyReportDetail.setArchiveType(model.get("archiveType").toString());
             }
-            if( !StringUtils.isEmpty(model.get("acqFlag").toString())){
+            if(model.get("acqFlag") != null){
                 int af = Integer.valueOf(model.get("acqFlag").toString());
                 qcDailyReportDetail.setAcqFlag(af);
             }
-            if( !StringUtils.isEmpty(model.get("timelyFlag"))){
-                int tf = Integer.valueOf(model.get("acqFlag").toString());
+            if(model.get("timelyFlag") != null){
+                int tf = Integer.valueOf(model.get("timelyFlag").toString());
                 qcDailyReportDetail.setTimelyFlag(tf);
             }
+            qcDailyReportDetail.setAddDate(new Date());
             list.add(qcDailyReportDetail);
         }
         return  list;

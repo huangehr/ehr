@@ -87,11 +87,11 @@ public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XAr
     {
         //根据profileId 判断是否存在
         String profileId = relation.getProfileId();
-        ArchiveRelation ar =  archiveRelationDao.findByApplyProfileId(profileId);
-        if(ar != null)
-        {
-            relation.setId(ar.getId());
-        }
+//        ArchiveRelation ar =  archiveRelationDao.findByApplyProfileId(profileId);
+//        if(ar != null)
+//        {
+//            relation.setId(ar.getId());
+//        }
 
         relation = archiveRelationDao.save(relation);
 

@@ -1,8 +1,8 @@
 package com.yihu.ehr.report.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
-import com.yihu.ehr.agModel.report.EventDetailModel;
-import com.yihu.ehr.agModel.report.EventsModel;
+import com.yihu.ehr.agModel.report.QcDailyEventDetailModel;
+import com.yihu.ehr.agModel.report.QcDailyEventsModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.report.QcDailyReport;
@@ -21,11 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author janseny
@@ -105,7 +103,6 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
         }
     }
 
-
     @RequestMapping(value = ServiceApi.Report.QcDailyReport, method = RequestMethod.GET)
     @ApiOperation(value = "获取质控包数据完整性日报信息")
     public Envelop getInfo(
@@ -121,109 +118,6 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
             return failed("获取信息出错！");
         }
     }
-
-
-
-    @RequestMapping(value = ServiceApi.Report.GetEventDataReport, method = RequestMethod.POST)
-    @ApiOperation(value = "日报数据采集上传")
-    public Envelop  getEventDataReport(
-            @ApiParam(name = "eventsData", value = "采集json数据", defaultValue = "")
-            @RequestParam("eventsData") String collectionData) {
-        try {
-            EventsModel eventsModel = objectMapper.readValue(collectionData, EventsModel.class);
-            MQcDailyReport qcDailyReport = new MQcDailyReport();
-            List<MQcDailyReportDetail> totalList = new ArrayList<>();
-            List<MQcDailyReportDetail> realList = new ArrayList<>();
-            if(eventsModel != null){
-                if(StringUtils.isEmpty(eventsModel.getCreate_date())){
-                    return failed("采集时间不能为空");
-                }
-                if(StringUtils.isEmpty(eventsModel.getOrg_code())){
-                    return failed("机构编码不能为空");
-                }
-                Date createDate = DateUtil.parseDate(eventsModel.getCreate_date(), "yyyy-MM-dd hh:mm:ss");
-                qcDailyReport.setOrgCode(eventsModel.getOrg_code());
-                qcDailyReport.setCreateDate(createDate );
-                qcDailyReport.setInnerVersion(eventsModel.getInner_version());
-                qcDailyReport.setRealHospitalNum(eventsModel.getReal_hospital_num());
-                qcDailyReport.setTotalHospitalNum(eventsModel.getTotal_hospital_num());
-                qcDailyReport.setRealOutpatientNum(eventsModel.getReal_outpatient_num());
-                qcDailyReport.setTotalOutpatientNum(eventsModel.getTotal_outpatient_num());
-                qcDailyReport = qcDailyReportClient.add(objectMapper.writeValueAsString(qcDailyReport));
-                if(eventsModel.getTotal_hospital() != null){
-                    addList(totalList, eventsModel.getTotal_hospital(), qcDailyReport.getId(), createDate, "hospital");
-                }
-                if(eventsModel.getReal_hospital() != null){
-                    addList(realList,eventsModel.getReal_hospital(),qcDailyReport.getId(),createDate,"hospital");
-                }
-                if(eventsModel.getTotal_outpatient() != null){
-                    addList(totalList, eventsModel.getTotal_outpatient(), qcDailyReport.getId(), createDate, "outpatient");
-                }
-                if(eventsModel.getReal_outpatient() != null){
-                    addList(realList,eventsModel.getReal_outpatient(),qcDailyReport.getId(),createDate,"outpatient");
-                }
-                List<QcDailyReportDetail> totalDetails = null;
-                totalDetails = qcDailyReportClient.addQcDailyReportDetailList(objectMapper.writeValueAsString(totalList));
-                String realListStr =  objectMapper.writeValueAsString(checkRealListFromTotal(totalDetails, realList));
-                if(realListStr.length()>2){
-                    qcDailyReportClient.updateQcDailyReportDetailList(realListStr);
-                }
-            }
-            return success("");
-        }catch (Exception e){
-            e.printStackTrace();
-            return failed(FeignExceptionUtils.getErrorMsg(e));
-        }
-    }
-
-    //应踩数据
-    protected List<MQcDailyReportDetail> addList(List<MQcDailyReportDetail> list,List<EventDetailModel> modelList,String qcDailyReportId,Date createTime,String archiveType){
-        for(EventDetailModel eventDetailModel : modelList){
-            MQcDailyReportDetail qcDailyReportDetail = new MQcDailyReportDetail();
-            qcDailyReportDetail.setEventNo(eventDetailModel.getEvent_no());
-            qcDailyReportDetail.setEventTime(eventDetailModel.getEvent_time());
-            qcDailyReportDetail.setPatientId(eventDetailModel.getPatient_id());
-            qcDailyReportDetail.setReportId(qcDailyReportId);
-            qcDailyReportDetail.setArchiveType(archiveType);
-            qcDailyReportDetail.setAcqFlag(0);
-            int day = 0;
-            if(StringUtils.isNotEmpty(eventDetailModel.getEvent_time())){
-                Date eventDate = DateUtil.parseDate(eventDetailModel.getEvent_time(), "yyyy-MM-dd HH:mm:ss");
-                long intervalMilli = DateUtil.compareDateTime(createTime ,eventDate);
-                day = (int) (intervalMilli / (24 * 60 * 60 * 1000));
-            }
-            qcDailyReportDetail.setTimelyFlag(day>2?1:0);
-            list.add(qcDailyReportDetail);
-        }
-        return list;
-    }
-
-    //检验是否采集
-    protected List<MQcDailyReportDetail> checkRealListFromTotal(List<QcDailyReportDetail> qcDailyReportDetails,List<MQcDailyReportDetail> realList){
-
-        List<MQcDailyReportDetail> realQcDailyReportDetailList = new ArrayList<>();
-        for (MQcDailyReportDetail mqcDailyReportDetail: realList){
-            for (QcDailyReportDetail qcDailyReportDetail: qcDailyReportDetails){
-                boolean eventNoFlag = mqcDailyReportDetail.getEventNo().equals(qcDailyReportDetail.getEventNo());
-                boolean eventTimeFlag = true;
-                if(mqcDailyReportDetail.getEventTime() !=null && qcDailyReportDetail.getEventTime() != null){
-                    long intervalMilli = DateUtil.compareDateTime(DateUtil.formatCharDateYMDHMS(mqcDailyReportDetail.getEventTime()) ,qcDailyReportDetail.getEventTime());
-                    eventTimeFlag  = intervalMilli==0;
-                }
-                boolean patientIdFlag = mqcDailyReportDetail.getPatientId().equals(qcDailyReportDetail.getPatientId());
-                if(eventNoFlag && eventTimeFlag && patientIdFlag){
-                    mqcDailyReportDetail.setId(qcDailyReportDetail.getId());
-                    mqcDailyReportDetail.setAcqFlag(1);
-                    realQcDailyReportDetailList.add(mqcDailyReportDetail);
-                    break;
-                }
-            }
-        }
-        return realQcDailyReportDetailList;
-    }
-
-
-
 
 
 }

@@ -3,6 +3,7 @@ package com.yihu.ehr.report.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.entity.report.QcDailyReportDataset;
 import com.yihu.ehr.model.report.MQcDailyReportMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincl
@@ -45,8 +47,7 @@ public interface QcDailyReportMetadataClient {
     @ApiOperation(value = "删除质控包数据元日报")
     boolean delete(@RequestParam(value = "id") String id);
 
-    @RequestMapping(value = ServiceApi.Report.QcDailyReportMetadata, method = RequestMethod.GET)
-    @ApiOperation(value = "获取数据元日报信息")
-    MQcDailyReportMetadata getInfo(@RequestParam(value = "id") String id) ;
-
+    @RequestMapping(value = ServiceApi.Report.AddQcDailyMetadataDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增质控包数据元日报列表")
+    boolean addDailyDatasetMetadataList(@RequestBody String models ) ;
 }
