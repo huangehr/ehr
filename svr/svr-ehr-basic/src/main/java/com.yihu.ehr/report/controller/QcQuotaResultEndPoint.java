@@ -17,12 +17,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
+import java.text.DecimalFormat;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by janseny on 2017/5/8.
@@ -164,21 +165,67 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         ListResult result = new ListResult();
-        List<QcQuotaResult> quotaList = new ArrayList<>();
-        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime.toString());
-        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime.toString());
+        List<Object> quotaList = new ArrayList<Object>();
+        List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
+        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
+        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime);
         QcQuotaResult qc=null;
         if(!StringUtils.isEmpty(quotaId)){
             //区域整体统计结果 - 按机构及指标划分，
             quotaList = qcQuotaResultService.getQuotaListByLocationGBOrg(location, Long.parseLong(quotaId),startDate, endDate);
             if(quotaList.size() > 0){
-//                for(QcQuotaResult q:quotaList){
-//                    //json处理
-//                  qc=new QcQuotaResult();
-//
-//
-//                }
-                result.setDetailModelList(quotaList);
+
+                for(int i=0;i<quotaList.size();i++){
+                    Object[] obj = (Object[])quotaList.get(i);
+                    //json处理
+                    qc=new QcQuotaResult();
+                    //机构code
+                    qc.setOrgCode(obj[0].toString());
+                    //机构名称
+                    qc.setOrgName(obj[1].toString());
+                    //指标名称
+                    qc.setQuotaName(obj[3].toString());
+                    int realNum = 0;
+                    int totalNum = 0;
+                    int errorNum = 0;
+                    int timelyNum = 0;
+                    if(obj[4] != null && obj[5] != null && obj[6] != null && obj[7] != null){
+                        //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
+                        totalNum = Integer.valueOf(obj[4].toString());
+                        qc.setTotalNum(totalNum);
+                        //应收数
+                        realNum = Integer.valueOf(obj[5].toString());
+                        qc.setRealNum(totalNum);
+                        //错误数量（该字段只针对数据元的准确性统计）
+                        errorNum = Integer.valueOf(obj[6].toString());
+                        qc.setErrorNum(errorNum);
+                        //及时采集的档案数量
+                        timelyNum = Integer.valueOf(obj[7].toString());
+                        qc.setTimelyNum(timelyNum);
+                    }
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    String s ="";
+                    if(obj[2] != null){
+                        //指标ID
+                        Long quotaIdstr  = Long.valueOf(obj[2].toString() );
+                        qc.setQuotaId(quotaIdstr);
+                        if( quotaId.equals("2")||quotaId.equals("1")||quotaId.equals("3")){
+                            //数据集完整性-2，档案完整性-1，数据元完整性-3
+                            s = df.format(((float)realNum/(float)totalNum)*100);
+                        }
+                        if( (quotaId.equals("7")||quotaId.equals("5")||quotaId.equals("6"))){
+                            //住院及时性-7，档案及时性-5，门诊及时性-6
+                            s = df.format(((float)timelyNum/(float)totalNum)*100);
+                        }
+                        if( quotaId.equals("4") ){
+                            //数据元准确性-4
+                            s = df.format(((float)(totalNum-errorNum)/(float)totalNum*100));
+                        }
+                    }
+                    qc.setValue(s+"%");
+                    newQuotaList.add(qc);
+                }
+                result.setDetailModelList(newQuotaList);
                 result.setSuccessFlg(true);
                 result.setCode(200);
             }else {

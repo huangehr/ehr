@@ -47,8 +47,8 @@ public class QcQuotaResultService extends BaseJpaService<QcQuotaResult, XQcQuota
      * @param endTime
      * @return
      */
-    public List getQuotaListByLocationGBOrg(String location,long quotaId,Date startTime, Date endTime) {
-        List quotaList = qcQuotaResultRepository.findListByLocationByOrg(location,quotaId, startTime, endTime);
+    public List<Object> getQuotaListByLocationGBOrg(String location,long quotaId,Date startTime, Date endTime) {
+        List<Object> quotaList = qcQuotaResultRepository.findListByLocationByOrg(location,quotaId, startTime, endTime);
         if(quotaList.size() > 0)
         {
             return quotaList;
