@@ -1,5 +1,6 @@
 package com.yihu.ehr.report.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +43,7 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "quota_id='1'")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
@@ -96,4 +98,52 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
+
+    @ApiOperation("质控-单项指标统计结果，按机构列表查询,初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaOrgIntegrity, method = RequestMethod.GET)
+    public Envelop queryQcQuotaOrgIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime) throws Exception {
+        ListResult  listResult =qcQuotaResultClient.queryQcQuotaOrgIntegrity(location,orgCode,quotaId,startTime,endTime);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
+
+    @ApiOperation("趋势分析 - 单项指标统计结果列表查询,初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaIntegrity, method = RequestMethod.GET)
+    public Envelop queryQcQuotaIntegrity(
+            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+        ListResult  listResult =qcQuotaResultClient.queryQcQuotaIntegrity(fields,filters,sorts,size,page);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
 }
