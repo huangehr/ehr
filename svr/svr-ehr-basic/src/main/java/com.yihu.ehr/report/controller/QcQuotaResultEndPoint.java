@@ -34,7 +34,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     ObjectMapper objectMapper;
-
+    
     @Autowired
     QcQuotaResultService qcQuotaResultService;
 
