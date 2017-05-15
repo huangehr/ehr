@@ -734,6 +734,8 @@ public class ServiceApi {
 
 
         public static final String QcDailyReportReolve = "/report/qcDailyReportReolve";
+        public static final String GetQcQuotaOrgIntegrity = "/report/getQcQuotaOrgIntegrity";
+        public static final String GetQcQuotaIntegrity = "/report/getQcQuotaIntegrity";
 
     }
 
