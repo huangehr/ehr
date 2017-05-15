@@ -121,9 +121,13 @@ public class QcDailyReportDatasetEndPoint extends EnvelopRestEndPoint {
             QcDailyReportDataset qcDailyReportDataset = new QcDailyReportDataset();
             Map<String, Object> model = models.get(i);
             qcDailyReportDataset.setAddDate(new Date());
-            qcDailyReportDataset.setDataset(model.get("dataset").toString());
-            qcDailyReportDataset.setReportId(model.get("reportId").toString());
-            if( !StringUtils.isEmpty(model.get("acqFlag").toString())){
+            if(model.get("dataset") != null){
+                qcDailyReportDataset.setDataset(model.get("dataset").toString());
+            }
+            if(model.get("reportId") != null){
+                qcDailyReportDataset.setReportId(model.get("reportId").toString());
+            }
+            if(model.get("acqFlag") != null){
                 int af = Integer.valueOf(model.get("acqFlag").toString());
                 qcDailyReportDataset.setAcqFlag(af);
             }

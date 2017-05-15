@@ -7,73 +7,64 @@ import java.util.List;
  */
 public class QcDailyEventsModel {
 
-    private  String orgCode ;      //机构编码
-    private  String createDate ;   //采集时间
-    private  String innerVersion ; //适配版本
-    private  int  totalOutpatientNum;//门诊应收数
-    private  int  realOutpatientNum ;//门诊实收数
-    private  int  totalHospitalNum;   //住院应收数
-    private  int  realHospitalNum ;   //住院实收数
+    private  String org_code ;      //机构编码
+    private  String create_date ;   //采集时间
+    private  String inner_version ; //适配版本
+    private  int  total_outpatient_num;//门诊应收数
+    private  int  real_outpatient_num ;//门诊实收数
+    private  int  total_hospital_num;//住院应收数
 
     private  List<QcDailyEventDetailModel> total_outpatient ;     //门诊应收列表
     private  List<QcDailyEventDetailModel> real_outpatient  ;     //门诊实收列表
     private  List<QcDailyEventDetailModel> total_hospital ;       //住院应收列表
     private  List<QcDailyEventDetailModel> real_hospital ;        //住院实收列表
 
-    public String getOrgCode() {
-        return orgCode;
+    public String getOrg_code() {
+        return org_code;
     }
 
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
+    public void setOrg_code(String org_code) {
+        this.org_code = org_code;
     }
 
-    public String getCreateDate() {
-        return createDate;
+    public String getCreate_date() {
+        return create_date;
     }
 
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
+    public void setCreate_date(String create_date) {
+        this.create_date = create_date;
     }
 
-    public String getInnerVersion() {
-        return innerVersion;
+    public String getInner_version() {
+        return inner_version;
     }
 
-    public void setInnerVersion(String innerVersion) {
-        this.innerVersion = innerVersion;
+    public void setInner_version(String inner_version) {
+        this.inner_version = inner_version;
     }
 
-    public int getTotalOutpatientNum() {
-        return totalOutpatientNum;
+    public int getTotal_outpatient_num() {
+        return total_outpatient_num;
     }
 
-    public void setTotalOutpatientNum(int totalOutpatientNum) {
-        this.totalOutpatientNum = totalOutpatientNum;
+    public void setTotal_outpatient_num(int total_outpatient_num) {
+        this.total_outpatient_num = total_outpatient_num;
     }
 
-    public int getRealOutpatientNum() {
-        return realOutpatientNum;
+    public int getReal_outpatient_num() {
+        return real_outpatient_num;
     }
 
-    public void setRealOutpatientNum(int realOutpatientNum) {
-        this.realOutpatientNum = realOutpatientNum;
+    public void setReal_outpatient_num(int real_outpatient_num) {
+        this.real_outpatient_num = real_outpatient_num;
     }
 
-    public int getTotalHospitalNum() {
-        return totalHospitalNum;
+    public int getTotal_hospital_num() {
+        return total_hospital_num;
     }
 
-    public void setTotalHospitalNum(int totalHospitalNum) {
-        this.totalHospitalNum = totalHospitalNum;
-    }
-
-    public int getRealHospitalNum() {
-        return realHospitalNum;
-    }
-
-    public void setRealHospitalNum(int realHospitalNum) {
-        this.realHospitalNum = realHospitalNum;
+    public void setTotal_hospital_num(int total_hospital_num) {
+        this.total_hospital_num = total_hospital_num;
     }
 
     public List<QcDailyEventDetailModel> getTotal_outpatient() {
