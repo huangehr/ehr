@@ -100,20 +100,20 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
             List<MQcDailyReportDetail> totalList = new ArrayList<>();
             List<MQcDailyReportDetail> realList = new ArrayList<>();
             if(eventsModel != null){
-                if(StringUtils.isEmpty(eventsModel.getCreateDate())){
+                if(StringUtils.isEmpty(eventsModel.getCreate_date())){
                     return failed("采集时间不能为空");
                 }
-                if(StringUtils.isEmpty(eventsModel.getOrgCode())){
+                if(StringUtils.isEmpty(eventsModel.getOrg_code())){
                     return failed("机构编码不能为空");
                 }
-                Date createDate = DateUtil.parseDate(eventsModel.getCreateDate(), "yyyy-MM-dd hh:mm:ss");
-                qcDailyReport.setOrgCode(eventsModel.getOrgCode());
+                Date createDate = DateUtil.parseDate(eventsModel.getCreate_date(), "yyyy-MM-dd hh:mm:ss");
+                qcDailyReport.setOrgCode(eventsModel.getOrg_code());
                 qcDailyReport.setCreateDate(createDate );
-                qcDailyReport.setInnerVersion(eventsModel.getInnerVersion());
-                qcDailyReport.setRealHospitalNum(eventsModel.getRealHospitalNum());
-                qcDailyReport.setTotalHospitalNum(eventsModel.getTotalHospitalNum());
-                qcDailyReport.setRealOutpatientNum(eventsModel.getRealOutpatientNum());
-                qcDailyReport.setTotalOutpatientNum(eventsModel.getTotalOutpatientNum());
+                qcDailyReport.setInnerVersion(eventsModel.getInner_version());
+                qcDailyReport.setRealHospitalNum(eventsModel.getReal_outpatient_num());
+                qcDailyReport.setTotalHospitalNum(eventsModel.getTotal_hospital_num());
+                qcDailyReport.setRealOutpatientNum(eventsModel.getReal_outpatient_num());
+                qcDailyReport.setTotalOutpatientNum(eventsModel.getTotal_outpatient_num());
                 qcDailyReport = qcDailyReportClient.add(objectMapper.writeValueAsString(qcDailyReport));
                 if(eventsModel.getTotal_hospital() != null){
                     qcDailyReportResolveService.addList(totalList, eventsModel.getTotal_hospital(), qcDailyReport.getId(), createDate, "hospital");
