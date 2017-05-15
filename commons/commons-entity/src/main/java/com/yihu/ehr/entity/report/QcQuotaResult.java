@@ -15,7 +15,7 @@ public class QcQuotaResult {
     private String id;
     private Date quotaDate;    //统计时间(yyyy-mm-dd)
     private Long quotaId;       //指标ID
-    private String quatoName;    //指标名称
+    private String quotaName;    //指标名称
     private String value;        //统计结果
     private String city;       //市级
     private String cityName; //市级名称
@@ -64,13 +64,13 @@ public class QcQuotaResult {
         this.quotaId = quotaId;
     }
     @Basic
-    @Column(name = "quato_name")
-    public String getQuatoName() {
-        return quatoName;
+    @Column(name = "quota_name")
+    public String getQuotaName() {
+        return quotaName;
     }
 
-    public void setQuatoName(String quatoName) {
-        this.quatoName = quatoName;
+    public void setQuotaName(String quotaName) {
+        this.quotaName = quotaName;
     }
     @Basic
     @Column(name = "value")
