@@ -31,6 +31,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,36 +54,32 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
     QcDailyReportClient qcDailyReportClient;
     @Autowired
     private QcDailyReportResolveService qcDailyReportResolveService;
+    @Autowired
+    SecurityClient securityClient;
 
     @RequestMapping(value = "/report/zipFileResolve", method = RequestMethod.POST)
     @ApiOperation(value = "质控包数据文件接收解析入库", notes = "质控包数据文件接收解析入库")
-    public void savePackageWithOrg(
+    public Envelop savePackageWithOrg(
             @ApiParam(name = "zipFile", value = "文件压缩包", allowMultiple = true)
-            @RequestParam File zipFile,
-//            @ApiParam(name = "org_code", value = "机构代码")
-//            @RequestParam(value = "org_code") String orgCode,
-//            @ApiParam(name = "package_crypto", value = "文件包解压密码,二次加密")
-//            @RequestParam(value = "package_crypto") String packageCrypto,
-//            @ApiParam(name = "md5", value = "文件包MD5")
-//            @RequestParam(value = "md5", required = false) String md5,
+            @RequestParam(name = "zipFile",required = true) File zipFile,
+            @ApiParam(name = "orgCode",required = true, value = "机构代码")
+            @RequestParam(value = "orgCode") String orgCode,
+            @ApiParam(name = "packageCrypto",required = true, value = "文件包解压密码,二次加密")
+            @RequestParam(value = "packageCrypto") String packageCrypto,
+            @ApiParam(name = "md5", value = "文件包MD5")
+            @RequestParam(value = "md5", required = false) String md5,
             HttpServletRequest request) throws Exception {
 
-//        MKey key = securityClient.getOrgKey(orgCode);
-//        if (key == null ||  key.getPrivateKey()==null) {
-//            throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
-//        }
-//        String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(key.getPrivateKey()));
-        qcDailyReportResolveService.resolveFile(zipFile, "");
-    }
-
-    @RequestMapping(value = ServiceApi.Report.QcDailyReportReolve, method = RequestMethod.POST)
-    @ApiOperation(value = "质控包数据文件解析")
-    public Envelop add(
-            @ApiParam(name = "filePath", value = "压缩包地址", defaultValue = "")
-            @RequestParam("filePath") String filePath) {
         try {
-            qcDailyReportResolveService.resolveFile(new File(filePath), "");
-            return success("解析并入库成功");
+            MKey key = securityClient.getOrgKey(orgCode);
+            if (key == null ||  key.getPrivateKey()==null) {
+                throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
+            }
+            String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(key.getPrivateKey()));
+            qcDailyReportResolveService.resolveFile(zipFile, "");
+            Envelop envelop = success("解压入库成功");
+            envelop.setObj(null);
+            return envelop;
         }catch (Exception e){
             e.printStackTrace();
             return failed(FeignExceptionUtils.getErrorMsg(e));
@@ -93,7 +90,7 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
     @ApiOperation(value = "日报数据采集上传")
     public Envelop  getEventDataReport(
             @ApiParam(name = "eventsData", value = "采集json数据", defaultValue = "")
-            @RequestParam("eventsData") String collectionData) {
+            @RequestParam(name = "eventsData",required = true) String collectionData) {
         try {
             QcDailyEventsModel eventsModel = objectMapper.readValue(collectionData, QcDailyEventsModel.class);
             MQcDailyReport qcDailyReport = new MQcDailyReport();
@@ -130,7 +127,9 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
                 List<MQcDailyReportDetail> dailyReportDetailList = qcDailyReportResolveService.checkRealListFromTotal(totalList, realList);
                 qcDailyReportClient.addQcDailyReportDetailList(objectMapper.writeValueAsString(dailyReportDetailList));
             }
-            return success("");
+            Envelop envelop = success("解析入库成功");
+            envelop.setObj(null);
+            return envelop;
         }catch (Exception e){
             e.printStackTrace();
             return failed(FeignExceptionUtils.getErrorMsg(e));
