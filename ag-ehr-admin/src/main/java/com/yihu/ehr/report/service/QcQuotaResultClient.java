@@ -48,9 +48,33 @@ public interface QcQuotaResultClient {
     @ApiOperation(value = "删除数据统计指标结果")
     Result delete(@RequestParam(value = "id") String id);
 
-    @ApiOperation("质控-单项指标统计结果，按机构列表查询,初始化查询")
+    @ApiOperation("趋势分析 -按机构列表查询,初始化查询")
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaOrgIntegrity, method = RequestMethod.GET)
     ListResult queryQcQuotaOrgIntegrity(
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime);
+
+    @ApiOperation("趋势分析 - 按区域列表查询,初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaIntegrity, method = RequestMethod.GET)
+    ListResult queryQcQuotaIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime);
+
+    @ApiOperation("根据地区、机构、期间、查询某项指标的值（含日推移信息）")
+    @RequestMapping(value = ServiceApi.Report.GetQcDailyIntegrity, method = RequestMethod.GET)
+    ListResult queryQcDailyIntegrity(
             @ApiParam(name = "location", value = "地域", defaultValue = "")
             @RequestParam(value = "location", required = false ) String location,
             @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
@@ -63,14 +87,51 @@ public interface QcQuotaResultClient {
             @RequestParam(value = "endTime") String endTime);
 
 
+    @ApiOperation("所有指标统计结果查询,初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcOverAllIntegrity, method = RequestMethod.GET)
+    ListResult queryQcOverAllIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime);
 
-    @ApiOperation("趋势分析 - 单项指标统计结果列表查询,初始化查询")
-    @RequestMapping(value = ServiceApi.Report.GetQcQuotaIntegrity, method = RequestMethod.GET)
-    ListResult queryQcQuotaIntegrity(
-            @RequestParam(value = "fields", required = false) String fields,
-            @RequestParam(value = "filters", required = false) String filters,
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page);
+
+    @ApiOperation("根据机构查询所有指标统计结果,初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcOverAllOrgIntegrity, method = RequestMethod.GET)
+    ListResult queryQcOverAllOrgIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime);
+
+    @ApiOperation("分析明细列表")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaDailyIntegrity, method = RequestMethod.GET)
+    ListResult queryQcQuotaDailyIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime);
+
+    @ApiOperation("根据地区、期间查询某项指标的值")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaByLocation, method = RequestMethod.GET)
+    ListResult queryQcQuotaByLocation(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime);
 
 }
