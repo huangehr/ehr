@@ -1,4 +1,4 @@
-package com.yihu.ehr.resource.dao;
+package com.yihu.ehr.resource.service.query;
 
 
 import com.yihu.ehr.resource.model.DtoResourceMetadata;
@@ -22,16 +22,6 @@ public class ResourcesMetadataQueryDao {
     JdbcTemplate jdbcTemplate;
 
     /**
-     * 通过AppId获取是否有资源权限
-     */
-    public RsAppResource loadAppResource(String appId) throws Exception
-    {
-        String sql = "select * from RS_APP_RESOURCE";
-        RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(RsAppResource.class);
-        return (RsAppResource)this.jdbcTemplate.queryForObject(sql,rowMapper);
-    }
-
-    /**
      * 获取某资源所有数据元
      */
     public List<DtoResourceMetadata> getResourceMetadata(String resourcesCode) throws Exception
@@ -46,7 +36,7 @@ public class ResourcesMetadataQueryDao {
     }
 
     /**
-     * 获取某资源所有数据元
+     * 获取某资源数据元(根据APPID过滤)
      */
     public List<DtoResourceMetadata> getResourceMetadata(String resourcesCode,String appResourceId) throws Exception
     {

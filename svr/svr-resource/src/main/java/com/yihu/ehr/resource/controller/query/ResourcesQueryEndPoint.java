@@ -1,12 +1,11 @@
-package com.yihu.ehr.resource.controller;
+package com.yihu.ehr.resource.controller.query;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MCdaTransformDto;
-import com.yihu.ehr.model.resource.MStdTransformDto;
-import com.yihu.ehr.resource.dao.ResourcesQueryDao;
-import com.yihu.ehr.resource.service.ResourcesQueryService;
+import com.yihu.ehr.resource.service.query.ResourcesQueryDao;
+import com.yihu.ehr.resource.service.query.ResourcesQueryService;
 import com.yihu.ehr.resource.service.ResourcesTransformService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -15,6 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -45,13 +45,23 @@ public class ResourcesQueryEndPoint {
      */
     @ApiOperation("获取资源数据")
     @RequestMapping(value = ServiceApi.Resources.ResourcesQuery, method = RequestMethod.POST)
-    public Envelop getResources(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
-                                @ApiParam("appId") @RequestParam(value = "appId", required = true) String appId,
-                                @ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-
-        return resourcesQueryService.getResources(resourcesCode, appId, queryParams, page, size);
+    public Envelop getResources(@ApiParam("资源代码")
+                                @RequestParam String resourcesCode,
+                                @ApiParam("appId应用ID")
+                                @RequestParam String appId,
+                                @ApiParam("orgCode机构代码")
+                                @RequestParam(required = false) String orgCode,
+                                @ApiParam("json查询条件，{\"q\":\"*:*\"}")
+                                @RequestParam(required = false) String queryParams,
+                                @ApiParam("第几页")
+                                @RequestParam(required = false) Integer page,
+                                @ApiParam("每页几条")
+                                @RequestParam(required = false) Integer size) throws Exception {
+        if(StringUtils.isEmpty(appId) && StringUtils.isEmpty(orgCode))
+        {
+            throw new Exception("非法操作！");
+        }
+        return resourcesQueryService.getResources(resourcesCode, appId, orgCode, queryParams, page, size);
     }
 
     /**
@@ -59,14 +69,26 @@ public class ResourcesQueryEndPoint {
      */
     @ApiOperation("获取资源数据(转译)")
     @RequestMapping(value = ServiceApi.Resources.ResourcesQueryTransform, method = RequestMethod.POST)
-    public Envelop getResourcesTransform(@ApiParam("resourcesCode") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
-                                @ApiParam("appId") @RequestParam(value = "appId", required = true) String appId,
-                                @ApiParam("queryParams") @RequestParam(value = "queryParams", required = false) String queryParams,
-                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size,
-                                @ApiParam("version") @RequestParam(value = "version", required = false) String version) throws Exception {
+    public Envelop getResourcesTransform(@ApiParam("资源代码")
+                                          @RequestParam String resourcesCode,
+                                          @ApiParam(value = "appId应用ID",defaultValue = "JKZL")
+                                          @RequestParam String appId,
+                                          @ApiParam("orgCode机构代码")
+                                          @RequestParam(required = false) String orgCode,
+                                          @ApiParam("json查询条件，{\"q\":\"*:*\"}")
+                                          @RequestParam(required = false) String queryParams,
+                                          @ApiParam("第几页")
+                                          @RequestParam(required = false) Integer page,
+                                          @ApiParam("每页几条")
+                                          @RequestParam(required = false) Integer size,
+                                          @ApiParam("版本号")
+                                          @RequestParam(required = false) String version) throws Exception {
+        if(StringUtils.isEmpty(appId) && StringUtils.isEmpty(orgCode))
+        {
+            throw new Exception("非法操作！");
+        }
 
-        Envelop re = resourcesQueryService.getResources(resourcesCode, appId, queryParams, page, size);
+        Envelop re = resourcesQueryService.getResources(resourcesCode, appId, orgCode, queryParams, page, size);
         if(version!=null && version.length()>0)
         {
             List<Map<String,Object>> list = re.getDetailModelList();
@@ -90,10 +112,11 @@ public class ResourcesQueryEndPoint {
      */
     @ApiOperation("资源浏览")
     @RequestMapping(value = ServiceApi.Resources.ResourceViewData, method = RequestMethod.GET)
-    public Envelop getResourceData(@ApiParam(name = "resourcesCode", defaultValue = "RS_HOSPITALIZED_DIAGNOSIS") @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
-                                   @ApiParam("queryCondition") @RequestParam(value = "queryCondition", required = false) String queryCondition,
-                                   @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                   @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+    public Envelop getResourceData(@ApiParam(name = "resourcesCode", defaultValue = "RS_HOSPITALIZED_DIAGNOSIS") @RequestParam String resourcesCode,
+                                   @ApiParam(name = "机构代码") @RequestParam String orgCode,
+                                   @ApiParam("查询条件") @RequestParam(value = "queryCondition", required = false) String queryCondition,
+                                   @ApiParam("第几页") @RequestParam(value = "page", required = false) Integer page,
+                                   @ApiParam("每页几条") @RequestParam(value = "size", required = false) Integer size) throws Exception {
         return resourcesQueryService.getResourceData(resourcesCode, queryCondition, page, size);
     }
 
@@ -104,15 +127,14 @@ public class ResourcesQueryEndPoint {
     @RequestMapping(value = ServiceApi.Resources.ResourcesRawFiles, method = RequestMethod.GET)
     public Envelop getRawFiles(@ApiParam("profileId") @RequestParam(value = "profileId", required = true) String profileId,
                                @ApiParam("cdaDocumentId") @RequestParam(value = "cdaDocumentId", required = false) String cdaDocumentId,
-                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
-                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
+                                @ApiParam("第几页") @RequestParam(value = "page", required = false) Integer page,
+                                @ApiParam("每页几条") @RequestParam(value = "size", required = false) Integer size) throws Exception {
 
         return resourcesQueryService.getRawFiles(profileId,cdaDocumentId,page,size);
     }
 
-    /**
-     * 获取非结构化数据list
-     */
+
+    @ApiOperation("获取非结构化数据list")
     @RequestMapping(value = ServiceApi.Resources.ResourcesRawFilesList, method = RequestMethod.GET)
     public Map<String,Envelop> getRawFilesList(@RequestParam(value = "profileId", required = true) String profileId,
                                @RequestParam(value = "cdaDocumentId", required = true) String[] cdaDocumentIdList) throws Exception {

@@ -3,6 +3,7 @@ package com.yihu.ehr.redis.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.redis.feign.XResourceClient;
 import com.yihu.ehr.redis.feign.XStandardClient;
 import com.yihu.ehr.redis.service.RedisInitService;
@@ -29,9 +30,18 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
     @Autowired
     XStandardClient standardClient;
 
+    @Autowired
+    RedisClient redis;
+
+    @ApiOperation("清除Redis")
+    @RequestMapping(value = ServiceApi.Redis.DeleteRedis, method = RequestMethod.POST)
+    public String deleteRedis(@RequestParam("key") String key) throws Exception {
+        redis.delete(key);
+        return "清除Redis成功！";
+    }
+
     @ApiOperation("缓存行政地址Redis")
     @RequestMapping(value = ServiceApi.Redis.AddressRedis, method = RequestMethod.POST)
-    @ResponseBody
     public String cacheAddressDict() throws Exception
     {
         redisInitService.cacheAddressDict();
@@ -40,7 +50,6 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("缓存健康问题Redis")
     @RequestMapping(value = ServiceApi.Redis.HealthProblemRedis, method = RequestMethod.POST)
-    @ResponseBody
     public String cacheIcd10ByHpCode() throws Exception
     {
         redisInitService.cacheIcd10ByHpCode();
@@ -49,7 +58,6 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("缓存机构名称Redis")
     @RequestMapping(value = ServiceApi.Redis.OrgRedis, method = RequestMethod.POST)
-    @ResponseBody
     public String cacheOrgName() throws Exception
     {
         redisInitService.cacheOrgName();
@@ -58,17 +66,31 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("缓存机构区域Redis")
     @RequestMapping(value = ServiceApi.Redis.OrgAreaRedis, method = RequestMethod.POST)
-    @ResponseBody
     public String cacheOrgArea() throws Exception
     {
         redisInitService.cacheOrgArea();
         return "缓存机构区域Redis完成！";
     }
 
+    @ApiOperation("缓存机构Saas区域Redis")
+    @RequestMapping(value = ServiceApi.Redis.OrgSaasAreaRedis, method = RequestMethod.POST)
+    public String cacheOrgSaasArea() throws Exception
+    {
+        redisInitService.cacheOrgSaasArea();
+        return "缓存机构Saas区域Redis完成！";
+    }
+
+    @ApiOperation("缓存机构Saas机构Redis")
+    @RequestMapping(value = ServiceApi.Redis.OrgSaasOrgRedis, method = RequestMethod.POST)
+    public String cacheOrgSaasOrg() throws Exception
+    {
+        redisInitService.cacheOrgSaasOrg();
+        return "缓存机构Saas机构Redis完成！";
+    }
 
     /************************************ 标准Redis *******************************************************************/
     @ApiOperation("缓存标准")
-    @RequestMapping(value = ServiceApi.Redis.Versions, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Redis.Versions, method = RequestMethod.POST)
     public String versions(@ApiParam(value = "版本列表，使用逗号分隔", defaultValue = "000000000000,568ce002559f")
                          @RequestParam("versions") String versions,
                          @ApiParam(value = "强制清除再缓存", defaultValue = "true")

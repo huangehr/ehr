@@ -35,8 +35,8 @@ public class ServiceApi {
      */
     public static class Resources {
         //资源查询接口(命名先按原有路径，不规范)
-        public static final String ResourceViewMetadata = "/rs/query/getResourceMetadata"; //资源浏览获取结构
-        public static final String ResourceViewData = "/rs/query/getResourceData"; //资源浏览获取数据
+        public static final String ResourceViewMetadata = "/resources/query/getResourceMetadata"; //资源浏览获取结构
+        public static final String ResourceViewData = "/resources/query/getResourceData"; //资源浏览获取数据
         public static final String ResourcesQuery = "/resources/query"; //资源查询接口
         public static final String ResourcesQueryTransform = "/resources/query/transform"; //资源查询接口+转译
         public static final String ResourcesRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
@@ -659,12 +659,15 @@ public class ServiceApi {
      *Redis服务
      */
     public static class Redis {
+        public static final String DeleteRedis = "/redis/delete";
         public static final String AddressRedis = "/redis/addressRedis";
         public static final String HealthProblemRedis = "/redis/healthProblemRedis";
         public static final String Icd10HpRelationRedis = "/redis/icd10HpRelationRedis";
         public static final String IndicatorsRedis = "/redis/indicatorsRedis";
         public static final String OrgRedis = "/redis/orgRedis";
         public static final String OrgAreaRedis = "/redis/orgAreaRedis";
+        public static final String OrgSaasAreaRedis = "/redis/orgSaasAreaRedis";
+        public static final String OrgSaasOrgRedis = "/redis/orgSaasOrgRedis";
 
         /******************************************* 资源化相关Redis *******************************************************************/
         public static final String RsAdaptionDict = "/redis/rsAdaptionDict";

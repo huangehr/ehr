@@ -88,16 +88,16 @@ public class RedisClient {
     }
 
     /**
-     * 删除。支持Key模式匹配删除。
+     * 删除。支持Key模糊匹配删除。
      *
      * @param key
      */
     public void delete(String key) {
-        redisTemplate.execute((RedisCallback<Serializable>) connection -> connection.del(key.getBytes()));
+        redisTemplate.delete(redisTemplate.keys(key));
     }
 
     /**
-     * 删除多条记录。如果Key集合过大，建议使用Key模式匹配删除。
+     * 删除多条记录。如果Key集合过大，建议使用Key模糊匹配删除。
      *
      * @param keys
      */
