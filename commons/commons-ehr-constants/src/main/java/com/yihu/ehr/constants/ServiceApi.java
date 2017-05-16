@@ -744,6 +744,7 @@ public class ServiceApi {
         public static final String GetQcOverAllIntegrity = "/report/getQcOverAllIntegrity";
         public static final String GetQcOverAllOrgIntegrity = "/report/getQcOverAllOrgIntegrity";
         public static final String GetQcQuotaDailyIntegrity = "/report/getQcQuotaDailyIntegrity";
+        public static final String GetQcQuotaByLocation = "/report/getQcQuotaByLocation";
 
 
 
