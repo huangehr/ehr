@@ -99,7 +99,7 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
         }
     }
 
-    @ApiOperation("质控-单项指标统计结果，按机构列表查询,初始化查询")
+    @ApiOperation("趋势分析 -按机构列表查询,初始化查询")
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaOrgIntegrity, method = RequestMethod.GET)
     public Envelop queryQcQuotaOrgIntegrity(
             @ApiParam(name = "location", value = "地域", defaultValue = "")
@@ -112,7 +112,7 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
             @RequestParam(value = "startTime") String startTime,
             @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
             @RequestParam(value = "endTime") String endTime) throws Exception {
-        ListResult  listResult =qcQuotaResultClient.queryQcQuotaOrgIntegrity(location,orgCode,quotaId,startTime,endTime);
+        ListResult  listResult =qcQuotaResultClient.queryQcQuotaOrgIntegrity(orgCode,quotaId,startTime,endTime);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
@@ -123,20 +123,18 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
     }
 
 
-    @ApiOperation("趋势分析 - 单项指标统计结果列表查询,初始化查询")
+    @ApiOperation("趋势分析 - 按区域列表查询,初始化查询")
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaIntegrity, method = RequestMethod.GET)
     public Envelop queryQcQuotaIntegrity(
-            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) throws Exception {
-        ListResult  listResult =qcQuotaResultClient.queryQcQuotaIntegrity(fields,filters,sorts,size,page);
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime) throws Exception {
+        ListResult  listResult =qcQuotaResultClient.queryQcQuotaIntegrity(location,quotaId,startTime,endTime);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
@@ -148,7 +146,7 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
 
 
 
-    @ApiOperation("所有指标统计结果查询,初始化查询")
+    @ApiOperation("根据机构查询所有指标统计结果,初始化查询")
     @RequestMapping(value = ServiceApi.Report.GetQcOverAllIntegrity, method = RequestMethod.GET)
     public Envelop queryQcOverAllIntegrity(
             @ApiParam(name = "location", value = "地域", defaultValue = "")
@@ -191,7 +189,7 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
 
     @ApiOperation("分析明细列表")
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaDailyIntegrity, method = RequestMethod.GET)
-    public Envelop queryQcQuotaDailyIntegrity(
+    public Envelop queryQcQuotaOrgIntegrity(
             @ApiParam(name = "location", value = "地域", defaultValue = "")
             @RequestParam(value = "location", required = false ) String location,
             @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
@@ -201,6 +199,27 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
             @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
             @RequestParam(value = "endTime") String endTime) throws Exception {
         ListResult  listResult =qcQuotaResultClient.queryQcQuotaDailyIntegrity(location,quotaId,startTime,endTime);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
+    @ApiOperation("根据地区、期间查询某项指标的值")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaByLocation, method = RequestMethod.GET)
+    public Envelop queryQcQuotaByLocation(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime) throws Exception {
+        ListResult  listResult =qcQuotaResultClient.queryQcQuotaByLocation(location,quotaId,startTime,endTime);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
