@@ -117,7 +117,7 @@ public class ResourcesQueryEndPoint {
                                    @ApiParam("查询条件") @RequestParam(value = "queryCondition", required = false) String queryCondition,
                                    @ApiParam("第几页") @RequestParam(value = "page", required = false) Integer page,
                                    @ApiParam("每页几条") @RequestParam(value = "size", required = false) Integer size) throws Exception {
-        return resourcesQueryService.getResourceData(resourcesCode, queryCondition, page, size);
+        return resourcesQueryService.getResourceData(resourcesCode,orgCode, queryCondition, page, size);
     }
 
     /**

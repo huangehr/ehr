@@ -567,7 +567,7 @@ public class ResourcesQueryService  {
      * 资源浏览
      * @return
      */
-    public Envelop getResourceData(String resourcesCode,String queryCondition,Integer page,Integer size) throws Exception
+    public Envelop getResourceData(String resourcesCode,String orgCode,String queryCondition,Integer page,Integer size) throws Exception
     {
         String queryParams = "";
         //获取资源信息
@@ -602,7 +602,7 @@ public class ResourcesQueryService  {
 
 
         }
-        return getResources(resourcesCode,"JKZL","",queryParams,page,size);
+        return getResources(resourcesCode,"JKZL",orgCode,queryParams,page,size);
     }
 
 
