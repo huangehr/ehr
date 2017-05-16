@@ -34,10 +34,10 @@ public class MicroServices {
 
     public static final String HealthProfile = "svr-health-profile";
     public static final String PackageResolve = "svr-pack-resolve";
-    public static final String Package = "svr-pack-mgr";
+    public static final String Package = "svr-pack-mgr-hzp";
     public static final String Cipher = "svr-cipher";
     public static final String ArchiveSecurity = "svr-archive-security";
-    public static final String Redis = "svr-redis";
+    public static final String Redis = "svr-redis-hzp";
 
 
 }

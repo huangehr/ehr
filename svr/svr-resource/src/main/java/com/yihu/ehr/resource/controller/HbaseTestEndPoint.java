@@ -180,7 +180,23 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
             return ex.getMessage();
         }
     }*/
-
+   @ApiOperation("删除单条Hbase")
+   @RequestMapping(value = "deleteHbase",method = RequestMethod.POST)
+   public String deleteHbase(@ApiParam(value="core",defaultValue = "HealthProfile")
+                            @RequestParam String core,
+                            @ApiParam(value="key",defaultValue = "")
+                            @RequestParam String key)
+   {
+       try {
+           hbaseDao.delete(core,key);
+           return "删除单条Hbase成功！";
+       }
+       catch (Exception ex)
+       {
+           ex.printStackTrace();
+           return ex.getMessage();
+       }
+   }
     /********************************** solr操作 ********************************************/
     @ApiOperation("删除Solr")
     @RequestMapping(value = "deleteSolr",method = RequestMethod.POST)
@@ -190,16 +206,8 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
                              @RequestParam String key)
     {
         try {
-            if(solrAdmin.delete(core,key))
-            {
-
-                return "删除Solr成功！";
-            }
-            else{
-
-
-                return "删除Solr失败！";
-            }
+            solrAdmin.delete(core,key);
+            return "删除Solr成功！";
         }
         catch (Exception ex)
         {
