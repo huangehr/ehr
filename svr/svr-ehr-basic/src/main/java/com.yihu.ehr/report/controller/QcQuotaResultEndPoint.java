@@ -1,10 +1,14 @@
 package com.yihu.ehr.report.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.report.QcQuotaResultAnalyseModel;
+import com.yihu.ehr.agModel.report.QcQuotaResultDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.report.QcQuotaResult;
+import com.yihu.ehr.entity.report.QcQuotaResultAnalyse;
+import com.yihu.ehr.entity.report.QcQuotaResultDetail;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -13,6 +17,7 @@ import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -35,9 +40,9 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     ObjectMapper objectMapper;
-    
     @Autowired
     QcQuotaResultService qcQuotaResultService;
+    calculatePointUtil calculatePointUtil=new calculatePointUtil();
 
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaResultList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询数据统计指标结果")
@@ -195,7 +200,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                         qc.setTotalNum(totalNum);
                         //应收数
                         realNum = Integer.valueOf(obj[5].toString());
-                        qc.setRealNum(totalNum);
+                        qc.setRealNum(realNum);
                         //错误数量（该字段只针对数据元的准确性统计）
                         errorNum = Integer.valueOf(obj[6].toString());
                         qc.setErrorNum(errorNum);
@@ -263,6 +268,218 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             listResult.setTotalCount(0);
         }
         return listResult;
+    }
+
+    @ApiOperation("根据区域查询所有指标统计结果,初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcOverAllIntegrity, method = RequestMethod.GET)
+    public ListResult queryQcOverAllIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        ListResult result = new ListResult();
+        List<Object> quotaList = new ArrayList<Object>();
+        List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
+        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime.toString());
+        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime.toString());
+        QcQuotaResult qc=null;
+        //按区域查询统计结果集
+        quotaList = qcQuotaResultService.getQuotaListByLocation(location,startDate,endDate);
+        for(int i=0;i<quotaList.size();i++){
+                Object[] obj = (Object[])quotaList.get(i);
+                //json处理
+                qc=new QcQuotaResult();
+                 //指标Id
+                String quotaId=obj[0].toString();
+                //指标名称
+                qc.setQuotaName(obj[1].toString());
+                int realNum = 0;
+                int totalNum = 0;
+                int errorNum = 0;
+                int timelyNum = 0;
+                String value="";
+                if(obj[2] != null && obj[3] != null && obj[4] != null && obj[5] != null){
+                    //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
+                    totalNum = Integer.valueOf(obj[2].toString());
+                    qc.setTotalNum(totalNum);
+                    //应收数
+                    realNum = Integer.valueOf(obj[3].toString());
+                    qc.setRealNum(realNum);
+                    //错误数量（该字段只针对数据元的准确性统计）
+                    errorNum = Integer.valueOf(obj[4].toString());
+                    qc.setErrorNum(errorNum);
+                    //及时采集的档案数量
+                    timelyNum = Integer.valueOf(obj[5].toString());
+                    qc.setTimelyNum(timelyNum);
+                   value=calculatePointUtil.calculatePoint(quotaId, realNum, totalNum , errorNum , timelyNum);
+                }
+                qc.setValue(value+"%");
+                newQuotaList.add(qc);
+            }
+        if(newQuotaList.size() > 0){
+            result.setDetailModelList(newQuotaList);
+            result.setSuccessFlg(true);
+            result.setCode(200);
+        }else {
+        }
+        return result;
+    }
+
+    @ApiOperation("根据机构查询所有指标统计结果,初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcOverAllOrgIntegrity, method = RequestMethod.GET)
+    public ListResult queryQcOverAllOrgIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        ListResult result = new ListResult();
+        List<Object> quotaList = new ArrayList<Object>();
+        List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
+        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime.toString());
+        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime.toString());
+        QcQuotaResult qc=null;
+        //按区域查询统计结果集
+        quotaList = qcQuotaResultService.getQuotaListByOrgCode(orgCode,startDate,endDate);
+      //  @Query("select qc.orgCode,qc.orgName,qc.quotaId,qc.quotaName,sum(qc.totalNum),sum(qc.realNum),sum(qc.errorNum),sum(qc.timelyNum) from QcQuotaResult qc where qc.orgCode = :orgCode and qc.eventTime >= :startTime and qc.eventTime< :endTime group by qc.orgCode,qc.orgName,qc.quotaId,qc.quotaName ")
+
+        for(int i=0;i<quotaList.size();i++){
+            Object[] obj = (Object[])quotaList.get(i);
+            //json处理
+            qc=new QcQuotaResult();
+            //指标Id
+            String quotaId=obj[2].toString();
+            //指标名称
+            qc.setQuotaName(obj[3].toString());
+            qc.setOrgName(obj[1].toString());
+            qc.setOrgCode(obj[0].toString());
+            int realNum = 0;
+            int totalNum = 0;
+            int errorNum = 0;
+            int timelyNum = 0;
+            String value="";
+            if(obj[4] != null && obj[5] != null && obj[6] != null && obj[7] != null){
+                //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
+                totalNum = Integer.valueOf(obj[4].toString());
+                qc.setTotalNum(totalNum);
+                //应收数
+                realNum = Integer.valueOf(obj[5].toString());
+                qc.setRealNum(realNum);
+                //错误数量（该字段只针对数据元的准确性统计）
+                errorNum = Integer.valueOf(obj[6].toString());
+                qc.setErrorNum(errorNum);
+                //及时采集的档案数量
+                timelyNum = Integer.valueOf(obj[7].toString());
+                qc.setTimelyNum(timelyNum);
+                value=calculatePointUtil.calculatePoint(quotaId, realNum, totalNum , errorNum , timelyNum);
+            }
+            qc.setValue(value+"%");
+            newQuotaList.add(qc);
+        }
+        if(newQuotaList.size() > 0){
+            result.setDetailModelList(newQuotaList);
+            result.setSuccessFlg(true);
+            result.setCode(200);
+        }else {
+        }
+        return result;
+    }
+
+    @ApiOperation("分析明细列表")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaDailyIntegrity, method = RequestMethod.GET)
+    public ListResult queryQcQuotaDailyIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        ListResult result = new ListResult();
+        List<Object> quotaList = new ArrayList<Object>();
+        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime.toString());
+        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime.toString());
+        List<Map<String,QcQuotaResultAnalyseModel>>  objectList=new ArrayList<Map<String,QcQuotaResultAnalyseModel>>();
+        QcQuotaResultAnalyseModel qc=null;
+        Map<String,QcQuotaResultAnalyseModel> QcQuotaResultAnalyseMap=new HashedMap();
+        //获取区域名称和事件时间
+        quotaList = qcQuotaResultService.getfindQcListByLocationAndTime(location,startDate, endDate);
+        if(quotaList.size()>0) {
+            for (int i = 0; i < quotaList.size(); i++) {
+                Object[] obj = (Object[]) quotaList.get(i);
+                qc = new QcQuotaResultAnalyseModel();
+                //区域名称
+                qc.setCityName(obj[0].toString());
+                //eventTime;    //事件时间
+                qc.setEventTime(obj[2].toString().substring(0,10));
+                QcQuotaResultAnalyseMap.put(qc.getEventTime(),qc);
+            }
+        }
+
+        //区域整体统计结果
+        quotaList = qcQuotaResultService.getQuotaListByLocationAndTime(location,startDate, endDate);
+        QcQuotaResultDetailModel qrd=null;
+        if(quotaList.size()>0) {
+            for (int i = 0; i < quotaList.size(); i++) {
+                Object[] obj = (Object[]) quotaList.get(i);
+                if (null != QcQuotaResultAnalyseMap.get(obj[0].toString().substring(0, 10))) {
+
+                    qrd = new QcQuotaResultDetailModel();
+                    //机构code
+                    qrd.setOrgCode(obj[1].toString());
+                    //机构名称
+                    qrd.setOrgName(obj[2].toString());
+                    //指标ID
+                    qrd.setQuotaId(Long.parseLong(obj[3].toString()));
+                    //指标名称
+                    qrd.setQuotaName(obj[4].toString());
+                    //同比：与去年的当天&周&月相比
+                    qrd.setAn(obj[10].toString());
+                    //环比：与前一天&周&月环比
+                    qrd.setMom(obj[11].toString());
+                    //应收数
+                    qrd.setTotalNum(Integer.valueOf(obj[6].toString()));
+                    //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
+                    qrd.setRealNum(Integer.valueOf(obj[7].toString()));
+                    //错误数量（该字段只针对数据元的准确性统计）
+                    qrd.setErrorNum(Integer.valueOf(obj[8].toString()));
+                    //及时采集的档案数量
+                    qrd.setTimelyNum(Integer.valueOf(obj[9].toString()));
+                    qrd.setValue(obj[5].toString());
+                    if(null==QcQuotaResultAnalyseMap.get(obj[0].toString().substring(0, 10)).getQcQuotaResultDetailList()){
+                        List<QcQuotaResultDetailModel> qcList=new ArrayList<QcQuotaResultDetailModel>();
+                        qcList.add(qrd);
+                        QcQuotaResultAnalyseMap.get(obj[0].toString().substring(0, 10)).setQcQuotaResultDetailList(qcList);
+                    }else{
+                        QcQuotaResultAnalyseMap.get(obj[0].toString().substring(0, 10)).getQcQuotaResultDetailList().add(qrd);
+                    }
+
+                }
+
+            }
+        }
+        objectList.add(QcQuotaResultAnalyseMap);
+
+        if(objectList.size() > 0){
+            result.setDetailModelList(objectList);
+            result.setSuccessFlg(true);
+            result.setCode(200);
+        }else {
+        }
+
+        return result;
     }
 
 }
