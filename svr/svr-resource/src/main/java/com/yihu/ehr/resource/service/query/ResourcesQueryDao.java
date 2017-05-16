@@ -1,7 +1,8 @@
-package com.yihu.ehr.resource.dao;
+package com.yihu.ehr.resource.service.query;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.common.sqlparser.ParserFactory;
 import com.yihu.ehr.query.common.sqlparser.ParserSql;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 /**
  * Created by hzp on 2016/4/22.
+ * 资源查询底层接口
  */
 @Service("resourcesQueryDao")
 public class ResourcesQueryDao {
@@ -36,19 +38,16 @@ public class ResourcesQueryDao {
     private Integer defaultPage = 1;
     private Integer defaultSize = 1000;
 
-    private String mainCore = "HealthProfile";
-    private String subCore = "HealthProfileSub";
-    private String mainJoinCore = "HealthProfile_shard1_replica1";
-    private String subJoinCore = "HealthProfileSub_shard1_replica1";
-    private String rawFilesCore = "RawFiles";
+    private String mainJoinCore = ResourceCore.MasterTable + "_shard1_replica1";
+    private String subJoinCore = ResourceCore.SubTable + "_shard1_replica1";
 
     /**
      * 获取Hbase主表
-     * queryParams可为solr表达式，也可为json例：{"q":"*:*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * queryParams可为solr表达式，也可为json例：{"q":"*:*","saas":"*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
      * 有join参数做join操作
      */
     public Page<Map<String,Object>> getEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
-        String core = mainCore;
+        String core = ResourceCore.MasterTable;
         String q = "";
         String fq = "";
         String fl = "";
@@ -59,7 +58,16 @@ public class ResourcesQueryDao {
                 Map<String, String> obj = objectMapper.readValue(queryParams, Map.class);
                 if (obj.containsKey("q")) {
                     q = obj.get("q");
+                    if (obj.containsKey("saas") && !obj.get("saas").equals("*")) {
+                        q += " AND ("+obj.get("saas")+")";
+                    }
                 }
+                else{
+                    if (obj.containsKey("saas") && !obj.get("saas").equals("*")) {
+                        q = obj.get("saas");
+                    }
+                }
+
                 if (obj.containsKey("fl")) {
                     fl = obj.get("fl");
                 }
@@ -93,11 +101,11 @@ public class ResourcesQueryDao {
 
     /**
      * 获取Hbase细表
-     * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * queryParams可为solr表达式，也可为json例：{"table":"HDSD00_08","q":"*:*","join":"*:*","saas":"*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
      * 有join参数做join操作
      */
     public Page<Map<String,Object>> getEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
-        String core = subCore;
+        String core = ResourceCore.SubTable;
         String q = "";
         String fq = "";
         String fl = "";
@@ -126,6 +134,13 @@ public class ResourcesQueryDao {
                             fq = "("+fq+") AND rowkey:*" + obj.get("table") + "*";
                         } else {
                             fq = "rowkey:*" + obj.get("table") + "*";
+                        }
+                    }
+                    if (obj.containsKey("saas")) {
+                        if (fq.length() > 0) {
+                            fq = "("+fq+") AND (" + obj.get("saas") + ")";
+                        } else {
+                            fq = obj.get("saas");
                         }
                     }
                 } else if(obj.containsKey("table")){
@@ -157,7 +172,7 @@ public class ResourcesQueryDao {
      * queryParams为json例：{"q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4","customGroup":[{"groupField":"lastUpdateTime","groupCondition":{"3Month":"last_update_time:[2016-02-16 TO *]","6Month":"last_update_time:[2015-11-10 TO *]"}}]}
      */
     public Page<Map<String,Object>> countEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
-        String core = mainCore;
+        String core = ResourceCore.MasterTable;
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> params = objectMapper.readValue(queryParams, Map.class);
 
@@ -168,7 +183,16 @@ public class ResourcesQueryDao {
         List<SolrGroupEntity> customGroup = new ArrayList<>();
         if (params.containsKey("q")) {
             fq = params.get("q").toString();
+            if (params.containsKey("saas") && !params.get("saas").equals("*")) {
+                fq += " AND ("+params.get("saas")+")";
+            }
         }
+        else{
+            if (params.containsKey("saas") && !params.get("saas").equals("*")) {
+                fq = params.get("saas").toString();
+            }
+        }
+
         if (params.containsKey("groupFields")) {
             groupFields = params.get("groupFields").toString();
         }
@@ -229,7 +253,7 @@ public class ResourcesQueryDao {
      * queryParams为json例：{"table":"HDSD00_08","q":"*:*","groupFields":"key1,key2","statsFields":"key3,key4",customGroup:""}
      */
     public Page<Map<String,Object>> countEhrCenterSub(String queryParams, Integer page, Integer size) throws Exception {
-        String core = subCore;
+        String core = ResourceCore.SubTable;
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, String> params = objectMapper.readValue(queryParams, Map.class);
 
@@ -253,6 +277,13 @@ public class ResourcesQueryDao {
                 fq += " AND rowkey:*" + params.get("table") + "*";
             } else {
                 fq = "rowkey:*" + params.get("table") + "*";
+            }
+        }
+        if (params.containsKey("saas")) {
+            if (fq.length() > 0) {
+                fq = "("+fq+") AND (" + params.get("saas") + ")";
+            } else {
+                fq = params.get("saas");
             }
         }
         //join操作
@@ -329,7 +360,7 @@ public class ResourcesQueryDao {
      * @return
      */
     public Page<Map<String,Object>> getRawFiles(String queryParams, Integer page, Integer size) throws Exception {
-        String core = rawFilesCore;
+        String core = ResourceCore.FileTable;
         String q = "";
         String fq = "";
         String sort = "";

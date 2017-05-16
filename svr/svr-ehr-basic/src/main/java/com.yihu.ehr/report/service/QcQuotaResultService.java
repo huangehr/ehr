@@ -73,6 +73,55 @@ public class QcQuotaResultService extends BaseJpaService<QcQuotaResult, XQcQuota
             return null;
         }
     }
+    /**
+     * //按区域查询统计结果集(完整性，及时性，准确性)
+     * @param location
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public List<Object>  findListByLocationAndTime(String location,Date startTime, Date endTime) {
+        List<Object> quotaList = qcQuotaResultRepository.findListByLocationAndTime(location, startTime, endTime);
+        if(quotaList.size() > 0)
+        {
+            return quotaList;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * 分析明细-2
+     * @param location
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public List<Object> getQuotaListByLocationAndTime(String location,Date startTime, Date endTime) {
+        List<Object> quotaList = qcQuotaResultRepository.findQcDetailListByLocationAndTime(location, startTime, endTime);
+        if(quotaList.size() > 0)
+        {
+            return quotaList;
+        }else{
+            return null;
+        }
+    }
+    /**
+     * 分析明细-1
+     * @param location
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public List<Object> getfindQcListByLocationAndTime(String location,Date startTime, Date endTime) {
+        List<Object> quotaList = qcQuotaResultRepository.findQcListByLocationAndTime(location, startTime, endTime);
+        if(quotaList.size() > 0)
+        {
+            return quotaList;
+        }else{
+            return null;
+        }
+    }
 
 
 
