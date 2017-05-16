@@ -154,13 +154,11 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         return null;
     }
 
-    @ApiOperation("质控-单项指标统计结果，按机构列表查询,初始化查询")
-    @RequestMapping(value = ServiceApi.Report.GetQcQuotaOrgIntegrity, method = RequestMethod.GET)
-    public ListResult queryQcQuotaOrgIntegrity(
+    @ApiOperation("趋势分析 -按区域列表查询,按日初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaIntegrity, method = RequestMethod.GET)
+    public ListResult queryQcQuotaIntegrity(
             @ApiParam(name = "location", value = "地域", defaultValue = "")
             @RequestParam(value = "location", required = false ) String location,
-            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
-            @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
             @RequestParam(value = "quotaId", required = false) String quotaId,
             @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
@@ -176,58 +174,44 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         Date endDate =DateTimeUtil.simpleDateTimeParse(endTime);
         QcQuotaResult qc=null;
         if(!StringUtils.isEmpty(quotaId)){
-            //区域整体统计结果 - 按机构及指标划分，
-            quotaList = qcQuotaResultService.getQuotaListByLocationGBOrg(location, Long.parseLong(quotaId),startDate, endDate);
+            //区域整体统计结果 - 按机构及指标划分
+            quotaList = qcQuotaResultService.getQuotaListByLocation(location,Long.parseLong(quotaId),startDate, endDate);
             if(quotaList.size() > 0){
-
                 for(int i=0;i<quotaList.size();i++){
                     Object[] obj = (Object[])quotaList.get(i);
                     //json处理
                     qc=new QcQuotaResult();
-                    //机构code
-                    qc.setOrgCode(obj[0].toString());
-                    //机构名称
-                    qc.setOrgName(obj[1].toString());
+                    String quotaIdstr = obj[0].toString();
                     //指标名称
-                    qc.setQuotaName(obj[3].toString());
+                    qc.setQuotaName(obj[1].toString());
+                    //事件时间
+                    qc.setEventTime(DateTimeUtil.simpleDateTimeParse(obj[2].toString()));
                     int realNum = 0;
                     int totalNum = 0;
                     int errorNum = 0;
                     int timelyNum = 0;
-                    if(obj[4] != null && obj[5] != null && obj[6] != null && obj[7] != null){
+                    String value="";
+                    if(obj[3] != null && obj[4] != null && obj[5] != null && obj[6] != null){
                         //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
-                        totalNum = Integer.valueOf(obj[4].toString());
+                        totalNum = Integer.valueOf(obj[3].toString());
                         qc.setTotalNum(totalNum);
                         //应收数
-                        realNum = Integer.valueOf(obj[5].toString());
+                        realNum = Integer.valueOf(obj[4].toString());
                         qc.setRealNum(realNum);
                         //错误数量（该字段只针对数据元的准确性统计）
-                        errorNum = Integer.valueOf(obj[6].toString());
+                        errorNum = Integer.valueOf(obj[5].toString());
                         qc.setErrorNum(errorNum);
                         //及时采集的档案数量
-                        timelyNum = Integer.valueOf(obj[7].toString());
+                        timelyNum = Integer.valueOf(obj[6].toString());
                         qc.setTimelyNum(timelyNum);
+                        value=calculatePointUtil.calculatePoint(quotaIdstr, realNum, totalNum , errorNum , timelyNum);
                     }
                     DecimalFormat df = new DecimalFormat("0.00");
-                    String s ="";
-                    if(obj[2] != null){
+                    if(obj[0] != null){
                         //指标ID
-                        Long quotaIdstr  = Long.valueOf(obj[2].toString() );
-                        qc.setQuotaId(quotaIdstr);
-                        if( quotaId.equals("2")||quotaId.equals("1")||quotaId.equals("3")){
-                            //数据集完整性-2，档案完整性-1，数据元完整性-3
-                            s = df.format(((float)realNum/(float)totalNum)*100);
-                        }
-                        if( (quotaId.equals("7")||quotaId.equals("5")||quotaId.equals("6"))){
-                            //住院及时性-7，档案及时性-5，门诊及时性-6
-                            s = df.format(((float)timelyNum/(float)totalNum)*100);
-                        }
-                        if( quotaId.equals("4") ){
-                            //数据元准确性-4
-                            s = df.format(((float)(totalNum-errorNum)/(float)totalNum*100));
-                        }
+                        qc.setQuotaId( Long.valueOf(obj[0].toString()));
                     }
-                    qc.setValue(s+"%");
+                    qc.setValue(value+"%");
                     newQuotaList.add(qc);
                 }
                 result.setDetailModelList(newQuotaList);
@@ -239,35 +223,76 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         return result;
     }
 
-    @ApiOperation("趋势分析 - 单项指标统计结果列表查询,初始化查询")
-    @RequestMapping(value = ServiceApi.Report.GetQcQuotaIntegrity, method = RequestMethod.GET)
-    public ListResult queryQcQuotaIntegrity(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+createTime")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
+    @ApiOperation("趋势分析 - 按机构列表查询,按日初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaOrgIntegrity, method = RequestMethod.GET)
+    public ListResult queryQcQuotaOrgIntegrity(
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        ListResult listResult = new ListResult();
-        List<QcQuotaResult> qcQuotaResultList = qcQuotaResultService.search(fields, filters, sorts, page, size);
-        if(null!=qcQuotaResultList){
-            listResult.setDetailModelList(qcQuotaResultList);
-            listResult.setTotalCount((int)qcQuotaResultService.getCount(filters));
-            listResult.setCode(200);
-            listResult.setCurrPage(page);
-            listResult.setPageSize(size);
-        }else{
-            listResult.setCode(200);
-            listResult.setMessage("查询无数据");
-            listResult.setTotalCount(0);
+        ListResult result = new ListResult();
+        List<Object> quotaList = new ArrayList<Object>();
+        List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
+        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
+        Date endDate = DateTimeUtil.simpleDateTimeParse(endTime);
+        QcQuotaResult qc = null;
+        if(!StringUtils.isEmpty(quotaId)){
+        //区域整体统计结果 - 按机构及指标划分
+        quotaList = qcQuotaResultService.getQuotaListByOrg(orgCode, Long.parseLong(quotaId), startDate, endDate);
+        if (quotaList.size() > 0) {
+            for (int i = 0; i < quotaList.size(); i++) {
+                Object[] obj = (Object[]) quotaList.get(i);
+                //json处理
+                qc = new QcQuotaResult();
+                String quotaIdstr = obj[0].toString();
+                //指标名称
+                qc.setQuotaName(obj[1].toString());
+                //事件时间
+                qc.setEventTime(DateTimeUtil.simpleDateTimeParse(obj[2].toString()));
+                int realNum = 0;
+                int totalNum = 0;
+                int errorNum = 0;
+                int timelyNum = 0;
+                String value="";
+                if (obj[3] != null && obj[4] != null && obj[5] != null && obj[6] != null) {
+                    //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
+                    totalNum = Integer.valueOf(obj[3].toString());
+                    qc.setTotalNum(totalNum);
+                    //应收数
+                    realNum = Integer.valueOf(obj[4].toString());
+                    qc.setRealNum(realNum);
+                    //错误数量（该字段只针对数据元的准确性统计）
+                    errorNum = Integer.valueOf(obj[5].toString());
+                    qc.setErrorNum(errorNum);
+                    //及时采集的档案数量
+                    timelyNum = Integer.valueOf(obj[6].toString());
+                    qc.setTimelyNum(timelyNum);
+                    value=calculatePointUtil.calculatePoint(quotaIdstr, realNum, totalNum , errorNum , timelyNum);
+                }
+                DecimalFormat df = new DecimalFormat("0.00");
+                if (obj[0] != null) {
+                    //指标ID
+                    qc.setQuotaId( Long.valueOf(obj[0].toString()));
+                }
+                qc.setValue(value+ "%");
+                newQuotaList.add(qc);
+            }
+            result.setDetailModelList(newQuotaList);
+            result.setSuccessFlg(true);
+            result.setCode(200);
+        } else {
+            result.setCode(200);
+            result.setMessage("查询无数据");
+            result.setTotalCount(0);
         }
-        return listResult;
+    }
+        return result;
     }
 
     @ApiOperation("根据区域查询所有指标统计结果,初始化查询")
@@ -479,6 +504,77 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         }else {
         }
 
+        return result;
+    }
+
+
+    @ApiOperation("根据地区、期间查询各机构某项指标的值")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaByLocation, method = RequestMethod.GET)
+    public ListResult queryQcQuotaByLocation(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        ListResult result = new ListResult();
+        List<Object> quotaList = new ArrayList<Object>();
+        List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
+        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
+        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime);
+        QcQuotaResult qc=null;
+        if(!StringUtils.isEmpty(quotaId)){
+            //区域整体统计结果 - 按机构及指标划分
+            //@Query("select qc.orgCode,qc.orgName,qc.quotaId,qc.quotaName,sum(qc.totalNum) as totalNum,sum(qc.realNum) as realNum,sum(qc.errorNum) as errorNum,sum(qc.timelyNum) as timelyNum
+            quotaList = qcQuotaResultService.getQuotaListByLocationGBOrg(location,Long.parseLong(quotaId),startDate, endDate);
+            if(quotaList.size() > 0){
+                for(int i=0;i<quotaList.size();i++){
+                    Object[] obj = (Object[])quotaList.get(i);
+                    //json处理
+                    qc=new QcQuotaResult();
+                    qc.setOrgCode(obj[0].toString());
+                    qc.setOrgName(obj[1].toString());
+                    String quotaIdstr = obj[2].toString();
+                    //指标名称
+                    qc.setQuotaName(obj[3].toString());
+                    int realNum = 0;
+                    int totalNum = 0;
+                    int errorNum = 0;
+                    int timelyNum = 0;
+                    String value="";
+                    if(obj[4] != null && obj[5] != null && obj[6] != null && obj[7] != null){
+                        //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
+                        totalNum = Integer.valueOf(obj[4].toString());
+                        qc.setTotalNum(totalNum);
+                        //应收数
+                        realNum = Integer.valueOf(obj[5].toString());
+                        qc.setRealNum(realNum);
+                        //错误数量（该字段只针对数据元的准确性统计）
+                        errorNum = Integer.valueOf(obj[6].toString());
+                        qc.setErrorNum(errorNum);
+                        //及时采集的档案数量
+                        timelyNum = Integer.valueOf(obj[7].toString());
+                        qc.setTimelyNum(timelyNum);
+                        value=calculatePointUtil.calculatePoint(quotaIdstr, realNum, totalNum , errorNum , timelyNum);
+                    }
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    if(obj[2] != null){
+                        //指标ID
+                        qc.setQuotaId( Long.valueOf(obj[2].toString()));
+                    }
+                    qc.setValue(value+"%");
+                    newQuotaList.add(qc);
+                }
+                result.setDetailModelList(newQuotaList);
+                result.setSuccessFlg(true);
+                result.setCode(200);
+            }else {
+            }
+        }
         return result;
     }
 

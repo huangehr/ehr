@@ -58,6 +58,43 @@ public class QcQuotaResultService extends BaseJpaService<QcQuotaResult, XQcQuota
     }
 
     /**
+     * 趋势分析按机构查询统计结果集 - 按机构区分
+     * @param orgCode
+     * @param quotaId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public List<Object> getQuotaListByOrg(String orgCode,long quotaId,Date startTime, Date endTime) {
+        List<Object> quotaList = qcQuotaResultRepository.findListByOrg(orgCode,quotaId, startTime, endTime);
+        if(quotaList.size() > 0)
+        {
+            return quotaList;
+        }else{
+            return null;
+        }
+    }
+    /**
+     * 趋势分析按区域查询统计结果集 - 按区域区分
+     * @param location
+     * @param quotaId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public List<Object> getQuotaListByLocation(String location,long quotaId,Date startTime, Date endTime) {
+        List<Object> quotaList = qcQuotaResultRepository.findListByLocation(location,quotaId, startTime, endTime);
+        if(quotaList.size() > 0)
+        {
+            return quotaList;
+        }else{
+            return null;
+        }
+    }
+
+
+
+    /**
      * 按区域查询统计结果集
      * @param location
      * @param startTime
