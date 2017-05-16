@@ -102,8 +102,6 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
     @ApiOperation("趋势分析 -按机构列表查询,初始化查询")
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaOrgIntegrity, method = RequestMethod.GET)
     public Envelop queryQcQuotaOrgIntegrity(
-            @ApiParam(name = "location", value = "地域", defaultValue = "")
-            @RequestParam(value = "location", required = false ) String location,
             @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
             @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
@@ -146,7 +144,7 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
 
 
 
-    @ApiOperation("根据机构查询所有指标统计结果,初始化查询")
+    @ApiOperation("根据区域查询所有指标统计结果,初始化查询")
     @RequestMapping(value = ServiceApi.Report.GetQcOverAllIntegrity, method = RequestMethod.GET)
     public Envelop queryQcOverAllIntegrity(
             @ApiParam(name = "location", value = "地域", defaultValue = "")
@@ -189,7 +187,7 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
 
     @ApiOperation("分析明细列表")
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaDailyIntegrity, method = RequestMethod.GET)
-    public Envelop queryQcQuotaOrgIntegrity(
+    public Envelop queryQcQuotaDailyIntegrity(
             @ApiParam(name = "location", value = "地域", defaultValue = "")
             @RequestParam(value = "location", required = false ) String location,
             @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
@@ -208,7 +206,7 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
         }
     }
 
-    @ApiOperation("根据地区、期间查询某项指标的值")
+    @ApiOperation("根据地区、期间查询各机构某项指标的值")
     @RequestMapping(value = ServiceApi.Report.GetQcQuotaByLocation, method = RequestMethod.GET)
     public Envelop queryQcQuotaByLocation(
             @ApiParam(name = "location", value = "地域", defaultValue = "")
