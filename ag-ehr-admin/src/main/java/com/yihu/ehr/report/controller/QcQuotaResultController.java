@@ -146,4 +146,68 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
         }
     }
 
+
+
+    @ApiOperation("所有指标统计结果查询,初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcOverAllIntegrity, method = RequestMethod.GET)
+    public Envelop queryQcOverAllIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime) throws Exception {
+        ListResult  listResult =qcQuotaResultClient.queryQcOverAllIntegrity(location,startTime,endTime);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
+
+    @ApiOperation("根据机构查询所有指标统计结果,初始化查询")
+    @RequestMapping(value = ServiceApi.Report.GetQcOverAllOrgIntegrity, method = RequestMethod.GET)
+    public Envelop queryQcOverAllOrgIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime) throws Exception {
+        ListResult  listResult =qcQuotaResultClient.queryQcOverAllOrgIntegrity(location,orgCode,startTime,endTime);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
+    @ApiOperation("分析明细列表")
+    @RequestMapping(value = ServiceApi.Report.GetQcQuotaDailyIntegrity, method = RequestMethod.GET)
+    public Envelop queryQcQuotaDailyIntegrity(
+            @ApiParam(name = "location", value = "地域", defaultValue = "")
+            @RequestParam(value = "location", required = false ) String location,
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
+            @RequestParam(value = "endTime") String endTime) throws Exception {
+        ListResult  listResult =qcQuotaResultClient.queryQcQuotaDailyIntegrity(location,quotaId,startTime,endTime);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
 }
