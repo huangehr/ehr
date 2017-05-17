@@ -320,6 +320,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                 qc=new QcQuotaResult();
                  //指标Id
                 String quotaId=obj[0].toString();
+                qc.setQuotaId(Long.parseLong(quotaId));
                 //指标名称
                 qc.setQuotaName(obj[1].toString());
                 int realNum = 0;
