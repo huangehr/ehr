@@ -38,11 +38,11 @@ public interface XQcQuotaResultRepository extends PagingAndSortingRepository<QcQ
     List findListByLocationAndTime(@Param("location")  String location,@Param("startTime")  Date startTime,@Param("endTime")  Date endTime);
 
     //趋势分析 按机构查询统计结果集 - 按机构区分
-    @Query("select qc.quotaId,qc.quotaName,qc.eventTime,sum(qc.totalNum) as totalNum,sum(qc.realNum) as realNum,sum(qc.errorNum) as errorNum,sum(qc.timelyNum) as timelyNum  from QcQuotaResult qc where qc.orgCode = :orgCode and qc.quotaId = :quotaId and  qc.eventTime >= :startTime and qc.eventTime< :endTime group by qc.eventTime,qc.quotaId,qc.quotaName")
+    @Query("select qc.quotaId,qc.quotaName,qc.eventTime,sum(qc.totalNum) as totalNum,sum(qc.realNum) as realNum,sum(qc.errorNum) as errorNum,sum(qc.timelyNum) as timelyNum ,avg(qc.an) as an,avg(qc.mom) as mom  from QcQuotaResult qc where qc.orgCode = :orgCode and qc.quotaId = :quotaId and  qc.eventTime >= :startTime and qc.eventTime< :endTime group by qc.eventTime,qc.quotaId,qc.quotaName")
     List<Object> findListByOrg(@Param("orgCode")  String orgCode, @Param("quotaId")  long quotaId, @Param("startTime")  Date startTime,@Param("endTime")  Date endTime);
 
     //趋势分析 按区域查询统计结果集 - 按机构区分
-    @Query("select qc.quotaId,qc.quotaName,qc.eventTime,sum(qc.totalNum) as totalNum,sum(qc.realNum) as realNum,sum(qc.errorNum) as errorNum,sum(qc.timelyNum) as timelyNum  from QcQuotaResult qc where (qc.city = :location or qc.town = :location ) and qc.quotaId = :quotaId and  qc.eventTime >= :startTime and qc.eventTime< :endTime group by qc.eventTime,qc.quotaId,qc.quotaName")
+    @Query("select qc.quotaId,qc.quotaName,qc.eventTime,sum(qc.totalNum) as totalNum,sum(qc.realNum) as realNum,sum(qc.errorNum) as errorNum,sum(qc.timelyNum) as timelyNum ,avg(qc.an) as an,avg(qc.mom) as mom  from QcQuotaResult qc where (qc.city = :location or qc.town = :location ) and qc.quotaId = :quotaId and  qc.eventTime >= :startTime and qc.eventTime< :endTime group by qc.eventTime,qc.quotaId,qc.quotaName")
     List<Object> findListByLocation(@Param("location")  String location, @Param("quotaId")  long quotaId, @Param("startTime")  Date startTime,@Param("endTime")  Date endTime);
 
 }

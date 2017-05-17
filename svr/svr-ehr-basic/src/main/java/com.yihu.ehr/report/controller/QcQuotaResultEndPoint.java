@@ -1,19 +1,18 @@
 package com.yihu.ehr.report.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.agModel.report.QcQuotaResultAnalyseModel;
-import com.yihu.ehr.agModel.report.QcQuotaResultDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.report.QcQuotaResult;
-import com.yihu.ehr.entity.report.QcQuotaResultAnalyse;
-import com.yihu.ehr.entity.report.QcQuotaResultDetail;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.report.MQcDailyReportResultAnalyse;
+import com.yihu.ehr.model.report.MQcDailyReportResultDetail;
 import com.yihu.ehr.report.service.QcQuotaResultService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -185,7 +184,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                     //指标名称
                     qc.setQuotaName(obj[1].toString());
                     //事件时间
-                    qc.setEventTime(DateTimeUtil.simpleDateTimeParse(obj[2].toString()));
+                    qc.setEventTime(DateUtil.formatCharDateYMD(obj[2].toString()));
                     int realNum = 0;
                     int totalNum = 0;
                     int errorNum = 0;
@@ -212,6 +211,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                         qc.setQuotaId( Long.valueOf(obj[0].toString()));
                     }
                     qc.setValue(value+"%");
+                    qc.setAn(obj[7].toString());
+                    qc.setMom(obj[8].toString());
                     newQuotaList.add(qc);
                 }
                 result.setDetailModelList(newQuotaList);
@@ -254,7 +255,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                 //指标名称
                 qc.setQuotaName(obj[1].toString());
                 //事件时间
-                qc.setEventTime(DateTimeUtil.simpleDateTimeParse(obj[2].toString()));
+                qc.setEventTime(DateUtil.formatCharDateYMD(obj[2].toString()));
                 int realNum = 0;
                 int totalNum = 0;
                 int errorNum = 0;
@@ -281,6 +282,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                     qc.setQuotaId( Long.valueOf(obj[0].toString()));
                 }
                 qc.setValue(value+ "%");
+                qc.setAn(obj[7].toString());
+                qc.setMom(obj[8].toString());
                 newQuotaList.add(qc);
             }
             result.setDetailModelList(newQuotaList);
@@ -437,15 +440,15 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         List<Object> quotaList = new ArrayList<Object>();
         Date startDate = DateTimeUtil.simpleDateTimeParse(startTime.toString());
         Date endDate =DateTimeUtil.simpleDateTimeParse(endTime.toString());
-        List<Map<String,QcQuotaResultAnalyseModel>>  objectList=new ArrayList<Map<String,QcQuotaResultAnalyseModel>>();
-        QcQuotaResultAnalyseModel qc=null;
-        Map<String,QcQuotaResultAnalyseModel> QcQuotaResultAnalyseMap=new HashedMap();
+        List<Map<String,MQcDailyReportResultAnalyse>>  objectList=new ArrayList<Map<String,MQcDailyReportResultAnalyse>>();
+        MQcDailyReportResultAnalyse qc=null;
+        Map<String,MQcDailyReportResultAnalyse> QcQuotaResultAnalyseMap=new HashedMap();
         //获取区域名称和事件时间
         quotaList = qcQuotaResultService.getfindQcListByLocationAndTime(location,startDate, endDate);
         if(quotaList.size()>0) {
             for (int i = 0; i < quotaList.size(); i++) {
                 Object[] obj = (Object[]) quotaList.get(i);
-                qc = new QcQuotaResultAnalyseModel();
+                qc = new MQcDailyReportResultAnalyse();
                 //区域名称
                 qc.setCityName(obj[0].toString());
                 //eventTime;    //事件时间
@@ -456,13 +459,13 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
 
         //区域整体统计结果
         quotaList = qcQuotaResultService.getQuotaListByLocationAndTime(location,startDate, endDate);
-        QcQuotaResultDetailModel qrd=null;
+        MQcDailyReportResultDetail qrd=null;
         if(quotaList.size()>0) {
             for (int i = 0; i < quotaList.size(); i++) {
                 Object[] obj = (Object[]) quotaList.get(i);
                 if (null != QcQuotaResultAnalyseMap.get(obj[0].toString().substring(0, 10))) {
 
-                    qrd = new QcQuotaResultDetailModel();
+                    qrd = new MQcDailyReportResultDetail();
                     //机构code
                     qrd.setOrgCode(obj[1].toString());
                     //机构名称
@@ -485,7 +488,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                     qrd.setTimelyNum(Integer.valueOf(obj[9].toString()));
                     qrd.setValue(obj[5].toString());
                     if(null==QcQuotaResultAnalyseMap.get(obj[0].toString().substring(0, 10)).getQcQuotaResultDetailList()){
-                        List<QcQuotaResultDetailModel> qcList=new ArrayList<QcQuotaResultDetailModel>();
+                        List<MQcDailyReportResultDetail> qcList=new ArrayList<MQcDailyReportResultDetail>();
                         qcList.add(qrd);
                         QcQuotaResultAnalyseMap.get(obj[0].toString().substring(0, 10)).setQcQuotaResultDetailList(qcList);
                     }else{
