@@ -42,7 +42,8 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     ObjectMapper objectMapper;
-
+    @Autowired
+    QuotaStatisticsEndPoint quotaStatisticsEndPoint;
     @Autowired
     QcDailyReportService qcDailyReportService;
     @Autowired
@@ -165,5 +166,25 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     protected MQcDailyReportDetail getModelDetail(QcDailyReportDetail o){
         return convertToModel(o, MQcDailyReportDetail.class);
     }
+
+
+    @RequestMapping(value = "getStatistData1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "测试统计数据")
+    void getStatistData1(){
+        quotaStatisticsEndPoint.statisticQuotaData("1","01114532-4", DateUtil.strToDate("2017-05-15"));
+    }
+
+    @RequestMapping(value = "getStatistDataAll", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "测试统计数据All")
+    void getStatistData5(
+            @RequestParam(value = "quotaId") String quotaId,
+            @RequestParam(value = "orgId") String orgId,
+            @RequestParam(value = "quotaDate") String quotaDate ){
+        quotaStatisticsEndPoint.statisticQuotaData(quotaId,orgId, DateUtil.strToDate(quotaDate));
+    }
+
+
+
+
 
 }
