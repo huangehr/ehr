@@ -13,6 +13,7 @@ import com.yihu.ehr.model.report.MQcDailyReportResultAnalyse;
 import com.yihu.ehr.model.report.MQcDailyReportResultDetail;
 import com.yihu.ehr.report.service.QcQuotaResultService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -170,8 +171,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
         List<MQcDailyReportQuotaResult> newQuotaList = new ArrayList<MQcDailyReportQuotaResult>();
-        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
-        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime);
+        Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
+        Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
         MQcDailyReportQuotaResult qc=null;
         if(!StringUtils.isEmpty(quotaId)){
             //区域整体统计结果 - 按机构及指标划分
@@ -254,8 +255,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
         List<MQcDailyReportQuotaResult> newQuotaList = new ArrayList<MQcDailyReportQuotaResult>();
-        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
-        Date endDate = DateTimeUtil.simpleDateTimeParse(endTime);
+        Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
+        Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
         MQcDailyReportQuotaResult qc = null;
         if(!StringUtils.isEmpty(quotaId)){
         quotaList = qcQuotaResultService.getQuotaListByOrg(orgCode, Long.parseLong(quotaId), startDate, endDate);
@@ -272,7 +273,6 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                     //事件时间
                     qc.setEventTime(eventTime.substring(0,4)+'年'+eventTime.substring(5,7)+'月'+eventTime.substring(8,10)+'日');
                 }
-
                 int realNum = 0;
                 int totalNum = 0;
                 int errorNum = 0;
@@ -339,8 +339,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
         List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
-        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime.toString());
-        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime.toString());
+        Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
+        Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
         QcQuotaResult qc=null;
         //按区域查询统计结果集
         quotaList = qcQuotaResultService.getQuotaListByLocation(location,startDate,endDate);
@@ -401,8 +401,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
         List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
-        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime.toString());
-        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime.toString());
+        Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
+        Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
         QcQuotaResult qc=null;
         //按区域查询统计结果集
         quotaList = qcQuotaResultService.getQuotaListByOrgCode(orgCode,startDate,endDate);
@@ -465,8 +465,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             HttpServletResponse response) throws Exception {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
-        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime.toString());
-        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime.toString());
+        Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
+        Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
         List<Map<String,MQcDailyReportResultAnalyse>>  objectList=new ArrayList<Map<String,MQcDailyReportResultAnalyse>>();
         MQcDailyReportResultAnalyse qc=null;
         Map<String,MQcDailyReportResultAnalyse> QcQuotaResultAnalyseMap=new HashedMap();
@@ -483,7 +483,6 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                 QcQuotaResultAnalyseMap.put(qc.getEventTime(),qc);
             }
         }
-
         //区域整体统计结果
         quotaList = qcQuotaResultService.getQuotaListByLocationAndTime(location,startDate, endDate);
         MQcDailyReportResultDetail qrd=null;
@@ -555,8 +554,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
         List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
-        Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
-        Date endDate =DateTimeUtil.simpleDateTimeParse(endTime);
+        Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
+        Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
         QcQuotaResult qc=null;
         if(!StringUtils.isEmpty(quotaId)){
             //区域整体统计结果 - 按机构及指标划分
@@ -608,5 +607,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         }
         return result;
     }
+
+
 
 }
