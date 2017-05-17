@@ -548,7 +548,13 @@ public class ResourcesQueryService  {
             List<String> colunmDict = new ArrayList<String>();
             for (DtoResourceMetadata r : metadataList) {
                 colunmName.add(r.getName());
-                colunmCode.add(r.getId());
+                if(!StringUtils.isEmpty(r.getDictCode()))
+                {
+                    colunmCode.add(r.getId()+"_VALUE");
+                }
+                else{
+                    colunmCode.add(r.getId());
+                }
                 colunmType.add(r.getColumnType());
                 colunmDict.add(r.getDictCode());
             }

@@ -144,16 +144,17 @@ public class ResourceBrowseController extends BaseController {
     @ApiOperation("资源浏览")
     @RequestMapping(value = "/resources/ResourceBrowses/getResourceData", method = RequestMethod.GET)
     public Envelop getResourceData(
-            @ApiParam("resourcesCode")
-            @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
-            @ApiParam("queryCondition")
-            @RequestParam(value = "queryCondition", required = false) String queryCondition,
-            @ApiParam("page")
-            @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam("size")
-            @RequestParam(value = "size", required = false) Integer size) throws Exception {
+            @ApiParam("资源代码")
+            @RequestParam String resourcesCode,
+            @ApiParam(name = "机构代码") @RequestParam String orgCode,
+            @ApiParam("查询条件")
+            @RequestParam(required = false) String queryCondition,
+            @ApiParam("第几页")
+            @RequestParam(required = false) Integer page,
+            @ApiParam("每页几行")
+            @RequestParam(required = false) Integer size) throws Exception {
 
-        Envelop categoryResponseEntity = resourceBrowseClient.getResourceData(resourcesCode, queryCondition, page, size);
+        Envelop categoryResponseEntity = resourceBrowseClient.getResourceData(resourcesCode,orgCode, queryCondition, page, size);
 
         return categoryResponseEntity;
     }
