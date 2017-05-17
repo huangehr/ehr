@@ -8,11 +8,11 @@ import com.yihu.ehr.entity.report.QcQuotaResult;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.report.MQcDailyReportQuotaResult;
 import com.yihu.ehr.model.report.MQcDailyReportResultAnalyse;
 import com.yihu.ehr.model.report.MQcDailyReportResultDetail;
 import com.yihu.ehr.report.service.QcQuotaResultService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,9 +21,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import java.text.DecimalFormat;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -168,10 +169,10 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             HttpServletResponse response) throws Exception {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
-        List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
+        List<MQcDailyReportQuotaResult> newQuotaList = new ArrayList<MQcDailyReportQuotaResult>();
         Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
         Date endDate =DateTimeUtil.simpleDateTimeParse(endTime);
-        QcQuotaResult qc=null;
+        MQcDailyReportQuotaResult qc=null;
         if(!StringUtils.isEmpty(quotaId)){
             //区域整体统计结果 - 按机构及指标划分
             quotaList = qcQuotaResultService.getQuotaListByLocation(location,Long.parseLong(quotaId),startDate, endDate);
@@ -179,12 +180,15 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                 for(int i=0;i<quotaList.size();i++){
                     Object[] obj = (Object[])quotaList.get(i);
                     //json处理
-                    qc=new QcQuotaResult();
+                    qc=new MQcDailyReportQuotaResult();
                     String quotaIdstr = obj[0].toString();
                     //指标名称
                     qc.setQuotaName(obj[1].toString());
-                    //事件时间
-                    qc.setEventTime(DateUtil.formatCharDateYMD(obj[2].toString()));
+                    String eventTime=obj[2].toString();
+                    if(null!=eventTime&&!"".equals(eventTime)){
+                        //事件时间
+                        qc.setEventTime(eventTime.substring(0,4)+'年'+eventTime.substring(5,7)+'月'+eventTime.substring(8,10)+'日');
+                    }
                     int realNum = 0;
                     int totalNum = 0;
                     int errorNum = 0;
@@ -211,8 +215,18 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                         qc.setQuotaId( Long.valueOf(obj[0].toString()));
                     }
                     qc.setValue(value+"%");
-                    qc.setAn(obj[7].toString());
-                    qc.setMom(obj[8].toString());
+                    String an=obj[7].toString();
+                    if(null!=an&&an.length()>5){
+                        qc.setAn(an.substring(0,6)+'%');
+                    }else{
+                        qc.setAn(an+'%');
+                    }
+                    String mom=obj[8].toString();
+                    if(null!=mom&&mom.length()>5){
+                        qc.setMom(mom.substring(0,6)+'%');
+                    }else{
+                        qc.setMom(mom+'%');
+                    }
                     newQuotaList.add(qc);
                 }
                 result.setDetailModelList(newQuotaList);
@@ -239,23 +253,26 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             HttpServletResponse response) throws Exception {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
-        List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
+        List<MQcDailyReportQuotaResult> newQuotaList = new ArrayList<MQcDailyReportQuotaResult>();
         Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
         Date endDate = DateTimeUtil.simpleDateTimeParse(endTime);
-        QcQuotaResult qc = null;
+        MQcDailyReportQuotaResult qc = null;
         if(!StringUtils.isEmpty(quotaId)){
-        //区域整体统计结果 - 按机构及指标划分
         quotaList = qcQuotaResultService.getQuotaListByOrg(orgCode, Long.parseLong(quotaId), startDate, endDate);
         if (quotaList.size() > 0) {
             for (int i = 0; i < quotaList.size(); i++) {
                 Object[] obj = (Object[]) quotaList.get(i);
                 //json处理
-                qc = new QcQuotaResult();
+                qc = new MQcDailyReportQuotaResult();
                 String quotaIdstr = obj[0].toString();
                 //指标名称
                 qc.setQuotaName(obj[1].toString());
-                //事件时间
-                qc.setEventTime(DateUtil.formatCharDateYMD(obj[2].toString()));
+                String eventTime=obj[2].toString();
+                if(null!=eventTime&&!"".equals(eventTime)){
+                    //事件时间
+                    qc.setEventTime(eventTime.substring(0,4)+'年'+eventTime.substring(5,7)+'月'+eventTime.substring(8,10)+'日');
+                }
+
                 int realNum = 0;
                 int totalNum = 0;
                 int errorNum = 0;
@@ -282,8 +299,18 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                     qc.setQuotaId( Long.valueOf(obj[0].toString()));
                 }
                 qc.setValue(value+ "%");
-                qc.setAn(obj[7].toString());
-                qc.setMom(obj[8].toString());
+                String an=obj[7].toString();
+                if(null!=an&&an.length()>5){
+                    qc.setAn(an.substring(0,6)+'%');
+                }else{
+                    qc.setAn(an+'%');
+                }
+                String mom=obj[8].toString();
+                if(null!=mom&&mom.length()>5){
+                    qc.setMom(mom.substring(0,6)+'%');
+                }else{
+                    qc.setMom(mom+'%');
+                }
                 newQuotaList.add(qc);
             }
             result.setDetailModelList(newQuotaList);
