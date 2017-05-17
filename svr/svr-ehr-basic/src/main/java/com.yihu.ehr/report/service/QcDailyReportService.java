@@ -47,14 +47,15 @@ public class QcDailyReportService extends BaseJpaService<QcDailyReport, XQcDaily
 
 
     //查询昨天 和 去年当天的数据
-    public List<Object> getYesterdayAndLastYearTodayData(String orgCode, Date quotaDate) {
+    public List<Object> getYesterdayAndLastYearTodayData(String orgCode,Date quotaDate, Date lasterYearQuotaDate) {
         Session session = currentSession();
         String hql = "select qc.createDate,qc.realHospitalNum,qc.realOutpatientNum,qc.id " +
                 "from QcDailyReport qc where  qc.orgCode=:orgCode and ( TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 1 " +
-                "or TO_DAYS( :quotaDate) - TO_DAYS( qc.createDate) = 365 or TO_DAYS( :quotaDate) - TO_DAYS( qc.createDate) = 366 )";
+                "or TO_DAYS( :lasterYearQuotaDate) - TO_DAYS( qc.createDate) = 0 )";
         Query query = session.createQuery(hql);
         query.setString("orgCode", orgCode);
         query.setDate("quotaDate", quotaDate);
+        query.setDate("lasterYearQuotaDate", lasterYearQuotaDate);
         List<Object> list = query.list();
         if(list.size()== 0) {
             return null;
