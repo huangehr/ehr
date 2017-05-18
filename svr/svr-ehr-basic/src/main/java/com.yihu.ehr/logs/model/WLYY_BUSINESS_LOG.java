@@ -1,4 +1,4 @@
-package com.yihu.ehr.common.logs.model;
+package com.yihu.ehr.logs.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

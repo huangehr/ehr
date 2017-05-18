@@ -57,6 +57,7 @@ public class SwaggerConfig {
                         regex("/docs/.*"),
                         regex("/actuator/.*"),
                         regex("/info/.*"),
+                        regex("/log/.*"),
                         regex("/autoconfig/.*")))
                 .build()
                 .apiInfo(privateAPIInfo());
