@@ -190,13 +190,11 @@ public class QcQuotaResultController extends ExtendController<QcQuotaResult> {
     public Envelop queryQcQuotaDailyIntegrity(
             @ApiParam(name = "location", value = "地域", defaultValue = "")
             @RequestParam(value = "location", required = false ) String location,
-            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
-            @RequestParam(value = "quotaId", required = false) String quotaId,
             @ApiParam(name = "startTime", value = "开始日期", defaultValue = "")
             @RequestParam(value = "startTime") String startTime,
             @ApiParam(name = "endTime", value = "结束日期", defaultValue = "")
             @RequestParam(value = "endTime") String endTime) throws Exception {
-        ListResult  listResult =qcQuotaResultClient.queryQcQuotaDailyIntegrity(location,quotaId,startTime,endTime);
+        ListResult  listResult =qcQuotaResultClient.queryQcQuotaDailyIntegrity(location,startTime,endTime);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
