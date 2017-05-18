@@ -182,7 +182,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         if(!StringUtils.isEmpty(quotaId)){
             //区域整体统计结果 - 按机构及指标划分
             quotaList = qcQuotaResultService.getQuotaListByLocation(location,Long.parseLong(quotaId),startDate, endDate);
-            if(quotaList.size() > 0){
+            if(null!=quotaList&&quotaList.size() > 0){
                 for(int i=0;i<quotaList.size();i++){
                     Object[] obj = (Object[])quotaList.get(i);
                     //json处理
@@ -239,6 +239,9 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                 result.setSuccessFlg(true);
                 result.setCode(200);
             }else {
+                result.setCode(200);
+                result.setMessage("查询无数据");
+                result.setTotalCount(0);
             }
         }
         return result;
@@ -269,7 +272,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         MQcDailyReportQuotaResult qc = null;
         if(!StringUtils.isEmpty(quotaId)){
         quotaList = qcQuotaResultService.getQuotaListByOrg(orgCode, Long.parseLong(quotaId), startDate, endDate);
-        if (quotaList.size() > 0) {
+        if (null!=quotaList&&quotaList.size() > 0) {
             for (int i = 0; i < quotaList.size(); i++) {
                 Object[] obj = (Object[]) quotaList.get(i);
                 //json处理
@@ -349,20 +352,21 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         List<Object> quotaList = new ArrayList<Object>();
         List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
         Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
-        Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
-        Calendar   calendar   =   new   GregorianCalendar();
+        Date endDate = DateUtil.formatYMDToYMDHMS(endTime);
+        Calendar calendar = new GregorianCalendar();
         calendar.setTime(endDate);
-        calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
-        endDate=calendar.getTime();   //日期往后推一天
-        QcQuotaResult qc=null;
+        calendar.add(calendar.DATE, 1);//把日期往后增加一天.整数往后推,负数往前移动
+        endDate = calendar.getTime();   //日期往后推一天
+        QcQuotaResult qc = null;
         //按区域查询统计结果集
-        quotaList = qcQuotaResultService.getQuotaListByLocation(location,startDate,endDate);
-        for(int i=0;i<quotaList.size();i++){
-                Object[] obj = (Object[])quotaList.get(i);
+        quotaList = qcQuotaResultService.getQuotaListByLocation(location, startDate, endDate);
+        if(null!=quotaList&&quotaList.size() > 0){
+            for (int i = 0; i < quotaList.size(); i++) {
+                Object[] obj = (Object[]) quotaList.get(i);
                 //json处理
-                qc=new QcQuotaResult();
-                 //指标Id
-                String quotaId=obj[0].toString();
+                qc = new QcQuotaResult();
+                //指标Id
+                String quotaId = obj[0].toString();
                 qc.setQuotaId(Long.parseLong(quotaId));
                 //指标名称
                 qc.setQuotaName(obj[1].toString());
@@ -370,8 +374,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                 int totalNum = 0;
                 int errorNum = 0;
                 int timelyNum = 0;
-                String value="";
-                if(obj[2] != null && obj[3] != null && obj[4] != null && obj[5] != null){
+                String value = "";
+                if (obj[2] != null && obj[3] != null && obj[4] != null && obj[5] != null) {
                     //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
                     totalNum = Integer.valueOf(obj[2].toString());
                     qc.setTotalNum(totalNum);
@@ -384,16 +388,20 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                     //及时采集的档案数量
                     timelyNum = Integer.valueOf(obj[5].toString());
                     qc.setTimelyNum(timelyNum);
-                   value=calculatePointUtil.calculatePoint(quotaId, realNum, totalNum , errorNum , timelyNum);
+                    value = calculatePointUtil.calculatePoint(quotaId, realNum, totalNum, errorNum, timelyNum);
                 }
-                qc.setValue(value+"%");
+                qc.setValue(value + "%");
                 newQuotaList.add(qc);
-            }
+        }
+    }
         if(newQuotaList.size() > 0){
             result.setDetailModelList(newQuotaList);
             result.setSuccessFlg(true);
             result.setCode(200);
         }else {
+            result.setCode(200);
+            result.setMessage("查询无数据");
+            result.setTotalCount(0);
         }
         return result;
     }
@@ -423,47 +431,51 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         QcQuotaResult qc=null;
         //按区域查询统计结果集
         quotaList = qcQuotaResultService.getQuotaListByOrgCode(orgCode,startDate,endDate);
-      //  @Query("select qc.orgCode,qc.orgName,qc.quotaId,qc.quotaName,sum(qc.totalNum),sum(qc.realNum),sum(qc.errorNum),sum(qc.timelyNum) from QcQuotaResult qc where qc.orgCode = :orgCode and qc.eventTime >= :startTime and qc.eventTime< :endTime group by qc.orgCode,qc.orgName,qc.quotaId,qc.quotaName ")
-
-        for(int i=0;i<quotaList.size();i++){
-            Object[] obj = (Object[])quotaList.get(i);
-            //json处理
-            qc=new QcQuotaResult();
-            //指标Id
-            String quotaId=obj[2].toString();
-            //指标名称
-            qc.setQuotaName(obj[3].toString());
-            qc.setOrgName(obj[1].toString());
-            qc.setOrgCode(obj[0].toString());
-            qc.setQuotaId(Long.parseLong(quotaId));
-            int realNum = 0;
-            int totalNum = 0;
-            int errorNum = 0;
-            int timelyNum = 0;
-            String value="";
-            if(obj[4] != null && obj[5] != null && obj[6] != null && obj[7] != null){
-                //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
-                totalNum = Integer.valueOf(obj[4].toString());
-                qc.setTotalNum(totalNum);
-                //应收数
-                realNum = Integer.valueOf(obj[5].toString());
-                qc.setRealNum(realNum);
-                //错误数量（该字段只针对数据元的准确性统计）
-                errorNum = Integer.valueOf(obj[6].toString());
-                qc.setErrorNum(errorNum);
-                //及时采集的档案数量
-                timelyNum = Integer.valueOf(obj[7].toString());
-                qc.setTimelyNum(timelyNum);
-                value=calculatePointUtil.calculatePoint(quotaId, realNum, totalNum , errorNum , timelyNum);
+        if(null!=quotaList&&quotaList.size() > 0) {
+            for (int i = 0; i < quotaList.size(); i++) {
+                Object[] obj = (Object[]) quotaList.get(i);
+                //json处理
+                qc = new QcQuotaResult();
+                //指标Id
+                String quotaId = obj[2].toString();
+                //指标名称
+                qc.setQuotaName(obj[3].toString());
+                qc.setOrgName(obj[1].toString());
+                qc.setOrgCode(obj[0].toString());
+                qc.setQuotaId(Long.parseLong(quotaId));
+                int realNum = 0;
+                int totalNum = 0;
+                int errorNum = 0;
+                int timelyNum = 0;
+                String value = "";
+                if (obj[4] != null && obj[5] != null && obj[6] != null && obj[7] != null) {
+                    //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
+                    totalNum = Integer.valueOf(obj[4].toString());
+                    qc.setTotalNum(totalNum);
+                    //应收数
+                    realNum = Integer.valueOf(obj[5].toString());
+                    qc.setRealNum(realNum);
+                    //错误数量（该字段只针对数据元的准确性统计）
+                    errorNum = Integer.valueOf(obj[6].toString());
+                    qc.setErrorNum(errorNum);
+                    //及时采集的档案数量
+                    timelyNum = Integer.valueOf(obj[7].toString());
+                    qc.setTimelyNum(timelyNum);
+                    value = calculatePointUtil.calculatePoint(quotaId, realNum, totalNum, errorNum, timelyNum);
+                }
+                qc.setValue(value + "%");
+                newQuotaList.add(qc);
             }
-            qc.setValue(value+"%");
-            newQuotaList.add(qc);
         }
         if(newQuotaList.size() > 0){
             result.setDetailModelList(newQuotaList);
             result.setSuccessFlg(true);
             result.setCode(200);
         }else {
+            result.setCode(200);
+            result.setMessage("查询无数据");
+            result.setTotalCount(0);
+            result.setDetailModelList(newQuotaList);
         }
         return result;
     }
@@ -481,56 +493,59 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             HttpServletResponse response) throws Exception {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
+        List<Object> detailQuotaList = new ArrayList<Object>();
         Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
-        Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
-        Calendar   calendar   =   new   GregorianCalendar();
+        Date endDate = DateUtil.formatYMDToYMDHMS(endTime);
+        Calendar calendar = new GregorianCalendar();
         calendar.setTime(endDate);
-        calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
-        endDate=calendar.getTime();   //日期往后推一天
-        Map<String,String> QcQuotaResultAnalyseMap=new TreeMap();
+        calendar.add(calendar.DATE, 1);//把日期往后增加一天.整数往后推,负数往前移动
+        endDate = calendar.getTime();   //日期往后推一天
+        Map<String, String> QcQuotaResultAnalyseMap = new TreeMap();
         //获取区域名称和事件时间
-        quotaList = qcQuotaResultService.getfindQcListByLocationAndTime(location,startDate, endDate);
-        if(quotaList.size()>0) {
+        quotaList = qcQuotaResultService.getfindQcListByLocationAndTime(location, startDate, endDate);
+        if (null!=quotaList&&quotaList.size() > 0) {
             for (int i = 0; i < quotaList.size(); i++) {
                 Object[] obj = (Object[]) quotaList.get(i);
-                String eventTime=obj[2].toString();
-                String newEventTime="";
-                if(null!=eventTime&&!"".equals(eventTime)){
+                String eventTime = obj[2].toString();
+                String newEventTime = "";
+                if (null != eventTime && !"".equals(eventTime)) {
                     //事件时间
-                     newEventTime= eventTime.substring(0,4)+'年'+eventTime.substring(5,7)+'月'+eventTime.substring(8,10)+'日';
+                    newEventTime = eventTime.substring(0, 4) + '年' + eventTime.substring(5, 7) + '月' + eventTime.substring(8, 10) + '日';
                 }
-                String qcKey=obj[2].toString().substring(0,10)+obj[3].toString();
-                QcQuotaResultAnalyseMap.put(qcKey,newEventTime);
+                String qcKey = obj[2].toString().substring(0, 10) + obj[3].toString();
+                QcQuotaResultAnalyseMap.put(qcKey, newEventTime);
             }
         }
         //区域整体统计结果
-        quotaList = qcQuotaResultService.getQuotaListByLocationAndTime(location,startDate, endDate);
-        Map<String,MQcDailyReportResultDetail> detailMap=new TreeMap();
-        Map<String,MQcDailyReportResultDetail> detailAnMap=new TreeMap();
-        Map<String,MQcDailyReportResultDetail> detailMonMap=new TreeMap();
-        MQcDailyReportResultDetail qrd=null;
-            for (int i = 0; i < quotaList.size(); i++) {
-                Object[] obj = (Object[]) quotaList.get(i);
-                String qcKey=obj[0].toString().substring(0, 10)+obj[2].toString();
+        detailQuotaList = qcQuotaResultService.getQuotaListByLocationAndTime(location, startDate, endDate);
+        Map<String, MQcDailyReportResultDetail> detailMap = new TreeMap();
+        Map<String, MQcDailyReportResultDetail> detailAnMap = new TreeMap();
+        Map<String, MQcDailyReportResultDetail> detailMonMap = new TreeMap();
+        MQcDailyReportResultDetail qrd = null;
+        if(null!=detailQuotaList&&detailQuotaList.size() > 0){
+            for (int i = 0; i < detailQuotaList.size(); i++) {
+                Object[] obj = (Object[]) detailQuotaList.get(i);
+                String qcKey = obj[0].toString().substring(0, 10) + obj[2].toString();
                 if (null != QcQuotaResultAnalyseMap.get(qcKey)) {
-                    String resultQuotaId=obj[3].toString();
+                    String resultQuotaId = obj[3].toString();
                     //总比
-                    String detailMapKey=qcKey+"总比";
-                    Map<String,String> map=calculatePointUtil.reportDetailData("1",obj);
-                    detailMap=calculatePointUtil.detailValue(resultQuotaId,i,detailMap,detailMapKey,QcQuotaResultAnalyseMap.get(qcKey),obj[2].toString(),obj[1].toString(),"总比",map.get("1"));
+                    String detailMapKey = qcKey + "总比";
+                    Map<String, String> map = calculatePointUtil.reportDetailData("1", obj);
+                    detailMap = calculatePointUtil.detailValue(resultQuotaId, i, detailMap, detailMapKey, QcQuotaResultAnalyseMap.get(qcKey), obj[2].toString(), obj[1].toString(), "总比", map.get("1"));
 
                     //同比
-                    String detailAnMapKey=qcKey+"同比";
-                    map=calculatePointUtil.reportDetailData("2",obj);
-                    detailAnMap=calculatePointUtil.detailValue(resultQuotaId,i,detailAnMap,detailAnMapKey,QcQuotaResultAnalyseMap.get(qcKey),obj[2].toString(),obj[1].toString(),"同比",map.get("2"));
+                    String detailAnMapKey = qcKey + "同比";
+                    map = calculatePointUtil.reportDetailData("2", obj);
+                    detailAnMap = calculatePointUtil.detailValue(resultQuotaId, i, detailAnMap, detailAnMapKey, QcQuotaResultAnalyseMap.get(qcKey), obj[2].toString(), obj[1].toString(), "同比", map.get("2"));
 
                     //环比
-                    String detailMonMapKey=qcKey+"环比";
-                    map=calculatePointUtil.reportDetailData("3",obj);
-                    detailMonMap=calculatePointUtil.detailValue(resultQuotaId,i,detailMonMap,detailMonMapKey,QcQuotaResultAnalyseMap.get(qcKey),obj[2].toString(),obj[1].toString(),"环比",map.get("3"));
+                    String detailMonMapKey = qcKey + "环比";
+                    map = calculatePointUtil.reportDetailData("3", obj);
+                    detailMonMap = calculatePointUtil.detailValue(resultQuotaId, i, detailMonMap, detailMonMapKey, QcQuotaResultAnalyseMap.get(qcKey), obj[2].toString(), obj[1].toString(), "环比", map.get("3"));
 
                 }
             }
+    }
         List<MQcDailyReportResultDetail>  objectList=new ArrayList<MQcDailyReportResultDetail>();
         for (String key : detailMap.keySet()) {
             String mapKey=key.substring(0,key.length()-2);
@@ -543,6 +558,9 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             result.setSuccessFlg(true);
             result.setCode(200);
         }else {
+            result.setCode(200);
+            result.setMessage("查询无数据");
+            result.setTotalCount(0);
         }
 
         return result;
@@ -576,7 +594,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             //区域整体统计结果 - 按机构及指标划分
             //@Query("select qc.orgCode,qc.orgName,qc.quotaId,qc.quotaName,sum(qc.totalNum) as totalNum,sum(qc.realNum) as realNum,sum(qc.errorNum) as errorNum,sum(qc.timelyNum) as timelyNum
             quotaList = qcQuotaResultService.getQuotaListByLocationGBOrg(location,Long.parseLong(quotaId),startDate, endDate);
-            if(quotaList.size() > 0){
+            if(null!=quotaList&&quotaList.size() > 0){
                 for(int i=0;i<quotaList.size();i++){
                     Object[] obj = (Object[])quotaList.get(i);
                     //json处理
@@ -618,6 +636,9 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                 result.setSuccessFlg(true);
                 result.setCode(200);
             }else {
+                result.setCode(200);
+                result.setMessage("查询无数据");
+                result.setTotalCount(0);
             }
         }
         return result;
