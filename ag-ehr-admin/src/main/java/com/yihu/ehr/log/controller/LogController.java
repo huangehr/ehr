@@ -24,7 +24,7 @@ import java.util.Map;
  * Created by zhoujie on 2017/3/11.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 + "/log")
+@RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api(value = "log", description = "日志页面展示", tags = {"云门户-日志页面展示"})
 public class LogController extends BaseController {
@@ -35,9 +35,9 @@ public class LogController extends BaseController {
     private ConventionalDictEntryClient conventionalDictClient;
 
 
-    @RequestMapping(value = "/logs", method = RequestMethod.GET)
+    @RequestMapping(value = "/getLogList", method = RequestMethod.GET)
     @ApiOperation(value = "获取门户配置列表", notes = "根据查询条件获取门户配置列表在前端表格展示")
-    public Envelop searchLog(
+    public Envelop getLogList(
             @ApiParam(name = "logType", value = "日志类型", defaultValue = "")
             @RequestParam(value = "logType", required = false) String logType,
             @ApiParam(name = "data", value = "数据", defaultValue = "")
@@ -55,7 +55,7 @@ public class LogController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) {
 
-        ListResult listResult = logClient.search(logType,data,startDate,endDate,caller, sorts, size, page);
+        ListResult listResult = logClient.getLogs(logType,data,startDate,endDate,caller, sorts, size, page);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());

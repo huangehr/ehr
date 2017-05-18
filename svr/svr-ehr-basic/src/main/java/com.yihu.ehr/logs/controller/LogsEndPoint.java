@@ -4,6 +4,7 @@ import com.mongodb.Mongo;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.controller.BaseUIController;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.logs.model.WLYY_BUSINESS_LOG;
 import com.yihu.ehr.model.common.ListResult;
 import io.swagger.annotations.Api;
@@ -17,10 +18,7 @@ import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +26,16 @@ import java.util.List;
 /**
  * Created by llh on 2017/5/9.
  */
-@Controller
+@RestController
 @RequestMapping(ApiVersion.Version1_0)
 @SessionAttributes(SessionAttributeKeys.CurrentUser)
 @Api(value = "log", description = "日志管理", tags = {"日志管理 - 日志信息获取"})
-public class LogsController extends BaseUIController {
+public class LogsEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    @RequestMapping(value = "/getLogs", method = RequestMethod.GET)
+    @RequestMapping(value = "/log/getLogs", method = RequestMethod.GET)
     @ApiOperation(value = "根据传入的参数进行MONGODB日志列表的查询", response = WLYY_BUSINESS_LOG.class, responseContainer = "List")
     public ListResult getLogs(
             @ApiParam(name = "logType", value = "日志类型", defaultValue = "")
@@ -57,8 +55,6 @@ public class LogsController extends BaseUIController {
             @ApiParam(name = "page", value = "当前页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception{
 
-        ListResult listResult = new ListResult();
-//        MongoOperations mongoOps = new MongoTemplate(new SimpleMongoDbFactory(new Mongo(), "wlyy"));
         int begin = (page - 1) * size + 1 ;
         int end = page * size;
         Query query = new Query();
@@ -94,16 +90,21 @@ public class LogsController extends BaseUIController {
         query.addCriteria(cr);
         query.limit(end - begin).skip(begin);//分页数据
         List<WLYY_BUSINESS_LOG> logsModelList =  mongoTemplate.find(query, WLYY_BUSINESS_LOG.class);
-
+        ListResult listResult = new ListResult();
         if(logsModelList.size() > 0) {
             listResult.setDetailModelList(logsModelList);
             listResult.setSuccessFlg(true);
             listResult.setTotalCount(logsModelList.size());
             listResult.setCode(200);
             listResult.setMessage("日志查询成功！");
-            return listResult;
+            listResult.setCurrPage(page);
+            listResult.setPageSize(size);
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
         }
-        return null;
+        return listResult;
     }
 
 }
