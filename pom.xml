@@ -640,6 +640,12 @@
                 <scope>${dependency.scope}</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-mongodb</artifactId>
+                <version>${version.spring-boot}</version>
+            </dependency>
+
             <!--Spring cloud family-->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
