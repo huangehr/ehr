@@ -6,9 +6,7 @@ import com.yihu.ehr.entity.report.QcQuotaResult;
 import com.yihu.ehr.geography.service.GeographyService;
 import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.org.service.OrgService;
-import com.yihu.ehr.report.service.QcDailyReportDetailService;
-import com.yihu.ehr.report.service.QcDailyReportService;
-import com.yihu.ehr.report.service.QcQuotaResultService;
+import com.yihu.ehr.report.service.*;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.StringUtil;
@@ -35,57 +33,246 @@ public class QuotaStatisticsEndPoint {
     private OrgService orgService;
     @Autowired
     private GeographyService geographyService;
+    @Autowired
+    QcDailyReportDatasetsService qcDailyReportDatasetsService;
+    @Autowired
+    QcDailyReportDatasetService qcDailyReportDatasetService;
+    @Autowired
+    QcDailyReportMetadataService qcDailyReportMetaDataService;
+
+    public static String quotaId1Name = "档案完整性";
+    public static String quotaId2Name = "数据集完整性";
+    public static String quotaId3Name = "数据元完整性";
+    public static String quotaId4Name = "数据元准确性";
+    public static String quotaId5Name = "档案及时性";
+    public static String quotaId6Name = "门诊及时性";
+    public static String quotaId7Name = "住院及时性";
 
     /**
      *
      * @param quotaId  指标ID  1 档案完整性 2 数据集完整性 3 数据元完整性 4 数据元准确性 5 档案及时性 6 门诊及时性 7 住院及时性
      * @param orgCode  机构编码
-     * @param quotaDate 指标统计时间  今天统计昨天 2017-05-16
+     * @param quotaDateStr 指标统计时间  今天统计昨天
      */
-    public void statisticQuotaData( String quotaId,String orgCode ,Date quotaDate ){
+    public void statisticQuotaData( String quotaId,String orgCode ,String quotaDateStr ){
         DecimalFormat df = new DecimalFormat("0");
-        List<Map<Integer,Object>> listVal = null;
-        Map<Integer,Object> mapVal = null;
+        Date quotaDate = DateUtil.formatCharDateYMD(quotaDateStr);
         switch (quotaId){
             case "1":
-                statisQuotaBy1( df,listVal,mapVal, orgCode , quotaDate);
+                statisQuotaBy1(quotaId,quotaId1Name, orgCode , quotaDate);
                 break;
             case "2":
-//                statisQuotaBy2(df, listVal, mapVal, orgCode, quotaDate);
+                statisDatasetsQuotaBy2(quotaId,quotaId2Name, orgCode, quotaDate);
                 break;
             case "3":
-
+                statisMetaddataQuotaBy3(quotaId,quotaId3Name, orgCode, quotaDate);
                 break;
             case "4":
-
+                statisMetaddataQuotaBy4(quotaId,quotaId4Name, orgCode, quotaDate);
                 break;
             case "5":
-
+                statisTimelyQuotaByQuotaId(quotaId,quotaId5Name,null, orgCode, quotaDate);
                 break;
             case "6":
-
+                statisTimelyQuotaByQuotaId(quotaId,quotaId6Name,"outpatient", orgCode, quotaDate);
                 break;
             case "7":
-
+                statisTimelyQuotaByQuotaId(quotaId, quotaId7Name, "hospital", orgCode, quotaDate);
                 break;
         }
     }
 
     //1 档案完整性 统计
-    public void statisQuotaBy1(DecimalFormat df,List<Map<Integer,Object>> listVal,Map<Integer,Object> mapVal,String orgCode ,Date quotaDate){
+    public void statisQuotaBy1(String quotaId ,String quotaName,String orgCode ,Date quotaDate){
+        DecimalFormat df = new DecimalFormat("0");
         QcQuotaResult qcQuotaResult = new QcQuotaResult();
+        qcQuotaResult = setBaseInfo(qcQuotaResult,quotaId,quotaName,quotaDate);
+        qcQuotaResult = setOrgInfo(orgCode,qcQuotaResult);
         int todayTolNum = 0;
         int todayRelNum = 0;
         int yesterdayRelNum = 0;
         int lasetYearTodayRelNum = 0;
+        int errorNum = 0;
+        int timelyNum = 0;
         Object object = qcDailyReportService.getOrgData(orgCode,quotaDate);
-        if(object == null)
+        if(object != null){
+            Map<Integer,Object> mapVal  = converMapObject(object);
+            todayTolNum = Integer.valueOf(mapVal.get(2).toString()) + Integer.valueOf(mapVal.get(4).toString());
+            todayRelNum = Integer.valueOf(mapVal.get(3).toString()) + Integer.valueOf(mapVal.get(5).toString());
+            List<Object> objects = qcDailyReportService.getYesterdayAndLastYearTodayData(orgCode, quotaDate, parseLastYearToday(quotaDate));
+            yesterdayRelNum =  getYesterdayOrLastYearData(objects,quotaDate,1);
+            lasetYearTodayRelNum =  getYesterdayOrLastYearData(objects,parseLastYearToday(quotaDate),2);
+
+            String val = todayTolNum==0?"0%":df.format((float)todayRelNum/(float)todayTolNum*100)+"%";
+            String an = yesterdayRelNum==0?"0%":df.format(((float)todayRelNum-(float)yesterdayRelNum)/(float)yesterdayRelNum*100)+"%";
+            String mom = lasetYearTodayRelNum==0?"0%":df.format(((float)todayRelNum-(float)lasetYearTodayRelNum)/(float)lasetYearTodayRelNum*100)+"%";
+
+            qcQuotaResult = setDataInfo(qcQuotaResult,val,an,mom,errorNum,todayTolNum,todayRelNum,timelyNum);
+            qcQuotaResultService.save(qcQuotaResult);
+        }
+    }
+
+
+    //2 数据集完整性  统计
+    public void statisDatasetsQuotaBy2(String quotaId ,String quotaName,String orgCode ,Date quotaDate){
+        DecimalFormat df = new DecimalFormat("0");
+        QcQuotaResult qcQuotaResult = new QcQuotaResult();
+        qcQuotaResult = setBaseInfo(qcQuotaResult,quotaId,quotaName,quotaDate);
+        qcQuotaResult = setOrgInfo(orgCode,qcQuotaResult);
+        int todayTolNum = 0;
+        int todayRelNum = 0;
+        int yesterdayRelNum = 0;
+        int lasetYearTodayRelNum = 0;
+        int errorNum = 0;
+        int timelyNum = 0;
+        Object object = qcDailyReportDatasetsService.getOrgDatasetsData(orgCode, quotaDate);
+        if(object != null){
+            Map<Integer,Object> mapVal  = converMapObject(object);
+            todayTolNum = Integer.valueOf(mapVal.get(2).toString());
+            todayRelNum = Integer.valueOf(mapVal.get(3).toString());
+            List<Object> objects = qcDailyReportDatasetsService.getDatasetsYesdayLastYearData(orgCode, quotaDate, parseLastYearToday(quotaDate));
+            yesterdayRelNum =  getYesterdayOrLastYearData(objects,quotaDate,1);
+            lasetYearTodayRelNum =  getYesterdayOrLastYearData(objects,parseLastYearToday(quotaDate),2);
+
+            String val = todayTolNum == 0 ? "0%" : df.format((float)todayRelNum/(float)todayTolNum*100)+"%";
+            String an = yesterdayRelNum == 0 ? "0%" : df.format(((float)todayRelNum-(float)yesterdayRelNum)/(float)yesterdayRelNum*100)+"%";
+            String mom = lasetYearTodayRelNum == 0 ? "0%" :df.format(((float)todayRelNum-(float)lasetYearTodayRelNum)/(float)lasetYearTodayRelNum*100)+"%";
+
+            qcQuotaResult = setDataInfo(qcQuotaResult,val,an,mom,errorNum,todayTolNum,todayRelNum,timelyNum);
+            qcQuotaResultService.save(qcQuotaResult);
+        }
+    }
+
+    // 3 数据元完整性 统计
+    public void statisMetaddataQuotaBy3(String quotaId ,String quotaName,String orgCode ,Date quotaDate){
+        DecimalFormat df = new DecimalFormat("0");
+        QcQuotaResult qcQuotaResult = new QcQuotaResult();
+        qcQuotaResult = setBaseInfo(qcQuotaResult,quotaId,quotaName,quotaDate);
+        qcQuotaResult = setOrgInfo(orgCode,qcQuotaResult);
+        int todayTolNum = 0;
+        int nullErrorNum = 0;
+        int yesterdayRelNum = 0;
+        int lasetYearTodayRelNum = 0;
+        List<Object> objectList  = qcDailyReportMetaDataService.getOrgMeataData(orgCode, quotaDate);
+        if(objectList != null){
+            List<Map<Integer,Object>> list  = converListObject(objectList);
+            for(Map<Integer,Object> map : list){
+                todayTolNum = todayTolNum + Integer.valueOf(map.get(0).toString());
+                String errorCode = map.get(2).toString();
+                nullErrorNum = nullErrorNum + errorCode.split(";").length;
+            }
+            List<Object> objects = qcDailyReportMetaDataService.getDataMeataYesdayLastYearData(orgCode, quotaDate, parseLastYearToday(quotaDate));
+            if(objects != null && objects.size() > 0) {
+                List<Map<Integer,Object>> mapList = converListObject(objects);
+                for(Map<Integer,Object> map : mapList){
+                    if(map.get(0) !=null ){
+                        Date createTime = DateUtil.formatCharDateYMD(map.get(0).toString());
+                        quotaDate = DateUtil.formatCharDateYMD(DateUtil.formatDate(quotaDate,"yyyy-MM-dd"));
+                        int days = DateUtil.getDifferenceOfDays(createTime,quotaDate);
+                        int days2 = DateUtil.getDifferenceOfDays(createTime,parseLastYearToday(quotaDate));
+                        if(days == 1){
+                            yesterdayRelNum = yesterdayRelNum + map.get(3).toString().split(";").length;
+                        }else if(days2 == 0){
+                            lasetYearTodayRelNum = lasetYearTodayRelNum + map.get(3).toString().split(";").length;
+                        }
+                    }
+                }
+            }
+            String val = todayTolNum == 0 ? "0%" : df.format((float)nullErrorNum/(float)todayTolNum*100)+"%";
+            String an = yesterdayRelNum == 0 ? "0%" : df.format(((float)nullErrorNum-(float)yesterdayRelNum)/(float)yesterdayRelNum*100)+"%";
+            String mom = lasetYearTodayRelNum == 0 ? "0%" :df.format(((float)nullErrorNum-(float)lasetYearTodayRelNum)/(float)lasetYearTodayRelNum*100)+"%";
+            qcQuotaResult = setDataInfo(qcQuotaResult,val,an,mom,nullErrorNum,todayTolNum,todayTolNum-nullErrorNum,0);
+            qcQuotaResultService.save(qcQuotaResult);
+        }
+    }
+
+
+    // 4 数据元准确性 统计
+    public void statisMetaddataQuotaBy4(String quotaId ,String quotaName,String orgCode ,Date quotaDate){
+        DecimalFormat df = new DecimalFormat("0");
+        QcQuotaResult qcQuotaResult = new QcQuotaResult();
+        qcQuotaResult = setBaseInfo(qcQuotaResult,quotaId,quotaName,quotaDate);
+        qcQuotaResult = setOrgInfo(orgCode,qcQuotaResult);
+        int todayErrorNum = 0;
+        int todayTolNum = 0;
+        int yesterdayErrorNum = 0;
+        int lasetYearTodayErrorNum = 0;
+        int errorNum = 0;
+        List<Object> objectList  = qcDailyReportMetaDataService.getOrgMeataData(orgCode, quotaDate);
+        String errrCodeStr = "";
+        if(objectList != null){
+            List<Map<Integer,Object>> listVal = converListObject(objectList);
+            for(Map<Integer,Object> map :listVal){
+                todayTolNum = todayTolNum + Integer.valueOf(map.get(0).toString());
+                todayErrorNum = todayErrorNum + Integer.valueOf(map.get(1).toString());
+                errrCodeStr = errrCodeStr + map.get(2).toString();
+            }
+        }else {
             return;
-        mapVal = converMapObject(object);
-        if(mapVal.get(0) != null){
-            Organization org = orgService.getOrg(mapVal.get(0).toString());
-            if(org != null && StringUtils.isNotEmpty(org.getLocation())){
-                Geography geography = geographyService.getAddressById(org.getLocation());
+        }
+
+        List<Object> objects = qcDailyReportMetaDataService.getDataMeataYesdayLastYearData(orgCode,quotaDate, parseLastYearToday(quotaDate));
+        yesterdayErrorNum =  getYesterdayOrLastYearData(objects,quotaDate,1);
+        lasetYearTodayErrorNum =  getYesterdayOrLastYearData(objects,parseLastYearToday(quotaDate),2);
+        String val = todayTolNum == 0 ? "0%" : df.format((float)todayErrorNum/(float)todayTolNum*100)+"%";
+        String an = yesterdayErrorNum == 0 ? "0%" : df.format(((float)todayErrorNum-(float)yesterdayErrorNum)/(float)yesterdayErrorNum*100)+"%";
+        String mom = lasetYearTodayErrorNum == 0 ? "0%" :df.format(((float)todayErrorNum-(float)lasetYearTodayErrorNum)/(float)lasetYearTodayErrorNum*100)+"%";
+
+        errorNum = todayErrorNum;
+        qcQuotaResult = setDataInfo(qcQuotaResult,val,an,mom,errorNum,todayTolNum,todayTolNum-errorNum,0);
+        qcQuotaResultService.save(qcQuotaResult);
+    }
+
+    //5 6 7  及时性 统计
+    public void statisTimelyQuotaByQuotaId(String quotaId ,String quotaName,String archiveType ,String orgCode ,Date quotaDate){
+        DecimalFormat df = new DecimalFormat("0");
+        QcQuotaResult qcQuotaResult = new QcQuotaResult();
+        qcQuotaResult = setBaseInfo(qcQuotaResult,quotaId,quotaName,quotaDate);
+        qcQuotaResult = setOrgInfo(orgCode,qcQuotaResult);
+        int todayTolNum = 0;
+        int todayRelNum = 0;
+        int yesterdayRelNum = 0;
+        int lasetYearTodayRelNum = 0;
+        int errorNum = 0;
+        int timelyNum = 0;
+        Object object = qcDailyReportService.getOrgData(orgCode, quotaDate);
+        if(object != null) {
+            Map<Integer,Object> mapVal  = converMapObject(object);
+            todayTolNum = qcDailyReportService.getOrgDailyReportDetailCount(mapVal.get(6).toString(), null,archiveType);
+            todayRelNum = qcDailyReportService.getOrgDailyReportDetailCount(mapVal.get(6).toString(), "1",archiveType);
+        }
+        List<Object> objects = qcDailyReportService.getYesterdayAndLastYearTodayData(orgCode, quotaDate,parseLastYearToday(quotaDate));
+        if(objects != null && objects.size() > 0) {
+            List<Map<Integer,Object>> mapList = converListObject(objects);
+            for(Map<Integer,Object> map : mapList){
+                if(map.get(0) !=null ){
+                    Date createTime = DateUtil.formatCharDateYMD(map.get(0).toString());
+                    quotaDate = DateUtil.formatCharDateYMD(DateUtil.formatDate(quotaDate,"yyyy-MM-dd"));
+                    int days = DateUtil.getDifferenceOfDays(createTime,quotaDate);
+                    int days2 = DateUtil.getDifferenceOfDays(createTime,parseLastYearToday(quotaDate));
+                    if(days == 1){
+                        yesterdayRelNum = qcDailyReportService.getOrgDailyReportDetailCount(map.get(3).toString(), "1",archiveType);
+                    }else if(days2 == 0){
+                        lasetYearTodayRelNum = qcDailyReportService.getOrgDailyReportDetailCount(map.get(3).toString(), "1",archiveType);
+                    }
+                }
+            }
+        }
+        String val = todayTolNum==0?"0%":df.format((float)todayRelNum/(float)todayTolNum*100)+"%";
+        String an = yesterdayRelNum==0?"0%":df.format(((float)todayRelNum-(float)yesterdayRelNum)/(float)yesterdayRelNum*100)+"%";
+        String mom = lasetYearTodayRelNum==0?"0%":df.format(((float)todayRelNum-(float)lasetYearTodayRelNum)/(float)lasetYearTodayRelNum*100)+"%";
+        timelyNum = todayRelNum;
+        qcQuotaResult = setDataInfo(qcQuotaResult,val,an,mom,errorNum,todayTolNum,todayRelNum,timelyNum);
+        qcQuotaResultService.save(qcQuotaResult);
+    }
+
+    //设置机构信息
+    public QcQuotaResult setOrgInfo(String orgCode,QcQuotaResult qcQuotaResult){
+        Organization org = orgService.getOrg(orgCode);
+        if(org != null && StringUtils.isNotEmpty(org.getLocation())){
+            Geography geography = geographyService.getAddressById(org.getLocation());
+            if(geography!=null){
+                qcQuotaResult.setOrgCode(orgCode);
                 qcQuotaResult.setOrgName(org.getShortName());
                 qcQuotaResult.setCity(geography.getCity());
                 qcQuotaResult.setCityName(geography.getCity());
@@ -93,42 +280,55 @@ public class QuotaStatisticsEndPoint {
                 qcQuotaResult.setTownName(geography.getTown());
             }
         }
-        qcQuotaResult.setQuotaId(Long.valueOf("1"));
-        qcQuotaResult.setOrgCode(mapVal.get(1).toString());
-        qcQuotaResult.setReceiveTime(DateUtil.formatCharDateYMDHMS(mapVal.get(1).toString()));
-        todayTolNum = Integer.valueOf(mapVal.get(2).toString()) + Integer.valueOf(mapVal.get(4).toString());
-        todayRelNum = Integer.valueOf(mapVal.get(3).toString()) + Integer.valueOf(mapVal.get(5).toString());
-        qcQuotaResult.setTotalNum(todayTolNum);
-        qcQuotaResult.setRealNum(todayRelNum);
-        List<Object> objects = qcDailyReportService.getYesterdayAndLastYearTodayData(orgCode, quotaDate);
-       if(objects!= null){
-           listVal = converListObject(objects);
-           for(Map<Integer,Object> map :listVal){
-               Date evenTime = DateUtil.formatCharDateYMD(map.get(0).toString());
-               quotaDate = DateUtil.formatCharDateYMD(DateUtil.formatDate(quotaDate,"yyyy-MM-dd"));
-               int days = DateUtil.getDifferenceOfDays(evenTime,quotaDate);
-               if(days <= 1){
-                   yesterdayRelNum = Integer.valueOf(map.get(1).toString())+Integer.valueOf(map.get(2).toString());
-               }else if(days == 365 || days == 366){
-                   lasetYearTodayRelNum = Integer.valueOf(map.get(1).toString())+Integer.valueOf(map.get(2).toString());
-               }
-           }
-       }
-        String an = yesterdayRelNum==0?"0":df.format((float)todayRelNum/(float)yesterdayRelNum*100)+"%";
-        String mom = lasetYearTodayRelNum==0?"0":df.format((float)todayRelNum/(float)lasetYearTodayRelNum*100)+"%";
-        String val = todayRelNum==0?"0":df.format((float)todayRelNum/(float)todayTolNum*100)+"%";
-        qcQuotaResult.setAn(an);
-        qcQuotaResult.setMom(mom);
-        qcQuotaResult.setQuotaName("档案完整性");
-        qcQuotaResult.setValue(val);
-        qcQuotaResult.setErrorNum(0);
-        qcQuotaResult.setTimelyNum(0);
-        qcQuotaResult.setQuotaDate(new Date());
-        qcQuotaResultService.save(qcQuotaResult);
+        return qcQuotaResult;
     }
 
+    //设置QcQuotaResult信息
+    public QcQuotaResult setBaseInfo(QcQuotaResult qcQuotaResult,String quotaId,String quotaName ,Date quotaDate){
+        qcQuotaResult.setQuotaId(Long.valueOf(quotaId));
+        qcQuotaResult.setQuotaName(quotaName);
+        qcQuotaResult.setQuotaDate(new Date());
+        qcQuotaResult.setReceiveTime(quotaDate);
+        qcQuotaResult.setEventTime(quotaDate);
+        return qcQuotaResult;
+    }
 
+    //设置QcQuotaResult  统计数据信息
+    public QcQuotaResult setDataInfo(QcQuotaResult qcQuotaResult,String val,String an ,String mom,int errorNum,int todayTolNum,int todayRelNum,int timeLyNum){
+        qcQuotaResult.setValue(val);
+        qcQuotaResult.setAn(an);
+        qcQuotaResult.setMom(mom);
+        qcQuotaResult.setErrorNum(errorNum);
+        qcQuotaResult.setTotalNum(todayTolNum);
+        qcQuotaResult.setRealNum(todayRelNum);
+        qcQuotaResult.setTimelyNum(timeLyNum);
+        return qcQuotaResult;
+    }
 
+    // type 1获取昨天的实收数据, 2 去年今天的实收数据
+    public int getYesterdayOrLastYearData( List<Object> objects,Date date,int type ){
+        List<Map<Integer,Object>> listVal = null;
+        int yesterdayRelNum = 0;
+        int lasetYearTodayRelNum = 0;
+        if(objects != null){
+            listVal = converListObject(objects);
+            for(Map<Integer,Object> map :listVal){
+                Date createTime = DateUtil.formatCharDateYMD(map.get(0).toString());
+                date = DateUtil.formatCharDateYMD(DateUtil.formatDate(date,"yyyy-MM-dd"));
+                int days = DateUtil.getDifferenceOfDays(createTime,date);
+                if(days == 1 && type == 1){
+                    yesterdayRelNum = Integer.valueOf(map.get(1).toString())+Integer.valueOf(map.get(2).toString());
+                }else if(days == 0 && type == 2){
+                    lasetYearTodayRelNum = Integer.valueOf(map.get(1).toString())+Integer.valueOf(map.get(2).toString());
+                }
+            }
+        }
+        if(type==1){
+            return  yesterdayRelNum;
+        }else {
+            return  lasetYearTodayRelNum;
+        }
+    }
 
     public List<Map<Integer,Object>> converListObject(List<Object> objects){
         List<Map<Integer,Object>> list = new ArrayList<>();
@@ -169,12 +369,5 @@ public class QuotaStatisticsEndPoint {
         Date lastyearToday = calendar.getTime();
         return  lastyearToday;
     }
-
-    public static void main(String args[]){
-        QuotaStatisticsEndPoint quotaStatisticsEndPoint = new QuotaStatisticsEndPoint();
-//        quotaStatisticsEndPoint.statisticQuotaData("1","org-1", DateUtil.strToDate("2017-05-09"));
-        quotaStatisticsEndPoint.parseYesterday(DateUtil.strToDate("2017-05-09"));
-    }
-
 
 }

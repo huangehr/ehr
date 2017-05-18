@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -65,5 +66,14 @@ public interface QcDailyReportClient {
     @RequestMapping(value = ServiceApi.Report.UpdateQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改质控包数据完整性详细数据日报")
     void updateQcDailyReportDetailList(@RequestBody String models ) ;
+
+
+    @RequestMapping(value = ServiceApi.Report.StatisticQuotaDataReportData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "统计指标日报数据")
+    void statisticQuotaDataReportData(
+            @RequestParam(value = "quotaId",required = true) String quotaId,
+            @RequestParam(value = "orgId",required = true) String orgId,
+            @RequestParam(value = "quotaDate",required = true) String quotaDate
+    );
 
 }

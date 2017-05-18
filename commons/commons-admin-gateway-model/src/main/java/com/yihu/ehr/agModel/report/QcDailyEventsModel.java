@@ -13,6 +13,7 @@ public class QcDailyEventsModel {
     private  int  total_outpatient_num;//门诊应收数
     private  int  real_outpatient_num ;//门诊实收数
     private  int  total_hospital_num;//住院应收数
+    private  int  real_hospital_num ;//门诊实收数
 
     private  List<QcDailyEventDetailModel> total_outpatient ;     //门诊应收列表
     private  List<QcDailyEventDetailModel> real_outpatient  ;     //门诊实收列表
@@ -81,6 +82,14 @@ public class QcDailyEventsModel {
 
     public void setReal_outpatient(List<QcDailyEventDetailModel> real_outpatient) {
         this.real_outpatient = real_outpatient;
+    }
+
+    public int getReal_hospital_num() {
+        return real_hospital_num;
+    }
+
+    public void setReal_hospital_num(int real_hospital_num) {
+        this.real_hospital_num = real_hospital_num;
     }
 
     public List<QcDailyEventDetailModel> getTotal_hospital() {
