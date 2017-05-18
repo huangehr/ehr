@@ -20,6 +20,7 @@ public class QcQuotaResultAnalyse {
     private String townName;    //区级名称
     private Date receiveTime;    //采集日期
     private Date eventTime;    //事件时间
+    private String orgCode;    //机构code
 
 
     @Id
@@ -91,5 +92,13 @@ public class QcQuotaResultAnalyse {
         this.eventTime = eventTime;
     }
 
+    @Basic
+    @Column(name = "org_code")
+    public String getOrgCode() {
+        return orgCode;
+    }
 
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
 }

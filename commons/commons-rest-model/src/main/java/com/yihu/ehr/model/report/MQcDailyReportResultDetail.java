@@ -16,12 +16,23 @@ public class MQcDailyReportResultDetail {
     private String orgCode;    //机构code
     private String orgName;    //机构名称
     private String eventTime;    //事件时间
-    private Integer totalNum;    //应收数
-    private Integer realNum;    //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
-    private Integer errorNum;    //错误数量（该字段只针对数据元的准确性统计）
-    private Integer timelyNum;    //及时采集的档案数量
+    private String totalNum;    //应收数
+    private String realNum;    //实收数 （数据元的实收为 应收 - 错误数（标识为空的错误code））
+    private String errorNum;    //错误数量（该字段只针对数据元的准确性统计）
+    private String timelyNum;    //及时采集的档案数量
     private String an;    //同比：与去年的当天&周&月相比
     private String mom;    //环比：与前一天&周&月环比
+    private String scaleType;//总体-1，同比-2，环比-3
+    private String arIntegrity;//档案完整性
+    private String dsIntegrity;//数据集完整性
+    private String mdIntegrity;//数据元完整性
+    private String mdAccuracy;//数据元准确性
+    private String arTimely;//档案及时性
+    private String hpTimely;//住院及时性
+    private String opTimely;//门诊及时性
+
+
+
 
 
     public String getId() {
@@ -96,35 +107,35 @@ public class MQcDailyReportResultDetail {
         this.eventTime = eventTime;
     }
 
-    public Integer getTotalNum() {
+    public String getTotalNum() {
         return totalNum;
     }
 
-    public void setTotalNum(Integer totalNum) {
+    public void setTotalNum(String totalNum) {
         this.totalNum = totalNum;
     }
 
-    public Integer getRealNum() {
+    public String getRealNum() {
         return realNum;
     }
 
-    public void setRealNum(Integer realNum) {
+    public void setRealNum(String realNum) {
         this.realNum = realNum;
     }
 
-    public Integer getErrorNum() {
+    public String getErrorNum() {
         return errorNum;
     }
 
-    public void setErrorNum(Integer errorNum) {
+    public void setErrorNum(String errorNum) {
         this.errorNum = errorNum;
     }
 
-    public Integer getTimelyNum() {
+    public String getTimelyNum() {
         return timelyNum;
     }
 
-    public void setTimelyNum(Integer timelyNum) {
+    public void setTimelyNum(String timelyNum) {
         this.timelyNum = timelyNum;
     }
 
@@ -142,5 +153,69 @@ public class MQcDailyReportResultDetail {
 
     public void setMom(String mom) {
         this.mom = mom;
+    }
+
+    public String getScaleType() {
+        return scaleType;
+    }
+
+    public void setScaleType(String scaleType) {
+        this.scaleType = scaleType;
+    }
+
+    public String getArIntegrity() {
+        return arIntegrity;
+    }
+
+    public void setArIntegrity(String arIntegrity) {
+        this.arIntegrity = arIntegrity;
+    }
+
+    public String getDsIntegrity() {
+        return dsIntegrity;
+    }
+
+    public void setDsIntegrity(String dsIntegrity) {
+        this.dsIntegrity = dsIntegrity;
+    }
+
+    public String getMdIntegrity() {
+        return mdIntegrity;
+    }
+
+    public void setMdIntegrity(String mdIntegrity) {
+        this.mdIntegrity = mdIntegrity;
+    }
+
+    public String getMdAccuracy() {
+        return mdAccuracy;
+    }
+
+    public void setMdAccuracy(String mdAccuracy) {
+        this.mdAccuracy = mdAccuracy;
+    }
+
+    public String getArTimely() {
+        return arTimely;
+    }
+
+    public void setArTimely(String arTimely) {
+        this.arTimely = arTimely;
+    }
+
+    public String getHpTimely() {
+        return hpTimely;
+    }
+
+    public void setHpTimely(String hpTimely) {
+        this.hpTimely = hpTimely;
+    }
+
+    public String getOpTimely() {
+        return opTimely;
+    }
+
+    public void setOpTimely(String opTimely) {
+        this.opTimely = opTimely;
     }
 }
