@@ -112,6 +112,10 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         List quotaList = new ArrayList<>();
         Date startDate = DateTimeUtil.simpleDateTimeParse(startTime);
         Date endDate = DateTimeUtil.simpleDateTimeParse(endTime);
+        Calendar   calendar   =   new   GregorianCalendar();
+        calendar.setTime(endDate);
+        calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+        endDate=calendar.getTime();   //日期往后推一天
         if(!StringUtils.isEmpty(orgCode)){
             //按机构查询整体统计结果
             quotaList = qcQuotaResultService.getQuotaListByOrgCode(orgCode, startDate, endDate);
@@ -170,6 +174,10 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         List<MQcDailyReportQuotaResult> newQuotaList = new ArrayList<MQcDailyReportQuotaResult>();
         Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
         Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
+        Calendar   calendar   =   new   GregorianCalendar();
+        calendar.setTime(endDate);
+        calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+        endDate=calendar.getTime();   //日期往后推一天
         MQcDailyReportQuotaResult qc=null;
         if(!StringUtils.isEmpty(quotaId)){
             //区域整体统计结果 - 按机构及指标划分
@@ -254,6 +262,10 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         List<MQcDailyReportQuotaResult> newQuotaList = new ArrayList<MQcDailyReportQuotaResult>();
         Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
         Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
+        Calendar   calendar   =   new   GregorianCalendar();
+        calendar.setTime(endDate);
+        calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+        endDate=calendar.getTime();   //日期往后推一天
         MQcDailyReportQuotaResult qc = null;
         if(!StringUtils.isEmpty(quotaId)){
         quotaList = qcQuotaResultService.getQuotaListByOrg(orgCode, Long.parseLong(quotaId), startDate, endDate);
@@ -338,6 +350,10 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
         Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
         Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
+        Calendar   calendar   =   new   GregorianCalendar();
+        calendar.setTime(endDate);
+        calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+        endDate=calendar.getTime();   //日期往后推一天
         QcQuotaResult qc=null;
         //按区域查询统计结果集
         quotaList = qcQuotaResultService.getQuotaListByLocation(location,startDate,endDate);
@@ -400,6 +416,10 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
         Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
         Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
+        Calendar   calendar   =   new   GregorianCalendar();
+        calendar.setTime(endDate);
+        calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+        endDate=calendar.getTime();   //日期往后推一天
         QcQuotaResult qc=null;
         //按区域查询统计结果集
         quotaList = qcQuotaResultService.getQuotaListByOrgCode(orgCode,startDate,endDate);
@@ -415,6 +435,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
             qc.setQuotaName(obj[3].toString());
             qc.setOrgName(obj[1].toString());
             qc.setOrgCode(obj[0].toString());
+            qc.setQuotaId(Long.parseLong(quotaId));
             int realNum = 0;
             int totalNum = 0;
             int errorNum = 0;
@@ -462,6 +483,10 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         List<Object> quotaList = new ArrayList<Object>();
         Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
         Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
+        Calendar   calendar   =   new   GregorianCalendar();
+        calendar.setTime(endDate);
+        calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+        endDate=calendar.getTime();   //日期往后推一天
         Map<String,String> QcQuotaResultAnalyseMap=new TreeMap();
         //获取区域名称和事件时间
         quotaList = qcQuotaResultService.getfindQcListByLocationAndTime(location,startDate, endDate);
@@ -542,6 +567,10 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         List<QcQuotaResult> newQuotaList = new ArrayList<QcQuotaResult>();
         Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
         Date endDate =DateUtil.formatYMDToYMDHMS(endTime);
+        Calendar   calendar   =   new   GregorianCalendar();
+        calendar.setTime(endDate);
+        calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+        endDate=calendar.getTime();   //日期往后推一天
         QcQuotaResult qc=null;
         if(!StringUtils.isEmpty(quotaId)){
             //区域整体统计结果 - 按机构及指标划分
