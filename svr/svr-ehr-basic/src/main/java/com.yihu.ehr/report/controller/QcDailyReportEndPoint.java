@@ -168,19 +168,16 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "getStatistData1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "测试统计数据")
-    void getStatistData1(){
-        quotaStatisticsEndPoint.statisticQuotaData("1","01114532-4", DateUtil.strToDate("2017-05-15"));
-    }
-
-    @RequestMapping(value = "getStatistDataAll", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "测试统计数据All")
-    void getStatistData5(
-            @RequestParam(value = "quotaId") String quotaId,
-            @RequestParam(value = "orgId") String orgId,
-            @RequestParam(value = "quotaDate") String quotaDate ){
-        quotaStatisticsEndPoint.statisticQuotaData(quotaId,orgId, DateUtil.strToDate(quotaDate));
+    @RequestMapping(value = ServiceApi.Report.StatisticQuotaDataReportData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "统计指标日报数据")
+    void statisticQuotaDataReportData(
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId",required = true) String quotaId,
+            @ApiParam(name = "orgId", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgId",required = true) String orgId,
+            @ApiParam(name = "quotaDate", value = "统计时间", defaultValue = "")
+            @RequestParam(value = "quotaDate",required = true) String quotaDate ){
+             quotaStatisticsEndPoint.statisticQuotaData(quotaId,orgId, quotaDate);
     }
 
 

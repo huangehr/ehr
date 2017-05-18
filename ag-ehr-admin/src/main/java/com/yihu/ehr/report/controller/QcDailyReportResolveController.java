@@ -30,6 +30,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -77,6 +78,10 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
             }
             String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(key.getPrivateKey()));
             qcDailyReportResolveService.resolveFile(zipFile, "");
+            //入库后统计
+            qcDailyReportClient.statisticQuotaDataReportData("2",orgCode,DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+            qcDailyReportClient.statisticQuotaDataReportData("3",orgCode,DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+            qcDailyReportClient.statisticQuotaDataReportData("4",orgCode,DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
             Envelop envelop = success("解压入库成功");
             envelop.setObj(null);
             return envelop;
@@ -107,7 +112,7 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
                 qcDailyReport.setOrgCode(eventsModel.getOrg_code());
                 qcDailyReport.setCreateDate(createDate );
                 qcDailyReport.setInnerVersion(eventsModel.getInner_version());
-                qcDailyReport.setRealHospitalNum(eventsModel.getReal_outpatient_num());
+                qcDailyReport.setRealHospitalNum(eventsModel.getReal_hospital_num());
                 qcDailyReport.setTotalHospitalNum(eventsModel.getTotal_hospital_num());
                 qcDailyReport.setRealOutpatientNum(eventsModel.getReal_outpatient_num());
                 qcDailyReport.setTotalOutpatientNum(eventsModel.getTotal_outpatient_num());
@@ -127,6 +132,13 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
                 List<MQcDailyReportDetail> dailyReportDetailList = qcDailyReportResolveService.checkRealListFromTotal(totalList, realList);
                 qcDailyReportClient.addQcDailyReportDetailList(objectMapper.writeValueAsString(dailyReportDetailList));
             }
+            //入库后统计
+            Date date = new Date();
+            qcDailyReportClient.statisticQuotaDataReportData("1",eventsModel.getOrg_code(), DateUtil.formatDate(date,"yyyy-MM-dd"));
+            qcDailyReportClient.statisticQuotaDataReportData("5",eventsModel.getOrg_code(),DateUtil.formatDate(date,"yyyy-MM-dd"));
+            qcDailyReportClient.statisticQuotaDataReportData("6",eventsModel.getOrg_code(),DateUtil.formatDate(date,"yyyy-MM-dd"));
+            qcDailyReportClient.statisticQuotaDataReportData("7",eventsModel.getOrg_code(),DateUtil.formatDate(date,"yyyy-MM-dd"));
+
             Envelop envelop = success("解析入库成功");
             envelop.setObj(null);
             return envelop;
