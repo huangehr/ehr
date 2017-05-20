@@ -28,7 +28,7 @@ public interface XQcQuotaResultRepository extends PagingAndSortingRepository<QcQ
     List findListByLocation(@Param("location")  String location,@Param("startTime")  Date startTime,@Param("endTime")  Date endTime);
 
     //分析明细-2
-    @Query("select qc.eventTime,qc.orgName,qc.orgCode,qc.quotaId,qc.quotaName,avg(qc.value) ,sum(qc.totalNum),sum(qc.realNum),sum(qc.errorNum),sum(qc.timelyNum),avg(qc.an) as an,avg(qc.mom) as mom  from QcQuotaResultDetail qc where (qc.city = :location or qc.town = :location ) and  qc.eventTime >= :startTime and qc.eventTime< :endTime group by  qc.eventTime,qc.orgCode,qc.orgName,qc.quotaId,qc.quotaName")
+    @Query("select qc.eventTime,qc.orgName,qc.orgCode,qc.quotaId,qc.quotaName,avg(qc.value) ,sum(qc.totalNum),sum(qc.realNum),sum(qc.errorNum),sum(qc.timelyNum),avg(qc.an) as an,avg(qc.mom) as mom ,avg(qc.standard) as standard  from QcQuotaResultDetail qc where (qc.city = :location or qc.town = :location ) and  qc.eventTime >= :startTime and qc.eventTime< :endTime group by  qc.eventTime,qc.orgCode,qc.orgName,qc.quotaId,qc.quotaName")
     List findQcDetailListByLocationAndTime(@Param("location")  String location,@Param("startTime")  Date startTime,@Param("endTime")  Date endTime);
 
     //分析明细-1

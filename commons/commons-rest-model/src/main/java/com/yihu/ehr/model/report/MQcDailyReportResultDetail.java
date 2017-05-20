@@ -30,6 +30,13 @@ public class MQcDailyReportResultDetail {
     private String arTimely;//档案及时性
     private String hpTimely;//住院及时性
     private String opTimely;//门诊及时性
+    private String arIntegritySta;//档案完整性达标值
+    private String dsIntegritySta;//数据集完整性达标值
+    private String mdIntegritySta;//数据元完整性达标值
+    private String mdAccuracySta;//数据元准确性达标值
+    private String arTimelySta;//档案及时性达标值
+    private String hpTimelySta;//住院及时性达标值
+    private String opTimelySta;//门诊及时性达标值
 
 
 
@@ -217,5 +224,61 @@ public class MQcDailyReportResultDetail {
 
     public void setOpTimely(String opTimely) {
         this.opTimely = opTimely;
+    }
+
+    public String getArIntegritySta() {
+        return arIntegritySta;
+    }
+
+    public void setArIntegritySta(String arIntegritySta) {
+        this.arIntegritySta = arIntegritySta;
+    }
+
+    public String getDsIntegritySta() {
+        return dsIntegritySta;
+    }
+
+    public void setDsIntegritySta(String dsIntegritySta) {
+        this.dsIntegritySta = dsIntegritySta;
+    }
+
+    public String getMdIntegritySta() {
+        return mdIntegritySta;
+    }
+
+    public void setMdIntegritySta(String mdIntegritySta) {
+        this.mdIntegritySta = mdIntegritySta;
+    }
+
+    public String getMdAccuracySta() {
+        return mdAccuracySta;
+    }
+
+    public void setMdAccuracySta(String mdAccuracySta) {
+        this.mdAccuracySta = mdAccuracySta;
+    }
+
+    public String getArTimelySta() {
+        return arTimelySta;
+    }
+
+    public void setArTimelySta(String arTimelySta) {
+        this.arTimelySta = arTimelySta;
+    }
+
+    public String getHpTimelySta() {
+        return hpTimelySta;
+    }
+
+    public void setHpTimelySta(String hpTimelySta) {
+        this.hpTimelySta = hpTimelySta;
+    }
+
+    public String getOpTimelySta() {
+        return opTimelySta;
+    }
+
+    public void setOpTimelySta(String opTimelySta) {
+        this.opTimelySta = opTimelySta;
     }
 }

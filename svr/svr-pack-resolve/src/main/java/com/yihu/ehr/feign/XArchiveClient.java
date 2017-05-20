@@ -18,9 +18,10 @@ import java.util.Map;
  */
 @ApiIgnore
 @FeignClient(name = MicroServices.Patient)
+@RequestMapping(ApiVersion.Version1_0)
 public interface XArchiveClient {
 
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Patients.ArchiveRelation, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Patients.ArchiveRelation, method = RequestMethod.POST)
     Result archiveRelation(@RequestBody String data);
 
 }
