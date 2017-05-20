@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.report.QcDailyReportDetail;
+import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.report.MQcDailyReport;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import io.swagger.annotations.ApiOperation;
@@ -53,19 +54,20 @@ public interface QcDailyReportClient {
     MQcDailyReport getInfo(@RequestParam(value = "id") String id) ;
 
 
+    @RequestMapping(value = ServiceApi.Report.GetQcDailyReportDetail, method = RequestMethod.GET)
+    @ApiOperation(value = "查询数据完整性详细数据")
+    QcDailyReportDetail searchQcDailyReportDetail( @RequestParam(value = "filters", required = false) String filters) ;
+
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
     boolean addQcDailyReportDetailList(@RequestBody String models ) ;
 
 
-    @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增质控包数据完整性详细数据日报")
-    MQcDailyReportDetail addQcDailyReportDetail(@RequestBody String model) ;
+    @RequestMapping(value = ServiceApi.Report.AddOrUpdateQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增修改质控包数据完整性详细数据日报")
+    ObjectResult addOrUpdateQcDailyReportDetail(@RequestBody String model) ;
 
 
-    @RequestMapping(value = ServiceApi.Report.UpdateQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改质控包数据完整性详细数据日报")
-    void updateQcDailyReportDetailList(@RequestBody String models ) ;
 
 
     @RequestMapping(value = ServiceApi.Report.StatisticQuotaDataReportData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
