@@ -54,8 +54,7 @@ public class QuotaStatisticsEndPoint {
      * @param orgCode  机构编码
      * @param quotaDateStr 指标统计时间  今天统计昨天
      */
-    public void statisticQuotaData( String quotaId,String orgCode ,String quotaDateStr ){
-        DecimalFormat df = new DecimalFormat("0");
+    public void statisticQuotaData( String quotaId,String orgCode ,String quotaDateStr ) throws ParseException {
         Date quotaDate = DateUtil.formatCharDateYMD(quotaDateStr);
         switch (quotaId){
             case "1":
@@ -83,7 +82,7 @@ public class QuotaStatisticsEndPoint {
     }
 
     //1 档案完整性 统计
-    public void statisQuotaBy1(String quotaId ,String quotaName,String orgCode ,Date quotaDate){
+    public void statisQuotaBy1(String quotaId ,String quotaName,String orgCode ,Date quotaDate) throws ParseException {
         DecimalFormat df = new DecimalFormat("0");
         QcQuotaResult qcQuotaResult = new QcQuotaResult();
         qcQuotaResult = setBaseInfo(qcQuotaResult,quotaId,quotaName,quotaDate);
@@ -98,18 +97,35 @@ public class QuotaStatisticsEndPoint {
         if(object != null){
             Map<Integer,Object> mapVal  = converMapObject(object);
             todayTolNum = Integer.valueOf(mapVal.get(2).toString()) + Integer.valueOf(mapVal.get(4).toString());
-            todayRelNum = Integer.valueOf(mapVal.get(3).toString()) + Integer.valueOf(mapVal.get(5).toString());
-            List<Object> objects = qcDailyReportService.getYesterdayAndLastYearTodayData(orgCode, quotaDate, parseLastYearToday(quotaDate));
-            yesterdayRelNum =  getYesterdayOrLastYearData(objects,quotaDate,1);
-            lasetYearTodayRelNum =  getYesterdayOrLastYearData(objects,parseLastYearToday(quotaDate),2);
-
-            String val = todayTolNum==0?"0%":df.format((float)todayRelNum/(float)todayTolNum*100)+"%";
-            String an = yesterdayRelNum==0?"0%":df.format(((float)todayRelNum-(float)yesterdayRelNum)/(float)yesterdayRelNum*100)+"%";
-            String mom = lasetYearTodayRelNum==0?"0%":df.format(((float)todayRelNum-(float)lasetYearTodayRelNum)/(float)lasetYearTodayRelNum*100)+"%";
-
-            qcQuotaResult = setDataInfo(qcQuotaResult,val,an,mom,errorNum,todayTolNum,todayRelNum,timelyNum);
-            qcQuotaResultService.save(qcQuotaResult);
+            String storageFlag = "3";//解析成功入库
+            String reportId = mapVal.get(6).toString();
+            List todaylist = qcDailyReportDetailService.getQcDailyReportDetailData(reportId,quotaDate,storageFlag);
+            todayRelNum =todaylist == null ? 0 : todaylist.size();
+            yesterdayRelNum = getRealCount(orgCode,parseYesterday(quotaDate));
+            lasetYearTodayRelNum = getRealCount(orgCode,parseLastYearToday(quotaDate));
         }
+        System.out.println(todayRelNum);
+        System.out.println(yesterdayRelNum);
+        System.out.println(lasetYearTodayRelNum);
+        String val = todayTolNum==0?"0%":df.format((float)todayRelNum/(float)todayTolNum*100)+"%";
+        String an = yesterdayRelNum==0?"0%":df.format(((float)todayRelNum-(float)yesterdayRelNum)/(float)yesterdayRelNum*100)+"%";
+        String mom = lasetYearTodayRelNum==0?"0%":df.format(((float)todayRelNum-(float)lasetYearTodayRelNum)/(float)lasetYearTodayRelNum*100)+"%";
+        qcQuotaResult = setDataInfo(qcQuotaResult,val,an,mom,errorNum,todayTolNum,todayRelNum,timelyNum);
+        qcQuotaResultService.save(qcQuotaResult);
+    }
+
+
+    public int getRealCount(String orgCode,Date quotaDate){
+        int todayRelNum = 0;
+        Object object = qcDailyReportService.getOrgData(orgCode,quotaDate);
+        if(object != null) {
+            Map<Integer, Object> mapVal = converMapObject(object);
+            String storageFlag = "3";//解析成功入库
+            String reportId = mapVal.get(6).toString();
+            List todaylist = qcDailyReportDetailService.getQcDailyReportDetailData(reportId, quotaDate, storageFlag);
+            todayRelNum = todaylist == null ? 0 : todaylist.size();
+        }
+        return todayRelNum;
     }
 
 
@@ -235,11 +251,12 @@ public class QuotaStatisticsEndPoint {
         int lasetYearTodayRelNum = 0;
         int errorNum = 0;
         int timelyNum = 0;
+        String storageFlag = "3";
         Object object = qcDailyReportService.getOrgData(orgCode, quotaDate);
         if(object != null) {
             Map<Integer,Object> mapVal  = converMapObject(object);
-            todayTolNum = qcDailyReportService.getOrgDailyReportDetailCount(mapVal.get(6).toString(), null,archiveType);
-            todayRelNum = qcDailyReportService.getOrgDailyReportDetailCount(mapVal.get(6).toString(), "1",archiveType);
+            todayTolNum = qcDailyReportService.getOrgDailyReportDetailCount(mapVal.get(6).toString(), null,archiveType,storageFlag);
+            todayRelNum = qcDailyReportService.getOrgDailyReportDetailCount(mapVal.get(6).toString(), "1",archiveType,storageFlag);
         }
         List<Object> objects = qcDailyReportService.getYesterdayAndLastYearTodayData(orgCode, quotaDate,parseLastYearToday(quotaDate));
         if(objects != null && objects.size() > 0) {
@@ -251,9 +268,9 @@ public class QuotaStatisticsEndPoint {
                     int days = DateUtil.getDifferenceOfDays(createTime,quotaDate);
                     int days2 = DateUtil.getDifferenceOfDays(createTime,parseLastYearToday(quotaDate));
                     if(days == 1){
-                        yesterdayRelNum = qcDailyReportService.getOrgDailyReportDetailCount(map.get(3).toString(), "1",archiveType);
+                        yesterdayRelNum = qcDailyReportService.getOrgDailyReportDetailCount(map.get(3).toString(), "1",archiveType,storageFlag);
                     }else if(days2 == 0){
-                        lasetYearTodayRelNum = qcDailyReportService.getOrgDailyReportDetailCount(map.get(3).toString(), "1",archiveType);
+                        lasetYearTodayRelNum = qcDailyReportService.getOrgDailyReportDetailCount(map.get(3).toString(), "1",archiveType,storageFlag);
                     }
                 }
             }

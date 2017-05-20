@@ -1,13 +1,18 @@
 package com.yihu.ehr.report.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.report.QcDailyDatasetModel;
 import com.yihu.ehr.agModel.report.QcDailyDatasetsModel;
 import com.yihu.ehr.agModel.report.QcDailyEventDetailModel;
 import com.yihu.ehr.agModel.report.QcDailyMetadataModel;
+import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.entity.report.JsonArchives;
 import com.yihu.ehr.entity.report.QcDailyReportDataset;
 import com.yihu.ehr.entity.report.QcDailyReportDatasets;
+import com.yihu.ehr.entity.report.QcDailyReportDetail;
+import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.util.QcDatasetsParser;
@@ -40,6 +45,8 @@ public class QcDailyReportResolveService {
     QcDailyReportMetadataClient qcDailyReportMetadataClient;
     @Autowired
     public ObjectMapper objectMapper;
+    @Autowired
+    public  JsonArchivesClient jsonArchivesClient;
 
 
     /**
@@ -139,42 +146,94 @@ public class QcDailyReportResolveService {
     //应踩数据
     public List<MQcDailyReportDetail> addList(List<MQcDailyReportDetail> list,List<QcDailyEventDetailModel> modelList,String qcDailyReportId,Date createTime,String archiveType){
         for(QcDailyEventDetailModel eventDetailModel : modelList){
-            MQcDailyReportDetail qcDailyReportDetail = new MQcDailyReportDetail();
-            qcDailyReportDetail.setEventNo(eventDetailModel.getEvent_no());
-            qcDailyReportDetail.setEventTime(eventDetailModel.getEvent_time());
-            qcDailyReportDetail.setPatientId(eventDetailModel.getPatient_id());
-            qcDailyReportDetail.setReportId(qcDailyReportId);
-            qcDailyReportDetail.setArchiveType(archiveType);
-            qcDailyReportDetail.setAcqFlag(0);
+            MQcDailyReportDetail mQcDailyReportDetail = new MQcDailyReportDetail();
+            mQcDailyReportDetail.setEventNo(eventDetailModel.getEvent_no());
+            mQcDailyReportDetail.setEventTime(eventDetailModel.getEvent_time());
+            mQcDailyReportDetail.setPatientId(eventDetailModel.getPatient_id());
+            mQcDailyReportDetail.setReportId(qcDailyReportId);
+            mQcDailyReportDetail.setArchiveType(archiveType);
+            mQcDailyReportDetail.setAcqFlag(0);
+            mQcDailyReportDetail.setAcqTime(createTime);
             int day = 0;
             if(StringUtils.isNotEmpty(eventDetailModel.getEvent_time())){
                 Date eventDate = DateUtil.parseDate(eventDetailModel.getEvent_time(), "yyyy-MM-dd HH:mm:ss");
                 long intervalMilli = DateUtil.compareDateTime(createTime ,eventDate);
                 day = (int) (intervalMilli / (24 * 60 * 60 * 1000));
             }
-            qcDailyReportDetail.setTimelyFlag(day>2?1:0);
-            list.add(qcDailyReportDetail);
+            mQcDailyReportDetail.setTimelyFlag(day > 2 ? 0 : 1);
+            list.add(mQcDailyReportDetail);
         }
         return list;
     }
 
-    //检验是否采集
-    public List<MQcDailyReportDetail> checkRealListFromTotal(List<MQcDailyReportDetail> totalList,List<MQcDailyReportDetail> realList){
+    public void checkRealStorage(List<MQcDailyReportDetail> realList ,String orgCode,Date createDate) throws JsonProcessingException {
 
-        List<MQcDailyReportDetail> qcDailyReportDetailList = new ArrayList<>();
-        for (MQcDailyReportDetail totalReportDetail: totalList){
-            for (MQcDailyReportDetail realReportDetail: realList){
-                boolean eventNoFlag = totalReportDetail.getEventNo().equals(realReportDetail.getEventNo());
-                boolean eventTimeFlag = totalReportDetail.getEventTime().equals(realReportDetail.getEventTime());
-                boolean patientIdFlag = totalReportDetail.getPatientId().equals(realReportDetail.getPatientId());
-                if(eventNoFlag && eventTimeFlag && patientIdFlag){
-                    totalReportDetail.setAcqFlag(1);
-                    break;
+        //更新采集状态 及 入库状态
+        for(MQcDailyReportDetail mQcDailyReportDetail:realList){
+            StringBuffer filter = new StringBuffer();
+            String eventNo = mQcDailyReportDetail.getEventNo();
+            String eventTime = mQcDailyReportDetail.getEventTime();
+            String patientId = mQcDailyReportDetail.getPatientId();
+            filter.append("eventNo=").append(eventNo).append( ";").
+                    append("patientId=").append(patientId ).append(";");
+            QcDailyReportDetail qDailyReportDetail = qcDailyReportClient.searchQcDailyReportDetail(filter.toString());
+            if(qDailyReportDetail != null){
+                qDailyReportDetail.setAcqFlag(1);
+                JsonArchives jsonArchives = checkIsInStorage(eventNo,patientId,orgCode);
+                if(jsonArchives != null){
+                    qDailyReportDetail.setStorageFlag(returnArchiveStatus(jsonArchives));
+                    qDailyReportDetail.setStorageTime(jsonArchives.getFinishDate());
                 }
+                qcDailyReportClient.addOrUpdateQcDailyReportDetail(objectMapper.writeValueAsString(qDailyReportDetail));
+            }else{//额外采集 的 新增
+                QcDailyReportDetail newqDailyReportDetail = new QcDailyReportDetail();
+                newqDailyReportDetail.setAddDate(new Date());
+                newqDailyReportDetail.setAcqTime(createDate);
+                newqDailyReportDetail.setAcqFlag(1);
+                newqDailyReportDetail.setTimelyFlag(mQcDailyReportDetail.getTimelyFlag());
+                newqDailyReportDetail.setEventNo(eventNo);
+                newqDailyReportDetail.setEventTime(DateUtil.formatCharDateYMDHMS(eventTime));
+                newqDailyReportDetail.setPatientId(patientId);
+                newqDailyReportDetail.setArchiveType(mQcDailyReportDetail.getArchiveType());
+                newqDailyReportDetail.setReportId(mQcDailyReportDetail.getReportId());
+                JsonArchives jsonArchives =  checkIsInStorage(eventNo, patientId, orgCode);
+                if(jsonArchives != null){
+                    newqDailyReportDetail.setStorageFlag(returnArchiveStatus(jsonArchives));
+                    newqDailyReportDetail.setStorageTime(jsonArchives.getFinishDate());
+                }
+                qcDailyReportClient.addOrUpdateQcDailyReportDetail(objectMapper.writeValueAsString(newqDailyReportDetail));
             }
-            qcDailyReportDetailList.add(totalReportDetail);
+
         }
-        return qcDailyReportDetailList;
+    }
+    
+    //判断是否入库
+    public JsonArchives checkIsInStorage(String eventNo,String patientId,String orgCode){
+        //查找是否入库
+        StringBuffer str = new StringBuffer();
+        str.append("eventNo=").append(eventNo).append( ";").
+                append("patientId=").append(patientId).append(";").
+                append("orgCode=").append(orgCode).append(";");
+        JsonArchives jsonArchives = jsonArchivesClient.search(str.toString());
+        return  jsonArchives;
+    }
+
+    public int returnArchiveStatus(JsonArchives jsonArchives){
+        if(jsonArchives != null){
+            if(jsonArchives.getArchiveStatus()== ArchiveStatus.Received){
+                return  0;
+            }else if(jsonArchives.getArchiveStatus()== ArchiveStatus.Acquired){
+                return  1;
+            }else if(jsonArchives.getArchiveStatus()== ArchiveStatus.Failed){
+                return  2;
+            }else if(jsonArchives.getArchiveStatus()== ArchiveStatus.Finished){
+                return  3;
+            }else{
+                return  0;
+            }
+        }else{
+            return  0;
+        }
     }
 
 

@@ -66,22 +66,28 @@ public class QcDailyReportService extends BaseJpaService<QcDailyReport, XQcDaily
     }
 
 
-    public int getOrgDailyReportDetailCount(String reportId,String acqFlag,String archiveType) {
+    public int getOrgDailyReportDetailCount(String reportId,String timelyFlag,String archiveType,String storageFlag) {
         Session session = currentSession();
         String hql = "select count(1) from QcDailyReportDetail qcd where  qcd.reportId=:reportId";
-        if(StringUtils.isNotEmpty(acqFlag)){
-            hql = hql + " and qcd.acqFlag=:acqFlag";
+        if(StringUtils.isNotEmpty(timelyFlag)){
+            hql = hql + " and qcd.timelyFlag=:timelyFlag";
         }
         if(StringUtils.isNotEmpty(archiveType)){
             hql = hql + " and qcd.archiveType =:archiveType";
         }
+        if(StringUtils.isNotEmpty(storageFlag)){
+            hql = hql + " and qcd.storageFlag =:storageFlag";
+        }
         Query query = session.createQuery(hql);
         query.setString("reportId", reportId);
-        if(StringUtils.isNotEmpty(acqFlag)){
-            query.setString("acqFlag", acqFlag);
-        }
         if(StringUtils.isNotEmpty(archiveType)){
             query.setString("archiveType", archiveType);
+        }
+        if(StringUtils.isNotEmpty(timelyFlag)){
+            query.setString("timelyFlag", timelyFlag);
+        }
+        if(StringUtils.isNotEmpty(storageFlag)){
+            query.setString("storageFlag", storageFlag);
         }
         return ((Long)query.list().get(0)).intValue();
     }

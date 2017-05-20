@@ -9,7 +9,10 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.patient.MedicalCards;
 import com.yihu.ehr.entity.report.QcDailyReport;
 import com.yihu.ehr.entity.report.QcDailyReportDetail;
+import com.yihu.ehr.entity.report.QcQuotaDict;
 import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.report.MQcDailyReport;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.report.service.QcDailyReportDetailService;
@@ -108,6 +111,18 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
+
+    @RequestMapping(value = ServiceApi.Report.GetQcDailyReportDetail, method = RequestMethod.GET)
+    @ApiOperation(value = "查询数据完整性详细数据")
+    QcDailyReportDetail search( @RequestParam(value = "filters", required = false) String filters) throws ParseException {
+        List<QcDailyReportDetail> list = qcDailyReportDetailService.search(filters);
+        if(list.isEmpty()){
+            return  null;
+        }else{
+            return list.get(0);
+        }
+    }
+
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
     boolean addQcDailyReportDetailList(@RequestBody String details ) throws IOException {
@@ -118,11 +133,14 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-
-    @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增质控包数据完整性详细数据日报")
-    MQcDailyReportDetail addQcDailyReportDetail(@RequestBody QcDailyReportDetail model){
-        return getModelDetail(qcDailyReportDetailService.save(model) );
+    @RequestMapping(value = ServiceApi.Report.AddOrUpdateQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增修改质控包数据完整性详细数据日报")
+    ObjectResult addQcDailyReportDetail(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestBody String model) throws IOException {
+        QcDailyReportDetail obj = objectMapper.readValue(model,QcDailyReportDetail.class);
+        obj = qcDailyReportDetailService.save(obj);
+        return Result.success("更新成功！", obj);
     }
 
     protected List<QcDailyReportDetail> getModelList(String modelStr) throws IOException {
@@ -176,7 +194,7 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "orgId", value = "机构编码", defaultValue = "")
             @RequestParam(value = "orgId",required = true) String orgId,
             @ApiParam(name = "quotaDate", value = "统计时间", defaultValue = "")
-            @RequestParam(value = "quotaDate",required = true) String quotaDate ){
+            @RequestParam(value = "quotaDate",required = true) String quotaDate ) throws ParseException {
              quotaStatisticsEndPoint.statisticQuotaData(quotaId,orgId, quotaDate);
     }
 

@@ -1,30 +1,20 @@
 package com.yihu.ehr.report.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.report.*;
-import com.yihu.ehr.agModel.standard.datasset.MetaDataModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.report.QcDailyReport;
-import com.yihu.ehr.entity.report.QcDailyReportDataset;
-import com.yihu.ehr.entity.report.QcDailyReportDatasets;
+import com.yihu.ehr.entity.report.QcDailyReportDetail;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.model.report.MQcDailyReport;
-import com.yihu.ehr.model.report.MQcDailyReportDatasets;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.report.service.*;
 import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
-import com.yihu.ehr.util.QcDatasetsParser;
-import com.yihu.ehr.util.QcMetadataParser;
-import com.yihu.ehr.util.ResolveJsonFileUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
-import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -129,8 +118,10 @@ public class QcDailyReportResolveController extends ExtendController<QcDailyRepo
                 if(eventsModel.getReal_outpatient() != null){
                     qcDailyReportResolveService.addList(realList, eventsModel.getReal_outpatient(), qcDailyReport.getId(), createDate, "outpatient");
                 }
-                List<MQcDailyReportDetail> dailyReportDetailList = qcDailyReportResolveService.checkRealListFromTotal(totalList, realList);
-                qcDailyReportClient.addQcDailyReportDetailList(objectMapper.writeValueAsString(dailyReportDetailList));
+                //添加应采集数据
+                qcDailyReportClient.addQcDailyReportDetailList(objectMapper.writeValueAsString(totalList));
+                //判断实采 数据是否已录入到esb库
+                qcDailyReportResolveService.checkRealStorage(realList,qcDailyReport.getOrgCode(),createDate);
             }
             //入库后统计
             Date date = new Date();

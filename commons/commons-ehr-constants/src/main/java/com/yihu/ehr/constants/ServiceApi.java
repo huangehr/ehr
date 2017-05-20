@@ -711,11 +711,14 @@ public class ServiceApi {
 
         public static final String GetQcDailyReportList = "/report/getQcDailyReportList";
         public static final String QcDailyReport = "/report/qcDailyReport";
-        public static final String AddQcDailyReportDetailList = "/report/addQcDailyReportDetailList";
-        public static final String AddQcDailyReportDetail = "/report/addQcDailyReportDetail";
         public static final String GetEventDataReport = "/report/getEventDataReport";
-        public static final String  UpdateQcDailyReportDetailList= "/report/updateQcDailyReportDetail";
+        public static final String AddQcDailyReportDetailList = "/report/addQcDailyReportDetailList";
+        public static final String AddOrUpdateQcDailyReportDetail = "/report/addorUpdateQcDailyReportDetail";
+        public static final String GetQcDailyReportDetail = "/report/getQcDailyReportDetail";
+
         public static final String  StatisticQuotaDataReportData = "/report/statisticQuotaDataReportData";
+
+        public static final String GetJsonArchives = "/report/getGetJsonArchives";
 
 
         public static final String GetQcDailyReportDatasetsList = "/report/getQcDailyReportDatasetsList";
