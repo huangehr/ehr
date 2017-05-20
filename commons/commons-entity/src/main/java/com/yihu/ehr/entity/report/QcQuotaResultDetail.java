@@ -26,6 +26,7 @@ public class QcQuotaResultDetail {
     private Integer timelyNum;    //及时采集的档案数量
     private String an;    //同比：与去年的当天&周&月相比
     private String mom;    //环比：与前一天&周&月环比
+    private String standard; //达标
 
     @Id
     @GenericGenerator(name="systemUUID",strategy="uuid")
@@ -168,5 +169,15 @@ public class QcQuotaResultDetail {
 
     public void setMom(String mom) {
         this.mom = mom;
+    }
+
+    @Basic
+    @Column(name = "standard")
+    public String getStandard() {
+        return standard;
+    }
+
+    public void setStandard(String standard) {
+        this.standard = standard;
     }
 }

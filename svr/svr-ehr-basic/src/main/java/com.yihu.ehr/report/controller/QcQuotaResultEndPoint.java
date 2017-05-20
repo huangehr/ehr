@@ -494,6 +494,8 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
         ListResult result = new ListResult();
         List<Object> quotaList = new ArrayList<Object>();
         List<Object> detailQuotaList = new ArrayList<Object>();
+//        int firstDate=(page-1)*size;
+
         Date startDate = DateUtil.formatYMDToYMDHMS(startTime);
         Date endDate = DateUtil.formatYMDToYMDHMS(endTime);
         Calendar calendar = new GregorianCalendar();
@@ -531,17 +533,18 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                     //总比
                     String detailMapKey = qcKey + "总比";
                     Map<String, String> map = calculatePointUtil.reportDetailData("1", obj);
-                    detailMap = calculatePointUtil.detailValue(resultQuotaId, i, detailMap, detailMapKey, QcQuotaResultAnalyseMap.get(qcKey), obj[2].toString(), obj[1].toString(), "总比", map.get("1"));
+                    //,map.get("1standard")
+                    detailMap = calculatePointUtil.detailValueModel(resultQuotaId, i, detailMap, detailMapKey, QcQuotaResultAnalyseMap.get(qcKey), obj[2].toString(), obj[1].toString(), "总比", map.get("1"),map.get("1standard"));
 
                     //同比
                     String detailAnMapKey = qcKey + "同比";
                     map = calculatePointUtil.reportDetailData("2", obj);
-                    detailAnMap = calculatePointUtil.detailValue(resultQuotaId, i, detailAnMap, detailAnMapKey, QcQuotaResultAnalyseMap.get(qcKey), obj[2].toString(), obj[1].toString(), "同比", map.get("2"));
+                    detailAnMap = calculatePointUtil.detailValueModel(resultQuotaId, i, detailAnMap, detailAnMapKey, QcQuotaResultAnalyseMap.get(qcKey), obj[2].toString(), obj[1].toString(), "同比", map.get("2"),"");
 
                     //环比
                     String detailMonMapKey = qcKey + "环比";
                     map = calculatePointUtil.reportDetailData("3", obj);
-                    detailMonMap = calculatePointUtil.detailValue(resultQuotaId, i, detailMonMap, detailMonMapKey, QcQuotaResultAnalyseMap.get(qcKey), obj[2].toString(), obj[1].toString(), "环比", map.get("3"));
+                    detailMonMap = calculatePointUtil.detailValueModel(resultQuotaId, i, detailMonMap, detailMonMapKey, QcQuotaResultAnalyseMap.get(qcKey), obj[2].toString(), obj[1].toString(), "环比", map.get("3"),"");
 
                 }
             }
