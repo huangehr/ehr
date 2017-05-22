@@ -127,23 +127,26 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Report.GetQcDailyReportPageList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件数据完整性详细分页分页列表")
     public ListResult getQcDailyReportPageList(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
-            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "reportId", value = "日报ID", defaultValue = "")
+            @RequestParam(value = "reportId", required = false) String reportId,
+            @ApiParam(name = "archiveType", value = "档案分类")
+            @RequestParam(value = "archiveType", required = false) String archiveType,
+            @ApiParam(name = "startDate", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startDate", required = false) Date startDate,
+            @ApiParam(name = "endDate", value = "截止日期", defaultValue = "")
+            @RequestParam(value = "endDate", required = false) Date endDate,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page
     ) throws Exception {
 
+        page = (page-1)*size;
         ListResult listResult = new ListResult();
-        List<QcDailyReportDetail> qcDailyReportDetailList = qcDailyReportService.search(fields, filters, sorts, page, size);
+        List<QcDailyReportDetail> qcDailyReportDetailList = qcDailyReportDetailService.getQcDailyReportDetailList(reportId, archiveType, startDate, endDate, page, size);
         if(qcDailyReportDetailList != null){
             listResult.setDetailModelList(qcDailyReportDetailList);
-            listResult.setTotalCount((int)qcDailyReportService.getCount(filters));
+            listResult.setTotalCount( qcDailyReportDetailService.getQcDailyReportDetailListCount(reportId, archiveType, startDate, endDate) );
             listResult.setCode(200);
             listResult.setCurrPage(page);
             listResult.setPageSize(size);
