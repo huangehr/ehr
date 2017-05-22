@@ -123,6 +123,39 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
         }
     }
 
+
+    @RequestMapping(value = ServiceApi.Report.GetQcDailyReportPageList, method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件数据完整性详细分页分页列表")
+    public ListResult getQcDailyReportPageList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page
+    ) throws Exception {
+
+        ListResult listResult = new ListResult();
+        List<QcDailyReportDetail> qcDailyReportDetailList = qcDailyReportService.search(fields, filters, sorts, page, size);
+        if(qcDailyReportDetailList != null){
+            listResult.setDetailModelList(qcDailyReportDetailList);
+            listResult.setTotalCount((int)qcDailyReportService.getCount(filters));
+            listResult.setCode(200);
+            listResult.setCurrPage(page);
+            listResult.setPageSize(size);
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
+        }
+        return listResult;
+    }
+
+
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
     boolean addQcDailyReportDetailList(@RequestBody String details ) throws IOException {

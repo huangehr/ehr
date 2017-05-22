@@ -78,4 +78,13 @@ public interface QcDailyReportClient {
             @RequestParam(value = "quotaDate",required = true) String quotaDate
     );
 
+    @RequestMapping(value = ServiceApi.Report.GetQcDailyReportPageList, method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件数据完整性详细分页列表")
+    ResponseEntity<List<MQcDailyReportDetail>> getQcDailyReportPageList(
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "page", required = false) int page);
+
 }

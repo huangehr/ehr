@@ -715,6 +715,7 @@ public class ServiceApi {
         public static final String AddQcDailyReportDetailList = "/report/addQcDailyReportDetailList";
         public static final String AddOrUpdateQcDailyReportDetail = "/report/addorUpdateQcDailyReportDetail";
         public static final String GetQcDailyReportDetail = "/report/getQcDailyReportDetail";
+        public static final String GetQcDailyReportPageList = "/report/getQcDailyReportPageList";
 
         public static final String  StatisticQuotaDataReportData = "/report/statisticQuotaDataReportData";
 
