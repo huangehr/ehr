@@ -1,5 +1,5 @@
 server:
-  port: 11116
+  port: ${svr-redis.server.port}
 
 management:
   port: ${server.port}
