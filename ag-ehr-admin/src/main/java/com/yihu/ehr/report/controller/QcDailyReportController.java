@@ -7,6 +7,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.report.QcDailyReport;
 import com.yihu.ehr.entity.report.QcDailyReportDetail;
+import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.report.MQcDailyReport;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.report.service.QcDailyReportClient;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author janseny
@@ -122,19 +124,24 @@ public class QcDailyReportController extends ExtendController<QcDailyReport> {
     @RequestMapping(value = ServiceApi.Report.GetQcDailyReportPageList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件数据完整性详细分页列表")
     public Envelop getQcDailyReportPageList(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
-            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "archiveType", value = "档案分类")
+            @RequestParam(value = "archiveType", required = false) String archiveType,
+            @ApiParam(name = "startDate", value = "开始日期", defaultValue = "")
+            @RequestParam(value = "startDate", required = false) Date startDate,
+            @ApiParam(name = "endDate", value = "截止日期", defaultValue = "")
+            @RequestParam(value = "endDate", required = false) Date endDate,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
-
-        ResponseEntity<List<MQcDailyReportDetail>> responseEntity = qcDailyReportClient.getQcDailyReportPageList(fields, filters, sorts, size, page);
-        return getResult(responseEntity.getBody(), getTotalCount(responseEntity), page, size);
+        ListResult listResult = qcDailyReportClient.getQcDailyReportPageList("reportId - Todo", archiveType, startDate , endDate, size, page);
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else{
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.report.QcDailyReportDetail;
+import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.report.MQcDailyReport;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
@@ -80,10 +81,11 @@ public interface QcDailyReportClient {
 
     @RequestMapping(value = ServiceApi.Report.GetQcDailyReportPageList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件数据完整性详细分页列表")
-    ResponseEntity<List<MQcDailyReportDetail>> getQcDailyReportPageList(
-            @RequestParam(value = "fields", required = false) String fields,
-            @RequestParam(value = "filters", required = false) String filters,
-            @RequestParam(value = "sorts", required = false) String sorts,
+    ListResult getQcDailyReportPageList(
+            @RequestParam(value = "reportId", required = false) String reportId,
+            @RequestParam(value = "archiveType", required = false) String archiveType,
+            @RequestParam(value = "startDate", required = false) Date startDate,
+            @RequestParam(value = "endDate", required = false) Date endDate,
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page);
 

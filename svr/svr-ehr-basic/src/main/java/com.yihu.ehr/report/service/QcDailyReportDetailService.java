@@ -3,6 +3,7 @@ package com.yihu.ehr.report.service;
 import com.yihu.ehr.entity.report.QcDailyReportDetail;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.report.dao.XQcDailyReportDetailRepository;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,73 @@ public class QcDailyReportDetailService extends BaseJpaService<QcDailyReportDeta
         }
 
     }
+
+
+
+
+    public List<QcDailyReportDetail> getQcDailyReportDetailList(String reportId, String archiveType,Date startDate,Date endDate,int page,int pageSize) {
+        Session session = currentSession();
+        String hql = "select qcd from QcDailyReportDetail qcd where 1=1  ";
+
+        if (StringUtils.isNotEmpty(reportId) ){
+            hql = hql + " and qcd.reportId =:reportId ";
+        }
+        if (StringUtils.isNotEmpty(archiveType) ){
+            hql = hql + " and qcd.archiveType =:archiveType ";
+        }
+        if (startDate != null && endDate != null) {
+            hql = hql + " and ( (DATE(qcd.acqTime) >=:startDate and  DATE(qcd.acqTime) <=:endDate) or (DATE(qcd.storageTime) >=:startDate and  DATE(qcd.storageTime) <=:endDate)) ";
+        }
+        Query query = session.createQuery(hql);
+        if (StringUtils.isNotEmpty(reportId) ){
+            query.setString("reportId", reportId);
+        }
+        if (StringUtils.isNotEmpty(archiveType) ){
+            query.setString("archiveType", archiveType);
+        }
+        if (startDate != null && endDate != null) {
+            query.setDate("startDate", startDate);
+            query.setDate("endDate", endDate);
+        }
+        query.setFirstResult(page);
+        query.setMaxResults(pageSize);
+        return query.list();
+    }
+
+
+    public int getQcDailyReportDetailListCount(String reportId, String archiveType,Date startDate,Date endDate) {
+        Session session = currentSession();
+        String hql = "select qcd from QcDailyReportDetail qcd where 1=1  ";
+
+        if (StringUtils.isNotEmpty(reportId) ){
+            hql = hql + " and qcd.reportId =:reportId ";
+        }
+        if (StringUtils.isNotEmpty(archiveType) ){
+            hql = hql + " and qcd.archiveType =:archiveType ";
+        }
+        if (startDate != null && endDate != null) {
+            hql = hql + " and ( (DATE(qcd.acqTime) >=:startDate and  DATE(qcd.acqTime) <=:endDate) or (DATE(qcd.storageTime) >=:startDate and  DATE(qcd.storageTime) <=:endDate)) ";
+        }
+        Query query = session.createQuery(hql);
+        if (StringUtils.isNotEmpty(reportId) ){
+            query.setString("reportId", reportId);
+        }
+        if (StringUtils.isNotEmpty(archiveType) ){
+            query.setString("archiveType", archiveType);
+        }
+        if (startDate != null && endDate != null) {
+            query.setDate("startDate", startDate);
+            query.setDate("endDate", endDate);
+        }
+        List list = query.list();
+        if(list != null){
+            return list.size();
+        }else{
+            return 0;
+        }
+
+    }
+
+
 
 }
