@@ -1,19 +1,12 @@
 package com.yihu.ehr.orgSaas.controller;
 
-import com.yihu.ehr.agModel.geogrephy.GeographyDictModel;
-import com.yihu.ehr.agModel.geogrephy.GeographyModel;
-import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.agModel.orgSaas.AreaSaasModel;
 import com.yihu.ehr.agModel.orgSaas.OrgSaasModel;
-import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.entity.organizations.OrgSaas;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
-import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.model.orgSaas.MAreaSaas;
 import com.yihu.ehr.orgSaas.service.OrgSaasClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -53,6 +46,7 @@ public class OrgSaasController extends BaseController{
         ListResult listResult =orgSaasClient.getOrgSaasByorgCode(orgCode,type);
         List<Map<String,Object>> saasList = listResult.getDetailModelList();
         Map<String,Object> orgSaasMap=new TreeMap();
+        ListResult Result=null;
         if(null!=saasList&&saasList.size()>0){
             for(int i=0;i<saasList.size();i++){
                 Object obj=(Object)saasList.get(i);
@@ -62,6 +56,7 @@ public class OrgSaasController extends BaseController{
             //授权类型 1区域 2机构
         OrgSaasModel osm=null;
         List<OrgSaasModel> OrgSaasModelList=new ArrayList<>();
+        List list=new ArrayList<>();
         if(!"".equals(type)&&type.equals("2")){
             //在机构表中获取所有机构数据
             List<Map<String,Object>> orgList =orgClient.getAllOrgs();
@@ -139,7 +134,36 @@ public class OrgSaasController extends BaseController{
         }
 
         return envelop;
+
     }
+    /**
+     * 机构授权检查并保存
+     * @return
+     */
+    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.POST)
+    @ApiOperation(value = "机构授权检查,如果被授权的机构或者区域在指定机构总不存在，这新增这条记录，否则返回地址id")
+    public Envelop saveOrgSaas(
+            @ApiParam(name = "orgSaas_model_json_data", value = "机构授权json字符串")
+            @RequestParam( value = "orgSaas_model_json_data") String orgSaasModelJsonData) throws Exception{
+
+        Envelop envelop = new Envelop();
+        OrgSaasModel orgSaasModel = new OrgSaasModel();
+
+        String id = orgSaasClient.saveOrgSaas(orgSaasModelJsonData);
+
+        if(id != null){
+            envelop.setSuccessFlg(true);
+            orgSaasModel.setId(id);
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("机构授权新增失败");
+        }
+        envelop.setObj(orgSaasModel);
+
+        return envelop;
+    }
+
+
 
 
 
