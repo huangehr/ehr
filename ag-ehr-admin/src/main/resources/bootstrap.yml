@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ag-admin-cws
+    name: ag-admin
 
 ---
 spring:
