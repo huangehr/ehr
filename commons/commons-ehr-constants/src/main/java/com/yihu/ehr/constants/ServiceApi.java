@@ -752,6 +752,14 @@ public class ServiceApi {
         public static final String GetQcQuotaByLocation = "/report/getQcQuotaByLocation";
 
 
+        public static final String QcDailyStatisticsStorage = "/report/qcDailyStatisticsStorage";
+        public static final String QcDailyStatisticsStorageByDate = "/report/qcDailyStatisticsStorageByDate";
+        public static final String QcDailyStatisticsIdentify = "/report/qcDailyStatisticsIdentify";
+
+
+
+
+
 
     }
 
