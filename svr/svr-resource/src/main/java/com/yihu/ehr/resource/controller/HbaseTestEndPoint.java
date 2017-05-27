@@ -6,9 +6,12 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.solr.SolrAdmin;
+import com.yihu.ehr.solr.SolrUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +37,9 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
     SolrAdmin solrAdmin;
 
     @Autowired
+    SolrUtil solrUtil;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     @ApiOperation("模糊匹配表")
@@ -54,6 +60,31 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
 
             re += "]";
             return re;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return "Fail!"+ex.getMessage();
+        }
+    }
+
+    @ApiOperation("Solr总条数")
+    @RequestMapping(value = "countSolr",method = RequestMethod.GET)
+    public String countSolr(
+            @ApiParam(value="表名",defaultValue = "HealthProfile")
+            @RequestParam String tableName)
+    {
+        try {
+            long count = solrUtil.count(tableName,"*:*");
+
+            //通过org_code分组统计
+            /*Map<String,Long> map = solrUtil.groupCount(tableName,null,null,"org_code",0,1000);
+            Long orgCount = new Long(0);
+            for(String key : map.keySet())
+            {
+                orgCount += map.get(key);
+            }*/
+            return "count:"+count;
         }
         catch (Exception ex)
         {
