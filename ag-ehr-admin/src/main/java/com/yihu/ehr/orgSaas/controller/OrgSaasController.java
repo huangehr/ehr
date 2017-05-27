@@ -34,13 +34,15 @@ public class OrgSaasController extends BaseController{
     @Autowired
     private AddressClient addressClient;
 
-    @RequestMapping(value = "/OrgSaasByOrg", method = RequestMethod.GET)
+    @RequestMapping(value = "/OrgSaasByOrg", method = RequestMethod.POST)
     @ApiOperation(value = "根据机构获取机构相关授权")
     public Envelop getOrgSaasByorgCode(
             @ApiParam(name = "orgCode", value = "机构", defaultValue = "")
             @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "type", value = "类别", defaultValue = "")
-            @RequestParam(value = "type", required = false) String type)throws Exception {
+            @RequestParam(value = "type", required = false) String type,
+            @ApiParam(name = "saasName", value = "名称", defaultValue = "")
+            @RequestParam(value = "saasName", required = false) String saasName)throws Exception {
         Envelop envelop = new Envelop();
         //根据机构id在asaas表中获取数据
         ListResult listResult =orgSaasClient.getOrgSaasByorgCode(orgCode,type);
@@ -49,23 +51,37 @@ public class OrgSaasController extends BaseController{
         if(null!=saasList&&saasList.size()>0){
             for(int i=0;i<saasList.size();i++){
                 Object obj=(Object)saasList.get(i);
-                orgSaasMap.put(((ArrayList) obj).get(2).toString(),obj);
+                if(null!=((ArrayList) obj).get(3)){
+                    orgSaasMap.put(((ArrayList) obj).get(3).toString(),obj);
+                }
             }
         }
             //授权类型 1区域 2机构
         OrgSaasModel osm=null;
         List<OrgSaasModel> OrgSaasModelList=new ArrayList<>();
+        List<OrgSaasModel> OrgSaasModelRightList=new ArrayList<>();
         if(!"".equals(type)&&type.equals("2")){
+            List<Map<String,Object>> orgList =new ArrayList<>();
             //在机构表中获取所有机构数据
-            List<Map<String,Object>> orgList =orgClient.getAllOrgs();
+            if(null!=saasName&&!"".equals(saasName)){
+                orgList =orgClient.getAllSaasOrgs(saasName);
+            }else{
+                orgList =orgClient.getAllOrgs();
+            }
+
             if(null!=orgList&&orgList.size()>0){
                 for(int i=0;i<orgList.size();i++){
                     Map<String,Object> obj=orgList.get(i);
                     osm=new OrgSaasModel();
-                    osm.setId(obj.get("id").toString());
+                    if(null!=obj.get("id")){
+                        osm.setId(obj.get("id").toString());
+                    }
                     osm.setOrgCode(orgCode);
                     osm.setType(type);
-                    osm.setLevel(obj.get("levelId").toString());
+                    if(null!=obj.get("levelId")){
+                        osm.setLevel(obj.get("levelId").toString());
+                    }
+
                     if(null!=obj.get("orgCode")){
                         osm.setSaasCode(obj.get("orgCode").toString());
                     }
@@ -80,6 +96,7 @@ public class OrgSaasController extends BaseController{
 
                     if(null!=obj.get("orgCode")&&null!=orgSaasMap.get(obj.get("orgCode").toString())){
                         osm.setIschecked(true);
+                        OrgSaasModelRightList.add(osm);
                     }else{
                         osm.setIschecked(false);
                     }
@@ -89,6 +106,7 @@ public class OrgSaasController extends BaseController{
             }
             if(OrgSaasModelList.size()>0){
                 envelop.setDetailModelList(OrgSaasModelList);
+                envelop.setObj(OrgSaasModelRightList);
                 envelop.setSuccessFlg(true);
             }else {
 
@@ -99,11 +117,19 @@ public class OrgSaasController extends BaseController{
             //查找所有区域
             List<MGeographyDict> mGeographyDictList =new ArrayList<MGeographyDict>();
             List<AreaSaasModel> AreaSaasModelList=new ArrayList<>();
+            List<AreaSaasModel> AreaSaasModelRightList=new ArrayList<>();
             AreaSaasModel asm=null;
-            for(int i=1;i<4;i++ ){
-                List<MGeographyDict> newMGeographyDictList = addressClient.getAddressByLevel(i);
+            List<MGeographyDict> newMGeographyDictList =new ArrayList<>();
+            if(null!=saasName&&!"".equals(saasName)){
+                newMGeographyDictList=addressClient.getOrgSaasAreaByname(saasName);
                 mGeographyDictList.addAll(newMGeographyDictList);
+            }else{
+                for(int i=1;i<4;i++ ){
+                    newMGeographyDictList = addressClient.getAddressByLevel(i);
+                    mGeographyDictList.addAll(newMGeographyDictList);
+                }
             }
+
             if(null!=mGeographyDictList&&mGeographyDictList.size()>0){
                 for(int i=0;i<mGeographyDictList.size();i++){
                     MGeographyDict obj=mGeographyDictList.get(i);
@@ -117,6 +143,7 @@ public class OrgSaasController extends BaseController{
                     asm.setLevel(obj.getLevel());
                     if(null!=orgSaasMap.get(String.valueOf(obj.getId()))){
                         asm.setIschecked(true);
+                        AreaSaasModelRightList.add(asm);
                     }else{
                         asm.setIschecked(false);
                     }
@@ -125,6 +152,7 @@ public class OrgSaasController extends BaseController{
             }
             if(AreaSaasModelList.size()>0){
                 envelop.setDetailModelList(AreaSaasModelList);
+                envelop.setObj(AreaSaasModelRightList);
                 envelop.setSuccessFlg(true);
             }else {
 
@@ -145,11 +173,12 @@ public class OrgSaasController extends BaseController{
             @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type,
-            @ApiParam(name = "orgSaas_model_json_data", value = "机构授权json字符串")
-            @RequestParam( value = "orgSaas_model_json_data") String orgSaasModelJsonData) throws Exception{
+            @ApiParam(name = "data", value = "json数据", defaultValue = "")
+            @RequestBody String data) throws Exception{
         Envelop envelop = new Envelop();
         OrgSaasModel orgSaasModel = new OrgSaasModel();
-        String id = orgSaasClient.saveOrgSaas(orgCode,type,orgSaasModelJsonData);
+        String id = orgSaasClient.saveOrgSaas(orgCode,type,data);
+
         if(id != null){
             envelop.setSuccessFlg(true);
             orgSaasModel.setId(id);
