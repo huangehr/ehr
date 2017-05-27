@@ -46,7 +46,6 @@ public class OrgSaasController extends BaseController{
         ListResult listResult =orgSaasClient.getOrgSaasByorgCode(orgCode,type);
         List<Map<String,Object>> saasList = listResult.getDetailModelList();
         Map<String,Object> orgSaasMap=new TreeMap();
-        ListResult Result=null;
         if(null!=saasList&&saasList.size()>0){
             for(int i=0;i<saasList.size();i++){
                 Object obj=(Object)saasList.get(i);
@@ -56,7 +55,6 @@ public class OrgSaasController extends BaseController{
             //授权类型 1区域 2机构
         OrgSaasModel osm=null;
         List<OrgSaasModel> OrgSaasModelList=new ArrayList<>();
-        List list=new ArrayList<>();
         if(!"".equals(type)&&type.equals("2")){
             //在机构表中获取所有机构数据
             List<Map<String,Object>> orgList =orgClient.getAllOrgs();
@@ -143,14 +141,15 @@ public class OrgSaasController extends BaseController{
     @RequestMapping(value = "/orgSaasSave", method = RequestMethod.POST)
     @ApiOperation(value = "机构授权检查,如果被授权的机构或者区域在指定机构总不存在，这新增这条记录，否则返回地址id")
     public Envelop saveOrgSaas(
+            @ApiParam(name = "orgCode", value = "机构", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "type", value = "类别", defaultValue = "")
+            @RequestParam(value = "type", required = false) String type,
             @ApiParam(name = "orgSaas_model_json_data", value = "机构授权json字符串")
             @RequestParam( value = "orgSaas_model_json_data") String orgSaasModelJsonData) throws Exception{
-
         Envelop envelop = new Envelop();
         OrgSaasModel orgSaasModel = new OrgSaasModel();
-
-        String id = orgSaasClient.saveOrgSaas(orgSaasModelJsonData);
-
+        String id = orgSaasClient.saveOrgSaas(orgCode,type,orgSaasModelJsonData);
         if(id != null){
             envelop.setSuccessFlg(true);
             orgSaasModel.setId(id);
@@ -162,6 +161,8 @@ public class OrgSaasController extends BaseController{
 
         return envelop;
     }
+
+
 
 
 

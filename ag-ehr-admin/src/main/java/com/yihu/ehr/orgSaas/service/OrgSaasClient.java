@@ -1,22 +1,14 @@
 package com.yihu.ehr.orgSaas.service;
 
-import com.yihu.ehr.agModel.orgSaas.OrgSaasModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.entity.organizations.OrgSaas;
 import com.yihu.ehr.model.common.ListResult;
-import com.yihu.ehr.model.geography.MGeography;
-import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.model.orgSaas.MAreaSaas;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by zdm on 2017/5/26.
@@ -34,6 +26,26 @@ public interface OrgSaasClient {
             @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type) ;
+    /**
+     * 机构授权并保存
+     * @return
+     */
+    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "机构授权检查,如果被授权的机构或者区域在指定机构总不存在，这新增这条记录，否则返回地址id")
+    String saveOrgSaas(
+            @ApiParam(name = "orgCode", value = "机构", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "type", value = "类别", defaultValue = "")
+            @RequestParam(value = "type", required = false) String type,
+            @ApiParam(name = "json_data", value = "机构授权json字符串")
+            @RequestBody String orgSaasModelJsonData) ;
 
+    @RequestMapping(value = "/orgSaasDel", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除机构授权", notes = "根据机构code和授权类别删除机构授权")
+    boolean deleteOrgSaas(
+            @ApiParam(name = "orgCode", value = "机构", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "type", value = "类别", defaultValue = "")
+            @RequestParam(value = "type", required = false) String type);
 
 }
