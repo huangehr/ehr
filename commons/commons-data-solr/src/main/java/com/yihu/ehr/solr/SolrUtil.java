@@ -112,7 +112,6 @@ public class SolrUtil {
     public long count(String core, String q, String fq) throws Exception {
         SolrClient conn = pool.getConnection(core);
         SolrQuery query = new SolrQuery();
-        query.setRows(1);
         if (null != q && !q.equals("")) //设置查询条件
         {
             query.setQuery(q);
@@ -123,13 +122,19 @@ public class SolrUtil {
         {
             query.setFilterQueries(fq);
         }
+        query.setStart(0);
+        query.setRows(0);
 
         QueryResponse rsp = conn.query(query);
+        Integer start =  (int)rsp.getResults().getNumFound();
+        query.setStart(start);
+        rsp = conn.query(query);
         qtime = rsp.getQTime();
         System.out.print("Solr Count Time:" + qtime);
+        SolrDocumentList docs = rsp.getResults();
 
         pool.close(core);
-        return rsp.getResults().getNumFound();
+        return docs.getNumFound();
     }
 
     /**

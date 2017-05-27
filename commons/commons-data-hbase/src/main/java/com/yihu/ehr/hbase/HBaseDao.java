@@ -27,7 +27,7 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      *模糊匹配rowkey
      */
-    public String[] findRowKeys(String tableName, String rowkeyRegEx) throws Throwable {
+    public String[] findRowKeys(String tableName, String rowkeyRegEx) throws Exception {
         Scan scan = new Scan();
         scan.addFamily(Bytes.toBytes("basic"));
         scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator(rowkeyRegEx)));
@@ -294,7 +294,7 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      * 保存数据 原型模式
      */
-    public void save(String tableName, TableBundle tableBundle) throws IOException {
+    public void save(String tableName, TableBundle tableBundle) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
 
             public Object doInTable(HTableInterface htable) throws Throwable {
