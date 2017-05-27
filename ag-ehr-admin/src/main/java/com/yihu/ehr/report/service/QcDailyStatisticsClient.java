@@ -20,7 +20,8 @@ import java.util.Map;
  * @version 1.0
  * @created 2016/6/22
  */
-@FeignClient(name=MicroServices.Statistics)
+//@FeignClient(name=MicroServices.Statistics)
+@FeignClient(name=MicroServices.Portal)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface QcDailyStatisticsClient {
@@ -33,6 +34,22 @@ public interface QcDailyStatisticsClient {
             @RequestParam(value = "endDate") String endDate);
 
 
+    @RequestMapping(value = ServiceApi.Report.QcDailyStatisticsStorage, method = RequestMethod.GET)
+    @ApiOperation(value = "单个机构总入库统计")
+    Map<String, Integer> getQcDailyStatisticsStorage(
+            @RequestParam(value = "orgCode", required = false) String orgCode);
+
+    @RequestMapping(value = ServiceApi.Report.QcDailyStatisticsIdentify, method = RequestMethod.GET)
+    @ApiOperation(value = "单个机构总身份识别统计")
+    Map<String, String> getQcDailyStatisticsIdentify(
+            @RequestParam(value = "orgCode", required = false) String orgCode);
+
+    @RequestMapping(value = ServiceApi.Report.QcDailyStatisticsStorageByDate, method = RequestMethod.GET)
+    @ApiOperation(value = "单个机构入库按时间统计")
+    List getQcDailyStatisticsStorageByDate(
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @RequestParam(value = "startDate") String startDate,
+            @RequestParam(value = "endDate") String endDate);
 
 
 }
