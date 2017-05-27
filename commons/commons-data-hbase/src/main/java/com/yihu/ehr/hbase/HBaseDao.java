@@ -46,6 +46,27 @@ public class HBaseDao extends AbstractHBaseClient {
     }
 
     /**
+     *表总条数
+     */
+    public Integer count(String tableName) throws Exception {
+        Scan scan = new Scan();
+        scan.addFamily(Bytes.toBytes("basic"));
+        scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator("^")));
+
+        List<String> list = new LinkedList<>();
+        hbaseTemplate.find(tableName, scan, new RowMapper<Void>() {
+            @Override
+            public Void mapRow(Result result, int rowNum) throws Exception {
+                list.add(Bytes.toString(result.getRow()));
+
+                return null;
+            }
+        });
+
+        return list.size();
+    }
+
+    /**
      * 根据 rowkey获取一条记录
      */
     public String get(String tableName, String rowkey) {
