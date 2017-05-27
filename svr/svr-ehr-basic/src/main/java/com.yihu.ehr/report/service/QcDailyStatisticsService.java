@@ -27,6 +27,14 @@ import java.util.Map;
 public class QcDailyStatisticsService extends BaseJpaService<ArchiveRelation, XQcDailyReportDetailRepository> {
 
 
+    public List<ArchiveRelation>  getArchiveRelationList(){
+        Session session = currentSession();
+        String hql  = "select ar from ArchiveRelation ar where ar.identifyFlag is null order by eventDate asc " ;
+        Query query = session.createQuery(hql);
+        List list = query.list();
+        return  list;
+    }
+
     public long getQcDailyStatisticsStorage(String orgCode) {
         Session session = currentSession();
         String hql  = "select count(*)  from ArchiveRelation ar where ar.orgCode=:orgCode " ;
