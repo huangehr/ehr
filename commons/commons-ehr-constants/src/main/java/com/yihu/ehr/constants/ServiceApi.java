@@ -704,6 +704,7 @@ public class ServiceApi {
         public static final String AddressDictList = "/geography_entries_list";  //获取多条行政区划地址
         public static final String AddressDictAll = "/geography_entries/all";    //获取全部行政区划地址
         public static final String AddressDictByFields = "/geography_entries/getAddressDict";     //根据地址中文名 查询地址编号
+        public static final String GetAddressNameByCode = "/geography/GetAddressNameByCode";     //根据地址中文名 查询地址编号
     }
 
 
