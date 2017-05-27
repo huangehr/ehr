@@ -50,11 +50,11 @@ public class StdPackageResolver extends PackageResolver {
                 //就诊卡信息
                 if (StringUtils.isEmpty(profile.getCardId())) {
                     Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
-                    String cardId = String.valueOf(properties.get(MasterResourceFamily.BasicColumns.CardId));
+                    String cardId = (String) properties.get(MasterResourceFamily.BasicColumns.CardId);
                     if(!StringUtils.isEmpty(cardId))
                     {
                         profile.setCardId(cardId);
-                        profile.setCardType(String.valueOf(properties.get(MasterResourceFamily.BasicColumns.CardType)));
+                        profile.setCardType((String) properties.get(MasterResourceFamily.BasicColumns.CardType));
                     }
                 }
 
@@ -62,12 +62,12 @@ public class StdPackageResolver extends PackageResolver {
                 if (StringUtils.isEmpty(profile.getDemographicId()) || StringUtils.isEmpty(profile.getPatientName())) {
                     Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo);
 
-                    String demographicId = String.valueOf(properties.get(MasterResourceFamily.BasicColumns.DemographicId));
+                    String demographicId = (String) properties.get(MasterResourceFamily.BasicColumns.DemographicId);
                     if(!StringUtils.isEmpty(demographicId) &&StringUtils.isEmpty(profile.getDemographicId())) {
                         profile.setDemographicId(demographicId);
                     }
 
-                    String patientName = String.valueOf(properties.get(MasterResourceFamily.BasicColumns.PatientName));
+                    String patientName =(String) properties.get(MasterResourceFamily.BasicColumns.PatientName);
                     if(!StringUtils.isEmpty(patientName) &&StringUtils.isEmpty(profile.getPatientName())) {
                         profile.setPatientName(patientName);
                     }

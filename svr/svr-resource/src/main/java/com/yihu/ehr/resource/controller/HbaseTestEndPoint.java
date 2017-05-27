@@ -62,13 +62,32 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @ApiOperation("判断表是否存在")
-    @RequestMapping(value = "isTableExists",method = RequestMethod.GET)
-    public String isTableExists(
-            @ApiParam(value="表名",defaultValue = "HH")
+    @ApiOperation("Hbase总条数")
+    @RequestMapping(value = "countHbase",method = RequestMethod.GET)
+    public String countHbase(
+            @ApiParam(value="表名",defaultValue = "HealthProfile")
             @RequestParam String tableName)
     {
         try {
+            Integer count = hbaseDao.count(tableName);
+
+            return "count："+count;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return "Fail!"+ex.getMessage();
+        }
+    }
+
+    @ApiOperation("判断表是否存在")
+    @RequestMapping(value = "isTableExists",method = RequestMethod.GET)
+    public String isTableExists(
+            @ApiParam(value="表名",defaultValue = "HealthProfile")
+            @RequestParam String tableName)
+    {
+        try {
+
             if (hbaseAdmin.isTableExists(tableName)) {
                 return "true";
             } else {
@@ -101,13 +120,19 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    /*@ApiOperation("删除表")
-    @RequestMapping(value = "dropTable",method = RequestMethod.POST)
-    public String dropTable(@ApiParam(value="表名",defaultValue = "HH")
+    @ApiOperation("清空表")
+    @RequestMapping(value = "truncateTable",method = RequestMethod.POST)
+    public String dropTable(@ApiParam(value="表名",defaultValue = "HealthArchives")
                               @RequestParam String tableName)
     {
         try {
-            hbaseAdmin.dropTable(tableName);
+            List<String> list = new ArrayList<>();
+            list.add(tableName);
+            hbaseAdmin.truncate(list);
+
+            //清空索引
+            solrAdmin.delete(tableName,"rowkey:*");
+
             return "Success drop table "+tableName+".";
         }
         catch (Exception ex)
@@ -120,15 +145,15 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("测试插入数据")
     @RequestMapping(value = "insertRecord",method = RequestMethod.POST)
-    public String insertRecord(@ApiParam(value="表名",defaultValue = "HH")
+    public String insertRecord(@ApiParam(value="表名",defaultValue = "HealthArchives")
                                    @RequestParam String tableName,
                                @ApiParam(value="主键",defaultValue = "1")
                                @RequestParam String rowKey,
-                               @ApiParam(value="列族",defaultValue = "HH_F1")
+                               @ApiParam(value="列族",defaultValue = "basic")
                                    @RequestParam String family,
-                               @ApiParam(value="列",defaultValue = "HH_C1,HH_C4")
+                               @ApiParam(value="列",defaultValue = "demographic_id")
                                    @RequestParam String columns,
-                               @ApiParam(value="值",defaultValue = "HH_V1,HH_V4")
+                               @ApiParam(value="值",defaultValue = "1234567")
                                    @RequestParam String values)
     {
         try {
@@ -142,7 +167,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
             ex.printStackTrace();
             return "Fail!"+ex.getMessage();
         }
-    }*/
+    }
 
     @ApiOperation("获取单条数据")
     @RequestMapping(value = "getOneResult",method = RequestMethod.POST)
@@ -163,23 +188,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-   /* @ApiOperation("清空Hbase数据成功")
-    @RequestMapping(value = "truncateHbaseTable",method = RequestMethod.POST)
-    public String truncateHbaseTable(@ApiParam(value="core",defaultValue = "HealthProfile")
-                             @RequestParam String core)
-    {
-        try {
-            List<String> list = new ArrayList<>();
-            list.add(core);
-            hbaseAdmin.truncate(list);
-            return "清空Hbase数据成功！";
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return ex.getMessage();
-        }
-    }*/
+
    @ApiOperation("删除单条Hbase")
    @RequestMapping(value = "deleteHbase",method = RequestMethod.POST)
    public String deleteHbase(@ApiParam(value="core",defaultValue = "HealthProfile")
