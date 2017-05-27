@@ -29,4 +29,7 @@ public interface XGeographyDictRepository extends PagingAndSortingRepository<Geo
 
     @Query("select dict from GeographyDict dict where 1=1")
     List<GeographyDict> getAll();
+
+    @Query("select dict from GeographyDict dict where dict.name like %:name% and dict.level > 0")
+    List<GeographyDict> getAddrDictByname(@Param("name") String name);
 }

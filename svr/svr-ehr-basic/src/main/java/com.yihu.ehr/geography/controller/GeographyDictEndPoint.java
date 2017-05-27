@@ -107,6 +107,17 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
         }
         return null;
     }
-
-
+    /**
+     * 根据地址等级查询地址信息
+     * @param name
+     * @return
+     */
+    @RequestMapping(value = "/OrgSaasAreaByname", method = RequestMethod.GET)
+    @ApiOperation(value = "根据名称查询行政区划地址")
+    public Collection<MGeographyDict> getOrgSaasAreaByname(
+            @ApiParam(name = "name", value = "名称", defaultValue = "")
+            @RequestParam(value = "name") String name) {
+        List<GeographyDict> addressDictList = geographyDictService.getAddrDictByname(name);
+        return convertToModels(addressDictList,new ArrayList<>(addressDictList.size()), MGeographyDict.class,"");
+    }
 }

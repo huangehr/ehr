@@ -15,8 +15,11 @@ public class AreaSaasModel implements Serializable {
     private String saasCode;//区域代码或者机构代码
     private String saasName;//区域名称或者机构名称
     private String parent_hos_id;//上级机构id
-    private boolean ischecked;//是否选中
     private int level;//等级
+    /**
+     * 界面上适配选中是否适配用做界面展示，代表是否以及被适配
+     */
+    private Boolean ischecked;
 
     public String getId() {
         return id;
@@ -66,19 +69,19 @@ public class AreaSaasModel implements Serializable {
         this.parent_hos_id = parent_hos_id;
     }
 
-    public boolean ischecked() {
-        return ischecked;
-    }
-
-    public void setIschecked(boolean ischecked) {
-        this.ischecked = ischecked;
-    }
-
     public int getLevel() {
         return level;
     }
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public Boolean getIschecked() {
+        return ischecked;
+    }
+
+    public void setIschecked(Boolean ischecked) {
+        this.ischecked = ischecked;
     }
 }

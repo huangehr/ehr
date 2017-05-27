@@ -117,4 +117,10 @@ public interface AddressClient {
             @ApiParam(name = "name", value = "name", defaultValue = "")
             @RequestParam(value = "name") String name);
 
+    @RequestMapping(value = "/OrgSaasAreaByname", method = RequestMethod.GET)
+    @ApiOperation(value = "根据名称查询行政区划地址")
+    List<MGeographyDict> getOrgSaasAreaByname(
+            @ApiParam(name = "name", value = "名称", defaultValue = "")
+            @RequestParam(value = "name") String name) ;
+
 }

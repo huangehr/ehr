@@ -18,7 +18,7 @@ public class OrgSaasModel implements Serializable {
     private String saasName;//区域名称或者机构名称
     private String full_name;//机构全名
     private String parent_hos_id;//上级机构id
-    private boolean ischecked;//是否选中
+    private Boolean ischecked;//是否选中
     private String level;//等级
 
     public String getId() {
@@ -77,11 +77,11 @@ public class OrgSaasModel implements Serializable {
         this.parent_hos_id = parent_hos_id;
     }
 
-    public boolean ischecked() {
+    public Boolean getIschecked() {
         return ischecked;
     }
 
-    public void setIschecked(boolean ischecked) {
+    public void setIschecked(Boolean ischecked) {
         this.ischecked = ischecked;
     }
 
