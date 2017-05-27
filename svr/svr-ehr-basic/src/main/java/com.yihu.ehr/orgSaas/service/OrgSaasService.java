@@ -43,7 +43,7 @@ public class OrgSaasService extends BaseJpaService<OrgSaas,OrgSaasRepository>{
     }
 
     /**
-     * 地址检查并保存
+     * 机构授权检查并保存
      * 返回新地址id
      * @param orgSaas
      */

@@ -34,7 +34,7 @@ public class OrgSaasController extends BaseController{
     @Autowired
     private AddressClient addressClient;
 
-    @RequestMapping(value = "/OrgSaasByOrg", method = RequestMethod.POST)
+    @RequestMapping(value = "/OrgSaasByOrg", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构获取机构相关授权")
     public Envelop getOrgSaasByorgCode(
             @ApiParam(name = "orgCode", value = "机构", defaultValue = "")
@@ -174,7 +174,7 @@ public class OrgSaasController extends BaseController{
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type,
             @ApiParam(name = "data", value = "json数据", defaultValue = "")
-            @RequestBody String data) throws Exception{
+            @RequestBody  String data) throws Exception{
         Envelop envelop = new Envelop();
         OrgSaasModel orgSaasModel = new OrgSaasModel();
         String id = orgSaasClient.saveOrgSaas(orgCode,type,data);
