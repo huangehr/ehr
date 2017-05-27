@@ -100,4 +100,9 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     public List<Organization> findByOrgArea(String area) {
         return organizationRepository.findByArea(area + "%");
     }
+
+    public List<Organization> getAllSaasOrgs(String name) {
+        List<Organization> codes = organizationRepository.fingorgByFullnameOrShortName(name);
+        return codes;
+    }
 }

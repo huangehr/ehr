@@ -367,4 +367,14 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         String imageStream = URLEncoder.encode(fileStream, "UTF-8");
         return imageStream;
     }
+
+    @RequestMapping(value = "/organizations/getAllSaasOrgs", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有机构列表")
+    public List<Organization> getAllSaasOrgs(
+            @ApiParam(name = "saasName", value = "名称", defaultValue = "")
+            @RequestParam(value = "saasName", required = false) String saasName) throws Exception {
+                List<Organization> orgs = orgService.getAllSaasOrgs(saasName);
+                return orgs;
+            }
+
 }

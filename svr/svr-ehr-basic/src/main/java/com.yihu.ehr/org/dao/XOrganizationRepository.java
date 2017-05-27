@@ -41,4 +41,7 @@ public interface XOrganizationRepository extends PagingAndSortingRepository<Orga
     @Query("select org from Organization org where org.id=:orgId and org.parentHosId=:orgPId")
     List<Organization> checkSunOrg(@Param("orgPId") int orgPId,@Param("orgId")  long orgId);
 
+    @Query("select org from Organization org where org.fullName like %:name% or org.shortName like %:name%")
+    List<Organization> fingorgByFullnameOrShortName(@Param("name") String name);
+
 }
