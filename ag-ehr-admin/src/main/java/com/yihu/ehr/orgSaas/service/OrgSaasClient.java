@@ -32,14 +32,14 @@ public interface OrgSaasClient {
      */
 
     @ApiOperation(value = "机构授权检查,如果被授权的机构或者区域在指定机构总不存在，这新增这条记录，否则返回地址id")
-    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.POST)
+    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.GET)
     String saveOrgSaas(
             @ApiParam(name = "orgCode", value = "机构", defaultValue = "")
             @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type,
-            @ApiParam(name = "data", value = "json数据", defaultValue = "")
-            @RequestBody String data);
+            @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
+            @RequestParam(value = "jsonData", required = false) String jsonData);
 
 
     @RequestMapping(value = "/orgSaasDel", method = RequestMethod.DELETE)

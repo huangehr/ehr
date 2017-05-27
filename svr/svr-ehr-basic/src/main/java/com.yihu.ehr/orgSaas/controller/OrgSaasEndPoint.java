@@ -63,26 +63,26 @@ public class OrgSaasEndPoint extends EnvelopRestEndPoint {
      * 机构授权检查并保存
      * @return
      */
-    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.POST)
+    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.GET)
     @ApiOperation(value = "机构授权检查,如果被授权的机构或者区域在指定机构总不存在，这新增这条记录，否则返回地址id")
     public String saveOrgSaas(
             @ApiParam(name = "orgCode", value = "机构", defaultValue = "")
             @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type,
-            @ApiParam(name = "data", value = "json数据", defaultValue = "")
-            @RequestBody String data) throws Exception{
+            @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
+            @RequestParam(value = "jsonData", required = false)String jsonData) throws Exception{
         //根据机构code和type值删除既存数据
         orgSaasService.deleteOrgSaas(orgCode,type);
         ObjectMapper objectMapper = new ObjectMapper();
         //将json串转换成对象，放进list里面
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, OrgSaas.class);
-       List<OrgSaas> models = objectMapper.readValue(data,javaType);
+       List<OrgSaas> models = objectMapper.readValue(jsonData,javaType);
         String addressId ="";
 
         if(models.size()>0){
             for(OrgSaas os:models){
-               orgSaasService.saveOrgSaas(os);
+                addressId=orgSaasService.saveOrgSaas(os);
             }
         }
         return addressId;
