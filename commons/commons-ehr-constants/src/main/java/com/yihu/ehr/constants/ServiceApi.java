@@ -704,6 +704,7 @@ public class ServiceApi {
         public static final String AddressDictList = "/geography_entries_list";  //获取多条行政区划地址
         public static final String AddressDictAll = "/geography_entries/all";    //获取全部行政区划地址
         public static final String AddressDictByFields = "/geography_entries/getAddressDict";     //根据地址中文名 查询地址编号
+        public static final String GetAddressNameByCode = "/geography/GetAddressNameByCode";     //根据地址中文名 查询地址编号
     }
 
 
@@ -750,6 +751,14 @@ public class ServiceApi {
         public static final String GetQcOverAllOrgIntegrity = "/report/getQcOverAllOrgIntegrity";
         public static final String GetQcQuotaDailyIntegrity = "/report/getQcQuotaDailyIntegrity";
         public static final String GetQcQuotaByLocation = "/report/getQcQuotaByLocation";
+
+
+        public static final String QcDailyStatisticsStorage = "/report/qcDailyStatisticsStorage";
+        public static final String QcDailyStatisticsStorageByDate = "/report/qcDailyStatisticsStorageByDate";
+        public static final String QcDailyStatisticsIdentify = "/report/qcDailyStatisticsIdentify";
+
+
+
 
 
 

@@ -3,6 +3,7 @@ package com.yihu.ehr.organization.controller;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
@@ -545,9 +546,9 @@ public class OrganizationController extends BaseController {
                 org.setTown(addr.getTown());
                 org.setStreet(addr.getStreet());
                 org.setExtra(addr.getExtra());
-                org.setProvinceId(geographyToCode(addr.getProvince(),156));
-                org.setCityId(geographyToCode(addr.getCity(),org.getProvinceId()));
-                org.setDistrictId(geographyToCode(addr.getDistrict(),org.getCityId()));
+                org.setProvinceId(getGeographyIdByName(addr.getProvince().toString()));
+                org.setCityId(getGeographyIdByName(addr.getCity().toString()));
+                org.setDistrictId(getGeographyIdByName(addr.getDistrict().toString()));
             }
         }
         //获取公钥信息（公钥、有效区间、开始时间）
@@ -560,6 +561,21 @@ public class OrganizationController extends BaseController {
         }
         return org;
     }
+
+    public int getGeographyIdByName(String name){
+        if(StringUtils.isEmpty(name)){
+            return 0;
+        }
+
+        ObjectResult result =  addressClient.getAddressNameByCode(name);
+        if(result != null){
+            Map<String,Object> info = (HashMap)result.getData();
+            int id = Integer.parseInt(info.get("id").toString());
+            return id;
+        }
+        return 0;
+    }
+
     public int geographyToCode(String name,int code){
         String[] fields = {"name","pid"};
         String[] values = {name,String.valueOf(code)};
