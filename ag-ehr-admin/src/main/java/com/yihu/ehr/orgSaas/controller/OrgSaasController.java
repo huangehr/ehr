@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -177,7 +178,9 @@ public class OrgSaasController extends BaseController{
             @RequestBody  String data) throws Exception{
         Envelop envelop = new Envelop();
         OrgSaasModel orgSaasModel = new OrgSaasModel();
-        String id = orgSaasClient.saveOrgSaas(orgCode,type,data);
+        String  utfData=URLDecoder.decode(data);
+
+        String id = orgSaasClient.saveOrgSaas(orgCode,type,utfData);
 
         if(id != null){
             envelop.setSuccessFlg(true);
