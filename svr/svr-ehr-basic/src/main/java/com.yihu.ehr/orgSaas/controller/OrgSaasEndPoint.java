@@ -73,19 +73,19 @@ public class OrgSaasEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
             @RequestBody  String jsonData) throws Exception{
         //根据机构code和type值删除既存数据
-        orgSaasService.deleteOrgSaas(orgCode,type);
+     //   orgSaasService.deleteOrgSaas(orgCode,type);
         ObjectMapper objectMapper = new ObjectMapper();
         String[] jsonDatalist=jsonData.split("jsonData=");
         //将json串转换成对象，放进list里面
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, OrgSaas.class);
        List<OrgSaas> models = objectMapper.readValue(jsonDatalist[1],javaType);
         String addressId ="";
-
-        if(models.size()>0){
-            for(OrgSaas os:models){
-                addressId=orgSaasService.saveOrgSaas(os);
-            }
-        }
+        addressId=orgSaasService.saveOrgSaas(models,orgCode,type);
+//        if(models.size()>0){
+//            for(OrgSaas os:models){
+//                addressId=orgSaasService.saveOrgSaas(os);
+//            }
+//        }
         return addressId;
 
     }

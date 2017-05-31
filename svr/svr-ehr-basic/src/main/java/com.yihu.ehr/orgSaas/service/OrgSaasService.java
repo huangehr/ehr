@@ -1,6 +1,8 @@
 package com.yihu.ehr.orgSaas.service;
 
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.entity.geography.GeographyDict;
 import com.yihu.ehr.entity.organizations.OrgSaas;
 import com.yihu.ehr.orgSaas.dao.OrgSaasRepository;
@@ -45,10 +47,20 @@ public class OrgSaasService extends BaseJpaService<OrgSaas,OrgSaasRepository>{
     /**
      * 机构授权检查并保存
      * 返回新地址id
-     * @param orgSaas
+     * @param orgSaaslist
+     * @param orgCode
+     * @param type
      */
-    public String saveOrgSaas(OrgSaas orgSaas) {
-        return oOrgSaasRepository.save(orgSaas).getId().toString();
+    public String saveOrgSaas(List<OrgSaas> orgSaaslist,String orgCode,String type) {
+        String id="";
+        oOrgSaasRepository.deleteOrgSaas(orgCode,type);
+        if(orgSaaslist.size()>0){
+            for(OrgSaas os:orgSaaslist){
+                id=oOrgSaasRepository.save(os).getId().toString();
+            }
+        }
+
+        return id;
     }
 
     public void deleteOrgSaas(String orgCode,String type) {
