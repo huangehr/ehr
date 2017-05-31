@@ -167,7 +167,7 @@ public class OrgSaasController extends BaseController{
      * 机构授权检查并保存
      * @return
      */
-    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.GET)
+    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.POST)
     @ApiOperation(value = "机构授权检查,如果被授权的机构或者区域在指定机构总不存在，这新增这条记录，否则返回地址id")
     public Envelop saveOrgSaas(
             @ApiParam(name = "orgCode", value = "机构", defaultValue = "")
@@ -175,11 +175,10 @@ public class OrgSaasController extends BaseController{
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type,
             @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
-            @RequestParam(value = "jsonData", required = false)String jsonData) throws Exception{
+            @RequestParam(value = "jsonData", required = false) String jsonData) throws Exception{
         Envelop envelop = new Envelop();
         OrgSaasModel orgSaasModel = new OrgSaasModel();
-        String[] newData=jsonData.split("&");
-        jsonData=URLDecoder.decode(newData[0]);
+        jsonData=URLDecoder.decode(jsonData);
 
         String id = orgSaasClient.saveOrgSaas(orgCode,type,jsonData);
 
@@ -190,8 +189,6 @@ public class OrgSaasController extends BaseController{
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构授权新增失败");
         }
-        envelop.setObj(orgSaasModel);
-
         return envelop;
     }
 
