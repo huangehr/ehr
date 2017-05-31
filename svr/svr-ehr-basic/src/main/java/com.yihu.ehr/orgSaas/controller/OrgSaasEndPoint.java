@@ -63,7 +63,7 @@ public class OrgSaasEndPoint extends EnvelopRestEndPoint {
      * 机构授权检查并保存
      * @return
      */
-    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.GET)
+    @RequestMapping(value = "/orgSaasSave", method = RequestMethod.POST)
     @ApiOperation(value = "机构授权检查,如果被授权的机构或者区域在指定机构总不存在，这新增这条记录，否则返回地址id")
     public String saveOrgSaas(
             @ApiParam(name = "orgCode", value = "机构", defaultValue = "")
@@ -71,7 +71,7 @@ public class OrgSaasEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type,
             @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
-            @RequestParam(value = "jsonData", required = false)String jsonData) throws Exception{
+            @RequestParam(value = "jsonData", required = false) String jsonData) throws Exception{
         //根据机构code和type值删除既存数据
         orgSaasService.deleteOrgSaas(orgCode,type);
         ObjectMapper objectMapper = new ObjectMapper();
