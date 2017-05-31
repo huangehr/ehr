@@ -189,8 +189,6 @@ public class OrgSaasController extends BaseController{
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构授权新增失败");
         }
-        envelop.setObj(orgSaasModel);
-
         return envelop;
     }
 
