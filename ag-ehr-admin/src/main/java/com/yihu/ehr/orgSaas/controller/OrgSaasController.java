@@ -175,12 +175,12 @@ public class OrgSaasController extends BaseController{
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type,
             @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
-            @RequestParam(value = "jsonData", required = false) String jsonData) throws Exception{
+            @RequestBody String jsonData) throws Exception{
         Envelop envelop = new Envelop();
         OrgSaasModel orgSaasModel = new OrgSaasModel();
         jsonData=URLDecoder.decode(jsonData);
-
-        String id = orgSaasClient.saveOrgSaas(orgCode,type,jsonData);
+        String[] newJsonData=jsonData.split("&");
+        String id = orgSaasClient.saveOrgSaas(orgCode,type,newJsonData[0]);
 
         if(id != null){
             envelop.setSuccessFlg(true);

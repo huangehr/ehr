@@ -39,7 +39,7 @@ public interface OrgSaasClient {
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type,
             @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
-            @RequestParam(value = "jsonData", required = false) String jsonData);
+            @RequestBody String jsonData);
 
 
     @RequestMapping(value = "/orgSaasDel", method = RequestMethod.DELETE)
