@@ -6,9 +6,12 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.hbase.HBaseAdmin;
 import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.solr.SolrAdmin;
+import com.yihu.ehr.solr.SolrUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +35,9 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     SolrAdmin solrAdmin;
+
+    @Autowired
+    SolrUtil solrUtil;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -62,13 +68,57 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @ApiOperation("判断表是否存在")
-    @RequestMapping(value = "isTableExists",method = RequestMethod.GET)
-    public String isTableExists(
-            @ApiParam(value="表名",defaultValue = "HH")
+    @ApiOperation("Solr总条数")
+    @RequestMapping(value = "countSolr",method = RequestMethod.GET)
+    public String countSolr(
+            @ApiParam(value="表名",defaultValue = "HealthProfile")
             @RequestParam String tableName)
     {
         try {
+            long count = solrUtil.count(tableName,"*:*");
+
+            //通过org_code分组统计
+            /*Map<String,Long> map = solrUtil.groupCount(tableName,null,null,"org_code",0,1000);
+            Long orgCount = new Long(0);
+            for(String key : map.keySet())
+            {
+                orgCount += map.get(key);
+            }*/
+            return "count:"+count;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return "Fail!"+ex.getMessage();
+        }
+    }
+
+    @ApiOperation("Hbase总条数")
+    @RequestMapping(value = "countHbase",method = RequestMethod.GET)
+    public String countHbase(
+            @ApiParam(value="表名",defaultValue = "HealthProfile")
+            @RequestParam String tableName)
+    {
+        try {
+            Integer count = hbaseDao.count(tableName);
+
+            return "count："+count;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return "Fail!"+ex.getMessage();
+        }
+    }
+
+    @ApiOperation("判断表是否存在")
+    @RequestMapping(value = "isTableExists",method = RequestMethod.GET)
+    public String isTableExists(
+            @ApiParam(value="表名",defaultValue = "HealthProfile")
+            @RequestParam String tableName)
+    {
+        try {
+
             if (hbaseAdmin.isTableExists(tableName)) {
                 return "true";
             } else {
@@ -101,13 +151,19 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    /*@ApiOperation("删除表")
-    @RequestMapping(value = "dropTable",method = RequestMethod.POST)
-    public String dropTable(@ApiParam(value="表名",defaultValue = "HH")
+    @ApiOperation("清空表")
+    @RequestMapping(value = "truncateTable",method = RequestMethod.POST)
+    public String dropTable(@ApiParam(value="表名",defaultValue = "HealthArchives")
                               @RequestParam String tableName)
     {
         try {
-            hbaseAdmin.dropTable(tableName);
+            List<String> list = new ArrayList<>();
+            list.add(tableName);
+            hbaseAdmin.truncate(list);
+
+            //清空索引
+            solrAdmin.delete(tableName,"rowkey:*");
+
             return "Success drop table "+tableName+".";
         }
         catch (Exception ex)
@@ -120,15 +176,15 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("测试插入数据")
     @RequestMapping(value = "insertRecord",method = RequestMethod.POST)
-    public String insertRecord(@ApiParam(value="表名",defaultValue = "HH")
+    public String insertRecord(@ApiParam(value="表名",defaultValue = "HealthArchives")
                                    @RequestParam String tableName,
                                @ApiParam(value="主键",defaultValue = "1")
                                @RequestParam String rowKey,
-                               @ApiParam(value="列族",defaultValue = "HH_F1")
+                               @ApiParam(value="列族",defaultValue = "basic")
                                    @RequestParam String family,
-                               @ApiParam(value="列",defaultValue = "HH_C1,HH_C4")
+                               @ApiParam(value="列",defaultValue = "demographic_id")
                                    @RequestParam String columns,
-                               @ApiParam(value="值",defaultValue = "HH_V1,HH_V4")
+                               @ApiParam(value="值",defaultValue = "1234567")
                                    @RequestParam String values)
     {
         try {
@@ -142,7 +198,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
             ex.printStackTrace();
             return "Fail!"+ex.getMessage();
         }
-    }*/
+    }
 
     @ApiOperation("获取单条数据")
     @RequestMapping(value = "getOneResult",method = RequestMethod.POST)
@@ -163,23 +219,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-   /* @ApiOperation("清空Hbase数据成功")
-    @RequestMapping(value = "truncateHbaseTable",method = RequestMethod.POST)
-    public String truncateHbaseTable(@ApiParam(value="core",defaultValue = "HealthProfile")
-                             @RequestParam String core)
-    {
-        try {
-            List<String> list = new ArrayList<>();
-            list.add(core);
-            hbaseAdmin.truncate(list);
-            return "清空Hbase数据成功！";
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return ex.getMessage();
-        }
-    }*/
+
    @ApiOperation("删除单条Hbase")
    @RequestMapping(value = "deleteHbase",method = RequestMethod.POST)
    public String deleteHbase(@ApiParam(value="core",defaultValue = "HealthProfile")

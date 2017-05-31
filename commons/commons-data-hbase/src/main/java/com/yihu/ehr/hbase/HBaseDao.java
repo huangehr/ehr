@@ -27,7 +27,7 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      *模糊匹配rowkey
      */
-    public String[] findRowKeys(String tableName, String rowkeyRegEx) throws Throwable {
+    public String[] findRowKeys(String tableName, String rowkeyRegEx) throws Exception {
         Scan scan = new Scan();
         scan.addFamily(Bytes.toBytes("basic"));
         scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator(rowkeyRegEx)));
@@ -43,6 +43,27 @@ public class HBaseDao extends AbstractHBaseClient {
         });
 
         return list.toArray(new String[list.size()]);
+    }
+
+    /**
+     *表总条数
+     */
+    public Integer count(String tableName) throws Exception {
+        Scan scan = new Scan();
+        scan.addFamily(Bytes.toBytes("basic"));
+        scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator("^")));
+
+        List<String> list = new LinkedList<>();
+        hbaseTemplate.find(tableName, scan, new RowMapper<Void>() {
+            @Override
+            public Void mapRow(Result result, int rowNum) throws Exception {
+                list.add(Bytes.toString(result.getRow()));
+
+                return null;
+            }
+        });
+
+        return list.size();
     }
 
     /**
@@ -273,7 +294,7 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      * 保存数据 原型模式
      */
-    public void save(String tableName, TableBundle tableBundle) throws IOException {
+    public void save(String tableName, TableBundle tableBundle) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
 
             public Object doInTable(HTableInterface htable) throws Throwable {

@@ -6,6 +6,8 @@ import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.service.resource.stage2.SubRecord;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import org.apache.poi.util.StringUtil;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -39,7 +41,15 @@ public class ResourceStorageUtil {
             map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(profile.getEventDate()));
             map.put(MasterResourceFamily.BasicColumns.EventType, Integer.toString(profile.getEventType().ordinal()));
             map.put(MasterResourceFamily.BasicColumns.ProfileType, Integer.toString(profile.getProfileType().ordinal()));
-            map.put(MasterResourceFamily.BasicColumns.DemographicId, profile.getDemographicId() == null ? "" : profile.getDemographicId());
+            String demographicId  = profile.getDemographicId();
+            if(StringUtils.isEmpty(demographicId))
+            {
+                demographicId = "";
+            }
+            else if(demographicId == "null"){
+                demographicId = "";
+            }
+            map.put(MasterResourceFamily.BasicColumns.DemographicId, demographicId);
             map.put(MasterResourceFamily.BasicColumns.ClientId, profile.getClientId());
             map.put(MasterResourceFamily.BasicColumns.CreateDate, DateTimeUtil.utcDateTimeFormat(new Date()));
             map.put(MasterResourceFamily.BasicColumns.CdaVersion, profile.getCdaVersion());

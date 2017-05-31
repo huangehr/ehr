@@ -29,6 +29,8 @@ public class ArchiveRelation {
     private Date createDate;//创建时间
     private Long applyId;//关联档案申请id
     private Long cardId;//申领卡ID
+    private String identifyFlag;//身份识别标识 0不可识别 1可以识别
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -174,5 +176,14 @@ public class ArchiveRelation {
 
     public void setCardId(Long cardId) {
         this.cardId = cardId;
+    }
+
+    @Column(name = "identify_flag")
+    public String getIdentifyFlag() {
+        return identifyFlag;
+    }
+
+    public void setIdentifyFlag(String identifyFlag) {
+        this.identifyFlag = identifyFlag;
     }
 }
