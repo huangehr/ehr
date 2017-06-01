@@ -390,7 +390,9 @@ public class UserController extends BaseController {
 //                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
 //                mUser.setImgLocalPath(localPath);
 //            }
-            mUser.setBirthday(mUser.getBirthday().substring(0,10));
+            if(StringUtils.isNotEmpty( mUser.getBirthday())){
+                mUser.setBirthday(mUser.getBirthday().substring(0,10));
+            }
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
