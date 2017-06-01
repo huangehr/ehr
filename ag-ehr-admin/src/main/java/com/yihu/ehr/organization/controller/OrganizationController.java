@@ -34,6 +34,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
@@ -461,6 +462,12 @@ public class OrganizationController extends BaseController {
                     e.printStackTrace();
                 }
             }
+            if (mOrg.getParentHosId() != null) {
+                MOrganization org =  orgClient.getOrgById(String.valueOf(mOrg.getParentHosId()));
+                if (org != null) {
+                    mOrg.setParentHosName(org.getFullName());
+                }
+            }
             if (mOrg == null) {
                 return failed("机构获取失败");
             }
@@ -546,9 +553,15 @@ public class OrganizationController extends BaseController {
                 org.setTown(addr.getTown());
                 org.setStreet(addr.getStreet());
                 org.setExtra(addr.getExtra());
-                org.setProvinceId(getGeographyIdByName(addr.getProvince().toString()));
-                org.setCityId(getGeographyIdByName(addr.getCity().toString()));
-                org.setDistrictId(getGeographyIdByName(addr.getDistrict().toString()));
+                if(StringUtils.isNotEmpty(addr.getProvince() )){
+                    org.setProvinceId(getGeographyIdByName(addr.getProvince().toString()));
+                }
+                if(StringUtils.isNotEmpty(addr.getCity() )){
+                    org.setCityId(getGeographyIdByName(addr.getCity().toString()));
+                }
+                if(StringUtils.isNotEmpty(addr.getDistrict() )) {
+                    org.setDistrictId(getGeographyIdByName(addr.getDistrict().toString()));
+                }
             }
         }
         //获取公钥信息（公钥、有效区间、开始时间）
