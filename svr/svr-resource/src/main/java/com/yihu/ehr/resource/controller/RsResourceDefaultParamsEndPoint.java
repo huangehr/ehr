@@ -48,6 +48,7 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "json_data", value = "资源默认参数json串")
             @RequestBody String jsonData){
         ResourceDefaultParam resourceDefaultParam = toEntity(jsonData, ResourceDefaultParam.class);
+        resourceDefaultParam.setId(resourceDefaultParam.getResourcesId());
         ResourceDefaultParam resourceDefaultParamNew = resourceDefaultParamService.save(resourceDefaultParam);
         return convertToModel(resourceDefaultParamNew, MResourceDefaultParam.class);
     }
@@ -58,6 +59,7 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "json_data", value = "资源默认参数json串")
             @RequestBody String jsonData){
         ResourceDefaultParam resourceDefaultParam = toEntity(jsonData, ResourceDefaultParam.class);
+        resourceDefaultParam.setId(resourceDefaultParam.getResourcesId());
         ResourceDefaultParam resourceDefaultParamNew = resourceDefaultParamService.save(resourceDefaultParam);
         return convertToModel(resourceDefaultParamNew, MResourceDefaultParam.class);
     }
