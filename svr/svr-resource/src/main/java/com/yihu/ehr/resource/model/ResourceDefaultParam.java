@@ -21,7 +21,9 @@ public class ResourceDefaultParam {
 
     @Id
    // @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id",unique = true,nullable = false)
+    @GenericGenerator(name="systemUUID",strategy="uuid")
+    @GeneratedValue(generator="systemUUID")
+    @Column(name = "id", unique = true, nullable = false, length = 32)
     public String getId() {
         return id;
     }
