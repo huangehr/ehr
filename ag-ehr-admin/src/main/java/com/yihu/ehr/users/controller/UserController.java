@@ -295,7 +295,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "user_json_data") String userJsonData) {
         try {
             UserDetailModel detailModel = toEntity(userJsonData, UserDetailModel.class);
-            String errorMsg = null;
+            String errorMsg = "";
             if (StringUtils.isEmpty(detailModel.getLoginCode())) {
                 errorMsg += "账户不能为空";
             }
