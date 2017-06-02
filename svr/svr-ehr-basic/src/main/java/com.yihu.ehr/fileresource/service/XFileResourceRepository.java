@@ -15,4 +15,6 @@ public interface XFileResourceRepository extends PagingAndSortingRepository<File
     List<FileResource> findByStoragePath(String storagePath);
 
     List<FileResource> findByObjectIdAndMime(String objectId, String mime);
+
+    FileResource findById(String id);
 }
