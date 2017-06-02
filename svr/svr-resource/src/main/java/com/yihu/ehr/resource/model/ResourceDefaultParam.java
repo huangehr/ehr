@@ -13,21 +13,24 @@ import javax.persistence.*;
 @Table(name="rs_resource_default_params")
 public class ResourceDefaultParam {
 
-    private long id;
+    private String id;
     private String resourcesId;
     private String resourcesCode;
     private String paramKey;
     private String paramValue;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id",unique = true,nullable = false)
-    public long getId() {
+   // @GeneratedValue(strategy = GenerationType.AUTO)
+    @GenericGenerator(name="systemUUID",strategy="uuid")
+    @GeneratedValue(generator="systemUUID")
+    @Column(name = "id", unique = true, nullable = false, length = 32)
+    public String getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
+
 
     @Column(name = "resources_id",nullable = false)
     public String getResourcesId() {

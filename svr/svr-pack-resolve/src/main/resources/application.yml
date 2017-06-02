@@ -79,6 +79,15 @@ ehr:
       meta-data:
         - HDSD00_01_457 # 挂号时间
         - HDSD00_01_575 # 入院时间
+    #诊断信息
+    diagnosis:
+      data-sets:
+        - HDSC01_03
+        - HDSC02_17
+      meta-data:
+        - HDSD00_01_550 # 门诊/住院诊断
+        # HDSC02_14   HDSD00_16_008出院诊断    HDSD00_16_008 入院诊断代码
+
     # 身份提取参数，从人口学提取
     identity:
       data-sets:

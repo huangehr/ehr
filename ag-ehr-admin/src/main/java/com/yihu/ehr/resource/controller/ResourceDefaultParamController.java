@@ -31,7 +31,7 @@ public class ResourceDefaultParamController extends BaseController {
     @ApiOperation("根据id获取参数信息")
     public Envelop getResourceDefaultParamById(
             @ApiParam(name = "id", value = "资源默认参数信息id")
-            @PathVariable(value = "id") Long id){
+            @PathVariable(value = "id") String id){
         MResourceDefaultParam mResourceDefaultParam = rsDefaultParamclient.getResourceDefaultParamById(id);
         if(mResourceDefaultParam == null){
             return failed("获取失败！");
@@ -87,7 +87,7 @@ public class ResourceDefaultParamController extends BaseController {
     @ApiOperation("根据id删除资源默认参数")
     public Envelop deleteResourceDefaultParams(
             @ApiParam(name="id",value="资源默认参数id")
-            @PathVariable(value="id") Long id){
+            @PathVariable(value="id") String id){
         boolean bo = rsDefaultParamclient.deleteResourceDefaultParams(id);
         if(bo){
             return success(null);

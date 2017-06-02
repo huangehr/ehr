@@ -37,6 +37,11 @@ public class ExtractorChain {
         {
             re = context.getBean(IdentityExtractor.class).extract(dataSet);
         }
+        //门诊/住院诊断
+        else if(filter.equals(KeyDataExtractor.Filter.Diagnosis))
+        {
+            re = context.getBean(DiagnosisExtractor.class).extract(dataSet);
+        }
 
         return re;
     }

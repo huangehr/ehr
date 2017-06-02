@@ -7,17 +7,17 @@ package com.yihu.ehr.model.resource;
  */
 public class MResourceDefaultParam {
 
-    private long id;
+    private String id;
     private String resourcesId;
     private String resourcesCode;
     private String paramKey;
     private String paramValue;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

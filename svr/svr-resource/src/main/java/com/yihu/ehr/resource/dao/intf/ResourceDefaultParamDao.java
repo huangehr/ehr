@@ -3,6 +3,7 @@ package com.yihu.ehr.resource.dao.intf;
 import com.yihu.ehr.resource.model.ResourceDefaultParam;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -19,4 +20,7 @@ public interface ResourceDefaultParamDao extends PagingAndSortingRepository<Reso
 
     @Query("from ResourceDefaultParam where ( resourcesId = ?1 or resourcesCode = ?2 ) and paramKey = ?3 ")
     List<ResourceDefaultParam> findByResourcesIdOrResourcesCodeWithParamKey(String resourceId,String resourceCode ,String ParamKey);
+
+    @Query("select rdf from ResourceDefaultParam rdf where rdf.id = :id")
+    ResourceDefaultParam findById(@Param("id") String id);
 }

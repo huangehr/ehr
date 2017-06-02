@@ -43,6 +43,7 @@ public class StandardPackage {
     //add by hzp
     private String cardType;                              // 就诊时用的就诊卡类型
     private String patientName;                           // 患者姓名
+    private List<String> diagnosisList;                           // ICD10诊断列表
 
     protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 
@@ -218,6 +219,14 @@ public class StandardPackage {
         this.patientName = patientName;
     }
 
+    public List<String> getDiagnosisList() {
+        return diagnosisList;
+    }
+
+    public void setDiagnosisList(List<String> diagnosisList) {
+        this.diagnosisList = diagnosisList;
+    }
+
     public String toJson() {
         ObjectNode node = jsonFormat();
         return node.toString();
@@ -238,6 +247,7 @@ public class StandardPackage {
         root.put("profileType", this.getProfileType().toString());
         root.put("cardType", this.getCardType());
         root.put("patientName", this.getPatientName());
+        root.put("diagnosis", StringUtils.join(this.getDiagnosisList(),";"));
 
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {

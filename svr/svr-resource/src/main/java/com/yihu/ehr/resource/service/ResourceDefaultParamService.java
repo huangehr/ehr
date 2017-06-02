@@ -20,8 +20,8 @@ public class ResourceDefaultParamService extends BaseJpaService<ResourceDefaultP
     @Autowired
     private ResourceDefaultParamDao resourceDefaultParamDao;
 
-    public ResourceDefaultParam findById(Long id) {
-        return resourceDefaultParamDao.findOne(id);
+    public ResourceDefaultParam findById(String id) {
+        return resourceDefaultParamDao.findById(id);
     }
     public List<ResourceDefaultParam> findByResourcesIdOrResourcesCodeWithParamKey(String resourcesId,String resourcesCode,String paramKey){
         return resourceDefaultParamDao.findByResourcesIdOrResourcesCodeWithParamKey(resourcesId, resourcesCode, paramKey);
