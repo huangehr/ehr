@@ -79,7 +79,7 @@ public class CDAControllerTests {
         assertNotEquals("删除cda文档列表失败",envelop,null);
 
 
-        Envelop relationshipEnvelop = cdaController.SaveRelationship("57",((CDAModel)envelop.getDetailModelList().get(0)).getId(),version,"xmlinfo");
+        Envelop relationshipEnvelop = cdaController.saveRelationship("57",((CDAModel)envelop.getDetailModelList().get(0)).getId(),version,"xmlinfo");
         assertNotEquals("新增CDADataSetRelationship失败",envelop,null);
 
         String cdaId = ((CDAModel)envelop.getDetailModelList().get(0)).getId();

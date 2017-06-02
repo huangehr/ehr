@@ -14,9 +14,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 标准档案包解析器.
@@ -82,7 +80,13 @@ public class StdPackageResolver extends PackageResolver {
                         profile.setEventDate(eventDate);
                         profile.setEventType((EventType) properties.get(MasterResourceFamily.BasicColumns.EventType));
                     }
+                }
 
+                //门诊/住院诊断
+                Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
+                List<String> diagnosisList = (List<String>)properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
+                if(diagnosisList!=null) {
+                    profile.setDiagnosisList(diagnosisList);
                 }
             }
 

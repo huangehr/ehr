@@ -248,7 +248,7 @@ public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
     @RequestMapping(value = ServiceApi.Standards.DataSetRelationships, method = RequestMethod.POST)
     public boolean saveCDADataSetRelationship(
             @ApiParam(name = "data_set_ids", value = "data_set_ids")
-            @RequestParam(value = "data_set_ids") String[] dataSetIds,
+            @RequestParam(value = "data_set_ids") String dataSetIds,
             @ApiParam(name = "document_Id", value = "文档编号")
             @RequestParam(value = "document_Id") String cdaId,
             @ApiParam(name = "version", value = "版本号")

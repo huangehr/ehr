@@ -32,6 +32,8 @@ public class ResourceBucket {
     //add by hzp
     private String cardType;                              // 就诊时用的就诊卡类型
     private String patientName;                           // 患者姓名
+    private String diagnosis;                           // ICD10诊断，分号分隔
+    private String healthProblem;                           // 健康问题，分号分隔
 
     protected MasterRecord masterRecord;                // 主记录
     protected SubRecords subRecords;                    // 子记录
@@ -178,5 +180,21 @@ public class ResourceBucket {
 
     public void setCdaDocuments(Map<String, CdaDocument> cdaDocuments) {
         this.cdaDocuments = cdaDocuments;
+    }
+
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
+    }
+
+    public String getHealthProblem() {
+        return healthProblem;
+    }
+
+    public void setHealthProblem(String healthProblem) {
+        this.healthProblem = healthProblem;
     }
 }

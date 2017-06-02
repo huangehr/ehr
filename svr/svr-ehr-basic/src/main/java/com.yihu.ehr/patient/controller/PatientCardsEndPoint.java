@@ -228,7 +228,7 @@ public class PatientCardsEndPoint extends EnvelopRestEndPoint {
         {
             card.setCreater(operator);
             card.setCreateDate(new Date());
-            card.setStatus("0");
+            //card.setStatus("0");
         }else{
             card.setUpdater(operator);
             card.setUpdateDate(new Date());

@@ -56,6 +56,7 @@ public class OrgDetailModel{
     private String logoUrl;
     private Integer sortNo;
     private Integer parentHosId;
+    private String parentHosName;
     private Integer zxy;
     private String hosPhoto;
     private String ing;
@@ -242,6 +243,14 @@ public class OrgDetailModel{
 
     public void setTel(String tel) {
         this.tel = tel;
+    }
+
+    public String getParentHosName() {
+        return parentHosName;
+    }
+
+    public void setParentHosName(String parentHosName) {
+        this.parentHosName = parentHosName;
     }
 
     public List<String> getTags() {

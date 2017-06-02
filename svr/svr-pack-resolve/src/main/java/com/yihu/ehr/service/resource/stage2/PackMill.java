@@ -13,7 +13,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -39,6 +41,7 @@ public class PackMill {
         ResourceBucket resourceBucket = new ResourceBucket();
         BeanUtils.copyProperties(stdPack, resourceBucket);
 
+        //机构名称、机构区域
         if(!StringUtils.isBlank(resourceBucket.getOrgCode()))
         {
             //获取机构名称
@@ -55,6 +58,23 @@ public class PackMill {
                 resourceBucket.setOrgArea(orgArea);
             }
         }
+
+        //门诊/住院诊断、健康问题
+        if(stdPack.getDiagnosisList()!=null && stdPack.getDiagnosisList().size()>0)
+        {
+            List<String> healthProblemList = new ArrayList<>();
+            for(String diagnosis:stdPack.getDiagnosisList())
+            {
+                String healthProblem = redisServiceClient.getIcd10HpRelationRedis(diagnosis);//通过ICD10获取健康问题
+                if(!StringUtils.isEmpty(healthProblem) && !healthProblemList.contains(healthProblem))
+                {
+                    healthProblemList.add(healthProblem);
+                }
+            }
+            resourceBucket.setDiagnosis(StringUtils.join(stdPack.getDiagnosisList().toArray(),";"));          //ICD10
+            resourceBucket.setHealthProblem(StringUtils.join(healthProblemList.toArray(),";"));    //健康问题
+        }
+
 
         Collection<PackageDataSet> packageDataSets = stdPack.getDataSets();
         for (PackageDataSet dataSet : packageDataSets){

@@ -4,7 +4,7 @@ package com.yihu.ehr.agModel.resource;
  * Created by yww on 2016/7/20.
  */
 public class ResourceDefaultParamModel {
-    private long id;
+    private String id;
     private String resourcesId;
     private String resourcesCode;
     private String paramKey;
@@ -13,11 +13,11 @@ public class ResourceDefaultParamModel {
     public ResourceDefaultParamModel() {
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
