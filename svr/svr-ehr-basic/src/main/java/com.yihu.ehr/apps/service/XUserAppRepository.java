@@ -3,6 +3,8 @@ package com.yihu.ehr.apps.service;
 import com.yihu.ehr.apps.model.AppApi;
 import com.yihu.ehr.apps.model.UserApp;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * @author yeshijie
@@ -11,4 +13,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface XUserAppRepository extends JpaRepository<UserApp, String> {
 
+    @Query("select userApp from UserApp userApp where userApp.appId = :appId and userApp.userId = :userId" )
+    UserApp findByAppIdAndUserId(@Param("appId") String appId, @Param("userId") String userId);
 }
