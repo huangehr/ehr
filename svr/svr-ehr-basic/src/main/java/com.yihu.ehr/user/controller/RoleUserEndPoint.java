@@ -1,11 +1,17 @@
 package com.yihu.ehr.user.controller;
 
+import com.yihu.ehr.apps.model.UserApp;
+import com.yihu.ehr.apps.service.UserAppService;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.user.MRoleUser;
+import com.yihu.ehr.user.entity.RoleAppRelation;
 import com.yihu.ehr.user.entity.RoleUser;
+import com.yihu.ehr.user.entity.Roles;
+import com.yihu.ehr.user.service.RoleAppRelationService;
 import com.yihu.ehr.user.service.RoleUserService;
+import com.yihu.ehr.user.service.RolesService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,6 +34,10 @@ import java.util.List;
 public class RoleUserEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RoleUserService roleUserService;
+    @Autowired
+    private RolesService rolesService;
+    @Autowired
+    private UserAppService userAppService;
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -53,10 +63,41 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "user_id") String userId,
             @ApiParam(name = "role_id",value = "角色组id")
             @RequestParam(value = "role_id") String roleId){
+        //删除角色组内成员
         RoleUser roleUser = roleUserService.findRelation(userId,Long.parseLong(roleId));
         if(null != roleUser){
-//            roleUserService.delete(roleUser.getId());
-            roleUserService.deleteRoleUser(roleUser);
+            roleUserService.delete(roleUser.getId());
+            //roleUserService.deleteRoleUser(roleUser);
+        }
+
+        //根据角色、应用、用户三者，判断该用户是否在该应用的其他角色组中存在授权：
+        //若存在，则不做任何操作，若不存在则需要变更USERAPP表中的状态 0 -> 1
+        String appId = "";
+        boolean result = false;
+        Roles roles = rolesService.getRoleByRoleId(Long.parseLong(roleId));
+        if(roles != null){
+            appId = roles.getAppId();
+            List<Roles> rolesRe = rolesService.getRoleByAppId(appId);
+            if(rolesRe != null && rolesRe.size() > 0){
+                for(Roles ra : rolesRe ){
+                    long roleIdRe = ra.getId();
+                    RoleUser roleUserRe = roleUserService.findRelation(userId, roleIdRe);
+                    if(roleUserRe == null){
+                        continue;
+                    }else{
+                        result = true;
+                        break;
+                    }
+                }
+            }
+            //当该用户确实无授权的情况，删除数据
+            if(!result){
+                UserApp userApp = userAppService.findByAppIdAndUserId(appId, userId);
+                if(userApp != null){
+                    userAppService.delete(userApp);
+                    return true;
+                }
+            }
         }
         return true;
     }
