@@ -663,6 +663,8 @@ public class ServiceApi {
         public static final String AddressRedis = "/redis/addressRedis";
         public static final String HealthProblemRedis = "/redis/healthProblemRedis";
         public static final String Icd10HpRelationRedis = "/redis/icd10HpRelationRedis";
+        public static final String Icd10NameRedis = "/redis/icd10NameRedis";
+        public static final String Icd10HpCodeRedis = "/redis/icd10HpCodeListRedis";
         public static final String IndicatorsRedis = "/redis/indicatorsRedis";
         public static final String OrgRedis = "/redis/orgRedis";
         public static final String OrgAreaRedis = "/redis/orgAreaRedis";

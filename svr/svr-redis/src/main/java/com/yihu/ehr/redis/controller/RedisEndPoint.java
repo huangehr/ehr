@@ -50,6 +50,21 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
         return redisService.getIcd10HpRelationRedis(key);
     }
 
+    @ApiOperation("获取ICD10名称 redis")
+    @RequestMapping(value = ServiceApi.Redis.Icd10NameRedis, method = RequestMethod.GET)
+    public String getIcd10NameRedis(@ApiParam(value = "key", defaultValue = "")
+                                          @RequestParam("key") String key)
+    {
+        return redisService.getIcd10NameRedis(key);
+    }
+
+    @ApiOperation("通过ICD10获取相关健康问题 redis")
+    @RequestMapping(value = ServiceApi.Redis.Icd10HpCodeRedis, method = RequestMethod.GET)
+    public String getIcd10HpCodeRedis(@ApiParam(value = "key", defaultValue = "")
+                                    @RequestParam("key") String key)
+    {
+        return redisService.getIcd10HpCodeRedis(key);
+    }
 
     @ApiOperation("获取指标 redis")
     @RequestMapping(value = ServiceApi.Redis.IndicatorsRedis, method = RequestMethod.GET)

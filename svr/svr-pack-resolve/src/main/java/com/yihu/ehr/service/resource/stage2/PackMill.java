@@ -65,10 +65,17 @@ public class PackMill {
             List<String> healthProblemList = new ArrayList<>();
             for(String diagnosis:stdPack.getDiagnosisList())
             {
-                String healthProblem = redisServiceClient.getIcd10HpRelationRedis(diagnosis);//通过ICD10获取健康问题
-                if(!StringUtils.isEmpty(healthProblem) && !healthProblemList.contains(healthProblem))
+                String healthProblem = redisServiceClient.getIcd10HpCodeRedis(diagnosis);//通过ICD10获取健康问题
+                if(!StringUtils.isEmpty(healthProblem))
                 {
-                    healthProblemList.add(healthProblem);
+                    String[] hpCodeList = healthProblem.split(";");
+                    for(String hpCode:hpCodeList)
+                    {
+                        if(!healthProblemList.contains(hpCode))
+                        {
+                            healthProblemList.add(hpCode);
+                        }
+                    }
                 }
             }
             resourceBucket.setDiagnosis(StringUtils.join(stdPack.getDiagnosisList().toArray(),";"));          //ICD10

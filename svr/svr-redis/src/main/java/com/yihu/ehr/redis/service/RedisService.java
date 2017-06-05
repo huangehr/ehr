@@ -21,6 +21,8 @@ public class RedisService {
     @Autowired
     Icd10HpRelationKeySchema icd10HpRelationKeySchema;
     @Autowired
+    Icd10KeySchema icd10KeySchema;
+    @Autowired
     IndicatorsDictKeySchema indicatorsDictKeySchema;
     @Autowired
     OrgKeySchema orgKeySchema;
@@ -64,6 +66,22 @@ public class RedisService {
     public String getIcd10HpRelationRedis(String key)
     {
         return icd10HpRelationKeySchema.get(key);
+    }
+
+    /**
+     *获取ICD10名称 redis
+     */
+    public String getIcd10NameRedis(String key)
+    {
+        return icd10KeySchema.get(key);
+    }
+
+    /**
+     *获取ICD10对应健康问题 redis
+     */
+    public String getIcd10HpCodeRedis(String key)
+    {
+        return icd10KeySchema.getHpCode(key);
     }
 
     /**

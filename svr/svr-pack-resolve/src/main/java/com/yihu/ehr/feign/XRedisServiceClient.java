@@ -26,7 +26,7 @@ public interface XRedisServiceClient {
     public String getAddressRedis(@RequestParam("key") String key);
 
 
-    //("获取健康问题redis")
+    //("获取健康问题名称redis")
     @RequestMapping(value = ServiceApi.Redis.HealthProblemRedis, method = RequestMethod.GET)
     public String getHealthProblemRedis(@RequestParam("key") String key);
 
@@ -35,6 +35,13 @@ public interface XRedisServiceClient {
     @RequestMapping(value = ServiceApi.Redis.Icd10HpRelationRedis, method = RequestMethod.GET)
     public String getIcd10HpRelationRedis(@RequestParam("key") String key);
 
+    //("获取健康问题名称redis")
+    @RequestMapping(value = ServiceApi.Redis.Icd10NameRedis, method = RequestMethod.GET)
+    public String getIcd10NameRedis(@RequestParam("key") String key);
+
+    //("获取健康问题名称redis")
+    @RequestMapping(value = ServiceApi.Redis.Icd10HpCodeRedis, method = RequestMethod.GET)
+    public String getIcd10HpCodeRedis(@RequestParam("key") String key);
 
     //("获取指标 redis")
     @RequestMapping(value = ServiceApi.Redis.IndicatorsRedis, method = RequestMethod.GET)
