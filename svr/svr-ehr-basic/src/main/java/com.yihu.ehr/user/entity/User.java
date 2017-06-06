@@ -59,6 +59,7 @@ public class User {
     private String cityName;
     private int areaId;
     private String areaName;
+    private String street;
     private String demographicId;
     private String doctorId;
     private String realnameFlag;
@@ -403,5 +404,13 @@ public class User {
 
     public void setRealnameFlag(String realnameFlag) {
         this.realnameFlag = realnameFlag;
+    }
+    @Column(name = "street",  nullable = true)
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
     }
 }

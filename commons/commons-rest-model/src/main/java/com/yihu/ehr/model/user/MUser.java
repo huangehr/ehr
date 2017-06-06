@@ -42,8 +42,8 @@ public class MUser implements Serializable{
     private String provinceName;
     private int cityId;
     private String cityName;
-    private int area_id;
-    private String area_name;
+    private int areaId;
+    private String areaName;
     private String street;
     private int fertilityStatus;
     private String secondPhone;
@@ -342,20 +342,20 @@ public class MUser implements Serializable{
         this.imgLocalPath = imgLocalPath;
     }
 
-    public int getArea_id() {
-        return area_id;
+    public int getAreaId() {
+        return areaId;
     }
 
-    public void setArea_id(int area_id) {
-        this.area_id = area_id;
+    public void setAreaId(int areaId) {
+        this.areaId = areaId;
     }
 
-    public String getArea_name() {
-        return area_name;
+    public String getAreaName() {
+        return areaName;
     }
 
-    public void setArea_name(String area_name) {
-        this.area_name = area_name;
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
     }
 
     public String getStreet() {
