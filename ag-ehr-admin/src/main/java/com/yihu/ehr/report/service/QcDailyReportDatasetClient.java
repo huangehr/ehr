@@ -1,6 +1,5 @@
 package com.yihu.ehr.report.service;
 
-import com.yihu.ehr.agModel.report.QcDailyDatasetModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;

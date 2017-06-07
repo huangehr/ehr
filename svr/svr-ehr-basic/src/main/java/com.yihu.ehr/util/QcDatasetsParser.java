@@ -1,14 +1,12 @@
 package com.yihu.ehr.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.agModel.report.QcDailyDatasetModel;
-import com.yihu.ehr.agModel.report.QcDailyDatasetsModel;
+import com.yihu.ehr.model.report.json.QcDailyDatasetModel;
+import com.yihu.ehr.model.report.json.QcDailyDatasetsModel;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 简易数据集解析器。仅将JSON结构中的数据集解析成KEY-VALUE模式，不提供字段翻译功能，
