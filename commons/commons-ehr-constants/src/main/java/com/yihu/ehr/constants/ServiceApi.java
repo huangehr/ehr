@@ -758,9 +758,16 @@ public class ServiceApi {
         public static final String QcDailyStatisticsIdentify = "/report/qcDailyStatisticsIdentify";
 
 
+    }
+
+    public static class TJ {
 
 
+        public static final String GetTjDimensionMainList = "/tj/getTjDimensionMainList";
+        public static final String TjDimensionMain = "/tj/tjDimensionMain";
 
+        public static final String GetTjDimensionSlaveList = "/tj/getTjDimensionSlaveList";
+        public static final String TjDimensionSlave = "/tj/tjDimensionSlave";
 
     }
 
