@@ -39,8 +39,6 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
-    QuotaStatisticsEndPoint quotaStatisticsEndPoint;
-    @Autowired
     QcDailyReportService qcDailyReportService;
     @Autowired
     QcDailyReportDetailService qcDailyReportDetailService;
@@ -213,22 +211,6 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     protected MQcDailyReportDetail getModelDetail(QcDailyReportDetail o){
         return convertToModel(o, MQcDailyReportDetail.class);
     }
-
-
-    @RequestMapping(value = ServiceApi.Report.StatisticQuotaDataReportData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "统计指标日报数据")
-    void statisticQuotaDataReportData(
-            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
-            @RequestParam(value = "quotaId",required = true) String quotaId,
-            @ApiParam(name = "orgId", value = "机构编码", defaultValue = "")
-            @RequestParam(value = "orgId",required = true) String orgId,
-            @ApiParam(name = "quotaDate", value = "统计时间", defaultValue = "")
-            @RequestParam(value = "quotaDate",required = true) String quotaDate ) throws ParseException {
-             quotaStatisticsEndPoint.statisticQuotaData(quotaId,orgId, quotaDate);
-    }
-
-
-
 
 
 }

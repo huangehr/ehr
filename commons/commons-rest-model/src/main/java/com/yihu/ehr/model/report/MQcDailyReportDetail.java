@@ -12,7 +12,7 @@ public class MQcDailyReportDetail {
     private String archiveType;//档案分类  outpatient - 门诊    hospital - 住院
     private String patientId;//病人id
     private String eventNo;//事件号
-    private String eventTime;//事件时间
+    private Date eventTime;//事件时间
     private Integer acqFlag;//采集状态  0 - 未采集  1 - 已采集（实收） 验证统计用
     private Integer timelyFlag;//及时状态 0 - 不及时  1 -及时，判断条件：采集时间 - 事件时间 > 2天 判断为不及时  不及时条件可以配置定义
     private Date addDate;
@@ -60,11 +60,11 @@ public class MQcDailyReportDetail {
         this.eventNo = eventNo;
     }
 
-    public String getEventTime() {
+    public Date getEventTime() {
         return eventTime;
     }
 
-    public void setEventTime(String eventTime) {
+    public void setEventTime(Date eventTime) {
         this.eventTime = eventTime;
     }
 

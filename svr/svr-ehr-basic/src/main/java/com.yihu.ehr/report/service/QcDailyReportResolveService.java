@@ -65,8 +65,12 @@ public class QcDailyReportResolveService {
                     QcDailyReportDatasets qcDailyReportDatasets = new QcDailyReportDatasets();
                     //解析json文件
                     dataSetsModel =  generateDataSet(file);
-                    qcDailyReportDatasets.setCreateDate(DateUtil.parseDate(dataSetsModel.getCreateDate(), "yyyy-MM-dd hh:mm:ss"));
-                    qcDailyReportDatasets.setEventTime(DateUtil.parseDate(dataSetsModel.getEventTime(),"yyyy-MM-dd  hh:mm:ss"));
+                    String parten = "yyyy-MM-dd hh:mm:ss";
+                    if(dataSetsModel.getCreateDate().contains("T")){
+                        parten = "yyyy-MM-dd'T'HH:mm:ss";
+                    }
+                    qcDailyReportDatasets.setCreateDate(DateUtil.parseDate(dataSetsModel.getCreateDate(), parten));
+                    qcDailyReportDatasets.setEventTime(DateUtil.parseDate(dataSetsModel.getEventTime(),parten));
                     qcDailyReportDatasets.setOrgCode(dataSetsModel.getOrgCode());
                     qcDailyReportDatasets.setInnerVersion(dataSetsModel.getInnerVersion());
                     qcDailyReportDatasets.setRealNum(dataSetsModel.getRealHospitalNum());
@@ -129,9 +133,13 @@ public class QcDailyReportResolveService {
                     if(StringUtils.isEmpty(eventsModel.getOrg_code())){
                         return "机构编码不能为空";
                     }
-                    Date createDate = DateUtil.parseDate(eventsModel.getCreate_date(), "yyyy-MM-dd hh:mm:ss");
-                    qcDailyReport.setOrgCode(eventsModel.getOrg_code());
+                    String parten = "yyyy-MM-dd hh:mm:ss";
+                    if(eventsModel.getCreate_date().contains("T")){
+                        parten = "yyyy-MM-dd'T'HH:mm:ss";
+                    }
+                    Date createDate = DateUtil.parseDate(eventsModel.getCreate_date(), parten);
                     qcDailyReport.setCreateDate(createDate );
+                    qcDailyReport.setOrgCode(eventsModel.getOrg_code());
                     qcDailyReport.setInnerVersion(eventsModel.getInner_version());
                     qcDailyReport.setRealHospitalNum(eventsModel.getReal_hospital_num());
                     qcDailyReport.setTotalHospitalNum(eventsModel.getTotal_hospital_num());
@@ -247,7 +255,6 @@ public class QcDailyReportResolveService {
         for(QcDailyEventDetailModel eventDetailModel : modelList){
             MQcDailyReportDetail mQcDailyReportDetail = new MQcDailyReportDetail();
             mQcDailyReportDetail.setEventNo(eventDetailModel.getEvent_no());
-            mQcDailyReportDetail.setEventTime(eventDetailModel.getEvent_time());
             mQcDailyReportDetail.setPatientId(eventDetailModel.getPatient_id());
             mQcDailyReportDetail.setReportId(qcDailyReportId);
             mQcDailyReportDetail.setArchiveType(archiveType);
@@ -255,8 +262,13 @@ public class QcDailyReportResolveService {
             mQcDailyReportDetail.setAcqTime(createTime);
             int day = 0;
             if(StringUtils.isNotEmpty(eventDetailModel.getEvent_time())){
-                Date eventDate = DateUtil.parseDate(eventDetailModel.getEvent_time(), "yyyy-MM-dd HH:mm:ss");
-                long intervalMilli = DateUtil.compareDateTime(createTime ,eventDate);
+                String parten = "yyyy-MM-dd hh:mm:ss";
+                if(eventDetailModel.getEvent_time().contains("T")){
+                    parten = "yyyy-MM-dd'T'HH:mm:ss";
+                }
+                Date eventTime = DateUtil.parseDate(eventDetailModel.getEvent_time(), parten);
+                mQcDailyReportDetail.setEventTime(eventTime);
+                long intervalMilli = DateUtil.compareDateTime(createTime ,eventTime);
                 day = (int) (intervalMilli / (24 * 60 * 60 * 1000));
             }
             mQcDailyReportDetail.setTimelyFlag(day > 2 ? 0 : 1);
@@ -271,7 +283,7 @@ public class QcDailyReportResolveService {
         for(MQcDailyReportDetail mQcDailyReportDetail:realList){
             StringBuffer filter = new StringBuffer();
             String eventNo = mQcDailyReportDetail.getEventNo();
-            String eventTime = mQcDailyReportDetail.getEventTime();
+            Date eventTime = mQcDailyReportDetail.getEventTime();
             String patientId = mQcDailyReportDetail.getPatientId();
             filter.append("eventNo=").append(eventNo).append( ";").
                     append("patientId=").append(patientId ).append(";");
@@ -292,7 +304,7 @@ public class QcDailyReportResolveService {
                 newqDailyReportDetail.setAcqFlag(1);
                 newqDailyReportDetail.setTimelyFlag(mQcDailyReportDetail.getTimelyFlag());
                 newqDailyReportDetail.setEventNo(eventNo);
-                newqDailyReportDetail.setEventTime(DateUtil.formatCharDateYMDHMS(eventTime));
+                newqDailyReportDetail.setEventTime(eventTime);
                 newqDailyReportDetail.setPatientId(patientId);
                 newqDailyReportDetail.setArchiveType(mQcDailyReportDetail.getArchiveType());
                 newqDailyReportDetail.setReportId(mQcDailyReportDetail.getReportId());

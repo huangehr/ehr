@@ -40,13 +40,17 @@ public class QcMetadataParser {
         String eventTime = root.path("event_time").isNull() ? "" : root.path("event_time").asText();
         String version = root.get("inner_version").asText();
         String dataset = root.get("code").asText();
+        String parten = "yyyy-MM-dd hh:mm:ss";
+        if(createTime.contains("T")){
+            parten = "yyyy-MM-dd'T'HH:mm:ss";
+        }
         try {
             JsonNode data = root.get("data");
             for (int i = 0; i < data.size(); ++i) {
                 QcDailyMetadataModel metadataModel = new QcDailyMetadataModel();
                 metadataModel.setOrgCode(orgCode);
-                metadataModel.setEventTime(DateUtil.parseDate(eventTime, "yyyy-MM-dd hh:mm:ss"));
-                metadataModel.setCreateDate(DateUtil.parseDate(createTime, "yyyy-MM-dd hh:mm:ss"));
+                metadataModel.setEventTime(DateUtil.parseDate(eventTime, parten));
+                metadataModel.setCreateDate(DateUtil.parseDate(createTime, parten));
                 metadataModel.setInnerVersion(version);
                 metadataModel.setDataset(dataset);
                 JsonNode recordNode = data.get(i);

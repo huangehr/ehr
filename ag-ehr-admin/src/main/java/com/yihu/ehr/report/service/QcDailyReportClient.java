@@ -67,21 +67,9 @@ public interface QcDailyReportClient {
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
     boolean addQcDailyReportDetailList(@RequestBody String models ) ;
 
-
     @RequestMapping(value = ServiceApi.Report.AddOrUpdateQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增修改质控包数据完整性详细数据日报")
     ObjectResult addOrUpdateQcDailyReportDetail(@RequestBody String model) ;
-
-
-
-
-    @RequestMapping(value = ServiceApi.Report.StatisticQuotaDataReportData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "统计指标日报数据")
-    void statisticQuotaDataReportData(
-            @RequestParam(value = "quotaId",required = true) String quotaId,
-            @RequestParam(value = "orgId",required = true) String orgId,
-            @RequestParam(value = "quotaDate",required = true) String quotaDate
-    );
 
     @RequestMapping(value = ServiceApi.Report.GetQcDailyReportPageList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件数据完整性详细分页列表")

@@ -25,7 +25,7 @@ public class QcDailyReportService extends BaseJpaService<QcDailyReport, XQcDaily
     @Autowired
     XQcDailyReportRepository xQcDailyReportRepository;
 
-    public Object getOrgData(String orgCode, Date quotaDate) {
+    public List<Object> getOrgData(String orgCode, Date quotaDate) {
         Session session = currentSession();
         String hql = "select qc.orgCode,qc.createDate,qc.totalOutpatientNum,qc.realOutpatientNum,qc.totalHospitalNum,qc.realHospitalNum,qc.id " +
                 "from QcDailyReport qc where  qc.orgCode=:orgCode and  TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 0 ";
@@ -33,29 +33,40 @@ public class QcDailyReportService extends BaseJpaService<QcDailyReport, XQcDaily
         query.setString("orgCode", orgCode);
         query.setDate("quotaDate", quotaDate);
         List<Object> list = query.list();
-        Object reObject = null;
         if(list.size()== 0) {
             return null;
         }else {
-            for(Object object :list){
-                reObject = object;
-            }
-            return reObject;
+            return list;
         }
 
     }
 
 
-    //查询昨天 和 去年当天的数据
-    public List<Object> getYesterdayAndLastYearTodayData(String orgCode,Date quotaDate, Date lasterYearQuotaDate) {
+    //查询昨天
+    public List<Object> getYesterdayData(String orgCode,Date quotaDate) {
         Session session = currentSession();
         String hql = "select qc.createDate,qc.realHospitalNum,qc.realOutpatientNum,qc.id " +
-                "from QcDailyReport qc where  qc.orgCode=:orgCode and ( TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 1 " +
-                "or TO_DAYS( :lasterYearQuotaDate) - TO_DAYS( qc.createDate) = 0 )";
+                "from QcDailyReport qc where  qc.orgCode=:orgCode and  TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 1 " ;
         Query query = session.createQuery(hql);
         query.setString("orgCode", orgCode);
         query.setDate("quotaDate", quotaDate);
-        query.setDate("lasterYearQuotaDate", lasterYearQuotaDate);
+        List<Object> list = query.list();
+        if(list.size()== 0) {
+            return null;
+        }else {
+            return list;
+        }
+
+    }
+
+    //当天的数据
+    public List<Object> getTodayData(String orgCode,Date quotaDate) {
+        Session session = currentSession();
+        String hql = "select qc.createDate,qc.realHospitalNum,qc.realOutpatientNum,qc.id " +
+                "from QcDailyReport qc where  qc.orgCode=:orgCode and  TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 0 " ;
+        Query query = session.createQuery(hql);
+        query.setString("orgCode", orgCode);
+        query.setDate("quotaDate", quotaDate);
         List<Object> list = query.list();
         if(list.size()== 0) {
             return null;

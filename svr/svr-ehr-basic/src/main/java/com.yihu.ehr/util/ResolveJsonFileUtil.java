@@ -1,10 +1,12 @@
 package com.yihu.ehr.util;
 
 import com.yihu.ehr.util.compress.Zipper;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 
 import java.io.*;
+import java.util.Date;
 
 /**
  * Created by janseny on 2017/5/9.
@@ -74,5 +76,11 @@ public class ResolveJsonFileUtil {
         }
     }
 
+    public static void  main (String args[]){
+        String s = "2017-06-08T11:40:37Z";
+        Date createDate = DateUtil.parseDate(s, "yyyy-MM-dd'T'HH:mm:ss");
+        System.out.println("");
+
+    }
 
 }
