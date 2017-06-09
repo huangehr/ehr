@@ -769,6 +769,15 @@ public class ServiceApi {
         public static final String GetTjDimensionSlaveList = "/tj/getTjDimensionSlaveList";
         public static final String TjDimensionSlave = "/tj/tjDimensionSlave";
 
+        public static final String GetTjDataSaveList = "/tj/getTjDataSaveList";
+        public static final String AddTjDataSave = "/tj/addTjDataSave";
+        public static final String DeleteTjDataSave = "/tj/deleteTjDataSave";
+
+        public static final String GetTjDataSourceList = "/tj/getTjDataSourceList";
+        public static final String AddTjDataSource = "/tj/addTjDataSource";
+        public static final String DeleteTjDataSource = "/tj/deletetTDataSource";
+
+
     }
 
 

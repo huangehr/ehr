@@ -1,7 +1,8 @@
 package com.yihu.ehr.entity.tj;
 
 import javax.persistence.*;
-import java.security.Timestamp;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 数据存储
@@ -9,15 +10,15 @@ import java.security.Timestamp;
  */
 @Entity
 @Table(name = "tj_data_save", schema = "", catalog = "healtharchive")
-public class TjDataSave {
+public class TjDataSave implements Serializable {
     private Long id;
     private String code;
     private String type;
     private String name;
-    private Timestamp createTime;
+    private Date createTime;
     private String createUser;
     private String createUserName;
-    private Timestamp updateTime;
+    private Date updateTime;
     private String updateUser;
     private String updateUserName;
     private String status;
@@ -62,11 +63,11 @@ public class TjDataSave {
     }
 
     @Column(name = "create_time", nullable = false)
-    public Timestamp getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Timestamp createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
@@ -89,11 +90,11 @@ public class TjDataSave {
     }
 
     @Column(name = "update_time", nullable = false)
-    public Timestamp getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Timestamp updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 
