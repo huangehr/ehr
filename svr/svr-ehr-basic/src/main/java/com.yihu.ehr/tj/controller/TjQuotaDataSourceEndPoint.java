@@ -5,10 +5,11 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.tj.TjDataSource;
+import com.yihu.ehr.entity.tj.TjQuotaDataSource;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
-import com.yihu.ehr.tj.service.TjDataSourceService;
+import com.yihu.ehr.tj.service.TjQuotaDataSourceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,15 +26,15 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "TjDataSource", description = "数据源", tags = {"统计指标管理-数据源"})
-public class TjDataSourceEndPoint extends EnvelopRestEndPoint {
+@Api(value = "TjQuotaDataSource", description = "统计数据源", tags = {"统计指标管理-统计数据源"})
+public class TjQuotaDataSourceEndPoint extends EnvelopRestEndPoint {
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
-    TjDataSourceService tjDataSourceService;
+    TjQuotaDataSourceService tjQuotaDataSourceService;
 
-    @RequestMapping(value = ServiceApi.TJ.GetTjDataSourceList, method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询数据源")
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDataSourceList, method = RequestMethod.GET)
+    @ApiOperation(value = "根据查询条件查询统计数据源")
     public ListResult getTjDataSourceList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -49,10 +50,10 @@ public class TjDataSourceEndPoint extends EnvelopRestEndPoint {
             HttpServletResponse response) throws Exception {
 
         ListResult listResult = new ListResult();
-        List<TjDataSource> tjDataSourceList = tjDataSourceService.search(fields, filters, sorts, page, size);
-        if(tjDataSourceList != null){
-            listResult.setDetailModelList(tjDataSourceList);
-            listResult.setTotalCount((int)tjDataSourceService.getCount(filters));
+        List<TjQuotaDataSource> tjQuotaDataSource = tjQuotaDataSourceService.search(fields, filters, sorts, page, size);
+        if(tjQuotaDataSource != null){
+            listResult.setDetailModelList(tjQuotaDataSource);
+            listResult.setTotalCount((int)tjQuotaDataSourceService.getCount(filters));
             listResult.setCode(200);
             listResult.setCurrPage(page);
             listResult.setPageSize(size);
@@ -64,23 +65,23 @@ public class TjDataSourceEndPoint extends EnvelopRestEndPoint {
         return listResult;
     }
 
-    @RequestMapping(value = ServiceApi.TJ.AddTjDataSource, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增&修改数据源")
+    @RequestMapping(value = ServiceApi.TJ.AddTjQuotaDataSource, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增&修改统计数据源")
     public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
-        TjDataSource obj = objectMapper.readValue(model,TjDataSource.class);
-        obj = tjDataSourceService.save(obj);
-        return Result.success("数据源更新成功！", obj);
+        TjQuotaDataSource obj = objectMapper.readValue(model,TjQuotaDataSource.class);
+        obj = tjQuotaDataSourceService.save(obj);
+        return Result.success("统计数据源更新成功！", obj);
     }
 
 
-    @RequestMapping(value = ServiceApi.TJ.DeleteTjDataSource, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除数据源")
+    @RequestMapping(value = ServiceApi.TJ.DeleteTjQuotaDataSource, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除统计数据源")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
-        tjDataSourceService.delete(id);
-        return Result.success("数据源删除成功！");
+        tjQuotaDataSourceService.delete(id);
+        return Result.success("统计数据源删除成功！");
     }
 }

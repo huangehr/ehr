@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "TjDataSave", description = "数据存储", tags = {"数据存储"})
+@Api(value = "TjDataSave", description = "数据存储", tags = {"统计指标管理-数据存储"})
 public class TjDataSaveEndPoint extends EnvelopRestEndPoint {
     @Autowired
     ObjectMapper objectMapper;

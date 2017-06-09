@@ -3,11 +3,11 @@ package com.yihu.ehr.tj.controller;
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.entity.tj.TjDataSave;
+import com.yihu.ehr.entity.tj.TjQuotaDataSave;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
-import com.yihu.ehr.tj.service.TjDataSaveClient;
+import com.yihu.ehr.tj.service.TjQuotaDataSaveClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -23,17 +23,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Administrator on 2017/6/8.
+ * Created by Administrator on 2017/6/9.
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api( value = "TjDataSave", description = "数据存储", tags = {"统计指标管理-数据存储"})
-public class TjDataSaveController extends ExtendController<TjDataSave> {
+@Api( value = "TjQuotaDataSave", description = "统计数据存储", tags = {"统计指标管理-统计数据存储"})
+public class TjQuotaDataSaveController extends ExtendController<TjQuotaDataSave> {
     @Autowired
-    TjDataSaveClient tjDataSaveClient;
+    TjQuotaDataSaveClient tjQuotaDataSaveClient;
 
-    @RequestMapping(value = ServiceApi.TJ.GetTjDataSaveList, method = RequestMethod.GET)
-    @ApiOperation(value = "数据存储信息表")
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDataSaveList, method = RequestMethod.GET)
+    @ApiOperation(value = "统计数据存储信息表")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -46,7 +46,7 @@ public class TjDataSaveController extends ExtendController<TjDataSave> {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
 
-        ListResult listResult = tjDataSaveClient.search(fields, filters, sorts, size, page);
+        ListResult listResult = tjQuotaDataSaveClient.search(fields, filters, sorts, size, page);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
            /* list = convertArApplyModels(list);*/
@@ -58,13 +58,13 @@ public class TjDataSaveController extends ExtendController<TjDataSave> {
     }
 
 
-    @RequestMapping(value = ServiceApi.TJ.AddTjDataSave, method = RequestMethod.POST)
-    @ApiOperation(value = "新增数据存储信息")
+    @RequestMapping(value = ServiceApi.TJ.AddTjQuotaDataSave, method = RequestMethod.POST)
+    @ApiOperation(value = "新增统计数据存储信息")
     public Envelop add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
         try {
-            ObjectResult objectResult = tjDataSaveClient.add(model);
+            ObjectResult objectResult = tjQuotaDataSaveClient.add(model);
             if (objectResult.getCode() == 200) {
                 return successObj(objectResult.getData());
             } else {
@@ -76,17 +76,17 @@ public class TjDataSaveController extends ExtendController<TjDataSave> {
         }
     }
 
-    @RequestMapping(value = ServiceApi.TJ.DeleteTjDataSave, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除数据存储信息")
+    @RequestMapping(value = ServiceApi.TJ.DeleteTjQuotaDataSave, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除统计数据存储信息")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) {
         try {
-            Result result = tjDataSaveClient.delete(id);
+            Result result = tjQuotaDataSaveClient.delete(id);
             if(result.getCode() == 200){
                 return successMsg(result.getMessage());
             }else{
-                return failed("数据存储信息删除失败！");
+                return failed("统计数据存储信息删除失败！");
             }
         }catch (Exception e){
             e.printStackTrace();

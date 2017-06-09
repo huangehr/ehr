@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api( value = "TjDataSource", description = "数据来源", tags = {"数据来源"})
+@Api( value = "TjDataSource", description = "数据来源", tags = {"统计指标管理-数据来源"})
 public class TjDataSourceController extends ExtendController<TjDataSource> {
     @Autowired
     TjDataSourceClient tjDataSourceClient;
