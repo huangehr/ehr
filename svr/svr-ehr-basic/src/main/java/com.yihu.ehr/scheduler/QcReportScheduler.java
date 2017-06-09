@@ -44,8 +44,8 @@ public class QcReportScheduler {
 	 * 解析由 ESB 系统上传上来的压缩包文件并入库
 	 * @throws Exception
 	 */
-//	@Scheduled(cron = "0 0 1 * * ?")
-	@Scheduled(cron = "0 0/1 * * * ?")
+	@Scheduled(cron = "0 0 1 * * ?")
+//	@Scheduled(cron = "0 0/1 * * * ?")
 	public void resolveFileScheduler() throws Exception{
 		resolveFile();
 	}
@@ -56,23 +56,34 @@ public class QcReportScheduler {
 	 * 统计数据质量的完整性 及时性
 	 * @throws Exception
 	 */
-//	@Scheduled(cron = "0 0 3 * * ?")
-	@Scheduled(cron = "0 0/6 * * * ?")//每两分钟
+	@Scheduled(cron = "0 0 3 * * ?")
+//	@Scheduled(cron = "0 0/2 * * * ?")//每2分钟
 	public void statisticalScheduler() throws Exception{
-		List<JsonReport> jsonReports = null;
+		List<Object> objectList = null;
+		List<JsonReport> jsonReportList = null;
 		try {
-			jsonReports = jsonReportService.getStatistJsonReportData(new Date());
-			if(!jsonReports.isEmpty()){
-				for(JsonReport jsonReport : jsonReports){
+			//  统计当天采集过来的数据    待修改为昨天
+			objectList = jsonReportService.getStatistOrgData(new Date());
+			if(!objectList.isEmpty()){
+				for(Object object : objectList){
+					String orgCode = object.toString();
 					for(int i = 1 ; i <= 7 ; i++){
 						long start = System.currentTimeMillis();
-						quotaStatisticsService.statisticQuotaData(String.valueOf(i), jsonReport.getOrgCode(), DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
-						jsonReportService.updateJsonReport(jsonReport.getId(),2);
+						quotaStatisticsService.statisticQuotaData(String.valueOf(i), orgCode, DateUtil.formatDate(new Date(), "yyyy-MM-dd"));
 						long end = System.currentTimeMillis();
-						String message = "机构：" + jsonReport.getOrgCode() + "，  统计数据质量的完整性 及时性- 调度执行完成，总耗时："+ (end-start);
+						String message = "机构：" + orgCode + "，  " + String.valueOf(i) + "统计数据质量的完整性 及时性- 调度执行完成，总耗时："+ (end-start);
 						System.out.println(message);
 						log.debug(message);
 					}
+				}
+			}
+
+			jsonReportList = jsonReportService.getJsonReportData(new Date());
+			if(!jsonReportList.isEmpty()) {
+				for (JsonReport jsonReport : jsonReportList) {
+					jsonReport.setStatus(2);
+					jsonReport.setStatisDate(new Date());
+					jsonReportService.updateJsonReport(jsonReport);
 				}
 			}
 		} catch (ParseException e) {
@@ -107,18 +118,22 @@ public class QcReportScheduler {
 			InputStream in = jsonReportService.downloadFile(id);
 			String toFile = TempPath + FileReportPath +  "/" + System.currentTimeMillis() +".zip";
 			String toDir = null;
+			String orgCode = "";
 			if(type == 1){
 				toDir = TempPath + FileDataPath;
 				CopyFileUtil.copyFile(in, toFile, true);
 				File file = new File(toFile);
-				qcDailyReportResolveService.resolveFile(file, password, toDir);
+				orgCode = qcDailyReportResolveService.resolveFile(file, password, toDir);
 			}else if(type == 2){
 				toDir = TempPath + FileReportPath;
 				CopyFileUtil.copyFile(in, toFile, true);
 				File file = new File(toFile);
-				qcDailyReportResolveService.resolveReportFile(file, password,toDir);
+				orgCode = qcDailyReportResolveService.resolveReportFile(file, password,toDir);
 			}
-			jsonReportService.updateJsonReport(id,1);
+			jsonReport.setStatus(1);
+			jsonReport.setReceiveDate(new Date());
+			jsonReport.setOrgCode(orgCode);
+			jsonReportService.updateJsonReport(jsonReport);
 			FileUtils.deleteDirectory(new File(toDir));
 		}catch (Exception e){
 			e.printStackTrace();
