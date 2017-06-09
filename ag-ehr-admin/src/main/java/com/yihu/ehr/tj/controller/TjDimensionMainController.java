@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * @author janseny
  * @version 1.0
- * @created 2017.5.9
+ * @created 2017.6.9
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
@@ -33,7 +33,7 @@ import java.util.Map;
 public class TjDimensionMainController extends ExtendController<TjDimensionMain> {
 
     @Autowired
-    TjDimensionMainClient qcQuotaDictClient;
+    TjDimensionMainClient qcTjDimensionMainClient;
 
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDimensionMainList, method = RequestMethod.GET)
@@ -50,10 +50,9 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
 
-        ListResult listResult = qcQuotaDictClient.search(fields, filters, sorts, size, page);
+        ListResult listResult = qcTjDimensionMainClient.search(fields, filters, sorts, size, page);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
-           /* list = convertArApplyModels(list);*/
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
             Envelop envelop = new Envelop();
@@ -68,7 +67,7 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
         try {
-            ObjectResult objectResult = qcQuotaDictClient.add(model);
+            ObjectResult objectResult = qcTjDimensionMainClient.add(model);
             if (objectResult.getCode() == 200) {
                 return successObj(objectResult.getData());
             } else {
@@ -86,7 +85,7 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) {
         try {
-            Result result = qcQuotaDictClient.delete(id);
+            Result result = qcTjDimensionMainClient.delete(id);
             if(result.getCode() == 200){
                 return successMsg(result.getMessage());
             }else{
