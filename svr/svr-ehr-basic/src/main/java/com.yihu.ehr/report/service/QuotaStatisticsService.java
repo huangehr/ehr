@@ -92,7 +92,7 @@ public class QuotaStatisticsService {
         int errorNum = 0;
         int timelyNum = 0;
         List<Object> objectList = qcDailyReportService.getOrgData(orgCode,quotaDate);
-        if( ! objectList.isEmpty()){
+        if(objectList != null && objectList.size() > 0){
             for(Object object :objectList){
                 Map<Integer,Object> mapVal  = converMapObject(object);
                 todayTolNum = todayTolNum + Integer.valueOf(mapVal.get(2).toString()) + Integer.valueOf(mapVal.get(4).toString());
@@ -117,7 +117,7 @@ public class QuotaStatisticsService {
     public int getRealCount(String orgCode,Date quotaDate){
         int todayRelNum = 0;
         List<Object> objectList = qcDailyReportService.getOrgData(orgCode,quotaDate);
-        if( ! objectList.isEmpty()) {
+        if(objectList != null && objectList.size() > 0){
             for (Object object : objectList) {
                 Map<Integer, Object> mapVal = converMapObject(object);
                 String storageFlag = "3";//解析成功入库
@@ -144,7 +144,7 @@ public class QuotaStatisticsService {
         int errorNum = 0;
         int timelyNum = 0;
         List<Object> objectList  = qcDailyReportDatasetsService.getOrgDatasetsData(orgCode, quotaDate);
-        if( ! objectList.isEmpty()) {
+        if(objectList != null && objectList.size() > 0){
             for (Object object : objectList) {
                 Map<Integer,Object> mapVal  = converMapObject(object);
                 todayTolNum = todayTolNum + Integer.valueOf(mapVal.get(2).toString());
@@ -177,7 +177,7 @@ public class QuotaStatisticsService {
         int yesterdayRelNum = 0;
         int lasetYearTodayRelNum = 0;
         List<Object> objectList  = qcDailyReportMetaDataService.getOrgMeataData(orgCode, quotaDate);
-        if(objectList != null){
+        if(objectList != null && objectList.size() > 0){
             List<Map<Integer,Object>> list  = converListObject(objectList);
             for(Map<Integer,Object> map : list){
                 todayTolNum = todayTolNum + Integer.valueOf(map.get(0).toString());
@@ -223,7 +223,7 @@ public class QuotaStatisticsService {
         int errorNum = 0;
         List<Object> objectList  = qcDailyReportMetaDataService.getOrgMeataData(orgCode, quotaDate);
         String errrCodeStr = "";
-        if(objectList != null){
+        if(objectList != null && objectList.size() > 0){
             List<Map<Integer,Object>> listVal = converListObject(objectList);
             for(Map<Integer,Object> map :listVal){
                 todayTolNum = todayTolNum + Integer.valueOf(map.get(0).toString());
@@ -258,7 +258,7 @@ public class QuotaStatisticsService {
         String storageFlag = "3";
         List<Object> objectList = qcDailyReportService.getOrgData(orgCode, quotaDate);
 
-        if( ! objectList.isEmpty()) {
+        if(objectList != null && objectList.size() > 0){
             for (Object object : objectList) {
                 Map<Integer,Object> mapVal  = converMapObject(object);
                 todayTolNum = todayTolNum + qcDailyReportService.getOrgDailyReportDetailCount(mapVal.get(6).toString(), null,archiveType,storageFlag);

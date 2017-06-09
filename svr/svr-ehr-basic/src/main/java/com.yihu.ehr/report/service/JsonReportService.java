@@ -97,17 +97,7 @@ public class JsonReportService extends BaseJpaService<JsonReport, XJsonReportRep
     }
 
     //更新解析状态 type 1 解析 2 统计
-    public JsonReport updateJsonReport(Integer id,int type) {
-        JsonReport aJsonReport = null;
-        aJsonReport = getRepo().findOne(id);
-        if(aJsonReport == null) return null;
-        if(type == 1 ){
-            aJsonReport.setParseDate(new Date());
-            aJsonReport.setStatus(1);
-        }else if(type == 2 ){
-            aJsonReport.setStatisDate(new Date());
-            aJsonReport.setStatus(2);
-        }
+    public JsonReport updateJsonReport(JsonReport aJsonReport) {
         getRepo().save(aJsonReport);
         return aJsonReport;
     }
@@ -131,7 +121,16 @@ public class JsonReportService extends BaseJpaService<JsonReport, XJsonReportRep
     }
 
 
-    public List<JsonReport> getStatistJsonReportData(Date statistsDate) {
+    public List<Object> getStatistOrgData(Date statistsDate) {
+        Session session = currentSession();
+        String hql = "select distinct(jr.orgCode) from JsonReport jr where  jr.status=1 and  TO_DAYS(:statistsDate) - TO_DAYS(jr.receiveDate) = 0 ";
+        Query query = session.createQuery(hql);
+        query.setDate("statistsDate", statistsDate);
+        List<Object> list = query.list();
+        return list;
+    }
+
+    public List<JsonReport> getJsonReportData(Date statistsDate) {
         Session session = currentSession();
         String hql = "select jr from JsonReport jr where  jr.status=1 and  TO_DAYS(:statistsDate) - TO_DAYS(jr.receiveDate) = 0 ";
         Query query = session.createQuery(hql);

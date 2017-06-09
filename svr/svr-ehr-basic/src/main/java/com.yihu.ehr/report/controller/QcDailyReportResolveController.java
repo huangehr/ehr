@@ -99,54 +99,5 @@ public class QcDailyReportResolveController extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = "/report/zipFileResolve", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "质控包数据文件接收解析入库", notes = "质控包数据文件接收解析入库")
-    public void zipFileResolve(
-            @ApiParam(name = "id", value = "质控包编号", defaultValue = "")
-            @RequestParam(required = false) Integer id) throws Exception {
-        try {
-            JsonReport jsonReport = jsonReportService.getJsonReport(id);
-            String orgCode = jsonReport.getOrgCode();
-            String password = jsonReport.getPwd();
-            InputStream in = jsonReportService.downloadFile(id);
-            String toFile = TempPath + FileDataPath +  "/" + System.currentTimeMillis() +".zip";
-            String toDir = TempPath + FileDataPath;
-            CopyFileUtil.copyFile(in,toFile,true);
-            File file = new File(toFile);
-            qcDailyReportResolveService.resolveFile(file, password,toDir);
-            jsonReportService.updateJsonReport(id,1);
-            FileUtils.deleteDirectory(new File(toDir));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
-    @RequestMapping(value = "/report/zipReportFileResolve", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "日报包数据文件接收解析入库", notes = "日报包数据文件接收解析入库")
-    public void zipReportFileResolve(
-            @ApiParam(name = "id", value = "质控包编号", defaultValue = "")
-            @RequestParam(required = false) Integer id) throws Exception {
-        try {
-            JsonReport jsonReport = jsonReportService.getJsonReport(id);
-            String orgCode = jsonReport.getOrgCode();
-            String password = jsonReport.getPwd();
-            InputStream in = jsonReportService.downloadFile(id);
-            String toFile = TempPath + FileReportPath +  "/" + System.currentTimeMillis() +".zip";
-            String toDir = TempPath + FileDataPath;
-            CopyFileUtil.copyFile(in,toFile,true);
-            File file = new File(toFile);
-            qcDailyReportResolveService.resolveReportFile(file, password, toDir);
-            jsonReportService.updateJsonReport(id,1);
-            FileUtils.deleteDirectory(new File(toDir));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-
-
-
-
 
 }

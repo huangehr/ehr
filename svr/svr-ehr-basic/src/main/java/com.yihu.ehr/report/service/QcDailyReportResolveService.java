@@ -52,8 +52,9 @@ public class QcDailyReportResolveService {
      * @param zipFile
      * @param password
      */
-    public void resolveFile(File zipFile,String password,String todir){
+    public String resolveFile(File zipFile,String password,String todir){
         ResolveJsonFileUtil rjfu = new ResolveJsonFileUtil();
+        String orgCode = "";
         try {
             File[] files = rjfu.unzip(zipFile,password,todir);
             QcDailyDatasetsModel dataSetsModel = new QcDailyDatasetsModel();
@@ -65,6 +66,7 @@ public class QcDailyReportResolveService {
                     QcDailyReportDatasets qcDailyReportDatasets = new QcDailyReportDatasets();
                     //解析json文件
                     dataSetsModel =  generateDataSet(file);
+                    orgCode = dataSetsModel.getOrgCode();
                     String parten = "yyyy-MM-dd hh:mm:ss";
                     if(dataSetsModel.getCreateDate().contains("T")){
                         parten = "yyyy-MM-dd'T'HH:mm:ss";
@@ -109,6 +111,7 @@ public class QcDailyReportResolveService {
         }catch (Exception e){
             e.getMessage();
         }
+        return orgCode;
     }
 
     /**
@@ -118,21 +121,17 @@ public class QcDailyReportResolveService {
      */
     public String resolveReportFile(File zipFile,String password,String todir){
         ResolveJsonFileUtil rjfu = new ResolveJsonFileUtil();
+        String orgCode = "";
         try {
             File[] files = rjfu.unzip(zipFile, password, todir);
             QcDailyEventsModel eventsModel = null;
             for (File file : files) {
                 eventsModel =  generateEventsData(file);
+                orgCode = eventsModel.getOrg_code();
                 QcDailyReport qcDailyReport = new QcDailyReport();
                 List<MQcDailyReportDetail> totalList = new ArrayList<>();
                 List<MQcDailyReportDetail> realList = new ArrayList<>();
                 if(eventsModel != null){
-                    if(StringUtils.isEmpty(eventsModel.getCreate_date())){
-                        return "采集时间不能为空";
-                    }
-                    if(StringUtils.isEmpty(eventsModel.getOrg_code())){
-                        return "机构编码不能为空";
-                    }
                     String parten = "yyyy-MM-dd hh:mm:ss";
                     if(eventsModel.getCreate_date().contains("T")){
                         parten = "yyyy-MM-dd'T'HH:mm:ss";
@@ -168,7 +167,7 @@ public class QcDailyReportResolveService {
         }catch (Exception e){
             e.getMessage();
         }
-        return  null;
+        return orgCode;
     }
 
 

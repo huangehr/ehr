@@ -93,6 +93,7 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
                 return failed("主纬度删除失败！");
             }
         }catch (Exception e){
+
             e.printStackTrace();
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
