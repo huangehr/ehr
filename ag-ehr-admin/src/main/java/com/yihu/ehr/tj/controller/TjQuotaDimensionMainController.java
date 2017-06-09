@@ -1,13 +1,17 @@
 package com.yihu.ehr.tj.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.tj.TjQuotaDimensionMainModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjDimensionMain;
+import com.yihu.ehr.entity.tj.TjQuotaDimensionMain;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.tj.service.TjDimensionMainClient;
+import com.yihu.ehr.tj.service.TjQuotaDimensionMainClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,15 +34,18 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api( value = "TjDimensionMain", description = "统计指标管理", tags = {"统计指标管理-主纬度"})
-public class TjDimensionMainController extends ExtendController<TjDimensionMain> {
+@Api( value = "TjQuotaDimensionMain", description = "统计指标", tags = {"统计指标管理-主纬度关联信息"})
+public class TjQuotaDimensionMainController extends ExtendController<TjQuotaDimensionMain> {
 
     @Autowired
+    TjQuotaDimensionMainClient tjQuotaDimensionMainClient;
+    @Autowired
     TjDimensionMainClient tjDimensionMainClient;
+    @Autowired
+    ObjectMapper objectMapper;
 
-
-    @RequestMapping(value = ServiceApi.TJ.GetTjDimensionMainList, method = RequestMethod.GET)
-    @ApiOperation(value = "主纬度列表")
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDimensionMainList, method = RequestMethod.GET)
+    @ApiOperation(value = "主纬度关联信息列表")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -50,23 +58,32 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page){
 
-        ListResult listResult = tjDimensionMainClient.search(fields, filters, sorts, size, page);
+        ListResult listResult = tjQuotaDimensionMainClient.search(fields, filters, sorts, size, page);
+        List<TjQuotaDimensionMainModel> mainModelList  = new ArrayList<>();;
         if(listResult.getTotalCount() != 0){
-            List<Map<String,Object>> list = listResult.getDetailModelList();
-            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            List<Map<String,Object>> modelList = listResult.getDetailModelList();
+            for(Map<String,Object> map : modelList){
+                TjQuotaDimensionMainModel tjQuotaQuotaDimensionMainModel = objectMapper.convertValue(map,TjQuotaDimensionMainModel.class);
+                TjDimensionMain tjDimensionMain = tjDimensionMainClient.getTjDimensionMain(tjQuotaQuotaDimensionMainModel.getMainCode());
+                if( tjDimensionMain != null ){
+                    tjQuotaQuotaDimensionMainModel.setName(tjDimensionMain.getName());
+                }
+                mainModelList.add(tjQuotaQuotaDimensionMainModel);
+            }
+            return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
             Envelop envelop = new Envelop();
             return envelop;
         }
     }
 
-    @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.POST)
-    @ApiOperation(value = "新增主纬度")
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.POST)
+    @ApiOperation(value = "新增主纬度关联信息")
     public Envelop add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
         try {
-            ObjectResult objectResult = tjDimensionMainClient.add(model);
+            ObjectResult objectResult = tjQuotaDimensionMainClient.add(model);
             if (objectResult.getCode() == 200) {
                 return successObj(objectResult.getData());
             } else {
@@ -78,17 +95,17 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
         }
     }
 
-    @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除主纬度")
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除主纬度关联信息")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) {
         try {
-            Result result = tjDimensionMainClient.delete(id);
+            Result result = tjQuotaDimensionMainClient.delete(id);
             if(result.getCode() == 200){
                 return successMsg(result.getMessage());
             }else{
-                return failed("主纬度删除失败！");
+                return failed("主纬度关联信息删除失败！");
             }
         }catch (Exception e){
 
