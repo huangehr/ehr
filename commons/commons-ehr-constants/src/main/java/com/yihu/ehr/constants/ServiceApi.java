@@ -765,10 +765,20 @@ public class ServiceApi {
 
         public static final String GetTjDimensionMainList = "/tj/getTjDimensionMainList";
         public static final String TjDimensionMain = "/tj/tjDimensionMain";
+        public static final String TjDimensionMainCode= "/tj/tjDimensionMain/Code";
 
         public static final String GetTjDimensionSlaveList = "/tj/getTjDimensionSlaveList";
         public static final String TjDimensionSlave = "/tj/tjDimensionSlave";
+        public static final String TjDimensionSlaveCode = "/tj/tjDimensionSlaveCode";
 
+        public static final String GetTjQuotaDimensionMainList = "/tj/getTjQuotaDimensionMainList";
+        public static final String TjQuotaDimensionMain = "/tj/tjQuotaDimensionMain";
+
+        public static final String GetTjQuotaDimensionSlaveList = "/tj/getTjQuotaDimensionSlaveList";
+        public static final String TjQuotaDimensionSlave = "/tj/tjQuotaDimensionSlave";
+
+
+        public static final String GetTjQuotaLogList = "/tj/getTjQuotaLogList";
     }
 
 

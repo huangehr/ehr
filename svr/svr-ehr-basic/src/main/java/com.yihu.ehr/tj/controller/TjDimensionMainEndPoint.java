@@ -85,4 +85,19 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
         tjDimensionMainService.delete(id);
         return Result.success("主纬度删除成功！");
     }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainCode, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "获取主纬度")
+    public TjDimensionMain getTjDimensionMain(
+            @ApiParam(name = "code", value = "code")
+            @RequestParam(value = "code") String code) throws Exception {
+        String filter = "code=" + code;
+        List<TjDimensionMain> tjDimensionMains = tjDimensionMainService.search(filter);
+        if(tjDimensionMains == null){
+            return null;
+        }else{
+            return  tjDimensionMains.get(0);
+        }
+    }
+
 }
