@@ -6,5 +6,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 /**
  * Created by Administrator on 2017/6/9.
  */
-public interface XTjDataSaveRepository extends PagingAndSortingRepository<TjDataSave, Integer> {
+public interface XTjDataSaveRepository extends PagingAndSortingRepository<TjDataSave, Long> {
 }

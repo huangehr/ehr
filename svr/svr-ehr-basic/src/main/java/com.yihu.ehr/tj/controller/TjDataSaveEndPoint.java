@@ -74,7 +74,6 @@ public class TjDataSaveEndPoint extends EnvelopRestEndPoint {
         return Result.success("数据存储更新成功！", obj);
     }
 
-
     @RequestMapping(value = ServiceApi.TJ.DeleteTjDataSave, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据存储")
     public Result delete(
@@ -82,5 +81,14 @@ public class TjDataSaveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "id") Long id) throws Exception{
         tjDataSaveService.delete(id);
         return Result.success("数据存储删除成功！");
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjDataSaveById, method = RequestMethod.GET)
+    @ApiOperation(value = "根据ID查询数据存储")
+    public TjDataSave getById(
+            @ApiParam(name = "id")
+            @PathVariable("id") Long id) {
+        TjDataSave tjDataSave = tjDataSaveService.getById(id);
+        return tjDataSave;
     }
 }

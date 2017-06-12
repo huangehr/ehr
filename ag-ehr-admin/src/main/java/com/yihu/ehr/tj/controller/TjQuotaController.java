@@ -15,10 +15,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -50,7 +47,6 @@ public class TjQuotaController extends ExtendController<TjQuota> {
         ListResult listResult = tjQuotaClient.search(fields, filters, sorts, size, page);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
-           /* list = convertArApplyModels(list);*/
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
             Envelop envelop = new Envelop();
@@ -92,6 +88,21 @@ public class TjQuotaController extends ExtendController<TjQuota> {
         }catch (Exception e){
             e.printStackTrace();
             return failed(FeignExceptionUtils.getErrorMsg(e));
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaById, method = RequestMethod.GET)
+    @ApiOperation(value = "根据ID查询指标")
+    public Envelop getById(@PathVariable(value = "id") Long id) {
+        try {
+            TjQuota tjQuota = tjQuotaClient.getById(id);
+            if (null == tjQuota) {
+                return failed("获取指标失败");
+            }
+            return success(tjQuota);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failedSystem();
         }
     }
 }

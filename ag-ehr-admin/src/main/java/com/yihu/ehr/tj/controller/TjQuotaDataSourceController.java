@@ -50,7 +50,6 @@ public class TjQuotaDataSourceController extends ExtendController<TjQuotaDataSav
         ListResult listResult = tjQuotaDataSourceClient.search(fields, filters, sorts, size, page);
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
-           /* list = convertArApplyModels(list);*/
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
             Envelop envelop = new Envelop();

@@ -83,4 +83,13 @@ public class TjDataSourceEndPoint extends EnvelopRestEndPoint {
         tjDataSourceService.delete(id);
         return Result.success("数据源删除成功！");
     }
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjDataSourceById, method = RequestMethod.GET)
+    @ApiOperation(value = "根据ID获取数据源")
+    public TjDataSource getById(
+            @ApiParam(name = "id")
+            @PathVariable(value = "id") Long id) {
+        TjDataSource tjDataSource = tjDataSourceService.getById(id);
+        return tjDataSource;
+    }
 }

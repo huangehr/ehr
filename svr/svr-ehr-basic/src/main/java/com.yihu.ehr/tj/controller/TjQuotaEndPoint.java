@@ -84,4 +84,13 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         tjQuotaService.delete(id);
         return Result.success("统计表删除成功！");
     }
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaById, method = RequestMethod.GET)
+    @ApiOperation(value = "根据ID获取指标")
+    public TjQuota getById(
+            @ApiParam(name = "id")
+            @PathVariable(value = "id") Long id) {
+        TjQuota tjQuota = tjQuotaService.getById(id);
+        return tjQuota;
+    }
 }
