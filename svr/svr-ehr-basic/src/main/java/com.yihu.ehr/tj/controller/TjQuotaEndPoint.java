@@ -6,13 +6,18 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.tj.TjQuota;
 import com.yihu.ehr.entity.tj.TjQuotaDataSave;
+import com.yihu.ehr.entity.tj.TjQuotaDataSource;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.tj.MTjQuotaDataSaveModel;
+import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.model.tj.MTjquotaDataSourceModel;
 import com.yihu.ehr.tj.service.TjQuotaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -70,9 +75,23 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
-        TjQuota obj = objectMapper.readValue(model, TjQuota.class);
+        /*TjQuota obj = objectMapper.readValue(model, TjQuota.class);
         obj = tjQuotaService.save(obj);
-        return Result.success("统计表更新成功！", obj);
+        return Result.success("统计表更新成功！", obj);*/
+        MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
+        if (null == tjQuotaModel) {
+            return Result.success("数据有误", tjQuotaModel);
+        }
+        TjQuotaDataSource tjquotaDataSource = new TjQuotaDataSource();
+        BeanUtils.copyProperties(tjQuotaModel.getTjquotaDataSourceModel(), tjquotaDataSource);
+        TjQuotaDataSave tjQuotaDataSave = new TjQuotaDataSave();
+        BeanUtils.copyProperties(tjQuotaModel.getTjQuotaDataSaveModel(),tjQuotaDataSave);
+        tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
+        tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
+        TjQuota tjQuota = new TjQuota();
+        BeanUtils.copyProperties(tjQuotaModel, tjQuota);
+        tjQuotaService.saves(tjQuota, tjquotaDataSource, tjQuotaDataSave);
+        return Result.success("统计表更新成功！", tjQuotaModel);
     }
 
 
