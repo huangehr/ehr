@@ -34,7 +34,7 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api( value = "TjQuotaDimensionMain", description = "统计指标", tags = {"统计指标管理-主纬度关联信息"})
+@Api( value = "TjQuotaDimensionMain", description = "统计指标", tags = {"统计指标管理-主维度关联信息"})
 public class TjQuotaDimensionMainController extends ExtendController<TjQuotaDimensionMain> {
 
     @Autowired
@@ -45,7 +45,7 @@ public class TjQuotaDimensionMainController extends ExtendController<TjQuotaDime
     ObjectMapper objectMapper;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDimensionMainList, method = RequestMethod.GET)
-    @ApiOperation(value = "主纬度关联信息列表")
+    @ApiOperation(value = "主维度关联信息列表")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -78,7 +78,7 @@ public class TjQuotaDimensionMainController extends ExtendController<TjQuotaDime
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.POST)
-    @ApiOperation(value = "新增主纬度关联信息")
+    @ApiOperation(value = "新增/修改主维度关联信息")
     public Envelop add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
@@ -96,7 +96,7 @@ public class TjQuotaDimensionMainController extends ExtendController<TjQuotaDime
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除主纬度关联信息")
+    @ApiOperation(value = "删除主维度关联信息")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) {
@@ -105,7 +105,7 @@ public class TjQuotaDimensionMainController extends ExtendController<TjQuotaDime
             if(result.getCode() == 200){
                 return successMsg(result.getMessage());
             }else{
-                return failed("主纬度关联信息删除失败！");
+                return failed("主维度关联信息删除失败！");
             }
         }catch (Exception e){
 

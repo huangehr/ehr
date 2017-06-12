@@ -24,7 +24,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public interface TjDimensionSlaveClient {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDimensionSlaveList, method = RequestMethod.GET)
-    @ApiOperation(value = "数据从纬度列表")
+    @ApiOperation(value = "数据从维度列表")
     ListResult search(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
@@ -34,15 +34,19 @@ public interface TjDimensionSlaveClient {
 
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增从纬度")
+    @ApiOperation(value = "新增/修改从维度")
     ObjectResult add(@RequestBody String model) ;
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除从纬度")
+    @ApiOperation(value = "删除从维度")
     Result delete(@RequestParam(value = "id") String id);
 
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveId, method = RequestMethod.GET)
+    @ApiOperation(value = "获取从维度信息", notes = "通知从维度信息")
+    TjDimensionSlave getTjDimensionSlave(@PathVariable(value = "id") Integer id);
+
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveCode, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "根据ID获取从纬度")
+    @ApiOperation(value = "根据ID获取从维度")
     public TjDimensionSlave getTjDimensionSlave(
             @RequestParam(value = "code") String code);
 }

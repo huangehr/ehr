@@ -14,10 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +26,7 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api( value = "TjDimensionMain", description = "统计指标管理", tags = {"统计指标管理-主纬度"})
+@Api( value = "TjDimensionMain", description = "统计指标管理", tags = {"统计指标管理-主维度"})
 public class TjDimensionMainController extends ExtendController<TjDimensionMain> {
 
     @Autowired
@@ -37,7 +34,7 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
 
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDimensionMainList, method = RequestMethod.GET)
-    @ApiOperation(value = "主纬度列表")
+    @ApiOperation(value = "主维度列表")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -60,8 +57,26 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
         }
     }
 
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainId, method = RequestMethod.GET)
+    @ApiOperation(value = "获取主维度信息", notes = "主维度")
+    public Envelop getTjDimensionMain(
+            @ApiParam(name = "id", value = "", defaultValue = "")
+            @PathVariable(value = "id") Integer id) {
+        try {
+            TjDimensionMain tjDimensionMain = tjDimensionMainClient.getTjDimensionMain(id);
+            if (tjDimensionMain == null) {
+                return failed("主维度信息获取失败!");
+            }
+            return success(tjDimensionMain);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.POST)
-    @ApiOperation(value = "新增主纬度")
+    @ApiOperation(value = "新增/修改主维度")
     public Envelop add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
@@ -79,7 +94,7 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除主纬度")
+    @ApiOperation(value = "删除主维度")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) {
@@ -88,7 +103,7 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             if(result.getCode() == 200){
                 return successMsg(result.getMessage());
             }else{
-                return failed("主纬度删除失败！");
+                return failed("主维度删除失败！");
             }
         }catch (Exception e){
 

@@ -14,10 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +26,7 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api( value = "TjDimensionSlave", description = "统计指标管理", tags = {"统计指标管理-从纬度"})
+@Api( value = "TjDimensionSlave", description = "统计指标管理", tags = {"统计指标管理-从维度"})
 public class TjDimensionSlaveController extends ExtendController<TjDimensionSlave> {
 
     @Autowired
@@ -37,7 +34,7 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
 
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDimensionSlaveList, method = RequestMethod.GET)
-    @ApiOperation(value = "从纬度列表")
+    @ApiOperation(value = "从维度列表")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -62,7 +59,7 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
 
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.POST)
-    @ApiOperation(value = "新增从纬度")
+    @ApiOperation(value = "新增/修改从维度")
     public Envelop add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
@@ -79,8 +76,26 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
         }
     }
 
+    @RequestMapping(value =  ServiceApi.TJ.TjDimensionSlaveId, method = RequestMethod.GET)
+    @ApiOperation(value = "获取从维度信息", notes = "从维度")
+    public Envelop getTjDimensionSlave(
+            @ApiParam(name = "id", value = "", defaultValue = "")
+            @PathVariable(value = "id") Integer id) {
+        try {
+            TjDimensionSlave tjDimensionSlave = tjDimensionSlaveClient.getTjDimensionSlave(id);
+            if (tjDimensionSlave == null) {
+                return failed("从维度信息获取失败!");
+            }
+            return success(tjDimensionSlave);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除从纬度")
+    @ApiOperation(value = "删除从维度")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) {
@@ -89,7 +104,7 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
             if(result.getCode() == 200){
                 return successMsg(result.getMessage());
             }else{
-                return failed("从纬度删除失败！");
+                return failed("从维度删除失败！");
             }
         }catch (Exception e){
 

@@ -34,7 +34,7 @@ public class TjQuotaLogController extends ExtendController<TjQuotaLog> {
 
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaLogList, method = RequestMethod.GET)
-    @ApiOperation(value = "主纬度列表")
+    @ApiOperation(value = "主维度列表")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,

@@ -8,6 +8,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * @version 1.0
  * @created 2017/5/08
  */
-public interface XTjDimensionMainRepository extends PagingAndSortingRepository<TjDimensionMain, Integer> {
+public interface XTjDimensionMainRepository extends PagingAndSortingRepository<TjDimensionMain, Long> {
 
 }

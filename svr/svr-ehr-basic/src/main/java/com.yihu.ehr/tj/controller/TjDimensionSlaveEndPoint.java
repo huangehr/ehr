@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "TjDimensionSlave", description = "从纬度", tags = {"从纬度"})
+@Api(value = "TjDimensionSlave", description = "从维度", tags = {"从维度"})
 public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -36,7 +36,7 @@ public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
     TjDimensionSlaveService tjDimensionSlaveService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDimensionSlaveList, method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询从纬度")
+    @ApiOperation(value = "根据查询条件查询从维度")
     public ListResult getTjDimensionSlaveList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -68,27 +68,33 @@ public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增&修改从纬度")
+    @ApiOperation(value = "新增&修改从维度")
     public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         TjDimensionSlave obj = objectMapper.readValue(model, TjDimensionSlave.class);
         obj = tjDimensionSlaveService.save(obj);
-        return Result.success("从纬度更新成功！", obj);
+        return Result.success("从维度更新成功！", obj);
     }
 
 
-    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除从纬度")
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.GET)
+    @ApiOperation(value = "删除从维度")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) throws Exception{
         tjDimensionSlaveService.delete(id);
-        return Result.success("从纬度删除成功！");
+        return Result.success("从维度删除成功！");
     }
 
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveId, method = RequestMethod.GET)
+    @ApiOperation(value = "获取从维度信息", notes = "通知从维度信息")
+    TjDimensionSlave getTjDimensionSlave(@PathVariable(value = "id") Integer id){
+        return tjDimensionSlaveService.getTjDimensionSlave(id);
+    };
+
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveCode, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "获取主纬度")
+    @ApiOperation(value = "获取从维度")
     public TjDimensionSlave getTjDimensionSlave(
             @ApiParam(name = "code", value = "code")
             @RequestParam(value = "code") String code) throws Exception {

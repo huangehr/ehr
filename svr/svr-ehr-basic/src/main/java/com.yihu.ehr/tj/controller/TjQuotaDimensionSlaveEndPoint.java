@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "TjQuotaDimensionSlave", description = "统计指标从纬度关联信息", tags = {"从统计指标从纬度关联信息"})
+@Api(value = "TjQuotaDimensionSlave", description = "统计指标从维度关联信息", tags = {"从统计指标从维度关联信息"})
 public class TjQuotaDimensionSlaveEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -35,7 +35,7 @@ public class TjQuotaDimensionSlaveEndPoint extends EnvelopRestEndPoint {
     TjQuotaDimensionSlaveService tjQuotaDimensionSlaveService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDimensionSlaveList, method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询统计指标从纬度关联信息")
+    @ApiOperation(value = "根据查询条件查询统计指标从维度关联信息")
     public ListResult getTjQuotaDimensionSlaveList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -67,22 +67,22 @@ public class TjQuotaDimensionSlaveEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionSlave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增&修改统计指标从纬度关联信息")
+    @ApiOperation(value = "新增&修改统计指标从维度关联信息")
     public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         TjQuotaDimensionSlave obj = objectMapper.readValue(model, TjQuotaDimensionSlave.class);
         obj = tjQuotaDimensionSlaveService.save(obj);
-        return Result.success("统计指标从纬度关联信息更新成功！", obj);
+        return Result.success("统计指标从维度关联信息更新成功！", obj);
     }
 
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionSlave, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除统计指标从纬度关联信息")
+    @ApiOperation(value = "删除统计指标从维度关联信息")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) throws Exception{
         tjQuotaDimensionSlaveService.delete(id);
-        return Result.success("统计指标从纬度关联信息删除成功！");
+        return Result.success("统计指标从维度关联信息删除成功！");
     }
 }

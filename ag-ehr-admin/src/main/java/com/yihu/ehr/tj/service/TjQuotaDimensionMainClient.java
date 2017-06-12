@@ -26,7 +26,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public interface TjQuotaDimensionMainClient {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDimensionMainList, method = RequestMethod.GET)
-    @ApiOperation(value = "数据统计主纬度关联信息列表")
+    @ApiOperation(value = "数据统计主维度关联信息列表")
     ListResult search(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
@@ -35,11 +35,11 @@ public interface TjQuotaDimensionMainClient {
             @RequestParam(value = "page", required = false) int page);
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增主纬度关联信息")
+    @ApiOperation(value = "新增/修改主维度关联信息")
     ObjectResult add(@RequestBody String model) ;
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除主纬度关联信息")
+    @ApiOperation(value = "删除主维度关联信息")
     Result delete(@RequestParam(value = "id") String id);
 
 }

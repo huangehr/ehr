@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "TjQuotaDimensionMain", description = "统计指标主纬度关联信息", tags = {"统计指标主纬度关联信息"})
+@Api(value = "TjQuotaDimensionMain", description = "统计指标主维度关联信息", tags = {"统计指标主维度关联信息"})
 public class TjQuotaDimensionMainEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -35,7 +35,7 @@ public class TjQuotaDimensionMainEndPoint extends EnvelopRestEndPoint {
     TjQuotaDimensionMainService tjQuotaDimensionMainService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDimensionMainList, method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询统计指标主纬度关联信息")
+    @ApiOperation(value = "根据查询条件查询统计指标主维度关联信息")
     public ListResult getTjQuotaDimensionMainList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -67,22 +67,22 @@ public class TjQuotaDimensionMainEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增&修改统计指标主纬度关联信息")
+    @ApiOperation(value = "新增&修改统计指标主维度关联信息")
     public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         TjQuotaDimensionMain obj = objectMapper.readValue(model, TjQuotaDimensionMain.class);
         obj = tjQuotaDimensionMainService.save(obj);
-        return Result.success("统计指标主纬度关联信息更新成功！", obj);
+        return Result.success("统计指标主维度关联信息更新成功！", obj);
     }
 
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除统计指标主纬度关联信息")
+    @ApiOperation(value = "删除统计指标主维度关联信息")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) throws Exception{
         tjQuotaDimensionMainService.delete(id);
-        return Result.success("统计指标主纬度关联信息删除成功！");
+        return Result.success("统计指标主维度关联信息删除成功！");
     }
 }
