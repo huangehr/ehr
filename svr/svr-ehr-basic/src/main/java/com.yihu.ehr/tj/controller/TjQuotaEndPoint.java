@@ -17,6 +17,7 @@ import com.yihu.ehr.tj.service.TjQuotaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -79,9 +80,6 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         obj = tjQuotaService.save(obj);
         return Result.success("统计表更新成功！", obj);*/
         MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
-        if (null == tjQuotaModel) {
-            return Result.success("数据有误", tjQuotaModel);
-        }
         TjQuotaDataSource tjquotaDataSource = new TjQuotaDataSource();
         BeanUtils.copyProperties(tjQuotaModel.getTjquotaDataSourceModel(), tjquotaDataSource);
         TjQuotaDataSave tjQuotaDataSave = new TjQuotaDataSave();
