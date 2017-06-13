@@ -76,18 +76,12 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
-        /*TjQuota obj = objectMapper.readValue(model, TjQuota.class);
-        obj = tjQuotaService.save(obj);
-        return Result.success("统计表更新成功！", obj);*/
         MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
-        TjQuotaDataSource tjquotaDataSource = new TjQuotaDataSource();
-        BeanUtils.copyProperties(tjQuotaModel.getTjquotaDataSourceModel(), tjquotaDataSource);
-        TjQuotaDataSave tjQuotaDataSave = new TjQuotaDataSave();
-        BeanUtils.copyProperties(tjQuotaModel.getTjQuotaDataSaveModel(),tjQuotaDataSave);
+        TjQuotaDataSource tjquotaDataSource = convertToModel(tjQuotaModel.getTjquotaDataSourceModel(), TjQuotaDataSource.class);
+        TjQuotaDataSave tjQuotaDataSave = convertToModel(tjQuotaModel.getTjQuotaDataSaveModel(), TjQuotaDataSave.class);
         tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
         tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
-        TjQuota tjQuota = new TjQuota();
-        BeanUtils.copyProperties(tjQuotaModel, tjQuota);
+        TjQuota tjQuota = convertToModel(tjQuotaModel, TjQuota.class);
         tjQuotaService.saves(tjQuota, tjquotaDataSource, tjQuotaDataSave);
         return Result.success("统计表更新成功！", tjQuotaModel);
     }
