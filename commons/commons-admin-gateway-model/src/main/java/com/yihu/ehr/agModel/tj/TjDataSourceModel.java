@@ -22,7 +22,7 @@ public class TjDataSourceModel {
     private Date updateTime;
     private String updateUser;
     private String updateUserName;
-    private String status;
+    private Integer status;
     private String remark;
     private String typeName;
     private String statusName;
@@ -59,11 +59,11 @@ public class TjDataSourceModel {
         this.type = type;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

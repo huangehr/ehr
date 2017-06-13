@@ -105,4 +105,16 @@ public class TjQuotaController extends ExtendController<TjQuota> {
             return failedSystem();
         }
     }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsName, method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(@PathVariable("name") String name) {
+        return tjQuotaClient.hasExistsName(name);
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsCode, method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(@PathVariable("code") String code) {
+        return tjQuotaClient.hasExistsCode(code);
+    }
 }

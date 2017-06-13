@@ -121,4 +121,16 @@ public class TjDataSourceController extends ExtendController<TjDataSource> {
             return failedSystem();
         }
     }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDataSourceExistsName, method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(@PathVariable("name") String name) {
+        return tjDataSourceClient.hasExistsName(name);
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDataSourceExistsCode, method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(@PathVariable("code") String code) {
+        return tjDataSourceClient.hasExistsCode(code);
+    }
 }

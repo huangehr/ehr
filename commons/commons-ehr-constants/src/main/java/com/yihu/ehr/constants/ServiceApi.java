@@ -792,6 +792,8 @@ public class ServiceApi {
         public static final String AddTjDataSource = "/tj/addTjDataSource";
         public static final String DeleteTjDataSource = "/tj/deletetTjDataSource";
         public static final String GetTjDataSourceById = "/tj/getTjDataSourceById/{id}";
+        public static final String TjDataSourceExistsName = "/tj/tjDataSourceExistsName/{name}";
+        public static final String TjDataSourceExistsCode = "/tj/tjDataSourceExistsCode/{code}";
 
         public static final String GetTjQuotaDataSaveList = "tj/getTjQuotaDataSaveList";
         public static final String AddTjQuotaDataSave = "tj/addTjQuotaDataSave";
@@ -805,6 +807,8 @@ public class ServiceApi {
         public static final String AddTjQuota = "tj/addTjQuota";
         public static final String DeleteTjQuota = "tj/deleteTjQuota";
         public static final String GetTjQuotaById = "tj/getTjQuotaById/{id}";
+        public static final String TjQuotaExistsName = "/tj/tjQuotaExistsName/{name}";
+        public static final String TjQuotaExistsCode = "/tj/tjQuotaExistsCode/{code}";
     }
 
 

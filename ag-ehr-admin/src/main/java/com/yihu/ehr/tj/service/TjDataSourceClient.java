@@ -40,4 +40,12 @@ public interface TjDataSourceClient {
     @RequestMapping(value = ServiceApi.TJ.GetTjDataSourceById, method = RequestMethod.GET)
     @ApiOperation(value = "根据ID查询数据源")
     TjDataSource getById(@PathVariable(value = "id") Long id);
+
+    @RequestMapping(value = ServiceApi.TJ.TjDataSourceExistsName, method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    boolean hasExistsName(@PathVariable("name") String name);
+
+    @RequestMapping(value = ServiceApi.TJ.TjDataSourceExistsCode, method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    boolean hasExistsCode(@PathVariable("code") String code);
 }

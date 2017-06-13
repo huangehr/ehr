@@ -88,7 +88,10 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
-        tjQuotaService.delete(id);
+//        tjQuotaService.delete(id);
+        TjQuota tjQuota = tjQuotaService.getById(id);
+        tjQuota.setStatus(-1);
+        tjQuotaService.save(tjQuota);
         return Result.success("统计表删除成功！");
     }
 
@@ -99,5 +102,31 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") Long id) {
         TjQuota tjQuota = tjQuotaService.getById(id);
         return tjQuota;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsName, method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(
+            @ApiParam(name = "name")
+            @PathVariable("name") String name) throws Exception {
+        String filter = "name=" + name;
+        List<TjQuota> list = tjQuotaService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsCode, method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(
+            @ApiParam(name = "code")
+            @PathVariable("code") String code) throws Exception {
+        String filter = "code=" + code;
+        List<TjQuota> list = tjQuotaService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
     }
 }

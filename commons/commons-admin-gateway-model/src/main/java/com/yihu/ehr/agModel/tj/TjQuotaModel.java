@@ -19,7 +19,7 @@ public class TjQuotaModel {
     private Date updateTime;
     private String updateUser;
     private String updateUserName;
-    private String status;
+    private Integer status;
     private Integer dataLevel;
     private String remark;
     private TjQuotaDataSourceModel tjQuotaDataSourceModel;
@@ -129,11 +129,11 @@ public class TjQuotaModel {
         this.updateUserName = updateUserName;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

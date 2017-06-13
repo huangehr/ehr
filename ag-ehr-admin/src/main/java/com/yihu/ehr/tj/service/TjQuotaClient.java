@@ -40,4 +40,12 @@ public interface TjQuotaClient {
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaById, method = RequestMethod.GET)
     @ApiOperation(value = "根据ID查询指标")
     TjQuota getById(@PathVariable(value = "id") Long id);
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsName, method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    boolean hasExistsName(@PathVariable("name") String name);
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsCode, method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    boolean hasExistsCode(@PathVariable("code") String code);
 }

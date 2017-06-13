@@ -79,7 +79,10 @@ public class TjDataSaveEndPoint extends EnvelopRestEndPoint {
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
-        tjDataSaveService.delete(id);
+//        tjDataSaveService.delete(id);
+        TjDataSave tjDataSave = tjDataSaveService.getById(id);
+        tjDataSave.setStatus(-1);
+        tjDataSaveService.save(tjDataSave);
         return Result.success("数据存储删除成功！");
     }
 
