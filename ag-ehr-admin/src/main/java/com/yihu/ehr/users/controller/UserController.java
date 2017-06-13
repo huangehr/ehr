@@ -76,6 +76,7 @@ public class UserController extends BaseController {
     @Autowired
     private FileResourceClient fileResourceClient;
 
+
     private String resetFilter(String filters) {
 
         if(!StringUtils.isEmpty(filters)){
@@ -704,6 +705,27 @@ public class UserController extends BaseController {
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(appFeatureModels);
         return envelop;
+    }
+
+    @RequestMapping(value = "users/getImage/{imageId}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户信息", notes = "包括地址信息等")
+    public String getImage(
+            @ApiParam(name = "imageId", value = "", defaultValue = "")
+            @PathVariable(value = "imageId") String imageId) {
+
+        try {
+           String imagePath= fileResourceClient.imageFindById(imageId);
+            if (imagePath == null) {
+                return "用户头像获取失败!";
+            }
+
+            return imagePath;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return "";
+        }
     }
 
 }

@@ -1,7 +1,8 @@
 package com.yihu.ehr.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.agModel.report.QcDailyMetadataModel;
+import com.yihu.ehr.model.report.json.QcDailyMetadataModel;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -27,26 +28,35 @@ public class QcMetadataParser {
      * @param root
      * @return
      */
-    public static List<QcDailyMetadataModel> parseStructuredJsonMetadateModel(JsonNode root) {
+    public static List<QcDailyMetadataModel> parseStructuredJsonMetadateModel(JsonNode root,String parentDirectory) {
+
+        if(!parentDirectory.contains("empty") && !parentDirectory.contains("error") ){
+            return null;
+        }
 
         List<QcDailyMetadataModel> metadataModels = new ArrayList<>();
-
         String orgCode = root.get("org_code").asText();
         String createTime = root.get("create_date").isNull() ? "" : root.get("create_date").asText();
         String eventTime = root.path("event_time").isNull() ? "" : root.path("event_time").asText();
         String version = root.get("inner_version").asText();
-        String dataset = root.get("dataset").asText();
+        String dataset = root.get("code").asText();
+        String parten = "yyyy-MM-dd hh:mm:ss";
+        if(createTime.contains("T")){
+            parten = "yyyy-MM-dd'T'HH:mm:ss";
+        }
         try {
             JsonNode data = root.get("data");
             for (int i = 0; i < data.size(); ++i) {
                 QcDailyMetadataModel metadataModel = new QcDailyMetadataModel();
                 metadataModel.setOrgCode(orgCode);
-                metadataModel.setEventTime(eventTime);
-                metadataModel.setCreateDate(createTime);
+                metadataModel.setEventTime(DateUtil.parseDate(eventTime, parten));
+                metadataModel.setCreateDate(DateUtil.parseDate(createTime, parten));
                 metadataModel.setInnerVersion(version);
                 metadataModel.setDataset(dataset);
                 JsonNode recordNode = data.get(i);
                 Iterator<Map.Entry<String, JsonNode>> iterator = recordNode.fields();
+                String metadate = "";
+                String error = "";
                 while (iterator.hasNext()) {
                     Map.Entry<String, JsonNode> item = iterator.next();
                     String key =  item.getKey();
@@ -58,9 +68,15 @@ public class QcMetadataParser {
                         metadataModel.setErrorQty(Integer.valueOf(val));
                     }else{
                         String val = item.getValue().asText().equals("null") ? "" : item.getValue().asText();
-                        metadataModel.setMetadate(key);
-                        metadataModel.setErrCode(val);
+                        metadate = metadate + key + ";";
+                        error =  error + val  + ";";
                     }
+                }
+                metadataModel.setMetadate(metadate);
+                if(parentDirectory.contains("empty") && error.length() > 0 ){
+                    metadataModel.setErrCode("is null");
+                }else {
+                    metadataModel.setErrCode(error.length()>2000?error.substring(0,2000):error );//
                 }
                 metadataModels.add(metadataModel);
             }

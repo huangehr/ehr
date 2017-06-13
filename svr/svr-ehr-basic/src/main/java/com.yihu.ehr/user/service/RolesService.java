@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Created by yww on 2016/7/7.
  */
@@ -22,5 +24,13 @@ public class RolesService extends BaseJpaService<Roles,XRolesRepository> {
     public Page<Roles> getRolesList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return rolesRepository.findAll(pageable);
+    }
+
+    public Roles getRoleByRoleId(long roleId) {
+        return rolesRepository.findById(roleId);
+    }
+
+    public List<Roles> getRoleByAppId(String appId) {
+        return rolesRepository.findByAppId(appId);
     }
 }

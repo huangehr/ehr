@@ -8,13 +8,17 @@ import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.report.MQcDailyReport;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -63,21 +67,9 @@ public interface QcDailyReportClient {
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
     boolean addQcDailyReportDetailList(@RequestBody String models ) ;
 
-
     @RequestMapping(value = ServiceApi.Report.AddOrUpdateQcDailyReportDetail, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增修改质控包数据完整性详细数据日报")
     ObjectResult addOrUpdateQcDailyReportDetail(@RequestBody String model) ;
-
-
-
-
-    @RequestMapping(value = ServiceApi.Report.StatisticQuotaDataReportData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "统计指标日报数据")
-    void statisticQuotaDataReportData(
-            @RequestParam(value = "quotaId",required = true) String quotaId,
-            @RequestParam(value = "orgId",required = true) String orgId,
-            @RequestParam(value = "quotaDate",required = true) String quotaDate
-    );
 
     @RequestMapping(value = ServiceApi.Report.GetQcDailyReportPageList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件数据完整性详细分页列表")
@@ -88,5 +80,19 @@ public interface QcDailyReportClient {
             @RequestParam(value = "endDate", required = false) Date endDate,
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page);
+
+
+
+    @RequestMapping(value ="/report/receiveReportFile", method = RequestMethod.POST)
+    @ApiOperation(value = "接收质控包")
+    Envelop receiveReportFile(
+            @RequestParam(value = "reportFile") File reportFile,
+            @RequestParam(value = "org_code") String orgCode,
+            @RequestParam(value = "encrypt_pwd") String encryptPwd,
+            @RequestParam(value = "md5", required = false) String md5,
+            @RequestParam(value = "type", defaultValue = "1", required = false) int type
+    );
+
+
 
 }

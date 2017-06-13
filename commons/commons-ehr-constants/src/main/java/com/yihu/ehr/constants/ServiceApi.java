@@ -663,6 +663,8 @@ public class ServiceApi {
         public static final String AddressRedis = "/redis/addressRedis";
         public static final String HealthProblemRedis = "/redis/healthProblemRedis";
         public static final String Icd10HpRelationRedis = "/redis/icd10HpRelationRedis";
+        public static final String Icd10NameRedis = "/redis/icd10NameRedis";
+        public static final String Icd10HpCodeRedis = "/redis/icd10HpCodeListRedis";
         public static final String IndicatorsRedis = "/redis/indicatorsRedis";
         public static final String OrgRedis = "/redis/orgRedis";
         public static final String OrgAreaRedis = "/redis/orgAreaRedis";
@@ -718,8 +720,6 @@ public class ServiceApi {
         public static final String GetQcDailyReportDetail = "/report/getQcDailyReportDetail";
         public static final String GetQcDailyReportPageList = "/report/getQcDailyReportPageList";
 
-        public static final String  StatisticQuotaDataReportData = "/report/statisticQuotaDataReportData";
-
         public static final String GetJsonArchives = "/report/getGetJsonArchives";
 
 
@@ -758,10 +758,52 @@ public class ServiceApi {
         public static final String QcDailyStatisticsIdentify = "/report/qcDailyStatisticsIdentify";
 
 
+    }
+
+    public static class TJ {
 
 
+        public static final String GetTjDimensionMainList = "/tj/getTjDimensionMainList";
+        public static final String TjDimensionMain = "/tj/tjDimensionMain";
+        public static final String TjDimensionMainId = "/tj/tjDimensionMainId";
+        public static final String TjDimensionMainCode= "/tj/tjDimensionMain/Code";
+
+        public static final String GetTjDimensionSlaveList = "/tj/getTjDimensionSlaveList";
+        public static final String TjDimensionSlaveId = "/tj/tjDimensionSlaveId";
+        public static final String TjDimensionSlave = "/tj/tjDimensionSlave";
+
+        public static final String TjDimensionSlaveCode = "/tj/tjDimensionSlaveCode";
+
+        public static final String GetTjQuotaDimensionMainList = "/tj/getTjQuotaDimensionMainList";
+        public static final String TjQuotaDimensionMain = "/tj/tjQuotaDimensionMain";
+
+        public static final String GetTjQuotaDimensionSlaveList = "/tj/getTjQuotaDimensionSlaveList";
+        public static final String TjQuotaDimensionSlave = "/tj/tjQuotaDimensionSlave";
 
 
+        public static final String GetTjQuotaLogList = "/tj/getTjQuotaLogList";
+        public static final String GetTjDataSaveList = "/tj/getTjDataSaveList";
+        public static final String AddTjDataSave = "/tj/addTjDataSave";
+        public static final String DeleteTjDataSave = "/tj/deleteTjDataSave";
+        public static final String GetTjDataSaveById = "/tj/getTjDataSaveById/{id}";
+
+        public static final String GetTjDataSourceList = "/tj/getTjDataSourceList";
+        public static final String AddTjDataSource = "/tj/addTjDataSource";
+        public static final String DeleteTjDataSource = "/tj/deletetTjDataSource";
+        public static final String GetTjDataSourceById = "/tj/getTjDataSourceById/{id}";
+
+        public static final String GetTjQuotaDataSaveList = "tj/getTjQuotaDataSaveList";
+        public static final String AddTjQuotaDataSave = "tj/addTjQuotaDataSave";
+        public static final String DeleteTjQuotaDataSave = "tj/deleteTjQuotaDataSave";
+
+        public static final String GetTjQuotaDataSourceList = "tj/getTjQuotaDataSourceList";
+        public static final String AddTjQuotaDataSource = "tj/addTjQuotaDataSource";
+        public static final String DeleteTjQuotaDataSource = "tj/deleteTjQuotaDataSource";
+
+        public static final String GetTjQuotaList = "tj/getTjQuotaList";
+        public static final String AddTjQuota = "tj/addTjQuota";
+        public static final String DeleteTjQuota = "tj/deleteTjQuota";
+        public static final String GetTjQuotaById = "tj/getTjQuotaById/{id}";
     }
 
 

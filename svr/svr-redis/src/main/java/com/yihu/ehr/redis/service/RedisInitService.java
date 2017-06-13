@@ -6,6 +6,7 @@ import com.yihu.ehr.entity.geography.GeographyDict;
 import com.yihu.ehr.redis.feign.XGeographyClient;
 import com.yihu.ehr.redis.schema.AddressDictKeySchema;
 import com.yihu.ehr.redis.schema.HealthProblemDictKeySchema;
+import com.yihu.ehr.redis.schema.Icd10KeySchema;
 import com.yihu.ehr.redis.schema.OrgKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -53,27 +54,48 @@ public class RedisInitService {
     /******************************** 缓存健康问题Redis ******************************************************/
     @Autowired
     HealthProblemDictKeySchema healthProblemDictKeySchema;
-
+    @Autowired
+    Icd10KeySchema icd10KeySchema;
     /**
-     * 缓存健康问题Redis
+     * 缓存健康问题名称Redis
      */
-    public boolean cacheIcd10ByHpCode()
+    public boolean cacheHpName()
     {
-        String sql = "select i.code,h.code hp_code \n" +
-                "from hp_icd10_relation r,icd10_dict i,health_problem_dict h\n" +
-                "where r.hp_id=h.id \n" +
-                "and r.icd10_id=i.id\n" ;
+        String sql = "select code,name from health_problem_dict";
 
         //清空相关Redis
         healthProblemDictKeySchema.deleteAll();
 
         List<Map<String,Object>> list = jdbc.queryForList(sql);
         for(Map<String,Object> map:list){
-            healthProblemDictKeySchema.set(String.valueOf(map.get("hp_code")),String.valueOf(map.get("code")));
+            healthProblemDictKeySchema.set((String) map.get("code"),(String)map.get("name"));
         }
         return true;
     }
 
+    /**
+     * 缓存ICD10 Redis
+     */
+    public boolean cacheIcd10()
+    {
+        String sql = "select t.hp_code,d.code,d.name from\n" +
+                "(select r.icd10_id,group_concat(p.`code` separator ';') hp_code \n" +
+                "from hp_icd10_relation r\n" +
+                "left join health_problem_dict p on p.id = r.hp_id \n" +
+                "group by icd10_id) t\n" +
+                "left join icd10_dict d on t.icd10_id = d.id" ;
+
+        //清空相关Redis
+        icd10KeySchema.deleteAll();
+        icd10KeySchema.deleteHpCode();
+
+        List<Map<String,Object>> list = jdbc.queryForList(sql);
+        for(Map<String,Object> map:list){
+            icd10KeySchema.set((String) map.get("code"),(String)map.get("name"));
+            icd10KeySchema.setHpCode((String) map.get("code"),(String)map.get("hp_code"));
+        }
+        return true;
+    }
 
     /******************************** 机构信息Redis ******************************************************/
     @Autowired

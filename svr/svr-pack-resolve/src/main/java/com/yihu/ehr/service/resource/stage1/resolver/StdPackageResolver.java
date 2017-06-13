@@ -85,7 +85,7 @@ public class StdPackageResolver extends PackageResolver {
                 //门诊/住院诊断
                 Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
                 List<String> diagnosisList = (List<String>)properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
-                if(diagnosisList!=null) {
+                if(diagnosisList!=null && diagnosisList.size()>0) {
                     profile.setDiagnosisList(diagnosisList);
                 }
             }

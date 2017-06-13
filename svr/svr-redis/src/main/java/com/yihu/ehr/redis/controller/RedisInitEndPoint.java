@@ -48,12 +48,20 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return "缓存行政地址Redis完成！";
     }
 
-    @ApiOperation("缓存健康问题Redis")
+    @ApiOperation("缓存健康问题名称Redis")
     @RequestMapping(value = ServiceApi.Redis.HealthProblemRedis, method = RequestMethod.POST)
-    public String cacheIcd10ByHpCode() throws Exception
+    public String cacheHpName() throws Exception
     {
-        redisInitService.cacheIcd10ByHpCode();
-        return "缓存健康问题Redis完成！";
+        redisInitService.cacheHpName();
+        return "缓存健康问题名称Redis完成！";
+    }
+
+    @ApiOperation("缓存ICD10 Redis")
+    @RequestMapping(value = ServiceApi.Redis.Icd10NameRedis, method = RequestMethod.POST)
+    public String cacheIcd10() throws Exception
+    {
+        redisInitService.cacheIcd10();
+        return "缓存ICD10 Redis完成！";
     }
 
     @ApiOperation("缓存机构名称Redis")

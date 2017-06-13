@@ -24,7 +24,7 @@ public interface XRedisServiceClient {
     public String getAddressRedis(@RequestParam("key") String key);
 
 
-    //("获取健康问题redis")
+    //("获取健康问题名称redis")
     @RequestMapping(value = ServiceApi.Redis.HealthProblemRedis, method = RequestMethod.GET)
     public String getHealthProblemRedis(@RequestParam("key") String key);
 

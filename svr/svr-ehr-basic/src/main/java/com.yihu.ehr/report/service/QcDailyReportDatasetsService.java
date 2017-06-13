@@ -21,7 +21,7 @@ import java.util.List;
 public class QcDailyReportDatasetsService extends BaseJpaService<QcDailyReportDatasets, XQcDailyReportDatasetsRepository> {
 
 
-    public Object getOrgDatasetsData(String orgCode, Date quotaDate) {
+    public List<Object> getOrgDatasetsData(String orgCode, Date quotaDate) {
         Session session = currentSession();
         String hql = "select qc.orgCode,qc.createDate,qc.totalNum,qc.realNum,qc.eventTime " +
                 "from QcDailyReportDatasets qc where  qc.orgCode=:orgCode and  TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 0 ";
@@ -29,14 +29,10 @@ public class QcDailyReportDatasetsService extends BaseJpaService<QcDailyReportDa
         query.setString("orgCode", orgCode);
         query.setDate("quotaDate", quotaDate);
         List<Object> list = query.list();
-        Object reObject = null;
         if(list.size()== 0) {
             return null;
         }else {
-            for(Object object :list){
-                reObject = object;
-            }
-            return reObject;
+            return list;
         }
     }
 

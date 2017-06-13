@@ -1,18 +1,13 @@
 package com.yihu.ehr.report.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
-import com.yihu.ehr.agModel.report.QcDailyEventDetailModel;
-import com.yihu.ehr.agModel.report.QcDailyEventsModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.report.QcDailyReport;
-import com.yihu.ehr.entity.report.QcDailyReportDetail;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.report.MQcDailyReport;
-import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.report.service.QcDailyReportClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

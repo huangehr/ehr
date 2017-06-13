@@ -1,15 +1,12 @@
 package com.yihu.ehr.report.controller;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.entity.patient.MedicalCards;
 import com.yihu.ehr.entity.report.QcDailyReport;
 import com.yihu.ehr.entity.report.QcDailyReportDetail;
-import com.yihu.ehr.entity.report.QcQuotaDict;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -17,22 +14,18 @@ import com.yihu.ehr.model.report.MQcDailyReport;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.report.service.QcDailyReportDetailService;
 import com.yihu.ehr.report.service.QcDailyReportService;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -45,8 +38,6 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     ObjectMapper objectMapper;
-    @Autowired
-    QuotaStatisticsEndPoint quotaStatisticsEndPoint;
     @Autowired
     QcDailyReportService qcDailyReportService;
     @Autowired
@@ -220,22 +211,6 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     protected MQcDailyReportDetail getModelDetail(QcDailyReportDetail o){
         return convertToModel(o, MQcDailyReportDetail.class);
     }
-
-
-    @RequestMapping(value = ServiceApi.Report.StatisticQuotaDataReportData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "统计指标日报数据")
-    void statisticQuotaDataReportData(
-            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "")
-            @RequestParam(value = "quotaId",required = true) String quotaId,
-            @ApiParam(name = "orgId", value = "机构编码", defaultValue = "")
-            @RequestParam(value = "orgId",required = true) String orgId,
-            @ApiParam(name = "quotaDate", value = "统计时间", defaultValue = "")
-            @RequestParam(value = "quotaDate",required = true) String quotaDate ) throws ParseException {
-             quotaStatisticsEndPoint.statisticQuotaData(quotaId,orgId, quotaDate);
-    }
-
-
-
 
 
 }

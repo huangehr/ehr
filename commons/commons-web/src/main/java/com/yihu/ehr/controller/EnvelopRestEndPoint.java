@@ -5,6 +5,7 @@ import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,6 +36,20 @@ public class EnvelopRestEndPoint extends BaseRestEndPoint {
         envelop.setDetailModelList(modelList);
         envelop.setTotalCount(totalCount);
 
+        return envelop;
+    }
+
+    public Envelop failed(String errMsg){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        envelop.setErrorMsg(errMsg);
+        return envelop;
+    }
+
+    public Envelop success(Object object){
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(object);
         return envelop;
     }
 
