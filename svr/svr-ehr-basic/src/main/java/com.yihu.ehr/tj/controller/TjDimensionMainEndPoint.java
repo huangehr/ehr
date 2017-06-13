@@ -101,10 +101,10 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "code") String code) throws Exception {
         String filter = "code=" + code;
         List<TjDimensionMain> tjDimensionMains = tjDimensionMainService.search(filter);
-        if(tjDimensionMains == null){
-            return null;
-        }else{
+        if(tjDimensionMains != null && tjDimensionMains.size() >0){
             return  tjDimensionMains.get(0);
+        }else{
+            return null;
         }
     }
 

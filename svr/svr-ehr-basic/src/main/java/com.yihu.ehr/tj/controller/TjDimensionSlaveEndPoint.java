@@ -100,10 +100,10 @@ public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "code") String code) throws Exception {
         String filter = "code=" + code;
         List<TjDimensionSlave> tjDimensionSlaves = tjDimensionSlaveService.search(filter);
-        if(tjDimensionSlaves == null){
-            return null;
-        }else{
+        if(tjDimensionSlaves != null && tjDimensionSlaves.size() >0){
             return  tjDimensionSlaves.get(0);
+        }else{
+            return null;
         }
     }
 
