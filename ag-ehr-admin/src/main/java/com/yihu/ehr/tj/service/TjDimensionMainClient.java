@@ -39,7 +39,7 @@ public interface TjDimensionMainClient {
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除主维度")
-    Result delete(@RequestParam(value = "id") String id);
+    Result delete(@RequestParam(value = "id") Long id);
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMainId, method = RequestMethod.GET)
     @ApiOperation(value = "获取主维度信息", notes = "通知主维度信息")

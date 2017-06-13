@@ -82,8 +82,10 @@ public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除从维度")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") String id) throws Exception{
-        tjDimensionSlaveService.delete(id);
+            @RequestParam(value = "id") Long id) throws Exception{
+        TjDimensionSlave tjDimensionSlave = tjDimensionSlaveService.getTjDimensionSlave(Integer.valueOf(id.toString()));
+        tjDimensionSlave.setStatus(-1);
+        tjDimensionSlaveService.save(tjDimensionSlave);
         return Result.success("从维度删除成功！");
     }
 
@@ -114,10 +116,10 @@ public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "name") String name)throws Exception {
         String filter = "name=" + name;
         List<TjDimensionSlave> tjDimensionSlaves = tjDimensionSlaveService.search(filter);
-        if(tjDimensionSlaves == null){
-            return false;
-        }else{
+        if(tjDimensionSlaves != null && tjDimensionSlaves.size() >0){
             return  true;
+        }else{
+            return false;
         }
     }
 

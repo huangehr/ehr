@@ -1,7 +1,5 @@
 package com.yihu.ehr.agModel.tj;
 
-import java.util.Date;
-
 /**
  *
  * @author janseny
@@ -16,10 +14,10 @@ public class TjDataSaveModel {
     private String code;
     private String type;
     private String name;
-    private Date createTime;
+    private String createTime;
     private String createUser;
     private String createUserName;
-    private Date updateTime;
+    private String updateTime;
     private String updateUser;
     private String updateUserName;
     private Integer status;
@@ -75,11 +73,11 @@ public class TjDataSaveModel {
         this.remark = remark;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
@@ -99,11 +97,11 @@ public class TjDataSaveModel {
         this.createUserName = createUserName;
     }
 
-    public Date getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 

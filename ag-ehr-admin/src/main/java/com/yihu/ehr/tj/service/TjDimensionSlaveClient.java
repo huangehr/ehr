@@ -39,11 +39,11 @@ public interface TjDimensionSlaveClient {
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除从维度")
-    Result delete(@RequestParam(value = "id") String id);
+    Result delete(@RequestParam(value = "id") Long id);
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveId, method = RequestMethod.GET)
     @ApiOperation(value = "获取从维度信息", notes = "通知从维度信息")
-    TjDimensionSlave getTjDimensionSlave(@PathVariable(value = "id") Integer id);
+    TjDimensionSlave getTjDimensionSlave(@RequestParam(value = "id") Integer id);
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveCode, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据ID获取从维度")

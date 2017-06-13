@@ -21,10 +21,10 @@ public class TjDimensionMainModel
     private String statusName;
     private Integer status;//1: 正常 0：不可以用 -1 已删除'
     private String remark;//备注
-    private Date createTime;//创建时间
+    private String createTime;//创建时间
     private String createUser;//创建人
     private String createUserName;//创建人名
-    private Date updateTime;//修改时间
+    private String updateTime;//修改时间
     private String updateUser;//修改人
     private String updateUserName;//修改人名
 
@@ -92,11 +92,11 @@ public class TjDimensionMainModel
         this.remark = remark;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
@@ -116,11 +116,11 @@ public class TjDimensionMainModel
         this.createUserName = createUserName;
     }
 
-    public Date getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 

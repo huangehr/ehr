@@ -2,6 +2,7 @@ package com.yihu.ehr.tj.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.tj.TjDataSaveModel;
+import com.yihu.ehr.agModel.tj.TjDataSourceModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjDataSave;
@@ -12,6 +13,8 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDataSaveClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +60,14 @@ public class TjDataSaveController extends ExtendController<TjDataSave> {
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
                 TjDataSaveModel tjDataSaveModel = objectMapper.convertValue(map,TjDataSaveModel.class);
+                if(tjDataSaveModel.getCreateTime() != null){
+                    Date createTime = DateUtil.parseDate(tjDataSaveModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDataSaveModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+                }
+                if(tjDataSaveModel.getUpdateTime() != null){
+                    Date updateTime = DateUtil.parseDate(tjDataSaveModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDataSaveModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+                }
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getTjDataSaveTypeList(String.valueOf(tjDataSaveModel.getType()));
                 tjDataSaveModel.setTypeName(dict == null ? "" : dict.getValue());

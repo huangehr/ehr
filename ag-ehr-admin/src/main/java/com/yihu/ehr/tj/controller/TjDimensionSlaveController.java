@@ -1,6 +1,7 @@
 package com.yihu.ehr.tj.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.tj.TjDimensionMainModel;
 import com.yihu.ehr.agModel.tj.TjDimensionSlaveModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -12,6 +13,8 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDimensionSlaveClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -55,10 +59,19 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
 
         List<TjDimensionSlaveModel> mainModelList  = new ArrayList<>();
         ListResult listResult = tjDimensionSlaveClient.search(fields, filters, sorts, size, page);
+
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
                 TjDimensionSlaveModel tjDimensionSlaveModel = objectMapper.convertValue(map,TjDimensionSlaveModel.class);
+                if(tjDimensionSlaveModel.getCreateTime() != null){
+                    Date createTime = DateUtil.parseDate(tjDimensionSlaveModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDimensionSlaveModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+                }
+                if(tjDimensionSlaveModel.getUpdateTime() != null){
+                    Date updateTime = DateUtil.parseDate(tjDimensionSlaveModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDimensionSlaveModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+                }
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getDimensionSlaveTypeList(String.valueOf(tjDimensionSlaveModel.getType()));
                 tjDimensionSlaveModel.setTypeName(dict == null ? "" : dict.getValue());
@@ -71,6 +84,9 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
             Envelop envelop = new Envelop();
             return envelop;
         }
+
+
+
     }
 
 
@@ -114,7 +130,7 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
     @ApiOperation(value = "删除从维度")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") String id) {
+            @RequestParam(value = "id") Long id) {
         try {
             Result result = tjDimensionSlaveClient.delete(id);
             if(result.getCode() == 200){

@@ -13,14 +13,18 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDimensionMainClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +65,14 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
                 TjDimensionMainModel tjDimensionMainModel = objectMapper.convertValue(map,TjDimensionMainModel.class);
+                if(tjDimensionMainModel.getCreateTime() != null){
+                    Date createTime = DateUtil.parseDate(tjDimensionMainModel.getCreateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDimensionMainModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+                }
+                if(tjDimensionMainModel.getUpdateTime() != null){
+                    Date updateTime = DateUtil.parseDate(tjDimensionMainModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDimensionMainModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+                }
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getDimensionMainTypeList(String.valueOf(tjDimensionMainModel.getType()));
                 tjDimensionMainModel.setTypeName(dict == null ? "" : dict.getValue());
@@ -115,7 +127,7 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
     @ApiOperation(value = "删除主维度")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") String id) {
+            @RequestParam(value = "id") Long id) {
         try {
             Result result = tjDimensionMainClient.delete(id);
             if(result.getCode() == 200){

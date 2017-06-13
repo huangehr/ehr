@@ -12,6 +12,8 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDataSourceClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +58,14 @@ public class TjDataSourceController extends ExtendController<TjDataSource> {
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
                 TjDataSourceModel tjDataSourceModel = objectMapper.convertValue(map,TjDataSourceModel.class);
+                if(tjDataSourceModel.getCreateTime() != null){
+                    Date createTime = DateUtil.parseDate(tjDataSourceModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDataSourceModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+                }
+                if(tjDataSourceModel.getUpdateTime() != null){
+                    Date updateTime = DateUtil.parseDate(tjDataSourceModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDataSourceModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+                }
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getTjDataSourceTypeList(String.valueOf(tjDataSourceModel.getType()));
                 tjDataSourceModel.setTypeName(dict == null ? "" : dict.getValue());
