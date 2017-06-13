@@ -21,7 +21,7 @@ public class TjDimensionSlave implements Serializable{
     private String code;  //业务代码
     private String name; //从维度名称
     private String type;//类型:1 性别 2 年龄
-    private Integer del;//1: 正常 0：不可以用 -1 已删除'
+    private Integer status;//1: 正常 0：不可以用 -1 已删除'
     private String remark;//备注
     private Date createTime;//创建时间
     private String createUser;//创建人
@@ -64,13 +64,13 @@ public class TjDimensionSlave implements Serializable{
         this.type = type;
     }
 
-    @Column(name = "del", nullable = false)
-    public Integer getDel() {
-        return del;
+    @Column(name = "status", nullable = false)
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setDel(Integer del) {
-        this.del = del;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     @Column(name = "remark", nullable = false)

@@ -1,12 +1,15 @@
 package com.yihu.ehr.tj.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.tj.TjDataSaveModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjDataSave;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDataSaveClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.rest.Envelop;
@@ -16,6 +19,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +32,8 @@ import java.util.Map;
 public class TjDataSaveController extends ExtendController<TjDataSave> {
     @Autowired
     TjDataSaveClient tjDataSaveClient;
+    @Autowired
+    private ConventionalDictEntryClient conventionalDictClient;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDataSaveList, method = RequestMethod.GET)
     @ApiOperation(value = "数据存储信息表")
@@ -44,9 +50,20 @@ public class TjDataSaveController extends ExtendController<TjDataSave> {
             @RequestParam(value = "page", required = false) int page){
 
         ListResult listResult = tjDataSaveClient.search(fields, filters, sorts, size, page);
+
+        List<TjDataSaveModel> mainModelList  = new ArrayList<>();
         if(listResult.getTotalCount() != 0){
-            List<Map<String,Object>> list = listResult.getDetailModelList();
-            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            List<Map<String,Object>> modelList = listResult.getDetailModelList();
+            for(Map<String,Object> map : modelList){
+                TjDataSaveModel tjDataSaveModel = objectMapper.convertValue(map,TjDataSaveModel.class);
+                //获取类别字典
+                MConventionalDict dict = conventionalDictClient.getTjDataSaveTypeList(String.valueOf(tjDataSaveModel.getType()));
+                tjDataSaveModel.setTypeName(dict == null ? "" : dict.getValue());
+                MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjDataSaveModel.getStatus()));
+                tjDataSaveModel.setStatusName(dict2 == null ? "" : dict2.getValue());
+                mainModelList.add(tjDataSaveModel);
+            }
+            return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
             Envelop envelop = new Envelop();
             return envelop;

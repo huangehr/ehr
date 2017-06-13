@@ -59,16 +59,16 @@ public class TjQuotaDimensionMainController extends ExtendController<TjQuotaDime
             @RequestParam(value = "page", required = false) int page){
 
         ListResult listResult = tjQuotaDimensionMainClient.search(fields, filters, sorts, size, page);
-        List<TjQuotaDimensionMainModel> mainModelList  = new ArrayList<>();;
+        List<TjQuotaDimensionMainModel> mainModelList  = new ArrayList<>();
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
-                TjQuotaDimensionMainModel tjQuotaQuotaDimensionMainModel = objectMapper.convertValue(map,TjQuotaDimensionMainModel.class);
-                TjDimensionMain tjDimensionMain = tjDimensionMainClient.getTjDimensionMain(tjQuotaQuotaDimensionMainModel.getMainCode());
+                TjQuotaDimensionMainModel tjQuotaDimensionMainModel = objectMapper.convertValue(map,TjQuotaDimensionMainModel.class);
+                TjDimensionMain tjDimensionMain = tjDimensionMainClient.getTjDimensionMain(tjQuotaDimensionMainModel.getMainCode());
                 if( tjDimensionMain != null ){
-                    tjQuotaQuotaDimensionMainModel.setName(tjDimensionMain.getName());
+                    tjQuotaDimensionMainModel.setName(tjDimensionMain.getName());
                 }
-                mainModelList.add(tjQuotaQuotaDimensionMainModel);
+                mainModelList.add(tjQuotaDimensionMainModel);
             }
             return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{

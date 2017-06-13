@@ -415,4 +415,34 @@ import java.util.List;
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
              @RequestParam(value = "code") String code);
 
+    @RequestMapping(value = "/dictionaries/dimension_main_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标主维度类型", response = MConventionalDict.class)
+    MConventionalDict getDimensionMainTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/dimension_slave_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标从维度类型", response = MConventionalDict.class)
+    MConventionalDict getDimensionSlaveTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/dimension_status_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标维度状态", response = MConventionalDict.class)
+    MConventionalDict getDimensionStatusList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/tj_data_source_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计数据资源", response = MConventionalDict.class)
+    MConventionalDict getTjDataSourceTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/tj_data_save_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计数据存储", response = MConventionalDict.class)
+    MConventionalDict getTjDataSaveTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
 }

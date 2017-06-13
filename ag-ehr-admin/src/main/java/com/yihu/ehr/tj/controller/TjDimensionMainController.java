@@ -1,12 +1,15 @@
 package com.yihu.ehr.tj.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.tj.TjDimensionMainModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjDimensionMain;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDimensionMainClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.rest.Envelop;
@@ -16,6 +19,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +35,8 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
 
     @Autowired
     TjDimensionMainClient tjDimensionMainClient;
+    @Autowired
+    private ConventionalDictEntryClient conventionalDictClient;
 
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDimensionMainList, method = RequestMethod.GET)
@@ -48,9 +54,20 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             @RequestParam(value = "page", required = false) int page){
 
         ListResult listResult = tjDimensionMainClient.search(fields, filters, sorts, size, page);
+
+        List<TjDimensionMainModel> mainModelList  = new ArrayList<>();
         if(listResult.getTotalCount() != 0){
-            List<Map<String,Object>> list = listResult.getDetailModelList();
-            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            List<Map<String,Object>> modelList = listResult.getDetailModelList();
+            for(Map<String,Object> map : modelList){
+                TjDimensionMainModel tjDimensionMainModel = objectMapper.convertValue(map,TjDimensionMainModel.class);
+                //获取类别字典
+                MConventionalDict dict = conventionalDictClient.getDimensionMainTypeList(String.valueOf(tjDimensionMainModel.getType()));
+                tjDimensionMainModel.setTypeName(dict == null ? "" : dict.getValue());
+                MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjDimensionMainModel.getStatus()));
+                tjDimensionMainModel.setStatusName(dict2 == null ? "" : dict2.getValue());
+                mainModelList.add(tjDimensionMainModel);
+            }
+            return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
             Envelop envelop = new Envelop();
             return envelop;

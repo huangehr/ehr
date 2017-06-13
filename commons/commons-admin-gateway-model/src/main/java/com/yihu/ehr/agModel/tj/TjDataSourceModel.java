@@ -24,6 +24,8 @@ public class TjDataSourceModel {
     private String updateUserName;
     private String status;
     private String remark;
+    private String typeName;
+    private String statusName;
 
     public long getId() {
         return id;
@@ -119,5 +121,21 @@ public class TjDataSourceModel {
 
     public void setUpdateUserName(String updateUserName) {
         this.updateUserName = updateUserName;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
     }
 }

@@ -1,12 +1,15 @@
 package com.yihu.ehr.tj.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.tj.TjDataSourceModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjDataSource;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDataSourceClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.rest.Envelop;
@@ -16,6 +19,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +32,8 @@ import java.util.Map;
 public class TjDataSourceController extends ExtendController<TjDataSource> {
     @Autowired
     TjDataSourceClient tjDataSourceClient;
+    @Autowired
+    private ConventionalDictEntryClient conventionalDictClient;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDataSourceList, method = RequestMethod.GET)
     @ApiOperation(value = "数据来源表")
@@ -44,13 +50,24 @@ public class TjDataSourceController extends ExtendController<TjDataSource> {
             @RequestParam(value = "page", required = false) int page){
 
         ListResult listResult = tjDataSourceClient.search(fields, filters, sorts, size, page);
+        List<TjDataSourceModel> mainModelList  = new ArrayList<>();
         if(listResult.getTotalCount() != 0){
-            List<Map<String,Object>> list = listResult.getDetailModelList();
-            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            List<Map<String,Object>> modelList = listResult.getDetailModelList();
+            for(Map<String,Object> map : modelList){
+                TjDataSourceModel tjDataSourceModel = objectMapper.convertValue(map,TjDataSourceModel.class);
+                //获取类别字典
+                MConventionalDict dict = conventionalDictClient.getTjDataSourceTypeList(String.valueOf(tjDataSourceModel.getType()));
+                tjDataSourceModel.setTypeName(dict == null ? "" : dict.getValue());
+                MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjDataSourceModel.getStatus()));
+                tjDataSourceModel.setStatusName(dict2 == null ? "" : dict2.getValue());
+                mainModelList.add(tjDataSourceModel);
+            }
+            return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
             Envelop envelop = new Envelop();
             return envelop;
         }
+
     }
 
 

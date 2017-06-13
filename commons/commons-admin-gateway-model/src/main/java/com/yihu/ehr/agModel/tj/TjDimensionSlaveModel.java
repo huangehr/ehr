@@ -16,7 +16,9 @@ public class TjDimensionSlaveModel {
     private String code;  //业务代码
     private String name; //从维度名称
     private String type;//类型:1 性别 2 年龄
-    private Integer del;//1: 正常 0：不可以用 -1 已删除'
+    private String typeName;
+    private String statusName;
+    private Integer status;//1: 正常 0：不可以用 -1 已删除'
     private String remark;//备注
     private Date createTime;//创建时间
     private String createUser;//创建人
@@ -57,12 +59,28 @@ public class TjDimensionSlaveModel {
         this.type = type;
     }
 
-    public Integer getDel() {
-        return del;
+    public String getTypeName() {
+        return typeName;
     }
 
-    public void setDel(Integer del) {
-        this.del = del;
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public String getRemark() {

@@ -17,6 +17,8 @@ public class TjDimensionMainModel
     private String code;  //业务代码
     private String name; //主维度名称
     private String type;//主维度 :1 行政区划
+    private String typeName;
+    private String statusName;
     private Integer status;//1: 正常 0：不可以用 -1 已删除'
     private String remark;//备注
     private Date createTime;//创建时间
@@ -56,6 +58,22 @@ public class TjDimensionMainModel
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
     }
 
     public Integer getStatus() {
