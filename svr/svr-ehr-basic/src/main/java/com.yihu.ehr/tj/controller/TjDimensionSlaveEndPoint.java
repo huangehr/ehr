@@ -78,7 +78,7 @@ public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除从维度")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
@@ -104,6 +104,20 @@ public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
             return null;
         }else{
             return  tjDimensionSlaves.get(0);
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveName,method = RequestMethod.GET)
+    @ApiOperation(value = "验证名称是否存在")
+    public boolean isNameExists(
+            @ApiParam(value = "name")
+            @RequestParam(value = "name") String name)throws Exception {
+        String filter = "name=" + name;
+        List<TjDimensionSlave> tjDimensionSlaves = tjDimensionSlaveService.search(filter);
+        if(tjDimensionSlaves == null){
+            return false;
+        }else{
+            return  true;
         }
     }
 

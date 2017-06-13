@@ -78,7 +78,7 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除主维度")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
@@ -89,7 +89,8 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMainId, method = RequestMethod.GET)
     @ApiOperation(value = "获取主维度信息", notes = "通知主维度信息")
-    TjDimensionMain getTjDimensionMain(@PathVariable(value = "id") Integer id){
+    TjDimensionMain getTjDimensionMain(
+            @PathVariable(value = "id") Integer id){
         return tjDimensionMainService.getTjDimensionMain(id);
     };
 
@@ -104,6 +105,20 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
             return null;
         }else{
             return  tjDimensionMains.get(0);
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainName,method = RequestMethod.GET)
+    @ApiOperation(value = "验证名称是否存在")
+    public boolean isNameExists(
+            @ApiParam(value = "name")
+            @RequestParam(value = "name") String name)throws Exception {
+        String filter = "name=" + name;
+        List<TjDimensionMain> tjDimensionMains = tjDimensionMainService.search(filter);
+        if(tjDimensionMains == null){
+            return false;
+        }else{
+            return  true;
         }
     }
 

@@ -47,7 +47,10 @@ public interface TjDimensionMainClient {
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMainCode, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据Code获取主维度")
-    public TjDimensionMain getTjDimensionMain(
-            @RequestParam(value = "code") String code);
+    public TjDimensionMain getTjDimensionMain(  @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainName,method = RequestMethod.GET)
+    @ApiOperation(value = "验证名称是否存在")
+    public boolean isNameExists( @RequestParam(value = "name") String name);
 
 }

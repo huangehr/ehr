@@ -5,6 +5,7 @@ import com.yihu.ehr.agModel.tj.TjDimensionMainModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjDimensionMain;
+import com.yihu.ehr.entity.tj.TjDimensionSlave;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -128,4 +129,21 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainName,method = RequestMethod.GET)
+    @ApiOperation(value = "验证名称是否存在")
+    public boolean isNameExists( @RequestParam(value = "name") String name){
+        return tjDimensionMainClient.isNameExists(name);
+    };
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainCode,method = RequestMethod.GET)
+    @ApiOperation(value = "验证Code是否存在")
+    public boolean isCodeExists( @RequestParam(value = "code") String code){
+        TjDimensionMain tjDimensionMain = tjDimensionMainClient.getTjDimensionMain(code);
+        if(tjDimensionMain != null ){
+            return true;
+        }else {
+            return false;
+        }
+    };
 }

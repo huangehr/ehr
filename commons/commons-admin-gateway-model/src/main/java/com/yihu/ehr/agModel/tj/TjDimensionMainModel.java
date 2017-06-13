@@ -13,7 +13,7 @@ public class TjDimensionMainModel
 {
 
 
-    private long id;
+    private Long id;
     private String code;  //业务代码
     private String name; //主维度名称
     private String type;//主维度 :1 行政区划
@@ -28,11 +28,11 @@ public class TjDimensionMainModel
     private String updateUser;//修改人
     private String updateUserName;//修改人名
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

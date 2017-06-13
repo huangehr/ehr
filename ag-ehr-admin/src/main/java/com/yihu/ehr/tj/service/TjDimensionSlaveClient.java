@@ -49,4 +49,8 @@ public interface TjDimensionSlaveClient {
     @ApiOperation(value = "根据ID获取从维度")
     public TjDimensionSlave getTjDimensionSlave(
             @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveName,method = RequestMethod.GET)
+    @ApiOperation(value = "验证名称是否存在")
+    public boolean isNameExists( @RequestParam(value = "name") String name);
 }

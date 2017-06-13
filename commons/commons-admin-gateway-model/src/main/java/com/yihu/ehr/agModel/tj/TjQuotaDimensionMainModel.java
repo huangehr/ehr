@@ -11,7 +11,7 @@ public class TjQuotaDimensionMainModel
 {
 
 
-    private long id;
+    private Long id;
     private String quotaCode;       //关联 tj_quota code
     private String mainCode;        //关联 jt_dimension_main
     private String name;            //主纬度名称
@@ -19,11 +19,11 @@ public class TjQuotaDimensionMainModel
     private String key;
 
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

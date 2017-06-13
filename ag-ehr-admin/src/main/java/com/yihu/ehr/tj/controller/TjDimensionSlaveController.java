@@ -128,4 +128,21 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveName,method = RequestMethod.GET)
+    @ApiOperation(value = "验证名称是否存在")
+    public boolean isNameExists( @RequestParam(value = "name") String name){
+        return tjDimensionSlaveClient.isNameExists(name);
+    };
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveCode,method = RequestMethod.GET)
+    @ApiOperation(value = "验证Code是否存在")
+    public boolean isCodeExists( @RequestParam(value = "code") String code){
+        TjDimensionSlave tjDimensionSlave = tjDimensionSlaveClient.getTjDimensionSlave(code);
+        if(tjDimensionSlave != null ){
+            return true;
+        }else {
+            return false;
+        }
+    };
 }

@@ -12,7 +12,7 @@ import java.util.Date;
 public class TjDimensionSlaveModel {
 
 
-    private long id;
+    private Long id;
     private String code;  //业务代码
     private String name; //从维度名称
     private String type;//类型:1 性别 2 年龄
@@ -27,11 +27,11 @@ public class TjDimensionSlaveModel {
     private String updateUser;//修改人
     private String updateUserName;//修改人名
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
