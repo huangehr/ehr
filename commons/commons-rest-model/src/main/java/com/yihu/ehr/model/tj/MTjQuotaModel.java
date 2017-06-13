@@ -22,7 +22,7 @@ public class MTjQuotaModel {
     private String status;
     private Integer dataLevel;
     private String remark;
-    private MTjquotaDataSourceModel tjquotaDataSourceModel;
+    private MTjQuotaDataSourceModel tjquotaDataSourceModel;
     private MTjQuotaDataSaveModel tjQuotaDataSaveModel;
 
     public Long getId() {
@@ -153,11 +153,11 @@ public class MTjQuotaModel {
         this.remark = remark;
     }
 
-    public MTjquotaDataSourceModel getTjquotaDataSourceModel() {
+    public MTjQuotaDataSourceModel getTjquotaDataSourceModel() {
         return tjquotaDataSourceModel;
     }
 
-    public void setTjquotaDataSourceModel(MTjquotaDataSourceModel tjquotaDataSourceModel) {
+    public void setTjquotaDataSourceModel(MTjQuotaDataSourceModel tjquotaDataSourceModel) {
         this.tjquotaDataSourceModel = tjquotaDataSourceModel;
     }
 

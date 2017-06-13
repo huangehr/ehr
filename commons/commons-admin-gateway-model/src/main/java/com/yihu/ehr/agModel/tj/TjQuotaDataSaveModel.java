@@ -1,12 +1,12 @@
-package com.yihu.ehr.model.tj;
+package com.yihu.ehr.agModel.tj;
 
 /**
  * Created by Administrator on 2017/6/13.
  */
-public class MTjQuotaDataSourceModel {
+public class TjQuotaDataSaveModel {
     private Long id;
     private String quotaCode;
-    private String sourceCode;
+    private String saveCode;
     private String configJson;
 
     public Long getId() {
@@ -25,12 +25,12 @@ public class MTjQuotaDataSourceModel {
         this.quotaCode = quotaCode;
     }
 
-    public String getSourceCode() {
-        return sourceCode;
+    public String getSaveCode() {
+        return saveCode;
     }
 
-    public void setSourceCode(String sourceCode) {
-        this.sourceCode = sourceCode;
+    public void setSaveCode(String saveCode) {
+        this.saveCode = saveCode;
     }
 
     public String getConfigJson() {

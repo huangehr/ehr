@@ -1,9 +1,9 @@
-package com.yihu.ehr.model.tj;
+package com.yihu.ehr.agModel.tj;
 
 /**
  * Created by Administrator on 2017/6/13.
  */
-public class MTjQuotaDataSourceModel {
+public class TjQuotaDataSourceModel {
     private Long id;
     private String quotaCode;
     private String sourceCode;
