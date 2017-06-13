@@ -20,4 +20,5 @@ public class TjDataSaveService extends BaseJpaService<TjDataSave,XTjDataSaveRepo
         TjDataSave tjDataSave = tjDataSaveRepository.findOne(id);
         return tjDataSave;
     }
+
 }

@@ -41,4 +41,12 @@ public interface TjDataSaveClient {
     @RequestMapping(value = ServiceApi.TJ.GetTjDataSaveById, method = RequestMethod.GET)
     @ApiOperation(value = "根据ID查询数据存储")
     TjDataSave getById(@PathVariable(value = "id") Long id);
+
+    @RequestMapping(value = "/tj/dataSaveExistsName/{name}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    boolean hasExistsName(@PathVariable("name") String name);
+
+    @RequestMapping(value = "/tj/dataSaveExistsCode/{code}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    boolean hasExistsCode(@PathVariable("code") String code);
 }

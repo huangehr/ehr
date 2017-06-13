@@ -121,4 +121,16 @@ public class TjDataSaveController extends ExtendController<TjDataSave> {
             return failedSystem();
         }
     }
+
+    @RequestMapping(value = "/tj/dataSaveExistsName/{name}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(@PathVariable("name") String name) {
+        return tjDataSaveClient.hasExistsName(name);
+    }
+
+    @RequestMapping(value = "/tj/dataSaveExistsCode/{code}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(@PathVariable("code") String code) {
+        return tjDataSaveClient.hasExistsCode(code);
+    }
 }

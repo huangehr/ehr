@@ -91,4 +91,30 @@ public class TjDataSaveEndPoint extends EnvelopRestEndPoint {
         TjDataSave tjDataSave = tjDataSaveService.getById(id);
         return tjDataSave;
     }
+
+    @RequestMapping(value = "/tj/dataSaveExistsName/{name}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(
+            @ApiParam(name = "name")
+            @PathVariable("name") String name) throws Exception {
+        String filter = "name=" + name;
+        List<TjDataSave> list = tjDataSaveService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @RequestMapping(value = "/tj/dataSaveExistsCode/{code}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(
+            @ApiParam(name = "code")
+            @PathVariable("code") String code) throws Exception {
+        String filter = "code=" + code;
+        List<TjDataSave> list = tjDataSaveService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
+    }
 }
