@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,6 +72,11 @@ public class TjDataSaveEndPoint extends EnvelopRestEndPoint {
             @RequestBody String model) throws Exception{
         TjDataSave obj = objectMapper.readValue(model, TjDataSave.class);
         obj = tjDataSaveService.save(obj);
+        if(obj.getId() != 0){
+            obj.setUpdateTime(new Date());
+        }else{
+            obj.setCreateTime(new Date());
+        }
         return Result.success("数据存储更新成功！", obj);
     }
 

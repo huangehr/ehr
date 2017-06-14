@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -73,6 +74,11 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         TjDimensionMain obj = objectMapper.readValue(model, TjDimensionMain.class);
+        if(obj.getId() != 0){
+            obj.setUpdateTime(new Date());
+        }else{
+            obj.setCreateTime(new Date());
+        }
         obj = tjDimensionMainService.save(obj);
         return Result.success("主维度更新成功！", obj);
     }
