@@ -87,9 +87,9 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
         tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
         TjQuota tjQuota = convertToModel(tjQuotaModel, TjQuota.class);
-        if(tjQuota.getId() != 0){
+        if (tjQuotaModel.getId() != null) {
             tjQuota.setUpdateTime(new Date());
-        }else{
+        } else{
             tjQuota.setCreateTime(new Date());
         }
         tjQuotaService.saves(tjQuota, tjquotaDataSource, tjQuotaDataSave);
