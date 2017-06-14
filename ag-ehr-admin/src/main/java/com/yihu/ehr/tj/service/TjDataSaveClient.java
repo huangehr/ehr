@@ -1,5 +1,6 @@
 package com.yihu.ehr.tj.service;
 
+import com.yihu.ehr.agModel.tj.TjDataSaveModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -40,7 +41,7 @@ public interface TjDataSaveClient {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDataSaveById, method = RequestMethod.GET)
     @ApiOperation(value = "根据ID查询数据存储")
-    TjDataSave getById(@PathVariable(value = "id") Long id);
+    TjDataSaveModel getById(@PathVariable(value = "id") Long id);
 
     @RequestMapping(value = "/tj/dataSaveExistsName/{name}", method = RequestMethod.GET)
     @ApiOperation(value = "校验name是否存在")

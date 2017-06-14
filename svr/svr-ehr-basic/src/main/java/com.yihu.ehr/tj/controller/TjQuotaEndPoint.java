@@ -10,7 +10,11 @@ import com.yihu.ehr.entity.tj.TjQuotaDataSource;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.tj.MTjQuotaDataSaveModel;
+import com.yihu.ehr.model.tj.MTjQuotaDataSourceModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.tj.service.TjQuotaDataSaveService;
+import com.yihu.ehr.tj.service.TjQuotaDataSourceService;
 import com.yihu.ehr.tj.service.TjQuotaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,6 +39,10 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     ObjectMapper objectMapper;
     @Autowired
     TjQuotaService tjQuotaService;
+    @Autowired
+    TjQuotaDataSaveService tjQuotaDataSaveService;
+    @Autowired
+    TjQuotaDataSourceService tjQuotaDataSourceService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询统计表")
@@ -78,6 +87,11 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
         tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
         TjQuota tjQuota = convertToModel(tjQuotaModel, TjQuota.class);
+        if(tjQuota.getId() != 0){
+            tjQuota.setUpdateTime(new Date());
+        }else{
+            tjQuota.setCreateTime(new Date());
+        }
         tjQuotaService.saves(tjQuota, tjquotaDataSource, tjQuotaDataSave);
         return Result.success("统计表更新成功！", tjQuotaModel);
     }
@@ -97,11 +111,29 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaById, method = RequestMethod.GET)
     @ApiOperation(value = "根据ID获取指标")
-    public TjQuota getById(
+    public MTjQuotaModel getById(
             @ApiParam(name = "id")
             @PathVariable(value = "id") Long id) {
         TjQuota tjQuota = tjQuotaService.getById(id);
-        return tjQuota;
+        MTjQuotaModel mTjQuotaModel = null;
+        if (null != tjQuota) {
+            mTjQuotaModel = convertToModel(tjQuota, MTjQuotaModel.class);
+            TjQuotaDataSave tjQuotaDataSave = tjQuotaDataSaveService.getByQuotaCode(tjQuota.getCode());
+            TjQuotaDataSource tjQuotaDataSource = tjQuotaDataSourceService.getByQuotaCode(tjQuota.getCode());
+            MTjQuotaDataSaveModel mTjQuotaDataSaveModel = new MTjQuotaDataSaveModel();
+            mTjQuotaDataSaveModel.setId(tjQuotaDataSave.getId());
+            mTjQuotaDataSaveModel.setSaveCode(tjQuotaDataSave.getSaveCode());
+            mTjQuotaDataSaveModel.setQuotaCode(tjQuotaDataSave.getQuotaCode());
+            mTjQuotaDataSaveModel.setConfigJson(tjQuotaDataSave.getConfigJson());
+            mTjQuotaModel.setTjQuotaDataSaveModel(mTjQuotaDataSaveModel);
+            MTjQuotaDataSourceModel mTjQuotaDataSourceModel = new MTjQuotaDataSourceModel();
+            mTjQuotaDataSourceModel.setId(tjQuotaDataSource.getId());
+            mTjQuotaDataSourceModel.setQuotaCode(tjQuotaDataSource.getQuotaCode());
+            mTjQuotaDataSourceModel.setSourceCode(tjQuotaDataSource.getSourceCode());
+            mTjQuotaDataSourceModel.setConfigJson(tjQuotaDataSource.getConfigJson());
+            mTjQuotaModel.setTjquotaDataSourceModel(mTjQuotaDataSourceModel);
+        }
+        return mTjQuotaModel;
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsName, method = RequestMethod.GET)

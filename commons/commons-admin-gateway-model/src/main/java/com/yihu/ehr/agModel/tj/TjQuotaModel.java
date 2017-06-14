@@ -11,12 +11,12 @@ public class TjQuotaModel {
     private String name;
     private String cron;
     private String execType;
-    private Date execTime;
+    private String execTime;
     private String jobClazz;
-    private Date createTime;
+    private String createTime;
     private String createUser;
     private String createUserName;
-    private Date updateTime;
+    private String updateTime;
     private String updateUser;
     private String updateUserName;
     private Integer status;
@@ -65,11 +65,11 @@ public class TjQuotaModel {
         this.execType = execType;
     }
 
-    public Date getExecTime() {
+    public String getExecTime() {
         return execTime;
     }
 
-    public void setExecTime(Date execTime) {
+    public void setExecTime(String execTime) {
         this.execTime = execTime;
     }
 
@@ -81,11 +81,11 @@ public class TjQuotaModel {
         this.jobClazz = jobClazz;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
@@ -105,11 +105,11 @@ public class TjQuotaModel {
         this.createUserName = createUserName;
     }
 
-    public Date getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 

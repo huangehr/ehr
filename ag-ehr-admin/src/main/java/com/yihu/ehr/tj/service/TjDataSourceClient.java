@@ -1,5 +1,6 @@
 package com.yihu.ehr.tj.service;
 
+import com.yihu.ehr.agModel.tj.TjDataSourceModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -39,7 +40,7 @@ public interface TjDataSourceClient {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDataSourceById, method = RequestMethod.GET)
     @ApiOperation(value = "根据ID查询数据源")
-    TjDataSource getById(@PathVariable(value = "id") Long id);
+    TjDataSourceModel getById(@PathVariable(value = "id") Long id);
 
     @RequestMapping(value = ServiceApi.TJ.TjDataSourceExistsName, method = RequestMethod.GET)
     @ApiOperation(value = "校验name是否存在")

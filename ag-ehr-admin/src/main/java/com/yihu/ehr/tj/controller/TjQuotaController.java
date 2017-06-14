@@ -1,6 +1,7 @@
 package com.yihu.ehr.tj.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.tj.TjQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjQuota;
@@ -8,8 +9,12 @@ import com.yihu.ehr.entity.tj.TjQuotaDataSource;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.tj.service.TjQuotaClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,6 +22,8 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +33,7 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api( value = "TjQuota", description = "统计表", tags = {"统计指标管理-统计表"})
-public class TjQuotaController extends ExtendController<TjQuota> {
+public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
     TjQuotaClient tjQuotaClient;
 
@@ -45,9 +52,26 @@ public class TjQuotaController extends ExtendController<TjQuota> {
             @RequestParam(value = "page", required = false) int page){
 
         ListResult listResult = tjQuotaClient.search(fields, filters, sorts, size, page);
+        List<MTjQuotaModel> mainModelList  = new ArrayList<>();
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
-            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            for(Map<String,Object> map : list){
+                MTjQuotaModel tjQuotaModel = objectMapper.convertValue(map,MTjQuotaModel.class);
+                if(tjQuotaModel.getCreateTime() != null){
+                    Date createTime = DateUtil.parseDate(tjQuotaModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjQuotaModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+                }
+                if(tjQuotaModel.getUpdateTime() != null){
+                    Date updateTime = DateUtil.parseDate(tjQuotaModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjQuotaModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+                }
+                if(tjQuotaModel.getExecTime() != null){
+                    Date execTime = DateUtil.parseDate(tjQuotaModel.getExecTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjQuotaModel.setExecTime( DateTimeUtil.simpleDateTimeFormat(execTime));
+                }
+                mainModelList.add(tjQuotaModel);
+            }
+            return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
             Envelop envelop = new Envelop();
             return envelop;
@@ -95,11 +119,24 @@ public class TjQuotaController extends ExtendController<TjQuota> {
     @ApiOperation(value = "根据ID查询指标")
     public Envelop getById(@PathVariable(value = "id") Long id) {
         try {
-            TjQuota tjQuota = tjQuotaClient.getById(id);
-            if (null == tjQuota) {
+            MTjQuotaModel tjQuotaModel = tjQuotaClient.getById(id);
+            if (null == tjQuotaModel) {
                 return failed("获取指标失败");
             }
-            return success(tjQuota);
+            tjQuotaModel = objectMapper.convertValue(tjQuotaModel,MTjQuotaModel.class);
+            if(tjQuotaModel.getCreateTime() != null){
+                Date createTime = DateUtil.parseDate(tjQuotaModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                tjQuotaModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+            }
+            if(tjQuotaModel.getUpdateTime() != null){
+                Date updateTime = DateUtil.parseDate(tjQuotaModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                tjQuotaModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+            }
+            if(tjQuotaModel.getExecTime() != null){
+                Date execTime = DateUtil.parseDate(tjQuotaModel.getExecTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                tjQuotaModel.setExecTime( DateTimeUtil.simpleDateTimeFormat(execTime));
+            }
+            return success(tjQuotaModel);
         } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();

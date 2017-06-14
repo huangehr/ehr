@@ -33,7 +33,7 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api( value = "TjDataSave", description = "数据存储", tags = {"统计指标管理-数据存储"})
-public class TjDataSaveController extends ExtendController<TjDataSave> {
+public class TjDataSaveController extends ExtendController<TjDataSaveModel> {
     @Autowired
     TjDataSaveClient tjDataSaveClient;
     @Autowired
@@ -123,11 +123,25 @@ public class TjDataSaveController extends ExtendController<TjDataSave> {
     @ApiOperation(value = "根据ID查询数据存储")
     public Envelop getById(@PathVariable(value = "id") Long id) {
         try {
-            TjDataSave tjDataSave = tjDataSaveClient.getById(id);
-            if (null == tjDataSave) {
+            TjDataSaveModel tjDataSaveModel = tjDataSaveClient.getById(id);
+            if (null == tjDataSaveModel) {
                 return failed("获取数据存储失败");
             }
-            return success(tjDataSave);
+            tjDataSaveModel = objectMapper.convertValue(tjDataSaveModel,TjDataSaveModel.class);
+            if(tjDataSaveModel.getCreateTime() != null){
+                Date createTime = DateUtil.parseDate(tjDataSaveModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                tjDataSaveModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+            }
+            if(tjDataSaveModel.getUpdateTime() != null){
+                Date updateTime = DateUtil.parseDate(tjDataSaveModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                tjDataSaveModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+            }
+            //获取类别字典
+            MConventionalDict dict = conventionalDictClient.getTjDataSaveTypeList(String.valueOf(tjDataSaveModel.getType()));
+            tjDataSaveModel.setTypeName(dict == null ? "" : dict.getValue());
+            MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjDataSaveModel.getStatus()));
+            tjDataSaveModel.setStatusName(dict2 == null ? "" : dict2.getValue());
+            return success(tjDataSaveModel);
         } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();

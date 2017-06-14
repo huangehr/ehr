@@ -11,18 +11,18 @@ public class MTjQuotaModel {
     private String name;
     private String cron;
     private String execType;
-    private Date execTime;
+    private String execTime;
     private String jobClazz;
-    private Date createTime;
+    private String createTime;
     private String createUser;
     private String createUserName;
-    private Date updateTime;
+    private String updateTime;
     private String updateUser;
     private String updateUserName;
     private Integer status;
     private Integer dataLevel;
     private String remark;
-    private MTjQuotaDataSourceModel tjquotaDataSourceModel;
+    private MTjQuotaDataSourceModel tjQuotaDataSourceModel;
     private MTjQuotaDataSaveModel tjQuotaDataSaveModel;
 
     public Long getId() {
@@ -65,11 +65,11 @@ public class MTjQuotaModel {
         this.execType = execType;
     }
 
-    public Date getExecTime() {
+    public String getExecTime() {
         return execTime;
     }
 
-    public void setExecTime(Date execTime) {
+    public void setExecTime(String execTime) {
         this.execTime = execTime;
     }
 
@@ -81,11 +81,11 @@ public class MTjQuotaModel {
         this.jobClazz = jobClazz;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
@@ -105,11 +105,11 @@ public class MTjQuotaModel {
         this.createUserName = createUserName;
     }
 
-    public Date getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -154,11 +154,11 @@ public class MTjQuotaModel {
     }
 
     public MTjQuotaDataSourceModel getTjquotaDataSourceModel() {
-        return tjquotaDataSourceModel;
+        return tjQuotaDataSourceModel;
     }
 
-    public void setTjquotaDataSourceModel(MTjQuotaDataSourceModel tjquotaDataSourceModel) {
-        this.tjquotaDataSourceModel = tjquotaDataSourceModel;
+    public void setTjquotaDataSourceModel(MTjQuotaDataSourceModel tjQuotaDataSourceModel) {
+        this.tjQuotaDataSourceModel = tjQuotaDataSourceModel;
     }
 
     public MTjQuotaDataSaveModel getTjQuotaDataSaveModel() {
