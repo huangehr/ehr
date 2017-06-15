@@ -1,5 +1,6 @@
 package com.yihu.ehr.users.controller;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.yihu.ehr.agModel.user.PlatformAppRolesModel;
 import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
 import com.yihu.ehr.agModel.user.RolesModel;
@@ -8,6 +9,7 @@ import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.entity.organizations.OrgSaas;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.user.*;
@@ -55,6 +57,15 @@ public class RolesController extends BaseController {
     public Envelop createRoles(
             @ApiParam(name = "data_json",value = "新增角色组Json字符串")
             @RequestParam(value = "data_json") String dataJson){
+        MRoles model=new MRoles();
+        try {
+            model= objectMapper.readValue(dataJson, MRoles.class);
+            if(null!=model&&model.getDescription().length()>200){
+                return failed("角色组描述不能大于200字");
+            }
+        }catch (Exception e){
+
+        }
         MRoles mRoles = rolesClient.createRoles(dataJson);
         if(null == mRoles){
             return failed("新增角色组失败");
@@ -66,6 +77,15 @@ public class RolesController extends BaseController {
     public Envelop updateRoles(
             @ApiParam(name = "data_json",value = "修改角色组Json字符串")
             @RequestParam(value = "data_json") String dataJson){
+        MRoles model=new MRoles();
+        try {
+            model= objectMapper.readValue(dataJson, MRoles.class);
+            if(null!=model&&model.getDescription().length()>200){
+                return failed("角色组描述不能大于200字");
+            }
+        }catch (Exception e){
+
+        }
         MRoles mRoles = rolesClient.updateRoles(dataJson);
         if(null == mRoles){
             return failed("修改角色组失败");
