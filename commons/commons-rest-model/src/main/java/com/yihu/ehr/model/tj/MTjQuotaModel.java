@@ -156,11 +156,11 @@ public class MTjQuotaModel {
         this.remark = remark;
     }
 
-    public MTjQuotaDataSourceModel getTjquotaDataSourceModel() {
+    public MTjQuotaDataSourceModel getTjQuotaDataSourceModel() {
         return tjQuotaDataSourceModel;
     }
 
-    public void setTjquotaDataSourceModel(MTjQuotaDataSourceModel tjQuotaDataSourceModel) {
+    public void setTjQuotaDataSourceModel(MTjQuotaDataSourceModel tjQuotaDataSourceModel) {
         this.tjQuotaDataSourceModel = tjQuotaDataSourceModel;
     }
 

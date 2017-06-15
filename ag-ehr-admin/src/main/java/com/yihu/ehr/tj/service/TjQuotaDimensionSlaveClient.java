@@ -6,7 +6,9 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +40,10 @@ public interface TjQuotaDimensionSlaveClient {
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionSlave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增/修改从维度关联信息")
     ObjectResult add(@RequestBody String model) ;
+
+    @RequestMapping(value = ServiceApi.TJ.AddTjQuotaDimensionSlave, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增从维度关联信息")
+    ObjectResult addTjQuotaDimensionSlave(@RequestBody String model);
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionSlave, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除从维度关联信息")
