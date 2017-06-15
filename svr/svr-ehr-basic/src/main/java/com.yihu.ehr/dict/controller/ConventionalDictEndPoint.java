@@ -723,6 +723,24 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
         return getDictModel(type);
     };
 
+    @RequestMapping(value = "/dictionaries/tj_quota_exec_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计指标管理", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaExecTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(77, code);
+        return getDictModel(type);
+    };
+
+    @RequestMapping(value = "/dictionaries/tj_quota_data_level_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计存储方式", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaDataLevelList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(77, code);
+        return getDictModel(type);
+    };
+
 
 
 

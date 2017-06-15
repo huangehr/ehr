@@ -11,6 +11,7 @@ import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjQuotaClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -36,6 +37,8 @@ import java.util.Map;
 public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
     TjQuotaClient tjQuotaClient;
+    @Autowired
+    private ConventionalDictEntryClient conventionalDictClient;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "统计表")
@@ -69,6 +72,13 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
                     Date execTime = DateUtil.parseDate(tjQuotaModel.getExecTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
                     tjQuotaModel.setExecTime( DateTimeUtil.simpleDateTimeFormat(execTime));
                 }
+                //获取类别字典
+                MConventionalDict dict = conventionalDictClient.getTjQuotaExecTypeList(tjQuotaModel.getExecType());
+                tjQuotaModel.setExecTypeName(dict == null ? "" : dict.getValue());
+                MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjQuotaModel.getStatus()));
+                tjQuotaModel.setStatusName(dict2 == null ? "" : dict2.getValue());
+                MConventionalDict dict3 = conventionalDictClient.getTjQuotaDataLevelList(String.valueOf(tjQuotaModel.getDataLevel()));
+                tjQuotaModel.setDataLevelName(dict3 == null ? "" : dict3.getValue());
                 mainModelList.add(tjQuotaModel);
             }
             return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
@@ -136,6 +146,13 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
                 Date execTime = DateUtil.parseDate(tjQuotaModel.getExecTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
                 tjQuotaModel.setExecTime( DateTimeUtil.simpleDateTimeFormat(execTime));
             }
+            //获取类别字典
+            MConventionalDict dict = conventionalDictClient.getTjQuotaExecTypeList(tjQuotaModel.getExecType());
+            tjQuotaModel.setExecTypeName(dict == null ? "" : dict.getValue());
+            MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjQuotaModel.getStatus()));
+            tjQuotaModel.setStatusName(dict2 == null ? "" : dict2.getValue());
+            MConventionalDict dict3 = conventionalDictClient.getTjQuotaDataLevelList(String.valueOf(tjQuotaModel.getDataLevel()));
+            tjQuotaModel.setDataLevelName(dict3 == null ? "" : dict3.getValue());
             return success(tjQuotaModel);
         } catch (Exception e) {
             e.printStackTrace();

@@ -25,11 +25,11 @@ public class TjDataSaveModel {
     private String typeName;
     private String statusName;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

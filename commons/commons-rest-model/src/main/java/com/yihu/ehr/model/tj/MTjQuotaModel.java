@@ -24,6 +24,9 @@ public class MTjQuotaModel {
     private String remark;
     private MTjQuotaDataSourceModel tjQuotaDataSourceModel;
     private MTjQuotaDataSaveModel tjQuotaDataSaveModel;
+    private String execTypeName;
+    private String statusName;
+    private String dataLevelName;
 
     public Long getId() {
         return id;
@@ -167,5 +170,29 @@ public class MTjQuotaModel {
 
     public void setTjQuotaDataSaveModel(MTjQuotaDataSaveModel tjQuotaDataSaveModel) {
         this.tjQuotaDataSaveModel = tjQuotaDataSaveModel;
+    }
+
+    public String getExecTypeName() {
+        return execTypeName;
+    }
+
+    public void setExecTypeName(String execTypeName) {
+        this.execTypeName = execTypeName;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public String getDataLevelName() {
+        return dataLevelName;
+    }
+
+    public void setDataLevelName(String dataLevelName) {
+        this.dataLevelName = dataLevelName;
     }
 }
