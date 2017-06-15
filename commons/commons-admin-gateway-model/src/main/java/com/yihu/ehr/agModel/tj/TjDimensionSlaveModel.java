@@ -26,6 +26,7 @@ public class TjDimensionSlaveModel {
     private String updateTime;//修改时间
     private String updateUser;//修改人
     private String updateUserName;//修改人名
+    private boolean checked; //是否已选中
 
     public Long getId() {
         return id;
@@ -137,5 +138,13 @@ public class TjDimensionSlaveModel {
 
     public void setUpdateUserName(String updateUserName) {
         this.updateUserName = updateUserName;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 }

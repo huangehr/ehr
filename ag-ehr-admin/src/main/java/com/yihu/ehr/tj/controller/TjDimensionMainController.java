@@ -2,6 +2,7 @@ package com.yihu.ehr.tj.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.tj.TjDimensionMainModel;
+import com.yihu.ehr.agModel.tj.TjQuotaDimensionMainModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjDimensionMain;
@@ -12,6 +13,7 @@ import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDimensionMainClient;
+import com.yihu.ehr.tj.service.TjQuotaDimensionMainClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -42,6 +44,8 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
     TjDimensionMainClient tjDimensionMainClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+    @Autowired
+    TjQuotaDimensionMainClient tjQuotaDimensionMainClient;
 
 
     @RequestMapping(value = ServiceApi.TJ.GetTjDimensionMainList, method = RequestMethod.GET)
@@ -79,6 +83,73 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
                 MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjDimensionMainModel.getStatus()));
                 tjDimensionMainModel.setStatusName(dict2 == null ? "" : dict2.getValue());
                 mainModelList.add(tjDimensionMainModel);
+            }
+            return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else{
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjDimensionMainInfoList, method = RequestMethod.GET)
+    @ApiOperation(value = "主维度列表")
+    public Envelop searchInfo(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page){
+
+        ListResult listResult = tjDimensionMainClient.search(fields, filters, sorts, size, page);
+
+        List<TjDimensionMainModel> mainModelList  = new ArrayList<>();
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> modelList = listResult.getDetailModelList();
+            for(Map<String,Object> map : modelList){
+                TjDimensionMainModel tjDimensionMainModel = objectMapper.convertValue(map,TjDimensionMainModel.class);
+                if(tjDimensionMainModel.getCreateTime() != null){
+                    Date createTime = DateUtil.parseDate(tjDimensionMainModel.getCreateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDimensionMainModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+                }
+                if(tjDimensionMainModel.getUpdateTime() != null){
+                    Date updateTime = DateUtil.parseDate(tjDimensionMainModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDimensionMainModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+                }
+                //获取类别字典
+                MConventionalDict dict = conventionalDictClient.getDimensionMainTypeList(String.valueOf(tjDimensionMainModel.getType()));
+                tjDimensionMainModel.setTypeName(dict == null ? "" : dict.getValue());
+                MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjDimensionMainModel.getStatus()));
+                tjDimensionMainModel.setStatusName(dict2 == null ? "" : dict2.getValue());
+                mainModelList.add(tjDimensionMainModel);
+            }
+            ListResult listResult2 = tjQuotaDimensionMainClient.search(fields, filters, sorts, size, page);
+            List<TjQuotaDimensionMainModel> mainModelList2  = new ArrayList<>();
+            if(listResult2.getTotalCount() != 0) {
+                List<Map<String, Object>> modelList2 = listResult2.getDetailModelList();
+                for (Map<String, Object> map : modelList2) {
+                    TjQuotaDimensionMainModel tjQuotaDimensionMainModel = objectMapper.convertValue(map, TjQuotaDimensionMainModel.class);
+                    TjDimensionMain tjDimensionMain = tjDimensionMainClient.getTjDimensionMain(tjQuotaDimensionMainModel.getMainCode());
+                    if (tjDimensionMain != null) {
+                        tjQuotaDimensionMainModel.setName(tjDimensionMain.getName());
+                    }
+                    mainModelList2.add(tjQuotaDimensionMainModel);
+                }
+            }
+            List<String> list = new ArrayList<>();
+            for (int i=0; i<mainModelList2.size(); i++) {
+                list.add(mainModelList2.get(i).getMainCode());
+            }
+            for (int i=0; i<mainModelList.size(); i++) {
+                if (list.contains(mainModelList.get(i).getCode())) {
+                    mainModelList.get(i).setChecked(true);
+                } else {
+                    mainModelList.get(i).setChecked(false);
+                }
             }
             return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
