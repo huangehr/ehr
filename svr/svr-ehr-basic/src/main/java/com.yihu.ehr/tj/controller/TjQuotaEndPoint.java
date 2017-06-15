@@ -82,7 +82,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
-        TjQuotaDataSource tjquotaDataSource = convertToModel(tjQuotaModel.getTjquotaDataSourceModel(), TjQuotaDataSource.class);
+        TjQuotaDataSource tjquotaDataSource = convertToModel(tjQuotaModel.getTjQuotaDataSourceModel(), TjQuotaDataSource.class);
         TjQuotaDataSave tjQuotaDataSave = convertToModel(tjQuotaModel.getTjQuotaDataSaveModel(), TjQuotaDataSave.class);
         tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
         tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
@@ -131,7 +131,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             mTjQuotaDataSourceModel.setQuotaCode(tjQuotaDataSource.getQuotaCode());
             mTjQuotaDataSourceModel.setSourceCode(tjQuotaDataSource.getSourceCode());
             mTjQuotaDataSourceModel.setConfigJson(tjQuotaDataSource.getConfigJson());
-            mTjQuotaModel.setTjquotaDataSourceModel(mTjQuotaDataSourceModel);
+            mTjQuotaModel.setTjQuotaDataSourceModel(mTjQuotaDataSourceModel);
         }
         return mTjQuotaModel;
     }

@@ -781,10 +781,11 @@ public class ServiceApi {
 
         public static final String GetTjQuotaDimensionMainList = "/tj/getTjQuotaDimensionMainList";
         public static final String TjQuotaDimensionMain = "/tj/tjQuotaDimensionMain";
+        public static final String AddTjQuotaDimensionMain = "/tj/addTjQuotaDimensionMain";
 
         public static final String GetTjQuotaDimensionSlaveList = "/tj/getTjQuotaDimensionSlaveList";
         public static final String TjQuotaDimensionSlave = "/tj/tjQuotaDimensionSlave";
-
+        public static final String AddTjQuotaDimensionSlave = "/tj/addTjQuotaDimensionSlave";
 
         public static final String GetTjQuotaLogList = "/tj/getTjQuotaLogList";
         public static final String GetTjDataSaveList = "/tj/getTjDataSaveList";

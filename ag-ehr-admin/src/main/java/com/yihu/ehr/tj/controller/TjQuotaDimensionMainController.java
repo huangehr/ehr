@@ -95,6 +95,24 @@ public class TjQuotaDimensionMainController extends ExtendController<TjQuotaDime
         }
     }
 
+    @RequestMapping(value = ServiceApi.TJ.AddTjQuotaDimensionMain, method = RequestMethod.POST)
+    @ApiOperation(value = "新增主维度关联信息")
+    public Envelop addTjQuotaDimensionMain(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam("model") String model) {
+        try {
+            ObjectResult objectResult = tjQuotaDimensionMainClient.addTjQuotaDimensionMain(model);
+            if (objectResult.getCode() == 200) {
+                return successObj(objectResult.getData());
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failed(FeignExceptionUtils.getErrorMsg(e));
+        }
+    }
+
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除主维度关联信息")
     public Envelop delete(

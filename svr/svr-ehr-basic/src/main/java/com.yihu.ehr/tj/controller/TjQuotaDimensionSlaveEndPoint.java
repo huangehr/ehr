@@ -1,5 +1,6 @@
 package com.yihu.ehr.tj.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -76,6 +77,17 @@ public class TjQuotaDimensionSlaveEndPoint extends EnvelopRestEndPoint {
         return Result.success("统计指标从维度关联信息更新成功！", obj);
     }
 
+    @RequestMapping(value = ServiceApi.TJ.AddTjQuotaDimensionSlave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增&修改统计指标从维度关联信息")
+    public ObjectResult addTjQuotaDimensionSlave(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestBody String model) throws Exception{
+        List<TjQuotaDimensionSlave> list = objectMapper.readValue(model, new TypeReference<List<TjQuotaDimensionSlave>>(){});
+        for (int i=0; i<list.size(); i++) {
+            tjQuotaDimensionSlaveService.save(list.get(i));
+        }
+        return Result.success("统计指标从维度关联信息更新成功！", list);
+    }
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionSlave, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除统计指标从维度关联信息")
