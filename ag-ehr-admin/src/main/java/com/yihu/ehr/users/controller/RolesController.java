@@ -60,8 +60,8 @@ public class RolesController extends BaseController {
         MRoles model=new MRoles();
         try {
             model= objectMapper.readValue(dataJson, MRoles.class);
-            if(null!=model&&model.getDescription().length()>200){
-                return failed("角色组描述不能大于200字");
+            if(null!=model&&model.getDescription().length()>250){
+                return failed("角色组描述不能大于250字");
             }
         }catch (Exception e){
 
@@ -80,8 +80,8 @@ public class RolesController extends BaseController {
         MRoles model=new MRoles();
         try {
             model= objectMapper.readValue(dataJson, MRoles.class);
-            if(null!=model&&model.getDescription().length()>200){
-                return failed("角色组描述不能大于200字");
+            if(null!=model&&model.getDescription().length()>250){
+                return failed("角色组描述不能大于250字");
             }
         }catch (Exception e){
 
