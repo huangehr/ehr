@@ -17,19 +17,19 @@ import java.util.Date;
 public class TjQuotaDimensionMain implements Serializable{
 
 
-    private long id;
+    private Long id;
     private String quotaCode;  //关联 tj_quota code
     private String mainCode; //关联 jt_dimension_main
     private String dictSql;//
-    private String key;//
+    private String keyVal;//
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
-    public long getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -60,12 +60,12 @@ public class TjQuotaDimensionMain implements Serializable{
         this.dictSql = dictSql;
     }
 
-    @Column(name = "key",  nullable = true)
-    public String getKey() {
-        return key;
+    @Column(name = "key_val",  nullable = true)
+    public String getKeyVal() {
+        return keyVal;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setKeyVal(String keyVal) {
+        this.keyVal = keyVal;
     }
 }
