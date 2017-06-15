@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
+import com.yihu.ehr.model.resource.MRsRolesResource;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
@@ -129,4 +130,13 @@ public interface ResourcesGrantClient {
     @RequestMapping(value = ServiceApi.Resources.ResourceAppMetadataGrantExistence, method = RequestMethod.GET)
     List<Map> appMetaExistence(
             @RequestParam("res_app_ids") String resAppIds);
+
+    @ApiOperation("角色组资源授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrants, method = RequestMethod.GET)
+    ResponseEntity<List<MRsRolesResource>> queryRolesResourceGrant(
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "size", required = false) int size);
 }

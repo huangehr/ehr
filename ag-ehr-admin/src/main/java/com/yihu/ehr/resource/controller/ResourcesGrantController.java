@@ -8,10 +8,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.resource.MRsAppResource;
-import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
-import com.yihu.ehr.model.resource.MRsMetadata;
-import com.yihu.ehr.model.resource.MRsResourceMetadata;
+import com.yihu.ehr.model.resource.*;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.resource.client.MetadataClient;
 import com.yihu.ehr.resource.client.ResourceMetadataClient;
@@ -530,6 +527,35 @@ public class ResourcesGrantController extends BaseController {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("查询出错");
+            return envelop;
+        }
+    }
+
+    @ApiOperation("角色组资源授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrants, method = RequestMethod.GET)
+    public Envelop queryRolesResourceGrant(
+            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "999")
+            @RequestParam(value = "size", required = false) int size) throws Exception {
+        try
+        {
+            ResponseEntity<List<MRsRolesResource>> responseEntity = resourcesGrantClient.queryRolesResourceGrant(fields,filters,sorts,page,size);
+            List<MRsRolesResource> rsAppResources = responseEntity.getBody();
+            Envelop envelop = getResult(rsAppResources, getTotalCount(responseEntity), page, size);
+            return envelop;
+        }
+        catch (Exception e)
+        {
+            Envelop envelop = new Envelop();
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
             return envelop;
         }
     }

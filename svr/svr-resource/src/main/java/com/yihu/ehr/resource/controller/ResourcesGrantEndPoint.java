@@ -5,8 +5,10 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
+import com.yihu.ehr.model.resource.MRsRolesResource;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsAppResourceMetadata;
+import com.yihu.ehr.resource.model.RsRolesResource;
 import com.yihu.ehr.resource.service.ResourceGrantService;
 import com.yihu.ehr.resource.service.ResourceMetadataGrantService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -358,5 +360,42 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
 
         List<Map> ls = rsMetadataGrantService.appMetaExistence(resAppIds.split(","));
         return  ls;
+    }
+
+    @ApiOperation("角色组资源授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrants,method = RequestMethod.GET)
+    public List<MRsRolesResource> queryRolesResourceGrant(
+            @ApiParam(name="fields",value="返回字段",defaultValue = "")
+            @RequestParam(value="fields",required = false)String fields,
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters,
+            @ApiParam(name="sorts",value="排序",defaultValue = "")
+            @RequestParam(value="sorts",required = false)String sorts,
+            @ApiParam(name="page",value="页码",defaultValue = "1")
+            @RequestParam(value="page",required = false)int page,
+            @ApiParam(name="size",value="分页大小",defaultValue = "999")
+            @RequestParam(value="size",required = false)int size,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception
+    {
+        long total = 0;
+        Collection<MRsRolesResource> rsRolesList;
+
+        //过滤条件为空
+        if(StringUtils.isEmpty(filters))
+        {
+            Page<RsRolesResource> rsGrant = rsGrantService.getRolesResourceGrant(sorts,reducePage(page),size);
+            total = rsGrant.getTotalElements();
+            rsRolesList = convertToModels(rsGrant.getContent(),new ArrayList<>(rsGrant.getNumber()),MRsRolesResource.class,fields);
+        }
+        else
+        {
+            List<RsRolesResource> rsGrant = rsGrantService.search(fields,filters,sorts,page,size);
+            total = rsGrantService.getCount(filters);
+            rsRolesList = convertToModels(rsGrant,new ArrayList<>(rsGrant.size()),MRsRolesResource.class,fields);
+        }
+
+        pagedResponse(request,response,total,page,size);
+        return (List<MRsRolesResource>)rsRolesList;
     }
 }

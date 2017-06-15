@@ -123,6 +123,8 @@ public class ServiceApi {
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
         public static final String AdapterDict = "/resources/adapter/dict/{id}";
+
+        public static final String ResourceRolesGrants = "/resources/rolesGrants";
     }
 
     /**
