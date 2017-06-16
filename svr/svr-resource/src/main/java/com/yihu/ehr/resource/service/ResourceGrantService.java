@@ -3,9 +3,7 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.AppResourceDao;
 import com.yihu.ehr.resource.dao.intf.AppResourceMetadataDao;
-import com.yihu.ehr.resource.dao.intf.RolesResourceDao;
 import com.yihu.ehr.resource.model.RsAppResource;
-import com.yihu.ehr.resource.model.RsRolesResource;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,8 +22,6 @@ import java.util.List;
 public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResourceDao> {
     @Autowired
     private AppResourceDao appRsDao;
-    @Autowired
-    private RolesResourceDao rolesRsDao;
     @Autowired
     private AppResourceMetadataDao appRsMetadataDao;
     @Autowired
@@ -153,20 +149,5 @@ public class ResourceGrantService extends BaseJpaService<RsAppResource,AppResour
 //        }
 //        rsMetadataGrantService.grantRsMetadataBatch(appRsMetadataList);
         return appRsList;
-    }
-
-    /**
-     * 角色组资源授权获取
-     *
-     * @param sorts String 排序
-     * @param page int 页码
-     * @param size int 分页大小
-     * @return Page<RsRolesResource> 资源
-     */
-    public Page<RsRolesResource> getRolesResourceGrant(String sorts, int page, int size)
-    {
-        Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
-
-        return rolesRsDao.findAll(pageable);
     }
 }
