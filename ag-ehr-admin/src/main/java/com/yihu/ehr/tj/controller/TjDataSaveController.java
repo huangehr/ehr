@@ -127,20 +127,6 @@ public class TjDataSaveController extends ExtendController<TjDataSaveModel> {
             if (null == tjDataSaveModel) {
                 return failed("获取数据存储失败");
             }
-            tjDataSaveModel = objectMapper.convertValue(tjDataSaveModel,TjDataSaveModel.class);
-            if(tjDataSaveModel.getCreateTime() != null){
-                Date createTime = DateUtil.parseDate(tjDataSaveModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                tjDataSaveModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
-            }
-            if(tjDataSaveModel.getUpdateTime() != null){
-                Date updateTime = DateUtil.parseDate(tjDataSaveModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                tjDataSaveModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
-            }
-            //获取类别字典
-            MConventionalDict dict = conventionalDictClient.getTjDataSaveTypeList(String.valueOf(tjDataSaveModel.getType()));
-            tjDataSaveModel.setTypeName(dict == null ? "" : dict.getValue());
-            MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjDataSaveModel.getStatus()));
-            tjDataSaveModel.setStatusName(dict2 == null ? "" : dict2.getValue());
             return success(tjDataSaveModel);
         } catch (Exception e) {
             e.printStackTrace();

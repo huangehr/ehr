@@ -16,6 +16,8 @@ import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.tj.service.TjQuotaDataSaveService;
 import com.yihu.ehr.tj.service.TjQuotaDataSourceService;
 import com.yihu.ehr.tj.service.TjQuotaService;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -118,6 +120,15 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         MTjQuotaModel mTjQuotaModel = null;
         if (null != tjQuota) {
             mTjQuotaModel = convertToModel(tjQuota, MTjQuotaModel.class);
+            if(tjQuota.getExecTime() != null){
+                mTjQuotaModel.setExecTime(DateUtil.toStringLong(tjQuota.getExecTime()));
+            }
+            if(tjQuota.getCreateTime() != null){
+                mTjQuotaModel.setCreateTime(DateUtil.toStringLong(tjQuota.getCreateTime()));
+            }
+            if(tjQuota.getUpdateTime() != null){
+                mTjQuotaModel.setUpdateTime(DateUtil.toStringLong(tjQuota.getUpdateTime()));
+            }
             TjQuotaDataSave tjQuotaDataSave = tjQuotaDataSaveService.getByQuotaCode(tjQuota.getCode());
             TjQuotaDataSource tjQuotaDataSource = tjQuotaDataSourceService.getByQuotaCode(tjQuota.getCode());
             MTjQuotaDataSaveModel mTjQuotaDataSaveModel = new MTjQuotaDataSaveModel();
