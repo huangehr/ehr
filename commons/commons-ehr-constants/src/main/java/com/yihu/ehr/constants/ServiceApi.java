@@ -123,8 +123,12 @@ public class ServiceApi {
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
         public static final String AdapterDict = "/resources/adapter/dict/{id}";
-
+        /**
+         * 应用角色资源授权
+         */
         public static final String ResourceRolesGrants = "/resources/rolesGrants";
+        public static final String ResourceRolesMetadatasValid = "/resources/relosMetadatas/valid";
+        public static final String ResourceRolesMetadataGrants = "/resources/relosMetadatas/grants";
     }
 
     /**

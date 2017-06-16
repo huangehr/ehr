@@ -559,4 +559,52 @@ public class ResourcesGrantController extends BaseController {
             return envelop;
         }
     }
+
+
+    @ApiOperation("角色组资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadatasValid,method = RequestMethod.POST)
+    public boolean rolesValid(
+            @ApiParam(name="data",value="授权数据元",defaultValue = "")
+            @RequestParam(value="data") String data,
+            @ApiParam(name="valid",value="授权数据元ID",defaultValue = "")
+            @RequestParam(value="valid") int valid) throws Exception
+    {
+        return resourcesGrantClient.rolesValid(data, valid);
+    }
+
+//    @ApiOperation("角色组资源数据元维度授权")
+//    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadatasValid, method = RequestMethod.POST)
+//    public Envelop rolesMetadataGrant(
+//            @ApiParam(name = "id", value = "授权ID", defaultValue = "")
+//            @PathVariable(value = "id") String id,
+//            @ApiParam(name = "dimension", value = "授权ID", defaultValue = "")
+//            @RequestParam(value = "dimension") String dimension) throws Exception {
+//
+//        Envelop envelop = new Envelop();
+//        try{
+//            envelop.setObj(resourcesGrantClient.metadataGrant(id, dimension));
+//            envelop.setSuccessFlg(true);
+//            return envelop;
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            return failed("授权失败！");
+//        }
+//    }
+
+    @ApiOperation("角色组资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrants, method = RequestMethod.POST)
+    public Envelop rolesMetadataGrant(
+            @ApiParam(name = "model", value = "数据模型", defaultValue = "")
+            @RequestParam String model) throws Exception {
+
+        Envelop envelop = new Envelop();
+        try{
+            envelop.setObj(resourcesGrantClient.rolesMetadataGrant(model));
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("授权失败！");
+        }
+    }
 }

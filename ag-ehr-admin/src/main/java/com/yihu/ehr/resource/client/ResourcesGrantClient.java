@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
 import com.yihu.ehr.model.resource.MRsRolesResource;
+import com.yihu.ehr.model.resource.MRsRolesResourceMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
@@ -139,4 +140,21 @@ public interface ResourcesGrantClient {
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
+
+    @ApiOperation("角色组资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadatasValid,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    boolean rolesValid(
+            @RequestBody String data,
+            @RequestParam(value="valid") int valid);
+
+//    @ApiOperation("角色组资源数据元维度授权")
+//    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadatasValid, method = RequestMethod.POST)
+//    MRsAppResourceMetadata metadataGrant(
+//            @PathVariable(value = "id") String id,
+//            @RequestParam(value = "dimension") String dimension);
+
+    @ApiOperation("角色组资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrants, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    MRsRolesResourceMetadata rolesMetadataGrant(
+            @RequestBody String model);
 }

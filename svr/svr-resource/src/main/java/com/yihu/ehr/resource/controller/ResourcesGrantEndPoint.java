@@ -6,12 +6,15 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
 import com.yihu.ehr.model.resource.MRsRolesResource;
+import com.yihu.ehr.model.resource.MRsRolesResourceMetadata;
 import com.yihu.ehr.resource.model.RsAppResource;
 import com.yihu.ehr.resource.model.RsAppResourceMetadata;
 import com.yihu.ehr.resource.model.RsRolesResource;
+import com.yihu.ehr.resource.model.RsRolesResourceMetadata;
 import com.yihu.ehr.resource.service.ResourceGrantService;
 import com.yihu.ehr.resource.service.ResourceMetadataGrantService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.resource.service.RolesResourceMetadataGrantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -40,6 +43,9 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
     private ResourceGrantService rsGrantService;
     @Autowired
     private ResourceMetadataGrantService rsMetadataGrantService;
+    @Autowired
+    private RolesResourceMetadataGrantService rolesResourceMetadataGrantService;
+
 
     @ApiOperation("单个应用授权多个资源")
     @RequestMapping(value= ServiceApi.Resources.AppsGrantResources ,method = RequestMethod.POST)
@@ -397,5 +403,59 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
 
         pagedResponse(request,response,total,page,size);
         return (List<MRsRolesResource>)rsRolesList;
+    }
+
+    @ApiOperation("角色组资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadatasValid,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public boolean rolesValid(
+            @ApiParam(name="data",value="授权数据元",defaultValue = "")
+            @RequestBody List<RsRolesResourceMetadata> data,
+            @ApiParam(name="valid",value="授权数据元ID",defaultValue = "")
+            @RequestParam(value="valid") int valid) throws Exception
+    {
+        String ids = "";
+        if(valid==0){
+            for(RsRolesResourceMetadata metadata: data){
+                ids += "," + metadata.getId();
+            }
+        }else{
+            List addLs = new ArrayList<>();
+            for(RsRolesResourceMetadata metadata: data){
+                if(!StringUtils.isEmpty(metadata.getId()))
+                    ids += "," + metadata.getId();
+                else {
+                    metadata.setId(getObjectId(BizObject.RolesResourceMetadata));
+                    addLs.add(metadata);
+                }
+            }
+            rolesResourceMetadataGrantService.grantRsRolesMetadataBatch(addLs);
+        }
+        if(ids.length()>0)
+            rolesResourceMetadataGrantService.rolesValid(ids.substring(1), valid);
+        return true;
+    }
+
+//    @ApiOperation("角色组资源数据元维度授权")
+//    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant, method = RequestMethod.POST)
+//    public MRsAppResourceMetadata metadataGrant(
+//            @ApiParam(name = "id", value = "授权ID", defaultValue = "")
+//            @PathVariable(value = "id") String id,
+//            @ApiParam(name = "dimension", value = "授权ID", defaultValue = "")
+//            @RequestParam(value = "dimension") String dimension) throws Exception {
+//
+//        RsAppResourceMetadata rsAppResourceMetadata = rsMetadataGrantService.retrieve(id);
+//        rsAppResourceMetadata.setDimensionValue(dimension);
+//        rsMetadataGrantService.save(rsAppResourceMetadata);
+//        return convertToModel(rsAppResourceMetadata, MRsAppResourceMetadata.class);
+//    }
+
+    @ApiOperation("角色组资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrants, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    MRsRolesResourceMetadata rolesMetadataGrant(
+            @RequestBody RsRolesResourceMetadata model) throws Exception {
+
+        if(StringUtils.isEmpty(model.getId()))
+            model.setId(getObjectId(BizObject.RolesResourceMetadata));
+        return convertToModel(rolesResourceMetadataGrantService.save(model), MRsRolesResourceMetadata.class);
     }
 }
