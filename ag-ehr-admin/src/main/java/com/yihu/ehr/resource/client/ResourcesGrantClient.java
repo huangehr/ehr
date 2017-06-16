@@ -147,11 +147,11 @@ public interface ResourcesGrantClient {
             @RequestBody String data,
             @RequestParam(value="valid") int valid);
 
-//    @ApiOperation("角色组资源数据元维度授权")
-//    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadatasValid, method = RequestMethod.POST)
-//    MRsAppResourceMetadata metadataGrant(
-//            @PathVariable(value = "id") String id,
-//            @RequestParam(value = "dimension") String dimension);
+    @ApiOperation("角色组资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrant, method = RequestMethod.POST)
+    MRsRolesResourceMetadata metadataRolesGrant(
+            @PathVariable(value = "id") String id,
+            @RequestParam(value = "dimension") String dimension);
 
     @ApiOperation("角色组资源数据元维度授权")
     @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrants, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

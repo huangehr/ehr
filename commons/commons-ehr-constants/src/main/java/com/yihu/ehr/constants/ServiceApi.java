@@ -127,8 +127,10 @@ public class ServiceApi {
          * 应用角色资源授权
          */
         public static final String ResourceRolesGrants = "/resources/rolesGrants";
+        public static final String ResourceRolesGrant = "/resources/rolesGrants/{id}";
         public static final String ResourceRolesMetadatasValid = "/resources/relosMetadatas/valid";
         public static final String ResourceRolesMetadataGrants = "/resources/relosMetadatas/grants";
+
     }
 
     /**
