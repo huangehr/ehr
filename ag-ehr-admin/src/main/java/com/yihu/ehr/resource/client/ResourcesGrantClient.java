@@ -157,4 +157,10 @@ public interface ResourcesGrantClient {
     @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrants, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     MRsRolesResourceMetadata rolesMetadataGrant(
             @RequestBody String model);
+
+    @ApiOperation("单个角色组授权多个资源")
+    @RequestMapping(value = ServiceApi.Resources.RolesGrantResources, method = RequestMethod.POST)
+    Collection<MRsRolesResource> grantRolesResource(
+            @PathVariable(value = "rolesId") String rolesId,
+            @RequestParam(value = "resourceIds") String resourceIds);
 }

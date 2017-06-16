@@ -130,6 +130,8 @@ public class ServiceApi {
         public static final String ResourceRolesGrant = "/resources/rolesGrants/{id}";
         public static final String ResourceRolesMetadatasValid = "/resources/relosMetadatas/valid";
         public static final String ResourceRolesMetadataGrants = "/resources/relosMetadatas/grants";
+        public static final String RolesGrantResources = "/resources/roles/{rolesId}/grant";
+//        public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
 
     }
 

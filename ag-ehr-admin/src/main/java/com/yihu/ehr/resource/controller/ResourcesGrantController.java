@@ -607,4 +607,23 @@ public class ResourcesGrantController extends BaseController {
             return failed("授权失败！");
         }
     }
+
+    @ApiOperation("单个角色组授权多个资源")
+    @RequestMapping(value = ServiceApi.Resources.RolesGrantResources, method = RequestMethod.POST)
+    public Envelop grantRolesResource(
+            @ApiParam(name = "rolesId", value = "角色组ID", defaultValue = "")
+            @PathVariable(value = "rolesId") String rolesId,
+            @ApiParam(name = "resourceIds", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceIds") String resourceIds) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            Collection<MRsRolesResource> rsRolesResource = resourcesGrantClient.grantRolesResource(rolesId,resourceIds);
+            envelop.setObj(rsRolesResource);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
 }

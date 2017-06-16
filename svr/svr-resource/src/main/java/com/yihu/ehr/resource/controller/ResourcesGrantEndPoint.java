@@ -461,6 +461,31 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         return convertToModel(rolesResourceMetadataGrantService.save(model), MRsRolesResourceMetadata.class);
     }
 
+    @ApiOperation("单个角色组授权多个资源")
+    @RequestMapping(value= ServiceApi.Resources.RolesGrantResources ,method = RequestMethod.POST)
+    public Collection<MRsRolesResource> grantRolesResource(
+            @ApiParam(name="rolesId",value="角色组ID",defaultValue = "")
+            @PathVariable(value="rolesId") String rolesId,
+            @ApiParam(name="resourceIds",value="资源ID",defaultValue = "")
+            @RequestParam(value="resourceIds") String resourceIds) throws Exception
+    {
+        String[] resourceIdArray = resourceIds.split(",");
+        List<RsRolesResource> rolesRsList = new ArrayList<RsRolesResource>();
+
+        for(String resoruceId : resourceIdArray)
+        {
+            RsRolesResource rolesRs = new RsRolesResource();
+
+            rolesRs.setId(getObjectId(BizObject.RolesResource));
+            rolesRs.setRolesId(rolesId);
+            rolesRs.setResourceId(resoruceId);
+
+            rolesRsList.add(rolesRs);
+        }
+
+        return convertToModels(rolesResourceGrantService.grantResourceBatch(rolesRsList),new ArrayList<>(rolesRsList.size()),MRsRolesResource.class,"");
+    }
+
 //    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant,method = RequestMethod.GET)
 //    @ApiOperation("根据ID获取资源数据元授权")
 //    public MRsAppResourceMetadata getRsMetadataGrantById(
