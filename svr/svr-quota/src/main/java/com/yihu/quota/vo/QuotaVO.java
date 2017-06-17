@@ -1,4 +1,4 @@
-package com.yihu.jw.quota.vo;
+package com.yihu.quota.vo;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -6,7 +6,9 @@ import java.util.Date;
 /**
  * Created by chenweida on 2017/6/1.
  */
-public class QuotaVo implements Serializable{
+public class QuotaVo implements Serializable {
+    private long serialVersionUID = 1L;
+
     private Integer id;
     private String code;
     private String compute;
@@ -20,8 +22,32 @@ public class QuotaVo implements Serializable{
     private Date updateTime;
     private String updateUser;
     private String updateUserName;
-    private String del;
+    private String execType;
+    private String status;
     private String remark;
+
+
+    @Override
+    public String toString() {
+        return "QuotaVo{" +
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", compute='" + compute + '\'' +
+                ", name='" + name + '\'' +
+                ", cron='" + cron + '\'' +
+                ", dataLevel='" + dataLevel + '\'' +
+                ", jobClazz='" + jobClazz + '\'' +
+                ", createTime=" + createTime +
+                ", createUser='" + createUser + '\'' +
+                ", createUserName='" + createUserName + '\'' +
+                ", updateTime=" + updateTime +
+                ", updateUser='" + updateUser + '\'' +
+                ", updateUserName='" + updateUserName + '\'' +
+                ", execType='" + execType + '\'' +
+                ", status='" + status + '\'' +
+                ", remark='" + remark + '\'' +
+                '}';
+    }
 
 
     public Integer getId() {
@@ -104,12 +130,20 @@ public class QuotaVo implements Serializable{
         this.updateUserName = updateUserName;
     }
 
-    public String getDel() {
-        return del;
+    public String getExecType() {
+        return execType;
     }
 
-    public void setDel(String del) {
-        this.del = del;
+    public void setExecType(String execType) {
+        this.execType = execType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getRemark() {
@@ -129,25 +163,6 @@ public class QuotaVo implements Serializable{
         this.compute = compute;
     }
 
-    @Override
-    public String toString() {
-        return "QuotaVo{" +
-                "id=" + id +
-                ", code='" + code + '\'' +
-                ", compute='" + compute + '\'' +
-                ", name='" + name + '\'' +
-                ", jobClazz='" + jobClazz + '\'' +
-                ", createTime=" + createTime +
-                ", createUser='" + createUser + '\'' +
-                ", createUserName='" + createUserName + '\'' +
-                ", updateTime=" + updateTime +
-                ", updateUser='" + updateUser + '\'' +
-                ", updateUserName='" + updateUserName + '\'' +
-                ", del='" + del + '\'' +
-                ", remark='" + remark + '\'' +
-                '}';
-    }
-
     public String getCron() {
         return cron;
     }
@@ -163,4 +178,6 @@ public class QuotaVo implements Serializable{
     public void setDataLevel(String dataLevel) {
         this.dataLevel = dataLevel;
     }
+
+
 }
