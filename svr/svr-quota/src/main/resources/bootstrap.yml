@@ -1,0 +1,40 @@
+---
+spring:
+  profiles: dev
+  cloud:
+    config:
+      username: user
+      password: configuration
+      #uri: http://127.0.0.1:1221
+      uri: http://192.168.1.221:1221
+      label: dev
+
+---
+spring:
+  profiles: alpha
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://172.19.103.11:1221
+      label: dev
+
+---
+spring:
+  profiles: test
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://172.19.103.73:1221
+      label: dev
+
+---
+spring:
+  profiles: prod
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://11.1.2.21:1221
+      label: master
