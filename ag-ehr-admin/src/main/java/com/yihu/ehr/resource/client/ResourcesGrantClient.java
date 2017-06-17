@@ -177,4 +177,10 @@ public interface ResourcesGrantClient {
     @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrants, method = RequestMethod.DELETE)
     boolean deleteRolesGrantBatch(
             @RequestParam(value = "ids") String ids);
+
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrant,method = RequestMethod.GET)
+    @ApiOperation("角色组-资源授权-维度授权-根据ID获取资源数据元授权")
+    public MRsRolesResourceMetadata getRolesRsMetadataGrantById(
+            @PathVariable(value="id") String id);
 }

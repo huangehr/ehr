@@ -517,12 +517,14 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
         rolesResourceGrantService.deleteGrantByIds(ids.split(","));
         return true;
     }
-//    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant,method = RequestMethod.GET)
-//    @ApiOperation("根据ID获取资源数据元授权")
-//    public MRsAppResourceMetadata getRsMetadataGrantById(
-//            @ApiParam(name="id",value="id",defaultValue = "")
-//            @PathVariable(value="id") String id) throws Exception
-//    {
-//        return convertToModel(rsMetadataGrantService.getRsMetadataGrantById(id),MRsAppResourceMetadata.class);
-//    }
+
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrant,method = RequestMethod.GET)
+    @ApiOperation("角色组-资源授权-维度授权-根据ID获取资源数据元授权")
+    public MRsRolesResourceMetadata getRolesRsMetadataGrantById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        return convertToModel(rolesResourceMetadataGrantService.getRsRolesMetadataGrantById(id),MRsRolesResourceMetadata.class);
+    }
 }

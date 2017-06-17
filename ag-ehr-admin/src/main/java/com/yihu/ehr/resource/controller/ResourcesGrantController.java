@@ -1,6 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.RsAppResourceMetadataModel;
+import com.yihu.ehr.agModel.resource.RsRolesResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.TreeModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppClient;
@@ -684,5 +685,38 @@ public class ResourcesGrantController extends BaseController {
             envelop.setSuccessFlg(false);
         }
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrant,method = RequestMethod.GET)
+    @ApiOperation("角色组-资源授权-维度授权-根据ID获取资源数据元授权")
+    public Envelop getRolesRsMetadataGrantById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        Envelop envelop = new Envelop();
+        try{
+            MRsRolesResourceMetadata rsRolesResourceMetadata = resourcesGrantClient.getRolesRsMetadataGrantById(id);
+            RsRolesResourceMetadataModel model = convertToModel(rsRolesResourceMetadata, RsRolesResourceMetadataModel.class);
+            envelop.setObj(getRolesDetail(model));
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    private RsRolesResourceMetadataModel getRolesDetail(RsRolesResourceMetadataModel model){
+        if(model!=null){
+            MRsResourceMetadata rsResourceMetadata = resourceMetadataClient.getRsMetadataById(model.getResourceMetadataId());
+            MRsMetadata mRsMetadata = metadataClient.getMetadataById(rsResourceMetadata.getMetadataId());
+            if(StringUtils.isEmpty(model.getId()))
+                model.setResourceMetadataName(mRsMetadata.getName());
+            model.setMetaColunmType(mRsMetadata.getColumnType());
+            model.setMetaId(mRsMetadata.getId());
+            if(!StringUtils.isEmpty(mRsMetadata.getDictCode()) && !"0".equals(mRsMetadata.getDictCode()))
+                model.setDictEntries(rsDictionaryEntryClient.searchRsDictionaryEntries("", "dictCode=" +mRsMetadata.getDictCode(), "", 1, 500).getBody());
+        }
+        return model;
     }
 }
