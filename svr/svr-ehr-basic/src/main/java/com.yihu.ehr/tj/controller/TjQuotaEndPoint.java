@@ -4,18 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.entity.tj.TjQuota;
-import com.yihu.ehr.entity.tj.TjQuotaDataSave;
-import com.yihu.ehr.entity.tj.TjQuotaDataSource;
+import com.yihu.ehr.entity.tj.*;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.tj.MTjQuotaDataSaveModel;
 import com.yihu.ehr.model.tj.MTjQuotaDataSourceModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
-import com.yihu.ehr.tj.service.TjQuotaDataSaveService;
-import com.yihu.ehr.tj.service.TjQuotaDataSourceService;
-import com.yihu.ehr.tj.service.TjQuotaService;
+import com.yihu.ehr.tj.service.*;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,6 +41,10 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     TjQuotaDataSaveService tjQuotaDataSaveService;
     @Autowired
     TjQuotaDataSourceService tjQuotaDataSourceService;
+    @Autowired
+    TjDataSaveService tjDataSaveService;
+    @Autowired
+    TjDataSourceService tjDataSourceService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询统计表")
@@ -82,7 +84,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
-        TjQuotaDataSource tjquotaDataSource = convertToModel(tjQuotaModel.getTjquotaDataSourceModel(), TjQuotaDataSource.class);
+        TjQuotaDataSource tjquotaDataSource = convertToModel(tjQuotaModel.getTjQuotaDataSourceModel(), TjQuotaDataSource.class);
         TjQuotaDataSave tjQuotaDataSave = convertToModel(tjQuotaModel.getTjQuotaDataSaveModel(), TjQuotaDataSave.class);
         tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
         tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
@@ -118,20 +120,37 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         MTjQuotaModel mTjQuotaModel = null;
         if (null != tjQuota) {
             mTjQuotaModel = convertToModel(tjQuota, MTjQuotaModel.class);
+            if(tjQuota.getExecTime() != null){
+                mTjQuotaModel.setExecTime(DateUtil.toStringLong(tjQuota.getExecTime()));
+            }
+            if(tjQuota.getCreateTime() != null){
+                mTjQuotaModel.setCreateTime(DateUtil.toStringLong(tjQuota.getCreateTime()));
+            }
+            if(tjQuota.getUpdateTime() != null){
+                mTjQuotaModel.setUpdateTime(DateUtil.toStringLong(tjQuota.getUpdateTime()));
+            }
             TjQuotaDataSave tjQuotaDataSave = tjQuotaDataSaveService.getByQuotaCode(tjQuota.getCode());
             TjQuotaDataSource tjQuotaDataSource = tjQuotaDataSourceService.getByQuotaCode(tjQuota.getCode());
+            TjDataSave tjDataSave = tjDataSaveService.getByCode(tjQuotaDataSave.getSaveCode());
+            TjDataSource tjDataSource = tjDataSourceService.getByCode(tjQuotaDataSource.getSourceCode());
             MTjQuotaDataSaveModel mTjQuotaDataSaveModel = new MTjQuotaDataSaveModel();
             mTjQuotaDataSaveModel.setId(tjQuotaDataSave.getId());
             mTjQuotaDataSaveModel.setSaveCode(tjQuotaDataSave.getSaveCode());
             mTjQuotaDataSaveModel.setQuotaCode(tjQuotaDataSave.getQuotaCode());
             mTjQuotaDataSaveModel.setConfigJson(tjQuotaDataSave.getConfigJson());
+            if (tjDataSave != null) {
+                mTjQuotaDataSaveModel.setName(tjDataSave.getName());
+            }
             mTjQuotaModel.setTjQuotaDataSaveModel(mTjQuotaDataSaveModel);
             MTjQuotaDataSourceModel mTjQuotaDataSourceModel = new MTjQuotaDataSourceModel();
             mTjQuotaDataSourceModel.setId(tjQuotaDataSource.getId());
             mTjQuotaDataSourceModel.setQuotaCode(tjQuotaDataSource.getQuotaCode());
             mTjQuotaDataSourceModel.setSourceCode(tjQuotaDataSource.getSourceCode());
             mTjQuotaDataSourceModel.setConfigJson(tjQuotaDataSource.getConfigJson());
-            mTjQuotaModel.setTjquotaDataSourceModel(mTjQuotaDataSourceModel);
+            if (tjDataSource != null) {
+                mTjQuotaDataSourceModel.setName(tjDataSource.getName());
+            }
+            mTjQuotaModel.setTjQuotaDataSourceModel(mTjQuotaDataSourceModel);
         }
         return mTjQuotaModel;
     }

@@ -21,7 +21,7 @@ public class TjQuotaDimensionSlave implements Serializable{
     private String quotaCode;  //关联 tj_quota code
     private String slaveCode; //关联 jt_dimension_slave
     private String dictSql;//
-    private String key;//
+    private String keyVal;//
     private Integer sort;//纬度顺序
 
     @Id
@@ -61,13 +61,13 @@ public class TjQuotaDimensionSlave implements Serializable{
         this.dictSql = dictSql;
     }
 
-    @Column(name = "key",  nullable = true)
-    public String getKey() {
-        return key;
+    @Column(name = "key_val",  nullable = true)
+    public String getKeyVal() {
+        return keyVal;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setKeyVal(String keyVal) {
+        this.keyVal = keyVal;
     }
 
     public Integer getSort() {

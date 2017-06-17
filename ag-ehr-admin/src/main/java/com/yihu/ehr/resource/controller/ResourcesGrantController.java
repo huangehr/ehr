@@ -8,10 +8,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.resource.MRsAppResource;
-import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
-import com.yihu.ehr.model.resource.MRsMetadata;
-import com.yihu.ehr.model.resource.MRsResourceMetadata;
+import com.yihu.ehr.model.resource.*;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.resource.client.MetadataClient;
 import com.yihu.ehr.resource.client.ResourceMetadataClient;
@@ -532,5 +529,101 @@ public class ResourcesGrantController extends BaseController {
             envelop.setErrorMsg("查询出错");
             return envelop;
         }
+    }
+
+    @ApiOperation("角色组资源授权初始查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrants, method = RequestMethod.GET)
+    public Envelop queryRolesResourceGrant(
+            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "999")
+            @RequestParam(value = "size", required = false) int size) throws Exception {
+        try
+        {
+            ResponseEntity<List<MRsRolesResource>> responseEntity = resourcesGrantClient.queryRolesResourceGrant(fields,filters,sorts,page,size);
+            List<MRsRolesResource> rsAppResources = responseEntity.getBody();
+            Envelop envelop = getResult(rsAppResources, getTotalCount(responseEntity), page, size);
+            return envelop;
+        }
+        catch (Exception e)
+        {
+            Envelop envelop = new Envelop();
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            return envelop;
+        }
+    }
+
+
+    @ApiOperation("角色组资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadatasValid,method = RequestMethod.POST)
+    public boolean rolesValid(
+            @ApiParam(name="data",value="授权数据元",defaultValue = "")
+            @RequestParam(value="data") String data,
+            @ApiParam(name="valid",value="授权数据元ID",defaultValue = "")
+            @RequestParam(value="valid") int valid) throws Exception
+    {
+        return resourcesGrantClient.rolesValid(data, valid);
+    }
+
+    @ApiOperation("角色组资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrant, method = RequestMethod.POST)
+    public Envelop rolesMetadataGrant(
+            @ApiParam(name = "id", value = "授权ID", defaultValue = "")
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "dimension", value = "授权ID", defaultValue = "")
+            @RequestParam(value = "dimension") String dimension) throws Exception {
+
+        Envelop envelop = new Envelop();
+        try{
+            envelop.setObj(resourcesGrantClient.metadataRolesGrant(id, dimension));
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("授权失败！");
+        }
+    }
+
+    @ApiOperation("角色组资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrants, method = RequestMethod.POST)
+    public Envelop rolesMetadataGrant(
+            @ApiParam(name = "model", value = "数据模型", defaultValue = "")
+            @RequestParam String model) throws Exception {
+
+        Envelop envelop = new Envelop();
+        try{
+            envelop.setObj(resourcesGrantClient.rolesMetadataGrant(model));
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("授权失败！");
+        }
+    }
+
+    @ApiOperation("单个角色组授权多个资源")
+    @RequestMapping(value = ServiceApi.Resources.RolesGrantResources, method = RequestMethod.POST)
+    public Envelop grantRolesResource(
+            @ApiParam(name = "rolesId", value = "角色组ID", defaultValue = "")
+            @PathVariable(value = "rolesId") String rolesId,
+            @ApiParam(name = "resourceIds", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceIds") String resourceIds) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            Collection<MRsRolesResource> rsRolesResource = resourcesGrantClient.grantRolesResource(rolesId,resourceIds);
+            envelop.setObj(rsRolesResource);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 }

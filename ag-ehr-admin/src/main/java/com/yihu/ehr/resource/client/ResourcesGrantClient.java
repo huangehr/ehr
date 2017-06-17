@@ -5,6 +5,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
+import com.yihu.ehr.model.resource.MRsRolesResource;
+import com.yihu.ehr.model.resource.MRsRolesResourceMetadata;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
@@ -129,4 +131,36 @@ public interface ResourcesGrantClient {
     @RequestMapping(value = ServiceApi.Resources.ResourceAppMetadataGrantExistence, method = RequestMethod.GET)
     List<Map> appMetaExistence(
             @RequestParam("res_app_ids") String resAppIds);
+
+    @ApiOperation("角色组资源授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrants, method = RequestMethod.GET)
+    ResponseEntity<List<MRsRolesResource>> queryRolesResourceGrant(
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "size", required = false) int size);
+
+    @ApiOperation("角色组资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadatasValid,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    boolean rolesValid(
+            @RequestBody String data,
+            @RequestParam(value="valid") int valid);
+
+    @ApiOperation("角色组资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrant, method = RequestMethod.POST)
+    MRsRolesResourceMetadata metadataRolesGrant(
+            @PathVariable(value = "id") String id,
+            @RequestParam(value = "dimension") String dimension);
+
+    @ApiOperation("角色组资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesMetadataGrants, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    MRsRolesResourceMetadata rolesMetadataGrant(
+            @RequestBody String model);
+
+    @ApiOperation("单个角色组授权多个资源")
+    @RequestMapping(value = ServiceApi.Resources.RolesGrantResources, method = RequestMethod.POST)
+    Collection<MRsRolesResource> grantRolesResource(
+            @PathVariable(value = "rolesId") String rolesId,
+            @RequestParam(value = "resourceIds") String resourceIds);
 }

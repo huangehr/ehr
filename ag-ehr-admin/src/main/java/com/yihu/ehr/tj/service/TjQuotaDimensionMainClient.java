@@ -38,6 +38,10 @@ public interface TjQuotaDimensionMainClient {
     @ApiOperation(value = "新增/修改主维度关联信息")
     ObjectResult add(@RequestBody String model) ;
 
+    @RequestMapping(value = ServiceApi.TJ.AddTjQuotaDimensionMain, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增主维度关联信息")
+    ObjectResult addTjQuotaDimensionMain(@RequestBody String model) ;
+
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionMain, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除主维度关联信息")
     Result delete(@RequestParam(value = "id") String id);
