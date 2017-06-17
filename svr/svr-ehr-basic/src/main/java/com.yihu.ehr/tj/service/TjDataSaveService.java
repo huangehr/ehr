@@ -21,4 +21,8 @@ public class TjDataSaveService extends BaseJpaService<TjDataSave,XTjDataSaveRepo
         return tjDataSave;
     }
 
+    public TjDataSave getByCode(String code) {
+        return tjDataSaveRepository.findByCode(code);
+    }
+
 }

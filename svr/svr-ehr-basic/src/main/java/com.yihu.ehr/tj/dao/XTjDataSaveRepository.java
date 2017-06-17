@@ -10,4 +10,5 @@ import org.springframework.data.repository.query.Param;
  * Created by Administrator on 2017/6/9.
  */
 public interface XTjDataSaveRepository extends PagingAndSortingRepository<TjDataSave, Long> {
+    TjDataSave findByCode(String code);
 }

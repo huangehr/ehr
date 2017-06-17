@@ -12,6 +12,6 @@ import java.util.List;
  */
 public interface XTjQuotaDataSaveRepository extends PagingAndSortingRepository<TjQuotaDataSave, Long> {
 
-    @Query("select dataSave from TjQuotaDataSave dataSave where dataSave.quotaCode = :quotaCode")
+    @Query("select dataSave from TjQuotaDataSave dataSave where dataSave.quotaCode = :quotaCode order by dataSave.id desc ")
     List<TjQuotaDataSave> getByQuotaCode(@Param("quotaCode") String quotaCode);
 }

@@ -20,4 +20,8 @@ public class TjDataSourceService extends BaseJpaService<TjDataSource, XTjDataSou
         TjDataSource tjDataSource = tjDataSourceRepository.findOne(id);
         return tjDataSource;
     }
+
+    public TjDataSource getByCode(String code) {
+        return tjDataSourceRepository.findByCode(code);
+    }
 }
