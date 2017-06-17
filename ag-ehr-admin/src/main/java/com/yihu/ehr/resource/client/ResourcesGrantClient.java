@@ -163,4 +163,18 @@ public interface ResourcesGrantClient {
     Collection<MRsRolesResource> grantRolesResource(
             @PathVariable(value = "rolesId") String rolesId,
             @RequestParam(value = "resourceIds") String resourceIds);
+
+    @ApiOperation("角色组资源数据元授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesResMetadataGrants,method = RequestMethod.GET)
+    ResponseEntity<List<MRsRolesResourceMetadata>> getRolesRsMetadatas(
+            @PathVariable(value="roles_res_id")String rolesResId);
+
+    @ApiOperation("角色组取消资源授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrantsNoPage,method = RequestMethod.GET)
+    List<MRsRolesResource> queryRolesResourceGrantNoPage(
+            @RequestParam(value="filters",required = false)String filters);
+    @ApiOperation("角色组资源授权批量删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrants, method = RequestMethod.DELETE)
+    boolean deleteRolesGrantBatch(
+            @RequestParam(value = "ids") String ids);
 }

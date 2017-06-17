@@ -485,7 +485,38 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
 
         return convertToModels(rolesResourceGrantService.grantResourceBatch(rolesRsList),new ArrayList<>(rolesRsList.size()),MRsRolesResource.class,"");
     }
-
+    @ApiOperation("角色组资源数据元授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesResMetadataGrants,method = RequestMethod.GET)
+    public Collection<MRsRolesResourceMetadata> getRolesRsMetadatas(
+            @ApiParam(name="roles_res_id",value="授权应用编号",defaultValue = "1")
+            @PathVariable(value="roles_res_id")String rolesResId) throws Exception
+    {
+        RsRolesResource rolesResource = rolesResourceGrantService.retrieve(rolesResId);
+        List<RsRolesResourceMetadata> rsMetadataGrant = new ArrayList<>();
+        if(rolesResource!=null){
+            rsMetadataGrant = rolesResourceMetadataGrantService.getRolesRsMetadatas(rolesResource.getId(), rolesResource.getRolesId(), rolesResource.getResourceId());
+        }
+        return convertToModels(rsMetadataGrant, new ArrayList<>(rsMetadataGrant.size()), MRsRolesResourceMetadata.class, "");
+    }
+    @ApiOperation("角色组取消资源授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrantsNoPage,method = RequestMethod.GET)
+    public List<MRsRolesResource> queryRolesResourceGrantNoPage(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception {
+        Collection<MRsRolesResource> rsRolesList;
+        List<RsRolesResource> rsGrant = rolesResourceGrantService.search(filters);
+        rsRolesList = convertToModels(rsGrant,new ArrayList<>(rsGrant.size()),MRsRolesResource.class,null);
+        return (List<MRsRolesResource>)rsRolesList;
+    }
+    @ApiOperation("角色组资源授权批量删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrants,method = RequestMethod.DELETE)
+    public boolean deleteRolesGrantBatch(
+            @ApiParam(name="ids",value="授权ID",defaultValue = "")
+            @RequestParam(value="ids") String ids) throws Exception
+    {
+        rolesResourceGrantService.deleteGrantByIds(ids.split(","));
+        return true;
+    }
 //    @RequestMapping(value = ServiceApi.Resources.ResourceMetadataGrant,method = RequestMethod.GET)
 //    @ApiOperation("根据ID获取资源数据元授权")
 //    public MRsAppResourceMetadata getRsMetadataGrantById(

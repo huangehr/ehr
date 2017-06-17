@@ -626,4 +626,63 @@ public class ResourcesGrantController extends BaseController {
         }
         return envelop;
     }
+
+    @ApiOperation("角色组资源数据元授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesResMetadataGrants,method = RequestMethod.GET)
+    public Envelop queryRolesRsMetadataGrant(
+            @ApiParam(name="roles_res_id",value="授权角色编号",defaultValue = "1")
+            @PathVariable(value="roles_res_id")String rolesResId,
+            @ApiParam(name="page",value="页码",defaultValue = "1")
+            @RequestParam(value="page",required = false)int page,
+            @ApiParam(name="size",value="分页大小",defaultValue = "15")
+            @RequestParam(value="size",required = false)int size) throws Exception
+    {
+        try
+        {
+            ResponseEntity<List<MRsRolesResourceMetadata>> responseEntity = resourcesGrantClient.getRolesRsMetadatas(rolesResId);
+            return getResult(responseEntity.getBody(), responseEntity.getBody().size(), 1, 15);
+        }
+        catch (Exception e)
+        {
+            Envelop envelop = new Envelop();
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("查询出错");
+            return envelop;
+        }
+    }
+
+    @ApiOperation("角色组资源取消授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrantsNoPage,method = RequestMethod.GET)
+    public Envelop queryRolesResourceGrantNoPage(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<MRsRolesResource> mRsRolesResources = resourcesGrantClient.queryRolesResourceGrantNoPage(filters);
+            if(mRsRolesResources != null){
+                envelop.setSuccessFlg(true);
+                envelop.setDetailModelList(mRsRolesResources);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+    @ApiOperation("角色组资源授权批量删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrants, method = RequestMethod.DELETE)
+    public Envelop deleteRolesGrantBatch(
+            @ApiParam(name = "ids", value = "授权ID", defaultValue = "")
+            @RequestParam(value = "ids") String ids) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            resourcesGrantClient.deleteRolesGrantBatch(ids);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
 }

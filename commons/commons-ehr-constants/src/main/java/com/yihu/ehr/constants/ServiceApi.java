@@ -123,6 +123,7 @@ public class ServiceApi {
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
         public static final String AdapterDict = "/resources/adapter/dict/{id}";
+
         /**
          * 应用角色资源授权
          */
@@ -132,6 +133,10 @@ public class ServiceApi {
         public static final String ResourceRolesMetadataGrants = "/resources/relosMetadatas/grants";
         public static final String RolesGrantResources = "/resources/roles/{rolesId}/grant";
 //        public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
+        public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
+        public static final String ResourceRolesResMetadataGrants = "/resources/roles_resource/{roles_res_id}/metadata";
+
 
     }
 
