@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.patient.feign.GeographyClient;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -15,8 +16,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 人口学索引实现类.
@@ -145,4 +145,110 @@ public class DemographicService {
         demInfo.setPassword(HashUtil.hash(pwd));
         demographicInfoRepository.save(demInfo);
     }
+    public List<DemographicInfo> searchPatientByParams(Map<String, Object> args) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String search = (String) args.get("search");
+        Integer page = (Integer) args.get("page");
+        Integer pageSize = (Integer) args.get("pageSize");
+
+        String province = (String) args.get("province");
+        String city = (String) args.get("city");
+        String district = (String) args.get("district");
+        String gender = (String) args.get("gender");
+
+        Date searchRegisterTimeStart = (Date) args.get("startDate");
+        Date searchRegisterTimeEnd = (Date) args.get("endDate");
+
+        boolean addressNotNull=(!StringUtils.isEmpty(province) || !StringUtils.isEmpty(city) || !StringUtils.isEmpty(district));
+        List<String> homeAddressIdList = null;
+        String hql = "from DemographicInfo where 1=1";
+        if (!StringUtils.isEmpty(search)) {
+            hql += " and ((id like :search) or (name like :search))";
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            hql += " and gender = (:gender)";
+        }
+        if (addressNotNull) {
+            homeAddressIdList = addressClient.search(province,city,district);
+            hql += " and homeAddress in (:homeAddressIdList)";
+        }
+
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            hql += " and registerTime>= :searchRegisterTimeStart";
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            hql += " and registerTime < :searchRegisterTimeEnd";
+        }
+        hql += " order by registerTime desc";
+        Query query = session.createQuery(hql);
+        if (!StringUtils.isEmpty(search)) {
+            query.setString("search", "%" + search + "%");
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            query.setString("gender", gender);
+        }
+        if (addressNotNull) {
+            query.setParameterList("homeAddressIdList", homeAddressIdList);
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            query.setDate("searchRegisterTimeStart",searchRegisterTimeStart);
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            query.setDate("searchRegisterTimeEnd", searchRegisterTimeEnd);
+        }
+        query.setMaxResults(pageSize);
+        query.setFirstResult((page - 1) * pageSize);
+        List<DemographicInfo> demographicInfos = query.list();
+        return demographicInfos;
+    }
+
+    public Integer searchPatientByParamsTotalCount(Map<String, Object> args) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String search = (String) args.get("search");
+
+        String province = (String) args.get("province");
+        String city = (String) args.get("city");
+        String district = (String) args.get("district");
+        String gender = (String) args.get("gender");
+        Date searchRegisterTimeStart = (Date) args.get("startDate");
+        Date searchRegisterTimeEnd = (Date) args.get("endDate");
+        boolean addressNotNull=(!StringUtils.isEmpty(province) || !StringUtils.isEmpty(city) || !StringUtils.isEmpty(district));
+        List<String> homeAddressIdList = null;
+        String hql = "select count(*) from DemographicInfo where 1=1";
+        if (!StringUtils.isEmpty(search)) {
+            hql += " and ((id like :search) or (name like :search))";
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            hql += " and gender = (:gender)";
+        }
+        if (addressNotNull) {
+            homeAddressIdList = addressClient.search(province,city,district);
+            hql += " and homeAddress in (:homeAddressIdList)";
+        }
+
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            hql += " and registerTime >= :searchRegisterTimeStart";
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            hql += " and registerTime < :searchRegisterTimeEnd";
+        }
+        Query query = session.createQuery(hql);
+        if (!StringUtils.isEmpty(search)) {
+            query.setString("search", "%" + search + "%");
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            query.setString("gender", gender);
+        }
+        if (addressNotNull) {
+            query.setParameterList("homeAddressIdList", homeAddressIdList);
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            query.setDate("searchRegisterTimeStart", searchRegisterTimeStart);
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            query.setDate("searchRegisterTimeEnd", searchRegisterTimeEnd);
+        }
+        return ((Long)query.list().get(0)).intValue();
+    }
+
 }
