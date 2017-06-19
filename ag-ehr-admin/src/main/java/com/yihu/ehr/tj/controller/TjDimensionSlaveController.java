@@ -1,7 +1,6 @@
 package com.yihu.ehr.tj.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
-import com.yihu.ehr.agModel.tj.TjDimensionMainModel;
 import com.yihu.ehr.agModel.tj.TjDimensionSlaveModel;
 import com.yihu.ehr.agModel.tj.TjQuotaDimensionSlaveModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -24,10 +23,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author janseny
@@ -100,6 +96,8 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "filter", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filter", required = true) String filter,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
@@ -114,22 +112,9 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
             List<Map<String, Object>> modelList = listResult.getDetailModelList();
             for (Map<String, Object> map : modelList) {
                 TjDimensionSlaveModel tjDimensionSlaveModel = objectMapper.convertValue(map, TjDimensionSlaveModel.class);
-                if (tjDimensionSlaveModel.getCreateTime() != null) {
-                    Date createTime = DateUtil.parseDate(tjDimensionSlaveModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                    tjDimensionSlaveModel.setCreateTime(DateTimeUtil.simpleDateTimeFormat(createTime));
-                }
-                if (tjDimensionSlaveModel.getUpdateTime() != null) {
-                    Date updateTime = DateUtil.parseDate(tjDimensionSlaveModel.getUpdateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                    tjDimensionSlaveModel.setUpdateTime(DateTimeUtil.simpleDateTimeFormat(updateTime));
-                }
-                //获取类别字典
-                MConventionalDict dict = conventionalDictClient.getDimensionSlaveTypeList(String.valueOf(tjDimensionSlaveModel.getType()));
-                tjDimensionSlaveModel.setTypeName(dict == null ? "" : dict.getValue());
-                MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjDimensionSlaveModel.getStatus()));
-                tjDimensionSlaveModel.setStatusName(dict2 == null ? "" : dict2.getValue());
                 mainModelList.add(tjDimensionSlaveModel);
             }
-            ListResult listResult2 = tjQuotaDimensionSlaveClient.search(fields, filters, sorts, size, page);
+            ListResult listResult2 = tjQuotaDimensionSlaveClient.search(fields, filter, sorts, size, page);
             List<TjQuotaDimensionSlaveModel> tjQuotaDimensionSlaveModelList = new ArrayList<>();
             if (listResult2.getTotalCount() != 0) {
                 List<Map<String, Object>> modelList2 = listResult2.getDetailModelList();
@@ -153,7 +138,9 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
                     mainModelList.get(i).setChecked(false);
                 }
             }
-            return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            Envelop result = getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            result.setObj(tjQuotaDimensionSlaveModelList);
+            return result;
         } else {
             Envelop envelop = new Envelop();
             return envelop;

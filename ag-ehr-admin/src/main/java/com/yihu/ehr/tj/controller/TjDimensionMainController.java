@@ -6,7 +6,6 @@ import com.yihu.ehr.agModel.tj.TjQuotaDimensionMainModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjDimensionMain;
-import com.yihu.ehr.entity.tj.TjDimensionSlave;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -21,14 +20,10 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author janseny
@@ -98,6 +93,8 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "filter", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filter", required = true) String filter,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
@@ -112,22 +109,9 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
                 TjDimensionMainModel tjDimensionMainModel = objectMapper.convertValue(map,TjDimensionMainModel.class);
-                if(tjDimensionMainModel.getCreateTime() != null){
-                    Date createTime = DateUtil.parseDate(tjDimensionMainModel.getCreateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                    tjDimensionMainModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
-                }
-                if(tjDimensionMainModel.getUpdateTime() != null){
-                    Date updateTime = DateUtil.parseDate(tjDimensionMainModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
-                    tjDimensionMainModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
-                }
-                //获取类别字典
-                MConventionalDict dict = conventionalDictClient.getDimensionMainTypeList(String.valueOf(tjDimensionMainModel.getType()));
-                tjDimensionMainModel.setTypeName(dict == null ? "" : dict.getValue());
-                MConventionalDict dict2 = conventionalDictClient.getDimensionStatusList(String.valueOf(tjDimensionMainModel.getStatus()));
-                tjDimensionMainModel.setStatusName(dict2 == null ? "" : dict2.getValue());
                 mainModelList.add(tjDimensionMainModel);
             }
-            ListResult listResult2 = tjQuotaDimensionMainClient.search(fields, filters, sorts, size, page);
+            ListResult listResult2 = tjQuotaDimensionMainClient.search(fields, filter, sorts, size, page);
             List<TjQuotaDimensionMainModel> mainModelList2  = new ArrayList<>();
             if(listResult2.getTotalCount() != 0) {
                 List<Map<String, Object>> modelList2 = listResult2.getDetailModelList();
@@ -151,7 +135,9 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
                     mainModelList.get(i).setChecked(false);
                 }
             }
-            return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            Envelop result = getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            result.setObj(mainModelList2);
+            return result;
         }else{
             Envelop envelop = new Envelop();
             return envelop;

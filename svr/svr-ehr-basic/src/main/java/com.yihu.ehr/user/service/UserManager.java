@@ -22,6 +22,7 @@ import java.util.Map;
  * @author Sand
  * @version 1.0
  * @updated 02-6月-2015 20:10:56
+ * @updated 16-6月-2017 14:17:24 修改loginVerification()
  */
 
 @Service
@@ -60,6 +61,10 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         return userRepository.findByLoginCode(loginCode);
     }
 
+    public  User getByTelephone(String telephone) {
+        return userRepository.findByTelephone(telephone);
+    }
+
     public User getUserByIdCardNo(String idCardNo) {
         List<User> users = userRepository.findByIdCardNo(idCardNo);
         if(users.size()>0){
@@ -90,7 +95,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     }
 
     /**
-     * 根据登陆用户名及密码验证用户.
+     * 根据登陆用户名/身份证号/手机号及密码验证用户.
      *
      * @param loginCode
      * @param psw
@@ -99,7 +104,13 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
 
         User user = getUserByUserName(loginCode);
         if (user == null) {
-            return null;
+            user = getByTelephone(loginCode);
+            if (null == user) {
+                user = getUserByIdCardNo(loginCode);
+                if (null == user) {
+                    return null;
+                }
+            }
         }
         boolean result = isPasswordRight(user,psw);
         if(result) {
