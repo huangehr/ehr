@@ -40,4 +40,5 @@ public class MicroServices {
     public static final String Authentication = "svr-authentication";
     public static final String Redis = "svr-redis";
     public static final String Statistics = "svr-protal-statistics";
+    public static final String Quota = "svr-quota";
 }

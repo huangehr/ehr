@@ -13,6 +13,7 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjQuotaClient;
+import com.yihu.ehr.tj.service.TjQuotaJobClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -37,6 +38,8 @@ import java.util.Map;
 public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
     TjQuotaClient tjQuotaClient;
+    @Autowired
+    TjQuotaJobClient tjQuotaJobClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
 
@@ -150,5 +153,14 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @ApiOperation(value = "校验code是否存在")
     public boolean hasExistsCode(@PathVariable("code") String code) {
         return tjQuotaClient.hasExistsCode(code);
+    }
+
+
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
+    public boolean execuJob(
+            @ApiParam(name = "id")
+            @RequestParam("id") int id) throws Exception {
+        return tjQuotaJobClient.tjQuotaExecute(id);
     }
 }

@@ -17,7 +17,7 @@ public class TjQuotaDimensionSlaveModel{
     private String slaveCode;   //关联 jt_dimension_slave
     private String name;        //细纬度名称
     private String dictSql;
-    private String key;
+    private String keyVal;
     private Integer sort;       //纬度顺序
 
     public Long getId() {
@@ -60,12 +60,12 @@ public class TjQuotaDimensionSlaveModel{
         this.name = name;
     }
 
-    public String getKey() {
-        return key;
+    public String getKeyVal() {
+        return keyVal;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setKeyVal(String keyVal) {
+        this.keyVal = keyVal;
     }
 
     public Integer getSort() {
