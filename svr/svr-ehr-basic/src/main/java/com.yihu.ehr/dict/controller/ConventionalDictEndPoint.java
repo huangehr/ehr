@@ -3,12 +3,14 @@ package com.yihu.ehr.dict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.dict.service.SystemDictEntry;
 import com.yihu.ehr.dict.service.SystemDictEntryService;
+import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -741,7 +743,20 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
         return getDictModel(type);
     };
 
-
+    @RequestMapping(value ="/GetAlldictionariesByDictId",method = RequestMethod.GET)
+    @ApiOperation(value = "获取卡状态所有字典项")
+    public ListResult GetAlldictionariesByDictId() throws Exception{
+        long dictId=10;
+        int page=0;
+        int size=1000;
+        ListResult re = new ListResult(page,size);
+        Page<SystemDictEntry> cardList = dictEntryService.findByDictId(dictId, page,size);
+        if(cardList!=null) {
+            re.setDetailModelList(cardList.getContent());
+            re.setTotalCount(cardList.getTotalPages());
+        }
+        return re;
+    }
 
 
 

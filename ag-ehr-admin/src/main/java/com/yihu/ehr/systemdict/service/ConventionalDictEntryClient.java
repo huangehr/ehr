@@ -2,6 +2,7 @@ package com.yihu.ehr.systemdict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -456,4 +457,9 @@ import java.util.List;
     MConventionalDict getTjQuotaDataLevelList(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
+
+
+    @RequestMapping(value = "/GetAlldictionariesByDictId", method = RequestMethod.GET)
+    @ApiOperation(value = "获取卡状态所有字典项")
+    ListResult GetAlldictionariesByDictId();
 }

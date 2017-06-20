@@ -1,8 +1,13 @@
 package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.patient.service.PatientCardsClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
@@ -13,18 +18,21 @@ import com.yihu.ehr.patient.service.PatientClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +58,12 @@ public class PatientController extends BaseController {
 
     @Autowired
     private FileResourceClient fileResourceClient;
+    @Autowired
+    PatientCardsClient patientCardsClient;
+    @Autowired
+    SystemDictClient systemDictClient;
+    @Autowired
+    private ConventionalDictEntryClient dictEntryClient;
 
     @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
@@ -515,5 +529,57 @@ public class PatientController extends BaseController {
             ex.printStackTrace();
             return failedSystem();
         }
+    }
+    @RequestMapping(value = "/PatientCardByUserId",method = RequestMethod.GET)
+    @ApiOperation(value = "用户获取个人卡列表")
+    public Envelop cardList(
+            @ApiParam(name = "userId", value = "用户ID", defaultValue = "")
+            @RequestParam(value = "userId",required = false) String userId,
+            @ApiParam(name = "cardType", value = "卡类别", defaultValue = "")
+            @RequestParam(value = "cardType",required = false) String cardType,
+            @ApiParam(name = "page", value = "当前页（从0开始）", defaultValue = "")
+            @RequestParam(value = "page",required = false) Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows",required = false) Integer rows) throws Exception{
+
+        ListResult result = patientCardsClient.cardList(userId, cardType, page, rows);
+        //系统字典-卡类别-10
+        String code="";
+        ListResult mConventionalDict = dictEntryClient.GetAlldictionariesByDictId();
+        List<Map<String,Object>> mConventionalDictList = mConventionalDict.getDetailModelList();
+        Map<String,String> cardMap=new HashedMap();
+        if(null!=mConventionalDictList&&mConventionalDictList.size()>0){
+            for(int i=0;i<mConventionalDictList.size();i++){
+//                Object obj = mConventionalDictList.get(i);
+               cardMap.put(mConventionalDictList.get(i).get("sort").toString(),mConventionalDictList.get(i).get("value").toString());
+            }
+        }
+        List<Map<String,Object>> list = result.getDetailModelList();
+        int totalCout=0;
+        if(null!=list&&list.size()>0){
+            for(int i=0;i<list.size();i++){
+                String cardTypeName=cardMap.get(list.get(i).get("cardType"));
+                if(null!=cardMap.get(list.get(i).get("cardType"))){
+                    list.get(i).put("cardType",cardMap.get(list.get(i).get("cardType")));
+                }
+            }
+            totalCout=list.size();
+        }
+        list = convertCardModels(list);
+        return getResult(list,totalCout, result.getCurrPage(), result.getPageSize());
+    }
+
+
+    private List convertCardModels(List<Map<String,Object>> userCards){
+        List<MDictionaryEntry> statusDicts = systemDictClient.getDictEntries("", "dictId=43", "", 10, 1).getBody();
+        Map<String, String> statusMap = new HashMap<>();
+        for(MDictionaryEntry entry : statusDicts){
+            statusMap.put(entry.getCode(), entry.getValue());
+        }
+        for(Map<String,Object> info : userCards){
+            info.put("statusName",statusMap.get(info.get("status")));
+        }
+
+        return userCards;
     }
 }
