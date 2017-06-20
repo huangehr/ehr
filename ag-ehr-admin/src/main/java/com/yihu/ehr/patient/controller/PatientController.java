@@ -2,6 +2,7 @@ package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.entity.patient.UserCards;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
@@ -531,19 +532,23 @@ public class PatientController extends BaseController {
             return failedSystem();
         }
     }
+
     @RequestMapping(value = "/PatientCardByUserId",method = RequestMethod.GET)
     @ApiOperation(value = "用户获取个人卡列表")
     public Envelop cardList(
-            @ApiParam(name = "userId", value = "用户ID", defaultValue = "")
-            @RequestParam(value = "userId",required = false) String userId,
-            @ApiParam(name = "cardType", value = "卡类别", defaultValue = "")
-            @RequestParam(value = "cardType",required = false) String cardType,
-            @ApiParam(name = "page", value = "当前页（从0开始）", defaultValue = "")
-            @RequestParam(value = "page",required = false) Integer page,
-            @ApiParam(name = "rows", value = "行数", defaultValue = "")
-            @RequestParam(value = "rows",required = false) Integer rows) throws Exception{
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,cardType,cardNo,releaseOrg,validityDateBegin,validityDateEnd,status")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+createDate")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception{
 
-        ListResult result = patientCardsClient.cardList(userId, cardType, page, rows);
+        ResponseEntity<List<UserCards>> responseEntity = patientCardsClient.getUserCardList(fields, filters, sorts, size, page);
+        List<UserCards> list = responseEntity.getBody();
         //系统字典-卡类别-10
         String code="";
         ListResult mConventionalDict = dictEntryClient.GetAlldictionariesByDictId();
@@ -555,19 +560,19 @@ public class PatientController extends BaseController {
                cardMap.put(mConventionalDictList.get(i).get("sort").toString(),mConventionalDictList.get(i).get("value").toString());
             }
         }
-        List<Map<String,Object>> list = result.getDetailModelList();
         int totalCout=0;
+        List<UserCards> lt=new ArrayList<>();
         if(null!=list&&list.size()>0){
-            for(int i=0;i<list.size();i++){
-                String cardTypeName=cardMap.get(list.get(i).get("cardType"));
-                if(null!=cardMap.get(list.get(i).get("cardType"))){
-                    list.get(i).put("cardType",cardMap.get(list.get(i).get("cardType")));
+            for(UserCards userCard:list){
+                String cardTypeName=cardMap.get(userCard.getCardType());
+                if(null!=cardMap.get(userCard.getCardType())){
+                    userCard.setCardType(cardMap.get(userCard.getCardType()));
+                    lt.add(userCard);
                 }
             }
             totalCout=list.size();
         }
-        list = convertCardModels(list);
-        return getResult(list,totalCout, result.getCurrPage(), result.getPageSize());
+        return getResult(lt,totalCout, page, size);
     }
 
 
