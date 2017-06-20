@@ -16,7 +16,7 @@ public class TjQuotaDimensionMainModel
     private String mainCode;        //关联 jt_dimension_main
     private String name;            //主纬度名称
     private String dictSql;
-    private String key;
+    private String keyVal;
 
 
     public Long getId() {
@@ -59,11 +59,11 @@ public class TjQuotaDimensionMainModel
         this.dictSql = dictSql;
     }
 
-    public String getKey() {
-        return key;
+    public String getKeyVal() {
+        return keyVal;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setKeyVal(String keyVal) {
+        this.keyVal = keyVal;
     }
 }
