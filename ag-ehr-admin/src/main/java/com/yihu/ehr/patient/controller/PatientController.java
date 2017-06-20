@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.patient.service.PatientCardsClient;
@@ -582,4 +583,25 @@ public class PatientController extends BaseController {
 
         return userCards;
     }
+    //根据就诊卡id删除就诊卡(改变就诊卡的审核状态)
+    @RequestMapping(value = "/deletePatientCardByCardId",method = RequestMethod.POST)
+    @ApiOperation(value = "根据就诊卡id删除就诊卡(改变就诊卡的审核状态)")
+    public Envelop cardVerifyManager(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @RequestParam(value = "id",required = false) Long id,
+            @ApiParam(name = "status", value = "status", defaultValue = "")
+            @RequestParam(value = "status",required = false) String status,
+            @ApiParam(name = "auditor", value = "审核者", defaultValue = "")
+            @RequestParam(value = "auditor",required = false) String auditor,
+            @ApiParam(name = "auditReason", value = "审核不通过原因", defaultValue = "")
+            @RequestParam(value = "auditReason",required = false) String auditReason) throws Exception{
+
+        Result result = patientCardsClient.cardVerifyManager(id, status, auditor, auditReason);
+        if (result.getCode() == 200){
+            return success("删除成功！");
+        }else{
+            return failed("删除失败！");
+        }
+    }
+
 }
