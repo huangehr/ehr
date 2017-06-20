@@ -1,14 +1,18 @@
 package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
+import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.patient.UserCards;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.patient.service.PatientCardsClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
@@ -21,6 +25,7 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
+import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
@@ -33,10 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -48,16 +50,12 @@ public class PatientController extends BaseController {
 
     @Autowired
     private PatientClient patientClient;
-
     @Autowired
     private AddressClient addressClient;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
-
     @Autowired
     private FileResourceClient fileResourceClient;
     @Autowired
@@ -66,6 +64,10 @@ public class PatientController extends BaseController {
     SystemDictClient systemDictClient;
     @Autowired
     private ConventionalDictEntryClient dictEntryClient;
+    @Autowired
+    private AppClient appClient;
+    @Autowired
+    private RolesClient rolesClient;
 
     @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
@@ -542,7 +544,7 @@ public class PatientController extends BaseController {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+createDate")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "999")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception{
@@ -607,6 +609,54 @@ public class PatientController extends BaseController {
         }else{
             return failed("删除失败！");
         }
+    }
+
+    @RequestMapping(value = "/roles/platformAllAppRolesTree",method = RequestMethod.GET)
+    @ApiOperation(value = "获取平台应用角色组列表,tree" )
+    public Envelop getPlatformAppRolesTree(
+            @ApiParam(name = "type",value = "角色组类型，应用角色/用户角色字典值")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "source_type",value = "平台应用sourceType字典值")
+            @RequestParam(value = "source_type") String sourceType){
+//        if(org.apache.commons.lang.StringUtils.isEmpty(type)){
+//            return failed("角色组类型不能为空！");
+//        }
+//        if(org.apache.commons.lang.StringUtils.isEmpty(sourceType)){
+//            return failed("平台应用类型不能为空！！");
+//        }
+        sourceType="";
+        Envelop envelop = new Envelop();
+        //平台应用-应用表中source_type为1
+        Collection<MApp> mApps =  appClient.getAppsNoPage(sourceType);
+        List<PlatformAppRolesTreeModel> appRolesTreeModelList = new ArrayList<>();
+
+        //平台应用-角色组对象模型列表
+        for(MApp mApp : mApps){
+            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId());
+            List<PlatformAppRolesTreeModel> roleTreeModelList = new ArrayList<>();
+            for(MRoles m : mRoles){
+                PlatformAppRolesTreeModel modelTree = new PlatformAppRolesTreeModel();
+                modelTree.setId(m.getId()+"");
+                modelTree.setName(m.getName());
+                modelTree.setType("1");
+                modelTree.setPid(mApp.getId());
+                modelTree.setChildren(null);
+                roleTreeModelList.add(modelTree);
+            }
+            if(roleTreeModelList.size()==0){
+                continue;
+            }
+            PlatformAppRolesTreeModel app = new PlatformAppRolesTreeModel();
+            app.setId(mApp.getId());
+            app.setName(mApp.getName());
+            app.setType(String.valueOf(mApp.getSourceType()));
+            app.setPid(null);
+            app.setChildren(roleTreeModelList);
+            appRolesTreeModelList.add(app);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(appRolesTreeModelList);
+        return envelop;
     }
 
 }
