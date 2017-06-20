@@ -1,5 +1,7 @@
 package com.yihu.ehr.systemdict.controller;
 
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -15,10 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by AndyCai on 2016/1/19.
@@ -837,4 +836,14 @@ public class ConventionalDictEntryController extends BaseController{
         envelop.setDetailModelList(systemDictEntryModelList);
         return envelop  ;
     }
+
+    @RequestMapping(value = "/GetAlldictionariesByDictId",method = RequestMethod.GET)
+    @ApiOperation(value = "获取卡状态所有字典项")
+    public  ListResult  GetAlldictionariesByDictId() throws Exception{
+
+        ListResult result = dictEntryClient.GetAlldictionariesByDictId();
+//        List<Map<String,Object>> list = result.getDetailModelList();
+        return result;
+    }
+
 }

@@ -88,14 +88,14 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         User user = toEntity(userJsonData, User.class);
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
-        if (!StringUtils.isEmpty(user.getPassword())){
+        if (!StringUtils.isEmpty(user.getPassword())) {
             user.setPassword(HashUtil.hash(user.getPassword()));
-        }else {
+        } else {
             user.setPassword(HashUtil.hash(default_password));
         }
         String userType = user.getUserType();
         MConventionalDict dict = conventionalDictClient.getUserType(userType);
-        if(dict!=null){
+        if (dict != null) {
             user.setDType(userType);
         }
         user.setActivated(true);
@@ -111,7 +111,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         User user = toEntity(userJsonData, User.class);
         String userType = user.getUserType();
         MConventionalDict dict = conventionalDictClient.getUserType(userType);
-        if(dict!=null){
+        if (dict != null) {
             user.setDType(userType);
         }
         userManager.saveUser(user);
@@ -174,7 +174,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "password", value = "密码", defaultValue = "")
             @RequestParam(value = "password") String password) throws Exception {
         String hashPassWord = HashUtil.hash(password);
-        userManager.changePassWord(userId,hashPassWord);
+        userManager.changePassWord(userId, hashPassWord);
         return true;
     }
 
@@ -260,27 +260,34 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         return userManager.getUserByEmail(email) != null;
     }
 
+    @RequestMapping(value = ServiceApi.Users.UserTelephoneNoExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断用户电话号码是否存在")
+    public boolean isTelephoneExists(@RequestParam(value = "telephone") String telephone) {
+        return userManager.getUserByTelephone(telephone) != null;
+    }
+
 
     /**
      * 用户头像图片上传
+     *
      * @return
      * @throws IOException
      */
-    @RequestMapping(value = "/user/picture",method = RequestMethod.POST)
+    @RequestMapping(value = "/user/picture", method = RequestMethod.POST)
     @ApiOperation(value = "上传头像,把图片转成流的方式发送")
     public String uploadPicture(
             @ApiParam(name = "jsonData", value = "头像转化后的输入流")
-            @RequestBody String jsonData ) throws IOException {
-        if(jsonData == null){
+            @RequestBody String jsonData) throws IOException {
+        if (jsonData == null) {
             return null;
         }
-        String date = URLDecoder.decode(jsonData,"UTF-8");
+        String date = URLDecoder.decode(jsonData, "UTF-8");
 
         String[] fileStreams = date.split(",");
-        String is = URLDecoder.decode(fileStreams[0],"UTF-8").replace(" ","+");
+        String is = URLDecoder.decode(fileStreams[0], "UTF-8").replace(" ", "+");
         byte[] in = Base64.getDecoder().decode(is);
 
-        String pictureName = fileStreams[1].substring(0,fileStreams[1].length()-1);
+        String pictureName = fileStreams[1].substring(0, fileStreams[1].length() - 1);
         String fileExtension = pictureName.substring(pictureName.lastIndexOf(".") + 1).toLowerCase();
         String description = null;
         if ((pictureName != null) && (pictureName.length() > 0)) {
@@ -297,10 +304,10 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             String groupName = objectNode.get("groupName").toString();
             String remoteFileName = objectNode.get("remoteFileName").toString();
 //            path = "{\"groupName\":" + groupName + ",\"remoteFileName\":" + remoteFileName + "}";
-            path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
+            path = groupName.substring(1, groupName.length() - 1) + ":" + remoteFileName.substring(1, remoteFileName.length() - 1);
 
         } catch (Exception e) {
-            LogService.getLogger(User.class).error("人口头像图片上传失败；错误代码："+e);
+            LogService.getLogger(User.class).error("人口头像图片上传失败；错误代码：" + e);
         }
         //返回文件路径
         return path;
@@ -309,11 +316,12 @@ public class UserEndPoint extends EnvelopRestEndPoint {
 
     /**
      * 用户头像图片下载
+     *
      * @return
      * @throws IOException
      * @throws MyException
      */
-    @RequestMapping(value = "/user/picture",method = RequestMethod.GET)
+    @RequestMapping(value = "/user/picture", method = RequestMethod.GET)
     @ApiOperation(value = "下载头像")
     public String downloadPicture(
             @ApiParam(name = "group_name", value = "分组", defaultValue = "")

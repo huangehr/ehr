@@ -79,44 +79,43 @@ public class UserController extends BaseController {
 
     private String resetFilter(String filters) {
 
-        if(!StringUtils.isEmpty(filters)){
+        if (!StringUtils.isEmpty(filters)) {
             String orgName, orgCodes = "";
             boolean searchOrg = false;
             String[] values;
             String[] filterArr = filters.split(";");
-            for(int i=0; i< filterArr.length; i++){
+            for (int i = 0; i < filterArr.length; i++) {
                 String filter = filterArr[i];
-                if(filter.startsWith("organization")){
-                    if(filter.contains("<>") || filter.contains(">=") || filter.contains("<="))
+                if (filter.startsWith("organization")) {
+                    if (filter.contains("<>") || filter.contains(">=") || filter.contains("<="))
                         values = filter.substring(14).split(" ");
                     else
                         values = filter.substring(13).split(" ");
 
-                    orgName =  values[0];
+                    orgName = values[0];
                     ResponseEntity<List<MOrganization>> rs = orgClient.searchOrgs("", "fullName?" + orgName, "", 1000, 1);
-                    if(rs.getStatusCode().value() <=200){
+                    if (rs.getStatusCode().value() <= 200) {
                         List<MOrganization> orgList = rs.getBody();
-                        if(orgList.size()>0){
-                            for(MOrganization org : orgList){
+                        if (orgList.size() > 0) {
+                            for (MOrganization org : orgList) {
                                 orgCodes += "," + org.getOrgCode();
                             }
                             filterArr[i] = "organization=" + orgCodes.substring(1);
-                        }else
+                        } else
                             filterArr[i] = "organization=-1";
 
-                        if(values.length>1)
+                        if (values.length > 1)
                             filterArr[i] = filterArr[i] + " " + values[1];
                         searchOrg = true;
                         break;
-                    }
-                    else
+                    } else
                         throw new IllegalAccessError("解析错误");
                 }
             }
 
-            if(searchOrg){
+            if (searchOrg) {
                 filters = "";
-                for(String filter : filterArr){
+                for (String filter : filterArr) {
                     filters += filter + ";";
                 }
             }
@@ -145,19 +144,19 @@ public class UserController extends BaseController {
         for (MUser mUser : mUsers) {
             UsersModel usersModel = convertToModel(mUser, UsersModel.class);
             //usersModel.setLastLoginTime(DateToString( mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
-            usersModel.setLastLoginTime(mUser.getLastLoginTime() == null?"":DateTimeUtil.simpleDateTimeFormat(mUser.getLastLoginTime()));
+            usersModel.setLastLoginTime(mUser.getLastLoginTime() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mUser.getLastLoginTime()));
             //获取用户类别字典
-            if(StringUtils.isNotEmpty(mUser.getUserType())) {
+            if (StringUtils.isNotEmpty(mUser.getUserType())) {
                 MConventionalDict dict = conventionalDictClient.getUserType(mUser.getUserType());
                 usersModel.setUserTypeName(dict == null ? "" : dict.getValue());
             }
             //获取机构信息
-            if(StringUtils.isNotEmpty(mUser.getOrganization())) {
+            if (StringUtils.isNotEmpty(mUser.getOrganization())) {
                 MOrganization organization = orgClient.getOrg(mUser.getOrganization());
                 usersModel.setOrganizationName(organization == null ? "" : organization.getFullName());
             }
             //获取用户来源信息
-            if(StringUtils.isNotEmpty(mUser.getSource())){
+            if (StringUtils.isNotEmpty(mUser.getSource())) {
                 MConventionalDict dict = conventionalDictClient.getUserSource(mUser.getSource());
                 usersModel.setSourceName(dict == null ? "" : dict.getValue());
             }
@@ -201,21 +200,21 @@ public class UserController extends BaseController {
             //删除用户-用户角色组关系
             //Todo 根据用户id删除的接口
             Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + userId);
-            if(mRoleUsers != null){
+            if (mRoleUsers != null) {
                 StringBuffer buffer = new StringBuffer();
-                for(MRoleUser m : mRoleUsers){
+                for (MRoleUser m : mRoleUsers) {
                     buffer.append(m.getRoleId());
                     buffer.append(",");
                 }
-                String roleIds = buffer.substring(0,buffer.length()-1);
-                boolean bo = roleUserClient.batchDeleteRoleUserRelation(userId,roleIds);
-                if(!bo){
+                String roleIds = buffer.substring(0, buffer.length() - 1);
+                boolean bo = roleUserClient.batchDeleteRoleUserRelation(userId, roleIds);
+                if (!bo) {
                     return failed("删除失败！");
                 }
             }
-            try{
-             fileResourceClient.filesDelete(userId);
-            }catch (Exception e){
+            try {
+                fileResourceClient.filesDelete(userId);
+            } catch (Exception e) {
                 return success("数据删除成功！头像图片删除失败！");
             }
             return success(null);
@@ -255,6 +254,9 @@ public class UserController extends BaseController {
             String roles = detailModel.getRole();
             if (StringUtils.isEmpty(roles)) {
                 errorMsg += "用户角色不能为空!";
+            }else{
+//                保存到role-user表
+
             }
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
@@ -268,6 +270,10 @@ public class UserController extends BaseController {
             if (userClient.isEmailExists(detailModel.getEmail())) {
                 return failed("邮箱已存在!");
             }
+            if (userClient.isTelephoneExists(detailModel.getTelephone())) {
+
+                return failed("电话号码已存在!");
+            }
             detailModel.setPassword(AgAdminConstants.DefaultPassword);
             MUser mUser = convertToMUser(detailModel);
             mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
@@ -276,7 +282,7 @@ public class UserController extends BaseController {
             }
             //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败），
             boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
-            if(!bo){
+            if (!bo) {
                 userClient.deleteUser(mUser.getId());
                 return failed("保存失败!");
             }
@@ -325,7 +331,7 @@ public class UserController extends BaseController {
                 return failed("账户已存在!");
             }
 
-            if (mUser.getIdCardNo()!=null&&!mUser.getIdCardNo().equals(detailModel.getIdCardNo())
+            if (mUser.getIdCardNo() != null && !mUser.getIdCardNo().equals(detailModel.getIdCardNo())
                     && userClient.isIdCardExists(detailModel.getIdCardNo())) {
                 return failed("身份证号已存在!");
             }
@@ -345,8 +351,8 @@ public class UserController extends BaseController {
 
             //修改时先修改所属角色组再修改用户，修改角色组失败（修改失败）、修改用户失败 （回显角色组）
             Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());
-            boolean bo = roleUserClient.batchUpdateRoleUsersRelation(mUser.getId(),detailModel.getRole());
-            if(!bo){
+            boolean bo = roleUserClient.batchUpdateRoleUsersRelation(mUser.getId(), detailModel.getRole());
+            if (!bo) {
                 return failed("保存失败！");
             }
             mUser = convertToMUser(detailModel);
@@ -356,18 +362,16 @@ public class UserController extends BaseController {
                 return success(detailModel);
             }
             StringBuffer buffer = new StringBuffer();
-            for(MRoleUser m : mRoleUsers){
+            for (MRoleUser m : mRoleUsers) {
                 buffer.append(m.getRoleId());
                 buffer.append(",");
             }
-            if(buffer.length()>0){
+            if (buffer.length() > 0) {
                 String oldRoleIds = buffer.substring(0, buffer.length() - 1);
-                roleUserClient.batchDeleteRoleUserRelation(mUser.getId(),oldRoleIds);
+                roleUserClient.batchDeleteRoleUserRelation(mUser.getId(), oldRoleIds);
             }
             return failed("保存失败!");
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
@@ -391,15 +395,13 @@ public class UserController extends BaseController {
 //                String localPath = userClient.downloadPicture(imagePath[0], imagePath[1]);
 //                mUser.setImgLocalPath(localPath);
 //            }
-            if(StringUtils.isNotEmpty( mUser.getBirthday())){
-                mUser.setBirthday(mUser.getBirthday().substring(0,10));
+            if (StringUtils.isNotEmpty(mUser.getBirthday())) {
+                mUser.setBirthday(mUser.getBirthday().substring(0, 10));
             }
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
@@ -415,9 +417,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "activity") boolean activity) {
         try {
             return userClient.activityUser(userId, activity);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
@@ -431,9 +431,7 @@ public class UserController extends BaseController {
             @PathVariable(value = "user_id") String userId) {
         try {
             return userClient.resetPass(userId);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
@@ -449,9 +447,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "type") String type) {
         try {
             return userClient.unBinding(userId, type);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
@@ -474,9 +470,7 @@ public class UserController extends BaseController {
                 return null;
             }
             return userClient.distributeKey(mUser.getId());
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
@@ -504,9 +498,7 @@ public class UserController extends BaseController {
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
@@ -532,9 +524,7 @@ public class UserController extends BaseController {
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
 
             return success(detailModel);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
@@ -543,9 +533,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users/existence", method = RequestMethod.GET)
     @ApiOperation(value = "用户属性唯一性验证", notes = "用户属性唯一性验证（用户名、省份证号、邮箱）")
     public Envelop existence(
-            @ApiParam(name = "existenceType",value = "", defaultValue = "")
+            @ApiParam(name = "existenceType", value = "", defaultValue = "")
             @RequestParam(value = "existenceType") String existenceType,
-            @ApiParam(name = "existenceNm",value = "", defaultValue = "")
+            @ApiParam(name = "existenceNm", value = "", defaultValue = "")
             @RequestParam(value = "existenceNm") String existenceNm) {
         try {
             Envelop envelop = new Envelop();
@@ -560,13 +550,14 @@ public class UserController extends BaseController {
                 case "email":
                     bo = userClient.isEmailExists(existenceNm);
                     break;
+                case "telephone":
+                    bo = userClient.isTelephoneExists(existenceNm);
+                    break;
             }
             envelop.setSuccessFlg(bo);
 
             return envelop;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return failedSystem();
         }
@@ -577,17 +568,17 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users/changePassWord", method = RequestMethod.PUT)
     @ApiOperation(value = "修改用户密码", notes = "修改用户密码")
     public Envelop changePassWord(
-            @ApiParam(name = "user_id",value = "password", defaultValue = "")
+            @ApiParam(name = "user_id", value = "password", defaultValue = "")
             @RequestParam(value = "user_id") String userId,
-            @ApiParam(name = "password",value = "密码", defaultValue = "")
+            @ApiParam(name = "password", value = "密码", defaultValue = "")
             @RequestParam(value = "password") String password) {
 
         Envelop envelop = new Envelop();
         try {
-            boolean bo = userClient.changePassWord(userId,password);
-            if (bo){
+            boolean bo = userClient.changePassWord(userId, password);
+            if (bo) {
                 envelop.setSuccessFlg(true);
-            }else {
+            } else {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("密码修改失败");
             }
@@ -605,19 +596,18 @@ public class UserController extends BaseController {
      * @return UserDetailModel
      */
     public UserDetailModel convertToUserDetailModel(MUser mUser) {
-        if(mUser==null)
-        {
+        if (mUser == null) {
             return null;
         }
         UserDetailModel detailModel = convertToModel(mUser, UserDetailModel.class);
 
-        detailModel.setCreateDate(DateToString(mUser.getCreateDate(),AgAdminConstants.DateTimeFormat));
-        detailModel.setLastLoginTime(DateToString(mUser.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
+        detailModel.setCreateDate(DateToString(mUser.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        detailModel.setLastLoginTime(DateToString(mUser.getLastLoginTime(), AgAdminConstants.DateTimeFormat));
 
         //获取婚姻状态代码
         String marryCode = mUser.getMartialStatus();
-        MConventionalDict dict=null;
-        if(StringUtils.isNotEmpty(marryCode)) {
+        MConventionalDict dict = null;
+        if (StringUtils.isNotEmpty(marryCode)) {
             dict = conventionalDictClient.getMartialStatus(marryCode);
             detailModel.setMartialStatusName(dict == null ? "" : dict.getValue());
         }
@@ -629,34 +619,34 @@ public class UserController extends BaseController {
         }
         //获取用户标准来源
         String userSource = mUser.getSource();
-        if (StringUtils.isNotEmpty(userSource)){
+        if (StringUtils.isNotEmpty(userSource)) {
             dict = conventionalDictClient.getUserSource(userSource);
-            detailModel.setSourceName(dict == null ? "":dict.getValue());
+            detailModel.setSourceName(dict == null ? "" : dict.getValue());
         }
         //从用户-角色组关系表获取用户所属角色组ids
         detailModel.setRole("");
         Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());
-        if(mRoleUsers.size()>0){
+        if (mRoleUsers.size() > 0) {
             StringBuffer buffer = new StringBuffer();
-            for(MRoleUser m : mRoleUsers){
+            for (MRoleUser m : mRoleUsers) {
                 buffer.append(m.getRoleId());
                 buffer.append(",");
             }
-            detailModel.setRole(buffer.substring(0,buffer.length()-1));
+            detailModel.setRole(buffer.substring(0, buffer.length() - 1));
         }
         //获取归属机构
         String orgCode = mUser.getOrganization();
-        if(StringUtils.isNotEmpty(orgCode)) {
+        if (StringUtils.isNotEmpty(orgCode)) {
             MOrganization orgModel = orgClient.getOrg(orgCode);
             detailModel.setOrganizationName(orgModel == null ? "" : orgModel.getFullName());
-            if(orgModel!=null&&StringUtils.isNotEmpty(orgModel.getLocation())) {
+            if (orgModel != null && StringUtils.isNotEmpty(orgModel.getLocation())) {
                 MGeography mGeography = addressClient.getAddressById(orgModel.getLocation());
-                detailModel.setProvinceName(mGeography==null?"":mGeography.getProvince());
-                detailModel.setCityName(mGeography==null?"":mGeography.getCity());
+                detailModel.setProvinceName(mGeography == null ? "" : mGeography.getProvince());
+                detailModel.setCityName(mGeography == null ? "" : mGeography.getCity());
             }
         }
         //获取秘钥信息
-        MKey userSecurity = securityClient.getUserKey(mUser.getId(),true);
+        MKey userSecurity = securityClient.getUserKey(mUser.getId(), true);
         if (userSecurity != null) {
             detailModel.setPublicKey(userSecurity.getPublicKey());
             String validTime = DateUtil.toString(userSecurity.getFromDate(), DateUtil.DEFAULT_DATE_YMD_FORMAT)
@@ -667,38 +657,36 @@ public class UserController extends BaseController {
         return detailModel;
     }
 
-    public MUser convertToMUser(UserDetailModel detailModel)
-    {
-        if(detailModel==null)
-        {
+    public MUser convertToMUser(UserDetailModel detailModel) {
+        if (detailModel == null) {
             return null;
         }
-        MUser mUser = convertToModel(detailModel,MUser.class);
-        mUser.setCreateDate(StringToDate(detailModel.getCreateDate(),AgAdminConstants.DateTimeFormat));
-        mUser.setLastLoginTime(StringToDate(detailModel.getLastLoginTime(),AgAdminConstants.DateTimeFormat));
+        MUser mUser = convertToModel(detailModel, MUser.class);
+        mUser.setCreateDate(StringToDate(detailModel.getCreateDate(), AgAdminConstants.DateTimeFormat));
+        mUser.setLastLoginTime(StringToDate(detailModel.getLastLoginTime(), AgAdminConstants.DateTimeFormat));
 
         return mUser;
     }
 
     //查看用户权限列表
-    @RequestMapping(value = "/users/user_features",method = RequestMethod.GET)
+    @RequestMapping(value = "/users/user_features", method = RequestMethod.GET)
     @ApiOperation(value = "查看用户权限", notes = "查看用户权限")
     public Envelop getUserFeatureList(
-            @ApiParam(name = "roles_ids",value = "用户所属角色组ids，多个以逗号隔开")
-            @RequestParam(value = "roles_ids") String roleIds){
+            @ApiParam(name = "roles_ids", value = "用户所属角色组ids，多个以逗号隔开")
+            @RequestParam(value = "roles_ids") String roleIds) {
         Collection<MRoleFeatureRelation> relations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + roleIds);
         String featureIds = "";
-        for(MRoleFeatureRelation relation : relations){
-            featureIds += relation.getFeatureId()+",";
+        for (MRoleFeatureRelation relation : relations) {
+            featureIds += relation.getFeatureId() + ",";
         }
-        if(StringUtils.isEmpty(featureIds)){
+        if (StringUtils.isEmpty(featureIds)) {
             return success(null);
         }
-        featureIds = featureIds.substring(0,featureIds.length()-1);
+        featureIds = featureIds.substring(0, featureIds.length() - 1);
         Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage("id=" + featureIds);
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
-        for(MAppFeature mAppFeature: mAppFeatures ){
+        for (MAppFeature mAppFeature : mAppFeatures) {
             AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
             appFeatureModels.add(appFeatureModel);
         }
@@ -714,15 +702,13 @@ public class UserController extends BaseController {
             @PathVariable(value = "imageId") String imageId) {
 
         try {
-           String imagePath= fileResourceClient.imageFindById(imageId);
+            String imagePath = fileResourceClient.imageFindById(imageId);
             if (imagePath == null) {
                 return "用户头像获取失败!";
             }
 
             return imagePath;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return "";
         }

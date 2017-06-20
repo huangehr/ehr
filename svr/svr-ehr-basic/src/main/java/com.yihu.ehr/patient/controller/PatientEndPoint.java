@@ -329,10 +329,12 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
 
                 Date startDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeStart);
                 Date endDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeEnd);
-                Calendar calendar   =   new GregorianCalendar();
-                calendar.setTime(endDate);
-                calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
-                endDate=calendar.getTime();   //日期往后推一天
+                if(null!=endDate){
+                    Calendar calendar   =   new GregorianCalendar();
+                    calendar.setTime(endDate);
+                    calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+                    endDate=calendar.getTime();   //日期往后推一天
+                }
                 conditionMap.put("startDate", startDate);
                 conditionMap.put("endDate", endDate);
         //        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);

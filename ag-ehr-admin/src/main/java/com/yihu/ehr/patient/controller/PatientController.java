@@ -1,8 +1,15 @@
 package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.entity.patient.UserCards;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.patient.service.PatientCardsClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
@@ -13,18 +20,21 @@ import com.yihu.ehr.patient.service.PatientClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +60,12 @@ public class PatientController extends BaseController {
 
     @Autowired
     private FileResourceClient fileResourceClient;
+    @Autowired
+    PatientCardsClient patientCardsClient;
+    @Autowired
+    SystemDictClient systemDictClient;
+    @Autowired
+    private ConventionalDictEntryClient dictEntryClient;
 
     @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
@@ -516,4 +532,81 @@ public class PatientController extends BaseController {
             return failedSystem();
         }
     }
+
+    @RequestMapping(value = "/PatientCardByUserId",method = RequestMethod.GET)
+    @ApiOperation(value = "用户获取个人卡列表")
+    public Envelop cardList(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,cardType,cardNo,releaseOrg,validityDateBegin,validityDateEnd,status")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+createDate")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception{
+
+        ResponseEntity<List<UserCards>> responseEntity = patientCardsClient.getUserCardList(fields, filters, sorts, size, page);
+        List<UserCards> list = responseEntity.getBody();
+        //系统字典-卡类别-10
+        String code="";
+        ListResult mConventionalDict = dictEntryClient.GetAlldictionariesByDictId();
+        List<Map<String,Object>> mConventionalDictList = mConventionalDict.getDetailModelList();
+        Map<String,String> cardMap=new HashedMap();
+        if(null!=mConventionalDictList&&mConventionalDictList.size()>0){
+            for(int i=0;i<mConventionalDictList.size();i++){
+//                Object obj = mConventionalDictList.get(i);
+               cardMap.put(mConventionalDictList.get(i).get("sort").toString(),mConventionalDictList.get(i).get("value").toString());
+            }
+        }
+        int totalCout=0;
+        List<UserCards> lt=new ArrayList<>();
+        if(null!=list&&list.size()>0){
+            for(UserCards userCard:list){
+                String cardTypeName=cardMap.get(userCard.getCardType());
+                if(null!=cardMap.get(userCard.getCardType())){
+                    userCard.setCardType(cardMap.get(userCard.getCardType()));
+                    lt.add(userCard);
+                }
+            }
+            totalCout=list.size();
+        }
+        return getResult(lt,totalCout, page, size);
+    }
+
+
+    private List convertCardModels(List<Map<String,Object>> userCards){
+        List<MDictionaryEntry> statusDicts = systemDictClient.getDictEntries("", "dictId=43", "", 10, 1).getBody();
+        Map<String, String> statusMap = new HashMap<>();
+        for(MDictionaryEntry entry : statusDicts){
+            statusMap.put(entry.getCode(), entry.getValue());
+        }
+        for(Map<String,Object> info : userCards){
+            info.put("statusName",statusMap.get(info.get("status")));
+        }
+
+        return userCards;
+    }
+    //根据就诊卡id删除就诊卡(改变就诊卡的审核状态)
+    @RequestMapping(value = "/deletePatientCardByCardId",method = RequestMethod.POST)
+    @ApiOperation(value = "根据就诊卡id删除就诊卡(改变就诊卡的审核状态)")
+    public Envelop cardVerifyManager(
+            @ApiParam(name = "id", value = "id", defaultValue = "")
+            @RequestParam(value = "id",required = false) Long id,
+            @ApiParam(name = "status", value = "status", defaultValue = "")
+            @RequestParam(value = "status",required = false) String status,
+            @ApiParam(name = "auditor", value = "审核者", defaultValue = "")
+            @RequestParam(value = "auditor",required = false) String auditor,
+            @ApiParam(name = "auditReason", value = "审核不通过原因", defaultValue = "")
+            @RequestParam(value = "auditReason",required = false) String auditReason) throws Exception{
+
+        Result result = patientCardsClient.cardVerifyManager(id, status, auditor, auditReason);
+        if (result.getCode() == 200){
+            return success("删除成功！");
+        }else{
+            return failed("删除失败！");
+        }
+    }
+
 }
