@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Created by AndyCai on 2016/1/29.
  */
-@FeignClient(name=MicroServices.User)
+@FeignClient(name = MicroServices.User)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface UserClient {
@@ -98,6 +98,10 @@ public interface UserClient {
     @ApiOperation(value = "判断用户邮件是否存在")
     boolean isEmailExists(@RequestParam(value = "email") String email);
 
+    @RequestMapping(value = ServiceApi.Users.UserTelephoneNoExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断电话号码是否存在")
+    boolean isTelephoneExists(@RequestParam(value = "telephone") String telephone);
+
     @RequestMapping(value = ServiceApi.Users.UserAdminPasswordReset, method = RequestMethod.PUT)
     @ApiOperation(value = "修改密码")
     boolean changePassWord(
@@ -106,19 +110,19 @@ public interface UserClient {
             @ApiParam(name = "password", value = "密码", defaultValue = "")
             @RequestParam(value = "password") String password);
 
-    @RequestMapping(value = "/user/picture",method = RequestMethod.POST)
+    @RequestMapping(value = "/user/picture", method = RequestMethod.POST)
     @ApiOperation(value = "头像上传")
     String uploadPicture(
             @ApiParam(name = "jsonData", value = "头像信息", defaultValue = "")
             @RequestBody String jsonData);
 
-    @RequestMapping(value = "/user/picture",method = RequestMethod.GET)
+    @RequestMapping(value = "/user/picture", method = RequestMethod.GET)
     @ApiOperation(value = "头像下载")
     String downloadPicture(
-                           @ApiParam(name = "group_name", value = "分组", defaultValue = "")
-                           @RequestParam(value = "group_name") String groupName,
-                           @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
-                           @RequestParam(value = "remote_file_name") String remoteFileName);
+            @ApiParam(name = "group_name", value = "分组", defaultValue = "")
+            @RequestParam(value = "group_name") String groupName,
+            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
+            @RequestParam(value = "remote_file_name") String remoteFileName);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files", method = RequestMethod.POST)
     @ApiOperation(value = "file upload test")

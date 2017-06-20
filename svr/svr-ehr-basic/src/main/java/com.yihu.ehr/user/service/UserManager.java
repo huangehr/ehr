@@ -22,7 +22,6 @@ import java.util.Map;
  * @author Sand
  * @version 1.0
  * @updated 02-6月-2015 20:10:56
- * @updated 16-6月-2017 14:17:24 修改loginVerification()
  */
 
 @Service
@@ -37,7 +36,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     @PostConstruct
     void init() {
         if (default_password.startsWith("$")) {
-            default_password="123456";
+            default_password = "123456";
         }
     }
 
@@ -61,27 +60,40 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         return userRepository.findByLoginCode(loginCode);
     }
 
-    public  User getByTelephone(String telephone) {
-        return userRepository.findByTelephone(telephone);
-    }
-
     public User getUserByIdCardNo(String idCardNo) {
         List<User> users = userRepository.findByIdCardNo(idCardNo);
-        if(users.size()>0){
+        if (users.size() > 0) {
             return users.get(0);
-        }else {
+        } else {
             return null;
         }
     }
 
     public User getUserByEmail(String email) {
-        Map<String,String> map =new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         Session session = entityManager.unwrap(Session.class);
         Query query = session.createQuery("from User where email = :email");
         List<User> userList = query.setString("email", email).list();
-        if(userList.size()== 0) {
+        if (userList.size() == 0) {
             return null;
-        }else {
+        } else {
+            return userList.get(0);
+        }
+    }
+
+    /**
+     * 根据电话号码查询账号信息
+     * @param telephone
+     * @return
+     */
+    public User getUserByTelephone(String telephone) {
+        Map<String, String> map = new HashMap<>();
+        Session session = entityManager.unwrap(Session.class);
+        Query query = session.createQuery("from User where telephone = :telephone");
+        List<User> userList = query.setString("telephone", telephone).list();
+        if (userList.size() == 0) {
+            return null;
+        } else {
             return userList.get(0);
         }
     }
@@ -95,32 +107,26 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     }
 
     /**
-     * 根据登陆用户名/身份证号/手机号及密码验证用户.
+     * 根据登陆用户名及密码验证用户.
      *
      * @param loginCode
      * @param psw
      */
-    public User loginVerification(String loginCode,String psw) {
+    public User loginVerification(String loginCode, String psw) {
 
         User user = getUserByUserName(loginCode);
         if (user == null) {
-            user = getByTelephone(loginCode);
-            if (null == user) {
-                user = getUserByIdCardNo(loginCode);
-                if (null == user) {
-                    return null;
-                }
-            }
+            return null;
         }
-        boolean result = isPasswordRight(user,psw);
-        if(result) {
+        boolean result = isPasswordRight(user, psw);
+        if (result) {
             return user;
         } else {
             return null;
         }
     }
 
-    public User resetPassword(User user){
+    public User resetPassword(User user) {
         user.setPassword(hashPassword(default_password));
         return user;
     }
@@ -149,6 +155,6 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
 
 
     public void changePassWord(String userId, String password) {
-        userRepository.changePassWord(userId,password);
+        userRepository.changePassWord(userId, password);
     }
 }
