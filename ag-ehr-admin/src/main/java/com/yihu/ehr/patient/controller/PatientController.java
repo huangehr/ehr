@@ -2,6 +2,7 @@ package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
+import com.yihu.ehr.agModel.user.RoleUserModel;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.patient.UserCards;
@@ -38,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -658,5 +660,34 @@ public class PatientController extends BaseController {
         envelop.setDetailModelList(appRolesTreeModelList);
         return envelop;
     }
+
+    /**
+     * 居民信息-角色授权-角色组保存
+     * @return
+     */
+    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.POST)
+    @ApiOperation(value = "居民信息-角色授权-角色组保存")
+    public Envelop saveRoleUser(
+            @ApiParam(name = "userId", value = "居民账户id", defaultValue = "")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
+            @RequestBody String jsonData) throws Exception{
+        Envelop envelop = new Envelop();
+        RoleUserModel roleUserModel = new RoleUserModel();
+        jsonData= URLDecoder.decode(jsonData);
+        String[] newJsonData=jsonData.split("&");
+        String id = patientClient.saveRoleUser(userId,newJsonData[0]);
+
+        if(id != null){
+            envelop.setSuccessFlg(true);
+            roleUserModel.setId(Long.parseLong(id));
+        }else{
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("居民角色授权失败！");
+        }
+        return envelop;
+    }
+
+
 
 }

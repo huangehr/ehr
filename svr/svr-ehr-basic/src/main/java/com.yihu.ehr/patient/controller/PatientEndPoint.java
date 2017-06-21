@@ -1,5 +1,6 @@
 package com.yihu.ehr.patient.controller;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
@@ -10,6 +11,8 @@ import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.user.entity.RoleUser;
+import com.yihu.ehr.user.service.RoleUserService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.log.LogService;
@@ -46,6 +49,9 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     private FastDFSUtil fastDFSUtil;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    private RoleUserService roleUserService;
+
     /**
      * 根据条件查询人口信息
      * @param search
@@ -345,6 +351,27 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
                 Long totalCount =Long.parseLong(demographicService.searchPatientByParamsTotalCount(conditionMap).toString());
                 pagedResponse(request, response, totalCount, page, rows);
                 return (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
+
+    }
+    /**
+     * 居民信息-角色授权-角色组保存
+     * @return
+     */
+    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.POST)
+    @ApiOperation(value = "居民信息-角色授权-角色组保存")
+    public String saveRoleUser(
+            @ApiParam(name = "userId", value = "机构", defaultValue = "")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
+            @RequestBody  String jsonData) throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+//        String[] jsonDatalist=jsonData.split("jsonData=");
+        //将json串转换成对象，放进list里面
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, RoleUser.class);
+        List<RoleUser> models = objectMapper.readValue(jsonData,javaType);
+        String Id ="";
+        Id=roleUserService.saveRoleUser(models,userId);
+        return Id;
 
     }
 

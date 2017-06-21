@@ -149,4 +149,20 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
 
         return save(roleUser);
     }
+
+    /**
+     * 居民信息-角色授权-角色组保存
+     * @param roleUserlist
+     * @param userId
+     */
+    public String saveRoleUser(List<RoleUser> roleUserlist,String userId) {
+        String id="";
+        roleUserRepository.deleteByUserId(userId);
+        if(roleUserlist.size()>0){
+            for(RoleUser r:roleUserlist){
+                id=String.valueOf(roleUserRepository.save(r).getId()) ;
+            }
+        }
+        return id;
+    }
 }

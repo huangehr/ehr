@@ -137,4 +137,17 @@ public interface PatientClient {
             @RequestParam(value = "page") Integer page,
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows);
+
+    /**
+     *居民信息-角色授权-角色组保存
+     * @return
+     */
+
+    @ApiOperation(value = "居民信息-角色授权-角色组保存")
+    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.POST)
+    String saveRoleUser(
+            @ApiParam(name = "userId", value = "居民账户id", defaultValue = "")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
+            @RequestBody String jsonData);
 }
