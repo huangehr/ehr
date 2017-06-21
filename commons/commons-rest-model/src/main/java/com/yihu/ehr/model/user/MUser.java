@@ -52,6 +52,8 @@ public class MUser implements Serializable{
     private String qq;
     private String ssid;
     private String realnameFlag;
+    private String demographicId;
+    private String doctorId;
 
 
     public int getProvinceId() {
@@ -364,5 +366,21 @@ public class MUser implements Serializable{
 
     public void setStreet(String street) {
         this.street = street;
+    }
+
+    public String getDemographicId() {
+        return demographicId;
+    }
+
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
+
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
     }
 }

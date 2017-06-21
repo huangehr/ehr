@@ -34,6 +34,7 @@ public class PatientDetailModel {
     private String picPath = "";
     private String localPath = "";
     private Date registerTime;   //注册时间
+    private String userId;//居民账户id
 
 
     public Date getRegisterTime() {
@@ -242,5 +243,13 @@ public class PatientDetailModel {
 
     public void setHomeAddressInfo(GeographyModel homeAddressInfo) {
         this.homeAddressInfo = homeAddressInfo;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

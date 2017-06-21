@@ -14,6 +14,7 @@ import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.user.MRoles;
+import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.patient.service.PatientCardsClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
@@ -27,6 +28,7 @@ import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.users.service.RolesClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
@@ -70,6 +72,8 @@ public class PatientController extends BaseController {
     private AppClient appClient;
     @Autowired
     private RolesClient rolesClient;
+    @Autowired
+    private UserClient userClient;
 
     @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
@@ -180,12 +184,23 @@ public class PatientController extends BaseController {
 //            String localPath = patientClient.downloadPicture(imagePath[0], imagePath[1]);
 //            demographicInfo.setLocalPath(localPath);
 //        }
+        String fields= "id,demographicId,realName";
+        String filters="demographicId="+idCardNo;
+        String sorts="+demographicId,+realName";
+        int size=20;
+        int page=1;
+        ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
+        List<MUser> mUsers = responseEntity.getBody();
 
         if (demographicInfo == null) {
             return failed("数据获取失败！");
         }
         PatientDetailModel detailModel = convertToPatientDetailModel(demographicInfo);
-
+        if(null!=mUsers&&mUsers.size()>0){
+            for(MUser u:mUsers){
+                detailModel.setUserId(u.getId());
+            }
+        }
         return success(detailModel);
     }
 
