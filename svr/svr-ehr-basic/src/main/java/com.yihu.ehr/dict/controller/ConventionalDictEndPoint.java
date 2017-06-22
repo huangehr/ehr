@@ -739,7 +739,34 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     MConventionalDict getTjQuotaDataLevelList(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code) {
-        SystemDictEntry type = dictEntryService.getDictEntry(77, code);
+        SystemDictEntry type = dictEntryService.getDictEntry(78, code);
+        return getDictModel(type);
+    };
+
+    @RequestMapping(value = "/dictionaries/org_dept_detail_display_status", method = RequestMethod.GET)
+    @ApiOperation(value = "是否显示", response = MConventionalDict.class)
+    MConventionalDict getOrgDeptDetailDisplayStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(79, code);
+        return getDictModel(type);
+    }
+
+    @RequestMapping(value = "/dictionaries/org_dept_detail_py_code", method = RequestMethod.GET)
+    @ApiOperation(value = "科室类型", response = MConventionalDict.class)
+    MConventionalDict getOrgDeptDetailPyCode(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(80, code);
+        return getDictModel(type);
+    }
+
+    @RequestMapping(value = "/dictionaries/org_dept_detail_glory_id", method = RequestMethod.GET)
+    @ApiOperation(value = "科室荣誉", response = MConventionalDict.class)
+    MConventionalDict getOrgDeptDetailGloryId(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(81, code);
         return getDictModel(type);
     };
 
@@ -757,7 +784,4 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
         }
         return re;
     }
-
-
-
 }

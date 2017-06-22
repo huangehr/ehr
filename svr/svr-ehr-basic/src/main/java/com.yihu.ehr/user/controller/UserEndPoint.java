@@ -256,8 +256,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Users.UserEmailNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断用户邮件是否存在")
     public boolean isEmailExists(@RequestParam(value = "email") String email) {
-
-        return userManager.getUserByEmail(email) != null;
+        return  userManager.getUserByEmail(email)!= null;
     }
 
     @RequestMapping(value = ServiceApi.Users.UserTelephoneNoExistence, method = RequestMethod.GET)

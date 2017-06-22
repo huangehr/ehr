@@ -1,7 +1,10 @@
 package com.yihu.ehr.tj.dao;
 
 import com.yihu.ehr.entity.tj.TjQuotaDimensionMain;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 /**
  * @author janseny
@@ -10,4 +13,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface XTjQuotaDimensionMainRepository extends PagingAndSortingRepository<TjQuotaDimensionMain, Integer> {
 
+    @Modifying
+    @Query("delete from TjQuotaDimensionMain DimensionMain where DimensionMain.quotaCode = :quotaCode")
+    int deleteByQuotaCode(@Param("quotaCode") String quotaCode);
 }

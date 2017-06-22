@@ -67,6 +67,26 @@ public class TjQuotaDimensionSlaveEndPoint extends EnvelopRestEndPoint {
         return listResult;
     }
 
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDimensionSlaveAll, method = RequestMethod.GET)
+    @ApiOperation(value = "获取从维度子表中的所有mainCode")
+    ListResult getTjQuotaDimensionSlaveAll(
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        ListResult listResult = new ListResult();
+        List<TjQuotaDimensionSlave> qtjQuotaDimensionSlaveList = tjQuotaDimensionSlaveService.search(filters, sorts);
+        if(qtjQuotaDimensionSlaveList != null){
+            listResult.setDetailModelList(qtjQuotaDimensionSlaveList);
+            listResult.setTotalCount((int)tjQuotaDimensionSlaveService.getCount(filters));
+            listResult.setCode(200);
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
+        }
+        return listResult;
+    }
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionSlave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增&修改统计指标从维度关联信息")
     public ObjectResult add(
@@ -83,6 +103,9 @@ public class TjQuotaDimensionSlaveEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         List<TjQuotaDimensionSlave> list = objectMapper.readValue(model, new TypeReference<List<TjQuotaDimensionSlave>>(){});
+        if (list != null && list.size() > 0) {
+            tjQuotaDimensionSlaveService.deleteByQuotaCode(list.get(0).getQuotaCode());
+        }
         for (int i=0; i<list.size(); i++) {
             tjQuotaDimensionSlaveService.save(list.get(i));
         }

@@ -76,9 +76,11 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
     ) throws Exception {
         OrgDept dept = orgDeptService.searchBydeptId(deptId);
         MOrgDept mOrgDept = convertToModel(dept, MOrgDept.class);
-        OrgDeptDetail orgDeptDetail = deptDetailService.searchByDeptId(deptId);
-        MOrgDeptDetail mOrgDeptDetail = convertToModel(orgDeptDetail, MOrgDeptDetail.class);
-        mOrgDept.setDeptDetail(mOrgDeptDetail);
+        if (dept != null) {
+            OrgDeptDetail orgDeptDetail = deptDetailService.searchByDeptId(Integer.valueOf(dept.getId()));
+            MOrgDeptDetail mOrgDeptDetail = convertToModel(orgDeptDetail, MOrgDeptDetail.class);
+            mOrgDept.setDeptDetail(mOrgDeptDetail);
+        }
         return mOrgDept;
     }
 

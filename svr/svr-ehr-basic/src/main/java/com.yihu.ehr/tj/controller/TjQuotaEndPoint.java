@@ -131,25 +131,25 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             }
             TjQuotaDataSave tjQuotaDataSave = tjQuotaDataSaveService.getByQuotaCode(tjQuota.getCode());
             TjQuotaDataSource tjQuotaDataSource = tjQuotaDataSourceService.getByQuotaCode(tjQuota.getCode());
-            TjDataSave tjDataSave = tjDataSaveService.getByCode(tjQuotaDataSave.getSaveCode());
-            TjDataSource tjDataSource = tjDataSourceService.getByCode(tjQuotaDataSource.getSourceCode());
             MTjQuotaDataSaveModel mTjQuotaDataSaveModel = new MTjQuotaDataSaveModel();
-            mTjQuotaDataSaveModel.setId(tjQuotaDataSave.getId());
-            mTjQuotaDataSaveModel.setSaveCode(tjQuotaDataSave.getSaveCode());
-            mTjQuotaDataSaveModel.setQuotaCode(tjQuotaDataSave.getQuotaCode());
-            mTjQuotaDataSaveModel.setConfigJson(tjQuotaDataSave.getConfigJson());
-            if (tjDataSave != null) {
+            MTjQuotaDataSourceModel mTjQuotaDataSourceModel = new MTjQuotaDataSourceModel();
+            if (tjQuotaDataSave != null) {
+                TjDataSave tjDataSave = tjDataSaveService.getByCode(tjQuotaDataSave.getSaveCode());
+                mTjQuotaDataSaveModel.setId(tjQuotaDataSave.getId());
+                mTjQuotaDataSaveModel.setSaveCode(tjQuotaDataSave.getSaveCode());
+                mTjQuotaDataSaveModel.setQuotaCode(tjQuotaDataSave.getQuotaCode());
+                mTjQuotaDataSaveModel.setConfigJson(tjQuotaDataSave.getConfigJson());
                 mTjQuotaDataSaveModel.setName(tjDataSave.getName());
             }
-            mTjQuotaModel.setTjQuotaDataSaveModel(mTjQuotaDataSaveModel);
-            MTjQuotaDataSourceModel mTjQuotaDataSourceModel = new MTjQuotaDataSourceModel();
-            mTjQuotaDataSourceModel.setId(tjQuotaDataSource.getId());
-            mTjQuotaDataSourceModel.setQuotaCode(tjQuotaDataSource.getQuotaCode());
-            mTjQuotaDataSourceModel.setSourceCode(tjQuotaDataSource.getSourceCode());
-            mTjQuotaDataSourceModel.setConfigJson(tjQuotaDataSource.getConfigJson());
-            if (tjDataSource != null) {
+            if (tjQuotaDataSource != null) {
+                TjDataSource tjDataSource = tjDataSourceService.getByCode(tjQuotaDataSource.getSourceCode());
+                mTjQuotaDataSourceModel.setId(tjQuotaDataSource.getId());
+                mTjQuotaDataSourceModel.setQuotaCode(tjQuotaDataSource.getQuotaCode());
+                mTjQuotaDataSourceModel.setSourceCode(tjQuotaDataSource.getSourceCode());
+                mTjQuotaDataSourceModel.setConfigJson(tjQuotaDataSource.getConfigJson());
                 mTjQuotaDataSourceModel.setName(tjDataSource.getName());
             }
+            mTjQuotaModel.setTjQuotaDataSaveModel(mTjQuotaDataSaveModel);
             mTjQuotaModel.setTjQuotaDataSourceModel(mTjQuotaDataSourceModel);
         }
         return mTjQuotaModel;

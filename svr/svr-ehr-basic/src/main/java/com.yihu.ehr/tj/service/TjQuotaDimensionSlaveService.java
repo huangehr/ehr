@@ -3,6 +3,7 @@ package com.yihu.ehr.tj.service;
 import com.yihu.ehr.entity.tj.TjQuotaDimensionSlave;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.tj.dao.XTjQuotaDimensionSlaveRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,5 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TjQuotaDimensionSlaveService extends BaseJpaService<TjQuotaDimensionSlave, XTjQuotaDimensionSlaveRepository> {
 
+    @Autowired
+    XTjQuotaDimensionSlaveRepository tjQuotaDimensionSlaveRepository;
+
+    public void deleteByQuotaCode(String quotaCode) {
+        tjQuotaDimensionSlaveRepository.deleteByQuotaCode(quotaCode);
+    }
 
 }

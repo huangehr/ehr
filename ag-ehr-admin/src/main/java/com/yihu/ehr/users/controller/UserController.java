@@ -1,6 +1,7 @@
 package com.yihu.ehr.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.discovery.converters.Auto;
 import com.yihu.ehr.agModel.app.AppFeatureModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
@@ -19,12 +20,14 @@ import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrganizationClient;
+import com.yihu.ehr.patient.service.PatientClient;
 import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.RoleFeatureRelationClient;
 import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.httpClient.HttpClientUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -33,6 +36,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -257,9 +261,6 @@ public class UserController extends BaseController {
             String roles = detailModel.getRole();
             if (StringUtils.isEmpty(roles)) {
                 errorMsg += "用户角色不能为空!";
-            }else{
-//                保存到role-user表
-
             }
             if (StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
@@ -274,10 +275,10 @@ public class UserController extends BaseController {
                 return failed("邮箱已存在!");
             }
             if (userClient.isTelephoneExists(detailModel.getTelephone())) {
-
                 return failed("电话号码已存在!");
             }
             detailModel.setPassword(AgAdminConstants.DefaultPassword);
+            detailModel.setRole(null);
             MUser mUser = convertToMUser(detailModel);
             mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
@@ -343,6 +344,13 @@ public class UserController extends BaseController {
                     && userClient.isEmailExists(detailModel.getEmail())) {
                 return failed("邮箱已存在!");
             }
+            if (!mUser.getTelephone().equals(detailModel.getTelephone())
+                    &&userClient.isTelephoneExists(detailModel.getTelephone())) {
+                return failed("电话号码已存在!");
+            }
+            if (userClient.isTelephoneExists(detailModel.getSecondPhone())) {
+                return failed("备用号码已存在!");
+            }
             //-----------
 //            mUser = convertToMUser(detailModel);
 //            mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
@@ -359,6 +367,7 @@ public class UserController extends BaseController {
                 return failed("保存失败！");
             }
             mUser = convertToMUser(detailModel);
+            mUser.setRole(null);
             mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
             if (mUser != null) {
                 detailModel = convertToUserDetailModel(mUser);

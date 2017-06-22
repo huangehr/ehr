@@ -29,4 +29,8 @@ public class TjQuotaDataSaveService extends BaseJpaService<TjQuotaDataSave,XTjQu
         }
         return null;
     }
+
+    public void deleteByQuotaCode(String quotaCode) {
+        tjQuotaDataSaveRepository.deleteByQuotaCode(quotaCode);
+    }
 }

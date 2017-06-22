@@ -24,14 +24,16 @@ public class OrgDeptDetail {
     private String place;
     private String pyCode;
     private Integer typeId;
-    private Timestamp insertTime;
-    private Timestamp updateTime;
 
     @Id
-    @Column(name = "id", nullable = false, insertable = true, updatable = true)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", unique = true, nullable = false)
     public int getId() {
         return id;
     }
+    private Timestamp insertTime;
+
+    private Timestamp updateTime;
 
     public void setId(int id) {
         this.id = id;
