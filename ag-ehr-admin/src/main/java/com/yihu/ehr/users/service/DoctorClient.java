@@ -139,4 +139,14 @@ public interface DoctorClient {
 //            @RequestParam(value = "file_name") String fileName,
 //            @ApiParam(name = "json_data", value = "文件资源属性")
 //            @RequestParam(value = "json_data") String jsonData);
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在电话号码")
+    List idExistence(
+            @RequestBody String phones);
+    @RequestMapping(value = ServiceApi.Doctors.DoctorBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入医生")
+    boolean createDoctorsPatch(
+            @RequestBody String doctors);
+
 }

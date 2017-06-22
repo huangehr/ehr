@@ -343,4 +343,15 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         }
         return imageStream;
     }
+
+
+    @RequestMapping(value = ServiceApi.Users.UserPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在电话号码")
+    public List idExistence(
+            @ApiParam(name="phones",value="phones",defaultValue = "")
+            @RequestBody String phones) throws Exception {
+
+        List existPhones = userManager.idExist(toEntity(phones, String[].class));
+        return existPhones;
+    }
 }

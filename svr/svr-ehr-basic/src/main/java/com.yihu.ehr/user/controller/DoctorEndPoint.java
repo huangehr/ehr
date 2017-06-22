@@ -1,5 +1,6 @@
 package com.yihu.ehr.user.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -114,6 +115,27 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "status", value = "状态", defaultValue = "")
             @RequestParam(value = "status") String status) throws Exception {
         doctorService.updDoctorStatus(doctorId, status);
+        return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在电话号码")
+    public List idExistence(
+            @ApiParam(name="phones",value="phones",defaultValue = "")
+            @RequestBody String phones) throws Exception {
+
+        List existPhones = doctorService.idExist(toEntity(phones, String[].class));
+        return existPhones;
+    }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorBatch,method = RequestMethod.POST)
+    @ApiOperation("批量导入医生")
+    public boolean createDoctorsPatch(
+            @ApiParam(name="doctors",value="医生JSON",defaultValue = "")
+            @RequestBody String doctors) throws Exception
+    {
+        List models = objectMapper.readValue(doctors, new TypeReference<List>() {});
+        doctorService.addDoctorBatch(models);
         return true;
     }
 

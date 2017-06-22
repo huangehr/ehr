@@ -8,11 +8,15 @@ import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.util.hash.HashUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 医生管理接口实现类.
@@ -112,6 +116,52 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         doctors.setStatus(status);
         doctors.setUpdateTime(new Date());
         doctorRepository.save(doctors);
+    }
+
+    /**
+     * 查询电话号码是否已存在， 返回已存在电话号码
+     */
+    public List idExist(String[] phones)
+    {
+        String sql = "SELECT phone FROM doctors WHERE phone in(:phones)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("phones", phones);
+        return sqlQuery.list();
+    }
+
+    /**
+     * 批量创建医生
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean addDoctorBatch(List<Map<String, Object>> doctorLs)
+    {
+        String header = "INSERT INTO doctors(code, name, sex, skill, work_portal, email, phone, office_tel) VALUES \n";
+        StringBuilder sql = new StringBuilder(header) ;
+        Map<String, Object> map;
+        SQLQuery query;
+        int total = 0;
+        for(int i=1; i<=doctorLs.size(); i++){
+            map = doctorLs.get(i-1);
+            sql.append("('"+ null2Space(map .get("code")) +"'");
+            sql.append(",'"+ map .get("name") +"'");
+            sql.append(",'"+ map .get("sex") +"'");
+            sql.append(",'"+ map .get("skill") +"'");
+            sql.append(",'"+ map .get("workPortal") +"'");
+            sql.append(",'"+ null2Space(map .get("email")) +"'");
+            sql.append(",'"+ null2Space(map .get("phone")) +"'");
+            sql.append(",'"+ map .get("officeTel") +"'");
+
+            if(i%100==0 || i == doctorLs.size()){
+                query = currentSession().createSQLQuery(sql.toString());
+                total += query.executeUpdate();
+                sql = new StringBuilder(header) ;
+            }else
+                sql.append(",");
+        }
+        return true;
+    }
+    private Object null2Space(Object o){
+        return o==null? "" : o;
     }
 
 }
