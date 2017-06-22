@@ -124,10 +124,7 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
                     mainModelList2.add(tjQuotaDimensionMainModel);
                 }
             }
-            List<String> list = new ArrayList<>();
-            for (int i=0; i<mainModelList2.size(); i++) {
-                list.add(mainModelList2.get(i).getMainCode());
-            }
+            List<String> list = getTjQuotaDimensionMainOfMainCode(filter, sorts);
             for (int i=0; i<mainModelList.size(); i++) {
                 if (list.contains(mainModelList.get(i).getCode())) {
                     mainModelList.get(i).setChecked(true);
@@ -215,4 +212,24 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
             return false;
         }
     };
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDimensionMainAll, method = RequestMethod.GET)
+    @ApiOperation(value = "获取主维度子表中的所有mainCode")
+    public List<String> getTjQuotaDimensionMainOfMainCode(String filters, String sorts) {
+        ListResult listResult = tjQuotaDimensionMainClient.getTjQuotaDimensionMainAll(filters, sorts);
+        List<TjQuotaDimensionMainModel> mainModelList  = new ArrayList<>();
+        List<String> list = new ArrayList<>();
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> modelList = listResult.getDetailModelList();
+            for(Map<String,Object> map : modelList){
+                TjQuotaDimensionMainModel tjQuotaDimensionMainModel = objectMapper.convertValue(map,TjQuotaDimensionMainModel.class);
+                mainModelList.add(tjQuotaDimensionMainModel);
+            }
+            for (int i=0; i<mainModelList.size(); i++) {
+                list.add(mainModelList.get(i).getMainCode());
+            }
+
+        }
+        return list;
+    }
 }

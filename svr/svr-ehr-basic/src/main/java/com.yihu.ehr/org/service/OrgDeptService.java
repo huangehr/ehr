@@ -40,6 +40,7 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
     public OrgDept searchBydeptId(Integer deptId) {
         return orgDeptRepository.findOne(deptId);
     }
+
     public OrgDept searchByOrgIdAndName(String orgId,String name) {
         List<OrgDept> orgDepts = orgDeptRepository.searchByOrgIdAndName(orgId, name);
         if (orgDepts!=null && !orgDepts.isEmpty()){
@@ -75,12 +76,13 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
         dept.setSortNo(searchParentIdOfMaxSortNo(dept.getParentDeptId()));
 
         OrgDeptDetail deptDetail = dept.getDeptDetail();
+        OrgDept save = orgDeptRepository.save(dept);
         if (deptDetail != null) {
+            deptDetail.setDeptId(save.getId());
             deptDetail.setUpdateTime(new Timestamp(new Date().getTime()));
             deptDetail.setInsertTime(new Timestamp(new Date().getTime()));
             deptDetailRepository.save(deptDetail);
         }
-        orgDeptRepository.save(dept);
         return dept;
     }
 
@@ -95,7 +97,7 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
         OrgDeptDetail deptDetail = dept.getDeptDetail();
         if (deptDetail != null) {
             deptDetail.setUpdateTime(new Timestamp(new Date().getTime()));
-            deptDetail.setInsertTime(new Timestamp(new Date().getTime()));
+//            deptDetail.setInsertTime(new Timestamp(new Date().getTime()));
             deptDetailRepository.save(deptDetail);
         }
         orgDeptRepository.save(dept);

@@ -36,6 +36,11 @@ public interface TjQuotaDimensionSlaveClient {
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page);
 
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDimensionSlaveAll, method = RequestMethod.GET)
+    @ApiOperation(value = "获取子维度子表中的所有mainCode")
+    ListResult getTjQuotaDimensionSlaveAll(
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "sorts", required = false) String sorts);
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionSlave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增/修改从维度关联信息")

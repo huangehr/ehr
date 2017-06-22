@@ -127,10 +127,7 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
                     tjQuotaDimensionSlaveModelList.add(tjQuotaQuotaDimensionSlaveModel);
                 }
             }
-            List<String> list = new ArrayList<>();
-            for (int i = 0; i < tjQuotaDimensionSlaveModelList.size(); i++) {
-                list.add(tjQuotaDimensionSlaveModelList.get(i).getSlaveCode());
-            }
+            List<String> list = getTjQuotaDimensionMainOfSlaveCode(filter, sorts);
             for (int i = 0; i < mainModelList.size(); i++) {
                 if (list.contains(mainModelList.get(i).getCode())) {
                     mainModelList.get(i).setChecked(true);
@@ -218,4 +215,23 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
             return false;
         }
     };
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaDimensionSlaveAll, method = RequestMethod.GET)
+    @ApiOperation(value = "获取从维度子表中的所有mainCode")
+    public List<String> getTjQuotaDimensionMainOfSlaveCode(String filters, String sorts) {
+        List<String> list = new ArrayList<>();
+        ListResult listResult = tjQuotaDimensionSlaveClient.getTjQuotaDimensionSlaveAll(filters, sorts);
+        List<TjQuotaDimensionSlaveModel>  tjQuotaDimensionSlaveModelList = new ArrayList<>();
+        if (listResult.getTotalCount() != 0) {
+            List<Map<String, Object>> modelList = listResult.getDetailModelList();
+            for (Map<String, Object> map : modelList) {
+                TjQuotaDimensionSlaveModel tjQuotaQuotaDimensionSlaveModel = objectMapper.convertValue(map, TjQuotaDimensionSlaveModel.class);
+                tjQuotaDimensionSlaveModelList.add(tjQuotaQuotaDimensionSlaveModel);
+            }
+            for (int i=0; i<tjQuotaDimensionSlaveModelList.size(); i++) {
+                list.add(tjQuotaDimensionSlaveModelList.get(i).getSlaveCode());
+            }
+        }
+        return list;
+    }
 }

@@ -29,4 +29,5 @@ public interface XOrgDeptRepository extends PagingAndSortingRepository<OrgDept, 
 
     @Query("select case when  max(dept.sortNo) is null then 1 else max(dept.sortNo) end from OrgDept dept where dept.parentDeptId = :parentDeptId")
     int searchParentIdOfMaxSortNo(@Param("parentDeptId") Integer parentDeptId);
+
 }

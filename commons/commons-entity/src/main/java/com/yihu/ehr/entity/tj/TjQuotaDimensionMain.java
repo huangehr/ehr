@@ -1,8 +1,8 @@
 package com.yihu.ehr.entity.tj;
 
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 统计主纬度关联表
