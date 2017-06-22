@@ -71,7 +71,7 @@ public class TjDataSourceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         TjDataSource obj = objectMapper.readValue(model,TjDataSource.class);
-        if(obj.getId() != 0){
+        if(obj.getId() != null){
             obj.setUpdateTime(new Date());
         }else{
             obj.setCreateTime(new Date());
