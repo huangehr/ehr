@@ -19,7 +19,7 @@ public interface XUserRepository extends PagingAndSortingRepository<User, String
 
     User findByLoginCode(String loginCode);
 
-    User findByTelephone(String telephone);
+    List<User> findByTelephone(String telephone);
 
     List<User> findByIdCardNo(String idCardNo);
 

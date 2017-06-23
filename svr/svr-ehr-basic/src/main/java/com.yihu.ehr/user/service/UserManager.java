@@ -62,6 +62,14 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         return userRepository.findByLoginCode(loginCode);
     }
 
+    public User getUserByTel(String telphone) {
+        List<User> users = userRepository.findByTelephone(telphone);
+        if (users.size() > 0) {
+            return users.get(0);
+        }
+        return null;
+    }
+
     public User getUserByIdCardNo(String idCardNo) {
         List<User> users = userRepository.findByIdCardNo(idCardNo);
         if (users.size() > 0) {
@@ -118,7 +126,12 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
 
         User user = getUserByUserName(loginCode);
         if (user == null) {
-            return null;
+            user = getUserByTel(loginCode);
+            if (user == null) {
+                user = getUserByIdCardNo(loginCode);
+                if (user == null)
+                    return null;
+            }
         }
         boolean result = isPasswordRight(user, psw);
         if (result) {
