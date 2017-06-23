@@ -7,10 +7,12 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.service.DoctorService;
+import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 2017-02-04 add  by hzp
@@ -32,6 +35,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     DoctorService doctorService;
+    @Autowired
+    private UserManager userManager;
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.GET)
     @ApiOperation(value = "获取医生列表", notes = "根据查询条件获取医生列表在前端表格展示")
@@ -135,9 +140,28 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             @RequestBody String doctors) throws Exception
     {
         List models = objectMapper.readValue(doctors, new TypeReference<List>() {});
-//        List existPhones = doctorService.getIdByPhone(toEntity(phones, String[].class));
+        String phones=doctorService.addDoctorBatch(models);
+        phones="["+phones.substring(0,phones.length()-1)+"]";
+        List list = doctorService.getIdByPhone(toEntity(phones, String[].class));
+        List<Doctors> existPhonesList=new ArrayList<Doctors>();
+        Doctors d;
+        for(int i = 0 ;i < list.size() ; i++){
+           Object[] objectList=(Object[])list.get(i);
+          if(null!=objectList){
+            d=new Doctors();
+              //INSERT INTO users(login_code, real_name, gender, tech_title, email, telephone, password,doctor_id
+              d.setId(Long.parseLong(objectList[0].toString()) );
+              d.setName(objectList[3].toString());
+              d.setCode(objectList[2].toString());
+              d.setSex(objectList[5].toString());
+              d.setSkill(objectList[7].toString());
+              d.setEmail(objectList[9].toString());
+              d.setPhone(objectList[10].toString());
+              existPhonesList.add(d);
+          }
+        }
+        userManager.addUserBatch(existPhonesList);
 
-        doctorService.addDoctorBatch(models);
         return true;
     }
 
