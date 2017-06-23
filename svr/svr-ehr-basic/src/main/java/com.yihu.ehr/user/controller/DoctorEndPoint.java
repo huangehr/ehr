@@ -135,8 +135,21 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             @RequestBody String doctors) throws Exception
     {
         List models = objectMapper.readValue(doctors, new TypeReference<List>() {});
+//        List existPhones = doctorService.getIdByPhone(toEntity(phones, String[].class));
+
         doctorService.addDoctorBatch(models);
         return true;
     }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        List<Doctors> doctor = doctorService.search("",filters,"", 1, 1);
+        return doctor!=null && doctor.size()>0;
+    }
+
 
 }

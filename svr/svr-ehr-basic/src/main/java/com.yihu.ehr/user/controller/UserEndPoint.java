@@ -353,4 +353,15 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         List existPhones = userManager.idExist(toEntity(phones, String[].class));
         return existPhones;
     }
+
+    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        List<User> user = userManager.search("",filters,"", 1, 1);
+        return user!=null && user.size()>0;
+    }
+
 }

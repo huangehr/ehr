@@ -293,4 +293,18 @@ public class DoctorController extends BaseController {
         }
         return envelop;
     }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public Envelop isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) {
+
+        try {
+            return success(doctorClient.isExistence(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询出错！");
+        }
+    }
 }
