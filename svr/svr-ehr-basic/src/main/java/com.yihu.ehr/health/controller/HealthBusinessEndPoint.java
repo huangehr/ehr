@@ -1,7 +1,6 @@
 package com.yihu.ehr.health.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.health.HealthBusiness;
 import com.yihu.ehr.health.service.HealthBusinessService;
@@ -24,13 +23,13 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "HealthBusiness", description = "卫生业务关系表", tags = {"卫生业务关系-管理"})
+@Api(value = "HealthBusiness", description = "指标分类管理", tags = {"指标分类-管理"})
 public class HealthBusinessEndPoint  extends EnvelopRestEndPoint {
     @Autowired
     HealthBusinessService healthBusinessService;
 
     @RequestMapping(value = "/healthBusiness/pageList", method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询卫生业务关系列表")
+    @ApiOperation(value = "根据查询条件查询指标分类列表")
     public ListResult getHealthBusinessList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -62,18 +61,18 @@ public class HealthBusinessEndPoint  extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/healthBusiness/list", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "获取卫生业务关系列表")
+    @ApiOperation(value = "获取指标分类列表")
     public List<MHealthBusiness> getAllHealthBusiness() throws Exception {
-        List<HealthBusiness> orgDepts = healthBusinessService.getAllHealthBusiness();
-        return (List<MHealthBusiness>) convertToModels(orgDepts, new ArrayList<MHealthBusiness>(orgDepts.size()), MHealthBusiness.class, null);
+        List<HealthBusiness> healthBusinesses = healthBusinessService.getAllHealthBusiness();
+        return (List<MHealthBusiness>) convertToModels(healthBusinesses, new ArrayList<MHealthBusiness>(healthBusinesses.size()), MHealthBusiness.class, null);
     }
 
-    @ApiOperation(value = "根据父ID获取子卫生业务列表")
+    @ApiOperation(value = "根据父ID获取子指标分类列表")
     @RequestMapping(value = "/healthBusiness/childs", method = RequestMethod.GET)
     List<MHealthBusiness> searchChildHealthBusiness(
             @RequestParam(value = "parentId", required = true) Integer parentId) throws Exception {
-        List<HealthBusiness> orgDepts = healthBusinessService.searchByParentId(parentId);
-        return (List<MHealthBusiness>) convertToModels(orgDepts, new ArrayList<MHealthBusiness>(orgDepts.size()), MHealthBusiness.class, null);
+        List<HealthBusiness> healthBusinesses = healthBusinessService.searchByParentId(parentId);
+        return (List<MHealthBusiness>) convertToModels(healthBusinesses, new ArrayList<MHealthBusiness>(healthBusinesses.size()), MHealthBusiness.class, null);
     }
 
     @RequestMapping(value = "/healthBusiness/detailById" , method = RequestMethod.GET)
@@ -81,13 +80,13 @@ public class HealthBusinessEndPoint  extends EnvelopRestEndPoint {
     MHealthBusiness searchHealthBusinessDetail(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id", required = true) Integer id) throws Exception {
-        HealthBusiness dept = healthBusinessService.getById(id);
-        MHealthBusiness mOrgDept = convertToModel(dept, MHealthBusiness.class);
-        return mOrgDept;
+        HealthBusiness healthBusiness = healthBusinessService.getById(id);
+        MHealthBusiness mHealthBusiness = convertToModel(healthBusiness, MHealthBusiness.class);
+        return mHealthBusiness;
     }
 
     @RequestMapping(value = "/healthBusiness/delete", method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除卫生业务")
+    @ApiOperation(value = "删除指标分类")
     public boolean deleteHealthBusiness(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id", required = true) Integer id
@@ -113,7 +112,7 @@ public class HealthBusinessEndPoint  extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/healthBusiness/add" , method = RequestMethod.POST)
-    @ApiOperation(value = "新增卫生业务")
+    @ApiOperation(value = "新增指标分类")
     MHealthBusiness saveHealthBusinesst(
             @ApiParam(name = "jsonData", value = "json信息")
             @RequestBody String jsonData) {
@@ -128,7 +127,7 @@ public class HealthBusinessEndPoint  extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/healthBusiness/update" , method = RequestMethod.POST)
-    @ApiOperation(value = "修改卫生业务")
+    @ApiOperation(value = "修改指标分类")
     MHealthBusiness updateHealthBusiness(
             @ApiParam(name = "jsonData", value = "json信息")
             @RequestBody String jsonData) {

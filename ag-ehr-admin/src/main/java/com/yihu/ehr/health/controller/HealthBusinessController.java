@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,13 +26,13 @@ import java.util.Map;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "HealthBusiness", description = "卫生业务关系表", tags = {"卫生业务关系-管理"})
+@Api(value = "HealthBusiness", description = "指标分类管理", tags = {"指标分类-管理"})
 public class HealthBusinessController extends BaseController {
     @Autowired
     HealthBusinessClient healthBusinessClient;
 
     @RequestMapping(value = "/healthBusiness/pageList", method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询卫生业务关系列表")
+    @ApiOperation(value = "根据查询条件查询指标分类列表")
     public Envelop getHealthBusinessList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -61,7 +60,7 @@ public class HealthBusinessController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "卫生业务关系列表")
+    @ApiOperation(value = "指标分类列表，不分页")
     @RequestMapping(value = "/healthBusiness/list", method = RequestMethod.GET)
     public Envelop getAllHealthBusiness() {
         try {
@@ -77,7 +76,7 @@ public class HealthBusinessController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "根据父ID获取子卫生业务列表")
+    @ApiOperation(value = "根据父ID获取子指标分类列表")
     @RequestMapping(value = "/healthBusiness/childs", method = RequestMethod.GET)
     public Envelop searchChildHealthBusiness(
             @ApiParam(name = "parentId", value = "父ID" )
@@ -106,6 +105,9 @@ public class HealthBusinessController extends BaseController {
             if (id == null) {
                 errorMsg += "id不能为空！";
             }
+            if(StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
             MHealthBusiness mHealthBusiness = healthBusinessClient.searchHealthBusinessDetail(id);
             if (mHealthBusiness == null) {
                 return failed("获取详情失败!");
@@ -119,7 +121,7 @@ public class HealthBusinessController extends BaseController {
     }
 
     @RequestMapping(value = "/healthBusiness/delete", method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除卫生业务")
+    @ApiOperation(value = "删除指标分类")
     boolean deleteHealthBusiness(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id", required = true) Integer id) {
@@ -140,7 +142,6 @@ public class HealthBusinessController extends BaseController {
             @RequestParam(value = "name", required = true) String name){
         try {
             Envelop envelop = new Envelop();
-            String errorMsg = "";
             if (StringUtils.isEmpty(name)) {
                 envelop.setErrorMsg("名称不能为空！");
             }
@@ -165,7 +166,6 @@ public class HealthBusinessController extends BaseController {
             @RequestParam(value = "code", required = true) String code){
         try {
             Envelop envelop = new Envelop();
-            String errorMsg = "";
             if (StringUtils.isEmpty(code)) {
                 envelop.setErrorMsg("编码不能为空！");
             }
@@ -184,9 +184,9 @@ public class HealthBusinessController extends BaseController {
     }
 
     @RequestMapping(value = "/healthBusiness/add" , method = RequestMethod.POST)
-    @ApiOperation(value = "新增卫生业务")
+    @ApiOperation(value = "新增指标分类")
     public Envelop create(
-            @ApiParam(name = "jsonData", value = " 部门信息Json", defaultValue = "")
+            @ApiParam(name = "jsonData", value = " 指标分类信息Json", defaultValue = "")
             @RequestParam(value = "jsonData", required = false) String jsonData){
         try {
             String errorMsg = "";
@@ -196,10 +196,9 @@ public class HealthBusinessController extends BaseController {
                 errorMsg+="编码不能为空！";
             }
             if (StringUtils.isEmpty(healthBusinessModel.getName())) {
-                errorMsg+="部门不能为空！";
+                errorMsg+="名称不能为空！";
             }
-            if(StringUtils.isNotEmpty(errorMsg))
-            {
+            if(StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
 
@@ -217,9 +216,9 @@ public class HealthBusinessController extends BaseController {
     }
 
     @RequestMapping(value = "/healthBusiness/update" , method = RequestMethod.POST)
-    @ApiOperation(value = "修改卫生业务")
+    @ApiOperation(value = "修改指标分类")
     public Envelop resetInfo(
-            @ApiParam(name = "jsonData", value = " 部门信息Json", defaultValue = "")
+            @ApiParam(name = "jsonData", value = " 指标分类信息Json", defaultValue = "")
             @RequestParam(value = "jsonData", required = false) String jsonData){
         try {
             String errorMsg = "";
@@ -230,10 +229,13 @@ public class HealthBusinessController extends BaseController {
             if (StringUtils.isEmpty(healthBusinessModel.getName())) {
                 errorMsg += "名称不能为空！";
             }
+            if(StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
             String json = objectMapper.writeValueAsString(healthBusinessModel);
             MHealthBusiness mHealthBusiness = healthBusinessClient.updateHealthBusiness(json);
             if (mHealthBusiness == null) {
-                return failed("修改部门失败!");
+                return failed("修改指标分类失败!");
             }
             return success(mHealthBusiness);
         } catch (Exception ex)

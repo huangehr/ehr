@@ -4,7 +4,6 @@ import com.yihu.ehr.entity.health.HealthBusiness;
 import com.yihu.ehr.health.dao.XHealthBusinessRepository;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

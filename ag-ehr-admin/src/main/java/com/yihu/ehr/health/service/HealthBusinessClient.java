@@ -27,7 +27,7 @@ import java.util.List;
 public interface HealthBusinessClient {
 
     @RequestMapping(value = "/healthBusiness/pageList", method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询卫生业务关系列表")
+    @ApiOperation(value = "根据查询条件查询指标分类管理列表")
     ListResult getHealthBusinessList(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
@@ -36,10 +36,10 @@ public interface HealthBusinessClient {
             @RequestParam(value = "page", required = false) int page);
 
     @RequestMapping(value = "/healthBusiness/list", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "获取卫生业务关系列表")
+    @ApiOperation(value = "获取指标分类列表，不分页")
     List<MHealthBusiness> getAllHealthBusiness();
 
-    @ApiOperation(value = "根据父ID获取子卫生业务列表")
+    @ApiOperation(value = "根据父ID获取子指标分类列表")
     @RequestMapping(value = "/healthBusiness/childs", method = RequestMethod.GET)
     List<MHealthBusiness> searchChildHealthBusiness(
             @RequestParam(value = "parentId", required = true) Integer parentId);
@@ -51,7 +51,7 @@ public interface HealthBusinessClient {
             @RequestParam(value = "id", required = true) Integer id);
 
     @RequestMapping(value = "/healthBusiness/delete", method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "删除卫生业务")
+    @ApiOperation(value = "删除指标分类")
     boolean deleteHealthBusiness(
             @ApiParam(name = "id", value = "id")
             @RequestParam(value = "id", required = true) Integer id);
@@ -69,13 +69,13 @@ public interface HealthBusinessClient {
             @RequestParam(value = "code", required = true) String code);
 
     @RequestMapping(value = "/healthBusiness/add" , method = RequestMethod.POST)
-    @ApiOperation(value = "新增卫生业务")
+    @ApiOperation(value = "新增指标分类")
     MHealthBusiness saveHealthBusinesst(
             @ApiParam(name = "jsonData", value = "json信息")
             @RequestBody String jsonData);
 
     @RequestMapping(value = "/healthBusiness/update" , method = RequestMethod.POST)
-    @ApiOperation(value = "修改卫生业务")
+    @ApiOperation(value = "修改指标分类")
     MHealthBusiness updateHealthBusiness(
             @ApiParam(name = "jsonData", value = "json信息")
             @RequestBody String jsonData);
