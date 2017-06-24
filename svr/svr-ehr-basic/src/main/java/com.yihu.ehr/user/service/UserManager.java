@@ -4,6 +4,7 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.user.dao.XUserRepository;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -192,7 +193,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean addUserBatch(List<Doctors> doctorLs)
     {
-        String header = "INSERT INTO users(id,login_code, real_name, gender, tech_title, email, telephone, password,doctor_id) VALUES \n";
+        String header = "INSERT INTO users(id,login_code, real_name, gender, tech_title, email, telephone, password, create_date, activated, user_type, DType, doctor_id) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Doctors map;
         SQLQuery query;
@@ -207,7 +208,10 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
             sql.append(",'"+ map .getEmail() +"'");
             sql.append(",'"+ null2Space(map .getPhone()) +"'");
             sql.append(",'"+ hashPassword(default_password) +"'");
-
+            sql.append(",'"+ DateUtil.getNowDateTime() +"'");
+            sql.append(","+ 1 +"");
+            sql.append(",'"+ "Doctor" +"'");
+            sql.append(",'"+ "Doctor" +"'");
 
             sql.append(",'"+ map .getId() +"')");
 
