@@ -41,4 +41,6 @@ public class MicroServices {
     public static final String Redis = "svr-redis";
     public static final String Statistics = "svr-protal-statistics";
     public static final String Quota = "svr-quota";
+
+    public static final String LogCollection = "svr-logCollection";
 }

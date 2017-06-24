@@ -342,4 +342,34 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         }
         return imageStream;
     }
+
+
+    @RequestMapping(value = ServiceApi.Users.UserPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在电话号码")
+    public List idExistence(
+            @ApiParam(name="phones",value="phones",defaultValue = "")
+            @RequestBody String phones) throws Exception {
+
+        List existPhones = userManager.idExist(toEntity(phones, String[].class));
+        return existPhones;
+    }
+
+    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        List<User> user = userManager.search("",filters,"", 1, 1);
+        return user!=null && user.size()>0;
+    }
+    @RequestMapping(value = ServiceApi.Users.UserEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @ApiParam(name="emails",value="emails",defaultValue = "")
+            @RequestBody String emails) throws Exception {
+
+        List existPhones = userManager.emailsExistence(toEntity(emails, String[].class));
+        return existPhones;
+    }
 }

@@ -56,4 +56,7 @@ public interface TjQuotaDimensionMainClient {
     @ApiOperation(value = "删除主维度关联信息")
     Result delete(@RequestParam(value = "id") String id);
 
+    @RequestMapping(value = "tj/deleteMainByQuotaCode", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据指标ID删除统计指标主维度关联信息")
+    Result deleteMainByQuotaCode(@RequestParam(value = "quotaCode") String quotaCode);
 }
