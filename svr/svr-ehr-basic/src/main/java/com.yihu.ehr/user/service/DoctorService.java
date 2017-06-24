@@ -135,7 +135,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     @Transactional(propagation = Propagation.REQUIRED)
     public String addDoctorBatch(List<Map<String, Object>> doctorLs)
     {
-        String header = "INSERT INTO doctors(code, name, sex, skill, work_portal, email, phone, office_tel, status) VALUES \n";
+        String header = "INSERT INTO doctors(code, name, sex, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction, office_tel, status) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
@@ -149,6 +149,11 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             sql.append(",'"+ map .get("workPortal") +"'");
             sql.append(",'"+ null2Space(map .get("email")) +"'");
             sql.append(",'"+ null2Space(map .get("phone")) +"'");
+            sql.append(",'"+ map .get("jxzc") +"'");
+            sql.append(",'"+ map .get("lczc") +"'");
+            sql.append(",'"+ map .get("xlzc") +"'");
+            sql.append(",'"+ map .get("xzzc") +"'");
+            sql.append(",'"+ map .get("introduction") +"'");
             sql.append(",'"+ map .get("officeTel") +"','1')\n");
 
             if(i%100==0 || i == doctorLs.size()){
