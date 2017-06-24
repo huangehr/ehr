@@ -183,4 +183,15 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         return sqlQuery.list();
     }
 
+    /**
+     * 查询电话号码是否已存在， 返回已存在邮箱
+     */
+    public List emailsExistence(String[] emails)
+    {
+        String sql = "SELECT email FROM doctors WHERE email in(:emails)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("emails", emails);
+        return sqlQuery.list();
+    }
+
 }

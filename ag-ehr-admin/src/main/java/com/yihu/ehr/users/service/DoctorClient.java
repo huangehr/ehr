@@ -155,5 +155,10 @@ public interface DoctorClient {
     boolean isExistence(
             @RequestParam(value="filters") String filters);
 
+    @RequestMapping(value = ServiceApi.Doctors.DoctorEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @RequestBody String emails);
+
 
 }

@@ -197,16 +197,18 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         Doctors map;
         SQLQuery query;
         int total = 0;
-        for(int i=0; i<doctorLs.size(); i++){
-            map = doctorLs.get(i);
+        for(int i=1; i<=doctorLs.size(); i++){
+            map = doctorLs.get(i-1);
             sql.append("('"+ UUID.randomUUID().toString()+"'");
-            sql.append(",'"+ null2Space(map.getCode()) +"'");
+            sql.append(",'"+ null2Space(map.getPhone()) +"'");
             sql.append(",'"+ map .getName() +"'");
             sql.append(",'"+ map .getSex() +"'");
             sql.append(",'"+ map .getSkill() +"'");
             sql.append(",'"+ map .getEmail() +"'");
             sql.append(",'"+ null2Space(map .getPhone()) +"'");
             sql.append(",'"+ hashPassword(default_password) +"'");
+
+
             sql.append(",'"+ map .getId() +"')");
 
             if(i%100==0 || i == doctorLs.size()){
@@ -220,5 +222,16 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     }
     private Object null2Space(Object o){
         return o==null? "" : o;
+    }
+
+    /**
+     * 查询电话号码是否已存在， 返回已存在邮箱
+     */
+    public List emailsExistence(String[] emails)
+    {
+        String sql = "SELECT email FROM users WHERE email in(:emails)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("emails", emails);
+        return sqlQuery.list();
     }
 }

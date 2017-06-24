@@ -307,4 +307,14 @@ public class DoctorController extends BaseController {
             return failed("查询出错！");
         }
     }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @ApiParam(name = "emails", value = "", defaultValue = "")
+            @RequestParam("emails") String emails) throws Exception {
+
+        List existPhones = doctorClient.emailsExistence(emails);
+        return existPhones;
+    }
 }

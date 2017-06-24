@@ -141,8 +141,11 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     {
         List models = objectMapper.readValue(doctors, new TypeReference<List>() {});
         String phones=doctorService.addDoctorBatch(models);
-        phones="["+phones.substring(0,phones.length()-1)+"]";
-        List list = doctorService.getIdByPhone(toEntity(phones, String[].class));
+        List list =new ArrayList<>();
+        if(!"".equals(phones)){
+            phones="["+phones.substring(0,phones.length()-1)+"]";
+             list = doctorService.getIdByPhone(toEntity(phones, String[].class));
+        }
         List<Doctors> existPhonesList=new ArrayList<Doctors>();
         Doctors d;
         for(int i = 0 ;i < list.size() ; i++){
@@ -174,6 +177,14 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         List<Doctors> doctor = doctorService.search("",filters,"", 1, 1);
         return doctor!=null && doctor.size()>0;
     }
+    @RequestMapping(value = ServiceApi.Doctors.DoctorEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @ApiParam(name="emails",value="emails",defaultValue = "")
+            @RequestBody String emails) throws Exception {
 
+        List existPhones = doctorService.emailsExistence(toEntity(emails, String[].class));
+        return existPhones;
+    }
 
 }

@@ -749,5 +749,13 @@ public class UserController extends BaseController {
             return failed("查询出错！");
         }
     }
+    @RequestMapping(value = ServiceApi.Users.UserEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @ApiParam(name = "emails", value = "", defaultValue = "")
+            @RequestParam("emails") String emails) throws Exception {
 
+        List existPhones = userClient.emailsExistence(emails);
+        return existPhones;
+    }
 }

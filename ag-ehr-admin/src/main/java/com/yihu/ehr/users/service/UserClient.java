@@ -144,4 +144,9 @@ public interface UserClient {
     boolean isExistence(
             @RequestParam(value="filters") String filters);
 
+    @RequestMapping(value = ServiceApi.Users.UserEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @RequestBody String emails);
+
 }

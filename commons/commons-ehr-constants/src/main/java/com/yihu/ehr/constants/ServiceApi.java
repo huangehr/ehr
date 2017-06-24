@@ -480,6 +480,9 @@ public class ServiceApi {
         public static final String DoctorPhoneExistence = "/doctor/phone/existence";
         public static final String DoctorBatch = "/doctor/batch";
         public static final String DoctorOnePhoneExistence = "/doctor/onePhone/existence";
+        public static final String DoctorEmailExistence = "/doctor/email/existence";
+
+
 
 
     }
@@ -499,6 +502,8 @@ public class ServiceApi {
         public static final String UserTelephoneNoExistence = "/user/telephone/existence";
         public static final String UserPhoneExistence = "/user/phone/existence";
         public static final String UserOnePhoneExistence = "/user/onePhone/existence";
+        public static final String UserEmailExistence = "/user/email/existence";
+
     }
 
     public static class Roles {
