@@ -57,12 +57,6 @@ spring:
     url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: ha
     password: ha
-  ldap:
-    host: 172.19.103.87
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
   data:
     mongodb:
       host: 172.19.103.57
@@ -84,12 +78,6 @@ spring:
     url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: ha
     password: ha
-  ldap:
-    host: 172.19.103.87
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
   data:
     mongodb:
       host: 172.19.103.57
@@ -106,15 +94,9 @@ fast-dfs:
 spring:
   profiles: test
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive_220?useUnicode=true&characterEncoding=UTF-8
     username: weifuwu
     password: weifuwu
-  ldap:
-    host: 172.19.103.87
-    port: 389
-    bindDn: cn=admin,dc=ehr,dc=jkzl
-    password: jkzl
-    root: dc=ehr,dc=jkzl
   data:
     mongodb:
       host: 172.19.103.57
