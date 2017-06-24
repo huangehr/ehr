@@ -118,6 +118,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         doctorRepository.save(doctors);
     }
 
+
     /**
      * 查询电话号码是否已存在， 返回已存在电话号码
      */
@@ -128,14 +129,13 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         sqlQuery.setParameterList("phones", phones);
         return sqlQuery.list();
     }
-
     /**
      * 批量创建医生
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean addDoctorBatch(List<Map<String, Object>> doctorLs)
+    public String addDoctorBatch(List<Map<String, Object>> doctorLs)
     {
-        String header = "INSERT INTO doctors(code, name, sex, skill, work_portal, email, phone, office_tel) VALUES \n";
+        String header = "INSERT INTO doctors(code, name, sex, skill, work_portal, email, phone, office_tel, status) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
@@ -149,7 +149,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             sql.append(",'"+ map .get("workPortal") +"'");
             sql.append(",'"+ null2Space(map .get("email")) +"'");
             sql.append(",'"+ null2Space(map .get("phone")) +"'");
-            sql.append(",'"+ map .get("officeTel") +"'");
+            sql.append(",'"+ map .get("officeTel") +"','1')\n");
 
             if(i%100==0 || i == doctorLs.size()){
                 query = currentSession().createSQLQuery(sql.toString());
@@ -158,10 +158,29 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             }else
                 sql.append(",");
         }
-        return true;
+        Map<String, Object> phoneMap;
+        StringBuffer stringBuffer = new StringBuffer();
+        for(int i=1; i<=doctorLs.size(); i++) {
+            phoneMap = doctorLs.get(i - 1);
+
+            stringBuffer.append("\""+phoneMap.get("phone")+"\",");
+        }
+
+        return stringBuffer.toString();
     }
     private Object null2Space(Object o){
         return o==null? "" : o;
+    }
+
+    /**
+     * 查询电话号码是否已存在， 返回已存在电话号码
+     */
+    public List getIdByPhone(String[] phones)
+    {
+        String sql = "SELECT d.* FROM doctors d WHERE phone in(:phones)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("phones", phones);
+        return sqlQuery.list();
     }
 
 }

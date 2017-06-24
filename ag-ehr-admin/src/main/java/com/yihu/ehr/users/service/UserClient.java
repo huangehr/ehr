@@ -138,4 +138,10 @@ public interface UserClient {
     @ApiOperation("获取已存在电话号码")
     List idExistence(
             @RequestBody String phones);
+
+    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    boolean isExistence(
+            @RequestParam(value="filters") String filters);
+
 }

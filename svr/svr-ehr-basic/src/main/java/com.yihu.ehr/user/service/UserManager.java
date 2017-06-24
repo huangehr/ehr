@@ -2,6 +2,7 @@ package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.user.dao.XUserRepository;
+import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.util.hash.HashUtil;
 import org.hibernate.Query;
@@ -17,6 +18,7 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 用户管理接口实现类.
@@ -60,6 +62,14 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
      */
     public User getUserByUserName(String loginCode) {
         return userRepository.findByLoginCode(loginCode);
+    }
+
+    public User getUserByTel(String telphone) {
+        List<User> users = userRepository.findByTelephone(telphone);
+        if (users.size() > 0) {
+            return users.get(0);
+        }
+        return null;
     }
 
     public User getUserByIdCardNo(String idCardNo) {
@@ -118,7 +128,12 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
 
         User user = getUserByUserName(loginCode);
         if (user == null) {
-            return null;
+            user = getUserByTel(loginCode);
+            if (user == null) {
+                user = getUserByIdCardNo(loginCode);
+                if (user == null)
+                    return null;
+            }
         }
         boolean result = isPasswordRight(user, psw);
         if (result) {
@@ -175,23 +190,24 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
      * 批量创建医生
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean addUserBatch(List<Map<String, Object>> doctorLs)
+    public boolean addUserBatch(List<Doctors> doctorLs)
     {
-        String header = "INSERT INTO users(login_code, real_name, gender, tech_title, email, telephone, password,doctor_id) VALUES \n";
+        String header = "INSERT INTO users(id,login_code, real_name, gender, tech_title, email, telephone, password,doctor_id) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
-        Map<String, Object> map;
+        Doctors map;
         SQLQuery query;
         int total = 0;
-        for(int i=1; i<=doctorLs.size(); i++){
-            map = doctorLs.get(i-1);
-            sql.append("('"+ null2Space(map .get("code")) +"'");
-            sql.append(",'"+ map .get("name") +"'");
-            sql.append(",'"+ map .get("sex") +"'");
-            sql.append(",'"+ map .get("skill") +"'");
-            sql.append(",'"+ map .get("email") +"'");
-            sql.append(",'"+ null2Space(map .get("phone")) +"'");
+        for(int i=0; i<doctorLs.size(); i++){
+            map = doctorLs.get(i);
+            sql.append("('"+ UUID.randomUUID().toString()+"'");
+            sql.append(",'"+ null2Space(map.getCode()) +"'");
+            sql.append(",'"+ map .getName() +"'");
+            sql.append(",'"+ map .getSex() +"'");
+            sql.append(",'"+ map .getSkill() +"'");
+            sql.append(",'"+ map .getEmail() +"'");
+            sql.append(",'"+ null2Space(map .getPhone()) +"'");
             sql.append(",'"+ hashPassword(default_password) +"'");
-            sql.append(",'"+ map .get("officeTel") +"'");
+            sql.append(",'"+ map .getId() +"')");
 
             if(i%100==0 || i == doctorLs.size()){
                 query = currentSession().createSQLQuery(sql.toString());
