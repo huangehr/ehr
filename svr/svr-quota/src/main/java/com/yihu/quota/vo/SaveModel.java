@@ -13,59 +13,34 @@ import java.util.Date;
 public class SaveModel {
     @JestId
     private String id;
-
     private String saasId;//saasId
-
     private String quotaCode;//指标code
-
     private String quotaDate;//统计时间
-
+    private String org;     //机构代码
+    private String orgName;//机构名字
     private String province;//省级代码 350000
-
     private String provinceName;//省名字
-
     private String city;//城市代码 350200
-
     private String cityName;//
-
     private String town;//区代码 350206
-
     private String townName;//
-
-    private String hospital;//机构code
-
-    private String hospitalName;//
-
     private String team;//团队的code
-
     private String teamName;//
-
     private String slaveKey1;//从维度  1级维度
-
     private String slaveKey1Name;
-
     private String slaveKey2;//从维度  2级维度
-
     private String slaveKey2Name;
-
     private String slaveKey3;//从维度  3级维度
-
     private String slaveKey3Name;
-
     private String slaveKey4;//从维度  4级维度
-
     private String slaveKey4Name;
-
     private Integer result;//统计结果
-
     private String timeLevel;// 1 日 2 周 3 月 4 年
-
     private String areaLevel;// 1 省 2 市 3 区县 4 机构 5团队
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd'T'HHmmss.SSS'Z'")
     @CreatedDate
     private Date createTime;//创建时间
-
-
 
     public String getQuotaDate() {
         return quotaDate;
@@ -73,6 +48,22 @@ public class SaveModel {
 
     public void setQuotaDate(String quotaDate) {
         this.quotaDate = quotaDate;
+    }
+
+    public String getOrg() {
+        return org;
+    }
+
+    public void setOrg(String org) {
+        this.org = org;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     public String getProvince() {
@@ -97,14 +88,6 @@ public class SaveModel {
 
     public void setTown(String town) {
         this.town = town;
-    }
-
-    public String getHospital() {
-        return hospital;
-    }
-
-    public void setHospital(String hospital) {
-        this.hospital = hospital;
     }
 
     public String getTeam() {
@@ -209,14 +192,6 @@ public class SaveModel {
 
     public void setTownName(String townName) {
         this.townName = townName;
-    }
-
-    public String getHospitalName() {
-        return hospitalName;
-    }
-
-    public void setHospitalName(String hospitalName) {
-        this.hospitalName = hospitalName;
     }
 
     public String getTeamName() {

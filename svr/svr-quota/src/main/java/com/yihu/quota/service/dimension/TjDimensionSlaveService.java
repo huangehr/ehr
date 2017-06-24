@@ -37,7 +37,7 @@ public class TjDimensionSlaveService {
                 "  tj_dimension_slave dm, " +
                 "  tj_quota_dimension_slave qdm " +
                 " WHERE " +
-                "  dm.`code` = qdm.quota_code " +
+                "  dm.`code` = qdm.slave_code " +
                 " AND qdm.quota_code = ? order BY" +
                 " qdm.sort asc ";
         List<TjQuotaDimensionSlave> quotaDataSources = jdbcTemplate.query(sql, new BeanPropertyRowMapper(TjQuotaDimensionSlave.class), code);
