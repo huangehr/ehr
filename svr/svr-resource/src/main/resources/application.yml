@@ -69,9 +69,9 @@ hadoop:
 spring:
   profiles: test
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: yuhaihua
-    password: yuhaihua
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive_220?useUnicode=true&characterEncoding=UTF-8
+    username: weifuwu
+    password: weifuwu
   redis:
     host: 172.19.103.47 # Redis server host.
   data:

@@ -16,6 +16,8 @@ import com.yihu.quota.vo.SaveModel;
 import net.sf.json.JSONObject;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
@@ -141,7 +143,7 @@ public class EsExtract {
                 //设置机构
                 dictData.stream().forEach(one -> {
                     // StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown() + "-" + one.getHospital());
-                    setOneData(allData, one.getHospital(), one, Contant.main_dimension_areaLevel.area_org);
+                    setOneData(allData, one.getOrg(), one, Contant.main_dimension_areaLevel.area_org);
                 });
                 break;
             }
@@ -261,7 +263,7 @@ public class EsExtract {
      */
     private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,Integer>map, StringBuffer sb) {
         while (gradeBucketIt.hasNext()) {
-            StringTerms.Bucket b = (StringTerms.Bucket) gradeBucketIt.next();
+            Terms.Bucket b =  gradeBucketIt.next();
             if (b.getAggregations().asList().get(0) instanceof StringTerms) {
                 StringTerms stringTermsCh = (StringTerms) b.getAggregations().asList().get(0);
                 Iterator<Terms.Bucket> gradeBucketItCh = stringTermsCh.getBuckets().iterator();
@@ -269,7 +271,21 @@ public class EsExtract {
                     StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
                     expainJson(gradeBucketItCh, map, sbTemp);
                 }
-            } else {
+            }else if (b.getAggregations().asList().get(0) instanceof LongTerms) {
+                LongTerms longTermsCh = (LongTerms) b.getAggregations().asList().get(0);
+                Iterator<Terms.Bucket> gradeBucketItCh = longTermsCh.getBuckets().iterator();
+                while (gradeBucketItCh.hasNext()) {
+                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
+                    expainJson(gradeBucketItCh, map, sbTemp);
+                }
+            }else if (b.getAggregations().asList().get(0) instanceof DoubleTerms) {
+                DoubleTerms doubleTermsCh = (DoubleTerms) b.getAggregations().asList().get(0);
+                Iterator<Terms.Bucket> gradeBucketItCh = doubleTermsCh.getBuckets().iterator();
+                while (gradeBucketItCh.hasNext()) {
+                    StringBuffer sbTemp = new StringBuffer((sb == null ? "" : (sb.toString() + "-")) + b.getKey());
+                    expainJson(gradeBucketItCh, map, sbTemp);
+                }
+            }else {
                 InternalValueCount count = (InternalValueCount) b.getAggregations().asList().get(0);
                 map.put(new StringBuffer(sb.toString() + "-" + b.getKey()).toString() , (int)count.getValue());
             }
@@ -316,4 +332,5 @@ public class EsExtract {
         }
         return sqlS;
     }
+
 }

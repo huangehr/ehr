@@ -10,6 +10,7 @@ import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.tj.service.TjQuotaDimensionMainService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -123,5 +124,14 @@ public class TjQuotaDimensionMainEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "id") String id) throws Exception{
         tjQuotaDimensionMainService.delete(id);
         return Result.success("统计指标主维度关联信息删除成功！");
+    }
+
+    @RequestMapping(value = "tj/deleteMainByQuotaCode", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据指标ID删除统计指标主维度关联信息")
+    public Result deleteMainByQuotaCode(
+            @ApiParam(name = "quotaCode", value = "指标Id")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        tjQuotaDimensionMainService.deleteByQuotaCode(quotaCode);
+        return Result.success("保存成功!");
     }
 }

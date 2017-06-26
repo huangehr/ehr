@@ -54,4 +54,7 @@ public interface TjQuotaDimensionSlaveClient {
     @ApiOperation(value = "删除从维度关联信息")
     Result delete(@RequestParam(value = "id") String id);
 
+    @RequestMapping(value = "/tj/deleteSlaveByQuotaCode", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除统计指标从维度关联信息")
+    Result deleteSlaveByQuotaCode(@RequestParam(value = "quotaCode") String quotaCode);
 }

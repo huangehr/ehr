@@ -736,4 +736,26 @@ public class UserController extends BaseController {
         return existPhones;
     }
 
+    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public Envelop isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) {
+
+        try {
+            return success(userClient.isExistence(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询出错！");
+        }
+    }
+    @RequestMapping(value = ServiceApi.Users.UserEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @ApiParam(name = "emails", value = "", defaultValue = "")
+            @RequestParam("emails") String emails) throws Exception {
+
+        List existPhones = userClient.emailsExistence(emails);
+        return existPhones;
+    }
 }

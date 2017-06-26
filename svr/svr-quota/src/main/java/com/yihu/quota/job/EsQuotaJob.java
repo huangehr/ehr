@@ -114,12 +114,11 @@ public class EsQuotaJob implements Job {
         if (StringUtils.isEmpty(endTime)) {
             endTime = LocalDate.now().toString("yyyy-MM-dd"); //2017-06-01 默认今天
         }
-
         this.startTime = map.getString("startTime");
-
         if (StringUtils.isEmpty(startTime)) {
             startTime = Contant.main_dimension_timeLevel.getStartTime(timeLevel);
         }
+
         Object object =  map.get("quota");
         if(object!=null){
             BeanUtils.copyProperties(object,this.quotaVo);

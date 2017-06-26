@@ -144,9 +144,21 @@ public interface DoctorClient {
     @ApiOperation("获取已存在电话号码")
     List idExistence(
             @RequestBody String phones);
+
     @RequestMapping(value = ServiceApi.Doctors.DoctorBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入医生")
     boolean createDoctorsPatch(
             @RequestBody String doctors);
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    boolean isExistence(
+            @RequestParam(value="filters") String filters);
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @RequestBody String emails);
+
 
 }
