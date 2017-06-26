@@ -8,6 +8,7 @@ import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.app.MAppFeature;
@@ -725,4 +726,36 @@ public class UserController extends BaseController {
         }
     }
 
+    @RequestMapping(value = ServiceApi.Users.UserPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在电话号码")
+    public List idExistence(
+            @ApiParam(name = "phones", value = "", defaultValue = "")
+            @RequestParam("phones") String phones) throws Exception {
+
+        List existPhones = userClient.idExistence(phones);
+        return existPhones;
+    }
+
+    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public Envelop isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) {
+
+        try {
+            return success(userClient.isExistence(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询出错！");
+        }
+    }
+    @RequestMapping(value = ServiceApi.Users.UserEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @ApiParam(name = "emails", value = "", defaultValue = "")
+            @RequestParam("emails") String emails) throws Exception {
+
+        List existPhones = userClient.emailsExistence(emails);
+        return existPhones;
+    }
 }
