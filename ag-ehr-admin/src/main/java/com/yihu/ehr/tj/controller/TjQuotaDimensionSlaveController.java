@@ -133,4 +133,21 @@ public class TjQuotaDimensionSlaveController extends ExtendController<TjQuotaDim
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
+
+    @RequestMapping(value = "/tj/deleteSlaveByQuotaCode", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除统计指标从维度关联信息")
+    public Envelop deleteSlaveByQuotaCode(
+            @ApiParam(name = "quotaCode", value = "指标Id")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        try {
+            Result result = tjQuotaDimensionSlaveClient.deleteSlaveByQuotaCode(quotaCode);
+            if(result.getCode() == 200){
+                return successMsg(result.getMessage());
+            }else{
+                return failed("删除失败！");
+            }
+        }catch (Exception e){
+            return failed(FeignExceptionUtils.getErrorMsg(e));
+        }
+    }
 }

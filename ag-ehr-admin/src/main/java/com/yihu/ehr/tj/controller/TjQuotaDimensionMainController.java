@@ -131,4 +131,21 @@ public class TjQuotaDimensionMainController extends ExtendController<TjQuotaDime
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
+
+    @RequestMapping(value = "/tj/deleteMainByQuotaCode", method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据指标ID删除统计指标主维度关联信息")
+    public Envelop deleteMainByQuotaCode(
+            @ApiParam(name = "quotaCode", value = "指标Id")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        try {
+            Result result = tjQuotaDimensionMainClient.deleteMainByQuotaCode(quotaCode);
+            if(result.getCode() == 200){
+                return successMsg(result.getMessage());
+            }else{
+                return failed("删除失败！");
+            }
+        }catch (Exception e){
+            return failed(FeignExceptionUtils.getErrorMsg(e));
+        }
+    }
 }

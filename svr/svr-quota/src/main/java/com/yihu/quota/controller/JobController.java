@@ -1,6 +1,7 @@
 package com.yihu.quota.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.service.job.JobService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -26,13 +30,13 @@ public class JobController extends BaseController {
 
     /**
      * 启动任务
-     * @param id id
+     * @param id
      * @return
      */
     @ApiOperation(value = "根据ID执行任务")
     @RequestMapping(value = "/job/execuJob", method = RequestMethod.GET)
     public boolean execuJob(
-            @ApiParam(name = "id", value = "任务ID", required = true)
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
             @RequestParam(value = "id", required = true) Integer id) {
         try {
             jobService.execuJob(id);
@@ -42,6 +46,28 @@ public class JobController extends BaseController {
             invalidUserException(e, -1, "启动失败:" + e.getMessage());
             return false;
         }
+    }
+
+
+    /**
+     * 查询结果
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "获取指标执行结果")
+    @RequestMapping(value = "/tj/tjGetQuotaResult", method = RequestMethod.GET)
+    public Envelop getQuotaResult(
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
+            @RequestParam(value = "id", required = true) Integer id) {
+        Envelop envelop = new Envelop();
+        try {
+            List<Map<String, Object>> resultList = jobService.getQuotaResult(id);
+            envelop.setDetailModelList(resultList);
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+        }
+        return envelop;
     }
 
 }
