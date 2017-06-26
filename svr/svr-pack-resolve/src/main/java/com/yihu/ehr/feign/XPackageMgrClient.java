@@ -1,15 +1,14 @@
 package com.yihu.ehr.feign;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.constants.ServiceApi;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * @author Sand
@@ -22,13 +21,19 @@ public interface XPackageMgrClient {
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
     String acquirePackage(@RequestParam(value = "id") String id);
 
+    /**
+     * 根据ID获取非健康档案包数据集
+     *
+     * @param datasetId 数据集ID
+     * @return
+     */
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.AcquirePackageDataset)
+    String acquirePackageDataset(@RequestParam(value = "datasetId") String datasetId);
+
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.Package, method = RequestMethod.PUT)
     void reportStatus(@PathVariable(value = "id") String id,
                       @RequestParam(value = "status") ArchiveStatus status,
                       @RequestBody String message);
-
-
-
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.ResolveMessage, method = RequestMethod.PUT)
     Map<String, String> sendResolveMessage(

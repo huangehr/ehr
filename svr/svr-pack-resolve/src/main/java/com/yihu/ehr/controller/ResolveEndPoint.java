@@ -2,16 +2,15 @@ package com.yihu.ehr.controller;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.config.MetricNames;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.exception.LegacyPackageException;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage2.PackMill;
@@ -23,7 +22,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.HashMapChangeSet;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -116,6 +114,22 @@ public class ResolveEndPoint {
                     ex.getMessage());
             throw ex;
         }
+    }
+
+    @ApiOperation(value = "非健康档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析非健康档案包")
+    @RequestMapping(value = ServiceApi.Packages.PackageDataset, method = RequestMethod.PUT)
+    public String resolveDataset(
+            @ApiParam(value = "数据集ID")
+            @RequestParam(required = false) String datasetId,
+            @ApiParam(value = "模拟应用ID")
+            @RequestParam(required = false) String clientId,
+            @ApiParam(value = "返回档案数据", required = true)
+            @RequestParam boolean echo) {
+
+
+
+
+        return "";
     }
 
     /**
