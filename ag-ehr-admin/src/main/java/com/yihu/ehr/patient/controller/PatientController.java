@@ -16,6 +16,7 @@ import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.patient.service.PatientCardsClient;
@@ -30,6 +31,7 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
+import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -77,6 +79,8 @@ public class PatientController extends BaseController {
     private RolesClient rolesClient;
     @Autowired
     private UserClient userClient;
+    @Autowired
+    private RoleUserClient roleUserClient;
 
     @RequestMapping(value = "/populations", method = RequestMethod.GET)
     @ApiOperation(value = "根据条件查询人")
@@ -772,7 +776,9 @@ public class PatientController extends BaseController {
             @ApiParam(name = "type", value = "角色组类型，应用角色/用户角色字典值")
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source_type", value = "平台应用sourceType字典值")
-            @RequestParam(value = "source_type") String sourceType) {
+            @RequestParam(value = "source_type") String sourceType,
+            @ApiParam(name = "user_id",value = "用户id")
+            @RequestParam(value = "user_id") String userId) {
 //        if(org.apache.commons.lang.StringUtils.isEmpty(type)){
 //            return failed("角色组类型不能为空！");
 //        }
@@ -784,7 +790,7 @@ public class PatientController extends BaseController {
         //平台应用-应用表中source_type为1
         Collection<MApp> mApps = appClient.getAppsNoPage(sourceType);
         List<PlatformAppRolesTreeModel> appRolesTreeModelList = new ArrayList<>();
-
+        Map<String,String> appRolesTreeModelMap=new HashedMap();
         //平台应用-角色组对象模型列表
         for (MApp mApp : mApps) {
             Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId());
@@ -808,9 +814,25 @@ public class PatientController extends BaseController {
             app.setPid(null);
             app.setChildren(roleTreeModelList);
             appRolesTreeModelList.add(app);
+            appRolesTreeModelMap.put(mApp.getId(),mApp.getName());
         }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(appRolesTreeModelList);
+
+
+        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId="+userId);
+        List<MRoleUser> mRoleUserList = new ArrayList<>();
+        String roleIds = "";
+        MRoleUser mr;
+        for (MRoleUser m : mRoleUsers){
+            if(null!=appRolesTreeModelMap.get(m.getRoleId())){
+                mr=new MRoleUser();
+                mr.setRoleId(m.getRoleId());
+                mr.setRoleName(appRolesTreeModelMap.get(m.getRoleId()));
+                mRoleUserList.add(mr);
+            }
+        }
+        envelop.setObj(mRoleUserList);
         return envelop;
     }
 
