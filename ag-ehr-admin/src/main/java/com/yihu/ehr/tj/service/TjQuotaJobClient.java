@@ -21,8 +21,8 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 public interface TjQuotaJobClient {
 
-    /*@RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
     @ApiOperation(value = "执行指标任务")
-    boolean tjQuotaExecute(@RequestParam("id") Integer id);*/
+    boolean tjQuotaExecute(@RequestParam("id") Integer id);
 
 }
