@@ -2,7 +2,10 @@ package com.yihu.ehr.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.discovery.converters.Auto;
+import com.unboundid.util.json.JSONObject;
 import com.yihu.ehr.agModel.app.AppFeatureModel;
+import com.yihu.ehr.agModel.geogrephy.GeographyModel;
+import com.yihu.ehr.agModel.patient.PatientDetailModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.agModel.user.UsersModel;
 import com.yihu.ehr.apps.service.AppFeatureClient;
@@ -15,6 +18,7 @@ import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.model.user.MRoleUser;
@@ -41,10 +45,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -80,6 +81,8 @@ public class UserController extends BaseController {
     private RoleUserClient roleUserClient;
     @Autowired
     private FileResourceClient fileResourceClient;
+    @Autowired
+    private PatientClient patientClient;
 
 
     private String resetFilter(String filters) {
@@ -141,8 +144,8 @@ public class UserController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) {
-        if(null==sorts){
-            sorts="-createDate,-lastLoginTime";
+        if (null == sorts) {
+            sorts = "-createDate,-lastLoginTime";
         }
         filters = resetFilter(filters);
         ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
@@ -241,6 +244,9 @@ public class UserController extends BaseController {
         try {
 
             UserDetailModel detailModel = objectMapper.readValue(userJsonData, UserDetailModel.class);
+            PatientDetailModel patientModel = objectMapper.readValue(userJsonData, PatientDetailModel.class);
+            String idCard = detailModel.getIdCardNo();
+            String userType = detailModel.getUserType();
 
             String errorMsg = null;
             if (StringUtils.isEmpty(detailModel.getLoginCode())) {
@@ -249,7 +255,7 @@ public class UserController extends BaseController {
             if (StringUtils.isEmpty(detailModel.getRealName())) {
                 errorMsg += "姓名不能为空!";
             }
-            if (StringUtils.isEmpty(detailModel.getIdCardNo())) {
+            if (StringUtils.isEmpty(idCard)) {
                 errorMsg += "身份证号不能为空!";
             }
             if (StringUtils.isEmpty(detailModel.getEmail())) {
@@ -268,7 +274,7 @@ public class UserController extends BaseController {
             if (userClient.isUserNameExists(detailModel.getLoginCode())) {
                 return failed("账户已存在!");
             }
-            if (userClient.isIdCardExists(detailModel.getIdCardNo())) {
+            if (userClient.isIdCardExists(idCard)) {
                 return failed("身份证号已存在!");
             }
             if (userClient.isEmailExists(detailModel.getEmail())) {
@@ -277,19 +283,54 @@ public class UserController extends BaseController {
             if (userClient.isTelephoneExists(detailModel.getTelephone())) {
                 return failed("电话号码已存在!");
             }
+
             detailModel.setPassword(AgAdminConstants.DefaultPassword);
             detailModel.setRole(null);
             MUser mUser = convertToMUser(detailModel);
+//            增加居民注册账号时身份证号的校验，demographics表中已存在，users表增加demographic_id身份证号关联
+            mUser.setDemographicId(idCard);
+            if (!patientClient.isExistIdCardNo(idCard)) {
+//                新增居民demographics表中居民信息
+                String telephone = "{\"联系电话\":\"telephone\"}";
+                telephone = telephone.replace("telephone", "" + detailModel.getTelephone());
+                patientModel.setTelephoneNo(telephone);
+                patientModel.setName(detailModel.getRealName());
+                   /* MDemographicInfo info = (MDemographicInfo) convertToModel(patientModel, MDemographicInfo.class);
+                    info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());
+*/
+                //新增家庭地址信息
+                GeographyModel geographyModel = new GeographyModel();
+                geographyModel.setProvinceId(detailModel.getProvinceId());
+                geographyModel.setProvince(detailModel.getProvinceName());
+                geographyModel.setCityId(detailModel.getCityId());
+                geographyModel.setCity(detailModel.getCityName());
+                geographyModel.setDistrictId(detailModel.getAreaId());
+                geographyModel.setDistrict(detailModel.getAreaName());
+                patientModel.setHomeAddress("");
+                if (!geographyModel.nullAddress()) {
+                    String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                    patientModel.setHomeAddress(addressId);
+                }
+
+                MDemographicInfo info = patientClient.createPatient(objectMapper.writeValueAsString(patientModel));
+                if (info == null) {
+                    return failed("保存失败!");
+                }
+            }
+
+
             mUser = userClient.createUser(objectMapper.writeValueAsString(mUser));
             if (mUser == null) {
                 return failed("保存失败!");
             }
-            //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败），
-            boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
-            if (!bo) {
-                userClient.deleteUser(mUser.getId());
-                return failed("保存失败!");
-            }
+            //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败）
+
+                boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
+                if (!bo) {
+                    userClient.deleteUser(mUser.getId());
+                    return failed("保存失败!");
+                }
+
             detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
         } catch (Exception ex) {
@@ -345,12 +386,12 @@ public class UserController extends BaseController {
                 return failed("邮箱已存在!");
             }
             if (!mUser.getTelephone().equals(detailModel.getTelephone())
-                    &&userClient.isTelephoneExists(detailModel.getTelephone())) {
+                    && userClient.isTelephoneExists(detailModel.getTelephone())) {
                 return failed("电话号码已存在!");
             }
-            if (userClient.isTelephoneExists(detailModel.getSecondPhone())) {
+           /* if (userClient.isTelephoneExists(detailModel.getSecondPhone())) {
                 return failed("备用号码已存在!");
-            }
+            }*/
             //-----------
 //            mUser = convertToMUser(detailModel);
 //            mUser = userClient.updateUser(objectMapper.writeValueAsString(mUser));
@@ -361,8 +402,14 @@ public class UserController extends BaseController {
 //            return success(detailModel);
 
             //修改时先修改所属角色组再修改用户，修改角色组失败（修改失败）、修改用户失败 （回显角色组）
+            /*if (mUser.getDemographicId() != null && "Patient".equals(detailModel.getUserType())) {
+                mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getDemographicId());
+                bo = roleUserClient.batchUpdateRoleUsersRelation(mUser.getDemographicId(), detailModel.getRole());
+            } else {*/
             Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getId());
             boolean bo = roleUserClient.batchUpdateRoleUsersRelation(mUser.getId(), detailModel.getRole());
+//            }
+
             if (!bo) {
                 return failed("保存失败！");
             }
@@ -378,10 +425,16 @@ public class UserController extends BaseController {
                 buffer.append(m.getRoleId());
                 buffer.append(",");
             }
-            if (buffer.length() > 0) {
-                String oldRoleIds = buffer.substring(0, buffer.length() - 1);
-                roleUserClient.batchDeleteRoleUserRelation(mUser.getId(), oldRoleIds);
-            }
+            String oldRoleIds = buffer.substring(0, buffer.length() - 1);
+            /*if (mUser.getDemographicId() != null && "Patient".equals(detailModel.getUserType())) {
+                if (buffer.length() > 0) {
+                    roleUserClient.batchDeleteRoleUserRelation(mUser.getDemographicId(), oldRoleIds);
+                }
+            } else {*/
+                if (buffer.length() > 0) {
+                    roleUserClient.batchDeleteRoleUserRelation(mUser.getId(), oldRoleIds);
+                }
+//            }
             return failed("保存失败!");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -411,6 +464,19 @@ public class UserController extends BaseController {
                 mUser.setBirthday(mUser.getBirthday().substring(0, 10));
             }
             UserDetailModel detailModel = convertToUserDetailModel(mUser);
+            /*if (StringUtils.isNotEmpty(mUser.getUserType()) && StringUtils.isNotEmpty(mUser.getDemographicId()) && "Patient".equals(mUser.getUserType())) {
+                Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId=" + mUser.getDemographicId());
+                if (mRoleUsers != null) {
+                    StringBuffer buffer = new StringBuffer();
+                    for (MRoleUser m : mRoleUsers) {
+                        buffer.append(m.getRoleId());
+                        buffer.append(",");
+                    }
+                    String roleIds = buffer.substring(0, buffer.length() - 1);
+                    detailModel.setRole(roleIds);
+                }
+
+            }*/
 
             return success(detailModel);
         } catch (Exception ex) {
@@ -726,7 +792,7 @@ public class UserController extends BaseController {
         }
     }
 
-    @RequestMapping(value = ServiceApi.Users.UserPhoneExistence,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Users.UserPhoneExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在电话号码")
     public List idExistence(
             @ApiParam(name = "phones", value = "", defaultValue = "")
@@ -736,20 +802,21 @@ public class UserController extends BaseController {
         return existPhones;
     }
 
-    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Users.UserOnePhoneExistence, method = RequestMethod.GET)
     @ApiOperation("根据过滤条件判断是否存在")
     public Envelop isExistence(
-            @ApiParam(name="filters",value="filters",defaultValue = "")
-            @RequestParam(value="filters") String filters) {
+            @ApiParam(name = "filters", value = "filters", defaultValue = "")
+            @RequestParam(value = "filters") String filters) {
 
         try {
             return success(userClient.isExistence(filters));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return failed("查询出错！");
         }
     }
-    @RequestMapping(value = ServiceApi.Users.UserEmailExistence,method = RequestMethod.POST)
+
+    @RequestMapping(value = ServiceApi.Users.UserEmailExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在邮箱")
     public List emailsExistence(
             @ApiParam(name = "emails", value = "", defaultValue = "")

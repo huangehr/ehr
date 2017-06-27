@@ -7,6 +7,7 @@ public class MRoleUser {
     private long id;
     private long roleId;
     private String userId;
+    private String  roleName;
 
     public long getId() {
         return id;
@@ -27,5 +28,13 @@ public class MRoleUser {
     }
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 }
