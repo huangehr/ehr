@@ -21,15 +21,6 @@ public interface XPackageMgrClient {
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
     String acquirePackage(@RequestParam(value = "id") String id);
 
-    /**
-     * 根据ID获取非健康档案包数据集
-     *
-     * @param datasetId 数据集ID
-     * @return
-     */
-    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.AcquirePackageDataset)
-    String acquirePackageDataset(@RequestParam(value = "datasetId") String datasetId);
-
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.Package, method = RequestMethod.PUT)
     void reportStatus(@PathVariable(value = "id") String id,
                       @RequestParam(value = "status") ArchiveStatus status,
@@ -40,4 +31,5 @@ public interface XPackageMgrClient {
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "count", required = false) int count);
+
 }
