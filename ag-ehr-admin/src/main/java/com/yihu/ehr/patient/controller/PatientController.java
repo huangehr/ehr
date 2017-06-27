@@ -653,6 +653,18 @@ public class PatientController extends BaseController {
                     MConventionalDict dict = conventionalDictClient.getGender(patientInfo.getGender());
                     patient.setGender(dict == null ? "" : dict.getValue());
                 }
+
+                //获取居民账户id
+                String fields= "id,demographicId,realName";
+                String filters="demographicId="+patientInfo.getIdCardNo();
+                String sorts="+demographicId,+realName";
+                ResponseEntity<List<MUser>> userEntity = userClient.searchUsers(fields, filters, sorts, 20, 1);
+                List<MUser> mUsers = userEntity.getBody();
+                if(null!=mUsers&&mUsers.size()>0){
+                    for(MUser u:mUsers){
+                        patient.setUserId(u.getId());
+                    }
+                }
                 //联系电话
                 Map<String, String> telephoneNo;
                 String tag = "联系电话";
