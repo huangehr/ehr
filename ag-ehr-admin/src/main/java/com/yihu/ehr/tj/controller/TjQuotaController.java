@@ -157,10 +157,10 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
 
 
 
-    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
+    /*@RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
     public boolean execuJob(
             @ApiParam(name = "id")
             @RequestParam("id") int id) throws Exception {
         return tjQuotaJobClient.tjQuotaExecute(id);
-    }
+    }*/
 }

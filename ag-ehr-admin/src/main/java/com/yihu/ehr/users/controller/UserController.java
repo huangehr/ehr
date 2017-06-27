@@ -288,36 +288,36 @@ public class UserController extends BaseController {
             detailModel.setRole(null);
             MUser mUser = convertToMUser(detailModel);
 //            增加居民注册账号时身份证号的校验，demographics表中已存在，users表增加demographic_id身份证号关联
-            if ("Patient".equals(userType)) {
-                mUser.setDemographicId(idCard);
-                if (!patientClient.isExistIdCardNo(idCard)) {
+            mUser.setDemographicId(idCard);
+            if ("Patient".equals(userType) && !patientClient.isExistIdCardNo(idCard)) {
+//                if (!patientClient.isExistIdCardNo(idCard)) {
 //                新增居民demographics表中居民信息
-                    String telephone = "{\"联系电话\":\"telephone\"}";
-                    telephone = telephone.replace("telephone", "" + detailModel.getTelephone());
-                    patientModel.setTelephoneNo(telephone);
-                    patientModel.setName(detailModel.getRealName());
+                String telephone = "{\"联系电话\":\"telephone\"}";
+                telephone = telephone.replace("telephone", "" + detailModel.getTelephone());
+                patientModel.setTelephoneNo(telephone);
+                patientModel.setName(detailModel.getRealName());
                    /* MDemographicInfo info = (MDemographicInfo) convertToModel(patientModel, MDemographicInfo.class);
                     info.setHomeAddress(detailModel.getProvinceName() + detailModel.getCityName() + detailModel.getAreaName());
 */
-                    //新增家庭地址信息
-                    GeographyModel geographyModel = new GeographyModel();
-                    geographyModel.setProvinceId(detailModel.getProvinceId());
-                    geographyModel.setProvince(detailModel.getProvinceName());
-                    geographyModel.setCityId(detailModel.getCityId());
-                    geographyModel.setCity(detailModel.getCityName());
-                    geographyModel.setDistrictId(detailModel.getAreaId());
-                    geographyModel.setDistrict(detailModel.getAreaName());
-                    patientModel.setHomeAddress("");
-                    if (!geographyModel.nullAddress()) {
-                        String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-                        patientModel.setHomeAddress(addressId);
-                    }
-
-                    MDemographicInfo info = patientClient.createPatient(objectMapper.writeValueAsString(patientModel));
-                    if (info == null) {
-                        return failed("保存失败!");
-                    }
+                //新增家庭地址信息
+                GeographyModel geographyModel = new GeographyModel();
+                geographyModel.setProvinceId(detailModel.getProvinceId());
+                geographyModel.setProvince(detailModel.getProvinceName());
+                geographyModel.setCityId(detailModel.getCityId());
+                geographyModel.setCity(detailModel.getCityName());
+                geographyModel.setDistrictId(detailModel.getAreaId());
+                geographyModel.setDistrict(detailModel.getAreaName());
+                patientModel.setHomeAddress("");
+                if (!geographyModel.nullAddress()) {
+                    String addressId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                    patientModel.setHomeAddress(addressId);
                 }
+
+                MDemographicInfo info = patientClient.createPatient(objectMapper.writeValueAsString(patientModel));
+                if (info == null) {
+                    return failed("保存失败!");
+                }
+//                }
             }
 
 
@@ -437,11 +437,11 @@ public class UserController extends BaseController {
                 buffer.append(",");
             }
             String oldRoleIds = buffer.substring(0, buffer.length() - 1);
-            if (mUser.getDemographicId() != null && "Patient".equals(detailModel.getUserType())){
+            if (mUser.getDemographicId() != null && "Patient".equals(detailModel.getUserType())) {
                 if (buffer.length() > 0) {
                     roleUserClient.batchDeleteRoleUserRelation(mUser.getDemographicId(), oldRoleIds);
                 }
-            }else {
+            } else {
                 if (buffer.length() > 0) {
                     roleUserClient.batchDeleteRoleUserRelation(mUser.getId(), oldRoleIds);
                 }
