@@ -261,10 +261,8 @@ public class ServiceApi {
     public static class Packages {
         public static final String Packages = "/packages";
         public static final String AcquirePackage = "/packages/acquire";
-        public static final String AcquirePackageDataset = "/packages/acquireDataset";
         public static final String Package = "/packages/{id}";
         public static final String PackageResolve = "/packages/resolve";
-        public static final String PackageDataset = "/packages/dataset";
         public static final String PackageSearch = "/packages/search";
         public static final String PackageDownloads = "/packages/{id}/downloads";
 
