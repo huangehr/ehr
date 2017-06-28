@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "档案住院接口")
+@Api(value = "档案住院接口", description = "档案住院接口")
 public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
 
     @Autowired
@@ -103,9 +103,11 @@ public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "saas_org", value = "授权机构")
+            @RequestParam(value = "saas_org", required = false) String saas_org,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedDiagnosis, demographic_id, profile_id,event_no, page,size);
+        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedDiagnosis, demographic_id, profile_id,event_no, page,size,saas_org);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
@@ -123,9 +125,11 @@ public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "saas_org", value = "授权机构")
+            @RequestParam(value = "saas_org", required = false) String saas_org,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedSymptom, demographic_id, profile_id,event_no, page,size);
+        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedSymptom, demographic_id, profile_id,event_no, page,size,saas_org);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
@@ -143,9 +147,11 @@ public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "saas_org", value = "授权机构")
+            @RequestParam(value = "saas_org", required = false) String saas_org,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedCost, demographic_id, profile_id,event_no, page,size);
+        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedCost, demographic_id, profile_id,event_no, page,size,saas_org);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
@@ -163,9 +169,11 @@ public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "saas_org", value = "授权机构")
+            @RequestParam(value = "saas_org", required = false) String saas_org,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedCostDetail, demographic_id, profile_id,event_no, page,size);
+        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedCostDetail, demographic_id, profile_id,event_no, page,size,saas_org);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
@@ -183,9 +191,11 @@ public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "saas_org", value = "授权机构")
+            @RequestParam(value = "saas_org", required = false) String saas_org,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedOrdersTemporary, demographic_id, profile_id,event_no, page,size);
+        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedOrdersTemporary, demographic_id, profile_id,event_no, page,size,saas_org);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
@@ -203,9 +213,11 @@ public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "saas_org", value = "授权机构")
+            @RequestParam(value = "saas_org", required = false) String saas_org,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedOrdersLongtime, demographic_id, profile_id,event_no, page,size);
+        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedOrdersLongtime, demographic_id, profile_id,event_no, page,size,saas_org);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
@@ -223,9 +235,11 @@ public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "saas_org", value = "授权机构")
+            @RequestParam(value = "saas_org", required = false) String saas_org,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedDeath, demographic_id, profile_id,event_no, page,size);
+        Envelop re = patientDetail.getProfileSub(BasisConstant.hospitalizedDeath, demographic_id, profile_id,event_no, page,size,saas_org);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
@@ -243,9 +257,11 @@ public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行")
             @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "saas_org", value = "授权机构")
+            @RequestParam(value = "saas_org", required = false) String saas_org,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = patientDetail.getProfileSub(BasisConstant.surgery, demographic_id, profile_id,event_no, page,size);
+        Envelop re = patientDetail.getProfileSub(BasisConstant.surgery, demographic_id, profile_id,event_no, page,size,saas_org);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }

@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "档案事件接口")
+@Api(value = "档案事件接口", description = "档案事件接口")
 public class ProfileEventEndPoint extends BaseRestEndPoint {
 
     @Autowired
@@ -38,6 +38,9 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
 
     @Autowired
     PatientInfoBaseService patient;
+
+    @Autowired
+    PatientEventService patientEvent;
 
     @Autowired
     PatientInfoDetailService patientDetail;
@@ -141,7 +144,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         return patient.getHealthProblem(demographic_id);
     }
 
-    @ApiOperation("就诊过的疾病OK")
+    /*@ApiOperation("就诊过的疾病OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalDisease, method = RequestMethod.GET)
     public List<Map<String,String>> MedicalDisease(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
@@ -163,27 +166,27 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
         return patient.getPatientYear(demographic_id);
-    }
+    }   */
 
     @ApiOperation("门诊/住院事件(时间轴)OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvents, method = RequestMethod.GET)
     public List<Map<String,Object>> MedicalEvents(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420101200006018700")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "events_type", value = "就诊事件类别")
             @RequestParam(value = "events_type", required = false) String events_type,
-            @ApiParam(name = "year", value = "年份")
+            /*@ApiParam(name = "year", value = "年份")
             @RequestParam(value = "year", required = false, defaultValue = "") String year,
             @ApiParam(name = "area", value = "地区")
-            @RequestParam(value = "area", required = false) String area,
+            @RequestParam(value = "area", required = false) String area,*/
             @ApiParam(name = "hp_id", value = "健康问题id")
             @RequestParam(value = "hp_id", required = false) String hp_id,
-            @ApiParam(name = "disease_id", value = "疾病id")
-            @RequestParam(value = "disease_id", required = false) String disease_id,
+            @ApiParam(name = "saasOrg", value = "机构授权")
+            @RequestParam(value = "saasOrg", required = false) String saasOrg,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
 
-        List<Map<String,Object>> re = patient.getPatientEvents(demographic_id, events_type, year, area, hp_id, disease_id);
+        List<Map<String,Object>> re = patientEvent.getPatientEvents(demographic_id, events_type, hp_id, saasOrg);
         return adapterBatch(version,re);
     }
 
@@ -196,7 +199,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "event_no", required = true) String event_no,
             @ApiParam(name = "version", value = "版本号",defaultValue="57623f01b2d9")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Map<String,Object> re = patient.getMedicalEvent(org_code,event_no);
+        Map<String,Object> re = patientEvent.getMedicalEvent(org_code,event_no);
         return adapterOne(version,re);
     }
 

@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "档案CDA接口")
+@Api(value = "档案CDA接口", description = "档案CDA接口")
 public class ProfileCDAEndPoint extends BaseRestEndPoint {
 
     @Autowired
