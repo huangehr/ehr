@@ -115,11 +115,6 @@
             <artifactId>commons-data-redis</artifactId>
             <scope>compile</scope>
         </dependency>
-        <!--<dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-keyschema</artifactId>
-            <scope>compile</scope>
-        </dependency>-->
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-profile-core</artifactId>
