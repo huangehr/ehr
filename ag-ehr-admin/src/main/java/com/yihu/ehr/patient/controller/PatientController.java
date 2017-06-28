@@ -803,6 +803,7 @@ public class PatientController extends BaseController {
                 modelTree.setPid(mApp.getId());
                 modelTree.setChildren(null);
                 roleTreeModelList.add(modelTree);
+                appRolesTreeModelMap.put(String.valueOf(m.getId()),m.getName());
             }
             if (roleTreeModelList.size() == 0) {
                 continue;
@@ -814,7 +815,7 @@ public class PatientController extends BaseController {
             app.setPid(null);
             app.setChildren(roleTreeModelList);
             appRolesTreeModelList.add(app);
-            appRolesTreeModelMap.put(mApp.getId(),mApp.getName());
+
         }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(appRolesTreeModelList);
@@ -825,10 +826,10 @@ public class PatientController extends BaseController {
         String roleIds = "";
         MRoleUser mr;
         for (MRoleUser m : mRoleUsers){
-            if(null!=appRolesTreeModelMap.get(m.getRoleId())){
+            if(null!=appRolesTreeModelMap.get(String.valueOf(m.getRoleId()))){
                 mr=new MRoleUser();
                 mr.setRoleId(m.getRoleId());
-                mr.setRoleName(appRolesTreeModelMap.get(m.getRoleId()));
+                mr.setRoleName(appRolesTreeModelMap.get(String.valueOf(m.getRoleId())));
                 mRoleUserList.add(mr);
             }
         }
@@ -863,6 +864,9 @@ public class PatientController extends BaseController {
         }
         return envelop;
     }
+
+
+
     public MUser convertToMUser(UserDetailModel detailModel) {
         if (detailModel == null) {
             return null;

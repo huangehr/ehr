@@ -365,15 +365,12 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
             @RequestBody  String jsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
-//        String[] jsonDatalist=jsonData.split("jsonData=");
+        String[] jsonDatalist=jsonData.split("jsonData=");
         //将json串转换成对象，放进list里面
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, RoleUser.class);
-        List<RoleUser> models = objectMapper.readValue(jsonData,javaType);
-        String Id ="";
-        Id=roleUserService.saveRoleUser(models,userId);
-        return Id;
+        List<RoleUser> models = objectMapper.readValue(jsonDatalist[1],javaType);
+        return roleUserService.saveRoleUser(models,userId);
 
     }
-
 
 }
