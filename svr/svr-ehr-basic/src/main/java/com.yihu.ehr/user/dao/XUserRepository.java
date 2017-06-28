@@ -1,5 +1,7 @@
 package com.yihu.ehr.user.dao;
 
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.user.entity.RoleUser;
 import com.yihu.ehr.user.entity.User;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +28,12 @@ public interface XUserRepository extends PagingAndSortingRepository<User, String
     @Modifying
     @Query("update User user set user.password = :password where user.id = :userId")
     void changePassWord(@Param ("userId") String userId, @Param("password") String password);
+
+
+    @Query("select user from User user where user.loginCode = :loginCode or user.telephone = :loginCode or user.idCardNo = :loginCode")
+    List<User> findUserForLogin(@Param("loginCode") String loginCode);
+
+
+
+
 }

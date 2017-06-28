@@ -153,8 +153,15 @@ public class UserEndPoint extends EnvelopRestEndPoint {
     public MUser getUserByLoginCode(
             @ApiParam(name = "user_name", value = "登录账号", defaultValue = "")
             @PathVariable(value = "user_name") String userName) {
-        User user = userManager.getUserByUserName(userName);
-        return convertToModel(user, MUser.class);
+        //User user = userManager.getUserByUserName(userName);
+        //TODO 可根据帐户，手机号，身份证号登陆接口新增
+        List<User> users = userManager.getUserForLogin(userName);
+        if(users != null){
+            if(users.size() == 1){
+                return convertToModel(users.get(0), MUser.class);
+            }
+        }
+         return null;
     }
 
     @RequestMapping(value = ServiceApi.Users.UserAdminPassword, method = RequestMethod.PUT)
