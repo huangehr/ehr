@@ -357,18 +357,18 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
      * 居民信息-角色授权-角色组保存
      * @return
      */
-    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.POST)
+    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "居民信息-角色授权-角色组保存")
     public String saveRoleUser(
             @ApiParam(name = "userId", value = "机构", defaultValue = "")
             @RequestParam(value = "userId", required = false) String userId,
             @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
-            @RequestBody  String jsonData) throws Exception{
+            @RequestBody String jsonData) throws Exception{
         ObjectMapper objectMapper = new ObjectMapper();
-        String[] jsonDatalist=jsonData.split("jsonData=");
+//        String[] jsonDatalist=jsonData.split("jsonData=");
         //将json串转换成对象，放进list里面
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, RoleUser.class);
-        List<RoleUser> models = objectMapper.readValue(jsonDatalist[1],javaType);
+        List<RoleUser> models = objectMapper.readValue(jsonData,javaType);
         return roleUserService.saveRoleUser(models,userId);
 
     }

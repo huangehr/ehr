@@ -43,6 +43,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -791,8 +792,15 @@ public class PatientController extends BaseController {
         Collection<MApp> mApps = appClient.getAppsNoPage(sourceType);
         List<PlatformAppRolesTreeModel> appRolesTreeModelList = new ArrayList<>();
         Map<String,String> appRolesTreeModelMap=new HashedMap();
+        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId="+userId);
+        Map<String,String> roleUserModel=new HashedMap();
+        for (MRoleUser model : mRoleUsers){
+            roleUserModel.put(String.valueOf(model.getRoleId()),String.valueOf(model.getRoleId()));
+        }
         //平台应用-角色组对象模型列表
+
         for (MApp mApp : mApps) {
+            boolean checkFlag=false;
             Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId());
             List<PlatformAppRolesTreeModel> roleTreeModelList = new ArrayList<>();
             for (MRoles m : mRoles) {
@@ -802,6 +810,12 @@ public class PatientController extends BaseController {
                 modelTree.setType("1");
                 modelTree.setPid(mApp.getId());
                 modelTree.setChildren(null);
+                if(null!=roleUserModel.get(String.valueOf(m.getId()))){
+                    modelTree.setIschecked(true);
+                    checkFlag=true;
+                }else{
+                    modelTree.setIschecked(false);
+                }
                 roleTreeModelList.add(modelTree);
                 appRolesTreeModelMap.put(String.valueOf(m.getId()),m.getName());
             }
@@ -814,16 +828,14 @@ public class PatientController extends BaseController {
             app.setType(String.valueOf(mApp.getSourceType()));
             app.setPid(null);
             app.setChildren(roleTreeModelList);
+            app.setIschecked(checkFlag);
             appRolesTreeModelList.add(app);
 
         }
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(appRolesTreeModelList);
 
-
-        Collection<MRoleUser> mRoleUsers = roleUserClient.searchRoleUserNoPaging("userId="+userId);
         List<MRoleUser> mRoleUserList = new ArrayList<>();
-        String roleIds = "";
         MRoleUser mr;
         for (MRoleUser m : mRoleUsers){
             if(null!=appRolesTreeModelMap.get(String.valueOf(m.getRoleId()))){
@@ -842,13 +854,13 @@ public class PatientController extends BaseController {
      *
      * @return
      */
-    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.POST)
+    @RequestMapping(value = "/appUserRolesSave",method = RequestMethod.PUT)
     @ApiOperation(value = "居民信息-角色授权-角色组保存")
     public Envelop saveRoleUser(
             @ApiParam(name = "userId", value = "居民账户id", defaultValue = "")
             @RequestParam(value = "userId", required = false) String userId,
             @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
+            @RequestParam(value = "jsonData", required = false) String jsonData) throws Exception {
         Envelop envelop = new Envelop();
         RoleUserModel roleUserModel = new RoleUserModel();
         jsonData = URLDecoder.decode(jsonData);
