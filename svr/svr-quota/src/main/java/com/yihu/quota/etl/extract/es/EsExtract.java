@@ -37,6 +37,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -162,7 +163,8 @@ public class EsExtract {
         one.setAreaLevel(areaLevel);
         one.setResult(0);
         one.setCreateTime(new Date());
-        one.setQuotaDate(startTime);
+        LocalDate today = LocalDate.now();
+        one.setQuotaDate(today.toString());
         one.setQuotaCode(quotaVo.getCode());
         one.setTimeLevel(timeLevel);
         one.setSaasId(saasid);
@@ -226,9 +228,9 @@ public class EsExtract {
         allData= initDimension(tjQuotaDimensionSlaves, one, allData);
 
         for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
-            String key=oneMap.getKey();
+            String key = oneMap.getKey().toLowerCase();//es 查询出结果默认是小写
             SaveModel saveModel=oneMap.getValue();
-            Integer num=map.get(key);
+            Integer num = map.get(key);
             if(saveModel!=null){
                 saveModel.setResult(num);
                 returnList.add(saveModel);
@@ -319,15 +321,13 @@ public class EsExtract {
             //拼凑where语句
             StringBuffer whereSql = new StringBuffer(" saasId= '" + saasid + "'" );
             if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
-                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");
+                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
                 //是否是增量
                 if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
-                    whereSql.append(" and " + esConfig.getTimekey() + " > '" + startTime + "'");
+                    whereSql.append(" and " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
                 }
             }
-
             StringBuffer sql = new StringBuffer("select " + allField + " ,count(*) result from " + tableName + " where " + whereSql + " group by " + AllGroupBy);
-
             sqlS.put(sql.toString(), one);
         }
         return sqlS;
