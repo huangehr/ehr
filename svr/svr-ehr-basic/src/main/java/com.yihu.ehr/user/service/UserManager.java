@@ -65,6 +65,15 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         return userRepository.findByLoginCode(loginCode);
     }
 
+    /**
+     * 根据登陆用户名&手机号&身份证号获取用户接口.
+     *
+     * @param loginCode
+     */
+    public List<User> getUserForLogin(String loginCode) {
+        return userRepository.findUserForLogin(loginCode);
+    }
+
     public User getUserByTel(String telphone) {
         List<User> users = userRepository.findByTelephone(telphone);
         if (users.size() > 0) {

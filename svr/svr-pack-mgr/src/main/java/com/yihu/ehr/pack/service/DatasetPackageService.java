@@ -17,20 +17,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
+ * 兼容非病人维度
  * JSON档案管理器。将档案存到fastDFS中, 并做文件索引
  *
- * @author Air
+ * @author HZY
  * @version 1.0
- * @created 2015.07.09 9:50
+ * @created 2017.06.26 9:50
  */
 @Service
 @Transactional
-public class PackageService extends BaseJpaService<Package, XPackageRepository> {
+public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatasetPackageRepository> {
     @Value("${deploy.region}")
     Short adminRegion;
 
@@ -40,35 +43,22 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
     @Autowired
     XDatasetPackageRepository datasetPackageRepository;
 
-    public Package receive(InputStream is, String pwd, String md5, String orgCode, String clientId) {
-        Map<String, String> metaData = storeJsonPackage(is);
-        return checkIn(metaData.get("id"), metaData.get("path"), pwd, md5, orgCode, clientId);
-    }
 
     public DatasetPackage receiveDatasets(InputStream is, String pwd, String md5, String orgCode, String clientId) {
         Map<String, String> metaData = storeJsonPackage(is);
         return checkDatasetIn(metaData.get("id"), metaData.get("path"), pwd, md5, orgCode, clientId);
     }
 
-    public Package getPackage(String id) {
+    public DatasetPackage getPackage(String id) {
         return getRepo().findOne(id);
     }
 
-    public InputStream downloadFile(String id) throws Exception {
-        Package aPackage = getRepo().findOne(id);
-        if (aPackage == null) return null;
 
-        String file[] = aPackage.getRemotePath().split(":");
-        byte[] data = fastDFSUtil.download(file[0], file[1]);
-
-        return new ByteArrayInputStream(data);
-    }
-
-    public Package acquirePackage(String id) {
-        Package aPackage = null;
+    public DatasetPackage acquirePackage(String id) {
+        DatasetPackage aPackage = null;
         if (StringUtils.isEmpty(id)){
             Pageable pageable = new PageRequest(0, 1);
-            List<Package> packages = getRepo().findEarliestOne(pageable);
+            List<DatasetPackage> packages = getRepo().findEarliestOne(pageable);
 
             if(packages.size() > 0) aPackage = packages.get(0);
         } else {
@@ -109,40 +99,13 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
 
             return metaData;
         } catch (Exception e) {
-            LogService.getLogger(PackageService.class)
+            LogService.getLogger(DatasetPackageService.class)
                     .error("存病人档案文件失败, 错误原因: " + ExceptionUtils.getStackTrace(e));
 
             return null;
         }
     }
 
-    /**
-     * 在数据库待解析的队列中登记.
-     *
-     * @param path 完整路径
-     * @param pwd  zip密码
-     * @return 索引存储成功
-     */
-    Package checkIn(String id, String path, String pwd, String md5, String orgCode, String clientId) {
-        try {
-            Package aPackage = new Package();
-            aPackage.setId(id);
-            aPackage.setMd5(md5);
-            aPackage.setOrgCode(orgCode);
-            aPackage.setClientId(clientId);
-            aPackage.setRemotePath(path);
-            aPackage.setPwd(pwd);
-            aPackage.setReceiveDate(new Date());
-            aPackage.setArchiveStatus(ArchiveStatus.Received);
-            getRepo().save(aPackage);
-
-            return aPackage;
-        } catch (HibernateException ex) {
-            LogService.getLogger(PackageService.class).error(ex.getMessage());
-
-            return null;
-        }
-    }
 
     /**
      * 在数据库待解析的队列中登记. （新）（兼容非病人维度采集）
@@ -166,7 +129,7 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
 
             return aPackage;
         } catch (HibernateException ex) {
-            LogService.getLogger(PackageService.class).error(ex.getMessage());
+            LogService.getLogger(DatasetPackageService.class).error(ex.getMessage());
 
             return null;
         }
@@ -185,7 +148,7 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
         getRepo().delete(id);
     }
     
-    private XPackageRepository getRepo(){
-        return (XPackageRepository)getRepository();
+    private XDatasetPackageRepository getRepo(){
+        return (XDatasetPackageRepository)getRepository();
     }
 }

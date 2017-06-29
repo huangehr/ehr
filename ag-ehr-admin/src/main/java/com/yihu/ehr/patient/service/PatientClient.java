@@ -144,7 +144,7 @@ public interface PatientClient {
      */
 
     @ApiOperation(value = "居民信息-角色授权-角色组保存")
-    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.POST)
+    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     String saveRoleUser(
             @ApiParam(name = "userId", value = "居民账户id", defaultValue = "")
             @RequestParam(value = "userId", required = false) String userId,

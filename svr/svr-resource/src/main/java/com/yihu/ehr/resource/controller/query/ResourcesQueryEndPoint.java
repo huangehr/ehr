@@ -57,10 +57,7 @@ public class ResourcesQueryEndPoint {
                                 @RequestParam(required = false) Integer page,
                                 @ApiParam("每页几条")
                                 @RequestParam(required = false) Integer size) throws Exception {
-        if(StringUtils.isEmpty(appId) && StringUtils.isEmpty(orgCode))
-        {
-            throw new Exception("非法操作！");
-        }
+
         return resourcesQueryService.getResources(resourcesCode, appId, orgCode, queryParams, page, size);
     }
 
@@ -83,10 +80,7 @@ public class ResourcesQueryEndPoint {
                                           @RequestParam(required = false) Integer size,
                                           @ApiParam("版本号")
                                           @RequestParam(required = false) String version) throws Exception {
-        if(StringUtils.isEmpty(appId) && StringUtils.isEmpty(orgCode))
-        {
-            throw new Exception("非法操作！");
-        }
+
 
         Envelop re = resourcesQueryService.getResources(resourcesCode, appId, orgCode, queryParams, page, size);
         if(version!=null && version.length()>0)
