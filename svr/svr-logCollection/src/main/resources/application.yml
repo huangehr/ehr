@@ -7,11 +7,11 @@ logging:
 
 kafka:
   broker:
-    address: node1.hde.h3c.com,node2.hde.h3c.com:6667
+    address: 172.17.110.201:6667
 
 zookeeper:
   broker:
-    address: node1.hde.h3c.com,node2.hde.h3c.com:2181
+    address: 172.17.110.201:2181
 ---
 spring:
   profiles: test

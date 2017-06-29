@@ -22,8 +22,35 @@ import java.io.Serializable;
 public class OperatorDataModel extends DataModel implements Serializable {
 
     private String responseTime;
+    private String responseCode;
+    private String response;
+    private String api;
+    private String appKey;
     private String url;
     private String params;
+
+    public static OperatorDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
+        OperatorDataModel operatorDataModel = new OperatorDataModel();
+        try {
+            operatorDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
+            operatorDataModel.setCaller(jsonObject.getString("caller"));
+            operatorDataModel.setTime(jsonObject.getString("time"));
+
+            JSONObject chlidren = jsonObject.getJSONObject("data");
+            operatorDataModel.setResponseTime(chlidren.get("responseTime").toString());
+            operatorDataModel.setResponseCode(chlidren.getString("responseCode"));
+            operatorDataModel.setResponse(chlidren.getString("response"));
+            operatorDataModel.setApi(chlidren.getString("api"));
+            operatorDataModel.setAppKey(chlidren.getString("appKey"));
+            operatorDataModel.setUrl(chlidren.getString("url"));
+            operatorDataModel.setParams(chlidren.getString("params"));
+
+        } catch (Exception e) {
+            throw new Exception("格式错误");
+        }
+        return operatorDataModel;
+    }
+
 
     public String getResponseTime() {
         return responseTime;
@@ -49,21 +76,37 @@ public class OperatorDataModel extends DataModel implements Serializable {
         this.params = params;
     }
 
-    public static OperatorDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
-        OperatorDataModel operatorDataModel = new OperatorDataModel();
-        try {
-            operatorDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
-            operatorDataModel.setCaller(jsonObject.getString("caller"));
-            operatorDataModel.setTime(jsonObject.getString("time"));
-
-            JSONObject chlidren = jsonObject.getJSONObject("data");
-            operatorDataModel.setResponseTime(chlidren.get("responseTime").toString());
-            operatorDataModel.setUrl(chlidren.getString("url"));
-            operatorDataModel.setParams(chlidren.getString("params"));
-
-        } catch (Exception e) {
-            throw new Exception("格式错误");
-        }
-        return operatorDataModel;
+    public String getResponseCode() {
+        return responseCode;
     }
+
+    public void setResponseCode(String responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public String getApi() {
+        return api;
+    }
+
+    public void setApi(String api) {
+        this.api = api;
+    }
+
+    public String getAppKey() {
+        return appKey;
+    }
+
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
+    }
+
+
 }

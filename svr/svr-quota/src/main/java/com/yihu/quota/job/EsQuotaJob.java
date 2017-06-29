@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -72,8 +73,14 @@ public class EsQuotaJob implements Job {
             //抽取数据 如果是累加就是 List<DataModel>  如果是相除 Map<String,List<DataModel>>
             List<SaveModel> dataModels = extract();
             if(dataModels != null && dataModels.size() > 0){
+                List<SaveModel> dataSaveModels = new ArrayList<>();
+                for(SaveModel saveModel :dataModels){
+                    if(saveModel.getResult() != null){
+                        dataSaveModels.add(saveModel);
+                    }
+                }
                 //保存数据
-                Boolean success = saveDate(dataModels);
+                Boolean success = saveDate(dataSaveModels);
                 tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
                 tjQuotaLog.setEndTime(new Date());
             }else {

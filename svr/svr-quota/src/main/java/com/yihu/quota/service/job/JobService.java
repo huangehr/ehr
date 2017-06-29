@@ -35,19 +35,24 @@ public class JobService {
             params.put("startTime", "");
             params.put("endTime", "");
 
+            quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()),  UUID.randomUUID().toString().replace("-", ""), params);
            //往quartz框架添加任务
-           if (!StringUtils.isEmpty(tjQuota.getJobClazz()) && tjQuota.getExecType().equals("1")) {
-               quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()),  UUID.randomUUID().toString().replace("-", ""), params);
-           }else {
-               quartzHelper.addJob(Class.forName(quotaVo.getJobClazz()), quotaVo.getCron(), UUID.randomUUID().toString().replace("-", ""), params);
-           }
+//           if (!StringUtils.isEmpty(tjQuota.getJobClazz()) && tjQuota.getExecType().equals("1")) {
+//               quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()),  UUID.randomUUID().toString().replace("-", ""), params);
+//           }else {
+//               quartzHelper.addJob(Class.forName(quotaVo.getJobClazz()), quotaVo.getCron(), UUID.randomUUID().toString().replace("-", ""), params);
+//           }
         }
     }
 
 
-    public List<Map<String, Object>> getQuotaResult(Integer id) throws Exception {
+    public List<Map<String, Object>> getQuotaResult(Integer id,String filters ,int pageNo,int pageSize) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
-        return  esResultExtract.queryResultListBySql(tjQuota);
+        return  esResultExtract.queryResultListBySql(tjQuota,filters,pageNo,pageSize);
+    }
+
+    public int getQuotaTotalCount(){
+        return  esResultExtract.getQuotaTotalCount();
     }
 
 }
