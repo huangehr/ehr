@@ -191,7 +191,7 @@ public class ProfileOutpatientEndPoint extends BaseRestEndPoint {
     @ApiOperation("门诊诊断OK")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientDiagnosis, method = RequestMethod.GET)
     public Envelop OutpatientDiagnosis(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "350101200006016803")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
@@ -213,7 +213,7 @@ public class ProfileOutpatientEndPoint extends BaseRestEndPoint {
     @ApiOperation("门诊症状OK")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientSymptom, method = RequestMethod.GET)
     public Envelop OutpatientSymptom(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "350101200006016803")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
@@ -235,7 +235,7 @@ public class ProfileOutpatientEndPoint extends BaseRestEndPoint {
     @ApiOperation("门诊费用汇总OK")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientCostMaster, method = RequestMethod.GET)
     public Envelop OutpatientCostMaster(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "360101200006011131")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "350101200006016803")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,
@@ -257,7 +257,7 @@ public class ProfileOutpatientEndPoint extends BaseRestEndPoint {
     @ApiOperation("门诊费用明细NON")
     @RequestMapping(value = ServiceApi.Profiles.OutpatientCostDetail, method = RequestMethod.GET)
     public Envelop OutpatientCostDetail(
-            @ApiParam(name = "demographic_id", value = "身份证号")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "350101200006016803")
             @RequestParam(value = "demographic_id", required = false) String demographic_id,
             @ApiParam(name = "profile_id", value = "档案ID")
             @RequestParam(value = "profile_id", required = false) String profile_id,

@@ -171,7 +171,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @ApiOperation("门诊/住院事件(时间轴)OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvents, method = RequestMethod.GET)
     public List<Map<String,Object>> MedicalEvents(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="420101200006018700")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="350101200006016803")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "events_type", value = "就诊事件类别")
             @RequestParam(value = "events_type", required = false) String events_type,
@@ -193,9 +193,9 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @ApiOperation("某次就诊事件OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvent, method = RequestMethod.GET)
     public Map<String,Object> MedicalEvent(
-            @ApiParam(name = "org_code", value = "机构代码",defaultValue="41872607-9")
+            @ApiParam(name = "org_code", value = "机构代码",defaultValue="dm201705")
             @RequestParam(value = "org_code", required = true) String org_code,
-            @ApiParam(name = "event_no", value = "档案ID",defaultValue="30000001")
+            @ApiParam(name = "event_no", value = "档案ID",defaultValue="23126080")
             @RequestParam(value = "event_no", required = true) String event_no,
             @ApiParam(name = "version", value = "版本号",defaultValue="57623f01b2d9")
             @RequestParam(value = "version", required = false) String version) throws Exception {
