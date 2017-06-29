@@ -158,9 +158,25 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
 
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
+    @ApiOperation(value = "指标执行")
     public boolean execuJob(
             @ApiParam(name = "id")
-            @RequestParam("id") int id) throws Exception {
+            @RequestParam(value = "id") int id) throws Exception {
         return tjQuotaJobClient.tjQuotaExecute(id);
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjGetQuotaResult, method = RequestMethod.GET)
+    @ApiOperation(value = "获取指标执行结果")
+    public Envelop getQuotaResult(
+            @ApiParam(name = "id" ,value = "指标ID" )
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "pageNo", value = "页码", defaultValue = "0")
+            @RequestParam(value = "pageNo" , required = false ,defaultValue = "0") int pageNo,
+            @ApiParam(name = "pageSize", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "pageSize" , required = false ,defaultValue ="15") int pageSize
+    ) throws Exception {
+        return tjQuotaJobClient.getQuotaResult(id,filters,pageNo,pageSize);
     }
 }
