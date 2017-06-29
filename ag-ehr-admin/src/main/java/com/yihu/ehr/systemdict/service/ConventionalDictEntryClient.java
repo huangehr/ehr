@@ -480,4 +480,10 @@ import java.util.List;
     MConventionalDict getOrgDeptDetailGloryId(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/tj_quota_log_status", method = RequestMethod.GET)
+    @ApiOperation(value = "指标日志状态", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaLogStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
 }

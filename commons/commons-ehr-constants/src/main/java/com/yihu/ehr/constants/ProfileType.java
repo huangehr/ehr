@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * 档案类型。注意新增类型只能依次增加，不能插队。
- * 1结构化档案，文件档案，链接档案
+ * 1结构化档案，文件档案，链接档案，数据集档案
  */
 public enum ProfileType {
     Standard(1),
     File(2),
-    Link(3);
+    Link(3),
+    Dataset(4);
 
     private int type;
     ProfileType(int type){

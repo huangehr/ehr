@@ -5,11 +5,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
 import java.util.*;
 
 /**
@@ -97,9 +93,6 @@ public class Contant {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(main_dimension_timeLevel.getStartTime("1"));
-    }
 
     /**
      * 主维度 时间维度

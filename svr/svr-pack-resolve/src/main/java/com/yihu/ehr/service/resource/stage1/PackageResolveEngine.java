@@ -2,10 +2,7 @@ package com.yihu.ehr.service.resource.stage1;
 
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.service.resource.stage1.resolver.FilePackageResolver;
-import com.yihu.ehr.service.resource.stage1.resolver.LinkPackageResolver;
-import com.yihu.ehr.service.resource.stage1.resolver.PackageResolver;
-import com.yihu.ehr.service.resource.stage1.resolver.StdPackageResolver;
+import com.yihu.ehr.service.resource.stage1.resolver.*;
 import com.yihu.ehr.util.compress.Zipper;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.io.FileUtils;
@@ -82,6 +79,36 @@ public class PackageResolveEngine {
         }
     }
 
+    /**
+     * 执行归档流程。
+     * 将数据集档案包解析，转换成 insert sql，后续批量保存到标准的对应表中。
+     *
+     * @param pack
+     * @param zipFile 数据集档案包路径
+     * @return
+     */
+    public DatasetPackage doResolveDataset(MPackage pack, String zipFile) throws Exception {
+        File root = null;
+        try {
+            // 因本地调试而暂时注释。
+            /*root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
+            if (root == null || !root.isDirectory() || root.list().length == 0) {
+                throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+            }*/
+            root =  new File(zipFile);
+
+            DatasetPackage profile = (DatasetPackage) PackModelFactory.createPackModel(root);
+            PackageResolver packageResolver = packageResolvers.get(ProfileType.Dataset);
+            packageResolver.resolve(profile, root);
+            profile.setClientId(pack.getClientId());
+
+            return profile;
+        } finally {
+            // 因本地调试而暂时注释。
+//            houseKeep(zipFile, root);
+        }
+    }
+
     private void houseKeep(String zipFile, File root) {
         try {
             FileUtils.deleteQuietly(new File(zipFile));
@@ -97,5 +124,6 @@ public class PackageResolveEngine {
         packageResolvers.put(Standard, context.getBean(StdPackageResolver.class));
         packageResolvers.put(File, context.getBean(FilePackageResolver.class));
         packageResolvers.put(Link, context.getBean(LinkPackageResolver.class));
+        packageResolvers.put(Dataset, context.getBean(DatasetPackageResolver.class));
     }
 }
