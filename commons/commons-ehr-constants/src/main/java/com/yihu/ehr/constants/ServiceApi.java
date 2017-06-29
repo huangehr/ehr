@@ -843,6 +843,7 @@ public class ServiceApi {
         public static final String TjQuotaExistsName = "/tj/tjQuotaExistsName/{name}";
         public static final String TjQuotaExistsCode = "/tj/tjQuotaExistsCode/{code}";
 
+        public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
         public static final String TjQuotaExecute = "/job/execuJob";
 
 

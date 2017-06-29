@@ -38,7 +38,7 @@ public class SaveModel {
     private String timeLevel;// 1 日 2 周 3 月 4 年
     private String areaLevel;// 1 省 2 市 3 区县 4 机构 5团队
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd'T'HHmmss.SSS'Z'")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     @CreatedDate
     private Date createTime;//创建时间
 

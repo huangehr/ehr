@@ -1,49 +1,26 @@
 package com.yihu.quota.etl.extract.es;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
-import com.alibaba.druid.sql.parser.ParserException;
-import com.alibaba.druid.sql.parser.SQLExprParser;
-import com.alibaba.druid.sql.parser.Token;
-import com.yihu.quota.etl.Contant;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.es.ElasticFactory;
 import com.yihu.quota.model.jpa.TjQuota;
-import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
-import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.model.jpa.save.TjDataSave;
 import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
-import com.yihu.quota.model.jpa.source.TjDataSource;
-import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.service.save.TjDataSaveService;
-import com.yihu.quota.service.source.TjDataSourceService;
-import com.yihu.quota.vo.DictModel;
-import com.yihu.quota.vo.QuotaVo;
-import com.yihu.quota.vo.SaveModel;
 import net.sf.json.JSONObject;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
-import org.nlpcn.es4sql.domain.Select;
-import org.nlpcn.es4sql.parse.ElasticSqlExprParser;
-import org.nlpcn.es4sql.parse.SqlParser;
-import org.nlpcn.es4sql.query.AggregationQueryAction;
-import org.nlpcn.es4sql.query.DefaultQueryAction;
-import org.nlpcn.es4sql.query.SqlElasticSearchRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -56,13 +33,52 @@ import java.util.*;
 @Scope("prototype")
 public class EsResultExtract {
     private Logger logger = LoggerFactory.getLogger(EsResultExtract.class);
+
+    private String startTime;
+    private String endTime;
+    private String orgName;
+    private String province;
+    private String city;
+    private String district;
+    private TjQuota tjQuota;
+    private String quotaCode;
+    private int pageNo;
+    private int pageSize;
+    private EsConfig esConfig;
+
     @Autowired
     private ElasticFactory elasticFactory;
     @Autowired
     private TjDataSaveService tjDataSaveService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
+    public List<Map<String, Object>> queryResultListBySql(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
+        Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
+        if (params !=null && params.size() > 0){
+           for(String key : params.keySet()){
+               if( params.get(key) != null ){
+                   if(key.equals("startTime"))
+                       this.startTime = params.get(key).toString();
+                   if(key.equals("endTime"))
+                       this.endTime = params.get(key).toString();
+                   if(key.equals("orgName"))
+                       this.orgName = params.get(key).toString();
+                   if(key.equals("province"))
+                       this.province = params.get(key).toString();
+                   if(key.equals("city"))
+                       this.city = params.get(key).toString();
+                   if(key.equals("district"))
+                       this.district = params.get(key).toString();
+               }
+           }
+       }
+        this.tjQuota = tjQuota;
+        if(tjQuota.getCode() != null)
+            this.quotaCode = tjQuota.getCode();
+        this.pageNo = pageNo;
+        this.pageSize = pageSize;
 
-    public List<Map<String, Object>> queryResultListBySql(TjQuota tjQuota) throws Exception {
         //得到该指标的数据存储
         TjQuotaDataSave quotaDataSave = tjDataSaveService.findByQuota(tjQuota.getCode());
         //如果为空说明数据错误
@@ -75,11 +91,10 @@ public class EsResultExtract {
             JSONObject obj = new JSONObject().fromObject(quotaDataSave.getConfigJson());
             esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
         }
-
-        List<SaveModel> returnList = new ArrayList<>();
         //初始化es链接
         esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(esConfig), EsConfig.class);
-        List<Map<String, Object>> restltList = query(esConfig,tjQuota.getCode());
+        this.esConfig = esConfig;
+        List<Map<String, Object>> restltList = query();
         for(Map<String,Object> map : restltList){
             System.out.println(map);
         }
@@ -88,24 +103,70 @@ public class EsResultExtract {
 
 
 
-    private List<Map<String, Object>> query( EsConfig esConfig ,String filed){
-        Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
-        SearchResponse actionGet = client.prepareSearch(esConfig.getIndex())
-                .setTypes(esConfig.getType())
-                .setQuery(
-                        QueryBuilders.boolQuery().must(QueryBuilders.termQuery("quotaCode", filed))
-                                .should(QueryBuilders.rangeQuery("result").gt("0"))
 
-                ).execute().actionGet();
+    private List<Map<String, Object>> query(){
+        Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
+       ////模糊查询
+//        WildcardQueryBuilder queryBuilder1 = QueryBuilders.wildcardQuery( "name", "*jack*");//搜索名字中含有jack的文档
+
+        SearchResponse actionGet = null;
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        getBoolQueryBuilder(boolQueryBuilder);
+
+        actionGet = client.prepareSearch(esConfig.getIndex())
+        .setTypes(esConfig.getType())
+        .setQuery(boolQueryBuilder)
+        .setFrom(pageNo).setSize(pageSize)
+        .execute().actionGet();
         SearchHits hits = actionGet.getHits();
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
-        for (SearchHit hit : hits.getHits())
-        {
+        for (SearchHit hit : hits.getHits()){
             matchRsult.add(hit.getSource());
         }
         return matchRsult;
     }
 
+    public int getQuotaTotalCount(){
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        getBoolQueryBuilder(boolQueryBuilder);
+        Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
+        long count = client.prepareCount(esConfig.getIndex()).setTypes(esConfig.getType()).setQuery(boolQueryBuilder).execute().actionGet().getCount();
+        return (int)count;
+    }
+
+    public BoolQueryBuilder getBoolQueryBuilder(BoolQueryBuilder boolQueryBuilder){
+        RangeQueryBuilder rangeQueryResult = QueryBuilders.rangeQuery("result").gte("0");
+        boolQueryBuilder.must(rangeQueryResult);
+        if( !StringUtils.isEmpty(quotaCode)){
+            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaCode);
+            boolQueryBuilder.must(termQueryQuotaCode);
+        }
+        if( !StringUtils.isEmpty(orgName) ){
+            TermQueryBuilder termQueryOrgName = QueryBuilders.termQuery("orgName", orgName);
+            boolQueryBuilder.must(termQueryOrgName);
+        }
+        if( !StringUtils.isEmpty(province) ){
+            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("provinceName", province);
+            boolQueryBuilder.must(termQueryProvince);
+        }
+        if( !StringUtils.isEmpty(city) ){
+            TermQueryBuilder termQueryCity = QueryBuilders.termQuery("cityName", city);
+            boolQueryBuilder.must(termQueryCity);
+        }
+        if( !StringUtils.isEmpty(district) ){
+            TermQueryBuilder termQueryTown = QueryBuilders.termQuery("townName", district);
+            boolQueryBuilder.must(termQueryTown);
+        }
+        if( !StringUtils.isEmpty(startTime) ){
+            RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("createTime").gte(startTime);
+            boolQueryBuilder.must(rangeQueryStartTime);
+        }
+        if( !StringUtils.isEmpty(endTime)){
+            RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("createTime").lte(endTime);
+            boolQueryBuilder.must(rangeQueryEndTime);
+        }
+        return boolQueryBuilder;
+    }
 
 
 }
