@@ -3,6 +3,7 @@ package com.yihu.ehr.service.resource.stage1.resolver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.service.resource.stage1.DatasetPackage;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,13 @@ public class DatasetPackageResolver extends PackageResolver {
         this.parseFiles((DatasetPackage) profile, originFolder.listFiles());
     }
 
+    /**
+     * 解析 .json 文件中的 JSON 数据，拼接成SQL语句
+     * @param profile
+     * @param files
+     * @throws IOException
+     * @throws ParseException
+     */
     private void parseFiles(DatasetPackage profile, File[] files) throws IOException, ParseException {
         List<String> sqlList = new ArrayList<>();
 
@@ -48,6 +56,17 @@ public class DatasetPackageResolver extends PackageResolver {
             JsonNode columnsNode = dataNode.get("columns");
             // rows 节点
             JsonNode rowsNode = dataNode.get("rows");
+
+            // 判断标准版本是否存在。
+            String isExistVersionSql = "SELECT 1 FROM std_cda_versions WHERE version = '" + version + "'";
+            if (jdbcTemplate.queryForList(isExistVersionSql).size() == 0) {
+                throw new RuntimeException("标准版本号不存在，version: " + version);
+            }
+            // 判断表是否存在。
+            String isExistTableSql = "SELECT 1 FROM std_data_set_" + version + " WHERE code = '" + tableName + "'";
+            if (jdbcTemplate.queryForList(isExistTableSql).size() == 0) {
+                throw new RuntimeException("标准中不存在该表，version: " + version + ", table: " + tableName);
+            }
 
             // 拼接 insert/update 语句，后续批量执行保存数据。
             for (int i = 0, length = rowsNode.size(); i < length; i++) {
@@ -71,7 +90,26 @@ public class DatasetPackageResolver extends PackageResolver {
                 for (JsonNode column : columnsNode) {
                     String fieldName = column.get("column").asText();
                     String fieldValue = rowNode.get(fieldName).asText();
-                    sql.append(fieldName + " = '" + fieldValue + "', ");
+
+                    // 判断表字段是否存在。
+                    String fieldSql = "SELECT f.column_type AS column_type FROM std_meta_data_" + version + " f  " +
+                            "LEFT JOIN std_data_set_" + version + " t ON t.id = f.dataset_id" +
+                            "WHERE t.code = '" + tableName + "' AND f.column_name = '" + fieldName + "'";
+                    if (jdbcTemplate.queryForList(fieldSql).size() == 0) {
+                        throw new RuntimeException("标准中不存在该表字段，version: " + version + ", table: " + tableName + ", field: " + fieldName);
+                    }
+
+                    // 判断字段类型
+                    String columnType = jdbcTemplate.queryForMap(fieldSql).get("column_type").toString().toUpperCase();
+                    if (columnType.contains("VARCHAR")) {
+                        sql.append(fieldName + " = '" + fieldValue + "', ");
+                    } else if (columnType.contains("TINYINT") || columnType.contains("NUMBER")) {
+                        sql.append(fieldName + " = " + fieldValue + ", ");
+                    } else if (columnType.contains("DATE")) {
+                        sql.append(fieldName + " = '" + DateTimeUtil.simpleDateFormat(DateTimeUtil.simpleDateParse(fieldValue)) + "', ");
+                    } else if (columnType.contains("DATETIME")) {
+                        sql.append(fieldName + " = '" + DateTimeUtil.simpleDateTimeFormat(DateTimeUtil.simpleDateParse(fieldValue)) + "', ");
+                    }
                 }
                 sql.deleteCharAt(sql.lastIndexOf(","));
                 if (!isInsert) {
@@ -88,19 +126,6 @@ public class DatasetPackageResolver extends PackageResolver {
             }
         }
         profile.setSqlList(sqlList);
-
-        // 因本地调试而暂时注释。
-        // Todo 部分字段待确定。
-        JsonNode headNode = objectMapper.readTree(files[0]).get("head");
-//        String eventDate = headNode.get("eventDate").isNull() ? "" : headNode.get("eventDate").asText();
-        String createTime = headNode.get("createTime").isNull() ? "" : headNode.get("createTime").asText();
-//        profile.setPatientId(headNode.get("patientId").asText());
-//        profile.setEventNo(headNode.get("eventNo").asText());
-//        profile.setEventType(EventType.create(headNode.get("eventType").asText()));
-//        profile.setEventDate(DateTimeUtil.simpleDateParse(eventDate));
-//        profile.setOrgCode(headNode.get("orgCode").asText());
-//        profile.setCdaVersion(headNode.get("version").asText());
-//        profile.setCreateDate(DateTimeUtil.simpleDateParse(createTime));
     }
 
 }
