@@ -136,7 +136,7 @@ public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
     //zip包密码规则：MD5(secret+packPwdSeed+secret)
     @RequestMapping(value = ServiceApi.DatasetPackages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案（兼容非病人维度)", notes = "支持数非健康档案维度的数据包接收")
-    public void savePackageForGateway(
+    public DatasetPackage savePackageForGateway(
             @ApiParam(name = "pack", value = "档案包", allowMultiple = true)
             @RequestPart() MultipartFile pack,
             @ApiParam(name = "orgCode", value = "机构代码")
@@ -158,13 +158,14 @@ public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
         }
         DatasetPackage aPackage =null;
         try {
-            String password = MD5.encrypt(secret+packPwdSeed+secret);//MD5 生成zip包密码
+            String password = MD5.hash(secret+packPwdSeed+secret);//MD5 生成zip包密码
             aPackage = datasetPackService.receiveDatasets(pack.getInputStream(), password, md5, orgCode, getClientId(request));
         } catch (Exception ex) {
             throw new ApiException(HttpStatus.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
+        return aPackage;
     }
 
     @RequestMapping(value = ServiceApi.Apps.App, method = RequestMethod.GET)
