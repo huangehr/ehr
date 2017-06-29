@@ -26,7 +26,8 @@ public class DatasetPackageRepository {
      */
     @Transactional(readOnly = false)
     public void saveDataset(DatasetPackage datasetPackage) {
-        String[] insertSqlArr = (String[]) datasetPackage.getInsertSqlList().toArray();
+        String[] insertSqlArr = new String[datasetPackage.getSqlList().size()];
+        insertSqlArr = datasetPackage.getSqlList().toArray(insertSqlArr);
         jdbcTemplate.batchUpdate(insertSqlArr);
     }
 

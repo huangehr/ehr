@@ -15,17 +15,17 @@ import java.util.List;
 @Table(ResourceCore.MasterTable)
 public class DatasetPackage extends StandardPackage {
 
-    private List<String> insertSqlList; // 遍历数据集拼接的SQL插入语句
+    private List<String> sqlList; // 遍历数据集拼接的插入/更新SQL语句
 
     public DatasetPackage(){
         setProfileType(ProfileType.Dataset);
     }
 
-    public List<String> getInsertSqlList() {
-        return insertSqlList;
+    public List<String> getSqlList() {
+        return sqlList;
     }
 
-    public void setInsertSqlList(List<String> insertSqlList) {
-        this.insertSqlList = insertSqlList;
+    public void setSqlList(List<String> sqlList) {
+        this.sqlList = sqlList;
     }
 }
