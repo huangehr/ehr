@@ -1,22 +1,11 @@
-package com.yihu.ehr.entity.tj;
+package com.yihu.ehr.model.tj;
 
-import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 统计指标日志
- *
- * @author janseny
- * @version 1.0
- * @updated 2017年6月9日
+ * Created by Administrator on 2017/6/29.
  */
-@Entity
-@Table(name = "tj_quota_log")
-@Access(value = AccessType.PROPERTY)
-public class TjQuotaLog implements Serializable{
-
-
+public class MTjQuotaLog {
     private long id;
     private String quotaCode;  //
     private String saasId; //
@@ -24,18 +13,16 @@ public class TjQuotaLog implements Serializable{
     private String content;//内容
     private Date startTime;//任务开始执行时间
     private Date endTime;//任务结束执行时间
+    private String statusName;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", unique = true, nullable = false)
     public long getId() {
         return id;
     }
+
     public void setId(long id) {
         this.id = id;
     }
 
-    @Column(name = "quota_code",  nullable = true)
     public String getQuotaCode() {
         return quotaCode;
     }
@@ -44,7 +31,6 @@ public class TjQuotaLog implements Serializable{
         this.quotaCode = quotaCode;
     }
 
-    @Column(name = "saas_id",  nullable = true)
     public String getSaasId() {
         return saasId;
     }
@@ -53,7 +39,6 @@ public class TjQuotaLog implements Serializable{
         this.saasId = saasId;
     }
 
-    @Column(name = "status",  nullable = true)
     public Integer getStatus() {
         return status;
     }
@@ -62,7 +47,6 @@ public class TjQuotaLog implements Serializable{
         this.status = status;
     }
 
-    @Column(name = "content",  nullable = true)
     public String getContent() {
         return content;
     }
@@ -71,7 +55,6 @@ public class TjQuotaLog implements Serializable{
         this.content = content;
     }
 
-    @Column(name = "start_time",  nullable = true)
     public Date getStartTime() {
         return startTime;
     }
@@ -80,12 +63,19 @@ public class TjQuotaLog implements Serializable{
         this.startTime = startTime;
     }
 
-    @Column(name = "end_time",  nullable = true)
     public Date getEndTime() {
         return endTime;
     }
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
     }
 }
