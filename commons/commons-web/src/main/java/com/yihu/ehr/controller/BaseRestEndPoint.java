@@ -179,7 +179,14 @@ public class BaseRestEndPoint extends AbstractController {
     }
 
     protected String getClientId(HttpServletRequest request){
-        String userAgent = request.getHeader("User-Agent");
+        String userAgent = "";
+        Enumeration<String> headers = request.getHeaders("User-Agent");
+        while (headers.hasMoreElements()){
+            String s = headers.nextElement();
+            if (!s.contains("jetty")){
+                userAgent = s;
+            }
+        }
 
         return StringUtils.isEmpty(userAgent) ? "" : userAgent.split(" ")[1];
     }
