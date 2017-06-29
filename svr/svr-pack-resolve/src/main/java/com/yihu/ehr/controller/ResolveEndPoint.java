@@ -151,11 +151,11 @@ public class ResolveEndPoint {
 
             // 回写入库状态
             Map<String, String> map = new HashMap<>();
+            map.put("eventType", null);
+            map.put("eventNo", null);
+            map.put("eventDate", null);
+            map.put("patientId", null);
             // 因本地调试而暂时注释。
-//            map.put("eventType", String.valueOf(datasetPackage.getEventType().getType()));
-//            map.put("eventNo", datasetPackage.getEventNo());
-//            map.put("eventDate", DateUtil.toStringLong(datasetPackage.getEventDate()));
-//            map.put("patientId", datasetPackage.getPatientId());
 //            datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
 
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
