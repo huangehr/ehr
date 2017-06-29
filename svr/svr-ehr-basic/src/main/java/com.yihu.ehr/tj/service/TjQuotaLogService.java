@@ -39,7 +39,7 @@ public class TjQuotaLogService extends BaseJpaService<TjQuotaLog, XTjQuotaLogRep
             hql += " and startTime >= :startTime";
         }
         if (!StringUtils.isEmpty(endTime)) {
-            hql += " and endTime < :endTime";
+            hql += " and endTime <= :endTime";
         }
         hql += " order by startTime desc";
         Query query = session.createQuery(hql);
@@ -74,7 +74,7 @@ public class TjQuotaLogService extends BaseJpaService<TjQuotaLog, XTjQuotaLogRep
             hql += " and startTime >= :startTime";
         }
         if (!StringUtils.isEmpty(endTime)) {
-            hql += " and endTime < :endTime";
+            hql += " and endTime <= :endTime";
         }
         Query query = session.createQuery(hql);
         if (!StringUtils.isEmpty(quotaCode)) {
