@@ -20,6 +20,8 @@ public class TjQuotaModel {
     private String updateUser;
     private String updateUserName;
     private Integer status;
+    private Integer quotaType;
+    private String quotaTypeName;
     private Integer dataLevel;
     private String remark;
     private TjQuotaDataSourceModel tjQuotaDataSourceModel;
@@ -167,5 +169,21 @@ public class TjQuotaModel {
 
     public void setTjQuotaDataSaveModel(TjQuotaDataSaveModel tjQuotaDataSaveModel) {
         this.tjQuotaDataSaveModel = tjQuotaDataSaveModel;
+    }
+
+    public Integer getQuotaType() {
+        return quotaType;
+    }
+
+    public void setQuotaType(Integer quotaType) {
+        this.quotaType = quotaType;
+    }
+
+    public String getQuotaTypeName() {
+        return quotaTypeName;
+    }
+
+    public void setQuotaTypeName(String quotaTypeName) {
+        this.quotaTypeName = quotaTypeName;
     }
 }
