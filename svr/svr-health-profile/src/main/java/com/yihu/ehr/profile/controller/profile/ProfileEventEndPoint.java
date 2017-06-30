@@ -91,7 +91,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     }
 
 
-    @ApiOperation("全文检索")
+    @ApiOperation("全文检索（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.ProfileLucene, method = RequestMethod.GET)
     public Envelop ProfileLucene(
             @ApiParam(name = "startTime", value = "开始时间")
@@ -214,7 +214,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         return patientDetail.getMedicationUsed(demographic_id, hp_id);
     }
 
-    @ApiOperation("患者用药清单！！")
+    @ApiOperation("患者用药清单（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.MedicationStat, method = RequestMethod.GET)
     public List<MedicationStat> MedicalStat(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
@@ -228,7 +228,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
 
 
     /***************************** 指标 ***************************************************/
-    @ApiOperation("获取某个健康问题指标OK")
+    @ApiOperation("获取某个健康问题指标（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.IndicatorsClass, method = RequestMethod.GET)
     public List<Map<String,Object>> IndicatorsClass(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
@@ -241,7 +241,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         return indicatorsService.getIndicatorsClass(demographic_id,hp_id,indicator_type);
     }
 
-    @ApiOperation("获取指标数据OK")
+    @ApiOperation("获取指标数据（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.IndicatorsData, method = RequestMethod.GET)
     public Envelop IndicatorsData(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
