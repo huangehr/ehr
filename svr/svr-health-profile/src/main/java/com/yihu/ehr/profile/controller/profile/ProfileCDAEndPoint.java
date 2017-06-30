@@ -41,7 +41,7 @@ public class ProfileCDAEndPoint extends BaseRestEndPoint {
     @ApiOperation("CDA分类")
     @RequestMapping(value = ServiceApi.Profiles.CDAClass, method = RequestMethod.GET)
     public List<Map<String,Object>> CDAClass(
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_1000000_30000001_1465894742000")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_20000001_1465894742000")
             @RequestParam(value = "profile_id", required = true) String profile_id,
             @ApiParam(name = "event_type", value = "事件类型")
             @RequestParam(value = "event_type", required = false) String event_type) throws Exception {
@@ -52,9 +52,9 @@ public class ProfileCDAEndPoint extends BaseRestEndPoint {
     @ApiOperation("CDA数据")
     @RequestMapping(value = ServiceApi.Profiles.CDAData, method = RequestMethod.GET)
     public Map<String,Object> CDAData(
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_1000000_30000001_1465894742000")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_20000001_1465894742000")
             @RequestParam(value = "profile_id", required = true) String profile_id,
-            @ApiParam(name = "cda_document_id", value = "模板ID",defaultValue="0dae0006568a12a20dc35654490ab357")
+            @ApiParam(name = "cda_document_id", value = "模板ID",defaultValue="0dae000656b2e89c0dc3568e6a372ad9")
             @RequestParam(value = "cda_document_id", required = true) String cda_document_id) throws Exception {
 
         return profileCDAService.getCDAData(profile_id, cda_document_id);
@@ -63,7 +63,7 @@ public class ProfileCDAEndPoint extends BaseRestEndPoint {
     @ApiOperation("完整CDA文档")
     @RequestMapping(value = ServiceApi.Profiles.CDADocument, method = RequestMethod.GET)
     public Map<String,Object> CDADocument(
-            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_1000000_30000001_1465894742000")
+            @ApiParam(name = "profile_id", value = "档案ID",defaultValue="41872607-9_20000001_1465894742000")
             @RequestParam(value = "profile_id", required = true) String profile_id) throws Exception {
 
         return  profileCDAService.getCDADocument(profile_id);
@@ -74,9 +74,9 @@ public class ProfileCDAEndPoint extends BaseRestEndPoint {
     public Map<String, Object> CDADocumentId(
             @ApiParam(name = "org_code", value = "机构代码",defaultValue="41872607-9")
             @RequestParam(value = "org_code", required = true) String org_code,
-            @ApiParam(name = "event_no", value = "事件号",defaultValue="30000001")
+            @ApiParam(name = "event_no", value = "事件号",defaultValue="20000001")
             @RequestParam(value = "event_no", required = true) String event_no,
-            @ApiParam(name = "cda_code", value = "模板类别",defaultValue="HSDC01.04")
+            @ApiParam(name = "cda_code", value = "模板类别",defaultValue="HSDC01.01")
             @RequestParam(value = "cda_code", required = true) String cda_code) throws Exception {
         return profileCDAService.getCDADocumentId(org_code,event_no, cda_code);
     }
