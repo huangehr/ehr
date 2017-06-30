@@ -195,7 +195,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     public Map<String,Object> MedicalEvent(
             @ApiParam(name = "org_code", value = "机构代码",defaultValue="dm201705")
             @RequestParam(value = "org_code", required = true) String org_code,
-            @ApiParam(name = "event_no", value = "档案ID",defaultValue="23126080")
+            @ApiParam(name = "event_no", value = "事件号",defaultValue="23126080")
             @RequestParam(value = "event_no", required = true) String event_no,
             @ApiParam(name = "version", value = "版本号",defaultValue="57623f01b2d9")
             @RequestParam(value = "version", required = false) String version) throws Exception {
