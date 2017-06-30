@@ -20,10 +20,10 @@ public class TjQuotaModel {
     private String updateUser;
     private String updateUserName;
     private Integer status;
-    private Integer dataLevel;
-    private String remark;
     private Integer quotaType;
     private String quotaTypeName;
+    private Integer dataLevel;
+    private String remark;
 
     public String getQuotaTypeName() {
         return quotaTypeName;
@@ -187,4 +187,5 @@ public class TjQuotaModel {
     public void setTjQuotaDataSaveModel(TjQuotaDataSaveModel tjQuotaDataSaveModel) {
         this.tjQuotaDataSaveModel = tjQuotaDataSaveModel;
     }
+
 }

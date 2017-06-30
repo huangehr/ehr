@@ -11,6 +11,7 @@ public class MHealthBusiness implements Serializable {
     private int parentId;
     private String code;
     private String note;
+    private String parentName;
 
     public int getId() {
         return id;
@@ -50,5 +51,13 @@ public class MHealthBusiness implements Serializable {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
     }
 }
