@@ -160,6 +160,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
               d.setSkill(objectList[7].toString());
               d.setEmail(objectList[9].toString());
               d.setPhone(objectList[10].toString());
+              d.setIdCardNo(objectList[22].toString());
               existPhonesList.add(d);
           }
         }
@@ -186,5 +187,11 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         List existPhones = doctorService.emailsExistence(toEntity(emails, String[].class));
         return existPhones;
     }
-
+    @RequestMapping(value = ServiceApi.Doctors.DoctorsIdCardNoExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断身份证号码是否存在")
+    public boolean isCardNoExists(
+            @ApiParam(name = "idCardNo", value = "身份证号码", defaultValue = "")
+            @PathVariable(value = "idCardNo") String idCardNo) {
+        return doctorService.getByIdCardNo(idCardNo) != null;
+    }
 }

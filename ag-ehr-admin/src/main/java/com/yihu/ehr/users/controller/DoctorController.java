@@ -92,6 +92,9 @@ public class DoctorController extends BaseController {
                 case "code":
                     bo = doctorClient.isCodeExists(existenceNm);
                     break;
+                case "idCardNo":
+                    bo = doctorClient.isCardNoExists(existenceNm);
+                    break;
             }
             envelop.setSuccessFlg(bo);
 
