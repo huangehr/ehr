@@ -38,4 +38,5 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "pageSize" , required = false) int pageSize
     );
 
+
 }

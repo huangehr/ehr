@@ -45,14 +45,4 @@ public class JobService {
         }
     }
 
-
-    public List<Map<String, Object>> getQuotaResult(Integer id,String filters ,int pageNo,int pageSize) throws Exception {
-        TjQuota tjQuota= quotaDao.findOne(id);
-        return  esResultExtract.queryResultListBySql(tjQuota,filters,pageNo,pageSize);
-    }
-
-    public int getQuotaTotalCount(){
-        return  esResultExtract.getQuotaTotalCount();
-    }
-
 }

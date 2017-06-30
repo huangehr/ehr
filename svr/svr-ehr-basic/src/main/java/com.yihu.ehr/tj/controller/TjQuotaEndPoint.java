@@ -180,4 +180,14 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         }
         return false;
     }
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaByCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据Code获取指标")
+    public MTjQuotaModel getByCode(
+            @ApiParam(name = "code")
+            @RequestParam(value = "code") String code) {
+        TjQuota tjQuota = tjQuotaService.findByCode(code);
+        MTjQuotaModel mTjQuotaModel = convertToModel(tjQuota, MTjQuotaModel.class);
+        return mTjQuotaModel;
+    }
 }
