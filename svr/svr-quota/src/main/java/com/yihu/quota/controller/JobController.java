@@ -30,8 +30,6 @@ import java.util.Map;
 public class JobController extends BaseController {
     @Autowired
     private JobService jobService;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     /**
      * 启动任务
@@ -53,47 +51,5 @@ public class JobController extends BaseController {
         }
     }
 
-
-    /**
-     * 查询结果
-     * @param id
-     * @return
-     */
-    @ApiOperation(value = "获取指标执行结果")
-    @RequestMapping(value = "/tj/tjGetQuotaResult", method = RequestMethod.GET)
-    public Envelop getQuotaResult(
-            @ApiParam(name = "id", value = "指标任务ID", required = true)
-            @RequestParam(value = "id" , required = true) int id,
-            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "pageNo", value = "页码", defaultValue = "0")
-            @RequestParam(value = "pageNo" , required = false ,defaultValue = "0") int pageNo,
-            @ApiParam(name = "pageSize", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "pageSize" , required = false ,defaultValue ="15") int pageSize
-    ) {
-        Envelop envelop = new Envelop();
-        try {
-            List<Map<String, Object>> resultList = jobService.getQuotaResult(id,filters,pageNo,pageSize);
-            List<SaveModel> saveModelList = new ArrayList<SaveModel>();
-            for(Map<String, Object> map : resultList){
-                SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
-                if(saveModel != null){
-                    saveModelList.add(saveModel);
-                }
-            }
-            int totalCount = jobService.getQuotaTotalCount();
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(saveModelList);
-            envelop.setCurrPage(pageNo);
-            envelop.setPageSize(pageSize);
-            envelop.setTotalCount(totalCount);
-            return envelop;
-        } catch (Exception e) {
-            error(e);
-            invalidUserException(e, -1, "查询失败:" + e.getMessage());
-        }
-        envelop.setSuccessFlg(false);
-        return envelop;
-    }
 
 }
