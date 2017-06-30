@@ -202,7 +202,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean addUserBatch(List<Doctors> doctorLs)
     {
-        String header = "INSERT INTO users(id,login_code, real_name, gender, tech_title, email, telephone, password, create_date, activated, user_type, DType, doctor_id) VALUES \n";
+        String header = "INSERT INTO users(id,login_code, real_name, gender, tech_title, email, telephone, password, create_date, activated, user_type, DType, doctor_id, province_id, city_id, area_id) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Doctors map;
         SQLQuery query;
@@ -222,7 +222,10 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
             sql.append(",'"+ "Doctor" +"'");
             sql.append(",'"+ "Doctor" +"'");
 
-            sql.append(",'"+ map .getId() +"')");
+            sql.append(",'"+ map .getId() +"'");
+            sql.append(","+ 0 +"");
+            sql.append(","+ 0 +"");
+            sql.append(","+ 0 +")");
 
             if(i%100==0 || i == doctorLs.size()){
                 query = currentSession().createSQLQuery(sql.toString());
