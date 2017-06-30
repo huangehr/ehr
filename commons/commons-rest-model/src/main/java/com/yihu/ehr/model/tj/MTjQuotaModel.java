@@ -30,14 +30,6 @@ public class MTjQuotaModel {
     private Integer quotaType;
     private String quotaTypeName;
 
-    public String getQuotaTypeName() {
-        return quotaTypeName;
-    }
-
-    public void setQuotaTypeName(String quotaTypeName) {
-        this.quotaTypeName = quotaTypeName;
-    }
-
     public Integer getQuotaType() {
         return quotaType;
     }
@@ -45,8 +37,14 @@ public class MTjQuotaModel {
     public void setQuotaType(Integer quotaType) {
         this.quotaType = quotaType;
     }
-    private Integer quotaType;
-    private String quotaTypeName;
+
+    public String getQuotaTypeName() {
+        return quotaTypeName;
+    }
+
+    public void setQuotaTypeName(String quotaTypeName) {
+        this.quotaTypeName = quotaTypeName;
+    }
 
     public Long getId() {
         return id;
