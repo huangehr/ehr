@@ -27,14 +27,14 @@ public class DiagnosisExtractor extends KeyDataExtractor {
         Map<String,Object> properties = new HashedMap();
 
         List<String> diagnosisList = new ArrayList<>();
-        if (dataSets.containsKey(dataSet.getCode())) {
+        if (dataSets.containsValue(dataSet.getCode())) {
             for (String rowKey : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(rowKey);
 
                 //获取门诊/住院诊断
                 for (String metaDataCode : metaData) {
                     String value = record.getMetaData(metaDataCode);
-                    if (StringUtils.isEmpty(value)&&!diagnosisList.contains(value)) {
+                    if (!StringUtils.isEmpty(value)&&!diagnosisList.contains(value)) {
                         diagnosisList.add(value);
                     }
                 }

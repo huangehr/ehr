@@ -8,13 +8,12 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.annotation.Column;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.util.ProfileId;
-import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -37,7 +36,7 @@ public class StandardPackage {
     private String demographicId;                       // 身份证号
     private Date createDate;                            // 包创建时间
     private String cdaVersion;
-    private ProfileType profileType; //1结构化档案，2文件档案，3链接档案
+    private ProfileType profileType; //1结构化档案，2文件档案，3链接档案，4数据集档案
     private EventType eventType; // 0门诊 1住院 2体检
 
     //add by hzp

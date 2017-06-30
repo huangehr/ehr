@@ -281,12 +281,12 @@ public class ServiceApi {
         public static final String Packages = "/dataset_package";
         public static final String AcquirePackage = "/datasetPackages/acquire";
         public static final String Package = "/datasetPackages/{id}";
-        public static final String PackageResolve = "/packages/resolve";
+        public static final String PackageResolve = "/datasetPackages/resolve";
         public static final String PackageSearch = "/datasetPackages/search";
         public static final String PackageDownloads = "/datasetPackages/{id}/downloads";
 
-        public static final String ResolveMessage = "/message/resolve";
-        public static final String MessageTimer = "/message/timer";
+        public static final String ResolveMessage = "/datasetPackages/message/resolve";
+        public static final String MessageTimer = "/datasetPackages/message/timer";
 
     }
 

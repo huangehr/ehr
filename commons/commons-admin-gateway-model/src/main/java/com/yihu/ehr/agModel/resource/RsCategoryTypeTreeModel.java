@@ -11,6 +11,7 @@ public class RsCategoryTypeTreeModel {
     private String pid;
     private String description;
     private List<RsCategoryTypeTreeModel> children;
+    private  List<RsResourcesModel>  rsResourceslist;
 //    private List<RsResourcesModel> resourceIds;
     private String resourceIds;
     private String resourceCode;
@@ -69,5 +70,13 @@ public class RsCategoryTypeTreeModel {
 
     public void setResourceCode(String resourceCode) {
         this.resourceCode = resourceCode;
+    }
+
+    public List<RsResourcesModel> getRsResourceslist() {
+        return rsResourceslist;
+    }
+
+    public void setRsResourceslist(List<RsResourcesModel> rsResourceslist) {
+        this.rsResourceslist = rsResourceslist;
     }
 }
