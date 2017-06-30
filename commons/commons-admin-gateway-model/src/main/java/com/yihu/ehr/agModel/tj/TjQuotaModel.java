@@ -22,6 +22,25 @@ public class TjQuotaModel {
     private Integer status;
     private Integer dataLevel;
     private String remark;
+    private Integer quotaType;
+    private String quotaTypeName;
+
+    public String getQuotaTypeName() {
+        return quotaTypeName;
+    }
+
+    public void setQuotaTypeName(String quotaTypeName) {
+        this.quotaTypeName = quotaTypeName;
+    }
+
+    public Integer getQuotaType() {
+        return quotaType;
+    }
+
+    public void setQuotaType(Integer quotaType) {
+        this.quotaType = quotaType;
+    }
+
     private TjQuotaDataSourceModel tjQuotaDataSourceModel;
     private TjQuotaDataSaveModel tjQuotaDataSaveModel;
 

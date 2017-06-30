@@ -27,6 +27,24 @@ public class MTjQuotaModel {
     private String execTypeName;
     private String statusName;
     private String dataLevelName;
+    private Integer quotaType;
+    private String quotaTypeName;
+
+    public String getQuotaTypeName() {
+        return quotaTypeName;
+    }
+
+    public void setQuotaTypeName(String quotaTypeName) {
+        this.quotaTypeName = quotaTypeName;
+    }
+
+    public Integer getQuotaType() {
+        return quotaType;
+    }
+
+    public void setQuotaType(Integer quotaType) {
+        this.quotaType = quotaType;
+    }
 
     public Long getId() {
         return id;
