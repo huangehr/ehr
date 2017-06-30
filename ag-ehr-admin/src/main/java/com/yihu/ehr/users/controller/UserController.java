@@ -24,6 +24,7 @@ import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrganizationClient;
+import com.yihu.ehr.patient.controller.PatientController;
 import com.yihu.ehr.patient.service.PatientClient;
 import com.yihu.ehr.security.service.SecurityClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
@@ -83,6 +84,8 @@ public class UserController extends BaseController {
     private FileResourceClient fileResourceClient;
     @Autowired
     private PatientClient patientClient;
+    @Autowired
+    private PatientController patientController;
 
 
     private String resetFilter(String filters) {
@@ -825,4 +828,29 @@ public class UserController extends BaseController {
         List existPhones = userClient.emailsExistence(emails);
         return existPhones;
     }
+
+    /**
+     * 根据身份证号获取用户.
+     *
+     * @param idCardNo
+     */
+    @RequestMapping(value ="/getPatientInUserByIdCardNo", method = RequestMethod.GET)
+    @ApiOperation(value = "根据身份证号获取用户", notes = "根据身份证号获取用户")
+    public Envelop getUserByIdCardNo(
+            @ApiParam(name = "id_card_no", value = "id_card_no", defaultValue = "")
+            @RequestParam(value = "id_card_no") String idCardNo) {
+        PatientDetailModel detailModel =new PatientDetailModel();
+        try{
+         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
+         detailModel = patientController.convertToPatientDetailModel(demographicInfo);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+        return success(detailModel);
+
+    }
+
+
 }

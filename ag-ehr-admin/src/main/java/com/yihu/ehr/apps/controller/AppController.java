@@ -421,7 +421,7 @@ public class AppController extends BaseController {
         //获取系统字典项（App类型）
         String filters="dictId="+1;
         String fields="";
-        String sort="";
+        String sort="+sort";
         int size=999;
         int page=1;
         ResponseEntity<List<MDictionaryEntry>> responseEntity = systemDictClient.getDictEntries(fields, filters, sort, size, page);
