@@ -83,11 +83,11 @@ public class QuotaController extends BaseController {
 
 
     /**
-     * 获取指标单天统计结果
+     * 获取指标当天统计结果报表
      * @param id
      * @return
      */
-    @ApiOperation(value = "获取指标单天统计结果")
+    @ApiOperation(value = "获取指标当天统计结果报表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReport, method = RequestMethod.GET)
     public Envelop getQuotaReport(
             @ApiParam(name = "id", value = "指标任务ID", required = true)

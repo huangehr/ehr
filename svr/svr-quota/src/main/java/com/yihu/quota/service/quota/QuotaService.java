@@ -4,16 +4,14 @@ import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.rest.QuotaReport;
+import com.yihu.quota.model.rest.ReultModel;
 import com.yihu.quota.util.QuartzHelper;
 import com.yihu.quota.vo.QuotaVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author chenweida
@@ -38,7 +36,16 @@ public class QuotaService {
     public QuotaReport getQuotaReport(Integer id, String filters) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
-        quotaReport.setMap(esResultExtract.getQuotaReport(tjQuota,filters));
+        Map<String, Integer> map = esResultExtract.getQuotaReport(tjQuota, filters);
+
+        List<ReultModel> reultModels = new ArrayList<>();
+        for (String key :map.keySet()){
+            ReultModel reultModel = new ReultModel();
+            reultModel.setKey(key);
+            reultModel.setValue(map.get(key).toString());
+            reultModels.add(reultModel);
+        }
+        quotaReport.setReultModelList(reultModels);
         quotaReport.setTjQuota(tjQuota);
         return quotaReport;
     }

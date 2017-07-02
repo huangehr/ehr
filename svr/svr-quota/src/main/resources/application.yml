@@ -1,4 +1,7 @@
 ##如果有配置服务的话，远程服务器和本地服务器配置不一致的情况下，优先远程的为主  git上 svr-base ->  git application ->本地 appliction ->本地 bootstarp
+server:
+  port: 8083
+
 spring:
   application:
     name:  svr-quota-zhoujie  ##注册到发现服务的id 如果id一样 eurika会自动做负载

@@ -45,8 +45,6 @@ public class MTjQuotaModel {
     public void setQuotaType(Integer quotaType) {
         this.quotaType = quotaType;
     }
-    private Integer quotaType;
-    private String quotaTypeName;
 
     public Long getId() {
         return id;
@@ -215,4 +213,6 @@ public class MTjQuotaModel {
     public void setDataLevelName(String dataLevelName) {
         this.dataLevelName = dataLevelName;
     }
+
+
 }

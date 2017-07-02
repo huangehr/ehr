@@ -2,6 +2,7 @@ package com.yihu.ehr.quota.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.tj.QuotaReportModel;
+import com.yihu.ehr.agModel.tj.ReultModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
@@ -51,9 +52,9 @@ public class TjQuotaController extends BaseController {
                     Envelop envelop = tjQuotaJobClient.getQuotaReport(Integer.valueOf(mTjQuotaModel.getId().toString()), null);
 
                     QuotaReportModel quotaReportModels = objectMapper.convertValue(envelop.getObj(),QuotaReportModel.class);
-                    Map<String, Integer> map = quotaReportModels.getMap();
-                    for(String key : map.keySet()){
-                        mTjQuotaWarn.setQuotaCount(map.get(key));
+                    List<ReultModel> reultModels = quotaReportModels.getReultModelList();
+                    for(ReultModel reult :reultModels){
+                        mTjQuotaWarn.setQuotaCount(Integer.valueOf(reult.getValue()));
                     }
                     if(Double.valueOf(mTjQuotaWarn.getValue()) < mTjQuotaWarn.getQuotaCount()){
                         mTjQuotaWarn.setStatus(1);
