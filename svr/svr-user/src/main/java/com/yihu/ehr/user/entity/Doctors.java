@@ -31,6 +31,7 @@ public class Doctors {
     private String status;
     private Date insertTime;
     private Date updateTime;
+    private String idCardNo;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -208,5 +209,13 @@ public class Doctors {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+    @Column(name = "id_card_no",  nullable = false)
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
     }
 }
