@@ -22,6 +22,8 @@ public class TjQuotaModel {
     private Integer status;
     private Integer dataLevel;
     private String remark;
+    private String quotaTypeName;
+    private Integer quotaType;
 
     public String getQuotaTypeName() {
         return quotaTypeName;
