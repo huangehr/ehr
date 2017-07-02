@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.user.entity.Doctors;
+import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.user.service.DoctorService;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.phonics.PinyinUtil;
@@ -161,11 +162,27 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
               d.setEmail(objectList[9].toString());
               d.setPhone(objectList[10].toString());
               d.setIdCardNo(objectList[22].toString());
-              existPhonesList.add(d);
+              //根据身份证和电话号码，判断账户表中是否存在该用户。若存在 将用户表与医生表关联；若不存在，为该医生初始化账户。
+              StringBuffer stringBuffer = new StringBuffer();
+              stringBuffer.append("idCardNo=" + d.getIdCardNo()+ ";");
+              stringBuffer.append("telephone=" + d.getPhone()+ ";");
+              String filters = stringBuffer.toString();
+              List<User> userList = userManager.search("", filters, "", 1, 1);
+              //若存在 将用户表与医生表关联
+              if(null!=userList&&userList.size()>0){
+                  for(User user:userList){
+                      user.setDoctorId(String.valueOf(d.getId()));
+                      userManager.saveUser(user);
+                  }
+              }else{
+                  //若不存在，为该医生初始化账户。
+                  existPhonesList.add(d);
+              }
           }
         }
-        userManager.addUserBatch(existPhonesList);
-
+        if(null!=existPhonesList&&existPhonesList.size()>0){
+            userManager.addUserBatch(existPhonesList);
+        }
         return true;
     }
 

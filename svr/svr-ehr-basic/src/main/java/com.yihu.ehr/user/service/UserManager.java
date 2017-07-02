@@ -222,7 +222,6 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
             sql.append(","+ 1 +"");
             sql.append(",'"+ "Doctor" +"'");
             sql.append(",'"+ "Doctor" +"'");
-
             sql.append(",'"+ map .getId() +"'");
             sql.append(","+ 0 +"");
             sql.append(","+ 0 +"");
