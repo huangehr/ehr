@@ -42,6 +42,7 @@ import java.util.Map;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "档案资源化", description = "档案包资源化服务。在包解析完之后，资源化入库。")
 public class ResolveEndPoint {
+
     @Autowired
     ResourceService resourceService;
     @Autowired
