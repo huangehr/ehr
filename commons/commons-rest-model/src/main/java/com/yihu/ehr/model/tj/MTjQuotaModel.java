@@ -30,20 +30,20 @@ public class MTjQuotaModel {
     private Integer quotaType;
     private String quotaTypeName;
 
-    public Integer getQuotaType() {
-        return quotaType;
-    }
-
-    public void setQuotaType(Integer quotaType) {
-        this.quotaType = quotaType;
-    }
-
     public String getQuotaTypeName() {
         return quotaTypeName;
     }
 
     public void setQuotaTypeName(String quotaTypeName) {
         this.quotaTypeName = quotaTypeName;
+    }
+
+    public Integer getQuotaType() {
+        return quotaType;
+    }
+
+    public void setQuotaType(Integer quotaType) {
+        this.quotaType = quotaType;
     }
 
     public Long getId() {
@@ -213,4 +213,6 @@ public class MTjQuotaModel {
     public void setDataLevelName(String dataLevelName) {
         this.dataLevelName = dataLevelName;
     }
+
+
 }

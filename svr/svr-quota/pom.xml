@@ -127,6 +127,10 @@
             <artifactId>jest</artifactId>
             <version>2.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-solr</artifactId>
+        </dependency>
 
     </dependencies>
 </project>

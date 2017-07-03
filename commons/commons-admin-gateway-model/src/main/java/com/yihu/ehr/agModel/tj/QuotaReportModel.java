@@ -1,6 +1,7 @@
 package com.yihu.ehr.agModel.tj;
 
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Map;
 public class QuotaReportModel {
 
     private TjQuotaModel tjQuotaModel;
-    private Map<String,Integer> map;
+    private List<ReultModel> reultModelList;
 
     public TjQuotaModel getTjQuotaModel() {
         return tjQuotaModel;
@@ -19,11 +20,11 @@ public class QuotaReportModel {
         this.tjQuotaModel = tjQuotaModel;
     }
 
-    public Map<String, Integer> getMap() {
-        return map;
+    public List<ReultModel> getReultModelList() {
+        return reultModelList;
     }
 
-    public void setMap(Map<String, Integer> map) {
-        this.map = map;
+    public void setReultModelList(List<ReultModel> reultModelList) {
+        this.reultModelList = reultModelList;
     }
 }

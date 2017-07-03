@@ -7,6 +7,7 @@ import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.Token;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.es.ElasticFactory;
@@ -14,8 +15,8 @@ import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.save.TjDataSave;
 import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
 import com.yihu.quota.service.save.TjDataSaveService;
-import com.yihu.quota.vo.SaveModel;
 import net.sf.json.JSONObject;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -30,6 +31,9 @@ import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.sum.InternalSum;
 import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.nlpcn.es4sql.domain.Select;
 import org.nlpcn.es4sql.parse.ElasticSqlExprParser;
 import org.nlpcn.es4sql.parse.SqlParser;
@@ -64,6 +68,7 @@ public class EsResultExtract {
     private int pageNo;
     private int pageSize;
     private EsConfig esConfig;
+    private static String core = "HealthProfile";
 
     @Autowired
     private ElasticFactory elasticFactory;
@@ -71,6 +76,34 @@ public class EsResultExtract {
     private TjDataSaveService tjDataSaveService;
     @Autowired
     private ObjectMapper objectMapper;
+//    @Autowired
+//    SolrUtil solrUtil;
+
+
+//    public void testSolr(String orgCode , int type ,String startDate ,String endDate) throws Exception {
+//        String orgParam = "org_code:" + (org.apache.commons.lang.StringUtils.isBlank(orgCode) ? "*" : orgCode);
+//        String dq = " && " + (type == 1 ? "create_date" : "event_date") + ":[";
+//
+//        //起始时间
+//        if (!StringUtils.isEmpty(startDate)) {
+//            dq += startDate + "T00:00:00Z";
+//        } else {
+//            dq += "*";
+//        }
+//        dq += " TO ";
+//        //结束时间
+//        if (!StringUtils.isEmpty(endDate)) {
+//            dq += endDate + "T23:59:59Z";
+//        } else {
+//            dq += "*";
+//        }
+//        dq += "]";
+//
+//        //累计统计
+//        FacetField totalFacet = solrUtil.getFacetField(core, "event_type", orgParam, 0, 0, -1, false);
+//        //期间统计
+//        FacetField intervalFacet = solrUtil.getFacetField(core, "event_type", orgParam + dq, 0, 0, -1, false);
+//    }
 
     public List<Map<String, Object>> queryResultListBySql(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
         Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
@@ -133,11 +166,12 @@ public class EsResultExtract {
         SearchResponse actionGet = null;
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
+        SortBuilder dealSorter = SortBuilders.fieldSort("quotaDate").order(SortOrder.DESC);
 
         actionGet = client.prepareSearch(esConfig.getIndex())
         .setTypes(esConfig.getType())
         .setQuery(boolQueryBuilder)
-        .setFrom(pageNo).setSize(pageSize)
+        .setFrom(pageNo).setSize(pageSize).addSort(dealSorter)
         .execute().actionGet();
         SearchHits hits = actionGet.getHits();
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
@@ -195,13 +229,23 @@ public class EsResultExtract {
         getBoolQueryBuilder(boolQueryBuilder);
         EsConfig esConfig = getEsConfig(tjQuota);
         Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
-        String sql = "select quotaDate,sum(result) result from index_quota_test where  quotaCode= '"+ tjQuota.getCode() +"' group by quotaDate";
+        String sql = "select quotaDate,sum(result) result from index_quota_test where  quotaCode= '"+ tjQuota.getCode() +"' group by quotaDate order by quotaDate desc ";
         System.out.println(sql);
-        return esClientQuery(sql,client);
+        return esClientQuery(sql,client,"date");
+    }
+
+    public Map<String, Integer> getQuotaBreadReport(TjQuota tjQuota, String filters) throws Exception {
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        getBoolQueryBuilder(boolQueryBuilder);
+        EsConfig esConfig = getEsConfig(tjQuota);
+        Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
+        String sql = "select town,sum(result) result from index_quota_test where  quotaCode= 'appointment_treetment_count' group by town order by quotaDate desc ";
+        System.out.println(sql);
+        return esClientQuery(sql,client,"nomal");
     }
 
 
-    public Map<String, Integer> esClientQuery(String sql, Client client){
+    public Map<String, Integer> esClientQuery(String sql, Client client,String type){
         try {
             SQLExprParser parser = new ElasticSqlExprParser(sql);
             SQLExpr expr = parser.expr();
@@ -226,28 +270,45 @@ public class EsResultExtract {
                 requestBuilder = queryAction.explain();
             }
             //之后就是对ES的操作
+            Iterator<Terms.Bucket> gradeBucketIt = null;
             SearchResponse response = (SearchResponse) requestBuilder.get();
-            LongTerms stringTerms = (LongTerms) response.getAggregations().asList().get(0);
-            Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
+            if(response.getAggregations().asList().get(0) instanceof LongTerms){
+                LongTerms longTerms = (LongTerms) response.getAggregations().asList().get(0);
+                gradeBucketIt = longTerms.getBuckets().iterator();
+            }else  if(response.getAggregations().asList().get(0) instanceof StringTerms){
+                StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
+                gradeBucketIt = stringTerms.getBuckets().iterator();
+            }
             //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
             Map<String,Integer> map = new HashMap<>();
             //递归解析json
             expainJson(gradeBucketIt, map, null);
 
-            Map<String, Integer> result = compute(map);
-            return result;
+            if(type.equals("date")){
+                return computeTime(map);
+            }else {
+                return compute(map);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private Map<String, Integer> compute( Map<String, Integer> map) {
+    private Map<String, Integer> computeTime( Map<String, Integer> map) {
         Map<String, Integer> result = new HashMap<>();
         for (String key : map.keySet()){
             Long time = Long.valueOf(key.substring(1));
             Date date = DateUtil.toDateFromTime(time);
             result.put(DateUtil.formatDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT),map.get(key));
+        }
+        return result;
+    }
+
+    private Map<String, Integer> compute( Map<String, Integer> map) {
+        Map<String, Integer> result = new HashMap<>();
+        for (String key : map.keySet()){
+            result.put(key.substring(1),map.get(key));
         }
         return result;
     }

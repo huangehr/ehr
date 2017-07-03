@@ -1,8 +1,10 @@
 package com.yihu.ehr.service.resource.stage1;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 
 import java.util.List;
 
@@ -28,4 +30,23 @@ public class DatasetPackage extends StandardPackage {
     public void setSqlList(List<String> sqlList) {
         this.sqlList = sqlList;
     }
+
+    @Override
+    public String toJson() {
+        ObjectNode root = objectMapper.createObjectNode();
+        root.put("cardId", this.getCardId());
+        root.put("orgCode", this.getOrgCode());
+        root.put("patientId", this.getPatientId());
+        root.put("eventNo", this.getEventNo());
+        root.put("cdaVersion", this.getCdaVersion());
+        root.put("clientId", this.getClientId());
+        root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventDate()));
+        root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
+        root.put("eventType", this.getEventType().toString());
+        root.put("profileType", this.getProfileType().toString());
+        root.put("cardType", this.getCardType());
+        root.put("patientName", this.getPatientName());
+        return root.toString();
+    }
+
 }

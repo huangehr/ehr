@@ -83,11 +83,11 @@ public class QuotaController extends BaseController {
 
 
     /**
-     * 获取指标单天统计结果
+     * 获取指标当天统计结果报表
      * @param id
      * @return
      */
-    @ApiOperation(value = "获取指标单天统计结果")
+    @ApiOperation(value = "获取指标当天统计结果报表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReport, method = RequestMethod.GET)
     public Envelop getQuotaReport(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
@@ -98,6 +98,33 @@ public class QuotaController extends BaseController {
         Envelop envelop = new Envelop();
         try {
             QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(quotaReport);
+            return envelop;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+        }
+        envelop.setSuccessFlg(false);
+        return envelop;
+    }
+
+    /**
+     * 获取指标统计饼状结果报表
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "获取指标统计饼状结果报表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaBreadReport, method = RequestMethod.GET)
+    public Envelop getQuotaBreadReport(
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters
+    ) {
+        Envelop envelop = new Envelop();
+        try {
+            QuotaReport  quotaReport = quotaService.getQuotaBreadReport(id, filters);
             envelop.setSuccessFlg(true);
             envelop.setObj(quotaReport);
             return envelop;
