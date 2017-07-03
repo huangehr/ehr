@@ -83,6 +83,9 @@ public class TjQuotaController extends BaseController {
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters
     ) {
+        if(filters !=null && filters.equals("bread")){
+            return tjQuotaJobClient.getQuotaBreadReport(id,filters);
+        }
         return tjQuotaJobClient.getQuotaReport(id,filters);
     }
 

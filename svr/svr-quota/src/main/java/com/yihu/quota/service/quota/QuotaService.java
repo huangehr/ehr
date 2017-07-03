@@ -50,5 +50,36 @@ public class QuotaService {
         return quotaReport;
     }
 
+    public QuotaReport getQuotaBreadReport(Integer id, String filters) throws Exception {
+        TjQuota tjQuota= quotaDao.findOne(id);
+        QuotaReport quotaReport = new QuotaReport();
+        Map<String, Integer> map = esResultExtract.getQuotaBreadReport(tjQuota, filters);
+
+        List<ReultModel> reultModels = new ArrayList<>();
+        for (String key :map.keySet()){
+            ReultModel reultModel = new ReultModel();
+            reultModel.setValue(map.get(key).toString());
+            switch (key){
+                case  "350203":
+                    key = "思明区";
+                case  "350205":
+                    key = "海沧区";
+                case  "350206":
+                    key = "湖里区";
+                case  "350211":
+                    key = "集美区";
+                case  "350212":
+                    key = "同安区";
+                case  "350213":
+                    key = "翔安区";
+            }
+            reultModel.setKey(key);
+            reultModels.add(reultModel);
+        }
+        quotaReport.setReultModelList(reultModels);
+        quotaReport.setTjQuota(tjQuota);
+        return quotaReport;
+    }
+
 
 }

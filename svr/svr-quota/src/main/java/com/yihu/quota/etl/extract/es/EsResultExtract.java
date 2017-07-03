@@ -231,11 +231,21 @@ public class EsResultExtract {
         Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
         String sql = "select quotaDate,sum(result) result from index_quota_test where  quotaCode= '"+ tjQuota.getCode() +"' group by quotaDate order by quotaDate desc ";
         System.out.println(sql);
-        return esClientQuery(sql,client);
+        return esClientQuery(sql,client,"date");
+    }
+
+    public Map<String, Integer> getQuotaBreadReport(TjQuota tjQuota, String filters) throws Exception {
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        getBoolQueryBuilder(boolQueryBuilder);
+        EsConfig esConfig = getEsConfig(tjQuota);
+        Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
+        String sql = "select town,sum(result) result from index_quota_test where  quotaCode= 'appointment_treetment_count' group by town order by quotaDate desc ";
+        System.out.println(sql);
+        return esClientQuery(sql,client,"nomal");
     }
 
 
-    public Map<String, Integer> esClientQuery(String sql, Client client){
+    public Map<String, Integer> esClientQuery(String sql, Client client,String type){
         try {
             SQLExprParser parser = new ElasticSqlExprParser(sql);
             SQLExpr expr = parser.expr();
@@ -260,28 +270,45 @@ public class EsResultExtract {
                 requestBuilder = queryAction.explain();
             }
             //之后就是对ES的操作
+            Iterator<Terms.Bucket> gradeBucketIt = null;
             SearchResponse response = (SearchResponse) requestBuilder.get();
-            LongTerms stringTerms = (LongTerms) response.getAggregations().asList().get(0);
-            Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
+            if(response.getAggregations().asList().get(0) instanceof LongTerms){
+                LongTerms longTerms = (LongTerms) response.getAggregations().asList().get(0);
+                gradeBucketIt = longTerms.getBuckets().iterator();
+            }else  if(response.getAggregations().asList().get(0) instanceof StringTerms){
+                StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
+                gradeBucketIt = stringTerms.getBuckets().iterator();
+            }
             //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
             Map<String,Integer> map = new HashMap<>();
             //递归解析json
             expainJson(gradeBucketIt, map, null);
 
-            Map<String, Integer> result = compute(map);
-            return result;
+            if(type.equals("date")){
+                return computeTime(map);
+            }else {
+                return compute(map);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private Map<String, Integer> compute( Map<String, Integer> map) {
+    private Map<String, Integer> computeTime( Map<String, Integer> map) {
         Map<String, Integer> result = new HashMap<>();
         for (String key : map.keySet()){
             Long time = Long.valueOf(key.substring(1));
             Date date = DateUtil.toDateFromTime(time);
             result.put(DateUtil.formatDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT),map.get(key));
+        }
+        return result;
+    }
+
+    private Map<String, Integer> compute( Map<String, Integer> map) {
+        Map<String, Integer> result = new HashMap<>();
+        for (String key : map.keySet()){
+            result.put(key.substring(1),map.get(key));
         }
         return result;
     }
