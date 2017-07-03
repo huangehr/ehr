@@ -56,16 +56,10 @@ public class QuotaService {
         QuotaReport quotaReport = new QuotaReport();
         Map<String, Integer> map = esResultExtract.getQuotaBreadReport(tjQuota, filters);
 
-        int total = 0;
-        for (String key :map.keySet()){
-            total = total + map.get(key);
-        }
         List<ReultModel> reultModels = new ArrayList<>();
         for (String key :map.keySet()){
             ReultModel reultModel = new ReultModel();
-            DecimalFormat df = new DecimalFormat("0");
-            String val = df.format((float) map.get(key) / (float) total * 100)+"%";
-            reultModel.setValue(val);
+            reultModel.setValue(map.get(key).toString());
             switch (key){
                 case  "350203":
                     key = "思明区";
