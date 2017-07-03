@@ -90,11 +90,10 @@ public class PackageResolveEngine {
     public DatasetPackage doResolveDataset(MPackage pack, String zipFile) throws Exception {
         File root = null;
         try {
-            // 因本地调试而暂时注释。
-            /*root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
+            root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
             if (root == null || !root.isDirectory() || root.list().length == 0) {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
-            }*/
+            }
             root =  new File(zipFile);
 
             DatasetPackage profile = (DatasetPackage) PackModelFactory.createPackModel(root);
@@ -104,8 +103,7 @@ public class PackageResolveEngine {
 
             return profile;
         } finally {
-            // 因本地调试而暂时注释。
-//            houseKeep(zipFile, root);
+            houseKeep(zipFile, root);
         }
     }
 
