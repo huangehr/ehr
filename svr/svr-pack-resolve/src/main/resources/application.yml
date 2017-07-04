@@ -105,7 +105,16 @@ ehr:
       meta-data:
         - card-no: CARD_NO #就诊卡号
         - card-type: CARD_TYPE  #就诊卡类型
-
+  eventIndex:
+    patientId:
+      - PATIENT_ID
+    eventNo:
+      - HDSD03_01_031
+      - HDSD00_01_579
+      - EVENT_NO
+    eventTime:
+      - HDSD00_01_457
+      - HDSD00_01_185
 #error code and message
 
 ---
