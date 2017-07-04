@@ -1,9 +1,13 @@
 package com.yihu.ehr.service.resource.stage1.resolver;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.service.resource.stage1.DatasetPackage;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
+import com.yihu.ehr.util.PackResolveLog;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -22,6 +26,8 @@ import java.util.List;
  */
 @Component
 public class DatasetPackageResolver extends PackageResolver {
+
+    Logger logger = LoggerFactory.getLogger(DatasetPackageResolver.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -45,6 +51,7 @@ public class DatasetPackageResolver extends PackageResolver {
         for (File file : files) {
             // head 节点
             JsonNode headNode = objectMapper.readTree(file).get("head");
+            String transactionId = headNode.get("id").asText();
             String version = headNode.get("version").asText();
             String sourceTable = headNode.get("source").asText();
             String targetTable = headNode.get("target").asText();
@@ -72,11 +79,24 @@ public class DatasetPackageResolver extends PackageResolver {
             for (int i = 0, length = rowsNode.size(); i < length; i++) {
                 JsonNode rowNode = rowsNode.get(i);
 
+                // 用于记录日志：日志JSON结构中的data子节点。
+                ObjectNode logDataNode = objectMapper.createObjectNode();
+                ObjectNode logDataTargetIdNode = objectMapper.createObjectNode();
+                logDataNode.put("transactionId", transactionId);
+                logDataNode.put("target", targetTable);
+                logDataNode.set("source_id", rowNode.get("_id"));
+
                 // 判断是 insert，还是 update。
                 StringBuffer hasRecordSql = new StringBuffer(" SELECT 1 FROM " + tableName + " WHERE ");
                 for (String pk : pkArr) {
-                    hasRecordSql.append(pk + " = '" + rowNode.get(pk).asText() + "' AND ");
+                    String pkValue = rowNode.get(pk).asText();
+                    hasRecordSql.append(pk + " = '" + pkValue + "' AND ");
+                    logDataTargetIdNode.put(pk, pkValue);
                 }
+
+                logDataNode.set("target_id", logDataTargetIdNode);
+                PackResolveLog.info("", logDataNode);
+
                 int hasRecordSqlLen = hasRecordSql.length();
                 hasRecordSql.delete(hasRecordSqlLen - 4, hasRecordSqlLen);
                 boolean isInsert = jdbcTemplate.queryForList(hasRecordSql.toString()).size() == 0 ? true : false;
