@@ -142,4 +142,10 @@ public class HealthBusinessEndPoint  extends EnvelopRestEndPoint {
 
         return null;
     }
+    @RequestMapping(value = "/health/getHealthBusinessOfChild", method = RequestMethod.GET)
+    @ApiOperation(value = "获取指标分类医疗服务子类目列表")
+    public List<MHealthBusiness> getHealthBusinessOfChild() {
+        List<HealthBusiness> healthBusinesses = healthBusinessService.getHealthBusinessOfChild();
+        return (List<MHealthBusiness>) convertToModels(healthBusinesses, new ArrayList<MHealthBusiness>(healthBusinesses.size()), MHealthBusiness.class, null);
+    }
 }

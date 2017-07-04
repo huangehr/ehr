@@ -42,6 +42,7 @@ import java.util.Map;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "档案资源化", description = "档案包资源化服务。在包解析完之后，资源化入库。")
 public class ResolveEndPoint {
+
     @Autowired
     ResourceService resourceService;
     @Autowired
@@ -180,16 +181,12 @@ public class ResolveEndPoint {
             @ApiParam(value = "返回档案数据", required = true)
             @RequestParam boolean echo) throws Exception {
 
-        // 因本地调试而暂时注释。
-        /*String packStr = datasetPackageMgrClient.acquireDatasetPackage(datasetId);
+        String packStr = datasetPackageMgrClient.acquireDatasetPackage(datasetId);
         if (StringUtils.isEmpty(packStr)) {
             throw new Exception("没有找到ID为 [" + datasetId + "] 的数据集档案包。");
-        }*/
+        }
 
-        // 因本地调试而暂时注释。
-//        MPackage pack = objectMapper.readValue(packStr, MPackage.class);
-        MPackage pack = new MPackage(); // test
-        pack.setId("1"); // test
+        MPackage pack = objectMapper.readValue(packStr, MPackage.class);
         String packId = pack.getId();
 
         try {
@@ -198,21 +195,18 @@ public class ResolveEndPoint {
             if (StringUtils.isEmpty(pack.getClientId())) {
                 pack.setClientId(clientId);
             }
-            // 因本地调试而暂时注释。
-//            String zipFile = downloadTo(pack.getRemotePath());
-            String zipFile = "E:/temp/数据集档案-测试包"; // test
+            String zipFile = downloadTo(pack.getRemotePath());
 
             DatasetPackage datasetPackage = packResolveEngine.doResolveDataset(pack, zipFile);
             datasetPackageRepository.saveDataset(datasetPackage);
 
             // 回写入库状态
             Map<String, String> map = new HashMap<>();
-            // 因本地调试而暂时注释。
-//            map.put("eventType", String.valueOf(datasetPackage.getEventType().getType()));
-//            map.put("eventNo", datasetPackage.getEventNo());
-//            map.put("eventDate", DateUtil.toStringLong(datasetPackage.getEventDate()));
-//            map.put("patientId", datasetPackage.getPatientId());
-//            datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
+            map.put("eventType", null);
+            map.put("eventNo", null);
+            map.put("eventDate", null);
+            map.put("patientId", null);
+            datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
 
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
@@ -222,8 +216,7 @@ public class ResolveEndPoint {
                 return "数据集档案包入库成功！";
             }
         } catch (Exception e) {
-            // 因本地调试而暂时注释。
-//            packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+            packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
             throw e;
         }
     }

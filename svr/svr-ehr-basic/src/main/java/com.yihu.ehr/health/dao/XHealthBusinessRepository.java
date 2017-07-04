@@ -23,4 +23,6 @@ public interface XHealthBusinessRepository extends PagingAndSortingRepository<He
     @Query("select business from HealthBusiness business where business.code = :code")
     List<HealthBusiness> searchByCode(@Param("code") String code);
 
+    @Query("select business from HealthBusiness business where business.parentId = 1")
+    List<HealthBusiness> getHealthBusinessOfChild();
 }

@@ -76,6 +76,7 @@ public class EsQuotaJob implements Job {
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for(SaveModel saveModel :dataModels){
                     if(saveModel.getResult() != null){
+                        saveModel.setQuotaDate(startTime);
                         dataSaveModels.add(saveModel);
                     }
                 }

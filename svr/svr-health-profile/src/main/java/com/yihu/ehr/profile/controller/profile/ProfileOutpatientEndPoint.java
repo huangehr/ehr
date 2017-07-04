@@ -143,7 +143,7 @@ public class ProfileOutpatientEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Profiles.MedicationDetailChinese, method = RequestMethod.GET)
     public Envelop DrugDetailChinese(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
-            @RequestParam(value = "demographic_id", required = false) String demographic_id,
+            @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
             @RequestParam(value = "hp_id", required = false) String hp_id,
             @ApiParam(name = "start_time", value = "开始时间")
@@ -167,7 +167,7 @@ public class ProfileOutpatientEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Profiles.MedicationDetailWestern, method = RequestMethod.GET)
     public Envelop DrugDetailWestern(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
-            @RequestParam(value = "demographic_id", required = false) String demographic_id,
+            @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
             @RequestParam(value = "hp_id", required = false) String hp_id,
             @ApiParam(name = "start_time", value = "开始时间")

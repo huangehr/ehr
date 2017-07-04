@@ -151,7 +151,11 @@ hadoop:
 ---
 spring:
   profiles: alpha
-
+  # Mysql
+  datasource:
+    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: ha
+    password: ha
   redis:
     host: 192.168.1.220 # Redis server host.
 
@@ -176,6 +180,10 @@ hadoop:
 ---
 spring:
   profiles: test
+  datasource:
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive_220?useUnicode=true&characterEncoding=UTF-8
+    username: weifuwu
+    password: weifuwu
 
   redis:
     host: 172.19.103.47 # Redis server host.
@@ -201,6 +209,10 @@ hadoop:
 ---
 spring:
   profiles: prod
+  datasource:
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: ha
+    password: jkzlxm
 
   redis:
     host: 11.1.2.20 # Redis server host.

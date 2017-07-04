@@ -773,7 +773,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value ="/GetAlldictionariesByDictId",method = RequestMethod.GET)
     @ApiOperation(value = "获取卡状态所有字典项")
     public ListResult GetAlldictionariesByDictId() throws Exception{
-        long dictId=10;
+        long dictId=66;
         int page=0;
         int size=1000;
         ListResult re = new ListResult(page,size);

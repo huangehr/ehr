@@ -35,4 +35,10 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
         TjQuota tjQuota = tjQuotaRepository.findOne(id);
         return tjQuota;
     }
+
+    public TjQuota findByCode(String code) {
+        TjQuota tjQuota = tjQuotaRepository.findByCode(code);
+        return tjQuota;
+    }
+
 }

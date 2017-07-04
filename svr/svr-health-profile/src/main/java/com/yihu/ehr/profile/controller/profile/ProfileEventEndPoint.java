@@ -91,7 +91,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     }
 
 
-    @ApiOperation("全文检索")
+    @ApiOperation("全文检索（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.ProfileLucene, method = RequestMethod.GET)
     public Envelop ProfileLucene(
             @ApiParam(name = "startTime", value = "开始时间")
@@ -115,7 +115,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @ApiOperation("患者基本信息OK")
     @RequestMapping(value = ServiceApi.Profiles.ProfileInfo, method = RequestMethod.GET)
     public Map<String,Object> profileInfo(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "version", value = "版本号",defaultValue="56395d75b854")
             @RequestParam(value = "version", required = false) String version) throws Exception {
@@ -127,7 +127,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @ApiOperation("患者患病史JSON")
     @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
     public String ProfileHistory(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
 
         return "[{\"pastHistoryType\":\"家族病史\",\"pastHistoryContents\":\"也就是医学中常常提到的家族史，也指某一种病的患者的家族成员（较大范围的家族成员，不仅限于祖孙等直系亲属）中发病情况。家族病史分为阴性跟阳性。 1)阴性（即没有发现同样病的患者）。临床上无家族史 2)阳性（即发现有同样病的患者）。比如：临床上讲糖尿病家族史、高血压病家族史、遗传型疾病家族史等。\"},\n" +
@@ -139,7 +139,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @ApiOperation("主要健康问题OK")
     @RequestMapping(value = ServiceApi.Profiles.HealthProblem, method = RequestMethod.GET)
     public List<Map<String,Object>> HealthProblem(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
         return patient.getHealthProblem(demographic_id);
     }
@@ -171,7 +171,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @ApiOperation("门诊/住院事件(时间轴)OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvents, method = RequestMethod.GET)
     public List<Map<String,Object>> MedicalEvents(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="350101200006016803")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "events_type", value = "就诊事件类别")
             @RequestParam(value = "events_type", required = false) String events_type,
@@ -195,7 +195,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     public Map<String,Object> MedicalEvent(
             @ApiParam(name = "org_code", value = "机构代码",defaultValue="dm201705")
             @RequestParam(value = "org_code", required = true) String org_code,
-            @ApiParam(name = "event_no", value = "档案ID",defaultValue="23126080")
+            @ApiParam(name = "event_no", value = "事件号",defaultValue="23126080")
             @RequestParam(value = "event_no", required = true) String event_no,
             @ApiParam(name = "version", value = "版本号",defaultValue="57623f01b2d9")
             @RequestParam(value = "version", required = false) String version) throws Exception {
@@ -206,7 +206,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @ApiOperation("患者常用药物OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicationUsed, method = RequestMethod.GET)
     public List<Map<String, Object>> MedicationUsed(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题",defaultValue="GM")
             @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception {
@@ -214,10 +214,10 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         return patientDetail.getMedicationUsed(demographic_id, hp_id);
     }
 
-    @ApiOperation("患者用药清单OK")
+    @ApiOperation("患者用药清单（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.MedicationStat, method = RequestMethod.GET)
     public List<MedicationStat> MedicalStat(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="360101200006011131")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题")
             @RequestParam(value = "hp_id", required = false) String hp_id) throws Exception {
@@ -228,10 +228,10 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
 
 
     /***************************** 指标 ***************************************************/
-    @ApiOperation("获取某个健康问题指标OK")
+    @ApiOperation("获取某个健康问题指标（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.IndicatorsClass, method = RequestMethod.GET)
     public List<Map<String,Object>> IndicatorsClass(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "420521195812172917")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "hp_id", value = "健康问题",defaultValue = "BXB")
             @RequestParam(value = "hp_id", required = true) String hp_id,
@@ -241,10 +241,10 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         return indicatorsService.getIndicatorsClass(demographic_id,hp_id,indicator_type);
     }
 
-    @ApiOperation("获取指标数据OK")
+    @ApiOperation("获取指标数据（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.IndicatorsData, method = RequestMethod.GET)
     public Envelop IndicatorsData(
-            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "420521195812172917")
+            @ApiParam(name = "demographic_id", value = "身份证号",defaultValue = "422724197105101686")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
             @ApiParam(name = "indicator_code", value = "指标代码")
             @RequestParam(value = "indicator_code", required = false) String indicator_code,

@@ -16,6 +16,7 @@ public class DoctorsModel {
     private String status;
     private String insertTime;
     private String updateTime;
+    private String idCardNo;
 
     public Long getId() {
         return id;
@@ -111,5 +112,13 @@ public class DoctorsModel {
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
     }
 }

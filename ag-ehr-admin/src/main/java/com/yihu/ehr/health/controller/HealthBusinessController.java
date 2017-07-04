@@ -50,8 +50,12 @@ public class HealthBusinessController extends BaseController {
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
-                HealthBusinessModel tjDataSaveModel = objectMapper.convertValue(map,HealthBusinessModel.class);
-                mainModelList.add(tjDataSaveModel);
+                HealthBusinessModel mHealthBusiness = objectMapper.convertValue(map,HealthBusinessModel.class);
+                if (mHealthBusiness.getParentId() != 0) {
+                    MHealthBusiness parent = healthBusinessClient.searchHealthBusinessDetail(mHealthBusiness.getParentId());
+                    mHealthBusiness.setParentName(parent.getName());
+                }
+                mainModelList.add(mHealthBusiness);
             }
             return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
         }else{
@@ -111,6 +115,10 @@ public class HealthBusinessController extends BaseController {
             MHealthBusiness mHealthBusiness = healthBusinessClient.searchHealthBusinessDetail(id);
             if (mHealthBusiness == null) {
                 return failed("获取详情失败!");
+            }
+            if (mHealthBusiness.getParentId() != 0) {
+                MHealthBusiness parent = healthBusinessClient.searchHealthBusinessDetail(mHealthBusiness.getParentId());
+                mHealthBusiness.setParentName(parent.getName());
             }
             return success(mHealthBusiness);
         } catch (Exception ex)

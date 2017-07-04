@@ -12,8 +12,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Table(name = "tj_data_source")
 public class TjDataSource implements java.io.Serializable {
 	public static String type_es ="1";
+	public static String type_solr ="2";
 	public static String type_mysql ="3";
-	public static String type_redis ="2";
 	// Fields
 
 	private Integer id;
