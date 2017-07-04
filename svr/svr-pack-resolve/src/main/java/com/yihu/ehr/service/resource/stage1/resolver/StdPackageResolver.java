@@ -3,18 +3,19 @@ package com.yihu.ehr.service.resource.stage1.resolver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.service.resource.stage1.StandardPackage;
-import com.yihu.ehr.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.profile.util.DataSetUtil;
+import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.service.resource.stage1.PackModelFactory;
+import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 标准档案包解析器.
@@ -24,6 +25,11 @@ import java.util.*;
  */
 @Component
 public class StdPackageResolver extends PackageResolver {
+    @Override
+    public void resolveDataSet(StandardPackage profile, File root) throws Exception {
+
+    }
+
     @Override
     public void resolve(StandardPackage profile, File root) throws IOException, Exception {
         File standardFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.StandardFolder);

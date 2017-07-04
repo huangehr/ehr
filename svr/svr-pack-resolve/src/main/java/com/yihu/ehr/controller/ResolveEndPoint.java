@@ -115,6 +115,62 @@ public class ResolveEndPoint {
         }
     }
 
+    //new add by HZY in 2017/06/29
+    @ApiOperation(value = "健康档案-（非病人维度-数据集包入库）", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析健康档案包")
+    @RequestMapping(value = ServiceApi.Packages.PackageResolve+2, method = RequestMethod.PUT)
+    public String resolveDatasetPackage(
+            @ApiParam(value = "id", defaultValue = "")
+            @RequestParam(required = false) String packageId,
+            @ApiParam(value = "模拟应用ID", defaultValue = "")
+            @RequestParam(required = false) String clientId,
+            @ApiParam(value = "返回档案数据", defaultValue = "true")
+            @RequestParam("echo") boolean echo) throws Throwable {
+        String packString = packageMgrClient.acquirePackage(packageId);
+
+        if (StringUtils.isEmpty(packString)) {
+            throw new Exception("Package not found.");
+        }
+
+        MPackage pack = objectMapper.readValue(packString, MPackage.class);  //已修改包状态为1 正在入库库
+        String packId = pack.getId();
+        try {
+            long start = System.currentTimeMillis();
+            if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
+            String zipFile = downloadTo(pack.getRemotePath());
+
+            StandardPackage standardPackage = packResolveEngine.doResolve(pack, zipFile);
+            ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
+            resourceService.save(resourceBucket);
+
+            //回填入库状态
+            Map<String, String> map = new HashMap();
+            map.put("profileId", standardPackage.getId());
+            map.put("demographicId", standardPackage.getDemographicId());
+            map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
+            map.put("eventNo", standardPackage.getEventNo());
+            map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
+            map.put("patientId", standardPackage.getPatientId());
+
+            packageMgrClient.reportStatus(packId,
+                    ArchiveStatus.Finished,
+                    objectMapper.writeValueAsString(map));
+
+
+            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
+
+            if (echo) {
+                return standardPackage.toJson();
+            } else {
+                return "档案包入库成功！";
+            }
+        } catch (Exception ex) {
+            packageMgrClient.reportStatus(packId,
+                    ArchiveStatus.Failed,
+                    ex.getMessage());
+            throw ex;
+        }
+    }
+
     @ApiOperation(value = "数据集档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析数据集档案包")
     @RequestMapping(value = ServiceApi.DatasetPackages.PackageResolve, method = RequestMethod.PUT)
     public String resolveDataset(
@@ -125,16 +181,12 @@ public class ResolveEndPoint {
             @ApiParam(value = "返回档案数据", required = true)
             @RequestParam boolean echo) throws Exception {
 
-        // 因本地调试而暂时注释。
-        /*String packStr = datasetPackageMgrClient.acquireDatasetPackage(datasetId);
+        String packStr = datasetPackageMgrClient.acquireDatasetPackage(datasetId);
         if (StringUtils.isEmpty(packStr)) {
             throw new Exception("没有找到ID为 [" + datasetId + "] 的数据集档案包。");
-        }*/
+        }
 
-        // 因本地调试而暂时注释。
-//        MPackage pack = objectMapper.readValue(packStr, MPackage.class);
-        MPackage pack = new MPackage(); // test
-        pack.setId("1"); // test
+        MPackage pack = objectMapper.readValue(packStr, MPackage.class);
         String packId = pack.getId();
 
         try {
@@ -143,9 +195,7 @@ public class ResolveEndPoint {
             if (StringUtils.isEmpty(pack.getClientId())) {
                 pack.setClientId(clientId);
             }
-            // 因本地调试而暂时注释。
-//            String zipFile = downloadTo(pack.getRemotePath());
-            String zipFile = "E:/temp/数据集档案-测试包"; // test
+            String zipFile = downloadTo(pack.getRemotePath());
 
             DatasetPackage datasetPackage = packResolveEngine.doResolveDataset(pack, zipFile);
             datasetPackageRepository.saveDataset(datasetPackage);
@@ -156,8 +206,7 @@ public class ResolveEndPoint {
             map.put("eventNo", null);
             map.put("eventDate", null);
             map.put("patientId", null);
-            // 因本地调试而暂时注释。
-//            datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
+            datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
 
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
@@ -167,8 +216,7 @@ public class ResolveEndPoint {
                 return "数据集档案包入库成功！";
             }
         } catch (Exception e) {
-            // 因本地调试而暂时注释。
-//            packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+            packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
             throw e;
         }
     }

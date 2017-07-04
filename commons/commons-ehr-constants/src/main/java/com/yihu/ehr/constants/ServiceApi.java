@@ -278,7 +278,7 @@ public class ServiceApi {
 
     //非病人维度
     public static class DatasetPackages {
-        public static final String Packages = "/dataset_package";
+        public static final String Packages = "/datasetPackages";
         public static final String AcquirePackage = "/datasetPackages/acquire";
         public static final String Package = "/datasetPackages/{id}";
         public static final String PackageResolve = "/datasetPackages/resolve";

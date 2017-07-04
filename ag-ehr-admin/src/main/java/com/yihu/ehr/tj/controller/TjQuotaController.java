@@ -89,7 +89,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
 
                 if(tjQuotaModel.getQuotaType() != null){
                     MHealthBusiness mHealthBusiness = healthBusinessClient.searchHealthBusinessDetail(tjQuotaModel.getQuotaType());
-                    tjQuotaModel.setQuotaTypeName(mHealthBusiness.getName());
+                    tjQuotaModel.setQuotaTypeName(mHealthBusiness == null ? "" :mHealthBusiness.getName());
                 }
 
                 mainModelList.add(tjQuotaModel);
