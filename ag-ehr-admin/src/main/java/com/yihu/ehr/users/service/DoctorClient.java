@@ -160,5 +160,9 @@ public interface DoctorClient {
     public List emailsExistence(
             @RequestBody String emails);
 
+    @RequestMapping(value = ServiceApi.Doctors.DoctorsIdCardNoExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断身份证号是否存在")
+    boolean isCardNoExists(@PathVariable(value = "idCardNo") String idCardNo);
+
 
 }

@@ -1,6 +1,7 @@
 package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.RsBrowseModel;
+import com.yihu.ehr.agModel.resource.RsCategoryModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -12,6 +13,7 @@ import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wq on 2016/5/30.
@@ -186,6 +189,44 @@ public class ResourceBrowseController extends BaseController {
         }
 
         envelop.setDetailModelList(rsBrowseModelList);
+        return envelop;
+    }
+
+    @RequestMapping(value = "/resourceBrowseTree", method = RequestMethod.GET)
+    @ApiOperation(value = "获取视图类别-数据集tree")
+    public Envelop getResourceBrowseTree() {
+        Envelop envelop = new Envelop();
+        List<MRsResources> rsResources = new ArrayList<>();
+        List<RsCategoryTypeTreeModel> rsCategoryTypeTreeModelList=new ArrayList<>();
+        Map<String,String> map=new HashedMap();
+        //限定五大库
+        map.put("0dae002159535497b3865e129433e933","0dae002159535497b3865e129433e933");
+        map.put("0dae0021595354a8b3865e129433e934","0dae0021595354a8b3865e129433e934");
+        map.put("0dae0021595354c4b3865e129433e935","0dae0021595354c4b3865e129433e935");
+        map.put("0dae0021595354cfb3865e129433e936","0dae0021595354cfb3865e129433e936");
+        map.put("0dae0021595354d6b3865e129433e937","0dae0021595354d6b3865e129433e937");
+        //查询资源分类
+        List<MRsCategory> resources = resourcesCategoryClient.getAllCategories("");
+        RsCategoryTypeTreeModel rsCategoryModel;
+        for (MRsCategory mRsCategory:resources){
+            if(null!=map.get(mRsCategory.getId().toString())){
+                rsCategoryModel = new RsCategoryTypeTreeModel();
+                rsCategoryModel.setId(mRsCategory.getId());
+                rsCategoryModel.setPid(mRsCategory.getPid());
+                rsCategoryModel.setName(mRsCategory.getName());
+                //查询资源-数据集
+                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999);// TODO: 2016/5/30 测试数据15（无不分页查询）
+                rsResources = categoryResponseEntity.getBody();
+                if (rsResources.size() > 0) {
+                    List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
+                    rsCategoryModel.setRsResourceslist(resourcesModelList);
+                }
+                rsCategoryTypeTreeModelList.add(rsCategoryModel);
+            }
+        }
+        //平台应用-角色组对象模型列表
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(rsCategoryTypeTreeModelList);
         return envelop;
     }
 

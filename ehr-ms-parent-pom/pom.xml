@@ -41,7 +41,8 @@
         <module>../ag-ehr-cloud</module>
         <module>../ag-portal-cloud</module>
         <module>../svr/svr-redis</module>
-        <module>../svr/svr-logCollection</module>
+        <module>../svr/svr-quota</module>
+        <!--<module>../svr/svr-logCollection</module>-->
     </modules>
 
     <build>

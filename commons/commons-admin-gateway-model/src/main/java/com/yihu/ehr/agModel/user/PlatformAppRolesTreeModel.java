@@ -10,6 +10,7 @@ public class PlatformAppRolesTreeModel {
     private String name; //应用名称或角色组名称
     private String type; //0或1，表示该模型是应用还是角色
     private String pid;
+    private Boolean ischecked;//是否选中
     private List<PlatformAppRolesTreeModel> children;
 
     public PlatformAppRolesTreeModel() {
@@ -54,4 +55,12 @@ public class PlatformAppRolesTreeModel {
     public void setChildren(List<PlatformAppRolesTreeModel> children) {
         this.children = children;
     }
+    public Boolean getIschecked() {
+        return ischecked;
+    }
+
+    public void setIschecked(Boolean ischecked) {
+        this.ischecked = ischecked;
+    }
+
 }

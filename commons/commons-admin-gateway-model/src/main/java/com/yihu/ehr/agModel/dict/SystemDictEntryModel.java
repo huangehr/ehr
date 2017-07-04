@@ -1,5 +1,9 @@
 package com.yihu.ehr.agModel.dict;
 
+import com.yihu.ehr.agModel.app.AppModel;
+
+import java.util.List;
+
 /**
  * Created by wq on 2016/2/19.
  */
@@ -16,6 +20,7 @@ public class SystemDictEntryModel {
     private String catalog;
 
     private String phoneticCode;
+    private List<AppModel> children;
 
 
     public long getDictId() {
@@ -64,5 +69,13 @@ public class SystemDictEntryModel {
 
     public void setPhoneticCode(String phoneticCode) {
         this.phoneticCode = phoneticCode;
+    }
+
+    public List<AppModel> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<AppModel> children) {
+        this.children = children;
     }
 }

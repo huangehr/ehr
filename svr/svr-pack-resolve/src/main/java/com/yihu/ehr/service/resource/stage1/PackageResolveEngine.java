@@ -65,6 +65,10 @@ public class PackageResolveEngine {
                     packageResolver = packageResolvers.get(ProfileType.Link);
                     break;
 
+                case Dataset:
+                    packageResolver = packageResolvers.get(ProfileType.Dataset);
+                    break;
+
                 default:
                     packageResolver = null;
                     break;
@@ -98,7 +102,7 @@ public class PackageResolveEngine {
 
             DatasetPackage profile = (DatasetPackage) PackModelFactory.createPackModel(root);
             PackageResolver packageResolver = packageResolvers.get(ProfileType.Dataset);
-            packageResolver.resolve(profile, root);
+            packageResolver.resolveDataSet(profile, root);
             profile.setClientId(pack.getClientId());
 
             return profile;

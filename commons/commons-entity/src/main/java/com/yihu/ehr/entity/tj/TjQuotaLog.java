@@ -18,8 +18,8 @@ public class TjQuotaLog implements Serializable{
 
 
     private long id;
-    private String quota_code;  //
-    private String saas_id; //
+    private String quotaCode;  //
+    private String saasId; //
     private Integer status;//1成功 0失败
     private String content;//内容
     private Date startTime;//任务开始执行时间
@@ -36,21 +36,21 @@ public class TjQuotaLog implements Serializable{
     }
 
     @Column(name = "quota_code",  nullable = true)
-    public String getQuota_code() {
-        return quota_code;
+    public String getQuotaCode() {
+        return quotaCode;
     }
 
-    public void setQuota_code(String quota_code) {
-        this.quota_code = quota_code;
+    public void setQuotaCode(String quotaCode) {
+        this.quotaCode = quotaCode;
     }
 
     @Column(name = "saas_id",  nullable = true)
-    public String getSaas_id() {
-        return saas_id;
+    public String getSaasId() {
+        return saasId;
     }
 
-    public void setSaas_id(String saas_id) {
-        this.saas_id = saas_id;
+    public void setSaasId(String saasId) {
+        this.saasId = saasId;
     }
 
     @Column(name = "status",  nullable = true)

@@ -6,10 +6,12 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjQuota;
 import com.yihu.ehr.entity.tj.TjQuotaDataSource;
+import com.yihu.ehr.health.service.HealthBusinessClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.health.MHealthBusiness;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjQuotaClient;
@@ -42,6 +44,8 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     TjQuotaJobClient tjQuotaJobClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
+    @Autowired
+    HealthBusinessClient healthBusinessClient;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "统计表")
@@ -82,6 +86,12 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
                 tjQuotaModel.setStatusName(dict2 == null ? "" : dict2.getValue());
                 MConventionalDict dict3 = conventionalDictClient.getTjQuotaDataLevelList(String.valueOf(tjQuotaModel.getDataLevel()));
                 tjQuotaModel.setDataLevelName(dict3 == null ? "" : dict3.getValue());
+
+                if(tjQuotaModel.getQuotaType() != null){
+                    MHealthBusiness mHealthBusiness = healthBusinessClient.searchHealthBusinessDetail(tjQuotaModel.getQuotaType());
+                    tjQuotaModel.setQuotaTypeName(mHealthBusiness == null ? "" :mHealthBusiness.getName());
+                }
+
                 mainModelList.add(tjQuotaModel);
             }
             return getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
@@ -136,6 +146,10 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             if (null == tjQuotaModel) {
                 return failed("获取指标失败");
             }
+            if(tjQuotaModel.getQuotaType() != null){
+                MHealthBusiness mHealthBusiness = healthBusinessClient.searchHealthBusinessDetail(tjQuotaModel.getQuotaType());
+                tjQuotaModel.setQuotaTypeName(mHealthBusiness.getName());
+            }
             return success(tjQuotaModel);
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,9 +172,26 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
 
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
+    @ApiOperation(value = "指标执行")
     public boolean execuJob(
             @ApiParam(name = "id")
-            @RequestParam("id") int id) throws Exception {
+            @RequestParam(value = "id") int id) throws Exception {
         return tjQuotaJobClient.tjQuotaExecute(id);
     }
+
+    @RequestMapping(value = ServiceApi.TJ.TjGetQuotaResult, method = RequestMethod.GET)
+    @ApiOperation(value = "获取指标执行结果")
+    public Envelop getQuotaResult(
+            @ApiParam(name = "id" ,value = "指标ID" )
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "pageNo", value = "页码", defaultValue = "0")
+            @RequestParam(value = "pageNo" , required = false ,defaultValue = "0") int pageNo,
+            @ApiParam(name = "pageSize", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "pageSize" , required = false ,defaultValue ="15") int pageSize
+    ) throws Exception {
+        return tjQuotaJobClient.getQuotaResult(id,filters,pageNo,pageSize);
+    }
+
 }

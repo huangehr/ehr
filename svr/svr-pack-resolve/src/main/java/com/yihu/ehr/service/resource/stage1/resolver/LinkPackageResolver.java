@@ -25,6 +25,11 @@ import java.util.Iterator;
 @Component
 public class LinkPackageResolver extends PackageResolver {
     @Override
+    public void resolveDataSet(StandardPackage profile, File root) throws Exception {
+
+    }
+
+    @Override
     public void resolve(StandardPackage profile, File root) throws IOException, ParseException {
         LinkPackage linkPackModel = (LinkPackage) profile;
 

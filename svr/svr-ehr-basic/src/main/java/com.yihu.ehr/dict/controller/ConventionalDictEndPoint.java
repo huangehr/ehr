@@ -773,7 +773,7 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value ="/GetAlldictionariesByDictId",method = RequestMethod.GET)
     @ApiOperation(value = "获取卡状态所有字典项")
     public ListResult GetAlldictionariesByDictId() throws Exception{
-        long dictId=10;
+        long dictId=66;
         int page=0;
         int size=1000;
         ListResult re = new ListResult(page,size);
@@ -783,5 +783,14 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
             re.setTotalCount(cardList.getTotalPages());
         }
         return re;
+    }
+
+    @RequestMapping(value = "/dictionaries/tj_quota_log_status", method = RequestMethod.GET)
+    @ApiOperation(value = "指标日志状态", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaLogStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(82, code);
+        return getDictModel(type);
     }
 }

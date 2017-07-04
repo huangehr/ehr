@@ -38,6 +38,11 @@ public class FilePackageResolver extends PackageResolver {
     FastDFSUtil fastDFSUtil;
 
     @Override
+    public void resolveDataSet(StandardPackage profile, File root) throws Exception {
+
+    }
+
+    @Override
     public void resolve(StandardPackage profile, File root) throws Exception {
         FilePackage filePackModel = (FilePackage) profile;
 

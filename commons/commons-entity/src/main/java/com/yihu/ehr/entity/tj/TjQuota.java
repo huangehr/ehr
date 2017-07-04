@@ -26,6 +26,7 @@ public class TjQuota implements Serializable {
     private Integer status;
     private Integer dataLevel;
     private String remark;
+    private Integer quotaType;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -162,6 +163,15 @@ public class TjQuota implements Serializable {
 
     public void setDataLevel(Integer dataLevel) {
         this.dataLevel = dataLevel;
+    }
+
+    @Column(name = "quota_type")
+    public Integer getQuotaType() {
+        return quotaType;
+    }
+
+    public void setQuotaType(Integer quotaType) {
+        this.quotaType = quotaType;
     }
 
     @Column(name = "remark")

@@ -8,6 +8,7 @@ import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -32,7 +33,8 @@ public class SanofiService {
     @Autowired
     XGeographyClient addressClient;
 
-    String appId = "svr-health-profile";
+    @Value("${spring.application.id}")
+    String appId;
 
 
     /**
@@ -58,7 +60,7 @@ public class SanofiService {
             }
         }
         query += "\"}";
-        Envelop result = resourceClient.getResources(BasisConstant.patientInfo, appId, query, null, null);
+        Envelop result = resourceClient.getResources(BasisConstant.patientInfo, appId,null, query, null, null);
 
         return result.getDetailModelList();
     }
@@ -66,7 +68,7 @@ public class SanofiService {
 
     // 获取数据集
     public List<Map<String, Object>> getDataSet(String core, String query) throws Exception {
-        Envelop result = resourceClient.getResources(core, appId, query, null, null);
+        Envelop result = resourceClient.getResources(core, appId, null,query, null, null);
         return result.getDetailModelList();
     }
 

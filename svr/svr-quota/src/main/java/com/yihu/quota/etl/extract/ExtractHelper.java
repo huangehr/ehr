@@ -56,7 +56,7 @@ public class ExtractHelper {
                 throw new Exception("QuotaDataSource data error");
             }
             //判断数据源是什么类型,根据类型和数据库相关的配置信息抽取数据
-            if (TjDataSource.type_es.equals(quotaDataSource.getType())) {
+            if ( TjDataSource.type_es.equals(quotaDataSource.getType()) ) {
                 JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
                 EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
                 //得到主维度
@@ -65,6 +65,8 @@ public class ExtractHelper {
                 List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = dimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaDataSource.getQuotaCode());
                 //查询ES数据
                 return  SpringUtil.getBean(EsExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
+            }else if( TjDataSource.type_solr.equals(quotaDataSource.getType()) ){
+
             }
 
         } catch (Exception e) {

@@ -42,10 +42,14 @@ public class BasisConstant {
     public static String healthIndicators = "RS_HEALTH_INDICATORS"; //健康指标
 
     /********** 数据元 *******************/
+    public static String rowkey = "rowkey";//主表主键
     public static String demographicId = "demographic_id";//身份证号
     public static String profileId = "profile_id";//细表外键profile_id
+    public static String healthProblem = "health_problem";//健康问题;分隔
     public static String eventDate = "event_date";//事件时间
     public static String eventType = "event_type";//事件类型
+    public static String orgCode = "org_code";//医院代码
+    public static String orgName = "org_name";//医院名称
 
     public static String mzzd = "EHR_000109";//门诊诊断代码
     public static String zyzd = "EHR_000293";//住院诊断代码

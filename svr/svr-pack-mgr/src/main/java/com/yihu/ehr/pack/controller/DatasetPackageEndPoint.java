@@ -9,8 +9,6 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.pack.feign.AppClient;
-import com.yihu.ehr.pack.feign.SecurityClient;
-import com.yihu.ehr.pack.feign.UserClient;
 import com.yihu.ehr.pack.service.DatasetPackage;
 import com.yihu.ehr.pack.service.DatasetPackageService;
 import com.yihu.ehr.pack.task.MessageBuffer;
@@ -41,14 +39,9 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "package_service", description = "档案包服务（非病人维度兼容）")
 public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
-    @Autowired
-    private SecurityClient securityClient;
 
     @Autowired
     private DatasetPackageService datasetPackService;
-
-    @Autowired
-    private UserClient userClient;
 
     @Autowired
     private AppClient appClient;
@@ -136,7 +129,7 @@ public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
     //zip包密码规则：MD5(secret+packPwdSeed+secret)
     @RequestMapping(value = ServiceApi.DatasetPackages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案（兼容非病人维度)", notes = "支持数非健康档案维度的数据包接收")
-    public void savePackageForGateway(
+    public DatasetPackage savePackageForGateway(
             @ApiParam(name = "pack", value = "档案包", allowMultiple = true)
             @RequestPart() MultipartFile pack,
             @ApiParam(name = "orgCode", value = "机构代码")
@@ -158,13 +151,14 @@ public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
         }
         DatasetPackage aPackage =null;
         try {
-            String password = MD5.encrypt(secret+packPwdSeed+secret);//MD5 生成zip包密码
+            String password = MD5.hash(secret+packPwdSeed+secret);//MD5 生成zip包密码
             aPackage = datasetPackService.receiveDatasets(pack.getInputStream(), password, md5, orgCode, getClientId(request));
         } catch (Exception ex) {
             throw new ApiException(HttpStatus.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
 
         messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
+        return aPackage;
     }
 
     @RequestMapping(value = ServiceApi.Apps.App, method = RequestMethod.GET)

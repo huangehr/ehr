@@ -11,5 +11,6 @@ public interface XDoctorRepository extends PagingAndSortingRepository<Doctors, L
      Doctors findByUserId(String userId) throws Exception;
 
      Doctors findByCode(String code);
+     Doctors findByIdCardNo(String idCardNo);
 
 }
