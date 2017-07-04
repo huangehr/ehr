@@ -52,9 +52,11 @@ public class DatasetPackageResolver extends PackageResolver {
             // head 节点
             JsonNode headNode = objectMapper.readTree(file).get("head");
             String transactionId = headNode.get("id").asText();
+            String orgCode = headNode.get("orgCode").asText();
             String version = headNode.get("version").asText();
             String sourceTable = headNode.get("source").asText();
             String targetTable = headNode.get("target").asText();
+            String createTime = headNode.get("createTime").asText();
             // data 节点
             JsonNode dataNode = objectMapper.readTree(file).get("data");
             String tableName = dataNode.get("table").get("name").asText();
@@ -144,6 +146,9 @@ public class DatasetPackageResolver extends PackageResolver {
 
                 sqlList.add(sql.toString());
             }
+
+            profile.setOrgCode(orgCode);
+            profile.setCreateDate(DateTimeUtil.simpleDateTimeParse(createTime));
         }
         profile.setSqlList(sqlList);
     }
