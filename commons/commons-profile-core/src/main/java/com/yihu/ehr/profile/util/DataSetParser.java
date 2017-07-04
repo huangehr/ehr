@@ -38,7 +38,7 @@ public class DataSetParser {
         JsonNode data = root.get("data");//文件内容主体信息
 
         String version = head.get("version").asText();
-        if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+        //if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
 
         String dataSetCode = head.get("target").asText();
         String createTime = head.get("createTime").isNull() ? "" : head.get("createTime").asText();
@@ -104,7 +104,7 @@ public class DataSetParser {
         PackageDataSet dataSet = new PackageDataSet();
 
         String version = root.get("inner_version").asText();
-        if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+        //if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
 
         String dataSetCode = root.get("code").asText();
         String eventNo = root.get("event_no").asText();
