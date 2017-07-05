@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.org.RsOrgResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.RsAppResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.RsRolesResourceMetadataModel;
 import com.yihu.ehr.agModel.resource.TreeModel;
@@ -9,6 +10,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.org.MRsOrgResource;
+import com.yihu.ehr.model.org.MRsOrgResourceMetadata;
 import com.yihu.ehr.model.resource.*;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.resource.client.MetadataClient;
@@ -719,4 +722,195 @@ public class ResourcesGrantController extends BaseController {
         }
         return model;
     }
+
+
+    //机构-资源授权
+    @ApiOperation("机构资源授权初始查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgGrants, method = RequestMethod.GET)
+    public Envelop queryOrgResourceGrant(
+            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "999")
+            @RequestParam(value = "size", required = false) int size) throws Exception {
+        try
+        {
+            ResponseEntity<List<MRsOrgResource>> responseEntity = resourcesGrantClient.queryOrgResourceGrant(fields,filters,sorts,page,size);
+            List<MRsOrgResource> rsOrgResources = responseEntity.getBody();
+            Envelop envelop = getResult(rsOrgResources, getTotalCount(responseEntity), page, size);
+            return envelop;
+        }
+        catch (Exception e)
+        {
+            Envelop envelop = new Envelop();
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            return envelop;
+        }
+    }
+
+
+    @ApiOperation("机构资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgMetadatasValid,method = RequestMethod.POST)
+    public boolean orgValid(
+            @ApiParam(name="data",value="授权数据元",defaultValue = "")
+            @RequestParam(value="data") String data,
+            @ApiParam(name="valid",value="授权数据元ID",defaultValue = "")
+            @RequestParam(value="valid") int valid) throws Exception
+    {
+        return resourcesGrantClient.orgValid(data, valid);
+    }
+
+    @ApiOperation("机构资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgGrant, method = RequestMethod.POST)
+    public Envelop orgMetadataGrant(
+            @ApiParam(name = "id", value = "授权ID", defaultValue = "")
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "dimension", value = "授权ID", defaultValue = "")
+            @RequestParam(value = "dimension") String dimension) throws Exception {
+
+        Envelop envelop = new Envelop();
+        try{
+            envelop.setObj(resourcesGrantClient.metadataOrgGrant(id, dimension));
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("授权失败！");
+        }
+    }
+
+    @ApiOperation("机构资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgMetadataGrants, method = RequestMethod.POST)
+    public Envelop orgMetadataGrant(
+            @ApiParam(name = "model", value = "数据模型", defaultValue = "")
+            @RequestParam String model) throws Exception {
+
+        Envelop envelop = new Envelop();
+        try{
+            envelop.setObj(resourcesGrantClient.orgMetadataGrant(model));
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("授权失败！");
+        }
+    }
+
+    @ApiOperation("单个机构授权多个资源")
+    @RequestMapping(value = ServiceApi.Resources.OrgGrantResources, method = RequestMethod.POST)
+    public Envelop grantOrgResource(
+            @ApiParam(name = "orgCode", value = "机构ID", defaultValue = "")
+            @PathVariable(value = "orgCode") String orgCode,
+            @ApiParam(name = "resourceIds", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceIds") String resourceIds) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            Collection<MRsOrgResource> rsOrgResource = resourcesGrantClient.grantOrgResource(orgCode,resourceIds);
+            envelop.setObj(rsOrgResource);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @ApiOperation("机构资源数据元授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgResMetadataGrants,method = RequestMethod.GET)
+    public Envelop queryOrgRsMetadataGrant(
+            @ApiParam(name="Org_res_id",value="授权角色编号",defaultValue = "1")
+            @PathVariable(value="Org_res_id")String orgResId,
+            @ApiParam(name="page",value="页码",defaultValue = "1")
+            @RequestParam(value="page",required = false)int page,
+            @ApiParam(name="size",value="分页大小",defaultValue = "15")
+            @RequestParam(value="size",required = false)int size) throws Exception
+    {
+        try
+        {
+            ResponseEntity<List<MRsOrgResourceMetadata>> responseEntity = resourcesGrantClient.getOrgRsMetadatas(orgResId);
+            return getResult(responseEntity.getBody(), responseEntity.getBody().size(), 1, 15);
+        }
+        catch (Exception e)
+        {
+            Envelop envelop = new Envelop();
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("查询出错");
+            return envelop;
+        }
+    }
+
+    @ApiOperation("机构资源取消授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgGrantsNoPage,method = RequestMethod.GET)
+    public Envelop queryOrgResourceGrantNoPage(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<MRsOrgResource> mRsOrgResources = resourcesGrantClient.queryOrgResourceGrantNoPage(filters);
+            if(mRsOrgResources != null){
+                envelop.setSuccessFlg(true);
+                envelop.setDetailModelList(mRsOrgResources);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+    @ApiOperation("机构资源授权批量删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgGrants, method = RequestMethod.DELETE)
+    public Envelop deleteOrgGrantBatch(
+            @ApiParam(name = "ids", value = "授权ID", defaultValue = "")
+            @RequestParam(value = "ids") String ids) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            resourcesGrantClient.deleteOrgGrantBatch(ids);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgMetadataGrant,method = RequestMethod.GET)
+    @ApiOperation("机构-资源授权-维度授权-根据ID获取资源数据元授权")
+    public Envelop getOrgRsMetadataGrantById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        Envelop envelop = new Envelop();
+        try{
+            MRsOrgResourceMetadata rsOrgResourceMetadata = resourcesGrantClient.getOrgRsMetadataGrantById(id);
+            RsOrgResourceMetadataModel model = convertToModel(rsOrgResourceMetadata, RsOrgResourceMetadataModel.class);
+            envelop.setObj(getOrgDetail(model));
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    private RsOrgResourceMetadataModel getOrgDetail(RsOrgResourceMetadataModel model){
+        if(model!=null){
+            MRsResourceMetadata rsResourceMetadata = resourceMetadataClient.getRsMetadataById(model.getResourceMetadataId());
+            MRsMetadata mRsMetadata = metadataClient.getMetadataById(rsResourceMetadata.getMetadataId());
+            if(org.apache.commons.lang3.StringUtils.isEmpty(model.getId()))
+                model.setResourceMetadataName(mRsMetadata.getName());
+            model.setMetaColunmType(mRsMetadata.getColumnType());
+            model.setMetaId(mRsMetadata.getId());
+            if(!org.apache.commons.lang3.StringUtils.isEmpty(mRsMetadata.getDictCode()) && !"0".equals(mRsMetadata.getDictCode()))
+                model.setDictEntries(rsDictionaryEntryClient.searchRsDictionaryEntries("", "dictCode=" +mRsMetadata.getDictCode(), "", 1, 500).getBody());
+        }
+        return model;
+    }
+
 }
