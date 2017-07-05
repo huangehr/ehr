@@ -6,6 +6,7 @@ import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -42,14 +43,7 @@ public class EventInfoExtractor extends KeyDataExtractor {
                     for (String metaDataCode : metaData) {
                         String value = record.getMetaData(metaDataCode);
                         if (StringUtils.isNotEmpty(value)) {
-                            if(value.contains("T") && value.contains("Z"))
-                            {
-                                eventDate = DateTimeUtil.utcDateTimeParse(value);
-                            }
-                            else
-                            {
-                                eventDate = DateTimeUtil.simpleDateTimeParse(value);
-                            }
+                            eventDate = DateUtil.strToDate(value);
                         }
 
                         if(eventDate != null) {
