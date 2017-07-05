@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -217,7 +218,7 @@ public class BaseController extends AbstractController {
      */
     public Date StringToDate(String dateTime, String formatRule) {
         try {
-            return dateTime == null ? null : DateTimeUtil.utcDateTimeParse(dateTime);
+            return dateTime == null ? null : DateUtil.strToDate(dateTime);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

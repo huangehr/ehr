@@ -292,7 +292,7 @@ public class ServiceApi {
 
     //非病人维度
     public static class DatasetPackages {
-        public static final String Packages = "/dataset_package";
+        public static final String Packages = "/datasetPackages";
         public static final String AcquirePackage = "/datasetPackages/acquire";
         public static final String Package = "/datasetPackages/{id}";
         public static final String PackageResolve = "/datasetPackages/resolve";
@@ -879,6 +879,7 @@ public class ServiceApi {
 
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
         public static final String GetQuotaReport = "tj/getQuotaReport";
+        public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
     }
 
 

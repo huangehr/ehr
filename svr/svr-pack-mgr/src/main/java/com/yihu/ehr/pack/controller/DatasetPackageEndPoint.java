@@ -9,8 +9,6 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.pack.feign.AppClient;
-import com.yihu.ehr.pack.feign.SecurityClient;
-import com.yihu.ehr.pack.feign.UserClient;
 import com.yihu.ehr.pack.service.DatasetPackage;
 import com.yihu.ehr.pack.service.DatasetPackageService;
 import com.yihu.ehr.pack.task.MessageBuffer;
@@ -41,14 +39,9 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "package_service", description = "档案包服务（非病人维度兼容）")
 public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
-    @Autowired
-    private SecurityClient securityClient;
 
     @Autowired
     private DatasetPackageService datasetPackService;
-
-    @Autowired
-    private UserClient userClient;
 
     @Autowired
     private AppClient appClient;
