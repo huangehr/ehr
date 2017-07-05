@@ -174,16 +174,16 @@ public class ResolveEndPoint {
     @ApiOperation(value = "数据集档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析数据集档案包")
     @RequestMapping(value = ServiceApi.DatasetPackages.PackageResolve, method = RequestMethod.PUT)
     public String resolveDataset(
-            @ApiParam(value = "数据集ID")
-            @RequestParam(required = false) String datasetId,
+            @ApiParam(value = "包ID")
+            @RequestParam(required = false) String packageId,
             @ApiParam(value = "模拟应用ID")
             @RequestParam(required = false) String clientId,
             @ApiParam(value = "返回档案数据", required = true)
             @RequestParam boolean echo) throws Exception {
 
-        String packStr = datasetPackageMgrClient.acquireDatasetPackage(datasetId);
+        String packStr = datasetPackageMgrClient.acquireDatasetPackage(packageId);
         if (StringUtils.isEmpty(packStr)) {
-            throw new Exception("没有找到ID为 [" + datasetId + "] 的数据集档案包。");
+            throw new Exception("没有找到 packageId 为 [" + packageId + "] 的数据包。");
         }
 
         MPackage pack = objectMapper.readValue(packStr, MPackage.class);

@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static com.yihu.ehr.util.datetime.DateTimeUtil.simpleDateTimeParse;
+
 /**
  * 数据集档案包解析器.
  *
@@ -42,8 +44,8 @@ public class DatasetPackageResolver extends PackageResolver {
 
     @Override
     public void resolveDataSet(StandardPackage profile, File root) throws Exception {
-        File originFolder = new File(root.getAbsolutePath());
-        this.parseDataSetFiles((DatasetPackage) profile, originFolder.listFiles());
+        File folder = new File(root.getAbsolutePath());
+        this.parseDataSetFiles((DatasetPackage) profile, folder.listFiles());
     }
 
     @Override
@@ -214,7 +216,7 @@ public class DatasetPackageResolver extends PackageResolver {
 
                     // 判断表字段是否存在。
                     String fieldSql = "SELECT f.column_type AS column_type FROM std_meta_data_" + version + " f  " +
-                            "LEFT JOIN std_data_set_" + version + " t ON t.id = f.dataset_id" +
+                            "LEFT JOIN std_data_set_" + version + " t ON t.id = f.dataset_id " +
                             "WHERE t.code = '" + tableName + "' AND f.column_name = '" + fieldName + "'";
                     if (jdbcTemplate.queryForList(fieldSql).size() == 0) {
                         throw new RuntimeException("标准中不存在该表字段，version: " + version + ", table: " + tableName + ", field: " + fieldName);
@@ -224,12 +226,12 @@ public class DatasetPackageResolver extends PackageResolver {
                     String columnType = jdbcTemplate.queryForMap(fieldSql).get("column_type").toString().toUpperCase();
                     if (columnType.contains("VARCHAR")) {
                         sql.append(fieldName + " = '" + fieldValue + "', ");
-                    } else if (columnType.contains("TINYINT") || columnType.contains("NUMBER")) {
+                    } else if (columnType.equals("TINYINT") || columnType.contains("NUMBER")) {
                         sql.append(fieldName + " = " + fieldValue + ", ");
-                    } else if (columnType.contains("DATE")) {
+                    } else if (columnType.equals("DATE")) {
                         sql.append(fieldName + " = '" + DateTimeUtil.simpleDateFormat(DateTimeUtil.simpleDateParse(fieldValue)) + "', ");
-                    } else if (columnType.contains("DATETIME")) {
-                        sql.append(fieldName + " = '" + DateTimeUtil.simpleDateTimeFormat(DateTimeUtil.simpleDateParse(fieldValue)) + "', ");
+                    } else if (columnType.equals("DATETIME")) {
+                        sql.append(fieldName + " = '" + DateTimeUtil.simpleDateTimeFormat(DateTimeUtil.utcDateTimeParse(fieldValue)) + "', ");
                     }
                 }
                 sql.deleteCharAt(sql.lastIndexOf(","));
@@ -247,7 +249,7 @@ public class DatasetPackageResolver extends PackageResolver {
             }
 
             profile.setOrgCode(orgCode);
-            profile.setCreateDate(DateTimeUtil.simpleDateTimeParse(createTime));
+            profile.setCreateDate(DateTimeUtil.utcDateTimeParse(createTime));
         }
         profile.setSqlList(sqlList);
     }
