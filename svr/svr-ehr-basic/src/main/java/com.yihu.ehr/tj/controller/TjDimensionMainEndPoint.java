@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -73,23 +74,31 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         TjDimensionMain obj = objectMapper.readValue(model, TjDimensionMain.class);
+        if(obj.getId() != 0){
+            obj.setUpdateTime(new Date());
+        }else{
+            obj.setCreateTime(new Date());
+        }
         obj = tjDimensionMainService.save(obj);
         return Result.success("主维度更新成功！", obj);
     }
 
 
-    @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除主维度")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") String id) throws Exception{
-        tjDimensionMainService.delete(id);
+            @RequestParam(value = "id") Long id) throws Exception{
+        TjDimensionMain tjDimensionMain = tjDimensionMainService.getTjDimensionMain(Integer.valueOf(id.toString()));
+        tjDimensionMain.setStatus(-1);
+        tjDimensionMainService.save(tjDimensionMain);
         return Result.success("主维度删除成功！");
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMainId, method = RequestMethod.GET)
     @ApiOperation(value = "获取主维度信息", notes = "通知主维度信息")
-    TjDimensionMain getTjDimensionMain(@PathVariable(value = "id") Integer id){
+    TjDimensionMain getTjDimensionMain(
+            @PathVariable(value = "id") Integer id){
         return tjDimensionMainService.getTjDimensionMain(id);
     };
 
@@ -100,11 +109,24 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "code") String code) throws Exception {
         String filter = "code=" + code;
         List<TjDimensionMain> tjDimensionMains = tjDimensionMainService.search(filter);
-        if(tjDimensionMains == null){
-            return null;
-        }else{
+        if(tjDimensionMains != null && tjDimensionMains.size() >0){
             return  tjDimensionMains.get(0);
+        }else{
+            return null;
         }
     }
 
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainName,method = RequestMethod.GET)
+    @ApiOperation(value = "验证名称是否存在")
+    public boolean isNameExists(
+            @ApiParam(value = "name")
+            @RequestParam(value = "name") String name)throws Exception {
+        String filter = "name=" + name;
+        List<TjDimensionMain> tjDimensionMains = tjDimensionMainService.search(filter);
+        if(tjDimensionMains != null && tjDimensionMains.size() >0){
+            return  true;
+        }else{
+            return false;
+        }
+    }
 }

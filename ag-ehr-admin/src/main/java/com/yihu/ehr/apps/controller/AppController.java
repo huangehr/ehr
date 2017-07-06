@@ -1,9 +1,13 @@
 package com.yihu.ehr.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppApiClient;
 import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.app.MUserApp;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
+import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsResources;
@@ -20,6 +24,7 @@ import com.yihu.ehr.agModel.app.AppDetailModel;
 import com.yihu.ehr.agModel.app.AppModel;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.users.service.RoleAppRelationClient;
 import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -27,11 +32,11 @@ import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
 
 /**
@@ -60,6 +65,8 @@ public class AppController extends BaseController {
     private RolesClient rolesClient;
     @Autowired
     private AppApiClient appApiClient;
+    @Autowired
+    private SystemDictClient systemDictClient;
 
 
     @RequestMapping(value = "test", method = RequestMethod.GET)
@@ -403,6 +410,41 @@ public class AppController extends BaseController {
         }
         Integer totalCount = getTotalCount(responseEntity);
         Envelop envelop = getResult(appModelList,totalCount,page,size);
+        return envelop;
+    }
+
+
+    @RequestMapping(value = "/getAppTreeByType", method = RequestMethod.GET)
+    @ApiOperation(value = "获取App tree")
+    public Envelop getAppTreeByType(
+            @ApiParam(name = "userId", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "userId", required = false) String userId) {
+        Envelop envelop = new Envelop();
+        //获取系统字典项（App类型）
+        String filters="dictId="+1;
+        String fields="";
+        String sort="+sort";
+        int size=999;
+        int page=1;
+
+        ResponseEntity<List<MDictionaryEntry>> responseEntity = systemDictClient.getDictEntries(fields, filters, sort, size, page);
+        List<MDictionaryEntry> dictionaryEntries = responseEntity.getBody();
+        List<SystemDictEntryModel> systemDictEntryModelList = (List<SystemDictEntryModel>) convertToModels(dictionaryEntries, new ArrayList<SystemDictEntryModel>(dictionaryEntries.size()), SystemDictEntryModel.class, null);
+        List<SystemDictEntryModel> DictEntryModelList=new ArrayList<>();
+        List<AppModel> appModelList=new ArrayList<>();
+        Map<String,String> map=new HashedMap();
+        if(null!=systemDictEntryModelList&&systemDictEntryModelList.size()>0){
+            for(SystemDictEntryModel dict:systemDictEntryModelList){
+                Collection<MApp> mAppList = appClient.getAppsByUserIdAndCatalog(userId,dict.getCode());
+                appModelList = (List<AppModel>) convertToModels(mAppList, new ArrayList<AppModel>(mAppList.size()), AppModel.class, null);
+                dict.setChildren(appModelList);
+                DictEntryModelList.add(dict);
+                }
+            }
+
+        //应用列表
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(DictEntryModelList);
         return envelop;
     }
 

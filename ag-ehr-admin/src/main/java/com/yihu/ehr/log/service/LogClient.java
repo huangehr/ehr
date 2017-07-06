@@ -23,10 +23,21 @@ import java.util.List;
 @ApiIgnore
 public interface LogClient {
 
-    @RequestMapping(value = "/log/getLogs", method = RequestMethod.GET)
-    @ApiOperation(value = "日志列表")
-    ListResult getLogs(
-            @RequestParam(value = "logType", required = false) String logType,
+    @RequestMapping(value = "/log/getBussinessLogs", method = RequestMethod.GET)
+    @ApiOperation(value = "业务日志列表")
+    ListResult getBussinessLogs(
+            @RequestParam(value = "data", required = false) String data,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "caller", required = false) String caller,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "page", required = false) int page
+    );
+
+    @RequestMapping(value = "/log/getOperatorLogs", method = RequestMethod.GET)
+    @ApiOperation(value = "操作日志列表")
+    ListResult getOperatorLogs(
             @RequestParam(value = "data", required = false) String data,
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate,

@@ -3,12 +3,14 @@ package com.yihu.ehr.dict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.dict.service.SystemDictEntry;
 import com.yihu.ehr.dict.service.SystemDictEntryService;
+import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -723,8 +725,72 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
         return getDictModel(type);
     };
 
+    @RequestMapping(value = "/dictionaries/tj_quota_exec_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计指标管理", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaExecTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(77, code);
+        return getDictModel(type);
+    };
 
+    @RequestMapping(value = "/dictionaries/tj_quota_data_level_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计存储方式", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaDataLevelList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(78, code);
+        return getDictModel(type);
+    };
 
+    @RequestMapping(value = "/dictionaries/org_dept_detail_display_status", method = RequestMethod.GET)
+    @ApiOperation(value = "是否显示", response = MConventionalDict.class)
+    MConventionalDict getOrgDeptDetailDisplayStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(79, code);
+        return getDictModel(type);
+    }
 
+    @RequestMapping(value = "/dictionaries/org_dept_detail_py_code", method = RequestMethod.GET)
+    @ApiOperation(value = "科室类型", response = MConventionalDict.class)
+    MConventionalDict getOrgDeptDetailPyCode(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(80, code);
+        return getDictModel(type);
+    }
 
+    @RequestMapping(value = "/dictionaries/org_dept_detail_glory_id", method = RequestMethod.GET)
+    @ApiOperation(value = "科室荣誉", response = MConventionalDict.class)
+    MConventionalDict getOrgDeptDetailGloryId(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(81, code);
+        return getDictModel(type);
+    };
+
+    @RequestMapping(value ="/GetAlldictionariesByDictId",method = RequestMethod.GET)
+    @ApiOperation(value = "获取卡状态所有字典项")
+    public ListResult GetAlldictionariesByDictId() throws Exception{
+        long dictId=66;
+        int page=0;
+        int size=1000;
+        ListResult re = new ListResult(page,size);
+        Page<SystemDictEntry> cardList = dictEntryService.findByDictId(dictId, page,size);
+        if(cardList!=null) {
+            re.setDetailModelList(cardList.getContent());
+            re.setTotalCount(cardList.getTotalPages());
+        }
+        return re;
+    }
+
+    @RequestMapping(value = "/dictionaries/tj_quota_log_status", method = RequestMethod.GET)
+    @ApiOperation(value = "指标日志状态", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaLogStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntry(82, code);
+        return getDictModel(type);
+    }
 }

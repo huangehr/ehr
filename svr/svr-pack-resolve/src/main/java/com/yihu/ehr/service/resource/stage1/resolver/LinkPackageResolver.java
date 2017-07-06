@@ -8,12 +8,14 @@ import com.yihu.ehr.service.resource.stage1.LinkPackageDataSet;
 import com.yihu.ehr.service.resource.stage1.LinkPackage;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * 轻量级档案包解析器.
@@ -24,6 +26,13 @@ import java.util.Iterator;
  */
 @Component
 public class LinkPackageResolver extends PackageResolver {
+
+
+    @Override
+    public List<StandardPackage> resolveDataSets(File root,String clinetId) throws Exception {
+        return null;
+    }
+
     @Override
     public void resolve(StandardPackage profile, File root) throws IOException, ParseException {
         LinkPackage linkPackModel = (LinkPackage) profile;
@@ -41,14 +50,14 @@ public class LinkPackageResolver extends PackageResolver {
         String version = jsonNode.get("inner_version").asText();
         String eventDate = jsonNode.get("event_time").asText();
         String expireDate = jsonNode.get("expiry_date").asText();
-        if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+        //if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
 
         profile.setPatientId(patientId);
         profile.setEventNo(eventNo);
         profile.setOrgCode(orgCode);
         profile.setCdaVersion(version);
-        profile.setEventDate(DateTimeUtil.utcDateTimeParse(eventDate));
-        profile.setExpireDate(DateTimeUtil.utcDateTimeParse(expireDate));
+        profile.setEventDate(DateUtil.strToDate(eventDate));
+        profile.setExpireDate(DateUtil.strToDate(expireDate));
 
         // dataset节点，存储数据集URL
         JsonNode dataSetNode = jsonNode.get("dataset");

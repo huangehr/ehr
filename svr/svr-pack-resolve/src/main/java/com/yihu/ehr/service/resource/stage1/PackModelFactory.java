@@ -35,9 +35,9 @@ public class PackModelFactory {
             return createPackModel(ProfileType.File);
         } else if (directories.size() == 1 && directories.contains(LinkFile)) {
             return createPackModel(ProfileType.Link);
+        } else { // 数据集档案包（zip下只有 .json 数据文件）。
+            return createPackModel(ProfileType.Dataset);
         }
-
-        return null;
     }
 
     public static StandardPackage createPackModel(ProfileType type){
@@ -50,6 +50,9 @@ public class PackModelFactory {
 
             case Link:
                 return new LinkPackage();
+
+            case Dataset:
+                return new DatasetPackage();
 
             default:
                 return null;

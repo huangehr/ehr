@@ -123,6 +123,36 @@ public class ServiceApi {
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
         public static final String AdapterDict = "/resources/adapter/dict/{id}";
+
+        /**
+         * 应用角色资源授权
+         */
+        public static final String ResourceRolesGrants = "/resources/rolesGrants";
+        public static final String ResourceRolesGrant = "/resources/rolesGrants/{id}";
+        public static final String ResourceRolesMetadatasValid = "/resources/relosMetadatas/valid";
+        public static final String ResourceRolesMetadataGrants = "/resources/relosMetadatas/grants";
+        public static final String RolesGrantResources = "/resources/roles/{rolesId}/grant";
+//        public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
+        public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
+        public static final String ResourceRolesResMetadataGrants = "/resources/roles_resource/{roles_res_id}/metadata";
+        public static final String ResourceRolesRsMetadataGrant = "/resources/roles_resource/metadata/grant";
+
+        /**
+         * 机构-资源授权
+         */
+        public static final String ResourceOrgGrants = "/resources/OrgGrants";
+        public static final String ResourceOrgGrant = "/resources/OrgGrants/{id}";
+        public static final String ResourceOrgMetadatasValid = "/resources/OrgMetadatas/valid";
+        public static final String ResourceOrgMetadataGrants = "/resources/OrgMetadatas/grants";
+        public static final String OrgGrantResources = "/resources/Org/{orgCode}/grant";
+        //        public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        public static final String ResourceOrgMetadataGrant = "/resources/OrgMetadata/grants/{id}";
+        public static final String ResourceOrgGrantsNoPage = "/resources/OrgGrants/no_paging";
+        public static final String ResourceOrgResMetadataGrants = "/resources/Org_resource/{Org_res_id}/metadata";
+        public static final String ResourceOrgRsMetadataGrant = "/resources/Org_resource/metadata/grant";
+
+
     }
 
     /**
@@ -207,6 +237,7 @@ public class ServiceApi {
         public static final String AppStatus = "/apps/{app_id}/status";
         public static final String AppNameExistence = "/app/{app_name}/existence";
         public static final String FilterList = "/apps/filterList";
+        public static final String getAppTreeByType = "/getAppTreeByType";
     }
 
     public static class AppApi {
@@ -238,6 +269,7 @@ public class ServiceApi {
     public static class UserApp {
         public static final String UserAppList = "/userAppList";
         public static final String UserAppShow = "/userApp/show";
+        public static final String GetUserAppListById = "/userApp/getUserAppByAppId";
     }
 
 
@@ -258,6 +290,20 @@ public class ServiceApi {
 
         public static final String Prescription = "/prescription"; //处方笺维护
         public static final String  ArchiveRelation = "/archiveRelation"; //档案关联
+    }
+
+    //非病人维度
+    public static class DatasetPackages {
+        public static final String Packages = "/datasetPackages";
+        public static final String AcquirePackage = "/datasetPackages/acquire";
+        public static final String Package = "/datasetPackages/{id}";
+        public static final String PackageResolve = "/datasetPackages/resolve";
+        public static final String PackageSearch = "/datasetPackages/search";
+        public static final String PackageDownloads = "/datasetPackages/{id}/downloads";
+
+        public static final String ResolveMessage = "/datasetPackages/message/resolve";
+        public static final String MessageTimer = "/datasetPackages/message/timer";
+
     }
 
     public static class PackageResolve {
@@ -461,6 +507,14 @@ public class ServiceApi {
         public static final String Doctors = "/doctors";
         public static final String DoctorsExistence = "/doctors/{doctor_code}/existence";
         public static final String DoctorAdmin = "/doctors/admin/{doctor_id}";
+        public static final String DoctorPhoneExistence = "/doctor/phone/existence";
+        public static final String DoctorBatch = "/doctor/batch";
+        public static final String DoctorOnePhoneExistence = "/doctor/onePhone/existence";
+        public static final String DoctorEmailExistence = "/doctor/email/existence";
+        public static final String DoctorsIdCardNoExistence = "/doctors/{doctor_idCardNo}/existence";
+
+
+
 
     }
 
@@ -476,6 +530,11 @@ public class ServiceApi {
         public static final String UserAdminContact = "/users/admin/{user_id}/contact";
         public static final String UserIdCardNoExistence = "/user/id_card_no/existence";
         public static final String UserEmailNoExistence = "/user/email/existence";
+        public static final String UserTelephoneNoExistence = "/user/telephone/existence";
+        public static final String UserPhoneExistence = "/user/phone/existence";
+        public static final String UserOnePhoneExistence = "/user/onePhone/existence";
+        public static final String UserEmailExistence = "/user/email/existence";
+
     }
 
     public static class Roles {
@@ -765,21 +824,27 @@ public class ServiceApi {
 
         public static final String GetTjDimensionMainList = "/tj/getTjDimensionMainList";
         public static final String TjDimensionMain = "/tj/tjDimensionMain";
-        public static final String TjDimensionMainId = "/tj/tjDimensionMainId";
-        public static final String TjDimensionMainCode= "/tj/tjDimensionMain/Code";
+        public static final String TjDimensionMainId = "/tj/tjDimensionMainId/{id}";
+        public static final String TjDimensionMainCode= "/tj/tjDimensionMainCode";
+        public static final String TjDimensionMainName= "/tj/tjDimensionMainName";
+        public static final String GetTjDimensionMainInfoList= "/tj/getTjDimensionMainInfoList";
 
         public static final String GetTjDimensionSlaveList = "/tj/getTjDimensionSlaveList";
-        public static final String TjDimensionSlaveId = "/tj/tjDimensionSlaveId";
+        public static final String TjDimensionSlaveId = "/tj/tjDimensionSlaveId/{id}";
         public static final String TjDimensionSlave = "/tj/tjDimensionSlave";
-
         public static final String TjDimensionSlaveCode = "/tj/tjDimensionSlaveCode";
+        public static final String TjDimensionSlaveName= "/tj/tjDimensionSlaveName";
+        public static final String GetTjDimensionSlaveInfoList= "/tj/getTjDimensionSlaveInfoList";
 
         public static final String GetTjQuotaDimensionMainList = "/tj/getTjQuotaDimensionMainList";
         public static final String TjQuotaDimensionMain = "/tj/tjQuotaDimensionMain";
+        public static final String AddTjQuotaDimensionMain = "/tj/addTjQuotaDimensionMain";
+        public static final String GetTjQuotaDimensionMainAll = "/tj/getTjQuotaDimensionMainAll";
 
         public static final String GetTjQuotaDimensionSlaveList = "/tj/getTjQuotaDimensionSlaveList";
         public static final String TjQuotaDimensionSlave = "/tj/tjQuotaDimensionSlave";
-
+        public static final String AddTjQuotaDimensionSlave = "/tj/addTjQuotaDimensionSlave";
+        public static final String GetTjQuotaDimensionSlaveAll = "/tj/getTjQuotaDimensionSlaveAll";
 
         public static final String GetTjQuotaLogList = "/tj/getTjQuotaLogList";
         public static final String GetTjDataSaveList = "/tj/getTjDataSaveList";
@@ -791,6 +856,8 @@ public class ServiceApi {
         public static final String AddTjDataSource = "/tj/addTjDataSource";
         public static final String DeleteTjDataSource = "/tj/deletetTjDataSource";
         public static final String GetTjDataSourceById = "/tj/getTjDataSourceById/{id}";
+        public static final String TjDataSourceExistsName = "/tj/tjDataSourceExistsName/{name}";
+        public static final String TjDataSourceExistsCode = "/tj/tjDataSourceExistsCode/{code}";
 
         public static final String GetTjQuotaDataSaveList = "tj/getTjQuotaDataSaveList";
         public static final String AddTjQuotaDataSave = "tj/addTjQuotaDataSave";
@@ -804,7 +871,20 @@ public class ServiceApi {
         public static final String AddTjQuota = "tj/addTjQuota";
         public static final String DeleteTjQuota = "tj/deleteTjQuota";
         public static final String GetTjQuotaById = "tj/getTjQuotaById/{id}";
+        public static final String TjQuotaExistsName = "/tj/tjQuotaExistsName/{name}";
+        public static final String TjQuotaExistsCode = "/tj/tjQuotaExistsCode/{code}";
+        public static final String GetTjQuotaByCode = "/tj/getTjQuotaByCode";
+
+        public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
+        public static final String TjQuotaExecute = "/job/execuJob";
+
+
+        public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
+        public static final String GetQuotaReport = "tj/getQuotaReport";
+        public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
     }
+
+
 
 
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,6 +71,11 @@ public class TjDataSaveEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         TjDataSave obj = objectMapper.readValue(model, TjDataSave.class);
+        if(obj.getId() != null){
+            obj.setUpdateTime(new Date());
+        }else{
+            obj.setCreateTime(new Date());
+        }
         obj = tjDataSaveService.save(obj);
         return Result.success("数据存储更新成功！", obj);
     }
@@ -79,7 +85,10 @@ public class TjDataSaveEndPoint extends EnvelopRestEndPoint {
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
-        tjDataSaveService.delete(id);
+//        tjDataSaveService.delete(id);
+        TjDataSave tjDataSave = tjDataSaveService.getById(id);
+        tjDataSave.setStatus(-1);
+        tjDataSaveService.save(tjDataSave);
         return Result.success("数据存储删除成功！");
     }
 
@@ -90,5 +99,31 @@ public class TjDataSaveEndPoint extends EnvelopRestEndPoint {
             @PathVariable("id") Long id) {
         TjDataSave tjDataSave = tjDataSaveService.getById(id);
         return tjDataSave;
+    }
+
+    @RequestMapping(value = "/tj/dataSaveExistsName/{name}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(
+            @ApiParam(name = "name")
+            @PathVariable("name") String name) throws Exception {
+        String filter = "name=" + name;
+        List<TjDataSave> list = tjDataSaveService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @RequestMapping(value = "/tj/dataSaveExistsCode/{code}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(
+            @ApiParam(name = "code")
+            @PathVariable("code") String code) throws Exception {
+        String filter = "code=" + code;
+        List<TjDataSave> list = tjDataSaveService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
     }
 }

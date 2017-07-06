@@ -1,6 +1,7 @@
 package com.yihu.ehr.query;
 
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.url.URLQueryBuilder;
 import javafx.util.Pair;
 import org.apache.commons.lang3.BooleanUtils;
@@ -206,7 +207,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, ">=", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
+                Date date = DateUtil.strToDate(pair.getValue());
                 predicate = cb.greaterThanOrEqualTo(pair.getKey(), date);
             }else {
                 predicate = cb.greaterThanOrEqualTo(pair.getKey(),value);
@@ -215,7 +216,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, ">", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
+                Date date = DateUtil.strToDate(pair.getValue());
                 predicate = cb.greaterThan(pair.getKey(), date);
             }else {
                 predicate = cb.greaterThan(pair.getKey(),value);
@@ -224,7 +225,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, "<=", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
+                Date date = DateUtil.strToDate(pair.getValue());
                 predicate = cb.lessThanOrEqualTo(pair.getKey(), date);
             }else {
                 predicate = cb.lessThanOrEqualTo(pair.getKey(),value);
@@ -233,7 +234,7 @@ public class URLQueryParser<T> {
             Pair<Path, String> pair = getPair(filter, "<", root);
             String value = pair.getValue();
             if(pair.getKey().getJavaType() == Date.class){
-                Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
+                Date date = DateUtil.strToDate(pair.getValue());
                 predicate = cb.lessThan(pair.getKey(), date);
             }else {
                 predicate = cb.lessThan(pair.getKey(),value);
@@ -248,7 +249,7 @@ public class URLQueryParser<T> {
                         pair.getKey().getJavaType().equals(Boolean.TYPE)) {
                     values.add(BooleanUtils.toBoolean(value));
                 } else if(pair.getKey().getJavaType() == Date.class){
-                    Date date = DateTimeUtil.utcDateTimeParse(pair.getValue());
+                    Date date = DateUtil.strToDate(pair.getValue());
                     values.add(date);
                 }else {
                     values.add(value);

@@ -3,6 +3,7 @@ package com.yihu.ehr.users.controller;
 import com.yihu.ehr.agModel.user.DoctorDetailModel;
 import com.yihu.ehr.agModel.user.DoctorsModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
@@ -90,6 +91,9 @@ public class DoctorController extends BaseController {
             switch (existenceType) {
                 case "code":
                     bo = doctorClient.isCodeExists(existenceNm);
+                    break;
+                case "idCardNo":
+                    bo = doctorClient.isCardNoExists(existenceNm);
                     break;
             }
             envelop.setSuccessFlg(bo);
@@ -263,5 +267,57 @@ public class DoctorController extends BaseController {
         mDoctor.setInsertTime(DateTimeUtil.simpleDateTimeParse(detailModel.getInsertTime()));
 
         return mDoctor;
+    }
+    @RequestMapping(value = ServiceApi.Doctors.DoctorPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在电话号码")
+    public List idExistence(
+            @ApiParam(name = "phones", value = "", defaultValue = "")
+            @RequestParam("phones") String phones) throws Exception {
+
+        List existPhones = doctorClient.idExistence(phones);
+        return existPhones;
+    }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入医生")
+    public Envelop createMetadataPatch(
+            @ApiParam(name = "doctors", value = "医生JSON", defaultValue = "")
+            @RequestParam(value = "doctors") String doctors) throws Exception {
+
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try{
+            doctorClient.createDoctorsPatch(doctors);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public Envelop isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) {
+
+        try {
+            return success(doctorClient.isExistence(filters));
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed("查询出错！");
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @ApiParam(name = "emails", value = "", defaultValue = "")
+            @RequestParam("emails") String emails) throws Exception {
+
+        List existPhones = doctorClient.emailsExistence(emails);
+        return existPhones;
     }
 }

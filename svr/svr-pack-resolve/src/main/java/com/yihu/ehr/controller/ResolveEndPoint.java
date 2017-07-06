@@ -2,28 +2,29 @@ package com.yihu.ehr.controller;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.config.MetricNames;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.feign.XDatasetPackageMgrClient;
 import com.yihu.ehr.feign.XPackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
-import com.yihu.ehr.profile.exception.LegacyPackageException;
+import com.yihu.ehr.service.resource.stage1.DatasetPackage;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage2.PackMill;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.ResourceService;
+import com.yihu.ehr.service.resource.stage2.repo.DatasetPackageRepository;
 import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.HashMapChangeSet;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,49 +35,49 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "档案资源化", description = "档案包资源化服务。在包解析完之后，资源化入库。")
 public class ResolveEndPoint {
+
     @Autowired
     ResourceService resourceService;
-
     @Autowired
     PackMill packMill;
-
     @Autowired
     FastDFSUtil fastDFSUtil;
-
     @Autowired
     private PackageResolveEngine packResolveEngine;
-
     @Autowired
     XPackageMgrClient packageMgrClient;
-
+    @Autowired
+    XDatasetPackageMgrClient datasetPackageMgrClient;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    private DatasetPackageRepository datasetPackageRepository;
 
-    @ApiOperation(value = "档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析档案包")
+    @ApiOperation(value = "健康档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析健康档案包")
     @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
     public String resolve(
-            @ApiParam(value = "id", defaultValue = "")
+            @ApiParam(value = "档案包ID", defaultValue = "")
             @RequestParam(required = false) String packageId,
             @ApiParam(value = "模拟应用ID", defaultValue = "")
             @RequestParam(required = false) String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
-            @RequestParam("echo") boolean echo) throws Throwable
-    {
+            @RequestParam("echo") boolean echo) throws Throwable {
         String packString = packageMgrClient.acquirePackage(packageId);
 
-        if(StringUtils.isEmpty(packString))
-        {
+        if (StringUtils.isEmpty(packString)) {
             throw new Exception("Package not found.");
         }
 
-        MPackage pack = objectMapper.readValue(packString,MPackage.class);  //已修改包状态为1 正在入库库
+        MPackage pack = objectMapper.readValue(packString, MPackage.class);  //已修改包状态为1 正在入库库
         String packId = pack.getId();
         try {
             long start = System.currentTimeMillis();
@@ -88,13 +89,13 @@ public class ResolveEndPoint {
             resourceService.save(resourceBucket);
 
             //回填入库状态
-            Map<String,String> map = new HashMap();
-            map.put("profileId",standardPackage.getId());
-            map.put("demographicId",standardPackage.getDemographicId());
-            map.put("eventType",String.valueOf(standardPackage.getEventType().getType()));
-            map.put("eventNo",standardPackage.getEventNo());
+            Map<String, String> map = new HashMap();
+            map.put("profileId", standardPackage.getId());
+            map.put("demographicId", standardPackage.getDemographicId());
+            map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
+            map.put("eventNo", standardPackage.getEventNo());
             map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-            map.put("patientId",standardPackage.getPatientId());
+            map.put("patientId", standardPackage.getPatientId());
 
             packageMgrClient.reportStatus(packId,
                     ArchiveStatus.Finished,
@@ -108,13 +109,124 @@ public class ResolveEndPoint {
             } else {
                 return "档案包入库成功！";
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             packageMgrClient.reportStatus(packId,
                     ArchiveStatus.Failed,
                     ex.getMessage());
             throw ex;
+        }
+    }
+
+    //new add by HZY in 2017/06/29
+    @ApiOperation(value = "健康档案-（非病人维度-数据集包入库）", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析健康档案包")
+    @RequestMapping(value = ServiceApi.Packages.PackageResolve+2, method = RequestMethod.PUT)
+    public List<String> resolveDatasetPackage(
+            @ApiParam(value = "档案包ID", defaultValue = "")
+            @RequestParam(required = false) String packageId,
+            @ApiParam(value = "模拟应用ID", defaultValue = "")
+            @RequestParam(required = false) String clientId,
+            @ApiParam(value = "返回档案数据", defaultValue = "true")
+            @RequestParam("echo") boolean echo) throws Throwable {
+        String packString = datasetPackageMgrClient.acquireDatasetPackage(packageId);
+
+        if (StringUtils.isEmpty(packString)) {
+            throw new Exception("Package not found.");
+        }
+
+        MPackage pack = objectMapper.readValue(packString, MPackage.class);  //已修改包状态为1 正在入库库
+        String packId = pack.getId();
+        try {
+            List<String> returnJson = new ArrayList<>();
+            long start = System.currentTimeMillis();
+            if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
+            String zipFile = downloadTo(pack.getRemotePath());
+
+            List<StandardPackage> standardPackages = packResolveEngine.doResolveNonArchive(pack, zipFile);
+            for (StandardPackage standardPackage : standardPackages){
+                ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
+                resourceService.save(resourceBucket);
+                String json = standardPackage.toJson();
+                returnJson.add(json);
+            }
+
+
+            //回填入库状态
+            Map<String, String> map = new HashMap();
+            map.put("profileId", standardPackages.get(0).getId());
+            map.put("demographicId", standardPackages.get(0).getDemographicId());
+            map.put("eventType", standardPackages.get(0).getEventType() == null ? "" : String.valueOf(standardPackages.get(0).getEventType().getType()));
+            map.put("eventNo", standardPackages.get(0).getEventNo());
+            map.put("eventDate", DateUtil.toStringLong(standardPackages.get(0).getEventDate()));
+            map.put("patientId", standardPackages.get(0).getPatientId());
+            datasetPackageMgrClient.reportStatus(packId,
+                    ArchiveStatus.Finished,
+                    objectMapper.writeValueAsString(map));
+
+
+            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
+
+            if (echo) {
+                return returnJson;
+            } else {
+                returnJson = new ArrayList<>();
+                returnJson.add("档案包入库成功！");
+                return returnJson;
+            }
+        } catch (Exception ex) {
+            packageMgrClient.reportStatus(packId,
+                    ArchiveStatus.Failed,
+                    ex.getMessage());
+            throw ex;
+        }
+    }
+
+    @ApiOperation(value = "数据集档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析数据集档案包")
+    @RequestMapping(value = ServiceApi.DatasetPackages.PackageResolve, method = RequestMethod.PUT)
+    public String resolveDataset(
+            @ApiParam(value = "包ID")
+            @RequestParam(required = false) String packageId,
+            @ApiParam(value = "模拟应用ID")
+            @RequestParam(required = false) String clientId,
+            @ApiParam(value = "返回档案数据", required = true)
+            @RequestParam boolean echo) throws Exception {
+
+        String packStr = datasetPackageMgrClient.acquireDatasetPackage(packageId);
+        if (StringUtils.isEmpty(packStr)) {
+            throw new Exception("没有找到ID为 [" + packageId + "] 的数据集档案包。");
+        }
+
+        MPackage pack = objectMapper.readValue(packStr, MPackage.class);
+        String packId = pack.getId();
+
+        try {
+            long start = System.currentTimeMillis();
+
+            if (StringUtils.isEmpty(pack.getClientId())) {
+                pack.setClientId(clientId);
+            }
+            String zipFile = downloadTo(pack.getRemotePath());
+
+            DatasetPackage datasetPackage = packResolveEngine.doResolveDataset(pack, zipFile);
+            datasetPackageRepository.saveDataset(datasetPackage);
+
+            // 回写入库状态
+            Map<String, String> map = new HashMap<>();
+            map.put("eventType", null);
+            map.put("eventNo", null);
+            map.put("eventDate", null);
+            map.put("patientId", null);
+            datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
+
+            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
+
+            if (echo) {
+                return datasetPackage.toJson();
+            } else {
+                return "数据集档案包入库成功！";
+            }
+        } catch (Exception e) {
+            packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+            throw e;
         }
     }
 
@@ -173,7 +285,7 @@ public class ResolveEndPoint {
         return fastDFSUtil.download(tokens[0], tokens[1], System.getProperty("java.io.tmpdir"));
     }
 
-    private MetricRegistry getMetricRegistry(){
+    private MetricRegistry getMetricRegistry() {
         return SpringContext.getService(MetricRegistry.class);
     }
 

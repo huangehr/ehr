@@ -13,6 +13,7 @@ import com.yihu.ehr.profile.feign.XTransformClient;
 import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -47,7 +48,8 @@ public class ProfileCDAService {
     @Autowired
     CdaDocumentTypeOptions cdaDocumentTypeOptions;
 
-    String appId = "svr-health-profile";
+    @Value("${spring.application.id}")
+    String appId;
 
     //event_type对应cda_code
     Map<String,String[]> eventTypeCDA = new HashMap() {
@@ -177,7 +179,7 @@ public class ProfileCDAService {
         //根据profileId或者eventNo获取主记录
         String q = "{\"q\":\"rowkey:" + profileId + "\"}";
 
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, q, 1, 1);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId,null, q, 1, 1);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(0);
             profileId = obj.get("rowkey").toString();
@@ -285,7 +287,7 @@ public class ProfileCDAService {
      */
     public Map<String, Object> getCDADocumentId(String orgCode,String eventNo, String cdaCode) throws Exception {
         Map<String, Object> re = new HashMap<>();
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"org_code:"+orgCode+"+AND+event_no:" + eventNo + "\"}", null, null);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, appId,null, "{\"q\":\"org_code:"+orgCode+"+AND+event_no:" + eventNo + "\"}", null, null);
 
         //是否有数据
         if (result.getDetailModelList() != null && result.getTotalCount() > 0) {

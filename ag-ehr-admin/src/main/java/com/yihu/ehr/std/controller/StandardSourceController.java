@@ -166,7 +166,7 @@ public class StandardSourceController extends BaseController {
         }
         if (!mStdSourceOld.getCode().equals(sourceDetailModel.getCode())
                 && stdSourcrClient.isCodeExist(sourceDetailModel.getCode())) {
-            return failed("代码已存在!");
+            return failed("编码已存在!");
         }
 
         mStdSourceOld = convertToMStdSource(sourceDetailModel);
@@ -201,7 +201,7 @@ public class StandardSourceController extends BaseController {
             return failed(errorMsg);
         }
         if (stdSourcrClient.isCodeExist(sourceDetailModel.getCode())) {
-            return failed("代码已存在!");
+            return failed("编码已存在!");
         }
 
         MStdSource mStdSource = convertToMStdSource(sourceDetailModel);

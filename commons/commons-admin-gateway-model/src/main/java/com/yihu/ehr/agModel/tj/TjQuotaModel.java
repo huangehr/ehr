@@ -11,17 +11,20 @@ public class TjQuotaModel {
     private String name;
     private String cron;
     private String execType;
-    private Date execTime;
+    private String execTime;
     private String jobClazz;
-    private Date createTime;
+    private String createTime;
     private String createUser;
     private String createUserName;
-    private Date updateTime;
+    private String updateTime;
     private String updateUser;
     private String updateUserName;
-    private String status;
+    private Integer status;
     private Integer dataLevel;
     private String remark;
+    private Integer quotaType;
+    private String quotaTypeName;
+
     private TjQuotaDataSourceModel tjQuotaDataSourceModel;
     private TjQuotaDataSaveModel tjQuotaDataSaveModel;
 
@@ -65,11 +68,11 @@ public class TjQuotaModel {
         this.execType = execType;
     }
 
-    public Date getExecTime() {
+    public String getExecTime() {
         return execTime;
     }
 
-    public void setExecTime(Date execTime) {
+    public void setExecTime(String execTime) {
         this.execTime = execTime;
     }
 
@@ -81,11 +84,11 @@ public class TjQuotaModel {
         this.jobClazz = jobClazz;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
@@ -105,11 +108,11 @@ public class TjQuotaModel {
         this.createUserName = createUserName;
     }
 
-    public Date getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -129,11 +132,11 @@ public class TjQuotaModel {
         this.updateUserName = updateUserName;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -167,5 +170,21 @@ public class TjQuotaModel {
 
     public void setTjQuotaDataSaveModel(TjQuotaDataSaveModel tjQuotaDataSaveModel) {
         this.tjQuotaDataSaveModel = tjQuotaDataSaveModel;
+    }
+
+    public Integer getQuotaType() {
+        return quotaType;
+    }
+
+    public void setQuotaType(Integer quotaType) {
+        this.quotaType = quotaType;
+    }
+
+    public String getQuotaTypeName() {
+        return quotaTypeName;
+    }
+
+    public void setQuotaTypeName(String quotaTypeName) {
+        this.quotaTypeName = quotaTypeName;
     }
 }

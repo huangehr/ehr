@@ -12,6 +12,8 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDataSourceClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +32,7 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api( value = "TjDataSource", description = "数据来源", tags = {"统计指标管理-数据来源"})
-public class TjDataSourceController extends ExtendController<TjDataSource> {
+public class TjDataSourceController extends ExtendController<TjDataSourceModel> {
     @Autowired
     TjDataSourceClient tjDataSourceClient;
     @Autowired
@@ -55,6 +58,14 @@ public class TjDataSourceController extends ExtendController<TjDataSource> {
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
                 TjDataSourceModel tjDataSourceModel = objectMapper.convertValue(map,TjDataSourceModel.class);
+                if(tjDataSourceModel.getCreateTime() != null){
+                    Date createTime = DateUtil.parseDate(tjDataSourceModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDataSourceModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+                }
+                if(tjDataSourceModel.getUpdateTime() != null){
+                    Date updateTime = DateUtil.parseDate(tjDataSourceModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDataSourceModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+                }
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getTjDataSourceTypeList(String.valueOf(tjDataSourceModel.getType()));
                 tjDataSourceModel.setTypeName(dict == null ? "" : dict.getValue());
@@ -111,14 +122,26 @@ public class TjDataSourceController extends ExtendController<TjDataSource> {
     @ApiOperation(value = "根据ID查询数据源")
     public Envelop getById(@PathVariable(value = "id") Long id) {
         try {
-            TjDataSource tjDataSource = tjDataSourceClient.getById(id);
-            if (null == tjDataSource) {
+            TjDataSourceModel tjDataSourceModel = tjDataSourceClient.getById(id);
+            if (null == tjDataSourceModel) {
                 return failed("获取数据源失败");
             }
-            return success(tjDataSource);
+            return success(tjDataSourceModel);
         } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();
         }
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDataSourceExistsName, method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(@PathVariable("name") String name) {
+        return tjDataSourceClient.hasExistsName(name);
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDataSourceExistsCode, method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(@PathVariable("code") String code) {
+        return tjDataSourceClient.hasExistsCode(code);
     }
 }

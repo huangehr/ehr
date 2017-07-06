@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    max-active: 20
+    max-idle: 8
+    min-idle: 8
+    validation-query: SELECT 1
+    test-on-borrow: true
+
+server:
+  port: ${svr-quota.server.port}
+
+management:
+  port: ${server.port}
+
+logging:
+  level:
+    com:
+      netflix: INFO
+    org:
+      springframework:
+        web: INFO
+      hibernate: ERROR
+
+---
+
+spring:
+  profiles: dev
+
+  datasource:
+    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: ha
+    password: ha
+
+---
+spring:
+  profiles: test
+
+  datasource:
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive_220?useUnicode=true&characterEncoding=UTF-8
+    username: weifuwu
+    password: weifuwu
+
+
+---
+spring:
+  profiles: prod
+
+  datasource:
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: ha
+    password: jkzlxm
+

@@ -34,8 +34,8 @@ public class EhrUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        String finalSql = "select * from users u where 1=1 and u.login_code=? ";
-        List<UserVO> users = jdbcTemplate.query(finalSql, new BeanPropertyRowMapper(UserVO.class), username);
+        String finalSql = "select * from users u where 1=1 and (u.login_code=? or u.telephone=? or u.id_card_no=?)";
+        List<UserVO> users = jdbcTemplate.query(finalSql, new BeanPropertyRowMapper(UserVO.class), username, username, username);
         if (users == null || users.size() == 0) {
             throw new UsernameNotFoundException(username);
         }

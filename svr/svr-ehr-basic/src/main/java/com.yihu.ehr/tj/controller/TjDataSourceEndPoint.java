@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,6 +71,11 @@ public class TjDataSourceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         TjDataSource obj = objectMapper.readValue(model,TjDataSource.class);
+        if(obj.getId() != null){
+            obj.setUpdateTime(new Date());
+        }else{
+            obj.setCreateTime(new Date());
+        }
         obj = tjDataSourceService.save(obj);
         return Result.success("数据源更新成功！", obj);
     }
@@ -80,7 +86,10 @@ public class TjDataSourceEndPoint extends EnvelopRestEndPoint {
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
-        tjDataSourceService.delete(id);
+//        tjDataSourceService.delete(id);
+        TjDataSource tjDataSource = tjDataSourceService.getById(id);
+        tjDataSource.setStatus(-1);
+        tjDataSourceService.save(tjDataSource);
         return Result.success("数据源删除成功！");
     }
 
@@ -91,5 +100,31 @@ public class TjDataSourceEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "id") Long id) {
         TjDataSource tjDataSource = tjDataSourceService.getById(id);
         return tjDataSource;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDataSourceExistsName, method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(
+            @ApiParam(name = "name")
+            @PathVariable("name") String name) throws Exception {
+        String filter = "name=" + name;
+        List<TjDataSource> list = tjDataSourceService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDataSourceExistsCode, method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(
+            @ApiParam(name = "code")
+            @PathVariable("code") String code) throws Exception {
+        String filter = "code=" + code;
+        List<TjDataSource> list = tjDataSourceService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
     }
 }

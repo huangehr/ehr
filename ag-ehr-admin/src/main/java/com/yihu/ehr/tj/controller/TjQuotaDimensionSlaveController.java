@@ -97,6 +97,24 @@ public class TjQuotaDimensionSlaveController extends ExtendController<TjQuotaDim
         }
     }
 
+    @RequestMapping(value = ServiceApi.TJ.AddTjQuotaDimensionSlave, method = RequestMethod.POST)
+    @ApiOperation(value = "新增从维度关联信息")
+    public Envelop addTjQuotaDimensionSlave(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam("model") String model) {
+        try {
+            ObjectResult objectResult = tjQuotaDimensionSlaveClient.addTjQuotaDimensionSlave(model);
+            if (objectResult.getCode() == 200) {
+                return successObj(objectResult.getData());
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failed(FeignExceptionUtils.getErrorMsg(e));
+        }
+    }
+
     @RequestMapping(value = ServiceApi.TJ.TjQuotaDimensionSlave, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除从维度关联信息")
     public Envelop delete(
@@ -112,6 +130,23 @@ public class TjQuotaDimensionSlaveController extends ExtendController<TjQuotaDim
         }catch (Exception e){
 
             e.printStackTrace();
+            return failed(FeignExceptionUtils.getErrorMsg(e));
+        }
+    }
+
+    @RequestMapping(value = "/tj/deleteSlaveByQuotaCode", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除统计指标从维度关联信息")
+    public Envelop deleteSlaveByQuotaCode(
+            @ApiParam(name = "quotaCode", value = "指标Id")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        try {
+            Result result = tjQuotaDimensionSlaveClient.deleteSlaveByQuotaCode(quotaCode);
+            if(result.getCode() == 200){
+                return successMsg(result.getMessage());
+            }else{
+                return failed("删除失败！");
+            }
+        }catch (Exception e){
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }

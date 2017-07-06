@@ -63,6 +63,16 @@ public class UserDetailModel {
     private String ssid;
     private String realnameFlag;
 
+    //    角色关联属性
+    private String demographicId;
+
+    public String getDemographicId() {
+        return demographicId;
+    }
+
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
 
     public int getFertilityStatus() {
         return fertilityStatus;

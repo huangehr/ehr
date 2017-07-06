@@ -36,7 +36,7 @@ public class LogController extends BaseController {
 
 
     @RequestMapping(value = "/getLogList", method = RequestMethod.GET)
-    @ApiOperation(value = "获取门户配置列表", notes = "根据查询条件获取门户配置列表在前端表格展示")
+    @ApiOperation(value = "获取业务日志列表", notes = "根据查询条件业务日志列表在前端展示")
     public Envelop getLogList(
             @ApiParam(name = "logType", value = "日志类型", defaultValue = "")
             @RequestParam(value = "logType", required = false) String logType,
@@ -55,7 +55,17 @@ public class LogController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) {
 
-        ListResult listResult = logClient.getLogs(logType,data,startDate,endDate,caller, sorts, size, page);
+        ListResult listResult = null;
+        if(logType !=null){
+            if(logType.equals("1")){
+                listResult = logClient.getOperatorLogs(data, startDate, endDate, caller, sorts, size, page);
+            }else if(logType.equals("2")){
+                listResult = logClient.getBussinessLogs(data, startDate, endDate, caller, sorts, size, page);
+            }
+        }else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
         if(listResult.getTotalCount() != 0){
             List<Map<String,Object>> list = listResult.getDetailModelList();
             return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
@@ -64,6 +74,8 @@ public class LogController extends BaseController {
             return envelop;
         }
     }
+
+
 
 }
 

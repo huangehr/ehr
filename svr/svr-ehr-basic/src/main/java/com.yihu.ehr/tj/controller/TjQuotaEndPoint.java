@@ -4,14 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.entity.tj.TjQuota;
-import com.yihu.ehr.entity.tj.TjQuotaDataSave;
-import com.yihu.ehr.entity.tj.TjQuotaDataSource;
+import com.yihu.ehr.entity.tj.*;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.tj.MTjQuotaDataSaveModel;
+import com.yihu.ehr.model.tj.MTjQuotaDataSourceModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
-import com.yihu.ehr.tj.service.TjQuotaService;
+import com.yihu.ehr.tj.service.*;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,6 +37,14 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     ObjectMapper objectMapper;
     @Autowired
     TjQuotaService tjQuotaService;
+    @Autowired
+    TjQuotaDataSaveService tjQuotaDataSaveService;
+    @Autowired
+    TjQuotaDataSourceService tjQuotaDataSourceService;
+    @Autowired
+    TjDataSaveService tjDataSaveService;
+    @Autowired
+    TjDataSourceService tjDataSourceService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询统计表")
@@ -73,11 +84,16 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
-        TjQuotaDataSource tjquotaDataSource = convertToModel(tjQuotaModel.getTjquotaDataSourceModel(), TjQuotaDataSource.class);
+        TjQuotaDataSource tjquotaDataSource = convertToModel(tjQuotaModel.getTjQuotaDataSourceModel(), TjQuotaDataSource.class);
         TjQuotaDataSave tjQuotaDataSave = convertToModel(tjQuotaModel.getTjQuotaDataSaveModel(), TjQuotaDataSave.class);
         tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
         tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
         TjQuota tjQuota = convertToModel(tjQuotaModel, TjQuota.class);
+        if (tjQuotaModel.getId() != null) {
+            tjQuota.setUpdateTime(new Date());
+        } else{
+            tjQuota.setCreateTime(new Date());
+        }
         tjQuotaService.saves(tjQuota, tjquotaDataSource, tjQuotaDataSave);
         return Result.success("统计表更新成功！", tjQuotaModel);
     }
@@ -88,16 +104,90 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
-        tjQuotaService.delete(id);
+//        tjQuotaService.delete(id);
+        TjQuota tjQuota = tjQuotaService.getById(id);
+        tjQuota.setStatus(-1);
+        tjQuotaService.save(tjQuota);
         return Result.success("统计表删除成功！");
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaById, method = RequestMethod.GET)
     @ApiOperation(value = "根据ID获取指标")
-    public TjQuota getById(
+    public MTjQuotaModel getById(
             @ApiParam(name = "id")
             @PathVariable(value = "id") Long id) {
         TjQuota tjQuota = tjQuotaService.getById(id);
-        return tjQuota;
+        MTjQuotaModel mTjQuotaModel = null;
+        if (null != tjQuota) {
+            mTjQuotaModel = convertToModel(tjQuota, MTjQuotaModel.class);
+            if(tjQuota.getExecTime() != null){
+                mTjQuotaModel.setExecTime(DateUtil.toStringLong(tjQuota.getExecTime()));
+            }
+            if(tjQuota.getCreateTime() != null){
+                mTjQuotaModel.setCreateTime(DateUtil.toStringLong(tjQuota.getCreateTime()));
+            }
+            if(tjQuota.getUpdateTime() != null){
+                mTjQuotaModel.setUpdateTime(DateUtil.toStringLong(tjQuota.getUpdateTime()));
+            }
+            TjQuotaDataSave tjQuotaDataSave = tjQuotaDataSaveService.getByQuotaCode(tjQuota.getCode());
+            TjQuotaDataSource tjQuotaDataSource = tjQuotaDataSourceService.getByQuotaCode(tjQuota.getCode());
+            MTjQuotaDataSaveModel mTjQuotaDataSaveModel = new MTjQuotaDataSaveModel();
+            MTjQuotaDataSourceModel mTjQuotaDataSourceModel = new MTjQuotaDataSourceModel();
+            if (tjQuotaDataSave != null) {
+                TjDataSave tjDataSave = tjDataSaveService.getByCode(tjQuotaDataSave.getSaveCode());
+                mTjQuotaDataSaveModel.setId(tjQuotaDataSave.getId());
+                mTjQuotaDataSaveModel.setSaveCode(tjQuotaDataSave.getSaveCode());
+                mTjQuotaDataSaveModel.setQuotaCode(tjQuotaDataSave.getQuotaCode());
+                mTjQuotaDataSaveModel.setConfigJson(tjQuotaDataSave.getConfigJson());
+                mTjQuotaDataSaveModel.setName(tjDataSave.getName());
+            }
+            if (tjQuotaDataSource != null) {
+                TjDataSource tjDataSource = tjDataSourceService.getByCode(tjQuotaDataSource.getSourceCode());
+                mTjQuotaDataSourceModel.setId(tjQuotaDataSource.getId());
+                mTjQuotaDataSourceModel.setQuotaCode(tjQuotaDataSource.getQuotaCode());
+                mTjQuotaDataSourceModel.setSourceCode(tjQuotaDataSource.getSourceCode());
+                mTjQuotaDataSourceModel.setConfigJson(tjQuotaDataSource.getConfigJson());
+                mTjQuotaDataSourceModel.setName(tjDataSource.getName());
+            }
+            mTjQuotaModel.setTjQuotaDataSaveModel(mTjQuotaDataSaveModel);
+            mTjQuotaModel.setTjQuotaDataSourceModel(mTjQuotaDataSourceModel);
+        }
+        return mTjQuotaModel;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsName, method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(
+            @ApiParam(name = "name")
+            @PathVariable("name") String name) throws Exception {
+        String filter = "name=" + name;
+        List<TjQuota> list = tjQuotaService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsCode, method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(
+            @ApiParam(name = "code")
+            @PathVariable("code") String code) throws Exception {
+        String filter = "code=" + code;
+        List<TjQuota> list = tjQuotaService.search(filter);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaByCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据Code获取指标")
+    public MTjQuotaModel getByCode(
+            @ApiParam(name = "code")
+            @RequestParam(value = "code") String code) {
+        TjQuota tjQuota = tjQuotaService.findByCode(code);
+        MTjQuotaModel mTjQuotaModel = convertToModel(tjQuota, MTjQuotaModel.class);
+        return mTjQuotaModel;
     }
 }

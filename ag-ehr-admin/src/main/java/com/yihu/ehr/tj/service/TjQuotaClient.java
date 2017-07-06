@@ -1,5 +1,6 @@
 package com.yihu.ehr.tj.service;
 
+import com.yihu.ehr.agModel.tj.TjQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -7,6 +8,7 @@ import com.yihu.ehr.entity.tj.TjQuota;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.tj.MTjQuotaModel;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
@@ -39,5 +41,13 @@ public interface TjQuotaClient {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaById, method = RequestMethod.GET)
     @ApiOperation(value = "根据ID查询指标")
-    TjQuota getById(@PathVariable(value = "id") Long id);
+    MTjQuotaModel getById(@PathVariable(value = "id") Long id);
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsName, method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    boolean hasExistsName(@PathVariable("name") String name);
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsCode, method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    boolean hasExistsCode(@PathVariable("code") String code);
 }

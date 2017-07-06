@@ -11,19 +11,40 @@ public class MTjQuotaModel {
     private String name;
     private String cron;
     private String execType;
-    private Date execTime;
+    private String execTime;
     private String jobClazz;
-    private Date createTime;
+    private String createTime;
     private String createUser;
     private String createUserName;
-    private Date updateTime;
+    private String updateTime;
     private String updateUser;
     private String updateUserName;
-    private String status;
+    private Integer status;
     private Integer dataLevel;
     private String remark;
-    private MTjQuotaDataSourceModel tjquotaDataSourceModel;
+    private MTjQuotaDataSourceModel tjQuotaDataSourceModel;
     private MTjQuotaDataSaveModel tjQuotaDataSaveModel;
+    private String execTypeName;
+    private String statusName;
+    private String dataLevelName;
+    private Integer quotaType;
+    private String quotaTypeName;
+
+    public String getQuotaTypeName() {
+        return quotaTypeName;
+    }
+
+    public void setQuotaTypeName(String quotaTypeName) {
+        this.quotaTypeName = quotaTypeName;
+    }
+
+    public Integer getQuotaType() {
+        return quotaType;
+    }
+
+    public void setQuotaType(Integer quotaType) {
+        this.quotaType = quotaType;
+    }
 
     public Long getId() {
         return id;
@@ -65,11 +86,11 @@ public class MTjQuotaModel {
         this.execType = execType;
     }
 
-    public Date getExecTime() {
+    public String getExecTime() {
         return execTime;
     }
 
-    public void setExecTime(Date execTime) {
+    public void setExecTime(String execTime) {
         this.execTime = execTime;
     }
 
@@ -81,11 +102,11 @@ public class MTjQuotaModel {
         this.jobClazz = jobClazz;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
@@ -105,11 +126,11 @@ public class MTjQuotaModel {
         this.createUserName = createUserName;
     }
 
-    public Date getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -129,11 +150,11 @@ public class MTjQuotaModel {
         this.updateUserName = updateUserName;
     }
 
-    public String getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -153,12 +174,12 @@ public class MTjQuotaModel {
         this.remark = remark;
     }
 
-    public MTjQuotaDataSourceModel getTjquotaDataSourceModel() {
-        return tjquotaDataSourceModel;
+    public MTjQuotaDataSourceModel getTjQuotaDataSourceModel() {
+        return tjQuotaDataSourceModel;
     }
 
-    public void setTjquotaDataSourceModel(MTjQuotaDataSourceModel tjquotaDataSourceModel) {
-        this.tjquotaDataSourceModel = tjquotaDataSourceModel;
+    public void setTjQuotaDataSourceModel(MTjQuotaDataSourceModel tjQuotaDataSourceModel) {
+        this.tjQuotaDataSourceModel = tjQuotaDataSourceModel;
     }
 
     public MTjQuotaDataSaveModel getTjQuotaDataSaveModel() {
@@ -168,4 +189,30 @@ public class MTjQuotaModel {
     public void setTjQuotaDataSaveModel(MTjQuotaDataSaveModel tjQuotaDataSaveModel) {
         this.tjQuotaDataSaveModel = tjQuotaDataSaveModel;
     }
+
+    public String getExecTypeName() {
+        return execTypeName;
+    }
+
+    public void setExecTypeName(String execTypeName) {
+        this.execTypeName = execTypeName;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public String getDataLevelName() {
+        return dataLevelName;
+    }
+
+    public void setDataLevelName(String dataLevelName) {
+        this.dataLevelName = dataLevelName;
+    }
+
+
 }

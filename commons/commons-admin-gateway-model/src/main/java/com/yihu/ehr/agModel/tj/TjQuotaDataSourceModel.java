@@ -8,6 +8,7 @@ public class TjQuotaDataSourceModel {
     private String quotaCode;
     private String sourceCode;
     private String configJson;
+    private String name;
 
     public Long getId() {
         return id;
@@ -39,5 +40,13 @@ public class TjQuotaDataSourceModel {
 
     public void setConfigJson(String configJson) {
         this.configJson = configJson;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

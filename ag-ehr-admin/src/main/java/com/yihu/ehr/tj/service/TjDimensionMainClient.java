@@ -39,7 +39,7 @@ public interface TjDimensionMainClient {
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMain, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除主维度")
-    Result delete(@RequestParam(value = "id") String id);
+    Result delete(@RequestParam(value = "id") Long id);
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMainId, method = RequestMethod.GET)
     @ApiOperation(value = "获取主维度信息", notes = "通知主维度信息")
@@ -47,7 +47,10 @@ public interface TjDimensionMainClient {
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMainCode, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据Code获取主维度")
-    public TjDimensionMain getTjDimensionMain(
-            @RequestParam(value = "code") String code);
+    public TjDimensionMain getTjDimensionMain(  @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainName,method = RequestMethod.GET)
+    @ApiOperation(value = "验证名称是否存在")
+    public boolean isNameExists( @RequestParam(value = "name") String name);
 
 }

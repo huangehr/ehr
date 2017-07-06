@@ -12,7 +12,7 @@ import java.util.Date;
 public class TjDimensionSlaveModel {
 
 
-    private long id;
+    private Long id;
     private String code;  //业务代码
     private String name; //从维度名称
     private String type;//类型:1 性别 2 年龄
@@ -20,18 +20,19 @@ public class TjDimensionSlaveModel {
     private String statusName;
     private Integer status;//1: 正常 0：不可以用 -1 已删除'
     private String remark;//备注
-    private Date createTime;//创建时间
+    private String createTime;//创建时间
     private String createUser;//创建人
     private String createUserName;//创建人名
-    private Date updateTime;//修改时间
+    private String updateTime;//修改时间
     private String updateUser;//修改人
     private String updateUserName;//修改人名
+    private boolean checked; //是否已选中
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -91,11 +92,11 @@ public class TjDimensionSlaveModel {
         this.remark = remark;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
@@ -115,11 +116,11 @@ public class TjDimensionSlaveModel {
         this.createUserName = createUserName;
     }
 
-    public Date getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -137,5 +138,13 @@ public class TjDimensionSlaveModel {
 
     public void setUpdateUserName(String updateUserName) {
         this.updateUserName = updateUserName;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 }

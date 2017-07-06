@@ -2,6 +2,7 @@ package com.yihu.ehr.tj.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.tj.TjDataSaveModel;
+import com.yihu.ehr.agModel.tj.TjDataSourceModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.tj.TjDataSave;
@@ -12,6 +13,8 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.tj.service.TjDataSaveClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +33,7 @@ import java.util.Map;
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api( value = "TjDataSave", description = "数据存储", tags = {"统计指标管理-数据存储"})
-public class TjDataSaveController extends ExtendController<TjDataSave> {
+public class TjDataSaveController extends ExtendController<TjDataSaveModel> {
     @Autowired
     TjDataSaveClient tjDataSaveClient;
     @Autowired
@@ -56,6 +60,14 @@ public class TjDataSaveController extends ExtendController<TjDataSave> {
             List<Map<String,Object>> modelList = listResult.getDetailModelList();
             for(Map<String,Object> map : modelList){
                 TjDataSaveModel tjDataSaveModel = objectMapper.convertValue(map,TjDataSaveModel.class);
+                if(tjDataSaveModel.getCreateTime() != null){
+                    Date createTime = DateUtil.parseDate(tjDataSaveModel.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDataSaveModel.setCreateTime( DateTimeUtil.simpleDateTimeFormat(createTime));
+                }
+                if(tjDataSaveModel.getUpdateTime() != null){
+                    Date updateTime = DateUtil.parseDate(tjDataSaveModel.getUpdateTime(),"yyyy-MM-dd'T'HH:mm:ss'Z'Z");
+                    tjDataSaveModel.setUpdateTime( DateTimeUtil.simpleDateTimeFormat(updateTime));
+                }
                 //获取类别字典
                 MConventionalDict dict = conventionalDictClient.getTjDataSaveTypeList(String.valueOf(tjDataSaveModel.getType()));
                 tjDataSaveModel.setTypeName(dict == null ? "" : dict.getValue());
@@ -111,14 +123,26 @@ public class TjDataSaveController extends ExtendController<TjDataSave> {
     @ApiOperation(value = "根据ID查询数据存储")
     public Envelop getById(@PathVariable(value = "id") Long id) {
         try {
-            TjDataSave tjDataSave = tjDataSaveClient.getById(id);
-            if (null == tjDataSave) {
+            TjDataSaveModel tjDataSaveModel = tjDataSaveClient.getById(id);
+            if (null == tjDataSaveModel) {
                 return failed("获取数据存储失败");
             }
-            return success(tjDataSave);
+            return success(tjDataSaveModel);
         } catch (Exception e) {
             e.printStackTrace();
             return failedSystem();
         }
+    }
+
+    @RequestMapping(value = "/tj/dataSaveExistsName/{name}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验name是否存在")
+    public boolean hasExistsName(@PathVariable("name") String name) {
+        return tjDataSaveClient.hasExistsName(name);
+    }
+
+    @RequestMapping(value = "/tj/dataSaveExistsCode/{code}", method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasExistsCode(@PathVariable("code") String code) {
+        return tjDataSaveClient.hasExistsCode(code);
     }
 }

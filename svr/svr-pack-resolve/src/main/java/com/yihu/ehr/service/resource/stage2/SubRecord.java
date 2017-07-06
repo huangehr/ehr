@@ -45,4 +45,10 @@ public class SubRecord extends ResourceRecord {
     public void setRowkey(String profileId, String dataSetCode, int index){
         rowkey = String.format(RowKeyFormat, profileId, dataSetCode, index);
     }
+
+    // 非档案类型使用
+    public void setRowkey(String profileId, String dataSetCode, String pk){
+        rowkey = String.format(RowKeyFormat, profileId, dataSetCode, pk);
+    }
+
 }

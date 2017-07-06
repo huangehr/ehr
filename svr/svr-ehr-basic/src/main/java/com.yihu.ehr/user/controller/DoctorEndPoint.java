@@ -1,15 +1,19 @@
 package com.yihu.ehr.user.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.user.entity.Doctors;
+import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.user.service.DoctorService;
+import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +24,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 2017-02-04 add  by hzp
@@ -31,6 +36,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     DoctorService doctorService;
+    @Autowired
+    private UserManager userManager;
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.GET)
     @ApiOperation(value = "获取医生列表", notes = "根据查询条件获取医生列表在前端表格展示")
@@ -117,4 +124,91 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
+    @RequestMapping(value = ServiceApi.Doctors.DoctorPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在电话号码")
+    public List idExistence(
+            @ApiParam(name="phones",value="phones",defaultValue = "")
+            @RequestBody String phones) throws Exception {
+
+        List existPhones = doctorService.idExist(toEntity(phones, String[].class));
+        return existPhones;
+    }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorBatch,method = RequestMethod.POST)
+    @ApiOperation("批量导入医生")
+    public boolean createDoctorsPatch(
+            @ApiParam(name="doctors",value="医生JSON",defaultValue = "")
+            @RequestBody String doctors) throws Exception
+    {
+        List models = objectMapper.readValue(doctors, new TypeReference<List>() {});
+        String phones=doctorService.addDoctorBatch(models);
+        List list =new ArrayList<>();
+        if(!"".equals(phones)){
+            phones="["+phones.substring(0,phones.length()-1)+"]";
+             list = doctorService.getIdByPhone(toEntity(phones, String[].class));
+        }
+        List<Doctors> existPhonesList=new ArrayList<Doctors>();
+        Doctors d;
+        for(int i = 0 ;i < list.size() ; i++){
+           Object[] objectList=(Object[])list.get(i);
+          if(null!=objectList){
+            d=new Doctors();
+              //INSERT INTO users(login_code, real_name, gender, tech_title, email, telephone, password,doctor_id
+              d.setId(Long.parseLong(objectList[0].toString()) );
+              d.setName(objectList[3].toString());
+              d.setCode(objectList[2].toString());
+              d.setSex(objectList[5].toString());
+              d.setSkill(objectList[7].toString());
+              d.setEmail(objectList[9].toString());
+              d.setPhone(objectList[10].toString());
+              d.setIdCardNo(objectList[22].toString());
+              //根据身份证和电话号码，判断账户表中是否存在该用户。若存在 将用户表与医生表关联；若不存在，为该医生初始化账户。
+              StringBuffer stringBuffer = new StringBuffer();
+              stringBuffer.append("idCardNo=" + d.getIdCardNo()+ ";");
+              stringBuffer.append("telephone=" + d.getPhone()+ ";");
+              String filters = stringBuffer.toString();
+              List<User> userList = userManager.search("", filters, "", 1, 1);
+              //若存在 将用户表与医生表关联
+              if(null!=userList&&userList.size()>0){
+                  for(User user:userList){
+                      user.setDoctorId(String.valueOf(d.getId()));
+                      userManager.saveUser(user);
+                  }
+              }else{
+                  //若不存在，为该医生初始化账户。
+                  existPhonesList.add(d);
+              }
+          }
+        }
+        if(null!=existPhonesList&&existPhonesList.size()>0){
+            userManager.addUserBatch(existPhonesList);
+        }
+        return true;
+    }
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    public boolean isExistence(
+            @ApiParam(name="filters",value="filters",defaultValue = "")
+            @RequestParam(value="filters") String filters) throws Exception {
+
+        List<Doctors> doctor = doctorService.search("",filters,"", 1, 1);
+        return doctor!=null && doctor.size()>0;
+    }
+    @RequestMapping(value = ServiceApi.Doctors.DoctorEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @ApiParam(name="emails",value="emails",defaultValue = "")
+            @RequestBody String emails) throws Exception {
+
+        List existPhones = doctorService.emailsExistence(toEntity(emails, String[].class));
+        return existPhones;
+    }
+    @RequestMapping(value = ServiceApi.Doctors.DoctorsIdCardNoExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断身份证号码是否存在")
+    public boolean isCardNoExists(
+            @ApiParam(name = "idCardNo", value = "身份证号码", defaultValue = "")
+            @PathVariable(value = "idCardNo") String idCardNo) {
+        return doctorService.getByIdCardNo(idCardNo) != null;
+    }
 }

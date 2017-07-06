@@ -24,6 +24,9 @@ public class MOrgDeptDetail {
     private Integer typeId;
     private Timestamp insertTime;
     private Timestamp updateTime;
+    private String displayStatusName;
+    private String pyCodeName;
+    private String gloryName;
 
     public int getId() {
         return id;
@@ -151,5 +154,29 @@ public class MOrgDeptDetail {
 
     public void setUpdateTime(Timestamp updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getDisplayStatusName() {
+        return displayStatusName;
+    }
+
+    public void setDisplayStatusName(String displayStatusName) {
+        this.displayStatusName = displayStatusName;
+    }
+
+    public String getPyCodeName() {
+        return pyCodeName;
+    }
+
+    public void setPyCodeName(String pyCodeName) {
+        this.pyCodeName = pyCodeName;
+    }
+
+    public String getGloryName() {
+        return gloryName;
+    }
+
+    public void setGloryName(String gloryName) {
+        this.gloryName = gloryName;
     }
 }
