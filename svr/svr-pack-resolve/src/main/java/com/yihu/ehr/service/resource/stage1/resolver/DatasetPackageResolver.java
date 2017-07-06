@@ -8,7 +8,7 @@ import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.service.resource.stage1.DatasetPackage;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
-import com.yihu.ehr.util.PackResolveLog;
+import com.yihu.ehr.util.PackResolveLogger;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import static com.yihu.ehr.util.datetime.DateTimeUtil.simpleDateTimeParse;
 
 /**
  * 数据集档案包解析器.
@@ -198,7 +196,7 @@ public class DatasetPackageResolver extends PackageResolver {
                 }
 
                 logDataNode.set("target_id", logDataTargetIdNode);
-                PackResolveLog.info("", logDataNode);
+                PackResolveLogger.info("", logDataNode);
 
                 int hasRecordSqlLen = hasRecordSql.length();
                 hasRecordSql.delete(hasRecordSqlLen - 4, hasRecordSqlLen);
