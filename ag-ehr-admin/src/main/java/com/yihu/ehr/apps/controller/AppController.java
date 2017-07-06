@@ -2,9 +2,6 @@ package com.yihu.ehr.apps.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
-import com.yihu.ehr.agModel.dict.SystemDictModel;
-import com.yihu.ehr.agModel.user.UserDetailModel;
-import com.yihu.ehr.apps.service.UserAppClient;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppApiClient;
 import com.yihu.ehr.model.app.MAppApi;
@@ -40,11 +37,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 
 /**
@@ -75,8 +67,6 @@ public class AppController extends BaseController {
     private AppApiClient appApiClient;
     @Autowired
     private SystemDictClient systemDictClient;
-    @Autowired
-    private UserAppClient userAppClient;
 
 
     @RequestMapping(value = "test", method = RequestMethod.GET)
