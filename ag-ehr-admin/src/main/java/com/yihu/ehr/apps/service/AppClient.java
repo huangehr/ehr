@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.app.MUserApp;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -89,5 +90,13 @@ public interface AppClient {
     boolean isExitApp(
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
             @RequestParam(value = "filters") String filters);
+
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Apps.getAppTreeByType, method = RequestMethod.GET)
+    @ApiOperation(value = "根据appid获取App列表")
+    Collection<MApp>  getAppsByUserIdAndCatalog(
+            @ApiParam(name = "userId", value = "userId")
+            @RequestParam(value = "userId", required = true) String userId ,
+            @ApiParam(name = "catalog", value = "catalog")
+            @RequestParam(value = "catalog", required = true) String catalog);
 
 }

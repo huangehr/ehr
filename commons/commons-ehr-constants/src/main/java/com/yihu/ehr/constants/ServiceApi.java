@@ -237,6 +237,7 @@ public class ServiceApi {
         public static final String AppStatus = "/apps/{app_id}/status";
         public static final String AppNameExistence = "/app/{app_name}/existence";
         public static final String FilterList = "/apps/filterList";
+        public static final String getAppTreeByType = "/getAppTreeByType";
     }
 
     public static class AppApi {
@@ -268,6 +269,7 @@ public class ServiceApi {
     public static class UserApp {
         public static final String UserAppList = "/userAppList";
         public static final String UserAppShow = "/userApp/show";
+        public static final String GetUserAppListById = "/userApp/getUserAppByAppId";
     }
 
 
