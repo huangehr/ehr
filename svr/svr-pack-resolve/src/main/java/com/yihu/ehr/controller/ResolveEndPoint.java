@@ -35,7 +35,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -63,7 +65,7 @@ public class ResolveEndPoint {
     @ApiOperation(value = "健康档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析健康档案包")
     @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
     public String resolve(
-            @ApiParam(value = "id", defaultValue = "")
+            @ApiParam(value = "档案包ID", defaultValue = "")
             @RequestParam(required = false) String packageId,
             @ApiParam(value = "模拟应用ID", defaultValue = "")
             @RequestParam(required = false) String clientId,
@@ -118,14 +120,14 @@ public class ResolveEndPoint {
     //new add by HZY in 2017/06/29
     @ApiOperation(value = "健康档案-（非病人维度-数据集包入库）", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析健康档案包")
     @RequestMapping(value = ServiceApi.Packages.PackageResolve+2, method = RequestMethod.PUT)
-    public String resolveDatasetPackage(
-            @ApiParam(value = "id", defaultValue = "")
+    public List<String> resolveDatasetPackage(
+            @ApiParam(value = "档案包ID", defaultValue = "")
             @RequestParam(required = false) String packageId,
             @ApiParam(value = "模拟应用ID", defaultValue = "")
             @RequestParam(required = false) String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
             @RequestParam("echo") boolean echo) throws Throwable {
-        String packString = packageMgrClient.acquirePackage(packageId);
+        String packString = datasetPackageMgrClient.acquireDatasetPackage(packageId);
 
         if (StringUtils.isEmpty(packString)) {
             throw new Exception("Package not found.");
@@ -134,24 +136,29 @@ public class ResolveEndPoint {
         MPackage pack = objectMapper.readValue(packString, MPackage.class);  //已修改包状态为1 正在入库库
         String packId = pack.getId();
         try {
+            List<String> returnJson = new ArrayList<>();
             long start = System.currentTimeMillis();
             if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
             String zipFile = downloadTo(pack.getRemotePath());
 
-            StandardPackage standardPackage = packResolveEngine.doResolve(pack, zipFile);
-            ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
-            resourceService.save(resourceBucket);
+            List<StandardPackage> standardPackages = packResolveEngine.doResolveNonArchive(pack, zipFile);
+            for (StandardPackage standardPackage : standardPackages){
+                ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
+                resourceService.save(resourceBucket);
+                String json = standardPackage.toJson();
+                returnJson.add(json);
+            }
+
 
             //回填入库状态
             Map<String, String> map = new HashMap();
-            map.put("profileId", standardPackage.getId());
-            map.put("demographicId", standardPackage.getDemographicId());
-            map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
-            map.put("eventNo", standardPackage.getEventNo());
-            map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-            map.put("patientId", standardPackage.getPatientId());
-
-            packageMgrClient.reportStatus(packId,
+            map.put("profileId", standardPackages.get(0).getId());
+            map.put("demographicId", standardPackages.get(0).getDemographicId());
+            map.put("eventType", standardPackages.get(0).getEventType() == null ? "" : String.valueOf(standardPackages.get(0).getEventType().getType()));
+            map.put("eventNo", standardPackages.get(0).getEventNo());
+            map.put("eventDate", DateUtil.toStringLong(standardPackages.get(0).getEventDate()));
+            map.put("patientId", standardPackages.get(0).getPatientId());
+            datasetPackageMgrClient.reportStatus(packId,
                     ArchiveStatus.Finished,
                     objectMapper.writeValueAsString(map));
 
@@ -159,14 +166,17 @@ public class ResolveEndPoint {
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
             if (echo) {
-                return standardPackage.toJson();
+                return returnJson;
             } else {
-                return "档案包入库成功！";
+                returnJson = new ArrayList<>();
+                returnJson.add("档案包入库成功！");
+                return returnJson;
             }
         } catch (Exception ex) {
             packageMgrClient.reportStatus(packId,
                     ArchiveStatus.Failed,
                     ex.getMessage());
+            ex.printStackTrace();
             throw ex;
         }
     }
@@ -175,15 +185,15 @@ public class ResolveEndPoint {
     @RequestMapping(value = ServiceApi.DatasetPackages.PackageResolve, method = RequestMethod.PUT)
     public String resolveDataset(
             @ApiParam(value = "数据集ID")
-            @RequestParam(required = false) String datasetId,
+            @RequestParam(required = false) String packageId,
             @ApiParam(value = "模拟应用ID")
             @RequestParam(required = false) String clientId,
             @ApiParam(value = "返回档案数据", required = true)
             @RequestParam boolean echo) throws Exception {
 
-        String packStr = datasetPackageMgrClient.acquireDatasetPackage(datasetId);
+        String packStr = datasetPackageMgrClient.acquireDatasetPackage(packageId);
         if (StringUtils.isEmpty(packStr)) {
-            throw new Exception("没有找到ID为 [" + datasetId + "] 的数据集档案包。");
+            throw new Exception("没有找到ID为 [" + packageId + "] 的数据集档案包。");
         }
 
         MPackage pack = objectMapper.readValue(packStr, MPackage.class);

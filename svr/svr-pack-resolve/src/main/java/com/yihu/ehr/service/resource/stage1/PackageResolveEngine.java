@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.yihu.ehr.constants.ProfileType.*;
@@ -84,6 +85,32 @@ public class PackageResolveEngine {
     }
 
     /**
+     *  非档案类型的病人数据解析入库流程
+     *  1.归档包保存某个数据集的相关数据，获取归档包并解析
+     *  2. 对关联字典的数据元进行标准化，将字典的值直接写入数据
+     *  3. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finis
+     * @param pack
+     * @param zipFile
+     * @return
+     * @throws Exception
+     */
+    public List<StandardPackage> doResolveNonArchive(MPackage pack, String zipFile) throws Exception {
+        File root = null;
+        try {
+            root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
+            if (root == null || !root.isDirectory() || root.list().length == 0) {
+                throw new RuntimeException("Invalid package file, package id: " + pack.getId());
+            }
+            PackageResolver packageResolver = packageResolvers.get(ProfileType.Dataset);
+            List<StandardPackage> standardPackages = packageResolver.resolveDataSets(root,pack.getClientId());
+            //profile.determineEventType();
+            return standardPackages;
+        } finally {
+            houseKeep(zipFile, root);
+        }
+    }
+
+    /**
      * 执行归档流程。
      * 将数据集档案包解析，转换成 insert sql，后续批量保存到标准的对应表中。
      *
@@ -102,7 +129,7 @@ public class PackageResolveEngine {
 
             DatasetPackage profile = (DatasetPackage) PackModelFactory.createPackModel(root);
             PackageResolver packageResolver = packageResolvers.get(ProfileType.Dataset);
-            packageResolver.resolveDataSet(profile, root);
+            packageResolver.resolve(profile, root);
             profile.setClientId(pack.getClientId());
 
             return profile;

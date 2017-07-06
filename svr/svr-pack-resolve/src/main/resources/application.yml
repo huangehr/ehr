@@ -105,7 +105,7 @@ ehr:
       meta-data:
         - card-no: CARD_NO #就诊卡号
         - card-type: CARD_TYPE  #就诊卡类型
-  eventIndex:
+  eventIndex: #病人事件索引信息
     patientId:
       - PATIENT_ID
     eventNo:

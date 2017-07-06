@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * 轻量级档案包解析器.
@@ -24,9 +25,11 @@ import java.util.Iterator;
  */
 @Component
 public class LinkPackageResolver extends PackageResolver {
-    @Override
-    public void resolveDataSet(StandardPackage profile, File root) throws Exception {
 
+
+    @Override
+    public List<StandardPackage> resolveDataSets(File root,String clinetId) throws Exception {
+        return null;
     }
 
     @Override
