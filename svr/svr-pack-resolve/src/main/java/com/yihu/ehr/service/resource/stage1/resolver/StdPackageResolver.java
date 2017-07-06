@@ -25,9 +25,11 @@ import java.util.Map;
  */
 @Component
 public class StdPackageResolver extends PackageResolver {
-    @Override
-    public void resolveDataSet(StandardPackage profile, File root) throws Exception {
 
+
+    @Override
+    public List<StandardPackage> resolveDataSets(File root,String clinetId) throws Exception {
+        return null;
     }
 
     @Override

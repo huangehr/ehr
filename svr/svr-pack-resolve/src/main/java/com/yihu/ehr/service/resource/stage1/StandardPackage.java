@@ -270,5 +270,39 @@ public class StandardPackage {
         }
     }
 
+    //非档案类型 rowKey获取
+    public String getNonArchiveProfileId(String dataSetCode) {
+        if (profileId == null) {
+            if (StringUtils.isEmpty(orgCode)) {
+                throw new IllegalArgumentException("Build profile id failed, organization code is empty.");
+            }
+
+            if (StringUtils.isEmpty(eventNo) && !"HDSA00_01".equals(dataSetCode)) {
+                throw new IllegalArgumentException("Build profile id failed, eventNo is empty.");
+            }
+
+            if (StringUtils.isEmpty(patientId) ) {
+                throw new IllegalArgumentException("Build profile id failed, patientId is empty.\"");
+            }
+
+            this.profileId = ProfileId.get(orgCode, patientId, eventNo);
+        }
+
+        return profileId.toString();
+    }
+
+    //非档案类型rowKey更新
+    public void regularNonArchiveRowKey() {
+        for (String dataSetCode : dataSets.keySet()) {
+            PackageDataSet dataSet = dataSets.get(dataSetCode);
+
+            int rowIndex = 0;
+            String sortFormat = dataSet.getRecordCount() > 10 ? "%s$%03d" : "%s$%1d";
+            String[] rowKeys = dataSet.getRecordKeys().toArray(new String[dataSet.getRecordCount()]);
+            for (String rowKey : rowKeys) {
+                dataSet.updateRecordKey(rowKey, String.format(sortFormat, getNonArchiveProfileId(dataSetCode), rowIndex++));
+            }
+        }
+    }
 
 }

@@ -33,7 +33,7 @@ public class RelationRepository {
             relation.setCardNo(resourceBucket.getCardId());
             relation.setEventNo(resourceBucket.getEventNo());
             relation.setEventDate(resourceBucket.getEventDate());
-            relation.setEventType(String.valueOf(resourceBucket.getEventType().getType()));
+            relation.setEventType(StringUtils.isEmpty(resourceBucket.getEventType()) ? "" : String.valueOf(resourceBucket.getEventType().getType()));
             relation.setProfileId(resourceBucket.getId());
             relation.setCreateDate(new Date());
 
@@ -50,6 +50,7 @@ public class RelationRepository {
         }
         catch (Exception ex)
         {
+            ex.printStackTrace();
             System.out.print("Create relation fail!"+ex.getMessage());
         }
     }

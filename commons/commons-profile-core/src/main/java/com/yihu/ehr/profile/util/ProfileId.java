@@ -38,7 +38,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
     private final static Pattern Pattern = java.util.regex.Pattern.compile("([\\da-zA-Z\\-]+)_([\\da-zA-Z\\-]+)_(\\d+)");
 
     private final String orgCode;
-    //private final String patientId;
+    private final String patientId;
     private final String eventNo;
     private final long timestamp;
 
@@ -51,11 +51,28 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
         return new ProfileId(orgId, eventNo, timestamp);
     }
 
+    /**
+     * 创建一个新的ID对象.(非档案维度）
+     *
+     * @return 新创建的ID对象.
+     */
+    public static ProfileId get(final String orgId,  final String patientId, final String eventNo) {
+        return new ProfileId(orgId, patientId, eventNo);
+    }
+
     public ProfileId(final String orgCode, final String eventNo, final Date timestamp) {
         this.orgCode = orgCode;
-        //this.patientId = patientId;
+        this.patientId = "";
         this.eventNo = eventNo;
         this.timestamp = timestamp.getTime();
+    }
+
+    //非档案维度的，没有时间时间
+    public ProfileId(final String orgCode, final String patientId, final String eventNo) {
+        this.orgCode = orgCode;
+        this.patientId = patientId;
+        this.eventNo = eventNo;
+        this.timestamp = 0;
     }
 
     /**
@@ -88,6 +105,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
         } else {
             throw new IllegalArgumentException("无效ID");
         }
+        patientId = "";
     }
 
     /**
@@ -139,11 +157,20 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
 
     @Override
     public String toString() {
-        return new StringBuilderEx("%1_%2_%3")
-                .arg(orgCode)
-                .arg(eventNo)
-                .arg(timestamp)
-                .toString();
+        if (timestamp==0){
+            return new StringBuilderEx("%1_%2_%3")
+                    .arg(orgCode)
+                    .arg(patientId)
+                    .arg(eventNo)
+                    .toString();
+        }else {
+            return new StringBuilderEx("%1_%2_%3")
+                    .arg(orgCode)
+                    .arg(eventNo)
+                    .arg(timestamp)
+                    .toString();
+        }
+
     }
 }
 
