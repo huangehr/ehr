@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
- * 打印档案入库的日志
+ * 档案入库的日志记录器
  */
-public class PackResolveLog {
+public class PackResolveLogger {
 
-    private static Logger logger = LoggerFactory.getLogger(PackResolveLog.class);
+    private static Logger logger = LoggerFactory.getLogger(PackResolveLogger.class);
 
     /**
      * 业务日志输出
@@ -28,7 +28,7 @@ public class PackResolveLog {
             ObjectNode log = objectMapper.createObjectNode();
             log.put("caller", caller);
             log.put("time", DateTimeUtil.simpleDateTimeFormat(new Date()));
-            log.put("logType", "3");
+            log.put("logType", "3"); // TODO - 2017.7.4 张进军 - 待确定。
             log.set("data", info);
 
             logger.info(log.toString());

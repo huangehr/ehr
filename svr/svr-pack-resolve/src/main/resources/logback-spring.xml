@@ -21,7 +21,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="com.yihu.ehr.util.PackResolveLog" level="INFO" additivity="false">
+	<logger name="com.yihu.ehr.util.PackResolveLogger" level="INFO" additivity="false">
 		<appender-ref ref="packResolve" />
 	</logger>
 

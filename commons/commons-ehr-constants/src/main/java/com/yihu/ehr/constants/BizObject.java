@@ -41,8 +41,10 @@ public enum BizObject {
     RsInterface((short)0x0030),
     RsAdapterDictionary((short)0x0031),
     RsParam((short)0x0032),
-    RolesResource((short)0x0019),
-    RolesResourceMetadata((short)0x0020);
+    RolesResource((short)0x0033),
+    RolesResourceMetadata((short)0x0034),
+    OrgResource((short)0x0035),
+    OrgResourceMetadata((short)0x0036);
 
 
 

@@ -14,6 +14,7 @@ import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.service.resource.stage1.DatasetPackage;
 import com.yihu.ehr.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
+import com.yihu.ehr.util.PackResolveLogger;
 import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
 import com.yihu.ehr.util.PackResolveLog;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -164,9 +165,11 @@ public class DatasetPackageResolver extends PackageResolver {
             // head 节点
             JsonNode headNode = objectMapper.readTree(file).get("head");
             String transactionId = headNode.get("id").asText();
+            String orgCode = headNode.get("orgCode").asText();
             String version = headNode.get("version").asText();
             String sourceTable = headNode.get("source").asText();
             String targetTable = headNode.get("target").asText();
+            String createTime = headNode.get("createTime").asText();
             // data 节点
             JsonNode dataNode = objectMapper.readTree(file).get("data");
             String tableName = dataNode.get("table").get("name").asText();
@@ -207,7 +210,7 @@ public class DatasetPackageResolver extends PackageResolver {
                 }
 
                 logDataNode.set("target_id", logDataTargetIdNode);
-                PackResolveLog.info("", logDataNode);
+                PackResolveLogger.info("", logDataNode);
 
                 int hasRecordSqlLen = hasRecordSql.length();
                 hasRecordSql.delete(hasRecordSqlLen - 4, hasRecordSqlLen);
@@ -225,7 +228,7 @@ public class DatasetPackageResolver extends PackageResolver {
 
                     // 判断表字段是否存在。
                     String fieldSql = "SELECT f.column_type AS column_type FROM std_meta_data_" + version + " f  " +
-                            "LEFT JOIN std_data_set_" + version + " t ON t.id = f.dataset_id" +
+                            "LEFT JOIN std_data_set_" + version + " t ON t.id = f.dataset_id " +
                             "WHERE t.code = '" + tableName + "' AND f.column_name = '" + fieldName + "'";
                     if (jdbcTemplate.queryForList(fieldSql).size() == 0) {
                         throw new RuntimeException("标准中不存在该表字段，version: " + version + ", table: " + tableName + ", field: " + fieldName);
@@ -235,12 +238,12 @@ public class DatasetPackageResolver extends PackageResolver {
                     String columnType = jdbcTemplate.queryForMap(fieldSql).get("column_type").toString().toUpperCase();
                     if (columnType.contains("VARCHAR")) {
                         sql.append(fieldName + " = '" + fieldValue + "', ");
-                    } else if (columnType.contains("TINYINT") || columnType.contains("NUMBER")) {
+                    } else if (columnType.equals("TINYINT") || columnType.contains("NUMBER")) {
                         sql.append(fieldName + " = " + fieldValue + ", ");
-                    } else if (columnType.contains("DATE")) {
+                    } else if (columnType.equals("DATE")) {
                         sql.append(fieldName + " = '" + DateTimeUtil.simpleDateFormat(DateTimeUtil.simpleDateParse(fieldValue)) + "', ");
-                    } else if (columnType.contains("DATETIME")) {
-                        sql.append(fieldName + " = '" + DateTimeUtil.simpleDateTimeFormat(DateTimeUtil.simpleDateParse(fieldValue)) + "', ");
+                    } else if (columnType.equals("DATETIME")) {
+                        sql.append(fieldName + " = '" + DateTimeUtil.simpleDateTimeFormat(DateTimeUtil.utcDateTimeParse(fieldValue)) + "', ");
                     }
                 }
                 sql.deleteCharAt(sql.lastIndexOf(","));
@@ -256,6 +259,9 @@ public class DatasetPackageResolver extends PackageResolver {
 
                 sqlList.add(sql.toString());
             }
+
+            profile.setOrgCode(orgCode);
+            profile.setCreateDate(DateTimeUtil.utcDateTimeParse(createTime));
         }
         profile.setSqlList(sqlList);
     }

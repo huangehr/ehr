@@ -138,6 +138,20 @@ public class ServiceApi {
         public static final String ResourceRolesResMetadataGrants = "/resources/roles_resource/{roles_res_id}/metadata";
         public static final String ResourceRolesRsMetadataGrant = "/resources/roles_resource/metadata/grant";
 
+        /**
+         * 机构-资源授权
+         */
+        public static final String ResourceOrgGrants = "/resources/OrgGrants";
+        public static final String ResourceOrgGrant = "/resources/OrgGrants/{id}";
+        public static final String ResourceOrgMetadatasValid = "/resources/OrgMetadatas/valid";
+        public static final String ResourceOrgMetadataGrants = "/resources/OrgMetadatas/grants";
+        public static final String OrgGrantResources = "/resources/Org/{orgCode}/grant";
+        //        public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        public static final String ResourceOrgMetadataGrant = "/resources/OrgMetadata/grants/{id}";
+        public static final String ResourceOrgGrantsNoPage = "/resources/OrgGrants/no_paging";
+        public static final String ResourceOrgResMetadataGrants = "/resources/Org_resource/{Org_res_id}/metadata";
+        public static final String ResourceOrgRsMetadataGrant = "/resources/Org_resource/metadata/grant";
+
 
     }
 
@@ -865,6 +879,7 @@ public class ServiceApi {
 
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
         public static final String GetQuotaReport = "tj/getQuotaReport";
+        public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
     }
 
 

@@ -125,7 +125,6 @@ public class PackageResolveEngine {
             if (root == null || !root.isDirectory() || root.list().length == 0) {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
-            root =  new File(zipFile);
 
             DatasetPackage profile = (DatasetPackage) PackModelFactory.createPackModel(root);
             PackageResolver packageResolver = packageResolvers.get(ProfileType.Dataset);

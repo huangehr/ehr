@@ -62,8 +62,7 @@ public class FilePackageResolver extends PackageResolver {
         String eventDate = root.get("event_time").asText();
         String createDate = root.get("create_date") == null ? null : root.get("create_date").asText();
         String cdaVersion = root.get("inner_version").asText();
-        if (cdaVersion.equals("000000000000"))
-            throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
+        //if (cdaVersion.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
 
         profile.setDemographicId(demographicId);
         profile.setPatientId(patientId);

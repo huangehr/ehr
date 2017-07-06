@@ -46,6 +46,7 @@ public class DateUtil {
     public static final String DATE_MDY_FORMAT = "MMddyyyy";
     public static final String DATE_MY_FORMAT = "MMyyyy";
     public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
+    public static final String utcDateTimePattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 
 
@@ -63,7 +64,11 @@ public class DateUtil {
                 strDate = strDate.replace("/","-");
             }
 
-            if(strDate.contains("-"))
+            if(strDate.contains("T") && strDate.contains("Z"))
+            {
+                return strToDate(strDate,utcDateTimePattern);
+            }
+            else if(strDate.contains("-"))
             {
                 if(length == 10)
                 {
@@ -72,6 +77,10 @@ public class DateUtil {
                 else if(length == 19)
                 {
                     return strToDate(strDate,DEFAULT_YMDHMSDATE_FORMAT);
+                }
+                else if (length > 19)
+                {
+                    return strToDate(strDate,DEFAULT_TIMESTAMP_FORMAT);
                 }
             }
             else{

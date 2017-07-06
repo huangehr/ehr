@@ -3,19 +3,15 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.model.org.MRsOrgResource;
+import com.yihu.ehr.model.org.MRsOrgResourceMetadata;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsAppResourceMetadata;
 import com.yihu.ehr.model.resource.MRsRolesResource;
 import com.yihu.ehr.model.resource.MRsRolesResourceMetadata;
-import com.yihu.ehr.resource.model.RsAppResource;
-import com.yihu.ehr.resource.model.RsAppResourceMetadata;
-import com.yihu.ehr.resource.model.RsRolesResource;
-import com.yihu.ehr.resource.model.RsRolesResourceMetadata;
-import com.yihu.ehr.resource.service.ResourceGrantService;
-import com.yihu.ehr.resource.service.ResourceMetadataGrantService;
+import com.yihu.ehr.resource.model.*;
+import com.yihu.ehr.resource.service.*;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.resource.service.RolesResourceGrantService;
-import com.yihu.ehr.resource.service.RolesResourceMetadataGrantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -48,6 +44,10 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
     private RolesResourceMetadataGrantService rolesResourceMetadataGrantService;
     @Autowired
     private RolesResourceGrantService rolesResourceGrantService;
+    @Autowired
+    private OrgResourceGrantService orgResourceGrantService;
+    @Autowired
+    private OrgResourceMetadataGrantService orgResourceMetadataGrantService;
 
     @ApiOperation("单个应用授权多个资源")
     @RequestMapping(value= ServiceApi.Resources.AppsGrantResources ,method = RequestMethod.POST)
@@ -526,5 +526,164 @@ public class ResourcesGrantEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value="id") String id) throws Exception
     {
         return convertToModel(rolesResourceMetadataGrantService.getRsRolesMetadataGrantById(id),MRsRolesResourceMetadata.class);
+    }
+
+
+    //机构授权
+    @ApiOperation("机构资源授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgGrants,method = RequestMethod.GET)
+    public List<MRsOrgResource> queryOrgResourceGrant(
+            @ApiParam(name="fields",value="返回字段",defaultValue = "")
+            @RequestParam(value="fields",required = false)String fields,
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters,
+            @ApiParam(name="sorts",value="排序",defaultValue = "")
+            @RequestParam(value="sorts",required = false)String sorts,
+            @ApiParam(name="page",value="页码",defaultValue = "1")
+            @RequestParam(value="page",required = false)int page,
+            @ApiParam(name="size",value="分页大小",defaultValue = "999")
+            @RequestParam(value="size",required = false)int size,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception
+    {
+        long total = 0;
+        Collection<MRsOrgResource> rsOrgList;
+
+        //过滤条件为空
+        if(StringUtils.isEmpty(filters))
+        {
+            Page<RsOrgResource> rsGrant = orgResourceGrantService.getOrgResourceGrant(sorts,reducePage(page),size);
+            total = rsGrant.getTotalElements();
+            rsOrgList = convertToModels(rsGrant.getContent(),new ArrayList<>(rsGrant.getNumber()),MRsOrgResource.class,fields);
+        }
+        else
+        {
+            List<RsOrgResource> rsGrant = orgResourceGrantService.search(fields,filters,sorts,page,size);
+            total = orgResourceGrantService.getCount(filters);
+            rsOrgList = convertToModels(rsGrant,new ArrayList<>(rsGrant.size()),MRsOrgResource.class,fields);
+        }
+
+        pagedResponse(request,response,total,page,size);
+        return (List<MRsOrgResource>)rsOrgList;
+    }
+
+    @ApiOperation("机构资源数据元生失效操作")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgMetadatasValid,method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public boolean orgValid(
+            @ApiParam(name="data",value="授权数据元",defaultValue = "")
+            @RequestBody List<RsOrgResourceMetadata> data,
+            @ApiParam(name="valid",value="授权数据元ID",defaultValue = "")
+            @RequestParam(value="valid") int valid) throws Exception
+    {
+        String ids = "";
+        if(valid==0){
+            for(RsOrgResourceMetadata metadata: data){
+                ids += "," + metadata.getId();
+            }
+        }else{
+            List addLs = new ArrayList<>();
+            for(RsOrgResourceMetadata metadata: data){
+                if(!StringUtils.isEmpty(metadata.getId()))
+                    ids += "," + metadata.getId();
+                else {
+                    metadata.setId(getObjectId(BizObject.OrgResourceMetadata));
+                    addLs.add(metadata);
+                }
+            }
+           orgResourceMetadataGrantService.grantRsOrgMetadataBatch(addLs);
+        }
+        if(ids.length()>0)
+            orgResourceMetadataGrantService.orgValid(ids.substring(1), valid);
+        return true;
+    }
+
+    @ApiOperation("机构资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgGrant, method = RequestMethod.POST)
+    public MRsOrgResourceMetadata metadataOrgGrant(
+            @ApiParam(name = "id", value = "授权ID", defaultValue = "")
+            @PathVariable(value = "id") String id,
+            @ApiParam(name = "dimension", value = "授权ID", defaultValue = "")
+            @RequestParam(value = "dimension") String dimension) throws Exception {
+
+        RsOrgResourceMetadata rsOrgResourceMetadata = orgResourceMetadataGrantService.retrieve(id);
+        rsOrgResourceMetadata.setDimensionValue(dimension);
+        orgResourceMetadataGrantService.save(rsOrgResourceMetadata);
+        return convertToModel(rsOrgResourceMetadata, MRsOrgResourceMetadata.class);
+    }
+
+    @ApiOperation("机构资源数据元维度授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgMetadataGrants, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    MRsOrgResourceMetadata orgMetadataGrant(
+            @RequestBody RsOrgResourceMetadata model) throws Exception {
+
+        if(StringUtils.isEmpty(model.getId()))
+            model.setId(getObjectId(BizObject.OrgResourceMetadata));
+        return convertToModel(orgResourceMetadataGrantService.save(model), MRsOrgResourceMetadata.class);
+    }
+
+    @ApiOperation("单个机构授权多个资源")
+    @RequestMapping(value= ServiceApi.Resources.OrgGrantResources ,method = RequestMethod.POST)
+    public Collection<MRsOrgResource> grantOrgResource(
+            @ApiParam(name="orgCode",value="机构ID",defaultValue = "")
+            @PathVariable(value="orgCode") String orgCode,
+            @ApiParam(name="resourceIds",value="资源ID",defaultValue = "")
+            @RequestParam(value="resourceIds") String resourceIds) throws Exception
+    {
+        String[] resourceIdArray = resourceIds.split(",");
+        List<RsOrgResource> orgRsList = new ArrayList<RsOrgResource>();
+
+        for(String resoruceId : resourceIdArray)
+        {
+            RsOrgResource orgRs = new RsOrgResource();
+            orgRs.setId(getObjectId(BizObject.RolesResource));
+            orgRs.setOrganizationId(orgCode);
+            orgRs.setResourceId(resoruceId);
+
+            orgRsList.add(orgRs);
+        }
+
+        return convertToModels(orgResourceGrantService.grantResourceBatch(orgRsList),new ArrayList<>(orgRsList.size()),MRsOrgResource.class,"");
+    }
+    @ApiOperation("机构资源数据元授权查询")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgResMetadataGrants,method = RequestMethod.GET)
+    public Collection<MRsOrgResourceMetadata> getOrgRsMetadatas(
+            @ApiParam(name="Org_res_id",value="授权应用编号",defaultValue = "1")
+            @PathVariable(value="Org_res_id")String orgResId) throws Exception
+    {
+        RsOrgResource orgResource = orgResourceGrantService.retrieve(orgResId);
+        List<RsOrgResourceMetadata> rsMetadataGrant = new ArrayList<>();
+        if(orgResource!=null){
+            rsMetadataGrant = orgResourceMetadataGrantService.getOrgRsMetadatas(orgResource.getId(), orgResource.getOrganizationId(), orgResource.getResourceId());
+        }
+        return convertToModels(rsMetadataGrant, new ArrayList<>(rsMetadataGrant.size()), MRsOrgResourceMetadata.class, "");
+    }
+    @ApiOperation(" 机构取消资源授权")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgGrantsNoPage,method = RequestMethod.GET)
+    public List<MRsOrgResource> queryOrgResourceGrantNoPage(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception {
+        Collection<MRsOrgResource> rsOrgList;
+        List<RsOrgResource> rsGrant = orgResourceGrantService.search(filters);
+        rsOrgList = convertToModels(rsGrant,new ArrayList<>(rsGrant.size()),MRsOrgResource.class,null);
+        return (List<MRsOrgResource>)rsOrgList;
+    }
+    @ApiOperation("机构资源授权批量删除")
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgGrants,method = RequestMethod.DELETE)
+    public boolean deleteOrgGrantBatch(
+            @ApiParam(name="ids",value="授权ID",defaultValue = "")
+            @RequestParam(value="ids") String ids) throws Exception
+    {
+        orgResourceGrantService.deleteGrantByIds(ids.split(","));
+        return true;
+    }
+
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceOrgMetadataGrant,method = RequestMethod.GET)
+    @ApiOperation("机构-资源授权-维度授权-根据ID获取资源数据元授权")
+    public MRsOrgResourceMetadata getOrgRsMetadataGrantById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        return convertToModel(orgResourceMetadataGrantService.getRsOrgMetadataGrantById(id),MRsOrgResourceMetadata.class);
     }
 }
