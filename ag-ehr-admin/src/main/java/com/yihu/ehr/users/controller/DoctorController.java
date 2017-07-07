@@ -277,6 +277,17 @@ public class DoctorController extends BaseController {
         List existPhones = doctorClient.idExistence(phones);
         return existPhones;
     }
+    @RequestMapping(value = ServiceApi.Doctors.DoctoridCardNoExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在身份证号码")
+    public List idCardNoExistence(
+            @ApiParam(name = "idCardNos", value = "", defaultValue = "")
+            @RequestParam("idCardNos") String idCardNos) throws Exception {
+
+        List existPhones = doctorClient.idCardNoExistence(idCardNos);
+        return existPhones;
+    }
+
+
 
     @RequestMapping(value = ServiceApi.Doctors.DoctorBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入医生")

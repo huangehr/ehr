@@ -512,6 +512,7 @@ public class ServiceApi {
         public static final String DoctorOnePhoneExistence = "/doctor/onePhone/existence";
         public static final String DoctorEmailExistence = "/doctor/email/existence";
         public static final String DoctorsIdCardNoExistence = "/doctors/{doctor_idCardNo}/existence";
+        public static final String DoctoridCardNoExistence = "/doctor/idCardNo/existence";
 
 
 
@@ -534,6 +535,7 @@ public class ServiceApi {
         public static final String UserPhoneExistence = "/user/phone/existence";
         public static final String UserOnePhoneExistence = "/user/onePhone/existence";
         public static final String UserEmailExistence = "/user/email/existence";
+        public static final String UseridCardNoExistence = "/user/idCardNo/existence";
 
     }
 

@@ -852,5 +852,15 @@ public class UserController extends BaseController {
 
     }
 
+    @RequestMapping(value = ServiceApi.Users.UseridCardNoExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在身份证号码")
+    public List idCardNoExistence(
+            @ApiParam(name = "idCardNos", value = "", defaultValue = "")
+            @RequestParam("idCardNos") String idCardNos) throws Exception {
+
+        List existPhones = userClient.idCardNoExistence(idCardNos);
+        return existPhones;
+    }
+
 
 }

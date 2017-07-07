@@ -104,7 +104,7 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
                         " b.source_type as sourceType, b.release_flag as releaseFlag" +
                         " FROM apps b " +
                         "LEFT JOIN user_app m on m.app_id=b.id " +
-                        "WHERE b.catalog= :catalog AND m.user_id=:userId AND b.release_flag='1'" +
+                        "WHERE b.catalog= :catalog AND m.user_id=:userId " +
                         ") p ORDER BY p.id";
 
         SQLQuery query = currentSession().createSQLQuery(sql);
