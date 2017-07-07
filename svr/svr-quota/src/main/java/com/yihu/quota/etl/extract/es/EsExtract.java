@@ -319,15 +319,19 @@ public class EsExtract {
                 }
             }
             //拼凑where语句
-            StringBuffer whereSql = new StringBuffer(" saasId= '" + saasid + "'" );
+            StringBuffer whereSql = new StringBuffer();
             if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
-                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
-                //是否是增量
                 if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
-                    whereSql.append(" and " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+                    whereSql.append("" + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
                 }
+                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }
-            StringBuffer sql = new StringBuffer("select " + allField + " ,count(*) result from " + tableName + " where " + whereSql + " group by " + AllGroupBy);
+            StringBuffer sql = new StringBuffer();
+            if(StringUtils.isEmpty(whereSql) || whereSql.length()==0){
+                 sql.append("select " + allField + " ,count(*) result from " + tableName + " group by " + AllGroupBy);
+            }else {
+                sql.append("select " + allField + " ,count(*) result from " + tableName + " where " + whereSql + " group by " + AllGroupBy);
+            }
             sqlS.put(sql.toString(), one);
         }
         return sqlS;
