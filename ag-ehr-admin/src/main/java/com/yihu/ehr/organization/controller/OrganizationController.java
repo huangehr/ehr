@@ -315,12 +315,6 @@ public class OrganizationController extends BaseController {
                 path = orgClient.uploadPicture(jsonData);
             }
 
-            GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData,GeographyModel.class);
-
-            if (geographyModel.nullAddress()) {
-                errorMsg+="机构地址不能为空！";
-            }
-
             OrgDetailModel orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
 
             if (!StringUtils.isEmpty(path)) {
@@ -345,12 +339,23 @@ public class OrganizationController extends BaseController {
             {
                 return failed(errorMsg);
             }
-            String location = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-            if (StringUtils.isEmpty(location)) {
-                return failed("保存失败!");
+            String locationId = null;
+            if (!StringUtils.isEmpty(geographyModelJsonData)) {
+                GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData, GeographyModel.class);
+                if (geographyModel.nullAddress()) {
+                    errorMsg+="机构地址不能为空！";
+                }
+                locationId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                if (StringUtils.isEmpty(locationId)) {
+                    return failed("保存地址失败！");
+                }
+                if(StringUtils.isNotEmpty(errorMsg))
+                {
+                    return failed(errorMsg);
+                }
             }
 
-            mOrganization.setLocation(location);
+            mOrganization.setLocation(locationId);
             String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
             MOrganization mOrgNew = orgClient.create(mOrganizationJson);
             if (mOrgNew == null) {
