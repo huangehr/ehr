@@ -379,4 +379,14 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         List existPhones = userManager.emailsExistence(toEntity(emails, String[].class));
         return existPhones;
     }
+
+    @RequestMapping(value = ServiceApi.Users.UseridCardNoExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在身份证号码")
+    public List idCardNoExistence(
+            @ApiParam(name="idCardNos",value="idCardNos",defaultValue = "")
+            @RequestBody String idCardNos) throws Exception {
+
+        List existidCardNos = userManager.idCardNosExist(toEntity(idCardNos, String[].class));
+        return existidCardNos;
+    }
 }

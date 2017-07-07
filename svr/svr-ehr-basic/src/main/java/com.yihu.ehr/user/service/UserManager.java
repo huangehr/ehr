@@ -250,4 +250,17 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         sqlQuery.setParameterList("emails", emails);
         return sqlQuery.list();
     }
+
+    /**
+     * 查询电话号码是否已存在， 返回已存在电话号码
+     */
+    public List idCardNosExist(String[] idCardNos)
+    {
+        String sql = "SELECT id_card_no FROM users WHERE id_card_no in(:idCardNos)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("idCardNos", idCardNos);
+        return sqlQuery.list();
+    }
+
+
 }

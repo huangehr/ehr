@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
- * 打印档案入库的日志
+ * 档案入库的日志记录器
  */
-public class PackResolveLog {
+public class PackResolveLogger {
 
-    private static Logger logger = LoggerFactory.getLogger(PackResolveLog.class);
+    private static Logger logger = LoggerFactory.getLogger(PackResolveLogger.class);
 
     /**
      * 业务日志输出

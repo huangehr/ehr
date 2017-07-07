@@ -37,9 +37,10 @@ public class FilePackageResolver extends PackageResolver {
     @Autowired
     FastDFSUtil fastDFSUtil;
 
-    @Override
-    public void resolveDataSet(StandardPackage profile, File root) throws Exception {
 
+    @Override
+    public List<StandardPackage> resolveDataSets(File root,String clinetId) throws Exception {
+        return null;
     }
 
     @Override

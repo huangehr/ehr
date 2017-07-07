@@ -164,5 +164,8 @@ public interface DoctorClient {
     @ApiOperation(value = "判断身份证号是否存在")
     boolean isCardNoExists(@PathVariable(value = "idCardNo") String idCardNo);
 
-
+    @RequestMapping(value = ServiceApi.Doctors.DoctoridCardNoExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在身份证号码")
+    List idCardNoExistence(
+            @RequestBody String idCardNos);
 }

@@ -111,7 +111,11 @@ public class PackMill {
                 int index = 0;
                 for (String key : keys){
                     SubRecord subRecord = new SubRecord();
-                    subRecord.setRowkey(stdPack.getId(), dataSet.getCode(), index++);
+                    if (stdPack.getProfileType()==ProfileType.Dataset){
+                        subRecord.setRowkey(stdPack.getId(), dataSet.getCode(), dataSet.getPk());
+                    }else {
+                        subRecord.setRowkey(stdPack.getId(), dataSet.getCode(), index++);
+                    }
 
                     MetaDataRecord metaDataRecord = dataSet.getRecord(key);
                     for (String metaDataCode : metaDataRecord.getMetaDataCodes()){

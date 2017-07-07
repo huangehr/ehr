@@ -149,4 +149,9 @@ public interface UserClient {
     public List emailsExistence(
             @RequestBody String emails);
 
+    @RequestMapping(value = ServiceApi.Users.UseridCardNoExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在身份证号码")
+    List idCardNoExistence(
+            @RequestBody String idCardNos);
+
 }

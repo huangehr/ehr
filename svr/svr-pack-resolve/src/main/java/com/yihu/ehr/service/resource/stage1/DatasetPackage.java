@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ import java.util.List;
  */
 @Table(ResourceCore.MasterTable)
 public class DatasetPackage extends StandardPackage {
+
+    private String pk;                              // 数据集主键（可能是联合主键）
 
     private List<String> sqlList; // 遍历数据集拼接的插入/更新SQL语句
 
@@ -31,6 +34,14 @@ public class DatasetPackage extends StandardPackage {
         this.sqlList = sqlList;
     }
 
+    public String getPk() {
+        return pk;
+    }
+
+    public void setPk(String pk) {
+        this.pk = pk;
+    }
+
     @Override
     public String toJson() {
         ObjectNode root = objectMapper.createObjectNode();
@@ -42,7 +53,7 @@ public class DatasetPackage extends StandardPackage {
         root.put("clientId", this.getClientId());
         root.put("eventTime", DateTimeUtil.utcDateTimeFormat(this.getEventDate()));
         root.put("createTime", DateTimeUtil.utcDateTimeFormat(this.getCreateDate()));
-        root.put("eventType", this.getEventType().toString());
+        root.put("eventType", StringUtils.isEmpty(this.getEventType()) ? "" : this.getEventType().toString());
         root.put("profileType", this.getProfileType().toString());
         root.put("cardType", this.getCardType());
         root.put("patientName", this.getPatientName());

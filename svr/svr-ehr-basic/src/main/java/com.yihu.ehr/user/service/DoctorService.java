@@ -206,4 +206,15 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     public Doctors getByIdCardNo(String idCardNo) {
         return doctorRepository.findByIdCardNo(idCardNo);
     }
+
+    /**
+     * 查询电话号码是否已存在， 返回已存在电话号码
+     */
+    public List idCardNosExist(String[] idCardNos)
+    {
+        String sql = "SELECT id_card_no FROM doctors WHERE id_card_no in(:idCardNos)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("idCardNos", idCardNos);
+        return sqlQuery.list();
+    }
 }

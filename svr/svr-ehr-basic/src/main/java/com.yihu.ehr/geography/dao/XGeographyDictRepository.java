@@ -25,7 +25,7 @@ public interface XGeographyDictRepository extends PagingAndSortingRepository<Geo
     List<GeographyDict> getAddrDictByPid(@Param("pid") Integer pid);
 
     @Query("select dict from GeographyDict dict where dict.name = :name")
-    GeographyDict findByName(@Param("name") String pid);
+    List<GeographyDict> findByName(@Param("name") String pid);
 
     @Query("select dict from GeographyDict dict where 1=1")
     List<GeographyDict> getAll();
