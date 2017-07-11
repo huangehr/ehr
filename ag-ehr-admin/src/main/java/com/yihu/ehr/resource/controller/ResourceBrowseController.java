@@ -236,7 +236,12 @@ public class ResourceBrowseController extends BaseController {
             @ApiParam("categoryId")
             @RequestParam(value = "categoryId", required = true) String categoryId) {
         //查询资源-数据集
-        ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + categoryId, "", 1, 999);
+        String filters="";
+        if(null!=categoryId&&!"".equals(categoryId)){
+             filters="categoryId=" + categoryId;
+        }
+
+        ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", filters, "", 1, 999);
         List<MRsResources>  rsResources = categoryResponseEntity.getBody();
         Integer totalCount = getTotalCount(categoryResponseEntity);
         return getResult(rsResources, totalCount, 1, 999);
