@@ -46,7 +46,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
         List<RoleUser> roleUsers = this.search("userId=" + userId + ",roleId=" + roleIds);
         for(RoleUser roleUser : roleUsers){
             delete(roleUser.getId());
-            userAppRepository.updateByUserId(roleUser.getUserId());
+            userAppRepository.deleteByUserId(roleUser.getUserId());
         }
         return true;
     }
@@ -171,7 +171,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
      */
     public void deleteRoleUser(RoleUser roleUser){
         Roles roles = rolesRepository.findOne(roleUser.getRoleId());
-        if("0".equals(roles.getType())){
+//        if("0".equals(roles.getType())){
             String userId = roleUser.getUserId();
             //应用角色添加人员
             String sql = "SELECT ra.app_id " +
@@ -186,7 +186,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
                 //伪删除机制，所以新增时需判断数据是否存在，如果存在只需更新状态
                 jdbcTemplate.execute(sqlUpd+sqlCon);
             }
-        }
+//        }
         delete(roleUser);
     }
 
@@ -197,7 +197,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
      */
     public RoleUser createRoleUser(RoleUser roleUser){
         Roles roles = rolesRepository.findOne(roleUser.getRoleId());
-        if("0".equals(roles.getType())){
+//        if("0".equals(roles.getType())){
             String user_id = roleUser.getUserId();
             //应用角色添加人员
             String sql = "SELECT DISTINCT ra.app_id,a.name app_name,u.id,u.real_name user_name,u.organization org_id,o.short_name org_name " +
@@ -231,7 +231,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
                     jdbcTemplate.execute(sqlInsert+insert);
                 }
             }
-        }
+//        }
 
         return save(roleUser);
     }
@@ -244,7 +244,7 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
     public String saveRoleUser(List<RoleUser> roleUserlist,String userId) {
         String id="";
         roleUserRepository.deleteByUserId(userId);
-        userAppRepository.updateByUserId(userId);
+        userAppRepository.deleteByUserId(userId);
         if(roleUserlist.size()>0){
             for(RoleUser r:roleUserlist){
                 id=String.valueOf(roleUserRepository.save(r).getId()) ;
@@ -274,8 +274,8 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
 
 //                    String sqlCon = " user_id = '" +user_id +"' and app_id = '"+app_id+"'";
 //                    listTemp = jdbcTemplate.queryForList(sql2+sqlCon);
-                    String insert = "('"+app_id+"','"+app_name+"','"+user_id+"','"+user_name+"','"+org_id+"','"+org_name+"',0)";
-                    jdbcTemplate.execute(sqlInsert+insert);
+                    String insert = "('" + app_id + "','" + app_name + "','" + user_id + "','" + user_name + "','" + org_id + "','" + org_name + "',0)";
+                    jdbcTemplate.execute(sqlInsert + insert);
                 }
             }
         } else {

@@ -18,6 +18,6 @@ public interface XUserAppRepository extends JpaRepository<UserApp, String> {
     UserApp findByAppIdAndUserId(@Param("appId") String appId, @Param("userId") String userId);
 
     @Modifying
-    @Query("update UserApp userApp set userApp.status = 1 where userApp.userId = :userId")
-    void updateByUserId(@Param("userId") String userId);
+//    @Query("update UserApp userApp set userApp.status = 1 where userApp.userId = :userId")
+    void deleteByUserId(@Param("userId") String userId);
 }
