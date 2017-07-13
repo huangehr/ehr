@@ -303,27 +303,22 @@ public class SolrQuery {
 	private List<Map<String,Object>> recGroupCount(String table,List<SolrGroupEntity> grouplist,int num,List<Map<String,Object>> preList,String q,String fq) throws Exception
 	{
 		String conditionName = "$condition";
-		if (num==grouplist.size()-1)
-		{
+		if (num==grouplist.size()-1){
 			List<Map<String,Object>> list =  new ArrayList<Map<String,Object>>();//返回集合
 			SolrGroupEntity group = grouplist.get(num);
 			String groupName = group.getGroupField();
 
 			for(Map<String,Object> preObj:preList) {
 				String query = preObj.get(conditionName).toString();
-
-				if(fq!=null && !fq.equals("") && !fq.equals("*:*"))
-				{
+				if(fq!=null && !fq.equals("") && !fq.equals("*:*")){
 					query += " AND " +fq;
 				}
 
 				//最后一级Solr统计
 				Map<String,Long> maps = solr.groupCount(table,q, query, groupName, 0, 1000);
-				if(maps!=null && maps.size()>0)
-				{
-					for (String key : maps.keySet())
-					{
-						Map<String,Object> obj = new HashMap<String,Object>();
+				if(maps!=null && maps.size()>0){
+					for (String key : maps.keySet()){
+						Map<String,Object> obj = new LinkedHashMap<String,Object>();
 						obj.putAll(preObj); //深拷贝
 						obj.put(groupName,key);
 						obj.put("$count",maps.get(key));
@@ -332,23 +327,19 @@ public class SolrQuery {
 					}
 				}
 			}
-
 			return list;
 		}
-		else
-		{
+		else{
 			List<Map<String,Object>> list =  new ArrayList<Map<String,Object>>();//返回集合
-
 			SolrGroupEntity group = grouplist.get(num); //当前分组
 			Map<String,String> groupMap = group.getGroupCondition(); //当前分组项
 			String groupName = group.getGroupField();
-
 			if(preList!=null) {
 				//遍历上级递归数据
 				for (Map<String,Object> preObj : preList) {
 					//遍历当前分组数据
 					for (Map.Entry<String, String> item : groupMap.entrySet()) {
-						Map<String,Object> obj = new HashMap<String,Object>();
+						Map<String,Object> obj = new LinkedHashMap<String,Object>();
 						obj.putAll(preObj); //深拷贝
 						obj.put(groupName, item.getKey());
 						//拼接过滤条件
@@ -367,7 +358,6 @@ public class SolrQuery {
 					list.add(obj);
 				}
 			}
-
 			return recGroupCount(table,grouplist, num + 1, list,q,fq);
 		}
 
@@ -459,6 +449,42 @@ public class SolrQuery {
 			}
 		}
 		return new PageImpl<Map<String,Object>>(data);
+	}
+
+	/**
+	 * 多级分组统计Count（包含自定义分组）
+	 */
+	public List<Map<String, Object>> getGroupMultList(String table,String groupFields,List<SolrGroupEntity> customGroup,String q,String fq) throws Exception{
+
+		List<Map<String, Object>> data = null;
+		if(groupFields!=null && groupFields.length()>0){
+			String[] groups = groupFields.split(",");
+			List<SolrGroupEntity> grouplist = new ArrayList<SolrGroupEntity>();
+			if(customGroup!=null && customGroup.size() > 0){
+				grouplist = customGroup;
+			}
+
+			//遍历字段分组
+			List<FacetField> facets = solr.groupCount(table, q,fq, groups);
+			for (FacetField facet : facets) {
+				String groupName = facet.getName();
+				List<FacetField.Count> counts = facet.getValues();
+				SolrGroupEntity group = new SolrGroupEntity(groupName);
+				for (FacetField.Count count : counts) {
+					String value = count.getName();
+					group.putGroupCondition(value, groupName + ":" + value);
+				}
+				grouplist.add(group);
+			}
+			data = recGroupCount(table,grouplist, 0, null,q,fq);
+		}
+		//纯自定义分组
+		else{
+			if(customGroup!=null && customGroup.size() > 0){
+				data = recGroupCount(table,customGroup,0,null,null,null);
+			}
+		}
+		return data;
 	}
 
 	/************************* 数值统计 **********************************************/
