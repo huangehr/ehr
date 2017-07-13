@@ -17,7 +17,7 @@ public class TjQuotaDataSource implements java.io.Serializable {
 	private String quotaCode;
 	private String sourceCode;
 	private String configJson;
-	private String type;
+	private String code;
 
 	// Constructors
 
@@ -73,11 +73,11 @@ public class TjQuotaDataSource implements java.io.Serializable {
 	}
 
 	@Transient
-	public String getType() {
-		return type;
+	public String getCode() {
+		return code;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setCode(String code) {
+		this.code = code;
 	}
 }
