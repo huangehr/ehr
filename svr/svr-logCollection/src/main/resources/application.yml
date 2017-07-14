@@ -7,11 +7,12 @@ logging:
 
 kafka:
   broker:
-    address: 172.17.110.201:6667
+    address: node1.hde.h3c.com:6667,node2.hde.h3c.com:6667
 
 zookeeper:
   broker:
-    address: 172.17.110.201:2181
+    address: node1.hde.h3c.com:2181,node2.hde.h3c.com:2181
+
 ---
 spring:
   profiles: test
@@ -42,3 +43,12 @@ spring:
 ---
 spring:
   profiles: prod
+
+  data:
+    mongodb:
+      host: 192.168.1.220
+      port: 27017
+      username: admin
+      password: admin
+      authenticationDatabase: admin
+      database: ehr
