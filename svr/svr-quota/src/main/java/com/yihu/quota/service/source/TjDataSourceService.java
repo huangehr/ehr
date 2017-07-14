@@ -24,7 +24,7 @@ public class TjDataSourceService {
 
     public TjQuotaDataSource findSourceByQuotaCode(String code) {
         String sql = " SELECT " +
-                "  qds.*, ds.type " +
+                "  qds.*, ds.code " +
                 "FROM " +
                 "  tj_quota_data_source qds, " +
                 "  tj_data_source ds " +

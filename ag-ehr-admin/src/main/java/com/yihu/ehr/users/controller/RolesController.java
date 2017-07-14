@@ -229,7 +229,7 @@ public class RolesController extends BaseController {
 
         //平台应用-角色组对象模型列表
         for(MApp mApp : mApps){
-            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId() + ";type=" + type);
+            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId() + ";");
             List<PlatformAppRolesTreeModel> roleTreeModelList = new ArrayList<>();
             for(MRoles m : mRoles){
                 PlatformAppRolesTreeModel modelTree = new PlatformAppRolesTreeModel();
