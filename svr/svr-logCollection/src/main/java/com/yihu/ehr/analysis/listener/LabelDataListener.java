@@ -22,12 +22,12 @@ public class LabelDataListener {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    private static String mongoDb_Business_TableName = "EHR_BUSINESS_LOG";
-    private static String mongoDb_Operator_TableName = "EHR_OPERATOR_LOG";
+    private static String mongoDb_Business_TableName = "cloudBusinessLog";
+    private static String mongoDb_Operator_TableName = "cloudOperatorLog";
 
     //@Scheduled(cron = "0 0/1 * * * ?") //每分钟执行一次
     //正式库的 topic名字是flumeLog
-    @KafkaListener(topics = "flumeLog1")
+    @KafkaListener(topics = "flumeLog_ehr")
     @Transactional
     public void labelData(ConsumerRecord<?, ?> record) {
         Long startTime = System.currentTimeMillis();
@@ -60,12 +60,17 @@ public class LabelDataListener {
     private void saveLogToMongo(String logType, JSONObject jsonObject) throws Exception {
         switch (logType) {
             case "1": {
-                //业务日志
+                //统一网关的日志
                 insertMongo(OperatorDataModel.getByJsonObject(jsonObject),mongoDb_Operator_TableName);
                 break;
             }
+            case "3": {
+                //云平台后台业务操作日志
+                insertMongo(BusinessDataModel.getByJsonObject(jsonObject),mongoDb_Business_TableName);
+                break;
+            }
             case "2": {
-                //操作日志
+                //采集日志
                 insertMongo(BusinessDataModel.getByJsonObject(jsonObject),mongoDb_Business_TableName);
                 break;
             }

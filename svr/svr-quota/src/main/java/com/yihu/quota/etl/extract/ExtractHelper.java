@@ -1,6 +1,7 @@
 package com.yihu.quota.etl.extract;
 
 import com.yihu.quota.etl.extract.es.EsExtract;
+import com.yihu.quota.etl.extract.solr.SolrExtract;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
@@ -37,6 +38,10 @@ public class ExtractHelper {
     private TjDimensionMainService dimensionMainService;
     @Autowired
     private TjDimensionSlaveService dimensionSlaveService;
+    @Autowired
+    private EsExtract esExtract;
+    @Autowired
+    private SolrExtract solrExtract;
 
     private Logger logger = LoggerFactory.getLogger(ExtractHelper.class);
 
@@ -55,17 +60,26 @@ public class ExtractHelper {
             if (quotaDataSource == null) {
                 throw new Exception("QuotaDataSource data error");
             }
+
+            JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
+            EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+            //得到主维度
+            List<TjQuotaDimensionMain> tjQuotaDimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaIncudeAddress(quotaDataSource.getQuotaCode());
+            //得到细维度
+            List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = dimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaDataSource.getQuotaCode());
+
             //判断数据源是什么类型,根据类型和数据库相关的配置信息抽取数据
-            if ( TjDataSource.type_es.equals(quotaDataSource.getType()) ) {
-                JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
-                EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
-                //得到主维度
-                List<TjQuotaDimensionMain> tjQuotaDimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaIncudeAddress(quotaDataSource.getQuotaCode());
-                //得到细维度
-                List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = dimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaDataSource.getQuotaCode());
+            if ( TjDataSource.type_es.equals(quotaDataSource.getCode()) ) {
+
                 //查询ES数据
-                return  SpringUtil.getBean(EsExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
-            }else if( TjDataSource.type_solr.equals(quotaDataSource.getType()) ){
+//                return  SpringUtil.getBean(EsExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
+                return esExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
+
+            }else if( TjDataSource.type_solr.equals(quotaDataSource.getCode()) ){
+
+                //查询 solr 数据
+//                return  SpringUtil.getBean(SolrExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
+                return  solrExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
 
             }
 

@@ -7,14 +7,19 @@ logging:
 
 kafka:
   broker:
-    address: 172.17.110.201:6667
+    address: node1.hde.h3c.com:6667
 
 zookeeper:
   broker:
-    address: 172.17.110.201:2181
+    address: node1.hde.h3c.com:2181,node2.hde.h3c.com:2181
+
 ---
 spring:
   profiles: test
+  datasource:
+    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true
+    username: root
+    password: 123456
 
   data:
     mongodb:
@@ -28,6 +33,10 @@ spring:
 ---
 spring:
   profiles: dev
+  datasource:
+    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true
+    username: root
+    password: 123456
 
   data:
     mongodb:
@@ -42,3 +51,16 @@ spring:
 ---
 spring:
   profiles: prod
+  datasource:
+    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true
+    username: root
+    password: 123456
+
+  data:
+    mongodb:
+      host: 192.168.1.220
+      port: 27017
+      username: admin
+      password: admin
+      authenticationDatabase: admin
+      database: ehr

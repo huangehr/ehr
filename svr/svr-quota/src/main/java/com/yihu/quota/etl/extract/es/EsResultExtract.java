@@ -19,10 +19,7 @@ import net.sf.json.JSONObject;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
@@ -68,42 +65,12 @@ public class EsResultExtract {
     private int pageNo;
     private int pageSize;
     private EsConfig esConfig;
-    private static String core = "HealthProfile";
-
     @Autowired
     private ElasticFactory elasticFactory;
     @Autowired
     private TjDataSaveService tjDataSaveService;
     @Autowired
     private ObjectMapper objectMapper;
-//    @Autowired
-//    SolrUtil solrUtil;
-
-
-//    public void testSolr(String orgCode , int type ,String startDate ,String endDate) throws Exception {
-//        String orgParam = "org_code:" + (org.apache.commons.lang.StringUtils.isBlank(orgCode) ? "*" : orgCode);
-//        String dq = " && " + (type == 1 ? "create_date" : "event_date") + ":[";
-//
-//        //起始时间
-//        if (!StringUtils.isEmpty(startDate)) {
-//            dq += startDate + "T00:00:00Z";
-//        } else {
-//            dq += "*";
-//        }
-//        dq += " TO ";
-//        //结束时间
-//        if (!StringUtils.isEmpty(endDate)) {
-//            dq += endDate + "T23:59:59Z";
-//        } else {
-//            dq += "*";
-//        }
-//        dq += "]";
-//
-//        //累计统计
-//        FacetField totalFacet = solrUtil.getFacetField(core, "event_type", orgParam, 0, 0, -1, false);
-//        //期间统计
-//        FacetField intervalFacet = solrUtil.getFacetField(core, "event_type", orgParam + dq, 0, 0, -1, false);
-//    }
 
     public List<Map<String, Object>> queryResultListBySql(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
         Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
@@ -128,7 +95,7 @@ public class EsResultExtract {
         this.tjQuota = tjQuota;
         if(tjQuota.getCode() != null)
             this.quotaCode = tjQuota.getCode();
-        this.pageNo = pageNo;
+        this.pageNo = pageNo-1;
         this.pageSize = pageSize;
         EsConfig esConfig = null;
         esConfig = getEsConfig(tjQuota);

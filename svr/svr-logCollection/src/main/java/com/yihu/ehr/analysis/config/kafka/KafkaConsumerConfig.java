@@ -55,7 +55,7 @@ public class KafkaConsumerConfig {
         //唯一的指明了consumer的group的名字，group名一样的进程属于同一个consumer group。
         propsMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         propsMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, "wlyy-analysis-group");
+        propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, "ehr-protal-group");//wlyy-analysis-group
         propsMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         return propsMap;
     }

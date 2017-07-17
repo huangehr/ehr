@@ -60,8 +60,8 @@ public class BusinessDataModel extends DataModel implements Serializable {
             businessDataModel.setResponseCode(chlidren.getString("responseCode"));
             businessDataModel.setResponse(chlidren.getString("response"));
             businessDataModel.setAppKey(chlidren.getString("appKey"));
-            businessDataModel.setOperation(chlidren.getString("operation"));
-            businessDataModel.setFunction(chlidren.getString("function"));
+//            businessDataModel.setOperation(chlidren.getString("operation"));
+//            businessDataModel.setFunction(chlidren.getString("function"));
 
         } catch (Exception e) {
             throw new Exception("格式错误");
