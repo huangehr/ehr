@@ -3,9 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-   <modelVersion>4.0.0</modelVersion>
-   
-   <parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
         <artifactId>ehr-ms-parent-pom</artifactId>
         <groupId>com.yihu.ehr</groupId>
         <version>1.1.0</version>
@@ -104,16 +104,16 @@
             <artifactId>commons-pool2</artifactId>
             <version>${version.commons-pool2}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>commons-dbutils</groupId>-->
-            <!--<artifactId>commons-dbutils</artifactId>-->
-            <!--<version>${version.commons-dbutils}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.commons</groupId>-->
-            <!--<artifactId>commons-dbcp2</artifactId>-->
-            <!--<version>${version.commons-dbcp2}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <version>${version.commons-dbutils}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>${version.commons-dbcp2}</version>
+        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -131,16 +131,16 @@
         </dependency>
 
         <!--Hibernate framework-->
-        <!--<dependency>-->
-            <!--<groupId>org.hibernate.javax.persistence</groupId>-->
-            <!--<artifactId>hibernate-jpa-2.1-api</artifactId>-->
-            <!--<version>${version.hibernate-jpa-api}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.hibernate</groupId>-->
-            <!--<artifactId>hibernate-core</artifactId>-->
-            <!--<version>${version.hibernate}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <version>${version.hibernate-jpa-api}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${version.hibernate}</version>
+        </dependency>
         <!--Miscellaneous-->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -178,17 +178,55 @@
             <version>${version.swagger-ui}</version>
         </dependency>
         <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${version.mysql}</version>
+        </dependency>
+        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>${version.joda-time}</version>
         </dependency>
+        <!--<dependency>-->
+        <!--<groupId>redis.clients</groupId>-->
+        <!--<artifactId>jedis</artifactId>-->
+        <!--<version>${version.jedis}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>${version.commons-codec}</version>
         </dependency>
 
-    <!--Log framework-->
+
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.kafka</groupId>-->
+            <!--<artifactId>spring-kafka</artifactId>-->
+            <!--<version>1.1.0.RELEASE</version>-->
+        <!--</dependency>-->
+
+        <dependency>
+        <groupId>org.springframework.kafka</groupId>
+        <artifactId>kafka-clients</artifactId>
+        <version>0.9.0.2.3.4.0-3485</version>
+        <scope>system</scope>
+        <systemPath>E:\repository\repository\org\springframework\kafka\kafka-clients\0.9.0.2.3.4.0-3485\kafka-clients-0.9.0.2.3.4.0-3485.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>1.0.6.RELEASE</version>
+            <exclusions>
+            <exclusion>
+            <artifactId>kafka-clients</artifactId>
+            <groupId>org.apache.kafka</groupId>
+            </exclusion>
+            </exclusions>
+        </dependency>
+
+
+        <!--Log framework-->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
@@ -311,13 +349,11 @@
             <artifactId>spring-boot-actuator-docs</artifactId>
             <version>${version.spring-boot}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <version>${version.spring-boot}</version>
-        </dependency>
-
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-devtools</artifactId>-->
+        <!--<version>${version.spring-boot}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -333,28 +369,26 @@
             <artifactId>spring-boot-starter-aop</artifactId>
             <version>${version.spring-boot}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-data-jpa</artifactId>-->
-            <!--<version>${version.spring-boot}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-jdbc</artifactId>-->
-            <!--<version>${version.spring-boot}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${version.spring-boot}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>${version.spring-boot}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
             <version>${version.spring-boot}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>${version.spring-boot}</version>
-        </dependency>
-
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-security</artifactId>-->
+        <!--<version>${version.spring-boot}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -386,20 +420,27 @@
             <artifactId>json</artifactId>
             <version>20151123</version>
         </dependency>
-
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.data</groupId>-->
+        <!--<artifactId>spring-data-redis</artifactId>-->
+        <!--<version>1.7.2.RELEASE</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>4.1.8.RELEASE</version>
+        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>net.sf.json-lib</groupId>-->
+        <!--<artifactId>json-lib</artifactId>-->
+        <!--<version>2.4</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.ansj</groupId>
             <artifactId>ansj_seg</artifactId>
             <version>5.1.0</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-            <version>1.0.6.RELEASE</version>
-        </dependency>
-
     </dependencies>
 
     <build>
