@@ -1,6 +1,8 @@
 package com.yihu.ehr.user.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.org.dao.XOrganizationRepository;
+import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.user.dao.XDoctorRepository;
 import com.yihu.ehr.user.dao.XUserRepository;
@@ -34,6 +36,8 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    private XOrganizationRepository organizationRepository;
 
     /**
      * 根据用户ID获取医生信息
@@ -135,7 +139,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     @Transactional(propagation = Propagation.REQUIRED)
     public String addDoctorBatch(List<Map<String, Object>> doctorLs)
     {
-        String header = "INSERT INTO doctors(code, name, sex, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction,id_card_no, office_tel, status) VALUES \n";
+        String header = "INSERT INTO doctors(code, name, sex,orgCode,orgId,org_full_name,dept_name, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction,id_card_no, office_tel, status) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
@@ -145,6 +149,11 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             sql.append("('"+ null2Space(map .get("code")) +"'");
             sql.append(",'"+ map .get("name") +"'");
             sql.append(",'"+ map .get("sex") +"'");
+            sql.append(",'"+ map .get("orgCode") +"'");
+            Organization org= getOrg(map .get("orgCode").toString());
+            sql.append(",'"+ org.getId() +"'");
+            sql.append(",'"+ map .get("orgFullName") +"'");
+            sql.append(",'"+ map .get("orgDeptName") +"'");
             sql.append(",'"+ map .get("skill") +"'");
             sql.append(",'"+ map .get("workPortal") +"'");
             sql.append(",'"+ null2Space(map .get("email")) +"'");
@@ -216,5 +225,14 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
         sqlQuery.setParameterList("idCardNos", idCardNos);
         return sqlQuery.list();
+    }
+
+    public Organization getOrg(String orgCode) {
+        List<Organization> list =  organizationRepository.findOrgByCode(orgCode);
+        if (list.size()>0){
+            return list.get(0);
+        }else {
+            return null;
+        }
     }
 }
