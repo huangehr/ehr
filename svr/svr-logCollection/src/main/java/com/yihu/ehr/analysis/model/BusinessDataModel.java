@@ -52,18 +52,19 @@ public class BusinessDataModel extends DataModel implements Serializable {
             businessDataModel.setTime(jsonObject.getString("time"));
 
             JSONObject chlidren = jsonObject.getJSONObject("data");
-            businessDataModel.setData(chlidren.getJSONObject("data").toString());
-            businessDataModel.setBusinessType(String.valueOf(chlidren.get("businessType")));
             businessDataModel.setPatient(chlidren.getString("patient"));
             businessDataModel.setUrl(chlidren.getString("url"));
-            businessDataModel.setResponseTime(chlidren.getString("responseTime"));
-            businessDataModel.setResponseCode(chlidren.getString("responseCode"));
+            businessDataModel.setResponseTime(String.valueOf(chlidren.getInt("responseTime")));
+            businessDataModel.setResponseCode(String.valueOf(chlidren.getInt("responseCode")));
             businessDataModel.setResponse(chlidren.getString("response"));
             businessDataModel.setAppKey(chlidren.getString("appKey"));
+//            businessDataModel.setData(chlidren.getJSONObject("data").toString());
+//            businessDataModel.setBusinessType(String.valueOf(chlidren.get("businessType")));
 //            businessDataModel.setOperation(chlidren.getString("operation"));
 //            businessDataModel.setFunction(chlidren.getString("function"));
 
         } catch (Exception e) {
+            System.out.println("格式错误"+ e.getMessage());
             throw new Exception("格式错误");
         }
         return businessDataModel;
