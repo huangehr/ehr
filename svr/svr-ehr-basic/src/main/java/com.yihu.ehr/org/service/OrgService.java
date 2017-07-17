@@ -4,6 +4,7 @@ import com.yihu.ehr.org.dao.XOrganizationRepository;
 import com.yihu.ehr.org.feign.GeographyClient;
 import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.query.BaseJpaService;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,5 +105,20 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     public List<Organization> getAllSaasOrgs(String name) {
         List<Organization> codes = organizationRepository.fingorgByFullnameOrShortName(name);
         return codes;
+    }
+
+    public List orgCodeExistence(String[] orgCode) {
+        String sql = "SELECT org_code FROM organizations WHERE org_code in(:orgCode)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("orgCode", orgCode);
+        return sqlQuery.list();
+    }
+
+    public String getOrgIdByOrgCode(String orgCode) {
+        List<Long> orgId = organizationRepository.getOrgIdByOrgCode(orgCode);
+        if (null != orgId && orgId.size() > 0) {
+            return Long.toString(orgId.get(0));
+        }
+        return null;
     }
 }

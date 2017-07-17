@@ -5,6 +5,9 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.user.MDoctor;
+import com.yihu.ehr.org.model.OrgMemberRelation;
+import com.yihu.ehr.org.service.OrgDeptService;
+import com.yihu.ehr.org.service.OrgMemberRelationService;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.user.service.DoctorService;
@@ -16,6 +19,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +42,10 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     DoctorService doctorService;
     @Autowired
     private UserManager userManager;
+    @Autowired
+    private OrgDeptService orgDeptService;
+    @Autowired
+    private OrgMemberRelationService relationService;
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.GET)
     @ApiOperation(value = "获取医生列表", notes = "根据查询条件获取医生列表在前端表格展示")
@@ -162,6 +170,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
               d.setEmail(objectList[9].toString());
               d.setPhone(objectList[10].toString());
               d.setIdCardNo(objectList[22].toString());
+
               //根据身份证和电话号码，判断账户表中是否存在该用户。若存在 将用户表与医生表关联；若不存在，为该医生初始化账户。
               StringBuffer stringBuffer = new StringBuffer();
               stringBuffer.append("idCardNo=" + d.getIdCardNo()+ ";");
@@ -178,6 +187,28 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                   //若不存在，为该医生初始化账户。
                   existPhonesList.add(d);
               }
+              String orgId="";
+              if(!StringUtils.isEmpty(objectList[23])){
+                  orgId=objectList[23].toString();
+              }
+              String deptName="";
+              if(!StringUtils.isEmpty(objectList[26])){
+                  deptName=objectList[26].toString();
+              }
+              // 根据机构id和部门名称 获取部门id
+            int deptId=  orgDeptService.getOrgDeptByOrgIdAndName(orgId, deptName);
+
+              OrgMemberRelation memberRelation = new OrgMemberRelation();
+              memberRelation.setOrgId(orgId);
+              if(!StringUtils.isEmpty(objectList[25])){
+                  memberRelation.setOrgName(objectList[25].toString());
+              }
+              memberRelation.setDeptId(deptId);
+              memberRelation.setDeptName(deptName);
+              memberRelation.setUserId(String.valueOf(d.getId()));
+              memberRelation.setUserName(d.getName());
+              memberRelation.setStatus(0);
+              relationService.save(memberRelation);
           }
         }
         if(null!=existPhonesList&&existPhonesList.size()>0){
