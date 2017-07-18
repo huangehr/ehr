@@ -3,8 +3,8 @@ package com.yihu.ehr.logs.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "WLYY_BUSINESS_LOG")
-public class WLYY_BUSINESS_LOG {
+@Document(collection = "cloudBusinessLog")
+public class cloudBusinessLog {
     @Id
     private String id;              //uuid
     private String caller;         //业务操作者
@@ -13,6 +13,12 @@ public class WLYY_BUSINESS_LOG {
     private String businessType; //业务代码
     private String patient;       //关联居民 - 与caller相同
     private String data;          //相关信息
+    private String responseCode; //
+    private String response;     //
+    private String responseTime;
+    private String appKey;
+    private String url;
+    private String params;
 
     public String getId() {
         return id;
@@ -68,5 +74,53 @@ public class WLYY_BUSINESS_LOG {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public String getResponseCode() {
+        return responseCode;
+    }
+
+    public void setResponseCode(String responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public String getResponseTime() {
+        return responseTime;
+    }
+
+    public void setResponseTime(String responseTime) {
+        this.responseTime = responseTime;
+    }
+
+    public String getAppKey() {
+        return appKey;
+    }
+
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getParams() {
+        return params;
+    }
+
+    public void setParams(String params) {
+        this.params = params;
     }
 }
