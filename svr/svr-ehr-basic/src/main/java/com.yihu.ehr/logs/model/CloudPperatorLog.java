@@ -3,8 +3,8 @@ package com.yihu.ehr.logs.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "cloudPperator")
-public class cloudPperator {
+@Document(collection = "CloudPperatorLog")
+public class CloudPperatorLog {
     @Id
     private String id;              //uuid
     private String caller;         //业务操作者
