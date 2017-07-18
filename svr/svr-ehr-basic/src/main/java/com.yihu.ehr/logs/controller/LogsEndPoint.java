@@ -1,24 +1,19 @@
 package com.yihu.ehr.logs.controller;
 
-import com.mongodb.Mongo;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.SessionAttributeKeys;
-import com.yihu.ehr.controller.BaseUIController;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.logs.model.WLYY_BUSINESS_LOG;
-import com.yihu.ehr.logs.model.WLYY_OPERATOR_LOG;
+import com.yihu.ehr.logs.model.cloudBusinessLog;
+import com.yihu.ehr.logs.model.cloudPperatorLog;
 import com.yihu.ehr.model.common.ListResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -37,7 +32,7 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/log/getBussinessLogs", method = RequestMethod.GET)
-    @ApiOperation(value = "根据传入的参数进行MONGODB日志列表的查询", response = WLYY_BUSINESS_LOG.class, responseContainer = "List")
+    @ApiOperation(value = "根据传入的参数进行MONGODB日志列表的查询", response = cloudBusinessLog.class, responseContainer = "List")
     public ListResult getBusinessLogs(
             @ApiParam(name = "data", value = "数据", defaultValue = "")
             @RequestParam(value = "data", required = false) String data,
@@ -84,12 +79,14 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
         }
         query.addCriteria(cr);
         query.limit(end - begin).skip(begin);//分页数据
-        List<WLYY_BUSINESS_LOG> logsModelList =  mongoTemplate.find(query, WLYY_BUSINESS_LOG.class);
+        List<cloudBusinessLog> logsModelList =  mongoTemplate.find(query, cloudBusinessLog.class);
+
+        long totalCount = mongoTemplate.count(query, cloudBusinessLog.class);
         ListResult listResult = new ListResult();
         if(logsModelList.size() > 0) {
             listResult.setDetailModelList(logsModelList);
             listResult.setSuccessFlg(true);
-            listResult.setTotalCount(logsModelList.size());
+            listResult.setTotalCount((int)totalCount);
             listResult.setCode(200);
             listResult.setMessage("日志查询成功！");
             listResult.setCurrPage(page);
@@ -104,7 +101,7 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
 
 
     @RequestMapping(value = "/log/getOperatorLogs", method = RequestMethod.GET)
-    @ApiOperation(value = "根据传入的参数进行MONGODB日志列表的查询", response = WLYY_OPERATOR_LOG.class, responseContainer = "List")
+    @ApiOperation(value = "根据传入的参数进行MONGODB日志列表的查询", response = cloudPperatorLog.class, responseContainer = "List")
     public ListResult getOperatorLogs(
             @ApiParam(name = "data", value = "数据", defaultValue = "")
             @RequestParam(value = "data", required = false) String data,
@@ -151,12 +148,13 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
         }
         query.addCriteria(cr);
         query.limit(end - begin).skip(begin);//分页数据
-        List<WLYY_OPERATOR_LOG> logsModelList =  mongoTemplate.find(query, WLYY_OPERATOR_LOG.class);
+        List<cloudPperatorLog> logsModelList =  mongoTemplate.find(query, cloudPperatorLog.class);
+        long totalCount = mongoTemplate.count(query, cloudBusinessLog.class);
         ListResult listResult = new ListResult();
         if(logsModelList.size() > 0) {
             listResult.setDetailModelList(logsModelList);
             listResult.setSuccessFlg(true);
-            listResult.setTotalCount(logsModelList.size());
+            listResult.setTotalCount((int)totalCount);
             listResult.setCode(200);
             listResult.setMessage("日志查询成功！");
             listResult.setCurrPage(page);
