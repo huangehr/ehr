@@ -5,6 +5,11 @@ logging:
   level:
     root: INFO
 
+service-gateway:
+  username: user
+  password: eureka
+  url: http://localhost:10000/api/v1.0/admin
+
 kafka:
   broker:
     address: node1.hde.h3c.com:6667

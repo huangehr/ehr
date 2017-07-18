@@ -1,9 +1,17 @@
 package com.yihu.ehr.analysis.model;
 
+import com.yihu.ehr.analysis.service.AppFeatureService;
+import com.yihu.ehr.util.rest.Envelop;
+import org.apache.commons.collections.CollectionUtils;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/2/9.
@@ -30,8 +38,11 @@ import java.io.Serializable;
  * }
  */
 @Document
+@Component
 public class BusinessDataModel extends DataModel implements Serializable {
 
+    @Autowired
+    private AppFeatureService appFeatureService;
     private String data;
     private String businessType;
     private String patient;
@@ -44,7 +55,7 @@ public class BusinessDataModel extends DataModel implements Serializable {
     private String function;
 
 
-    public static BusinessDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
+    public BusinessDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
         BusinessDataModel businessDataModel = new BusinessDataModel();
         try {
             businessDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
@@ -58,10 +69,18 @@ public class BusinessDataModel extends DataModel implements Serializable {
             businessDataModel.setResponseCode(String.valueOf(chlidren.getInt("responseCode")));
             businessDataModel.setResponse(chlidren.getString("response"));
             businessDataModel.setAppKey(chlidren.getString("appKey"));
+
+            Object obj = appFeatureService.appFeatureFindUrl("/standardsource/updateStdSource");
+            Map<String,String> map = new HashMap<>();
+            if(obj != null){
+                map = appFeatureService.getOperatPageName(obj);
+            }
 //            businessDataModel.setData(chlidren.getJSONObject("data").toString());
 //            businessDataModel.setBusinessType(String.valueOf(chlidren.get("businessType")));
-//            businessDataModel.setOperation(chlidren.getString("operation"));
-//            businessDataModel.setFunction(chlidren.getString("function"));
+            if(map != null && map.size() > 0){
+                businessDataModel.setOperation(map.get("operation"));
+                businessDataModel.setFunction(map.get("function"));
+            }
 
         } catch (Exception e) {
             System.out.println("格式错误"+ e.getMessage());
@@ -69,6 +88,8 @@ public class BusinessDataModel extends DataModel implements Serializable {
         }
         return businessDataModel;
     }
+
+
 
 
     public String getUrl() {

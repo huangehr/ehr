@@ -2,6 +2,7 @@ package com.yihu.ehr.analysis.listener;
 
 import com.yihu.ehr.analysis.model.BusinessDataModel;
 import com.yihu.ehr.analysis.model.OperatorDataModel;
+import com.yihu.ehr.analysis.service.AppFeatureService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -21,9 +22,14 @@ public class LabelDataListener {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private OperatorDataModel operatorDataModel;
+    @Autowired
+    private BusinessDataModel businessDataModel;
 
-    private static String mongoDb_Business_TableName = "cloudBusinessLog";
-    private static String mongoDb_Operator_TableName = "cloudOperatorLog";
+
+    private static String mongoDb_Business_TableName = "CloudBusinessLog";
+    private static String mongoDb_Operator_TableName = "CloudOperatorLog";
 
     //@Scheduled(cron = "0 0/1 * * * ?") //每分钟执行一次
     //正式库的 topic名字是flumeLog
@@ -31,6 +37,7 @@ public class LabelDataListener {
     @Transactional
     public void labelData(ConsumerRecord<?, ?> record) {
         Long startTime = System.currentTimeMillis();
+        System.out.println("Kafka开始消费:" + record.topic() + " - " + record.toString());
         logger.debug("Kafka开始消费");
         Optional<?> kafkaMessage = Optional.ofNullable(record.value());
         if (kafkaMessage.isPresent()) {
@@ -61,17 +68,17 @@ public class LabelDataListener {
         switch (logType) {
             case "1": {
                 //统一网关的日志
-                insertMongo(OperatorDataModel.getByJsonObject(jsonObject),mongoDb_Operator_TableName);
+                insertMongo(operatorDataModel.getByJsonObject(jsonObject),mongoDb_Operator_TableName);
                 break;
             }
             case "3": {
                 //云平台后台业务操作日志
-                insertMongo(BusinessDataModel.getByJsonObject(jsonObject),mongoDb_Business_TableName);
+                insertMongo(businessDataModel.getByJsonObject(jsonObject),mongoDb_Business_TableName);
                 break;
             }
             case "2": {
                 //采集日志
-                insertMongo(BusinessDataModel.getByJsonObject(jsonObject),mongoDb_Business_TableName);
+                insertMongo(businessDataModel.getByJsonObject(jsonObject),mongoDb_Business_TableName);
                 break;
             }
         }
@@ -79,9 +86,7 @@ public class LabelDataListener {
     }
 
     private void insertMongo(Object data, String tableName) {
-        mongoTemplate.insert(
-                data, tableName
-        );
+        mongoTemplate.insert( data, tableName);
     }
 //    @Scheduled(fixedRate=20000)//每20秒执行一次。开始
 //    public void testTasks() {

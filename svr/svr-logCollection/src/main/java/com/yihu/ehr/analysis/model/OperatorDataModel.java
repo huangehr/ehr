@@ -1,7 +1,11 @@
 package com.yihu.ehr.analysis.model;
 
+import com.yihu.ehr.analysis.service.AppFeatureService;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 
@@ -19,7 +23,11 @@ import java.io.Serializable;
  * }
  */
 @Document
+@Component
 public class OperatorDataModel extends DataModel implements Serializable {
+
+    @Autowired
+    private AppFeatureService appFeatureService;
 
     private String responseTime;
     private String responseCode;
@@ -29,7 +37,7 @@ public class OperatorDataModel extends DataModel implements Serializable {
     private String url;
     private String params;
 
-    public static OperatorDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
+    public  OperatorDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
         OperatorDataModel operatorDataModel = new OperatorDataModel();
         try {
             operatorDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
@@ -43,6 +51,7 @@ public class OperatorDataModel extends DataModel implements Serializable {
             operatorDataModel.setApi(chlidren.getString("api"));
             operatorDataModel.setAppKey(chlidren.getString("appKey"));
             operatorDataModel.setUrl(chlidren.getString("url"));
+            appFeatureService.appFeatureFindUrl(chlidren.getString("url"));
             operatorDataModel.setParams(chlidren.getString("params"));
 
         } catch (Exception e) {
