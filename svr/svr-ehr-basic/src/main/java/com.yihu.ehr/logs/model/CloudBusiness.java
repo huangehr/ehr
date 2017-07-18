@@ -3,11 +3,11 @@ package com.yihu.ehr.logs.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "cloudBusinessLog")
-public class cloudBusinessLog {
+@Document(collection = "CloudBusiness")
+public class CloudBusiness {
     @Id
     private String id;              //uuid
-    private String caller;         //业务操作者
+    private String caller;         //业务操作�?
     private String time;           //操作时间
     private String logType;       //日志类型
     private String businessType; //业务代码
