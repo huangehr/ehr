@@ -3,8 +3,8 @@ package com.yihu.ehr.logs.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.logs.model.cloudBusinessLog;
-import com.yihu.ehr.logs.model.cloudPperatorLog;
+import com.yihu.ehr.logs.model.CloudBusinessLog;
+import com.yihu.ehr.logs.model.CloudPperatorLog;
 import com.yihu.ehr.model.common.ListResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +32,7 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/log/getBussinessLogs", method = RequestMethod.GET)
-    @ApiOperation(value = "根据传入的参数进行MONGODB日志列表的查询", response = cloudBusinessLog.class, responseContainer = "List")
+    @ApiOperation(value = "根据传入的参数进行MONGODB日志列表的查询", response = CloudBusinessLog.class, responseContainer = "List")
     public ListResult getBusinessLogs(
             @ApiParam(name = "data", value = "数据", defaultValue = "")
             @RequestParam(value = "data", required = false) String data,
@@ -79,9 +79,9 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
         }
         query.addCriteria(cr);
         query.limit(end - begin).skip(begin);//分页数据
-        List<cloudBusinessLog> logsModelList =  mongoTemplate.find(query, cloudBusinessLog.class);
+        List<CloudBusinessLog> logsModelList =  mongoTemplate.find(query, CloudBusinessLog.class);
 
-        long totalCount = mongoTemplate.count(query, cloudBusinessLog.class);
+        long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
         ListResult listResult = new ListResult();
         if(logsModelList.size() > 0) {
             listResult.setDetailModelList(logsModelList);
@@ -101,7 +101,7 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
 
 
     @RequestMapping(value = "/log/getOperatorLogs", method = RequestMethod.GET)
-    @ApiOperation(value = "根据传入的参数进行MONGODB日志列表的查询", response = cloudPperatorLog.class, responseContainer = "List")
+    @ApiOperation(value = "根据传入的参数进行MONGODB日志列表的查询", response = CloudPperatorLog.class, responseContainer = "List")
     public ListResult getOperatorLogs(
             @ApiParam(name = "data", value = "数据", defaultValue = "")
             @RequestParam(value = "data", required = false) String data,
@@ -148,8 +148,8 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
         }
         query.addCriteria(cr);
         query.limit(end - begin).skip(begin);//分页数据
-        List<cloudPperatorLog> logsModelList =  mongoTemplate.find(query, cloudPperatorLog.class);
-        long totalCount = mongoTemplate.count(query, cloudBusinessLog.class);
+        List<CloudPperatorLog> logsModelList =  mongoTemplate.find(query, CloudPperatorLog.class);
+        long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
         ListResult listResult = new ListResult();
         if(logsModelList.size() > 0) {
             listResult.setDetailModelList(logsModelList);
