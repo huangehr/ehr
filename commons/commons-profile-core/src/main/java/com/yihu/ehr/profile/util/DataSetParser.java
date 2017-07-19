@@ -1,7 +1,6 @@
 package com.yihu.ehr.profile.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.yihu.ehr.profile.exception.LegacyPackageException;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -35,12 +34,12 @@ public class DataSetParser {
         String version = root.get("inner_version").asText();
         //if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
 
-        String dataSetCode = root.get("code").isNull() ? "" : root.get("code").asText();
-        String eventNo = root.get("event_no").isNull() ? "" : root.get("event_no").asText();
-        String patientId = root.get("patient_id").isNull() ? "" : root.get("patient_id").asText();
-        String orgCode = root.get("org_code").isNull() ? "" : root.get("org_code").asText();
-        String createTime = root.get("create_date").isNull() ? "" : root.get("create_date").asText();
-        String eventTime = root.path("event_time").isNull() ? "" : root.path("event_time").asText();    // 旧数据集结构可能不存在这个属性*/
+        String dataSetCode = root.get("code") == null? "" : root.get("code").asText();
+        String eventNo = root.get("event_no") == null ? "" : root.get("event_no").asText();
+        String patientId = root.get("patient_id") == null ? "" : root.get("patient_id").asText();
+        String orgCode = root.get("org_code") == null ? "" : root.get("org_code").asText();
+        String createTime = root.get("create_date") == null ? "" : root.get("create_date").asText();
+        String eventTime = root.path("event_time") == null ? "" : root.path("event_time").asText();    // 旧数据集结构可能不存在这个属性*/
 
         //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
         String errorMsg = "";
@@ -57,7 +56,7 @@ public class DataSetParser {
             errorMsg = errorMsg + "orgCode is null;";
         }
 
-        if(StringUtils.isEmpty(errorMsg)){
+        if(!StringUtils.isEmpty(errorMsg)){
             throw new RuntimeException("Invalid date time format.");
         }
 
