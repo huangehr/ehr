@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/2/9.
@@ -48,11 +50,12 @@ public class OperatorDataModel extends DataModel implements Serializable {
             operatorDataModel.setResponseTime(chlidren.get("responseTime").toString());
             operatorDataModel.setResponseCode(chlidren.getString("responseCode"));
             operatorDataModel.setResponse(chlidren.getString("response"));
-            operatorDataModel.setApi(chlidren.getString("api"));
-            operatorDataModel.setAppKey(chlidren.getString("appKey"));
             operatorDataModel.setUrl(chlidren.getString("url"));
-            appFeatureService.appFeatureFindUrl(chlidren.getString("url"));
-            operatorDataModel.setParams(chlidren.getString("params"));
+
+            JSONObject paramsChild = chlidren.getJSONObject("params");
+            operatorDataModel.setApi(paramsChild.getString("api"));
+            operatorDataModel.setAppKey(paramsChild.getString("appKey"));
+            operatorDataModel.setParams(paramsChild.getString("param"));
 
         } catch (Exception e) {
             throw new Exception("格式错误");
@@ -116,6 +119,5 @@ public class OperatorDataModel extends DataModel implements Serializable {
     public void setAppKey(String appKey) {
         this.appKey = appKey;
     }
-
 
 }
