@@ -251,4 +251,139 @@ public class DemographicService {
         return ((Long)query.list().get(0)).intValue();
     }
 
+    public List<DemographicInfo> searchPatientByParams2(Map<String, Object> args) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String search = (String) args.get("search");
+        Integer page = (Integer) args.get("page");
+        Integer pageSize = (Integer) args.get("pageSize");
+
+        String province = (String) args.get("province");
+        String city = (String) args.get("city");
+        String district = (String) args.get("district");
+        String gender = (String) args.get("gender");
+        String districtList = (String) args.get("districtList");
+        List<String> locationList = stringToList(districtList);
+
+        Date searchRegisterTimeStart = (Date) args.get("startDate");
+        Date searchRegisterTimeEnd = (Date) args.get("endDate");
+
+        boolean addressNotNull=(!StringUtils.isEmpty(province) || !StringUtils.isEmpty(city) || !StringUtils.isEmpty(district));
+        List<String> homeAddressIdList = null;
+        String hql = "from DemographicInfo where 1=1";
+        if (!StringUtils.isEmpty(search)) {
+            hql += " and ((id like :search) or (name like :search))";
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            hql += " and gender = (:gender)";
+        }
+        if (addressNotNull) {
+            homeAddressIdList = addressClient.search(province,city,district);
+            hql += " and homeAddress in (:homeAddressIdList)";
+        }
+        if (!StringUtils.isEmpty(districtList)) {
+            hql += " and homeAddress in (:locationList)";
+        } else {
+            hql += " and homeAddress in ('-1')";
+        }
+
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            hql += " and registerTime>= :searchRegisterTimeStart";
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            hql += " and registerTime < :searchRegisterTimeEnd";
+        }
+        hql += " order by registerTime desc";
+        Query query = session.createQuery(hql);
+        if (!StringUtils.isEmpty(search)) {
+            query.setString("search", "%" + search + "%");
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            query.setString("gender", gender);
+        }
+        if (addressNotNull) {
+            query.setParameterList("homeAddressIdList", homeAddressIdList);
+        }
+        if (!StringUtils.isEmpty(districtList)) {
+            query.setParameterList("locationList", locationList);
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            query.setDate("searchRegisterTimeStart",searchRegisterTimeStart);
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            query.setDate("searchRegisterTimeEnd", searchRegisterTimeEnd);
+        }
+        query.setMaxResults(pageSize);
+        query.setFirstResult((page - 1) * pageSize);
+        List<DemographicInfo> demographicInfos = query.list();
+        return demographicInfos;
+    }
+
+    public Integer searchPatientByParamsTotalCount2(Map<String, Object> args) {
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        String search = (String) args.get("search");
+
+        String province = (String) args.get("province");
+        String city = (String) args.get("city");
+        String district = (String) args.get("district");
+        String gender = (String) args.get("gender");
+        String districtList = (String) args.get("districtList");
+        Date searchRegisterTimeStart = (Date) args.get("startDate");
+        Date searchRegisterTimeEnd = (Date) args.get("endDate");
+        List<String> locationList = stringToList(districtList);
+        boolean addressNotNull=(!StringUtils.isEmpty(province) || !StringUtils.isEmpty(city) || !StringUtils.isEmpty(district));
+        List<String> homeAddressIdList = null;
+        String hql = "select count(*) from DemographicInfo where 1=1";
+        if (!StringUtils.isEmpty(search)) {
+            hql += " and ((id like :search) or (name like :search))";
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            hql += " and gender = (:gender)";
+        }
+        if (addressNotNull) {
+            homeAddressIdList = addressClient.search(province,city,district);
+            hql += " and homeAddress in (:homeAddressIdList)";
+        }
+
+        if (!StringUtils.isEmpty(districtList)) {
+            hql += " and homeAddress in (:locationList)";
+        } else {
+            hql += " and homeAddress in ('-1')";
+        }
+
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            hql += " and registerTime >= :searchRegisterTimeStart";
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            hql += " and registerTime < :searchRegisterTimeEnd";
+        }
+        Query query = session.createQuery(hql);
+        if (!StringUtils.isEmpty(search)) {
+            query.setString("search", "%" + search + "%");
+        }
+        if (!StringUtils.isEmpty(gender)) {
+            query.setString("gender", gender);
+        }
+        if (addressNotNull) {
+            query.setParameterList("homeAddressIdList", homeAddressIdList);
+        }
+        if (!StringUtils.isEmpty(districtList)) {
+            query.setParameterList("locationList", locationList);
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeStart)) {
+            query.setDate("searchRegisterTimeStart", searchRegisterTimeStart);
+        }
+        if (!StringUtils.isEmpty(searchRegisterTimeEnd)) {
+            query.setDate("searchRegisterTimeEnd", searchRegisterTimeEnd);
+        }
+        return ((Long)query.list().get(0)).intValue();
+    }
+
+    private List<String> stringToList(String districtList) {
+        List<String> locationList = null;
+        if (!StringUtils.isEmpty(districtList)) {
+            String[] arr = districtList.split(",");
+            locationList = Arrays.asList(arr);
+        }
+        return locationList;
+    }
 }

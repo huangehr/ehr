@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -118,6 +119,27 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
         List<Long> orgId = organizationRepository.getOrgIdByOrgCode(orgCode);
         if (null != orgId && orgId.size() > 0) {
             return Long.toString(orgId.get(0));
+        }
+        return null;
+    }
+
+    public String getOrgCodeByOrgId(Long orgId) {
+        return organizationRepository.findOrgCodeByOrgId(orgId);
+    }
+
+    public List<String> getOrgCodeByFullName(List<String> fullName) {
+        List<String> list = organizationRepository.findOrgCodeByFullName(fullName);
+        return list;
+    }
+
+    public List<String> getOrgIdByOrgCodeList(List<String> orgCode) {
+        List<Long> orgId = organizationRepository.findOrgIdByOrgCodeList(orgCode);
+        List<String> orgIdList = new ArrayList<>();
+        if (null != orgId && orgId.size() > 0) {
+            for (Long l : orgId) {
+                orgIdList.add(Long.toString(l));
+                return orgIdList;
+            }
         }
         return null;
     }
