@@ -86,29 +86,11 @@ public class BusinessDataModel extends DataModel implements Serializable {
                     businessDataModel.setFunction(map.get("function"));
                 }
             }
-
-
         } catch (Exception e) {
-            System.out.println("格式错误"+ e.getMessage());
             throw new Exception("格式错误");
         }
         return businessDataModel;
     }
-
-    public static void main(String[] args){
-        //http://172.19.103.37:8080/esb/flow/initial
-        String api = "http://172.19.103.37:8080/esb/flow/initial";
-        String a = api.substring(api.lastIndexOf(":"));
-        System.out.println(a);
-        String b = a.substring(a.indexOf("/") + 1);
-        System.out.println(b);
-
-
-        System.out.println(b.substring(b.indexOf("/")+1));
-    }
-
-
-
 
     public String getUrl() {
         return url;
