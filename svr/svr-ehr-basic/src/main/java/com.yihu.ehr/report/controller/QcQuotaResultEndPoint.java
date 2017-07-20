@@ -193,7 +193,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                     String eventTime=obj[2].toString();
                     if(null!=eventTime&&!"".equals(eventTime)){
                         //事件时间
-                        qc.setEventTime(eventTime.substring(0,4)+'年'+eventTime.substring(5,7)+'月'+eventTime.substring(8,10)+'日');
+                        qc.setEventTime(eventTime.substring(0,4)+"年"+eventTime.substring(5,7)+"月"+eventTime.substring(8,10)+"日");
                     }
                     int realNum = 0;
                     int totalNum = 0;
@@ -283,7 +283,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                 String eventTime=obj[2].toString();
                 if(null!=eventTime&&!"".equals(eventTime)){
                     //事件时间
-                    qc.setEventTime(eventTime.substring(0,4)+'年'+eventTime.substring(5,7)+'月'+eventTime.substring(8,10)+'日');
+                    qc.setEventTime(eventTime.substring(0,4)+"年"+eventTime.substring(5,7)+"月"+eventTime.substring(8,10)+"日");
                 }
                 int realNum = 0;
                 int totalNum = 0;
@@ -512,7 +512,7 @@ public class QcQuotaResultEndPoint extends EnvelopRestEndPoint {
                 String newEventTime = "";
                 if (null != eventTime && !"".equals(eventTime)) {
                     //事件时间
-                    newEventTime = eventTime.substring(0, 4) + '年' + eventTime.substring(5, 7) + '月' + eventTime.substring(8, 10) + '日';
+                    newEventTime = eventTime.substring(0,4)+"年"+eventTime.substring(5,7)+"月"+eventTime.substring(8,10)+"日";
                 }
                 String qcKey = obj[2].toString().substring(0, 10) + obj[3].toString();
                 QcQuotaResultAnalyseMap.put(qcKey, newEventTime);
