@@ -138,6 +138,30 @@ public interface PatientClient {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows);
 
+    @RequestMapping(value = "/populationsByParams2", method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件查询人")
+    ResponseEntity<List<MDemographicInfo>> searchPatientByParams2(
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search") String search,
+            @ApiParam(name = "gender", value = "性别", defaultValue = "")
+            @RequestParam(value = "gender") String gender,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province") String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city") String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district") String district,
+            @ApiParam(name = "searchRegisterTimeStart", value = "注册开始时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeStart") String searchRegisterTimeStart,
+            @ApiParam(name = "searchRegisterTimeEnd", value = "注册结束时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeEnd") String searchRegisterTimeEnd,
+            @ApiParam(name = "districtList", value = "区域", defaultValue = "")
+            @RequestParam(value = "districtList") String districtList,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows") Integer rows);
+
     /**
      *居民信息-角色授权-角色组保存
      * @return
