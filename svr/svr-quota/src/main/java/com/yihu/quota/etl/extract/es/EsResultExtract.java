@@ -5,10 +5,12 @@ import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
 import com.alibaba.druid.sql.parser.ParserException;
 import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.Token;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.quota.etl.extract.ElasticsearchUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.es.ElasticFactory;
 import com.yihu.quota.model.jpa.TjQuota;
@@ -44,6 +46,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -68,44 +71,11 @@ public class EsResultExtract {
     @Autowired
     private ElasticFactory elasticFactory;
     @Autowired
+    ElasticsearchUtil elasticsearchUtil;
+    @Autowired
     private TjDataSaveService tjDataSaveService;
     @Autowired
     private ObjectMapper objectMapper;
-
-    public List<Map<String, Object>> queryResultListBySql(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
-        Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
-        if (params !=null && params.size() > 0){
-           for(String key : params.keySet()){
-               if( params.get(key) != null ){
-                   if(key.equals("startTime"))
-                       this.startTime = params.get(key).toString();
-                   if(key.equals("endTime"))
-                       this.endTime = params.get(key).toString();
-                   if(key.equals("orgName"))
-                       this.orgName = params.get(key).toString();
-                   if(key.equals("province"))
-                       this.province = params.get(key).toString();
-                   if(key.equals("city"))
-                       this.city = params.get(key).toString();
-                   if(key.equals("district"))
-                       this.district = params.get(key).toString();
-               }
-           }
-       }
-        this.tjQuota = tjQuota;
-        if(tjQuota.getCode() != null)
-            this.quotaCode = tjQuota.getCode();
-        this.pageNo = pageNo-1;
-        this.pageSize = pageSize;
-        EsConfig esConfig = null;
-        esConfig = getEsConfig(tjQuota);
-        this.esConfig = esConfig;
-        List<Map<String, Object>> restltList = query(esConfig);
-        for(Map<String,Object> map : restltList){
-            System.out.println(map);
-        }
-        return restltList;
-    }
 
     public EsConfig getEsConfig(TjQuota tjQuota) throws Exception {
         //得到该指标的数据存储
@@ -125,35 +95,58 @@ public class EsResultExtract {
         return esConfig;
     }
 
-    private List<Map<String, Object>> query(EsConfig esConfig){
-        Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
-       ////模糊查询
-//        WildcardQueryBuilder queryBuilder1 = QueryBuilders.wildcardQuery( "name", "*jack*");//搜索名字中含有jack的文档
-
-        SearchResponse actionGet = null;
-        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
-        getBoolQueryBuilder(boolQueryBuilder);
-        SortBuilder dealSorter = SortBuilders.fieldSort("quotaDate").order(SortOrder.DESC);
-
-        actionGet = client.prepareSearch(esConfig.getIndex())
-        .setTypes(esConfig.getType())
-        .setQuery(boolQueryBuilder)
-        .setFrom(pageNo).setSize(pageSize).addSort(dealSorter)
-        .execute().actionGet();
-        SearchHits hits = actionGet.getHits();
-        List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
-        for (SearchHit hit : hits.getHits()){
-            matchRsult.add(hit.getSource());
+    public void initialize(TjQuota tjQuota ,String filters) throws Exception {
+        if(!StringUtils.isEmpty(filters)){
+            Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
+            if (params !=null && params.size() > 0){
+                for(String key : params.keySet()){
+                    if( params.get(key) != null ){
+                        if(key.equals("startTime"))
+                            this.startTime = params.get(key).toString();
+                        if(key.equals("endTime"))
+                            this.endTime = params.get(key).toString();
+                        if(key.equals("orgName"))
+                            this.orgName = params.get(key).toString();
+                        if(key.equals("province"))
+                            this.province = params.get(key).toString();
+                        if(key.equals("city"))
+                            this.city = params.get(key).toString();
+                        if(key.equals("district"))
+                            this.district = params.get(key).toString();
+                    }
+                }
+            }
         }
-        return matchRsult;
+        this.tjQuota = tjQuota;
+        if(tjQuota.getCode() != null)
+            this.quotaCode = tjQuota.getCode();
+        EsConfig esConfig = null;
+        esConfig = getEsConfig(tjQuota);
+        this.esConfig = esConfig;
     }
 
-    public int getQuotaTotalCount(){
+    public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
+        initialize(tjQuota,filters);
+        this.pageNo = pageNo-1;
+        this.pageSize = pageSize;
+        List<Map<String, Object>> restltList = queryPageList(esConfig);
+        for(Map<String,Object> map : restltList){
+            System.out.println(map);
+        }
+        return restltList;
+    }
+
+    private List<Map<String, Object>> queryPageList(EsConfig esConfig){
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
-        long count = client.prepareCount(esConfig.getIndex()).setTypes(esConfig.getType()).setQuery(boolQueryBuilder).execute().actionGet().getCount();
-        return (int)count;
+        return elasticsearchUtil.queryPageList(esConfig,boolQueryBuilder,pageNo,pageSize,"quotaDate");
+    }
+
+    public int getQuotaTotalCount(TjQuota tjQuota,String filters) throws Exception {
+        initialize(tjQuota,filters);
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        getBoolQueryBuilder(boolQueryBuilder);
+        return (int)elasticsearchUtil.getTotalCount(esConfig, boolQueryBuilder);
     }
 
     public BoolQueryBuilder getBoolQueryBuilder(BoolQueryBuilder boolQueryBuilder){
@@ -190,95 +183,82 @@ public class EsResultExtract {
         return boolQueryBuilder;
     }
 
-
-    public Map<String, Integer> getQuotaReport(TjQuota tjQuota, String filters) throws Exception {
+    public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters) throws Exception {
+        initialize(tjQuota,filters);
+        EsConfig esConfig = getEsConfig(tjQuota);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        EsConfig esConfig = getEsConfig(tjQuota);
-        Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
-        String sql = "select quotaDate,sum(result) result from index_quota_test where  quotaCode= '"+ tjQuota.getCode() +"' group by quotaDate order by quotaDate desc ";
-        System.out.println(sql);
-        return esClientQuery(sql,client,"date");
+        List<Map<String, Object>> list = elasticsearchUtil.queryList(esConfig, boolQueryBuilder, "quotaDate");
+        return  list;
     }
 
-    public Map<String, Integer> getQuotaBreadReport(TjQuota tjQuota, String filters) throws Exception {
-        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
-        getBoolQueryBuilder(boolQueryBuilder);
-        EsConfig esConfig = getEsConfig(tjQuota);
-        Client client = elasticFactory.getClient(esConfig.getHost(), 9300, null);
-        String sql = "select town,sum(result) result from index_quota_test where  quotaCode= 'appointment_treetment_count' group by town order by quotaDate desc ";
-        System.out.println(sql);
-        return esClientQuery(sql,client,"nomal");
-    }
-
-
-    public Map<String, Integer> esClientQuery(String sql, Client client,String type){
-        try {
-            SQLExprParser parser = new ElasticSqlExprParser(sql);
-            SQLExpr expr = parser.expr();
-            if (parser.getLexer().token() != Token.EOF) {
-                throw new ParserException("illegal sql expr : " + sql);
-            }
-            SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
-            //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
-            Select select = null;
-            select = new SqlParser().parseSelect(queryExpr);
-
-            AggregationQueryAction action = null;
-            DefaultQueryAction queryAction = null;
-            SqlElasticSearchRequestBuilder requestBuilder = null;
-            if (select.isAgg) {
-                //包含计算的的排序分组的
-                action = new AggregationQueryAction(client, select);
-                requestBuilder = action.explain();
-            } else {
-                //封装成自己的Select对象
-                queryAction = new DefaultQueryAction(client, select);
-                requestBuilder = queryAction.explain();
-            }
-            //之后就是对ES的操作
-            Iterator<Terms.Bucket> gradeBucketIt = null;
-            SearchResponse response = (SearchResponse) requestBuilder.get();
-            if(response.getAggregations().asList().get(0) instanceof LongTerms){
-                LongTerms longTerms = (LongTerms) response.getAggregations().asList().get(0);
-                gradeBucketIt = longTerms.getBuckets().iterator();
-            }else  if(response.getAggregations().asList().get(0) instanceof StringTerms){
-                StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
-                gradeBucketIt = stringTerms.getBuckets().iterator();
-            }
-            //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
-            Map<String,Integer> map = new HashMap<>();
-            //递归解析json
-            expainJson(gradeBucketIt, map, null);
-
-            if(type.equals("date")){
-                return computeTime(map);
-            }else {
-                return compute(map);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private Map<String, Integer> computeTime( Map<String, Integer> map) {
-        Map<String, Integer> result = new HashMap<>();
-        for (String key : map.keySet()){
-            Long time = Long.valueOf(key.substring(1));
-            Date date = DateUtil.toDateFromTime(time);
-            result.put(DateUtil.formatDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT),map.get(key));
-        }
-        return result;
-    }
-
-    private Map<String, Integer> compute( Map<String, Integer> map) {
-        Map<String, Integer> result = new HashMap<>();
-        for (String key : map.keySet()){
-            result.put(key.substring(1),map.get(key));
-        }
-        return result;
-    }
+//    public Map<String, Integer> esClientQuery(String sql, Client client,String type){
+//        try {
+//            SQLExprParser parser = new ElasticSqlExprParser(sql);
+//            SQLExpr expr = parser.expr();
+//            if (parser.getLexer().token() != Token.EOF) {
+//                throw new ParserException("illegal sql expr : " + sql);
+//            }
+//            SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
+//            //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
+//            Select select = null;
+//            select = new SqlParser().parseSelect(queryExpr);
+//
+//            AggregationQueryAction action = null;
+//            DefaultQueryAction queryAction = null;
+//            SqlElasticSearchRequestBuilder requestBuilder = null;
+//            if (select.isAgg) {
+//                //包含计算的的排序分组的
+//                action = new AggregationQueryAction(client, select);
+//                requestBuilder = action.explain();
+//            } else {
+//                //封装成自己的Select对象
+//                queryAction = new DefaultQueryAction(client, select);
+//                requestBuilder = queryAction.explain();
+//            }
+//            //之后就是对ES的操作
+//            Iterator<Terms.Bucket> gradeBucketIt = null;
+//            SearchResponse response = (SearchResponse) requestBuilder.get();
+//            if(response.getAggregations().asList().get(0) instanceof LongTerms){
+//                LongTerms longTerms = (LongTerms) response.getAggregations().asList().get(0);
+//                gradeBucketIt = longTerms.getBuckets().iterator();
+//            }else  if(response.getAggregations().asList().get(0) instanceof StringTerms){
+//                StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
+//                gradeBucketIt = stringTerms.getBuckets().iterator();
+//            }
+//            //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
+//            Map<String,Integer> map = new HashMap<>();
+//            //递归解析json
+//            expainJson(gradeBucketIt, map, null);
+//
+//            if(type.equals("date")){
+//                return computeTime(map);
+//            }else {
+//                return compute(map);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+//
+//    private Map<String, Integer> computeTime( Map<String, Integer> map) {
+//        Map<String, Integer> result = new HashMap<>();
+//        for (String key : map.keySet()){
+//            Long time = Long.valueOf(key.substring(1));
+//            Date date = DateUtil.toDateFromTime(time);
+//            result.put(DateUtil.formatDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT),map.get(key));
+//        }
+//        return result;
+//    }
+//
+//    private Map<String, Integer> compute( Map<String, Integer> map) {
+//        Map<String, Integer> result = new HashMap<>();
+//        for (String key : map.keySet()){
+//            result.put(key.substring(1),map.get(key));
+//        }
+//        return result;
+//    }
 
 
     /**

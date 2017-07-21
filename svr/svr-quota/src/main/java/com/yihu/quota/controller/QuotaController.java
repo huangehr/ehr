@@ -58,7 +58,7 @@ public class QuotaController extends BaseController {
     ) {
         Envelop envelop = new Envelop();
         try {
-            List<Map<String, Object>> resultList = quotaService.getQuotaResult(id,filters,pageNo,pageSize);
+            List<Map<String, Object>> resultList = quotaService.queryResultPage(id, filters, pageNo, pageSize);
             List<SaveModel> saveModelList = new ArrayList<SaveModel>();
             for(Map<String, Object> map : resultList){
                 SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
@@ -66,12 +66,12 @@ public class QuotaController extends BaseController {
                     saveModelList.add(saveModel);
                 }
             }
-            int totalCount = quotaService.getQuotaTotalCount();
+            long totalCount = quotaService.getQuotaTotalCount(id,filters);
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(saveModelList);
             envelop.setCurrPage(pageNo);
             envelop.setPageSize(pageSize);
-            envelop.setTotalCount(totalCount);
+            envelop.setTotalCount((int)totalCount);
             return envelop;
         } catch (Exception e) {
             error(e);
@@ -83,11 +83,11 @@ public class QuotaController extends BaseController {
 
 
     /**
-     * 获取指标当天统计结果报表
+     * 获取指标当天统计结果曲线性和柱状报表
      * @param id
      * @return
      */
-    @ApiOperation(value = "获取指标当天统计结果报表")
+    @ApiOperation(value = "获取指标当天统计结果曲线性和柱状报表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaReport, method = RequestMethod.GET)
     public Envelop getQuotaReport(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
@@ -124,7 +124,7 @@ public class QuotaController extends BaseController {
     ) {
         Envelop envelop = new Envelop();
         try {
-            QuotaReport  quotaReport = quotaService.getQuotaBreadReport(id, filters);
+            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters);
             envelop.setSuccessFlg(true);
             envelop.setObj(quotaReport);
             return envelop;
@@ -135,5 +135,32 @@ public class QuotaController extends BaseController {
         envelop.setSuccessFlg(false);
         return envelop;
     }
+
+
+    /**
+     * 获取指标统计结果总量
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "获取指标统计结果总量")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
+    public Envelop getQuotaTotalCount(
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
+            @RequestParam(value = "id" , required = true) int id
+    ) {
+        Envelop envelop = new Envelop();
+        try {
+            long  count = quotaService.getQuotaTotalCount(id, null);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(count);
+            return envelop;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+        }
+        envelop.setSuccessFlg(false);
+        return envelop;
+    }
+
 
 }

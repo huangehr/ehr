@@ -1,6 +1,7 @@
 package com.yihu.quota.etl.extract;
 
 import com.yihu.quota.etl.extract.es.EsExtract;
+import com.yihu.quota.etl.extract.mysql.MysqlExtract;
 import com.yihu.quota.etl.extract.solr.SolrExtract;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
@@ -80,6 +81,11 @@ public class ExtractHelper {
                 //查询 solr 数据
 //                return  SpringUtil.getBean(SolrExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
                 return  solrExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
+
+            }else if( TjDataSource.type_mysql.equals(quotaDataSource.getCode()) ){
+
+                //查询 mysql 数据
+                return  SpringUtil.getBean(MysqlExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
 
             }
 

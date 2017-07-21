@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 /**
- * @author chenweida
+ * @author janseny
  */
 @Service
 public class QuotaService {
@@ -25,68 +25,34 @@ public class QuotaService {
     private EsResultExtract esResultExtract;
 
 
-    public List<Map<String, Object>> getQuotaResult(Integer id,String filters ,int pageNo,int pageSize) throws Exception {
+    public List<Map<String, Object>> queryResultPage(Integer id,String filters ,int pageNo,int pageSize) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
-        return  esResultExtract.queryResultListBySql(tjQuota,filters,pageNo,pageSize);
+        return  esResultExtract.queryResultPage(tjQuota, filters, pageNo, pageSize);
     }
 
-    public int getQuotaTotalCount(){
-        return  esResultExtract.getQuotaTotalCount();
+
+    public long getQuotaTotalCount(Integer id,String filters) throws Exception {
+        TjQuota tjQuota= quotaDao.findOne(id);
+        long count = esResultExtract.getQuotaTotalCount(tjQuota,filters);
+        return count;
     }
 
     public QuotaReport getQuotaReport(Integer id, String filters) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
-        Map<String, Integer> map = esResultExtract.getQuotaReport(tjQuota, filters);
-
-        List<ReultModel> reultModels = new ArrayList<>();
-        for (String key :map.keySet()){
+        List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters);
+        List<ReultModel> reultModelList = new ArrayList<>();
+        for(int i=0 ; i< listMap.size() ;i++){
             ReultModel reultModel = new ReultModel();
-            reultModel.setKey(key);
-            reultModel.setValue(map.get(key).toString());
-            reultModels.add(reultModel);
-        }
-        quotaReport.setReultModelList(reultModels);
-        quotaReport.setTjQuota(tjQuota);
-        return quotaReport;
-    }
-
-    public QuotaReport getQuotaBreadReport(Integer id, String filters) throws Exception {
-        TjQuota tjQuota= quotaDao.findOne(id);
-        QuotaReport quotaReport = new QuotaReport();
-        Map<String, Integer> map = esResultExtract.getQuotaBreadReport(tjQuota, filters);
-
-        List<ReultModel> reultModels = new ArrayList<>();
-        for (String key :map.keySet()){
-            ReultModel reultModel = new ReultModel();
-            reultModel.setValue(map.get(key).toString());
-            switch (key){
-                case  "350203":
-                    key = "思明区";
-                    break;
-                case  "350205":
-                    key = "海沧区";
-                    break;
-                case  "350206":
-                    key = "湖里区";
-                    break;
-                case  "350211":
-                    key = "集美区";
-                    break;
-                case  "350212":
-                    key = "同安区";
-                    break;
-                case  "350213":
-                    key = "翔安区";
-                    break;
+            for(String key : listMap.get(i).keySet()){
+                reultModel.setKey(listMap.get(i).get("quotaDate").toString());
+                reultModel.setValue(listMap.get(i).get("result"));
             }
-            reultModel.setKey(key);
-            reultModels.add(reultModel);
+            reultModelList.add(reultModel);
         }
-        quotaReport.setReultModelList(reultModels);
+        quotaReport.setReultModelList(reultModelList);
         quotaReport.setTjQuota(tjQuota);
         return quotaReport;
     }
-
 
 }

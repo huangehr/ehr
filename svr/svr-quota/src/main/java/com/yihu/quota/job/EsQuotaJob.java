@@ -1,5 +1,6 @@
 package com.yihu.quota.job;
 
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaLogDao;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractHelper;
@@ -76,7 +77,7 @@ public class EsQuotaJob implements Job {
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for(SaveModel saveModel :dataModels){
                     if(saveModel.getResult() != null){
-                        saveModel.setQuotaDate(startTime);
+                        saveModel.setQuotaDate(DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT));
                         dataSaveModels.add(saveModel);
                     }
                 }

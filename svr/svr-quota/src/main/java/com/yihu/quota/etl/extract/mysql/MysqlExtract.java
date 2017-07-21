@@ -1,4 +1,4 @@
-package com.yihu.quota.etl.extract.solr;
+package com.yihu.quota.etl.extract.mysql;
 
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
@@ -10,7 +10,11 @@ import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import org.apache.solr.client.solrj.response.PivotField;
+import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -29,8 +33,8 @@ import java.util.*;
  */
 @Component
 @Scope("prototype")
-public class SolrExtract {
-    private Logger logger = LoggerFactory.getLogger(SolrExtract.class);
+public class MysqlExtract {
+    private Logger logger = LoggerFactory.getLogger(MysqlExtract.class);
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -59,116 +63,95 @@ public class SolrExtract {
         this.quotaVo = quotaVo;
         this.esConfig = esConfig;
 
-        //根据solr 统计数据
-        return statiscSlor(qdm,qds,quotaVo);
-
-    }
-
-    public List<SaveModel> statiscSlor(
-            List<TjQuotaDimensionMain> qdm, List<TjQuotaDimensionSlave> qds,QuotaVo quotaVo) throws Exception {
         List<SaveModel> returnList = new ArrayList<>();
-        String core = esConfig.getTable();//"HealthProfile"
-        String fq = null;
-        String q = null;
-        String groupFields = "";
-        List<SolrGroupEntity> customGroup = null;//自定义分组
+       //获取mysql
+        String mysql = getSql(qdm,qds);
+        logger.debug(mysql);
+        if( !StringUtils.isEmpty(mysql)){
+            Map<String,Long> resultMap = new HashMap<>();
+            //执行MySQL
+            List<Map<String, Object>> mapList =  jdbcTemplate.queryForList(mysql);
 
-        Map<String,String> mainMap = new HashMap<>();
-        Map<String,String> slaveMap = new HashMap<>();
-        for (int i = 0; i < qdm.size(); i++) {
-            groupFields = groupFields + qdm.get(i).getKeyVal() + ",";
-            mainMap.put(qdm.get(i).getKeyVal(),qdm.get(i).getKeyVal());
-        }
-        for (int i = 0; i < qds.size(); i++) {
-            groupFields = groupFields + qds.get(i).getKeyVal() + ",";
-            slaveMap.put(qds.get(i).getKeyVal(),qds.get(i).getKeyVal());
-        }
-        groupFields = groupFields.substring(0,groupFields.length()-1);
-        if (!StringUtils.isEmpty(esConfig.getTimekey())) {
-            //1 全量 2 增量
-            if(quotaVo!=null && quotaVo.getDataLevel().equals(Contant.quota.dataLeval_oneDay)){
-                fq = esConfig.getTimekey()+":[";
-                //起始时间
-                if (!StringUtils.isEmpty(startTime)) {
-                    fq += startTime + "T00:00:00Z";
-                } else {
-                    fq += "*";
+            for(Map<String, Object> map :mapList){
+                String key  = "";
+                for(String s :map.keySet()){
+                    key = key + s +  "-";
                 }
-                fq += " TO ";
-                //结束时间
-                if (!StringUtils.isEmpty(endTime)) {
-                    fq += startTime + "T23:59:59Z";
-                } else {
-                    fq += "*";
-                }
-                fq += "]";
-            }else {
-                fq = esConfig.getTimekey()+":[ * TO  ";
-                //结束时间
-                if (!StringUtils.isEmpty(endTime)) {
-                    fq += startTime + "T23:59:59Z";
-                } else {
-                    fq += "*";
-                }
-                fq += "]";
+                resultMap.put(key.substring(0,key.length()-1),(long)map.get("result"));
             }
-            System.out.println(fq);
+
+            compute(qdm, qds, returnList, resultMap);
         }
-        Map<String,Long> map = new HashMap<>();
-        //core 表名 q 查询条件  fq 过滤条件  group 分
-        if( (qdm.size() + qds.size()) == 1){
-            //单分组查询
-            Map<String, Long>  resMap = solrUtil.groupCount(core, q, fq, groupFields, 0, 1000);
-            compute(qdm,qds,returnList,resMap);
-            return returnList;
-        }else {
-            //多分组查询
-            List<Map<String, Object>>   list = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
-            if(list != null && list.size() > 0){
-                for(Map<String, Object> objectMap : list){
-                    long count = 0;
-                    String mainSlavesStr = "";
-                    for(String key : objectMap.keySet()){
-                        if(mainMap.get(key) != null){
-                            mainSlavesStr = mainSlavesStr + objectMap.get(key);
-                        }else if(key.equals("$count")){
-                            if(objectMap.get(key) != null){
-                                count = Long.valueOf(objectMap.get(key).toString() );
-                            }
-                        }
-                    }
-                    for(String key : objectMap.keySet()){
-                        if(slaveMap.get(key) != null) {
-                            mainSlavesStr = mainSlavesStr + "-" + objectMap.get(key);
-                        }
-                    }
-                    map.put(mainSlavesStr,count);
-                }
-            }
-        }
-        //整合数据
-        if(map != null  && map.size() >0){
-            compute(qdm,qds,returnList,map);
-        }
-        return  returnList;
+
+        return returnList;
+
     }
+
+
+
+    /**
+     * @param tjQuotaDimensionMains
+     * @param tjQuotaDimensionSlaves
+     * @return
+     */
+    private String getSql(List<TjQuotaDimensionMain> tjQuotaDimensionMains, List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves) {
+        Map<String, TjQuotaDimensionMain> sqlS = new HashMap<>();
+        StringBuffer allField = new StringBuffer("");
+        String tableName = esConfig.getTable();
+        for (int j = 0; j < tjQuotaDimensionMains.size(); j++) {
+            TjQuotaDimensionMain one = tjQuotaDimensionMains.get(j);
+            if ( !StringUtils.isEmpty(one.getKeyVal())) {
+                allField.append(one.getKeyVal() + ",");
+            }
+        }
+        for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
+            allField.append(tjQuotaDimensionSlaves.get(i).getKeyVal());
+        }
+        //拼凑where语句
+        StringBuffer whereSql = new StringBuffer();
+        if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
+            if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
+                whereSql.append(" where " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
+            }else{
+                whereSql.append( " where " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
+            }
+        }
+        StringBuffer sql = new StringBuffer();
+        if(StringUtils.isEmpty(allField)|| allField.length()==0){
+            sql.append("select count(*)  result  from " + tableName + whereSql);
+        }else {
+            String groupByField = allField.substring(0,allField.length() - 1);
+            sql.append("select " + allField + "  count(*) result from " + tableName + whereSql + " group by " + groupByField);
+        }
+        return sql.toString();
+    }
+
 
     private void compute(List<TjQuotaDimensionMain> qdm,List<TjQuotaDimensionSlave> qds,
             List<SaveModel> returnList, Map<String, Long> map) {
         Map<String, SaveModel> allData = new HashMap<>();
-        //初始化主细维度
-        for(TjQuotaDimensionMain qmain:qdm){
-            allData= initDimension(qds, qmain, allData);
-        }
-        for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
-            String key = oneMap.getKey();
-            SaveModel saveModel = oneMap.getValue();
-            Long num = map.get(key);
-            if(saveModel != null && num != null){
-                saveModel.setResult(Integer.valueOf(num.toString()));
-                returnList.add(saveModel);
-            }
-        }
+       if(qdm.size() + qds.size() == 0){
+           SaveModel saveModel = new SaveModel();
+           Long num = map.get("result");
+           saveModel = setSaveModel(saveModel);
+           saveModel.setResult(Integer.valueOf(num.toString()));
+           returnList.add(saveModel);
+       }else {
+           //初始化主细维度
+           for(TjQuotaDimensionMain qmain:qdm){
+               allData= initDimension(qds, qmain, allData);
+           }
+           for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
+               String key = oneMap.getKey();
+               SaveModel saveModel = oneMap.getValue();
+               Long num = map.get(key);
+               if(saveModel != null && num != null){
+                   saveModel.setResult(Integer.valueOf(num.toString()));
+                   returnList.add(saveModel);
+               }
+           }
+       }
     }
 
     /**
@@ -273,6 +256,17 @@ public class SolrExtract {
         one.setTimeLevel(timeLevel);
         one.setSaasId(null);
         allData.put(key, one);
+    }
+
+    private SaveModel setSaveModel(SaveModel one ) {
+        one.setResult(0);
+        one.setCreateTime(new Date());
+        LocalDate today = LocalDate.now();
+        one.setQuotaDate(today.toString());
+        one.setQuotaCode(quotaVo.getCode());
+        one.setTimeLevel(timeLevel);
+        one.setSaasId(null);
+        return one;
     }
 
 

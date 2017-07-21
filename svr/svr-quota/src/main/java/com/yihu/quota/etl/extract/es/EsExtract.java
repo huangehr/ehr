@@ -323,8 +323,10 @@ public class EsExtract {
             if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
                 if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
                     whereSql.append("" + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+                    whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
+                }else{
+                    whereSql.append( "" + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
                 }
-                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }
             StringBuffer sql = new StringBuffer();
             if(StringUtils.isEmpty(whereSql) || whereSql.length()==0){
