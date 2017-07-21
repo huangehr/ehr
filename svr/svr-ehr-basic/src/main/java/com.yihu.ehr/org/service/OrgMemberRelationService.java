@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +21,8 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
 
     @Autowired
     private XOrgMemberRelationRepository relationRepository;
+    @Autowired
+    private OrgService orgService;
 
     public List<OrgMemberRelation> searchByDeptId(Integer deptId) {
         return relationRepository.searchByDeptId(deptId);
@@ -64,4 +67,22 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
         }
     }
 
+    public List<String> getOrgIds(String userId) {
+        List<String> userIds = relationRepository.findOrgIdByUserId(userId);
+        return userIds;
+    }
+
+    public List<String> getOrgCodes(String userId) {
+        List<String> orgIds = this.getOrgIds(userId);
+        List<String> orgCodes = new ArrayList<>();
+        for (String s : orgIds) {
+            String orgCode = orgService.getOrgCodeByOrgId(Long.valueOf(s));
+            orgCodes.add(orgCode);
+        }
+        return orgCodes;
+    }
+
+    public List<String> getUserIdByOrgId(List<String> orgId) {
+        return relationRepository.findUserIdByOrgId(orgId);
+    }
 }

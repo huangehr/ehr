@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -70,27 +71,26 @@ public class BusinessDataModel extends DataModel implements Serializable {
             businessDataModel.setResponse(chlidren.getString("response"));
             businessDataModel.setAppKey(chlidren.getString("appKey"));
 
-            Object obj = appFeatureService.appFeatureFindUrl("/standardsource/updateStdSource");
-            Map<String,String> map = new HashMap<>();
-            if(obj != null){
-                map = appFeatureService.getOperatPageName(obj);
+            String url = chlidren.getString("url");
+            if( ! StringUtils.isEmpty(url) ){
+                String a = url.substring(url.lastIndexOf(":"));
+                String b = a.substring(a.indexOf("/") + 1);
+                String urlApi = b.substring(b.indexOf("/") + 1);
+                Object obj = appFeatureService.appFeatureFindUrl(urlApi);
+                Map<String,String> map = new HashMap<>();
+                if(obj != null){
+                    map = appFeatureService.getOperatPageName(obj);
+                }
+                if(map != null && map.size() > 0){
+                    businessDataModel.setOperation(map.get("operation"));
+                    businessDataModel.setFunction(map.get("function"));
+                }
             }
-//            businessDataModel.setData(chlidren.getJSONObject("data").toString());
-//            businessDataModel.setBusinessType(String.valueOf(chlidren.get("businessType")));
-            if(map != null && map.size() > 0){
-                businessDataModel.setOperation(map.get("operation"));
-                businessDataModel.setFunction(map.get("function"));
-            }
-
         } catch (Exception e) {
-            System.out.println("格式错误"+ e.getMessage());
             throw new Exception("格式错误");
         }
         return businessDataModel;
     }
-
-
-
 
     public String getUrl() {
         return url;

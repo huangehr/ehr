@@ -67,4 +67,10 @@ public class OrgSaasService extends BaseJpaService<OrgSaas,OrgSaasRepository>{
         oOrgSaasRepository.deleteOrgSaas(orgCode,type);
     }
 
+    public List<String> getSaasName(String orgCode, String type) {
+        if ("1".equals(type)) {
+            return oOrgSaasRepository.findSaasName(orgCode);
+        }
+        return oOrgSaasRepository.findSaasNameByType(orgCode);
+    }
 }

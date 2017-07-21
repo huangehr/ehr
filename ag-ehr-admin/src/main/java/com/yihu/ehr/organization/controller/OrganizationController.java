@@ -128,7 +128,7 @@ public class OrganizationController extends BaseController {
                 address = String.join(",", addrIdsArrays);
             }
             if(StringUtils.isNotBlank(address)){
-                filters = StringUtils.isNotBlank(filters)?(filters+";location="+address):"location="+address;
+                filters = StringUtils.isNotBlank(filters)?(filters+"location="+address):"location="+address;
             }
             List<OrgModel> orgModelList = new ArrayList<>();
             ResponseEntity<List<MOrganization>> responseEntity = orgClient.searchOrgs(fields, filters, sorts, size, page);

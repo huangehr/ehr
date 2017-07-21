@@ -59,12 +59,12 @@ spring:
     password: ha
   data:
     mongodb:
-      host: 172.19.103.57
+      host: 192.168.1.220
       port: 27017
-      username: esb
-      password: esb
+      username: admin
+      password: admin
       authenticationDatabase: admin
-      database: wlyy
+      database: ehr
 
 
 fast-dfs:
@@ -80,12 +80,12 @@ spring:
     password: ha
   data:
     mongodb:
-      host: 172.19.103.57
+      host: 192.168.1.220
       port: 27017
-      username: esb
-      password: esb
+      username: admin
+      password: admin
       authenticationDatabase: admin
-      database: wlyy
+      database: ehr
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54
@@ -99,12 +99,12 @@ spring:
     password: weifuwu
   data:
     mongodb:
-      host: 172.19.103.57
+      host: 192.168.1.220
       port: 27017
-      username: esb
-      password: esb
+      username: admin
+      password: admin
       authenticationDatabase: admin
-      database: wlyy
+      database: ehr
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
@@ -124,12 +124,12 @@ spring:
     root: dc=ehr,dc=jkzl
   data:
     mongodb:
-      host: 172.19.103.57
+      host: 192.168.1.220
       port: 27017
-      username: esb
-      password: esb
+      username: admin
+      password: admin
       authenticationDatabase: admin
-      database: wlyy
+      database: ehr
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
