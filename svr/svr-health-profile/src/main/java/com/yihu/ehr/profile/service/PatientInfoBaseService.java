@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -20,8 +21,19 @@ public class PatientInfoBaseService {
     static class EventDateComparatorDesc implements Comparator<Map<String, Object>> {
         @Override
         public int compare(Map<String, Object> m1, Map<String, Object> m2) {
-            Date v1 = (Date)m1.get(BasisConstant.eventDate);
-            Date v2 = (Date)m2.get(BasisConstant.eventDate);
+            String eventDate1 = (String)m1.get(BasisConstant.eventDate);
+            String eventDate2 = (String)m2.get(BasisConstant.eventDate);
+            String str1 = eventDate1.substring(0, eventDate1.length()-1).replaceAll("[a-zA-Z]"," ");
+            String str2 = eventDate2.substring(0, eventDate1.length()-1).replaceAll("[a-zA-Z]"," ");
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date v1 = null;
+            Date v2 = null;
+            try {
+                v1 = dateFormat.parse(str1);
+                v2 = dateFormat.parse(str2);
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
             if (v2 != null) {
                 return v2.compareTo(v1);
             }
@@ -127,7 +139,6 @@ public class PatientInfoBaseService {
                     }
                 }
                 /*******************************************************/
-
                 return re;
             }
         } else {
