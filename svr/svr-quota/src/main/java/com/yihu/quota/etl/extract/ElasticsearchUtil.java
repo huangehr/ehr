@@ -5,6 +5,8 @@ import com.yihu.quota.etl.save.es.ElasticFactory;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
+import org.elasticsearch.action.delete.DeleteRequestBuilder;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -139,6 +141,34 @@ public class ElasticsearchUtil {
             dataMap.put(key, bucket.getDocCount() + "");
         }
         return dataMap;
+    }
+
+
+    public void deleteById(String index , String type ,String host, String clusterName, String id){
+        getClient(host,clusterName);
+        DeleteRequestBuilder drBuilder = client.prepareDelete(index, type, id);
+        drBuilder.execute().actionGet();
+    }
+
+    /**
+     * 查询后 存在 删除
+     * @param esConfig
+     * @param boolQueryBuilder
+     */
+    public void queryDelete(EsConfig esConfig,BoolQueryBuilder boolQueryBuilder){
+        getClient(esConfig.getHost(),esConfig.getClusterName());
+        SearchResponse actionGet = null;
+        actionGet = client.prepareSearch(esConfig.getIndex())
+                .setTypes(esConfig.getType())
+                .setQuery(boolQueryBuilder)
+                .execute().actionGet();
+        SearchHits hits = actionGet.getHits();
+        List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
+        for (SearchHit hit : hits.getHits()){
+            matchRsult.add(hit.getSource());
+            DeleteRequestBuilder drBuilder = client.prepareDelete(esConfig.getIndex(), esConfig.getType(), hit.getId());
+            drBuilder.execute().actionGet();
+        }
     }
 
 }
