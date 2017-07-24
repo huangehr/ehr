@@ -290,7 +290,7 @@ public class RolesController extends BaseController {
         List<PlatformAppRolesModel> appRolesModelList = new ArrayList<>();
         for(MApp mApp : mApps){
             //查找用户所属角色组
-            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId()+";type="+type+";id="+rolesIds);
+            Collection<MRoles> mRoles = rolesClient.searchRolesNoPaging("appId=" + mApp.getId()+";id="+rolesIds);
             if(mRoles == null || mRoles.size() <= 0){
                 continue;
             }
