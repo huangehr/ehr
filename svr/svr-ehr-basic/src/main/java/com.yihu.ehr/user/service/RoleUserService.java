@@ -113,6 +113,8 @@ public class RoleUserService extends BaseJpaService<RoleUser,XRoleUserRepository
                 jdbcTemplate.execute(sqlUpd+sqlCon);
             }
             delete(roleUser.getId());
+            Roles role= rolesRepository.findById(roleUser.getRoleId());
+            userAppRepository.deleteByAppId(role.getAppId());
         }
         List<RoleUser> roleUserList = search("userId=" + userId + ";roleId=" + roleIds);
         List<Long> ids = new ArrayList<>();
