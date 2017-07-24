@@ -1,12 +1,16 @@
 package com.yihu.quota.etl.extract;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.es.ElasticFactory;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
+import net.sf.json.JSON;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -37,28 +41,25 @@ import java.util.*;
 public class ElasticsearchUtil {
 
     @Autowired
-    private ElasticFactory elasticFactory;
+    ObjectMapper objectMapper;
 
-    private Client client;
+    @Autowired
+    private EsClientUtil esClientUtil;
 
-    public Client getClient(String host,String clusterName){
-        return this.client = elasticFactory.getClient(host, 9300, clusterName);
-    }
 
     /**
-     * @param esConfig 基本配置
      * @param boolQueryBuilder  查询参数 build
      * @param pageNo
      * @param pageSize
      * @param sortName 排序字段名称
      * @return
      */
-    public List<Map<String, Object>> queryPageList(EsConfig esConfig,BoolQueryBuilder boolQueryBuilder,int pageNo,int pageSize,String sortName){
-        getClient(esConfig.getHost(),esConfig.getClusterName());
+    public List<Map<String, Object>> queryPageList( Client client,BoolQueryBuilder boolQueryBuilder,
+                                                   int pageNo,int pageSize,String sortName){
         SearchResponse actionGet = null;
         SortBuilder dealSorter = SortBuilders.fieldSort(sortName).order(SortOrder.DESC);
-        actionGet = client.prepareSearch(esConfig.getIndex())
-                .setTypes(esConfig.getType())
+        actionGet = client.prepareSearch(esClientUtil.getIndex())
+                .setTypes(esClientUtil.getType())
                 .setQuery(boolQueryBuilder)
                 .setFrom(pageNo).setSize(pageSize).addSort(dealSorter)
                 .execute().actionGet();
@@ -67,22 +68,22 @@ public class ElasticsearchUtil {
         for (SearchHit hit : hits.getHits()){
             matchRsult.add(hit.getSource());
         }
+        client.close();
         return matchRsult;
     }
 
     /**
-     * @param esConfig 基本配置
      * @param boolQueryBuilder  查询参数 build
      * @return
      */
-    public long getTotalCount(EsConfig esConfig,BoolQueryBuilder boolQueryBuilder){
-        getClient(esConfig.getHost(),esConfig.getClusterName());
+    public long getTotalCount(Client client,BoolQueryBuilder boolQueryBuilder){
         SearchResponse actionGet = null;
-        actionGet = client.prepareSearch(esConfig.getIndex())
-                .setTypes(esConfig.getType())
+        actionGet = client.prepareSearch(esClientUtil.getIndex())
+                .setTypes(esClientUtil.getType())
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
+        client.close();
        if(hits != null){
            return hits.totalHits();
        }
@@ -90,24 +91,31 @@ public class ElasticsearchUtil {
     }
 
     /**
-     * @param esConfig 基本配置
      * @param boolQueryBuilder  查询参数 build
      * @param sortName 排序字段名称
      * @return
      */
-    public List<Map<String, Object>> queryList(EsConfig esConfig,BoolQueryBuilder boolQueryBuilder,String sortName){
-        getClient(esConfig.getHost(),esConfig.getClusterName());
+    public List<Map<String, Object>> queryList(Client client,BoolQueryBuilder boolQueryBuilder,String sortName){
         SearchResponse actionGet = null;
-        SortBuilder dealSorter = SortBuilders.fieldSort(sortName).order(SortOrder.DESC);
-        actionGet = client.prepareSearch(esConfig.getIndex())
-                .setTypes(esConfig.getType())
+        SortBuilder dealSorter = null;
+        if(sortName != null){
+            dealSorter = SortBuilders.fieldSort(sortName).order(SortOrder.DESC);
+        }else{
+            dealSorter = SortBuilders.fieldSort("_id").order(SortOrder.DESC);
+        }
+        actionGet = client.prepareSearch(esClientUtil.getIndex())
+                .setTypes(esClientUtil.getType())
                 .setQuery(boolQueryBuilder)
                 .addSort(dealSorter)
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
+        client.close();
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
         for (SearchHit hit : hits.getHits()){
-            matchRsult.add(hit.getSource());
+            Map<String, Object> map = new HashMap<>() ;
+            map = hit.getSource();
+            map.put("id",hit.getId());
+            matchRsult.add(map);
         }
         return matchRsult;
     }
@@ -115,16 +123,15 @@ public class ElasticsearchUtil {
 
     /**
      * 执行搜索（带分组）
-     * @param indexName 索引名称
-     * @param typeName 类型名称
      * @param queryBuilder 查询内容
      * @param aggsField 要分组的字段
      * @return
      */
-    public Map<String, Object> searcherByGroup(String indexName, String typeName,String host, String clusterName,
-                                               BoolQueryBuilder queryBuilder, String aggsField) {
-        getClient(host,clusterName);
-        SearchRequestBuilder searchRequestBuilder = client.prepareSearch(indexName).setTypes(typeName).setQuery(queryBuilder);
+    public Map<String, Object> searcherByGroup(Client client,BoolQueryBuilder queryBuilder, String aggsField) {
+        SearchRequestBuilder searchRequestBuilder =
+                client.prepareSearch(esClientUtil.getIndex())
+                .setTypes(esClientUtil.getType())
+                .setQuery(queryBuilder);
 
         //创建TermsBuilder对象，使用term查询，设置该分组的名称为 name_count，并根据aggsField字段进行分组
         TermsBuilder termsBuilder = AggregationBuilders.terms(aggsField +"_count").field(aggsField);//此处也可继续设置order、size等
@@ -135,6 +142,7 @@ public class ElasticsearchUtil {
         //解析返回数据，获取分组名称为aggs-class的数据
         Terms terms = searchResponse.getAggregations().get(aggsField +"_count");
         Collection<Terms.Bucket> buckets = terms.getBuckets();
+        client.close();
         Map<String, Object> dataMap = new HashMap<String, Object>();
         for (Terms.Bucket bucket : buckets) {
             String key = bucket.getKey().toString();
@@ -144,31 +152,41 @@ public class ElasticsearchUtil {
     }
 
 
-    public void deleteById(String index , String type ,String host, String clusterName, String id){
-        getClient(host,clusterName);
-        DeleteRequestBuilder drBuilder = client.prepareDelete(index, type, id);
+    public boolean save(Client client,Object object) throws JsonProcessingException {
+        String source = objectMapper.writeValueAsString(object);
+        IndexResponse indexResponse = client
+                .prepareIndex(esClientUtil.getIndex(), esClientUtil.getType(), null).setSource(source).get();
+        boolean result =  indexResponse.isCreated();
+        client.close();
+        return result;
+    }
+
+    public void deleteById(Client client ,String id){
+//        DeleteResponse deleteresponse = client.prepareDelete(esClientUtil.getIndex(), esClientUtil.getType(), id)
+//                .execute().actionGet();
+        DeleteRequestBuilder drBuilder = client.prepareDelete(esClientUtil.getIndex(), esClientUtil.getType(), id);
         drBuilder.execute().actionGet();
+        client.close();
     }
 
     /**
      * 查询后 存在 删除
-     * @param esConfig
      * @param boolQueryBuilder
      */
-    public void queryDelete(EsConfig esConfig,BoolQueryBuilder boolQueryBuilder){
-        getClient(esConfig.getHost(),esConfig.getClusterName());
+    public void queryDelete(Client client,BoolQueryBuilder boolQueryBuilder){
         SearchResponse actionGet = null;
-        actionGet = client.prepareSearch(esConfig.getIndex())
-                .setTypes(esConfig.getType())
+        actionGet = client.prepareSearch(esClientUtil.getIndex())
+                .setTypes(esClientUtil.getType())
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
         for (SearchHit hit : hits.getHits()){
             matchRsult.add(hit.getSource());
-            DeleteRequestBuilder drBuilder = client.prepareDelete(esConfig.getIndex(), esConfig.getType(), hit.getId());
+            DeleteRequestBuilder drBuilder = client.prepareDelete(esClientUtil.getIndex(), esClientUtil.getType(), hit.getId());
             drBuilder.execute().actionGet();
         }
+        client.close();
     }
 
 }

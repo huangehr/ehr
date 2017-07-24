@@ -1,16 +1,9 @@
 package com.yihu.quota.etl.extract.es;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
-import com.alibaba.druid.sql.parser.ParserException;
-import com.alibaba.druid.sql.parser.SQLExprParser;
-import com.alibaba.druid.sql.parser.Token;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.solr.SolrUtil;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.extract.ElasticsearchUtil;
+import com.yihu.quota.etl.extract.EsClientUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.es.ElasticFactory;
 import com.yihu.quota.model.jpa.TjQuota;
@@ -18,27 +11,14 @@ import com.yihu.quota.model.jpa.save.TjDataSave;
 import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
 import com.yihu.quota.service.save.TjDataSaveService;
 import net.sf.json.JSONObject;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.*;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.sum.InternalSum;
 import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
-import org.nlpcn.es4sql.domain.Select;
-import org.nlpcn.es4sql.parse.ElasticSqlExprParser;
-import org.nlpcn.es4sql.parse.SqlParser;
-import org.nlpcn.es4sql.query.AggregationQueryAction;
-import org.nlpcn.es4sql.query.DefaultQueryAction;
-import org.nlpcn.es4sql.query.SqlElasticSearchRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +26,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -69,7 +48,7 @@ public class EsResultExtract {
     private int pageSize;
     private EsConfig esConfig;
     @Autowired
-    private ElasticFactory elasticFactory;
+    private EsClientUtil esClientUtil;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
     @Autowired
@@ -125,6 +104,12 @@ public class EsResultExtract {
         this.esConfig = esConfig;
     }
 
+    public Client getEsClient(EsConfig esConfig){
+        esClientUtil.getConfig(esConfig);
+        Client client = esClientUtil.getClient();
+        return  client;
+    }
+
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
         initialize(tjQuota,filters);
         this.pageNo = pageNo-1;
@@ -139,14 +124,14 @@ public class EsResultExtract {
     private List<Map<String, Object>> queryPageList(EsConfig esConfig){
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        return elasticsearchUtil.queryPageList(esConfig,boolQueryBuilder,pageNo,pageSize,"quotaDate");
+        return elasticsearchUtil.queryPageList(getEsClient(esConfig),boolQueryBuilder,pageNo,pageSize,"quotaDate");
     }
 
     public int getQuotaTotalCount(TjQuota tjQuota,String filters) throws Exception {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        return (int)elasticsearchUtil.getTotalCount(esConfig, boolQueryBuilder);
+        return (int)elasticsearchUtil.getTotalCount(getEsClient(esConfig),boolQueryBuilder);
     }
 
     public BoolQueryBuilder getBoolQueryBuilder(BoolQueryBuilder boolQueryBuilder){
@@ -186,9 +171,10 @@ public class EsResultExtract {
     public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters) throws Exception {
         initialize(tjQuota,filters);
         EsConfig esConfig = getEsConfig(tjQuota);
+
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> list = elasticsearchUtil.queryList(esConfig, boolQueryBuilder, "quotaDate");
+        List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(esConfig),boolQueryBuilder, "quotaDate");
         return  list;
     }
 
