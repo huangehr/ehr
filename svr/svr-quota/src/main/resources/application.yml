@@ -37,7 +37,7 @@ spring:
   profiles: test
 
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive_220?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: weifuwu
     password: weifuwu
 
