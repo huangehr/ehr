@@ -106,7 +106,7 @@ public class MysqlExtract {
             }
         }
         for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-            allField.append(tjQuotaDimensionSlaves.get(i).getKeyVal());
+            allField.append(tjQuotaDimensionSlaves.get(i).getKeyVal() + ",");
         }
         //拼凑where语句
         StringBuffer whereSql = new StringBuffer();
