@@ -73,13 +73,14 @@ public class MysqlExtract {
             List<Map<String, Object>> mapList =  jdbcTemplate.queryForList(mysql);
 
             for(Map<String, Object> map :mapList){
-                String key  = "";
-                for(String s :map.keySet()){
-                    key = key + s +  "-";
+                String keyVal  = "";
+                for(String key :map.keySet()){
+                    if(!key.equals("result")){
+                        keyVal = keyVal + map.get(key) +  "-";
+                    }
                 }
-                resultMap.put(key.substring(0,key.length()-1),(long)map.get("result"));
+                resultMap.put(keyVal.substring(0,keyVal.length()-1),(long)map.get("result"));
             }
-
             compute(qdm, qds, returnList, resultMap);
         }
 
@@ -105,7 +106,7 @@ public class MysqlExtract {
             }
         }
         for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-            allField.append(tjQuotaDimensionSlaves.get(i).getKeyVal());
+            allField.append(tjQuotaDimensionSlaves.get(i).getKeyVal() + ",");
         }
         //拼凑where语句
         StringBuffer whereSql = new StringBuffer();

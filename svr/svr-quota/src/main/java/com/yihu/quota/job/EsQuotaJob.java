@@ -3,12 +3,20 @@ package com.yihu.quota.job;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaLogDao;
 import com.yihu.quota.etl.Contant;
+import com.yihu.quota.etl.extract.ElasticsearchUtil;
+import com.yihu.quota.etl.extract.EsClientUtil;
 import com.yihu.quota.etl.extract.ExtractHelper;
+import com.yihu.quota.etl.extract.es.EsResultExtract;
+import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.SaveHelper;
 import com.yihu.quota.model.jpa.TjQuotaLog;
 import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.joda.time.LocalDate;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -42,6 +50,12 @@ public class EsQuotaJob implements Job {
     private String timeLevel;//时间
     @Autowired
     private TjQuotaLogDao tjQuotaLogDao;
+    @Autowired
+    private EsClientUtil esClientUtil;
+    @Autowired
+    private ExtractHelper extractHelper;
+    @Autowired
+    ElasticsearchUtil elasticsearchUtil;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -69,15 +83,25 @@ public class EsQuotaJob implements Job {
             tjQuotaLog.setQuotaCode(quotaVo.getCode());
             tjQuotaLog.setSaasId(saasid);
             tjQuotaLog.setStartTime(new Date());
-
             //抽取数据 如果是累加就是 List<DataModel>  如果是相除 Map<String,List<DataModel>>
             List<SaveModel> dataModels = extract();
-
             if(dataModels != null && dataModels.size() > 0){
+                String quoataDate = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                //查询是否已经统计过,如果已统计 先删除后保存
+                EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
+                BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+                TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaVo.getCode());
+                TermQueryBuilder termQueryQuotaDate = QueryBuilders.termQuery("quotaDate", quoataDate);
+                boolQueryBuilder.must(termQueryQuotaCode);
+                boolQueryBuilder.must(termQueryQuotaDate);
+                esClientUtil.getConfig(esConfig);
+                Client client = esClientUtil.getClient();
+                elasticsearchUtil.queryDelete(client,boolQueryBuilder);
+
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for(SaveModel saveModel :dataModels){
                     if(saveModel.getResult() != null){
-                        saveModel.setQuotaDate(DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT));
+                        saveModel.setQuotaDate(quoataDate);
                         dataSaveModels.add(saveModel);
                     }
                 }
