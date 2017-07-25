@@ -38,6 +38,7 @@ public class EsResultExtract {
 
     private String startTime;
     private String endTime;
+    private String org;
     private String orgName;
     private String province;
     private String city;
@@ -86,6 +87,8 @@ public class EsResultExtract {
                             this.endTime = params.get(key).toString();
                         if(key.equals("orgName"))
                             this.orgName = params.get(key).toString();
+                        if(key.equals("org"))
+                            this.org = params.get(key).toString();
                         if(key.equals("province"))
                             this.province = params.get(key).toString();
                         if(key.equals("city"))
@@ -145,6 +148,13 @@ public class EsResultExtract {
             TermQueryBuilder termQueryOrgName = QueryBuilders.termQuery("orgName", orgName);
             boolQueryBuilder.must(termQueryOrgName);
         }
+        if( !StringUtils.isEmpty(org) ){
+            String [] orgvals =org.split(",");
+            for(int i=0;i<orgvals.length ; i++){
+                TermQueryBuilder termQueryOrg = QueryBuilders.termQuery("org", orgvals[i]);
+                boolQueryBuilder.mustNot(termQueryOrg);
+            }
+        }
         if( !StringUtils.isEmpty(province) ){
             TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("provinceName", province);
             boolQueryBuilder.must(termQueryProvince);
@@ -177,75 +187,6 @@ public class EsResultExtract {
         List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(esConfig),boolQueryBuilder, "quotaDate");
         return  list;
     }
-
-//    public Map<String, Integer> esClientQuery(String sql, Client client,String type){
-//        try {
-//            SQLExprParser parser = new ElasticSqlExprParser(sql);
-//            SQLExpr expr = parser.expr();
-//            if (parser.getLexer().token() != Token.EOF) {
-//                throw new ParserException("illegal sql expr : " + sql);
-//            }
-//            SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
-//            //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
-//            Select select = null;
-//            select = new SqlParser().parseSelect(queryExpr);
-//
-//            AggregationQueryAction action = null;
-//            DefaultQueryAction queryAction = null;
-//            SqlElasticSearchRequestBuilder requestBuilder = null;
-//            if (select.isAgg) {
-//                //包含计算的的排序分组的
-//                action = new AggregationQueryAction(client, select);
-//                requestBuilder = action.explain();
-//            } else {
-//                //封装成自己的Select对象
-//                queryAction = new DefaultQueryAction(client, select);
-//                requestBuilder = queryAction.explain();
-//            }
-//            //之后就是对ES的操作
-//            Iterator<Terms.Bucket> gradeBucketIt = null;
-//            SearchResponse response = (SearchResponse) requestBuilder.get();
-//            if(response.getAggregations().asList().get(0) instanceof LongTerms){
-//                LongTerms longTerms = (LongTerms) response.getAggregations().asList().get(0);
-//                gradeBucketIt = longTerms.getBuckets().iterator();
-//            }else  if(response.getAggregations().asList().get(0) instanceof StringTerms){
-//                StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
-//                gradeBucketIt = stringTerms.getBuckets().iterator();
-//            }
-//            //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
-//            Map<String,Integer> map = new HashMap<>();
-//            //递归解析json
-//            expainJson(gradeBucketIt, map, null);
-//
-//            if(type.equals("date")){
-//                return computeTime(map);
-//            }else {
-//                return compute(map);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//    private Map<String, Integer> computeTime( Map<String, Integer> map) {
-//        Map<String, Integer> result = new HashMap<>();
-//        for (String key : map.keySet()){
-//            Long time = Long.valueOf(key.substring(1));
-//            Date date = DateUtil.toDateFromTime(time);
-//            result.put(DateUtil.formatDate(date, DateUtil.DEFAULT_DATE_YMD_FORMAT),map.get(key));
-//        }
-//        return result;
-//    }
-//
-//    private Map<String, Integer> compute( Map<String, Integer> map) {
-//        Map<String, Integer> result = new HashMap<>();
-//        for (String key : map.keySet()){
-//            result.put(key.substring(1),map.get(key));
-//        }
-//        return result;
-//    }
-
 
     /**
      * 递归解析json
