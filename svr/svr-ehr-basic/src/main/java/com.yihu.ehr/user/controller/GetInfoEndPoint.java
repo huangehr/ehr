@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "userInfo", description = "获取用户的机构&地区", tags = {"获取用户的机构&地区"})
+@Api(value = "userInfo", description = "获取用户可查询的机构&地区", tags = {"获取用户可查询的机构&地区"})
 public class GetInfoEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -38,7 +38,7 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
 
 
     @RequestMapping(value = "/userInfo/getOrgCode", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户的机构代码")
+    @ApiOperation(value = "获取当前用户可查询的机构代码")
     List<String> getOrgCode(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
@@ -47,7 +47,7 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/getOrgByUserId", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户的机构名称")
+    @ApiOperation(value = "获取当前用户可查询的机构名称")
     List<String> getOrgByUserId(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
@@ -55,7 +55,7 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/getDistrictByUserId", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户管理的地区")
+    @ApiOperation(value = "获取当前用户可查询的地区")
     List<String> getDistrictByUserId(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
@@ -63,7 +63,7 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/getUserIdList", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户管理的机构所对应的userId列表")
+    @ApiOperation(value = "获取当前用户可查询的机构下所对应的userId列表")
     List<String> getUserIdList(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
@@ -71,13 +71,18 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = "/getDistrictList", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户管理的机构所对应的 区域列表")
+    @ApiOperation(value = "获取当前用户可查询的机构所对应的区域列表")
     List<String> getDistrictList(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
         return getGeographyId(userId);
     }
 
+    /**
+     * 获取当前用户可查询的地区名称列表
+     * @param userId
+     * @return
+     */
     public List<String> getDistrict(String userId) {
         List<String> orgCodes = orgMemberRelationService.getOrgCodes(userId);
         List<String> saasNameList = new ArrayList<>();
@@ -87,6 +92,12 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
         }
         return saasNameList;
     }
+
+    /**
+     * 获取当前用户可查询的机构名称列表
+     * @param userId
+     * @return
+     */
     public List<String> getOrgCodes(String userId) {
         List<String> orgCodes = orgMemberRelationService.getOrgCodes(userId);
         List<String> saasNameList = new ArrayList<>();
@@ -97,6 +108,11 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
         return saasNameList;
     }
 
+    /**
+     * 获取当前用户可查询的地区在addresses表中的地址ID
+     * @param userId
+     * @return
+     */
     public List<String> getGeographyId(String userId) {
         List<String> districtList = getDistrict(userId);
         if (null != districtList && districtList.size() > 0) {
@@ -108,6 +124,11 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
         return null;
     }
 
+    /**
+     * 获取当前用户可查询的机构编码orgCode列表
+     * @param userId
+     * @return
+     */
     public List<String> getOrgCodeByName(String userId) {
         List<String> orgCodeList = getOrgCodes(userId);
         if (null != orgCodeList && orgCodeList.size() > 0) {
@@ -117,6 +138,11 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
         return null;
     }
 
+    /**
+     *获取当前用户可查询的机构所对应的人员列表
+     * @param userId
+     * @return
+     */
     public List<String> getUserIdInMember(String userId) {
         List<String> orgCodeList = getOrgCodeByName(userId);
         if (null != orgCodeList && orgCodeList.size() > 0) {
