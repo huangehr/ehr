@@ -23,14 +23,14 @@ import java.util.List;
 @EnableFeignClients
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "userInfo", description = "获取用户的机构&地区", tags = {"获取用户的机构&地区"})
+@Api(value = "userInfo", description = "获取用户可查询的机构&地区", tags = {"获取用户可查询的机构&地区"})
 public class GetInfoController extends BaseController {
 
     @Autowired
     private GetInfoClient getInfoClient;
 
     @RequestMapping(value = "/userInfo/getOrgCode", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户的机构代码")
+    @ApiOperation(value = "获取当前用户可查询的机构代码")
     public String getOrgCode(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
@@ -40,7 +40,7 @@ public class GetInfoController extends BaseController {
     }
 
     @RequestMapping(value = "/getOrgByUserId", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户的机构名称")
+    @ApiOperation(value = "获取当前用户可查询的机构名称")
     public Envelop getOrgByUserId(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
@@ -49,7 +49,7 @@ public class GetInfoController extends BaseController {
     }
 
     @RequestMapping(value = "/getDistrictByUserId", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户管理的地区")
+    @ApiOperation(value = "获取当前用户可查询的地区列表")
     public Envelop getDistrictByUserId(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
@@ -58,7 +58,7 @@ public class GetInfoController extends BaseController {
     }
 
     @RequestMapping(value = "/getUserIdList", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户管理的机构所对应的userId列表")
+    @ApiOperation(value = "获取当前用户可查询的机构下所对应的userId列表")
     public String getUserIdList(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {
@@ -68,7 +68,7 @@ public class GetInfoController extends BaseController {
     }
 
     @RequestMapping(value = "/getDistrictList", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户管理的机构所对应的区域列表")
+    @ApiOperation(value = "获取当前用户可查询的机构所对应的区域列表")
     public String getDistrictList(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId) {

@@ -1,9 +1,7 @@
-package com.yihu.ehr.users.service;
+package com.yihu.ehr.portal.service.function;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
-import com.yihu.ehr.model.common.ListResult;
-import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -23,31 +21,31 @@ import java.util.List;
 public interface GetInfoClient {
 
     @RequestMapping(value = "/userInfo/getOrgCode", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户可查询的机构代码")
+    @ApiOperation(value = "获取当前用户的机构代码")
     List<String> getOrgCode(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId);
 
     @RequestMapping(value = "/getOrgByUserId", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户可查询的机构名称")
+    @ApiOperation(value = "获取当前用户的机构名称")
     List<String> getOrgByUserId(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId);
 
     @RequestMapping(value = "/getDistrictByUserId", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户可查询的地区")
+    @ApiOperation(value = "获取当前用户管理的地区")
     List<String> getDistrictByUserId(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId);
 
     @RequestMapping(value = "/getUserIdList", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户可查询的机构下所对应的userId列表")
+    @ApiOperation(value = "获取当前用户管理的机构所对应的userId列表")
     List<String> getUserIdList(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId);
 
     @RequestMapping(value = "/getDistrictList", method = RequestMethod.GET)
-    @ApiOperation(value = "获取当前用户可查询的机构所对应的区域列表")
+    @ApiOperation(value = "获取当前用户管理的机构所对应的 区域列表")
     List<String> getDistrictList(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId);

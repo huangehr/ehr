@@ -10,6 +10,7 @@ import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -50,4 +51,10 @@ public interface TjQuotaClient {
     @RequestMapping(value = ServiceApi.TJ.TjQuotaExistsCode, method = RequestMethod.GET)
     @ApiOperation(value = "校验code是否存在")
     boolean hasExistsCode(@PathVariable("code") String code);
+
+    @RequestMapping(value = "/tj/hasConfigDimension", method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    boolean hasConfigDimension(
+            @ApiParam(name = "quotaCode", value = "指标编码")
+            @RequestParam(value = "quotaCode") String quotaCode);
 }

@@ -73,13 +73,14 @@ public class MysqlExtract {
             List<Map<String, Object>> mapList =  jdbcTemplate.queryForList(mysql);
 
             for(Map<String, Object> map :mapList){
-                String key  = "";
-                for(String s :map.keySet()){
-                    key = key + s +  "-";
+                String keyVal  = "";
+                for(String key :map.keySet()){
+                    if(!key.equals("result")){
+                        keyVal = keyVal + map.get(key) +  "-";
+                    }
                 }
-                resultMap.put(key.substring(0,key.length()-1),(long)map.get("result"));
+                resultMap.put(keyVal.substring(0, keyVal.length() - 1), (long) map.get("result"));
             }
-
             compute(qdm, qds, returnList, resultMap);
         }
 
@@ -105,7 +106,7 @@ public class MysqlExtract {
             }
         }
         for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-            allField.append(tjQuotaDimensionSlaves.get(i).getKeyVal());
+            allField.append(tjQuotaDimensionSlaves.get(i).getKeyVal()+ ",");
         }
         //拼凑where语句
         StringBuffer whereSql = new StringBuffer();
@@ -139,8 +140,12 @@ public class MysqlExtract {
            returnList.add(saveModel);
        }else {
            //初始化主细维度
-           for(TjQuotaDimensionMain qmain:qdm){
-               allData= initDimension(qds, qmain, allData);
+           if(qdm!=null && qdm.size()>0){
+               for(TjQuotaDimensionMain qmain:qdm){
+                   allData= initDimension(qds, qmain, allData);
+               }
+           }else{
+               allData= initDimension(qds, null, allData);
            }
            for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
                String key = oneMap.getKey();
@@ -158,10 +163,12 @@ public class MysqlExtract {
      * 初始化主细维度
      */
     private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, TjQuotaDimensionMain quotaDimensionMain, Map<String, SaveModel> allData) {
-        //查询字典数据
-        List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-        //设置到map里面
-        setAllData(allData, dictData, quotaDimensionMain.getType());
+        if(quotaDimensionMain !=null){
+            //查询字典数据
+            List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+            //设置到map里面
+            setAllData(allData, dictData, quotaDimensionMain.getType());
+        }
         for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
             List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
             allData = setAllSlaveData(allData, dictDataSlave,i);

@@ -6,10 +6,12 @@ import com.yihu.quota.etl.extract.solr.SolrExtract;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
+import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
 import com.yihu.quota.model.jpa.source.TjDataSource;
 import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
+import com.yihu.quota.service.save.TjDataSaveService;
 import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.DictModel;
@@ -36,6 +38,8 @@ public class ExtractHelper {
     @Autowired
     private TjDataSourceService dataSourceService;
     @Autowired
+    private TjDataSaveService datsSaveService;
+    @Autowired
     private TjDimensionMainService dimensionMainService;
     @Autowired
     private TjDimensionSlaveService dimensionSlaveService;
@@ -45,6 +49,18 @@ public class ExtractHelper {
     private SolrExtract solrExtract;
 
     private Logger logger = LoggerFactory.getLogger(ExtractHelper.class);
+
+    public EsConfig getEsConfig(String quotaCode) throws Exception {
+        //得到该指标的数据存储位置
+        TjQuotaDataSave quotaDataSave = datsSaveService.findByQuota(quotaCode);
+        //如果为空说明数据错误
+        if (quotaDataSave == null) {
+            throw new Exception("QuotaDataSave data error");
+        }
+        JSONObject obj = new JSONObject().fromObject(quotaDataSave.getConfigJson());
+        EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+        return  esConfig;
+    }
 
     /**
      * 公共的抽取数据
@@ -61,7 +77,6 @@ public class ExtractHelper {
             if (quotaDataSource == null) {
                 throw new Exception("QuotaDataSource data error");
             }
-
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             //得到主维度
@@ -71,29 +86,19 @@ public class ExtractHelper {
 
             //判断数据源是什么类型,根据类型和数据库相关的配置信息抽取数据
             if ( TjDataSource.type_es.equals(quotaDataSource.getCode()) ) {
-
                 //查询ES数据
-//                return  SpringUtil.getBean(EsExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
                 return esExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
-
             }else if( TjDataSource.type_solr.equals(quotaDataSource.getCode()) ){
-
                 //查询 solr 数据
-//                return  SpringUtil.getBean(SolrExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
                 return  solrExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
-
             }else if( TjDataSource.type_mysql.equals(quotaDataSource.getCode()) ){
-
                 //查询 mysql 数据
                 return  SpringUtil.getBean(MysqlExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
-
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("extract error:" + e.getMessage());
             logger.error("quotaVOr:" + quotaVo.toString());
-
         }
         return null;
     }
@@ -120,7 +125,7 @@ public class ExtractHelper {
             }
             return returnAllData;
         } catch (Exception e) {
-
+            e.getMessage();
         }
         return null;
     }
