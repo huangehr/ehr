@@ -194,4 +194,11 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         return tjQuotaJobClient.getQuotaResult(id,filters,pageNo,pageSize);
     }
 
+    @RequestMapping(value = "/tj/hasConfigDimension", method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasConfigDimension(
+            @ApiParam(name = "quotaCode", value = "指标编码")
+            @RequestParam(value = "quotaCode") String quotaCode) {
+        return tjQuotaClient.hasConfigDimension(quotaCode);
+    }
 }
