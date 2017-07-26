@@ -516,6 +516,19 @@ public class ResourcesQueryService  {
                         }
                         re.setDetailModelList(list);
                     }
+                    if(resourcesCode.equals("RS_OUTPATIENT_DIAGNOSIS")) {
+                        List<Map<String,Object>> transformKeyList = new ArrayList<>();
+                        for(Map<String, Object> temp : (List<Map<String, Object>>)re.getDetailModelList()) {
+                            Map<String, Object> newKeyObject = new HashMap<String, Object>();
+                            for(DtoResourceMetadata metadada : metadataList) {
+                                if (temp.containsKey(metadada.getId())) {
+                                    newKeyObject.put(metadada.getName(), temp.get(metadada.getId()));
+                                }
+                            }
+                            transformKeyList.add(newKeyObject);
+                        }
+                        re.setDetailModelList(transformKeyList);
+                    }
                 }
                 else {
                     re.setSuccessFlg(false);

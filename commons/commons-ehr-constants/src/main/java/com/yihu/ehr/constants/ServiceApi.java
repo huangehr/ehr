@@ -163,6 +163,7 @@ public class ServiceApi {
         public static final String ProfileInfo = "/{demographic_id}/profile/info"; //基本信息
         public static final String ProfileHistory = "/{demographic_id}/profile/history"; //患病史
         public static final String HealthProblem = "/{demographic_id}/profile/health_problem"; //主要健康问题
+        public static final String HealthProblemSub = "/{last_visit_record}/profile/health_problem_sub"; //主要健康问题诊断情况
         public static final String MedicalDisease = "/{demographic_id}/profile/medical_disease"; //就诊过疾病
         public static final String MedicalArea = "/{demographic_id}/profile/medical_area"; //就诊过区域
         public static final String MedicalYear = "/{demographic_id}/profile/medical_year"; //就诊过年份

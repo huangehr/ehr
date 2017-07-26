@@ -143,7 +143,15 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
         return patient.getHealthProblem(demographic_id);
     }
-
+		
+		@ApiOperation("主要健康问题诊断详情OK")
+    @RequestMapping(value = ServiceApi.Profiles.HealthProblemSub, method = RequestMethod.GET)
+    public List<Map<String,Object>> HealthProblemSub(
+            @ApiParam(name = "last_visit_record", value = "最后一次诊断记录",defaultValue="41872607-9_20000001_1465894742000")
+            @RequestParam(value = "last_visit_record", required = true) String last_visit_record) throws Exception {
+        return patient.getHealthProblemSub(last_visit_record);
+    }
+		
     /*@ApiOperation("就诊过的疾病OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalDisease, method = RequestMethod.GET)
     public List<Map<String,String>> MedicalDisease(
