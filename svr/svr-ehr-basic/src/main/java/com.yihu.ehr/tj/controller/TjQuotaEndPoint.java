@@ -45,6 +45,8 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     TjDataSaveService tjDataSaveService;
     @Autowired
     TjDataSourceService tjDataSourceService;
+    @Autowired
+    TjQuotaDimensionMainService tjQuotaDimensionMainService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询统计表")
@@ -189,5 +191,18 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         TjQuota tjQuota = tjQuotaService.findByCode(code);
         MTjQuotaModel mTjQuotaModel = convertToModel(tjQuota, MTjQuotaModel.class);
         return mTjQuotaModel;
+    }
+
+    @RequestMapping(value = "/tj/hasConfigDimension", method = RequestMethod.GET)
+    @ApiOperation(value = "校验code是否存在")
+    public boolean hasConfigDimension(
+            @ApiParam(name = "quotaCode", value = "指标编码")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        String filters = "quotaCode=" + quotaCode;
+        List<TjQuotaDimensionMain> dimensionMainList = tjQuotaDimensionMainService.search(filters);
+        if (null != dimensionMainList && dimensionMainList.size() > 0) {
+            return true;
+        }
+        return false;
     }
 }
