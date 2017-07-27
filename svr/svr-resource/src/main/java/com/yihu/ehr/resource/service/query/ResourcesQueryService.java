@@ -516,6 +516,19 @@ public class ResourcesQueryService  {
                         }
                         re.setDetailModelList(list);
                     }
+                    if(resourcesCode.equals("RS_OUTPATIENT_DIAGNOSIS")) {
+                        List<Map<String,Object>> transformKeyList = new ArrayList<>();
+                        for(Map<String, Object> temp : (List<Map<String, Object>>)re.getDetailModelList()) {
+                            Map<String, Object> newKeyObject = new HashMap<String, Object>();
+                            newKeyObject.put("DiagnosticTypeCode", temp.get("EHR_000111") != null ? temp.get("EHR_000111") : "");
+                            newKeyObject.put("DiagnosticDate", temp.get("EHR_000113") != null ? temp.get("EHR_000113") : "");
+                            newKeyObject.put("SignatureDoctor", temp.get("EHR_000106") != null ? temp.get("EHR_000106") : "");
+                            newKeyObject.put("DiagnosticName", temp.get("EHR_000112") != null ? temp.get("EHR_000112") : "");
+                            newKeyObject.put("DiagnosticInstructions", temp.get("EHR_000114") != null ? temp.get("EHR_000114") : "");
+                            transformKeyList.add(newKeyObject);
+                        }
+                        re.setDetailModelList(transformKeyList);
+                    }
                 }
                 else {
                     re.setSuccessFlg(false);
@@ -525,9 +538,7 @@ public class ResourcesQueryService  {
         else{
             throw new Exception("无效资源！");
         }
-
         return re;
-
     }
 
 

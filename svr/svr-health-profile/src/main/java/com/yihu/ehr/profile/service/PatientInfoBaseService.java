@@ -242,7 +242,18 @@ public class PatientInfoBaseService {
 
         return re;
     }
-
+		
+		/*
+     * @根据患者最后一次诊断记录获取诊断详情
+     */
+    public List<Map<String, Object>> getHealthProblemSub(String lastVisitRecord) throws Exception {
+        List<Map<String, Object>> re = new ArrayList<>();
+        //获取门诊断详情
+        Envelop result = resource.getResources(BasisConstant.outpatientDiagnosis, appId, null, "{\"q\":\"profile_id:" + lastVisitRecord + "\"}", null, null);
+        re = result.getDetailModelList();
+        return re;
+    }
+		
     /**
      * 全文检索
      */
