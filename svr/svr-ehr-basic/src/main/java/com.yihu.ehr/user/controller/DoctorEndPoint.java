@@ -238,8 +238,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Doctors.DoctorsIdCardNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断身份证号码是否存在")
     public boolean isCardNoExists(
-            @ApiParam(name = "idCardNo", value = "身份证号码", defaultValue = "")
-            @PathVariable(value = "idCardNo") String idCardNo) {
+            @ApiParam(name = "doctor_idCardNo", value = "身份证号码", defaultValue = "")
+            @PathVariable(value = "doctor_idCardNo") String idCardNo) {
         return doctorService.getByIdCardNo(idCardNo) != null;
     }
 
