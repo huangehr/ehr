@@ -30,6 +30,10 @@ public interface OrgDeptImportClient {
     @ApiOperation("获取已存在部门编号")
     List codeExistence(@RequestBody String code);
 
+    @RequestMapping(value = "/name/existence",method = RequestMethod.POST)
+    @ApiOperation("获取已存在部门名称")
+    List nameExistence(@RequestBody String name);
+
     @RequestMapping(value = "/orgCode/existence",method = RequestMethod.POST)
     @ApiOperation("获取已存在的机构代码")
     List orgCodeExistence(@RequestBody String orgCode);
