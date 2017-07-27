@@ -3,6 +3,7 @@ package com.yihu.ehr.org.service;
 import com.yihu.ehr.org.dao.XOrgDeptRepository;
 import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.model.OrgDeptDetail;
+import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,13 @@ public class OrgDeptImportService extends BaseJpaService<OrgDept,XOrgDeptReposit
         return sqlQuery.list();
     }
 
+    public List nameExistence(String[] name) {
+        String sql = "SELECT name FROM Org_Dept WHERE name in(:name)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("name", name);
+        return sqlQuery.list();
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean addOrgDeptBatch(List<Map<String, Object>> orgDepts) {
         Map<String, Object> map;
@@ -53,8 +61,9 @@ public class OrgDeptImportService extends BaseJpaService<OrgDept,XOrgDeptReposit
             newOrgDept.setDelFlag(0);
             OrgDept save = orgDeptService.save(newOrgDept);
 
-            String gloryId = map.get("gloryId").toString();
-            if (!"".equals(gloryId)) {
+            Organization org = orgService.getOrg(map.get("orgCode").toString());
+            if (null != org && "Hospital".equalsIgnoreCase(org.getOrgCode())) {
+                String gloryId = map.get("gloryId").toString();
                 String[] arr = gloryId.split(",");
                 String ids = "";
                 for (String s : arr) {
