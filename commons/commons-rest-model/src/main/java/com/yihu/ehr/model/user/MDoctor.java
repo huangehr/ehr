@@ -29,6 +29,7 @@ public class MDoctor implements Serializable {
     private String status;
     private Date insertTime;
     private Date updateTime;
+    private String idCardNo;
 
     public Long getId() {
         return id;
@@ -204,5 +205,13 @@ public class MDoctor implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getIdCardNo() {
+        return idCardNo;
+    }
+
+    public void setIdCardNo(String idCardNo) {
+        this.idCardNo = idCardNo;
     }
 }

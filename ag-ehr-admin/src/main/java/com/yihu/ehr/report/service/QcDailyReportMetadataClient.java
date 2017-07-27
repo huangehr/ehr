@@ -45,8 +45,7 @@ public interface QcDailyReportMetadataClient {
     @ApiOperation(value = "删除质控包数据元日报")
     boolean delete(@RequestParam(value = "id") String id);
 
-    @RequestMapping(value = ServiceApi.Report.QcDailyReportMetadata, method = RequestMethod.GET)
-    @ApiOperation(value = "获取数据元日报信息")
-    MQcDailyReportMetadata getInfo(@RequestParam(value = "id") String id) ;
-
+    @RequestMapping(value = ServiceApi.Report.AddQcDailyMetadataDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "新增质控包数据元日报列表")
+    boolean addDailyDatasetMetadataList(@RequestBody String models ) ;
 }

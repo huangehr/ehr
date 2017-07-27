@@ -45,6 +45,7 @@ public class SolrAdmin {
             doc.addField(key, map.get(key));
         }
         UpdateResponse re = client.add(doc);
+        client.commit();
 
         pool.close(core); //释放连接
 
@@ -92,6 +93,7 @@ public class SolrAdmin {
             }
 
             UpdateResponse re = client.add(solrList);
+            client.commit();
             pool.close(core); //释放连接
 
             if(re.getStatus()!=0) {
@@ -117,6 +119,7 @@ public class SolrAdmin {
     public Boolean delete(String core,String keyQuery) throws Exception {
         SolrClient client = pool.getConnection(core);
         UpdateResponse de = client.deleteByQuery(keyQuery);
+        client.commit();
         pool.close(core); //释放连接
 
         if(de.getStatus()!=0) {
@@ -124,7 +127,7 @@ public class SolrAdmin {
             return true;
         }
         else{
-            System.out.print("update index faild!");
+            System.out.print("delete index faild!");
             return false;
         }
     }

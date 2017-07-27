@@ -22,7 +22,6 @@ public class MicroServices {
     public static final String FileResource = "svr-ehr-basic";
     public static final String Dictionary = "svr-ehr-basic";
     public static final String Organization = "svr-ehr-basic";
-    public static final String Authentication = "svr-authentication";
 
     //以下几个微服务聚合svr-standard
     public static final String Adaption = "svr-standard";
@@ -37,7 +36,11 @@ public class MicroServices {
     public static final String Package = "svr-pack-mgr";
     public static final String Cipher = "svr-cipher";
     public static final String ArchiveSecurity = "svr-archive-security";
+
+    public static final String Authentication = "svr-authentication";
     public static final String Redis = "svr-redis";
+    public static final String Statistics = "svr-protal-statistics";
+    public static final String Quota = "svr-quota";
 
-
+    public static final String LogCollection = "svr-logCollection";
 }

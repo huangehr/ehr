@@ -23,7 +23,7 @@ public class FileResourceRepository {
     @Autowired
     HBaseDao hbaseDao;
 
-    public void save(ResourceBucket resBucket) throws IOException {
+    public void save(ResourceBucket resBucket) throws Exception {
         if (resBucket.getProfileType() == ProfileType.File){
             TableBundle bundle = new TableBundle();
 

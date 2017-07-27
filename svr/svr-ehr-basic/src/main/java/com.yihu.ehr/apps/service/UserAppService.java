@@ -2,6 +2,7 @@ package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.model.UserApp;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.user.entity.RoleAppRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,5 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserAppService extends BaseJpaService<UserApp, XUserAppRepository> {
     @Autowired
     private XUserAppRepository userAppRepository;
+
+    public UserApp findByAppIdAndUserId(String appId, String userId){
+        return  userAppRepository.findByAppIdAndUserId(appId,userId);
+    }
 
 }

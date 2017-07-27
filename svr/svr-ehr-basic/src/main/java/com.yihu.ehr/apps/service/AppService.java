@@ -1,7 +1,10 @@
 package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.model.App;
+import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.query.BaseJpaService;
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -85,6 +89,29 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
 
     public boolean findByIdAndSecret(String appId, String secret) {
         return appRepo.findByIdAndSecret(appId,secret).size()>0;
+    }
+
+    /**
+     * 机构资源授权获取
+     */
+    public List<App> getAppsByUserIdAndCatalog(String userId,String catalog)
+    {
+        String sql =
+                "SELECT * FROM (" +
+                        "SELECT b.id, b.name as name, b.secret as secret, b.url as url, b.creator as creator," +
+                        "b.auditor as auditor, b.create_time as createTime, b.audit_time as auditTime , b.catalog as catalog, b.status as status, " +
+                        "b.description as description, b.org as org, b.code as code," +
+                        " b.source_type as sourceType, b.release_flag as releaseFlag" +
+                        " FROM apps b " +
+                        "LEFT JOIN user_app m on m.app_id=b.id " +
+                        "WHERE b.catalog= :catalog AND m.user_id=:userId " +
+                        ") p ORDER BY p.id";
+
+        SQLQuery query = currentSession().createSQLQuery(sql);
+        query.setParameter("userId", userId);
+        query.setParameter("catalog", catalog);
+        query.setResultTransformer(Transformers.aliasToBean(App.class));
+        return query.list();
     }
 
 }

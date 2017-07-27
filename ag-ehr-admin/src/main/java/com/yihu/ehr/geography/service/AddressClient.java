@@ -2,6 +2,8 @@ package com.yihu.ehr.geography.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import io.swagger.annotations.ApiOperation;
@@ -105,8 +107,20 @@ public interface AddressClient {
 
     @RequestMapping(value = "/geography_entries/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据id查询行政区划地址")
-    public MGeographyDict getAddressDictById(
+    MGeographyDict getAddressDictById(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) ;
+
+    @RequestMapping(value = ServiceApi.Geography.GetAddressNameByCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据地址中文名 查询地址编号")
+    ObjectResult getAddressNameByCode(
+            @ApiParam(name = "name", value = "name", defaultValue = "")
+            @RequestParam(value = "name") String name);
+
+    @RequestMapping(value = "/OrgSaasAreaByname", method = RequestMethod.GET)
+    @ApiOperation(value = "根据名称查询行政区划地址")
+    List<MGeographyDict> getOrgSaasAreaByname(
+            @ApiParam(name = "name", value = "名称", defaultValue = "")
+            @RequestParam(value = "name") String name) ;
 
 }

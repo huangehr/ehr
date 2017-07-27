@@ -28,6 +28,9 @@ public class UserDetailModel {
     private String provinceName;
     private int cityId;
     private String cityName;
+    private int areaId;
+    private String areaName;
+    private String street;
 
 
     // 未绑定属性
@@ -60,6 +63,16 @@ public class UserDetailModel {
     private String ssid;
     private String realnameFlag;
 
+    //    角色关联属性
+    private String demographicId;
+
+    public String getDemographicId() {
+        return demographicId;
+    }
+
+    public void setDemographicId(String demographicId) {
+        this.demographicId = demographicId;
+    }
 
     public int getFertilityStatus() {
         return fertilityStatus;
@@ -411,5 +424,29 @@ public class UserDetailModel {
 
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
+    }
+
+    public int getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(int areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
     }
 }

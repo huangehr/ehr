@@ -10,6 +10,7 @@ public class PatientModel {
     private String telephoneNo;
     private String homeAddress;
     private String registerTime;
+    private String userId;
 
     public String getIdCardNo() {
         return idCardNo;
@@ -57,5 +58,13 @@ public class PatientModel {
 
     public void setRegisterTime(String registerTime) {
         this.registerTime = registerTime;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

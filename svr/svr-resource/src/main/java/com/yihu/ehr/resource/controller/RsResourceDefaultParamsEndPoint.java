@@ -34,7 +34,7 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("根据id获取参数信息")
     public MResourceDefaultParam getResourceDefaultParamById(
             @ApiParam(name = "id", value = "资源默认参数信息id")
-            @PathVariable(value = "id") Long id){
+            @PathVariable(value = "id") String id){
         ResourceDefaultParam resourceDefaultParam = resourceDefaultParamService.findById(id);
         if(resourceDefaultParam == null){
             return null;
@@ -66,7 +66,7 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("根据id删除资源默认参数")
     public boolean deleteResourceDefaultParams(
             @ApiParam(name="id",value="资源默认参数id")
-            @PathVariable(value="id") Long id){
+            @PathVariable(value="id") String id){
         resourceDefaultParamService.delete(id);
         return true;
     }

@@ -8,6 +8,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * @version 1.0
  * @created 2017/5/08
  */
-public interface XQcDailyReportMetaDataRepository extends PagingAndSortingRepository<QcDailyReportMetadata, Integer> {
+public interface XQcDailyReportMetaDataRepository extends PagingAndSortingRepository<QcDailyReportMetadata, String> {
 
 }

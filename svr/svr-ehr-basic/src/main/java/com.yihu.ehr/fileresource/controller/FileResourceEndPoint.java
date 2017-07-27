@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
@@ -33,6 +34,8 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private FileResourceManager fileResourceManager;
+    @Value("${fast-dfs.public-server}")
+    private String fastDfsPublicServers;
 
 
     /**
@@ -212,5 +215,27 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
         String fileStream = new String(Base64.getEncoder().encode(bytes));
         return fileStream;
     }
+
+
+
+    /**
+     * 根据文件的id,查找文件路径
+     *
+     * @param imageId
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/imageFindById", method = RequestMethod.GET)
+    @ApiOperation(value = "根据文件的id,查找文件路径")
+    public String imageFindById(
+            @ApiParam(name = "imageId", value = "文件路径")
+            @RequestParam(value = "imageId") String imageId) throws Exception {
+        String s = java.net.URLDecoder.decode(imageId, "UTF-8");
+        String imgRemotePath=fileResourceManager.imageFindById(s);
+        imgRemotePath = imgRemotePath.replace(":","/");
+        imgRemotePath= fastDfsPublicServers +"/"+imgRemotePath ;
+        return imgRemotePath;
+    }
+
 
 }

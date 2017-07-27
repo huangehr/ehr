@@ -195,9 +195,9 @@ public class CDAController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "SaveRelationship", method = RequestMethod.POST)
+    @RequestMapping(value = "saveRelationship", method = RequestMethod.POST)
     @ApiOperation(value = "保存CDADataSetRelationship")
-    public Envelop SaveRelationship(
+    public Envelop saveRelationship(
             @ApiParam(name = "dataSetIds", value = "数据集ID(多ID以逗号隔开)")
             @RequestParam(value = "dataSetIds") String dataSetIds,
             @ApiParam(name = "cdaId", value = "cdaID")

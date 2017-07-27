@@ -26,7 +26,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("获取地址redis")
     @RequestMapping(value = ServiceApi.Redis.AddressRedis, method = RequestMethod.GET)
-    @ResponseBody
     public String getAddressRedis(@ApiParam(value = "key", defaultValue = "")
                                       @RequestParam("key") String key)
     {
@@ -36,7 +35,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("获取健康问题redis")
     @RequestMapping(value = ServiceApi.Redis.HealthProblemRedis, method = RequestMethod.GET)
-    @ResponseBody
     public String getHealthProblemRedis(@ApiParam(value = "key", defaultValue = "")
                                             @RequestParam("key") String key)
     {
@@ -46,17 +44,30 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("获取ICD10健康问题 redis")
     @RequestMapping(value = ServiceApi.Redis.Icd10HpRelationRedis, method = RequestMethod.GET)
-    @ResponseBody
     public String getIcd10HpRelationRedis(@ApiParam(value = "key", defaultValue = "")
                                               @RequestParam("key") String key)
     {
         return redisService.getIcd10HpRelationRedis(key);
     }
 
+    @ApiOperation("获取ICD10名称 redis")
+    @RequestMapping(value = ServiceApi.Redis.Icd10NameRedis, method = RequestMethod.GET)
+    public String getIcd10NameRedis(@ApiParam(value = "key", defaultValue = "")
+                                          @RequestParam("key") String key)
+    {
+        return redisService.getIcd10NameRedis(key);
+    }
+
+    @ApiOperation("通过ICD10获取相关健康问题 redis")
+    @RequestMapping(value = ServiceApi.Redis.Icd10HpCodeRedis, method = RequestMethod.GET)
+    public String getIcd10HpCodeRedis(@ApiParam(value = "key", defaultValue = "")
+                                    @RequestParam("key") String key)
+    {
+        return redisService.getIcd10HpCodeRedis(key);
+    }
 
     @ApiOperation("获取指标 redis")
     @RequestMapping(value = ServiceApi.Redis.IndicatorsRedis, method = RequestMethod.GET)
-    @ResponseBody
     public String getIndicatorsRedis(@ApiParam(value = "key", defaultValue = "")
                                          @RequestParam("key") String key)
     {
@@ -64,25 +75,38 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
     }
 
 
-    @ApiOperation("获取机构redis")
+    @ApiOperation("获取机构名称redis")
     @RequestMapping(value = ServiceApi.Redis.OrgRedis, method = RequestMethod.GET)
-    @ResponseBody
     public String getOrgRedis(@ApiParam(value = "key", defaultValue = "")
                                   @RequestParam("key") String key)
     {
         return redisService.getOrgRedis(key);
     }
 
-    @ApiOperation("获取机构redis")
+    @ApiOperation("获取机构区域redis")
     @RequestMapping(value = ServiceApi.Redis.OrgAreaRedis, method = RequestMethod.GET)
-    @ResponseBody
-    public String OrgAreaRedis(@ApiParam(value = "key", defaultValue = "")
+    public String getOrgAreaRedis(@ApiParam(value = "key", defaultValue = "")
                               @RequestParam("key") String key)
     {
         return redisService.getOrgAreaRedis(key);
     }
 
+    @ApiOperation("获取机构SAAS区域权限范围redis")
+    @RequestMapping(value = ServiceApi.Redis.OrgSaasAreaRedis, method = RequestMethod.GET)
+    public String getOrgSaasAreaRedis(@ApiParam(value = "key", defaultValue = "")
+                               @RequestParam("key") String key)
+    {
+        return redisService.getOrgSaasArea(key);
+    }
 
+    @ApiOperation("获取机构SAAS机构权限范围redis")
+    @RequestMapping(value = ServiceApi.Redis.OrgSaasOrgRedis, method = RequestMethod.GET)
+    @ResponseBody
+    public String getOrgSaasOrgRedis(@ApiParam(value = "key", defaultValue = "")
+                                      @RequestParam("key") String key)
+    {
+        return redisService.getOrgSaasOrg(key);
+    }
     /******************************************* 资源化相关Redis *******************************************************************/
 
     @ApiOperation("获取资源化字典映射 redis")

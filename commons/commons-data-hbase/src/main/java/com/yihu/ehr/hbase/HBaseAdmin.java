@@ -100,6 +100,15 @@ public class HBaseAdmin extends AbstractHBaseClient {
                     admin.deleteTable(tn);
                     admin.createTable(descriptor);
                 }
+                else{
+                    System.out.print("not exit table "+tableName+".\r\n");
+                }
+                /*else{
+                    HTableDescriptor descriptor = new HTableDescriptor(tableName);
+                    descriptor.addFamily(new HColumnDescriptor("basic"));
+                    descriptor.addFamily(new HColumnDescriptor("d"));
+                    admin.createTable(descriptor);
+                }*/
             }
         } finally {
             admin.close();

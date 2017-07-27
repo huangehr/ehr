@@ -8,13 +8,12 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.profile.annotation.Column;
 import com.yihu.ehr.profile.annotation.Table;
 import com.yihu.ehr.profile.core.ResourceCore;
+import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.util.ProfileId;
-import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -37,12 +36,13 @@ public class StandardPackage {
     private String demographicId;                       // 身份证号
     private Date createDate;                            // 包创建时间
     private String cdaVersion;
-    private ProfileType profileType; //1结构化档案，2文件档案，3链接档案
+    private ProfileType profileType; //1结构化档案，2文件档案，3链接档案，4数据集档案
     private EventType eventType; // 0门诊 1住院 2体检
 
     //add by hzp
     private String cardType;                              // 就诊时用的就诊卡类型
     private String patientName;                           // 患者姓名
+    private List<String> diagnosisList;                           // ICD10诊断列表
 
     protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 
@@ -218,6 +218,14 @@ public class StandardPackage {
         this.patientName = patientName;
     }
 
+    public List<String> getDiagnosisList() {
+        return diagnosisList;
+    }
+
+    public void setDiagnosisList(List<String> diagnosisList) {
+        this.diagnosisList = diagnosisList;
+    }
+
     public String toJson() {
         ObjectNode node = jsonFormat();
         return node.toString();
@@ -238,6 +246,7 @@ public class StandardPackage {
         root.put("profileType", this.getProfileType().toString());
         root.put("cardType", this.getCardType());
         root.put("patientName", this.getPatientName());
+        root.put("diagnosis", StringUtils.join(this.getDiagnosisList(),";"));
 
         ObjectNode dataSetsNode = root.putObject("dataSets");
         for (String dataSetCode : dataSets.keySet()) {
@@ -261,5 +270,39 @@ public class StandardPackage {
         }
     }
 
+    //非档案类型 rowKey获取
+    public String getNonArchiveProfileId(String dataSetCode) {
+        if (profileId == null) {
+            if (StringUtils.isEmpty(orgCode)) {
+                throw new IllegalArgumentException("Build profile id failed, organization code is empty.");
+            }
+
+            if (StringUtils.isEmpty(eventNo) && !"HDSA00_01".equals(dataSetCode)) {
+                throw new IllegalArgumentException("Build profile id failed, eventNo is empty.");
+            }
+
+            if (StringUtils.isEmpty(patientId) ) {
+                throw new IllegalArgumentException("Build profile id failed, patientId is empty.\"");
+            }
+
+            this.profileId = ProfileId.get(orgCode, patientId, eventNo);
+        }
+
+        return profileId.toString();
+    }
+
+    //非档案类型rowKey更新
+    public void regularNonArchiveRowKey() {
+        for (String dataSetCode : dataSets.keySet()) {
+            PackageDataSet dataSet = dataSets.get(dataSetCode);
+
+            int rowIndex = 0;
+            String sortFormat = dataSet.getRecordCount() > 10 ? "%s$%03d" : "%s$%1d";
+            String[] rowKeys = dataSet.getRecordKeys().toArray(new String[dataSet.getRecordCount()]);
+            for (String rowKey : rowKeys) {
+                dataSet.updateRecordKey(rowKey, String.format(sortFormat, getNonArchiveProfileId(dataSetCode), rowIndex++));
+            }
+        }
+    }
 
 }

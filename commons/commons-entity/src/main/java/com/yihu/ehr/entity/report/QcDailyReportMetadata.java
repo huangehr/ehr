@@ -24,7 +24,7 @@ public class QcDailyReportMetadata {
     private Integer errorQty;//错误数据元数量
     private String errCode;//错误代码
     private Integer acqFlag;//采集状态  0 - 未采集  1 - 已采集（实收） 验证统计用
-
+    private Date addDate;   //添加时间
 
 
     @Id
@@ -146,5 +146,15 @@ public class QcDailyReportMetadata {
 
     public void setAcqFlag(Integer acqFlag) {
         this.acqFlag = acqFlag;
+    }
+
+    @Basic
+    @Column(name = "add_date")
+    public Date getAddDate() {
+        return addDate;
+    }
+
+    public void setAddDate(Date addDate) {
+        this.addDate = addDate;
     }
 }

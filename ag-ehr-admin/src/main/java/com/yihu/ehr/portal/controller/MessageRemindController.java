@@ -123,7 +123,7 @@ public class MessageRemindController extends BaseController {
             @RequestParam(value = "messageRemind_json_data") String messageRemindJsonData) {
         try {
             MessageRemindModel detailModel = toEntity(messageRemindJsonData, MessageRemindModel.class);
-            String errorMsg = null;
+            String errorMsg = "";
             if (detailModel.getAppId() == null) {
                 errorMsg += "应用ID不能为空!";
             }

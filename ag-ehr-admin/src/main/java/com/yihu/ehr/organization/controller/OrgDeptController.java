@@ -6,12 +6,14 @@ import com.yihu.ehr.agModel.org.OrgDeptMemberModel;
 import com.yihu.ehr.agModel.org.OrgDeptModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrgDept;
 import com.yihu.ehr.model.org.MOrgDeptDetail;
 import com.yihu.ehr.model.org.MOrgMemberRelation;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrgDeptClient;
 import com.yihu.ehr.organization.service.OrgDeptMemberClient;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -43,7 +45,8 @@ public class OrgDeptController  extends BaseController {
     private OrgDeptMemberClient orgDeptMemberClient;
     @Autowired
     private UserClient userClient;
-
+    @Autowired
+    private ConventionalDictEntryClient conventionalDictClient;
 
 
 
@@ -125,6 +128,43 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/orgDept/detailById" , method = RequestMethod.GET)
+    @ApiOperation(value = "根据id查询部门&科室详情")
+    public Envelop detailById(
+            @ApiParam(name = "deptId", value = "deptId")
+            @RequestParam(value = "deptId", required = true) Integer deptId) {
+        try {
+            String errorMsg = "";
+
+            if (deptId == null) {
+                errorMsg+="部门不能为空！";
+            }
+
+            MOrgDept mOrgDeptNew = orgDeptClient.searchDeptDetail(deptId);
+            if (mOrgDeptNew == null) {
+                return failed("获取部门详情失败!");
+            }
+            if (mOrgDeptNew.getDeptDetail() != null) {
+                //获取类别字典
+                MConventionalDict dict = conventionalDictClient.getOrgDeptDetailDisplayStatus(String.valueOf(mOrgDeptNew.getDeptDetail().getDisplayStatus()));
+                mOrgDeptNew.getDeptDetail().setDisplayStatusName(dict == null ? "" : dict.getValue());
+                MConventionalDict dict2 = conventionalDictClient.getOrgDeptDetailPyCode(String.valueOf(mOrgDeptNew.getDeptDetail().getPyCode()));
+                mOrgDeptNew.getDeptDetail().setPyCodeName(dict2 == null ? "" : dict2.getValue());
+                String[] glory = mOrgDeptNew.getDeptDetail().getGloryId().split(",");
+                String gloryName = "";
+                for (int i= 0; i<glory.length; i++) {
+                    MConventionalDict dict3 = conventionalDictClient.getOrgDeptDetailGloryId(glory[i]);
+                    gloryName += (dict3 == null ? "" : dict3.getValue()) + ",";
+                }
+                mOrgDeptNew.getDeptDetail().setGloryName(gloryName.substring(0,gloryName.length()-1));
+            }
+            return success(mOrgDeptNew);
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
 
     @RequestMapping(value = "/orgDept" , method = RequestMethod.POST)
     @ApiOperation(value = "新增机构部门")
@@ -134,15 +174,15 @@ public class OrgDeptController  extends BaseController {
         try {
             String errorMsg = "";
             OrgDeptModel orgDeptModel = objectMapper.readValue(orgDeptsJsonData, OrgDeptModel.class);
-            MOrgDept mOrgDept = convertToModel(orgDeptModel, MOrgDept.class);
+//            MOrgDept mOrgDept = convertToModel(orgDeptModel, MOrgDept.class);
 
-            if (StringUtils.isEmpty(mOrgDept.getCode())) {
+            if (StringUtils.isEmpty(orgDeptModel.getCode())) {
                 errorMsg+="部门代码不能为空！";
             }
-            if (StringUtils.isEmpty(mOrgDept.getName())) {
+            if (StringUtils.isEmpty(orgDeptModel.getName())) {
                 errorMsg+="部门不能为空！";
             }
-            if (StringUtils.isEmpty(mOrgDept.getOrgId())) {
+            if (StringUtils.isEmpty(orgDeptModel.getOrgId())) {
                 errorMsg+="机构不能为空！";
             }
             if(StringUtils.isNotEmpty(errorMsg))
@@ -150,7 +190,7 @@ public class OrgDeptController  extends BaseController {
                 return failed(errorMsg);
             }
 
-            String mOrganizationJson = objectMapper.writeValueAsString(mOrgDept);
+            String mOrganizationJson = objectMapper.writeValueAsString(orgDeptModel);
             MOrgDept mOrgDeptNew = orgDeptClient.saveOrgDept(mOrganizationJson);
             if (mOrgDeptNew == null) {
                 return failed("保存失败!");

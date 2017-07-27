@@ -211,6 +211,8 @@ public class RoleUserController extends BaseController {
         //获取用户名
         MUser user = userClient.getUser(m.getUserId());
         model.setUserName(user == null?"":user.getRealName());
+        model.setLoginCode(user == null?"":user.getLoginCode());
+        model.setUserType(user == null?"":user.getUserType());
         //获取角色名
         MRoles roles = rolesClient.getRolesById(m.getRoleId());
         model.setRoleName(roles == null?"":roles.getName());

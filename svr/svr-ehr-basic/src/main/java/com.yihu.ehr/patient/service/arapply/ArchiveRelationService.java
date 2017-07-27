@@ -6,12 +6,14 @@ import com.yihu.ehr.entity.patient.ArchiveRelation;
 import com.yihu.ehr.patient.dao.XArchiveRelationDao;
 import com.yihu.ehr.patient.feign.PatientArchiveClient;
 import com.yihu.ehr.query.BaseJpaService;
+import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -83,6 +85,14 @@ public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XAr
      */
     public ArchiveRelation archiveRelation(ArchiveRelation relation) throws Exception
     {
+        //根据profileId 判断是否存在
+        String profileId = relation.getProfileId();
+        ArchiveRelation ar =  archiveRelationDao.findByProfileId(profileId);
+        if(ar != null)
+        {
+            relation.setId(ar.getId());
+        }
+
         relation = archiveRelationDao.save(relation);
 
         return relation;

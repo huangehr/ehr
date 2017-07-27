@@ -5,6 +5,7 @@ package com.yihu.ehr.redis.service;
 import com.yihu.ehr.redis.schema.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -19,6 +20,8 @@ public class RedisService {
     HealthProblemDictKeySchema healthProblemDictKeySchema;
     @Autowired
     Icd10HpRelationKeySchema icd10HpRelationKeySchema;
+    @Autowired
+    Icd10KeySchema icd10KeySchema;
     @Autowired
     IndicatorsDictKeySchema indicatorsDictKeySchema;
     @Autowired
@@ -66,6 +69,22 @@ public class RedisService {
     }
 
     /**
+     *获取ICD10名称 redis
+     */
+    public String getIcd10NameRedis(String key)
+    {
+        return icd10KeySchema.get(key);
+    }
+
+    /**
+     *获取ICD10对应健康问题 redis
+     */
+    public String getIcd10HpCodeRedis(String key)
+    {
+        return icd10KeySchema.getHpCode(key);
+    }
+
+    /**
      *获取指标 redis
      * @return
      */
@@ -75,7 +94,7 @@ public class RedisService {
     }
 
     /**
-     *获取机构redis
+     *获取机构名称redis
      * @return
      */
     public String getOrgRedis(String key)
@@ -84,7 +103,7 @@ public class RedisService {
     }
 
     /**
-     *获取机构redis
+     *获取机构区域redis
      * @return
      */
     public String getOrgAreaRedis(String key)
@@ -92,8 +111,33 @@ public class RedisService {
         return orgKeySchema.getOrgArea(key);
     }
 
-    /******************************************* 资源化相关Redis *******************************************************************/
+    /**
+     *获取机构Saas区域权限范围redis
+     * @return
+     */
+    public String getOrgSaasArea(String key)
+    {
+        return orgKeySchema.getOrgSaasArea(key);
+    }
 
+    /**
+     *获取机构Saas机构权限范围redis
+     * @return
+     */
+    public String getOrgSaasOrg(String key)
+    {
+        String saasOrg = orgKeySchema.getOrgSaasOrg(key);
+
+        //未设置权限，默认自身机构
+        if(StringUtils.isEmpty(saasOrg))
+        {
+            saasOrg = key;
+        }
+
+        return saasOrg;
+    }
+
+    /******************************************* 资源化相关Redis *******************************************************************/
     /**
      *获取资源化字典映射 redis
      * @return

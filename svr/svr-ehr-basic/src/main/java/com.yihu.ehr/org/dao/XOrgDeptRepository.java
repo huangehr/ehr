@@ -18,7 +18,7 @@ public interface XOrgDeptRepository extends PagingAndSortingRepository<OrgDept, 
     @Query("select dept from OrgDept dept where dept.parentDeptId = :parentDeptId order by dept.sortNo desc ")
     List<OrgDept> searchByParentDeptId(@Param("parentDeptId") Integer parentDeptId);
 
-    @Query("select dept from OrgDept dept where dept.orgId = :orgId order by dept.sortNo desc ")
+    @Query("select dept from OrgDept dept where dept.orgId = :orgId and dept.delFlag=0 order by dept.sortNo desc ")
     List<OrgDept> searchByOrgId(@Param("orgId") String orgId);
 
     @Query("select dept from OrgDept dept where dept.orgId = :orgId and dept.name=:name order by dept.sortNo desc ")
@@ -29,4 +29,5 @@ public interface XOrgDeptRepository extends PagingAndSortingRepository<OrgDept, 
 
     @Query("select case when  max(dept.sortNo) is null then 1 else max(dept.sortNo) end from OrgDept dept where dept.parentDeptId = :parentDeptId")
     int searchParentIdOfMaxSortNo(@Param("parentDeptId") Integer parentDeptId);
+
 }

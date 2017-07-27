@@ -17,4 +17,6 @@ public interface XGeographyRepository extends PagingAndSortingRepository<Geograp
     @Query("select geography from Geography geography where geography.country = :country")
     List<Geography> findAddressListByCountry(@Param("country") String country);
 
+    @Query("select geography.id from Geography geography where geography.district in(:district)")
+    List<String> findIdByDistrict(@Param("district") List<String> district);
 }

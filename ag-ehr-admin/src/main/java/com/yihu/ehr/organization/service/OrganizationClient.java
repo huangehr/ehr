@@ -178,4 +178,14 @@ public interface OrganizationClient {
             @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
             @RequestParam(value = "remote_file_name") String remoteFileName);
 
+    @RequestMapping(value = "/orgDept/getAllOrgAndDepts", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有的机构列表")
+    List<Object> getOrgs();
+
+    @RequestMapping(value = "/organizations/getAllSaasOrgs", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有的机构列表")
+    List getAllSaasOrgs(
+            @ApiParam(name = "saasName", value = "名称", defaultValue = "")
+            @RequestParam(value = "saasName", required = false) String saasName);
+
 }

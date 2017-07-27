@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.geography.GeographyDict;
 import com.yihu.ehr.geography.service.GeographyDictService;
+import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -92,5 +93,31 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
         return convertToModels(geographyDictList,new ArrayList<>(geographyDictList.size()), MGeographyDict.class,"");
     }
 
-
+    @RequestMapping(value = ServiceApi.Geography.GetAddressNameByCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据地址中文名 查询地址编号")
+    ObjectResult getAddressNameByCode(
+            @ApiParam(name = "name", value = "name", defaultValue = "")
+            @RequestParam(value = "name") String name){
+        GeographyDict geographyDict = geographyDictService.findByName(name);
+        if(geographyDict != null){
+            ObjectResult objectResult = new ObjectResult();
+            objectResult.setData(geographyDict);
+            objectResult.setSuccessFlg(true);
+            return objectResult;
+        }
+        return null;
+    }
+    /**
+     * 根据地址等级查询地址信息
+     * @param name
+     * @return
+     */
+    @RequestMapping(value = "/OrgSaasAreaByname", method = RequestMethod.GET)
+    @ApiOperation(value = "根据名称查询行政区划地址")
+    public Collection<MGeographyDict> getOrgSaasAreaByname(
+            @ApiParam(name = "name", value = "名称", defaultValue = "")
+            @RequestParam(value = "name") String name) {
+        List<GeographyDict> addressDictList = geographyDictService.getAddrDictByname(name);
+        return convertToModels(addressDictList,new ArrayList<>(addressDictList.size()), MGeographyDict.class,"");
+    }
 }

@@ -3,13 +3,6 @@ server:
 
 management:
   port: ${server.port}
-
-info:
-  app:
-    name: PackageResolveService
-    description: EHR platform package resolve service.
-    version: 1.1.0
-
 logging:
   level:
     com:
@@ -20,6 +13,14 @@ logging:
       hibernate: ERROR
 
 spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    max-active: 20
+    max-idle: 8
+    min-idle: 8
+    validation-query: SELECT 1
+    test-on-borrow: true
+
   # REDIS
   redis:
     database: 0 # Database index used by the connection factory.
@@ -73,12 +74,25 @@ ehr:
       data-sets:
         - HDSC01_01: Clinic
         - HDSC01_02: Clinic
+        - HDSD00_85: Clinic
+        - HDSD00_72: Clinic
         - HDSC02_01: Resident
         - HDSC02_02: Resident
         - HDSC02_09: Resident
+        - HDSD00_13: Resident
+        - HDSD00_77: Resident
+        - HDSD00_76: Resident
       meta-data:
         - HDSD00_01_457 # 挂号时间
         - HDSD00_01_575 # 入院时间
+        - HDSD00_13_057 # 入院时间-v1.3
+    #诊断信息
+    diagnosis:
+      data-sets:
+        - HDSC01_03
+        - HDSC02_17
+      meta-data:
+        - HDSD00_01_550 # 门诊/住院诊断
     # 身份提取参数，从人口学提取
     identity:
       data-sets:
@@ -97,12 +111,30 @@ ehr:
       meta-data:
         - card-no: CARD_NO #就诊卡号
         - card-type: CARD_TYPE  #就诊卡类型
-
+  eventIndex: #病人事件索引信息
+    patientId:
+      - PATIENT_ID
+    eventNo:
+      - HDSD03_01_031
+      - HDSD00_01_579
+      - EVENT_NO
+      - HDSD00_02_040 #v1.3
+      - HDSD00_02_066 #v1.3
+    eventTime:
+      - HDSD00_01_457
+      - HDSD00_01_185
+      - HDSD00_16_005 #v1.3出院时间
 #error code and message
 
 ---
 spring:
   profiles: dev
+
+  # Mysql
+  datasource:
+    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: ha
+    password: ha
 
   redis:
     host: 192.168.1.220 # Redis server host.
@@ -128,7 +160,11 @@ hadoop:
 ---
 spring:
   profiles: alpha
-
+  # Mysql
+  datasource:
+    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: ha
+    password: ha
   redis:
     host: 192.168.1.220 # Redis server host.
 
@@ -153,6 +189,10 @@ hadoop:
 ---
 spring:
   profiles: test
+  datasource:
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: weifuwu
+    password: weifuwu
 
   redis:
     host: 172.19.103.47 # Redis server host.
@@ -160,7 +200,6 @@ spring:
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
-
 
   metrics:
     export:
@@ -179,13 +218,19 @@ hadoop:
 ---
 spring:
   profiles: prod
+  datasource:
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: ha
+    password: jkzlxm
 
   redis:
     host: 11.1.2.20 # Redis server host.
 
   data:
     solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      host: http://172.19.103.10:8983/solr # Solr host. Ignored if "zk-host" is set.
+      #zk-host: node1,node2,node3:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      zk-host: node1.hde.jkzlehr.com,node2.hde.jkzlehr.com,node3.hde.jkzlehr.com:2181/solr
 
   metrics:
     export:
@@ -199,4 +244,5 @@ fast-dfs:
 
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+    #- hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
+    - hbase.zookeeper.quorum: node1,node2,node3

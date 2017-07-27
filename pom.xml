@@ -640,6 +640,12 @@
                 <scope>${dependency.scope}</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-mongodb</artifactId>
+                <version>${version.spring-boot}</version>
+            </dependency>
+
             <!--Spring cloud family-->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -680,12 +686,12 @@
         <repository>
             <id>repositoryCentral</id>
             <name>repositoryCentral</name>
-            <url>http://172.19.103.47:8081/nexus/content/repositories/central/</url>
+            <url>http://172.19.103.43:8081/nexus/content/repositories/central/</url>
         </repository>
         <repository>
             <id>repositoryReleases</id>
             <name>repositoryReleases</name>
-            <url>http://172.19.103.47:8081/nexus/content/repositories/releases/</url>
+            <url>http://172.19.103.43:8081/nexus/content/repositories/releases/</url>
         </repository>
     </repositories>
 

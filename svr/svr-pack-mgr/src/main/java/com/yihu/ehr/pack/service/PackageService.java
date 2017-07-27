@@ -37,9 +37,17 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
     @Autowired
     FastDFSUtil fastDFSUtil;
 
+    @Autowired
+    XDatasetPackageRepository datasetPackageRepository;
+
     public Package receive(InputStream is, String pwd, String md5, String orgCode, String clientId) {
         Map<String, String> metaData = storeJsonPackage(is);
         return checkIn(metaData.get("id"), metaData.get("path"), pwd, md5, orgCode, clientId);
+    }
+
+    public DatasetPackage receiveDatasets(InputStream is, String pwd, String md5, String orgCode, String clientId) {
+        Map<String, String> metaData = storeJsonPackage(is);
+        return checkDatasetIn(metaData.get("id"), metaData.get("path"), pwd, md5, orgCode, clientId);
     }
 
     public Package getPackage(String id) {
@@ -127,6 +135,34 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
             aPackage.setReceiveDate(new Date());
             aPackage.setArchiveStatus(ArchiveStatus.Received);
             getRepo().save(aPackage);
+
+            return aPackage;
+        } catch (HibernateException ex) {
+            LogService.getLogger(PackageService.class).error(ex.getMessage());
+
+            return null;
+        }
+    }
+
+    /**
+     * 在数据库待解析的队列中登记. （新）（兼容非病人维度采集）
+     * add in 2017/06/22 by HZY
+     * @param path 完整路径
+     * @param pwd  zip密码
+     * @return 索引存储成功
+     */
+    DatasetPackage checkDatasetIn(String id, String path, String pwd, String md5, String orgCode, String clientId) {
+        try {
+            DatasetPackage aPackage = new DatasetPackage();
+            aPackage.setId(id);
+            aPackage.setMd5(md5);
+            aPackage.setOrgCode(orgCode);
+            aPackage.setClientId(clientId);
+            aPackage.setRemotePath(path);
+            aPackage.setPwd(pwd);
+            aPackage.setReceiveDate(new Date());
+            aPackage.setArchiveStatus(ArchiveStatus.Received);
+            datasetPackageRepository.save(aPackage);
 
             return aPackage;
         } catch (HibernateException ex) {

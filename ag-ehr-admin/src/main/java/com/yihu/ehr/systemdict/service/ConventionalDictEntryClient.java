@@ -2,6 +2,7 @@ package com.yihu.ehr.systemdict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -415,4 +416,74 @@ import java.util.List;
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
              @RequestParam(value = "code") String code);
 
+    @RequestMapping(value = "/dictionaries/dimension_main_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标主维度类型", response = MConventionalDict.class)
+    MConventionalDict getDimensionMainTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/dimension_slave_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标从维度类型", response = MConventionalDict.class)
+    MConventionalDict getDimensionSlaveTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/dimension_status_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标维度状态", response = MConventionalDict.class)
+    MConventionalDict getDimensionStatusList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/tj_data_source_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计数据资源", response = MConventionalDict.class)
+    MConventionalDict getTjDataSourceTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/tj_data_save_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计数据存储", response = MConventionalDict.class)
+    MConventionalDict getTjDataSaveTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/tj_quota_exec_type_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计指标管理", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaExecTypeList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/tj_quota_data_level_list", method = RequestMethod.GET)
+    @ApiOperation(value = "指标统计存储方式", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaDataLevelList(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+
+    @RequestMapping(value = "/GetAlldictionariesByDictId", method = RequestMethod.GET)
+    @ApiOperation(value = "获取卡状态所有字典项")
+    ListResult GetAlldictionariesByDictId();
+
+    @RequestMapping(value = "/dictionaries/org_dept_detail_display_status", method = RequestMethod.GET)
+    @ApiOperation(value = "是否显示", response = MConventionalDict.class)
+    MConventionalDict getOrgDeptDetailDisplayStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/org_dept_detail_py_code", method = RequestMethod.GET)
+    @ApiOperation(value = "科室类型", response = MConventionalDict.class)
+    MConventionalDict getOrgDeptDetailPyCode(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/org_dept_detail_glory_id", method = RequestMethod.GET)
+    @ApiOperation(value = "科室荣誉", response = MConventionalDict.class)
+    MConventionalDict getOrgDeptDetailGloryId(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
+
+    @RequestMapping(value = "/dictionaries/tj_quota_log_status", method = RequestMethod.GET)
+    @ApiOperation(value = "指标日志状态", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaLogStatus(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
 }

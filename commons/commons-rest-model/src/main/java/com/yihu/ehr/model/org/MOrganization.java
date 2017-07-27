@@ -48,6 +48,7 @@ public class MOrganization implements Serializable{
     private String logoUrl;     //医院LOGO图片
     private Integer sortNo;     //排序ID，按城市排序
     private Integer parentHosId;     //上级医院ID
+    private String parentHosName;     //上级医院名称
     private String hosPhoto;     //医院照片
     private Integer zxy;     //中西医
     private String ing;     //经度
@@ -177,6 +178,14 @@ public class MOrganization implements Serializable{
 
     public void setAdministrativeDivision(Integer administrativeDivision) {
         this.administrativeDivision = administrativeDivision;
+    }
+
+    public String getParentHosName() {
+        return parentHosName;
+    }
+
+    public void setParentHosName(String parentHosName) {
+        this.parentHosName = parentHosName;
     }
 
     public List<String> getTags() {

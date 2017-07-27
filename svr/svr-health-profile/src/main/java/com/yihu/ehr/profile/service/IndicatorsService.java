@@ -5,6 +5,7 @@ import com.yihu.ehr.profile.feign.XDictClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ public class IndicatorsService {
     @Autowired
     XResourceClient resource; //资源服务
 
-    String appId = "svr-health-profile";
+    @Value("${spring.application.id}")
+    String appId;
 
     /**
      * 获取某个健康问题指标
@@ -49,10 +51,10 @@ public class IndicatorsService {
             }
             sql = sql.substring(0,sql.length()-1)+")";
             //获取某个健康问题指标
-            Envelop result = resource.getResources(BasisConstant.healthIndicators,appId,sql,null,null);
+            Envelop result = resource.getResources(BasisConstant.healthIndicators,appId,null,sql,null,null);
             if(result.getDetailModelList()!=null&&result.getDetailModelList().size()>0)
             {
-                List<String>ETL_INDICATORS_CODE_LIST=new ArrayList<>();
+                List<String> ETL_INDICATORS_CODE_LIST=new ArrayList<>();
                 for(int i=0;i<result.getDetailModelList().size();i++)
                 {
                     ETL_INDICATORS_CODE_LIST.add(((Map<String, Object>) result.getDetailModelList().get(i)).get("ETL_INDICATORS_CODE").toString());
@@ -101,7 +103,7 @@ public class IndicatorsService {
 
         //获取指标数据
 
-        Envelop e= resource.getResources(BasisConstant.healthIndicators,appId,sql,page,size);
+        Envelop e= resource.getResources(BasisConstant.healthIndicators,appId,null,sql,page,size);
         for(int i=0;i<e.getDetailModelList().size();i++){
             Map<String, String> map=(Map<String, String>)(e.getDetailModelList().get(i));
             MIndicatorsDict detailInformationFromCode = dictService.getIndicatorsDictByCode(map.get("ETL_INDICATORS_CODE"));

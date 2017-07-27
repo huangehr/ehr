@@ -9,6 +9,8 @@ public class RoleUserModel {
     private String roleName;
     private String userId;
     private String userName;
+    private String loginCode;
+    private String userType;
 
     public RoleUserModel() {
     }
@@ -51,5 +53,21 @@ public class RoleUserModel {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getLoginCode() {
+        return loginCode;
+    }
+
+    public void setLoginCode(String loginCode) {
+        this.loginCode = loginCode;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 }

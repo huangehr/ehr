@@ -147,13 +147,13 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
      * 保存CDA信息
      * 1.先删除CDA数据集关联关系信息与cda文档XML文件，在新增信息
      *
-     * @param dataSetIds  关联的数据集
+     * @param strDataSetIds  关联的数据集
      * @param cdaId       cda文档 ID
      * @param versionCode 版本号
      * @param xmlInfo     xml 文件内容
      * @return 操作结果
      */
-    public boolean SaveDataSetRelationship(String[] dataSetIds, String cdaId, String versionCode, String xmlInfo) throws Exception {
+    public boolean SaveDataSetRelationship(String strDataSetIds, String cdaId, String versionCode, String xmlInfo) throws Exception {
         deleteRelationshipByCdaIds(versionCode, new String[]{cdaId});
 
         Class entityClass = getDocumentServiceEntity(versionCode);
@@ -168,6 +168,7 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
                 && !cdaDocument.getSchema().equals("")) {
             fastDFSUtil.delete(cdaDocument.getFileGroup(), cdaDocument.getSchema());
         }
+        String[] dataSetIds = strDataSetIds.split(",");
         if (dataSetIds == null || dataSetIds.length == 0) return true;
 
         List<CDADataSetRelationship> infos = new ArrayList<>();

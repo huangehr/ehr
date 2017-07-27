@@ -35,6 +35,7 @@ public class SubResourceRepository {
             hbaseDao.delete(ResourceCore.SubTable, bundle);
         }
 
+        bundle = new TableBundle();
         // now save the data to hbase
         SubRecords subRecords = resBucket.getSubRecords();
         for (SubRecord record : subRecords.getRecords()){

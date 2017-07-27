@@ -26,7 +26,7 @@ public interface ResourceDefaultParamClient {
     @ApiOperation("根据id获取参数信息")
     MResourceDefaultParam getResourceDefaultParamById(
             @ApiParam(name = "id", value = "资源默认参数信息id")
-            @PathVariable(value = "id") Long id);
+            @PathVariable(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Resources.Param,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("增加资源默认参数")
@@ -44,7 +44,7 @@ public interface ResourceDefaultParamClient {
     @ApiOperation("根据id删除资源默认参数")
     boolean deleteResourceDefaultParams(
             @ApiParam(name="id",value="资源默认参数id")
-            @PathVariable(value="id") Long id);
+            @PathVariable(value="id") String id);
 
     @RequestMapping(value = ServiceApi.Resources.Params, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件获取资源默认参数列表，分页")

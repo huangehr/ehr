@@ -139,4 +139,33 @@ public interface DoctorClient {
 //            @RequestParam(value = "file_name") String fileName,
 //            @ApiParam(name = "json_data", value = "文件资源属性")
 //            @RequestParam(value = "json_data") String jsonData);
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在电话号码")
+    List idExistence(
+            @RequestBody String phones);
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入医生")
+    boolean createDoctorsPatch(
+            @RequestBody String doctors);
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorOnePhoneExistence,method = RequestMethod.GET)
+    @ApiOperation("根据过滤条件判断是否存在")
+    boolean isExistence(
+            @RequestParam(value="filters") String filters);
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorEmailExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在邮箱")
+    public List emailsExistence(
+            @RequestBody String emails);
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctorsIdCardNoExistence, method = RequestMethod.GET)
+    @ApiOperation(value = "判断身份证号是否存在")
+    boolean isCardNoExists(@PathVariable(value = "doctor_idCardNo") String idCardNo);
+
+    @RequestMapping(value = ServiceApi.Doctors.DoctoridCardNoExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在身份证号码")
+    List idCardNoExistence(
+            @RequestBody String idCardNos);
 }

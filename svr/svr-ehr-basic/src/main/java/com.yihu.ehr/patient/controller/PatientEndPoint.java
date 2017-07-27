@@ -1,5 +1,6 @@
 package com.yihu.ehr.patient.controller;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
@@ -10,6 +11,9 @@ import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.user.entity.RoleUser;
+import com.yihu.ehr.user.service.RoleUserService;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
@@ -45,6 +49,9 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     private FastDFSUtil fastDFSUtil;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    private RoleUserService roleUserService;
+
     /**
      * 根据条件查询人口信息
      * @param search
@@ -284,7 +291,141 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     }
 
 
+            /**
+             * 用户信息 查询（添加查询条件修改）
+             * @param search
+             * @param province
+             * @param city
+             * @param district
+             * @param page
+             * @param rows
+             * @return
+             * @throws Exception
+             */
+            @RequestMapping(value = "/populationsByParams",method = RequestMethod.GET)
+            @ApiOperation(value = "用户信息 查询（添加查询条件修改）")
+            public List<MDemographicInfo> searchPatientByParams(
+                    @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+                    @RequestParam(value = "search",required = false) String search,
+                    @ApiParam(name = "gender", value = "性别", defaultValue = "")
+                    @RequestParam(value = "gender") String gender,
+                    @ApiParam(name = "home_province", value = "省", defaultValue = "")
+                    @RequestParam(value = "home_province",required = false) String province,
+                    @ApiParam(name = "home_city", value = "市", defaultValue = "")
+                    @RequestParam(value = "home_city",required = false) String city,
+                    @ApiParam(name = "home_district", value = "县", defaultValue = "")
+                    @RequestParam(value = "home_district",required = false) String district,
+                    @ApiParam(name = "searchRegisterTimeStart", value = "注册开始时间", defaultValue = "")
+                    @RequestParam(value = "searchRegisterTimeStart") String searchRegisterTimeStart,
+                    @ApiParam(name = "searchRegisterTimeEnd", value = "注册结束时间", defaultValue = "")
+                    @RequestParam(value = "searchRegisterTimeEnd") String searchRegisterTimeEnd,
+                    @ApiParam(name = "page", value = "当前页", defaultValue = "")
+                    @RequestParam(value = "page") Integer page,
+                    @ApiParam(name = "rows", value = "行数", defaultValue = "")
+                    @RequestParam(value = "rows") Integer rows,
+            HttpServletRequest request,HttpServletResponse response) throws Exception{
+                Map<String, Object> conditionMap = new HashMap<>();
+                conditionMap.put("search", search);
+                conditionMap.put("page", page);
+                conditionMap.put("pageSize", rows);
+                conditionMap.put("province", province);
+                conditionMap.put("city", city);
+                conditionMap.put("district", district);
+                conditionMap.put("gender", gender);
 
+                Date startDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeStart);
+                Date endDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeEnd);
+                if(null!=endDate){
+                    Calendar calendar   =   new GregorianCalendar();
+                    calendar.setTime(endDate);
+                    calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+                    endDate=calendar.getTime();   //日期往后推一天
+                }
+                conditionMap.put("startDate", startDate);
+                conditionMap.put("endDate", endDate);
+        //        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
+        //        Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
+        //        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
+        //        return getResult(mDemographicInfos,totalCount);
+                List<DemographicInfo> demographicInfos = demographicService.searchPatientByParams(conditionMap);
+                Long totalCount =Long.parseLong(demographicService.searchPatientByParamsTotalCount(conditionMap).toString());
+                pagedResponse(request, response, totalCount, page, rows);
+                return (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
 
+    }
+
+    @RequestMapping(value = "/populationsByParams2",method = RequestMethod.GET)
+    @ApiOperation(value = "用户信息 查询（添加查询条件修改）")
+    public List<MDemographicInfo> searchPatientByParams2(
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search",required = false) String search,
+            @ApiParam(name = "gender", value = "性别", defaultValue = "")
+            @RequestParam(value = "gender") String gender,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province",required = false) String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city",required = false) String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district",required = false) String district,
+            @ApiParam(name = "searchRegisterTimeStart", value = "注册开始时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeStart") String searchRegisterTimeStart,
+            @ApiParam(name = "searchRegisterTimeEnd", value = "注册结束时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeEnd") String searchRegisterTimeEnd,
+            @ApiParam(name = "districtList", value = "区域", defaultValue = "")
+            @RequestParam(value = "districtList") String districtList,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows") Integer rows,
+            HttpServletRequest request,HttpServletResponse response) throws Exception{
+        Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("search", search);
+        conditionMap.put("page", page);
+        conditionMap.put("pageSize", rows);
+        conditionMap.put("province", province);
+        conditionMap.put("city", city);
+        conditionMap.put("district", district);
+        conditionMap.put("gender", gender);
+        conditionMap.put("districtList", districtList);
+
+        Date startDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeStart);
+        Date endDate = DateTimeUtil.simpleDateTimeParse(searchRegisterTimeEnd);
+        if(null!=endDate){
+            Calendar calendar   =   new GregorianCalendar();
+            calendar.setTime(endDate);
+            calendar.add(calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动
+            endDate=calendar.getTime();   //日期往后推一天
+        }
+        conditionMap.put("startDate", startDate);
+        conditionMap.put("endDate", endDate);
+        //        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
+        //        Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
+        //        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
+        //        return getResult(mDemographicInfos,totalCount);
+        List<DemographicInfo> demographicInfos = demographicService.searchPatientByParams2(conditionMap);
+        Long totalCount =Long.parseLong(demographicService.searchPatientByParamsTotalCount2(conditionMap).toString());
+        pagedResponse(request, response, totalCount, page, rows);
+        return (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
+
+    }
+    /**
+     * 居民信息-角色授权-角色组保存
+     * @return
+     */
+    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "居民信息-角色授权-角色组保存")
+    public String saveRoleUser(
+            @ApiParam(name = "userId", value = "机构", defaultValue = "")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
+            @RequestBody String jsonData) throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+//        String[] jsonDatalist=jsonData.split("jsonData=");
+        //将json串转换成对象，放进list里面
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, RoleUser.class);
+        List<RoleUser> models = objectMapper.readValue(jsonData,javaType);
+        return roleUserService.saveRoleUser(models,userId);
+
+    }
 
 }

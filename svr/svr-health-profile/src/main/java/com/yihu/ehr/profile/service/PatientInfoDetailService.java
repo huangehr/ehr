@@ -56,17 +56,16 @@ public class PatientInfoDetailService {
     private String fastDfsUrl;
 
 
-    String appId = "svr-health-profile";
+    @Value("${spring.application.id}")
+    String appId;
 
     /**
-     * 通过身份证获取相关rowkeys
-     *
-     * @return
+     * 【机构权限控制】通过身份证获取相关rowkeys
      */
-    private String getProfileIds(String demographicId) throws Exception {
+    private String getProfileIds(String demographicId,String saasOrg) throws Exception {
         String re = "";
         //获取相关门诊住院记录
-        Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
+        Envelop main = resource.getResources(BasisConstant.patientEvent, appId,saasOrg, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
         if (main.getDetailModelList() != null && main.getDetailModelList().size() > 0) {
             //主表rowkey条件
             StringBuilder rowkeys = new StringBuilder();
@@ -88,11 +87,11 @@ public class PatientInfoDetailService {
     /******************************* 用药信息 ***********************************************************/
 
     /*
-     * 患者常用药（根据处方中次数）
+     * 【机构权限控制】患者常用药（根据处方中次数）
      */
     public List<Map<String, Object>> getMedicationUsed(String demographicId, String hpCode) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
-        String rowkeys = getProfileIds(demographicId);
+        String rowkeys = getProfileIds(demographicId,null);
 
         String xyQueryParams = "{\"q\":\"" + rowkeys + "\"}";
         String zyQueryParams = "{\"q\":\"" + rowkeys + "\"}";
@@ -114,7 +113,7 @@ public class PatientInfoDetailService {
         }
 
         //西药统计
-        Envelop resultWestern = resource.getResources(BasisConstant.medicationWesternStat, appId, xyQueryParams.replace(" ", "+"), null, null);
+        Envelop resultWestern = resource.getResources(BasisConstant.medicationWesternStat, appId,null, xyQueryParams.replace(" ", "+"), null, null);
         if (resultWestern.getDetailModelList() != null && resultWestern.getDetailModelList().size() > 0) {
             List<Map<String, Object>> list = resultWestern.getDetailModelList();
             for (Map<String, Object> map : list) {
@@ -125,7 +124,7 @@ public class PatientInfoDetailService {
             }
         }
         //中药统计
-        Envelop resultChinese = resource.getResources(BasisConstant.medicationChineseStat, appId, zyQueryParams.replace(" ", "+"), null, null);
+        Envelop resultChinese = resource.getResources(BasisConstant.medicationChineseStat, appId,null, zyQueryParams.replace(" ", "+"), null, null);
         if (resultChinese.getDetailModelList() != null && resultChinese.getDetailModelList().size() > 0) {
             List<Map<String, Object>> list = resultChinese.getDetailModelList();
             for (Map<String, Object> map : list) {
@@ -183,15 +182,15 @@ public class PatientInfoDetailService {
         {
             resourceCode = BasisConstant.medicationChinese;
         }
-        Envelop result = resource.getResources(resourceCode, appId, "{\"q\":\"" + queryParams + "\"}", null, null);
+        Envelop result = resource.getResources(resourceCode, appId, null,"{\"q\":\"" + queryParams + "\"}", null, null);
         re = result.getDetailModelList();
         return re;
     }
 
     /*
-     * 处方主表记录
+     * 【机构权限控制】处方主表记录
      */
-    public List<Map<String, Object>> getMedicationMaster(String demographicId, String profileId, String prescriptionNo) throws Exception {
+    public List<Map<String, Object>> getMedicationMaster(String demographicId, String profileId, String prescriptionNo,String saasOrg) throws Exception {
         String queryParams = "";
         if (prescriptionNo != null && prescriptionNo.length() > 0) {
             queryParams = BasisConstant.cfbh + ":" + prescriptionNo;
@@ -199,13 +198,13 @@ public class PatientInfoDetailService {
             if (profileId != null && profileId.length() > 0) {
                 queryParams = BasisConstant.profileId + ":" + profileId;
             } else {
-                queryParams = getProfileIds(demographicId);
+                queryParams = getProfileIds(demographicId,saasOrg);
             }
         }
 
         queryParams = "{\"q\":\"" + queryParams + "\"}";
         //获取数据
-        Envelop result = resource.getResources(BasisConstant.medicationMaster, appId, queryParams.replace(" ", "+"), null, null);
+        Envelop result = resource.getResources(BasisConstant.medicationMaster, appId,null, queryParams.replace(" ", "+"), null, null);
 
         return result.getDetailModelList();
     }
@@ -228,7 +227,7 @@ public class PatientInfoDetailService {
             if (!StringUtils.isBlank(profileId)) {
                 Map<String, Object> mainEvent = new HashMap<String, Object>();
                 //根据rowkey查询门诊事件
-                Envelop envelop = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"rowkey:" + profileId + "\"}", null, null);
+                Envelop envelop = resource.getResources(BasisConstant.patientEvent, appId,null, "{\"q\":\"rowkey:" + profileId + "\"}", null, null);
 
                 //门诊事件为空返回null，不为空获取事件信息
                 if (envelop.getDetailModelList() == null || envelop.getDetailModelList().size() < 1) {
@@ -238,7 +237,7 @@ public class PatientInfoDetailService {
                 }
 
                 //查询事件对应主处方信息
-                Envelop mainPres = resource.getResources(BasisConstant.medicationMaster, appId, "{\"q\":\"profile_id:" + profileId
+                Envelop mainPres = resource.getResources(BasisConstant.medicationMaster, appId, null,"{\"q\":\"profile_id:" + profileId
                         + (!StringUtils.isBlank(prescriptionNo) ? ("+AND+EHR_000086:" + prescriptionNo) : "") + "\"}", null, null);
 
                 //主处方存在查询对应处方笺是否存在，不存在则根据处方信息生成处方笺
@@ -248,7 +247,7 @@ public class PatientInfoDetailService {
                     //待入库处方笺数据列表
                     List<Map<String, String>> dataList = new ArrayList<Map<String, String>>();
                     //查询处方对应处方笺
-                    Envelop presription = resource.getResources(BasisConstant.medicationPrescription, appId, "{\"q\":\"profile_id:"
+                    Envelop presription = resource.getResources(BasisConstant.medicationPrescription, appId, null,"{\"q\":\"profile_id:"
                             + profileId + "\"}", null, null);
                     //处方笺List
                     List<Map<String, Object>> presriptions = presription.getDetailModelList();
@@ -322,10 +321,10 @@ public class PatientInfoDetailService {
     }
 
     /**
-     * 患者中药处方（可分页）
+     * 【机构权限控制】患者处方（可分页）
      * 1.西药处方；2.中药处方
      */
-    public Envelop getMedicationList(String type, String demographicId, String hpCode, String startTime, String endTime, Integer page, Integer size) throws Exception {
+    public Envelop getMedicationList(String type, String demographicId, String hpCode, String startTime, String endTime, Integer page, Integer size,String saasOrg) throws Exception {
         String q = "";
         String date = BasisConstant.xysj;
         String name = BasisConstant.xymc;
@@ -377,7 +376,7 @@ public class PatientInfoDetailService {
         //获取门诊住院记录
         String rowkeys = "";
         if (demographicId != null && demographicId != "")
-            rowkeys = getProfileIds(demographicId);
+            rowkeys = getProfileIds(demographicId,saasOrg);
         if (!("profile_id:(NOT *)").equals(rowkeys) && rowkeys != "") {
             if (q.length() > 0) {
                 q += " AND (" + rowkeys.toString() + ")";
@@ -394,20 +393,20 @@ public class PatientInfoDetailService {
         if (q == "")
             q = "*:*";
         String queryParams = "{\"q\":\"" + q + "\"}";
-        return resource.getResources(resourceCode, appId, queryParams.replace(" ", "+"), page, size);
+        return resource.getResources(resourceCode, appId, null,queryParams.replace(" ", "+"), page, size);
     }
 
 
     /*************************  分页查细表数据，简单公用方法 *************************************************/
     /**
-     * 处方主表、处方细表、处方笺
+     * 【机构权限控制】处方主表、处方细表、处方笺
      * 门诊诊断、门诊症状、门诊费用汇总、门诊费用明细
      * 住院诊断、住院症状、住院费用汇总、住院费用明细、住院临时医嘱、住院长期医嘱、住院死亡记录
      * 检查报告单、检查报告单图片
      * 检验报告单、检验报告单项目
      * 手术记录
      */
-    public Envelop getProfileSub(String resourceCode, String demographicId, String profileId, String eventNo, Integer page, Integer size) throws Exception {
+    public Envelop getProfileSub(String resourceCode, String demographicId, String profileId, String eventNo, Integer page, Integer size,String saasOrg) throws Exception {
         if (demographicId == null && profileId == null && eventNo == null) {
             throw new Exception("非法传参！");
         }
@@ -419,7 +418,7 @@ public class PatientInfoDetailService {
         } else {
             if (eventNo != null) {
                 //获取相关门诊住院记录
-                Envelop main = resource.getResources(BasisConstant.patientEvent, appId, "{\"q\":\"event_no:" + eventNo + "\"}", 1, 1);
+                Envelop main = resource.getResources(BasisConstant.patientEvent, appId,null, "{\"q\":\"event_no:" + eventNo + "\"}", 1, 1);
                 if (main.getDetailModelList() != null && main.getDetailModelList().size() > 0) {
                     profileId = ((Map<String, String>) main.getDetailModelList().get(0)).get("rowkey");
                     queryParams = "profile_id:" + profileId;
@@ -427,9 +426,9 @@ public class PatientInfoDetailService {
                     throw new Exception("不存在该档案信息！（event_no:" + eventNo + "）");
                 }
             } else {
-                queryParams = getProfileIds(demographicId);
+                queryParams = getProfileIds(demographicId,saasOrg);
             }
         }
-        return resource.getResources(resourceCode, appId, "{\"q\":\"" + queryParams.replace(' ', '+') + "\"}", page, size);
+        return resource.getResources(resourceCode, appId, null, "{\"q\":\"" + queryParams.replace(' ', '+') + "\"}", page, size);
     }
 }

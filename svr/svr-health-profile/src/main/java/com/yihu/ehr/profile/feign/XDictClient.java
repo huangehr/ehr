@@ -49,34 +49,34 @@ public interface XDictClient {
 
     /**
      * Redis通过疾病ID获取健康问题
-     */
+     *//*
     @RequestMapping(value = "/hp_icd10_relation_cache/one" , method = RequestMethod.GET)
     public MHealthProblemDict getHealthProblemByIcd10(@RequestParam(value = "icd10_id") String icd10Id);
 
-    /**
+    *//**
      * Redis通过疾病ID获取健康问题
-     */
+     *//*
     @RequestMapping(value = "/hp_icd10_relation_cache/list" , method = RequestMethod.POST)
     public List<MHealthProblemDict> getHealthProblemListByIcd10List(@RequestParam(value = "icd10_idList",required = true) List<String> icd10_idList);
 
-    /**************************** ICD10疾病 *******************************************/
-    /*
+    *//**************************** ICD10疾病 *******************************************//*
+    *//*
      * 通过Code获取单个疾病字典
-     */
+     *//*
     @RequestMapping(value = "/dict/icd10/code/{code}", method = RequestMethod.GET)
     public MIcd10Dict getIcd10ByCode(@RequestParam(value = "code") String code);
 
-    /*
+    *//*
     * 通过CodeList获取疾病字典
-    */
+    *//*
     @RequestMapping(value = "/dict/icd10/codeList", method = RequestMethod.POST)
     public List<MIcd10Dict> getIcd10ByCodeList(@RequestParam(value = "codeList") List<String> codeList);
 
-    /**
+    *//**
      * 根据id列表获取ICD10字典信息
-     */
+     *//*
     @RequestMapping(value = "/dict/icd10/ids" , method = RequestMethod.GET)
-    public List<MIcd10Dict> getIcd10DictListByIds(@RequestParam(value = "ids") List<String> ids);
+    public List<MIcd10Dict> getIcd10DictListByIds(@RequestParam(value = "ids") List<String> ids);*/
 
     /************************** 药品 **************************************/
     /**

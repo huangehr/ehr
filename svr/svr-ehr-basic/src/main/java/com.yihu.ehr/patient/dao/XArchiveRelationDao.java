@@ -23,4 +23,6 @@ public interface XArchiveRelationDao extends PagingAndSortingRepository<ArchiveR
 
     ArchiveRelation findByApplyId(long applyId);
 
+    ArchiveRelation findByProfileId(String profileId);
+
 }

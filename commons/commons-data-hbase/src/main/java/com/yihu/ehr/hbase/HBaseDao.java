@@ -27,7 +27,7 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      *模糊匹配rowkey
      */
-    public String[] findRowKeys(String tableName, String rowkeyRegEx) throws Throwable {
+    public String[] findRowKeys(String tableName, String rowkeyRegEx) throws Exception {
         Scan scan = new Scan();
         scan.addFamily(Bytes.toBytes("basic"));
         scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator(rowkeyRegEx)));
@@ -43,6 +43,27 @@ public class HBaseDao extends AbstractHBaseClient {
         });
 
         return list.toArray(new String[list.size()]);
+    }
+
+    /**
+     *表总条数
+     */
+    public Integer count(String tableName) throws Exception {
+        Scan scan = new Scan();
+        scan.addFamily(Bytes.toBytes("basic"));
+        scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator("^")));
+
+        List<String> list = new LinkedList<>();
+        hbaseTemplate.find(tableName, scan, new RowMapper<Void>() {
+            @Override
+            public Void mapRow(Result result, int rowNum) throws Exception {
+                list.add(Bytes.toString(result.getRow()));
+
+                return null;
+            }
+        });
+
+        return list.size();
     }
 
     /**
@@ -127,11 +148,12 @@ public class HBaseDao extends AbstractHBaseClient {
     public Map<String, Object> getResultMap(String tableName, String rowKey) throws Exception {
         return hbaseTemplate.get(tableName, rowKey, new RowMapper<Map<String, Object>>() {
             public Map<String, Object> mapRow(Result result, int rowNum) throws Exception {
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = null;
                 if(result!=null) {
                     List<Cell> ceList = result.listCells();
-                    map.put("rowkey", rowKey);
                     if (ceList != null && ceList.size() > 0) {
+                        map = new HashMap<String, Object>();
+                        map.put("rowkey", rowKey);
                         for (Cell cell : ceList) {
                             //默认不加列族
                             // Bytes.toString(cell.getFamilyArray(), cell.getFamilyOffset(), cell.getFamilyLength()) +"_"
@@ -272,7 +294,7 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      * 保存数据 原型模式
      */
-    public void save(String tableName, TableBundle tableBundle) throws IOException {
+    public void save(String tableName, TableBundle tableBundle) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
 
             public Object doInTable(HTableInterface htable) throws Throwable {

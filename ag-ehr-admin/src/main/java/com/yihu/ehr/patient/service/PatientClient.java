@@ -37,7 +37,6 @@ public interface PatientClient {
             @ApiParam(name = "rows", value = "行数", defaultValue = "")
             @RequestParam(value = "rows") Integer rows) ;
 
-
     /**
      * 根据身份证号删除人
      * @param idCardNo
@@ -114,4 +113,65 @@ public interface PatientClient {
                            @RequestParam(value = "group_name") String groupName,
                            @ApiParam(name = "remote_file_name", value = "服务器头像名称", defaultValue = "")
                            @RequestParam(value = "remote_file_name") String remoteFileName);
+
+
+    //用户信息 查询（添加查询条件修改）
+    @RequestMapping(value = "/populationsByParams", method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件查询人")
+    ResponseEntity<List<MDemographicInfo>> searchPatientByParams(
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search") String search,
+            @ApiParam(name = "gender", value = "性别", defaultValue = "")
+            @RequestParam(value = "gender") String gender,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province") String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city") String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district") String district,
+            @ApiParam(name = "searchRegisterTimeStart", value = "注册开始时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeStart") String searchRegisterTimeStart,
+            @ApiParam(name = "searchRegisterTimeEnd", value = "注册结束时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeEnd") String searchRegisterTimeEnd,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows") Integer rows);
+
+    @RequestMapping(value = "/populationsByParams2", method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件查询人")
+    ResponseEntity<List<MDemographicInfo>> searchPatientByParams2(
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search") String search,
+            @ApiParam(name = "gender", value = "性别", defaultValue = "")
+            @RequestParam(value = "gender") String gender,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province") String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city") String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district") String district,
+            @ApiParam(name = "searchRegisterTimeStart", value = "注册开始时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeStart") String searchRegisterTimeStart,
+            @ApiParam(name = "searchRegisterTimeEnd", value = "注册结束时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeEnd") String searchRegisterTimeEnd,
+            @ApiParam(name = "districtList", value = "区域", defaultValue = "")
+            @RequestParam(value = "districtList") String districtList,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows") Integer rows);
+
+    /**
+     *居民信息-角色授权-角色组保存
+     * @return
+     */
+
+    @ApiOperation(value = "居民信息-角色授权-角色组保存")
+    @RequestMapping(value = "/appUserRolesSave", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    String saveRoleUser(
+            @ApiParam(name = "userId", value = "居民账户id", defaultValue = "")
+            @RequestParam(value = "userId", required = false) String userId,
+            @ApiParam(name = "jsonData", value = "json数据", defaultValue = "")
+            @RequestBody String jsonData);
 }

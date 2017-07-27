@@ -3,20 +3,19 @@ package com.yihu.ehr.service.resource.stage1.resolver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
-import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.service.resource.stage1.StandardPackage;
-import com.yihu.ehr.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.profile.util.DataSetUtil;
+import com.yihu.ehr.profile.util.PackageDataSet;
+import com.yihu.ehr.service.resource.stage1.PackModelFactory;
+import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * 标准档案包解析器.
@@ -26,6 +25,13 @@ import java.util.Properties;
  */
 @Component
 public class StdPackageResolver extends PackageResolver {
+
+
+    @Override
+    public List<StandardPackage> resolveDataSets(File root,String clinetId) throws Exception {
+        return null;
+    }
+
     @Override
     public void resolve(StandardPackage profile, File root) throws IOException, Exception {
         File standardFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.StandardFolder);
@@ -50,11 +56,11 @@ public class StdPackageResolver extends PackageResolver {
                 //就诊卡信息
                 if (StringUtils.isEmpty(profile.getCardId())) {
                     Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
-                    String cardId = String.valueOf(properties.get(MasterResourceFamily.BasicColumns.CardId));
+                    String cardId = (String) properties.get(MasterResourceFamily.BasicColumns.CardId);
                     if(!StringUtils.isEmpty(cardId))
                     {
                         profile.setCardId(cardId);
-                        profile.setCardType(String.valueOf(properties.get(MasterResourceFamily.BasicColumns.CardType)));
+                        profile.setCardType((String) properties.get(MasterResourceFamily.BasicColumns.CardType));
                     }
                 }
 
@@ -62,12 +68,12 @@ public class StdPackageResolver extends PackageResolver {
                 if (StringUtils.isEmpty(profile.getDemographicId()) || StringUtils.isEmpty(profile.getPatientName())) {
                     Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo);
 
-                    String demographicId = String.valueOf(properties.get(MasterResourceFamily.BasicColumns.DemographicId));
+                    String demographicId = (String) properties.get(MasterResourceFamily.BasicColumns.DemographicId);
                     if(!StringUtils.isEmpty(demographicId) &&StringUtils.isEmpty(profile.getDemographicId())) {
                         profile.setDemographicId(demographicId);
                     }
 
-                    String patientName = String.valueOf(properties.get(MasterResourceFamily.BasicColumns.PatientName));
+                    String patientName =(String) properties.get(MasterResourceFamily.BasicColumns.PatientName);
                     if(!StringUtils.isEmpty(patientName) &&StringUtils.isEmpty(profile.getPatientName())) {
                         profile.setPatientName(patientName);
                     }
@@ -82,7 +88,13 @@ public class StdPackageResolver extends PackageResolver {
                         profile.setEventDate(eventDate);
                         profile.setEventType((EventType) properties.get(MasterResourceFamily.BasicColumns.EventType));
                     }
+                }
 
+                //门诊/住院诊断
+                Map<String,Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
+                List<String> diagnosisList = (List<String>)properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
+                if(diagnosisList!=null && diagnosisList.size()>0) {
+                    profile.setDiagnosisList(diagnosisList);
                 }
             }
 

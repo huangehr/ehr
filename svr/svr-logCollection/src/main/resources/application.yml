@@ -1,0 +1,71 @@
+server:
+  port: 10320
+
+logging:
+  level:
+    root: INFO
+
+service-gateway:
+  username: user
+  password: eureka
+  url: http://localhost:10000/api/v1.0/admin
+
+kafka:
+  broker:
+    address: node1.hde.h3c.com:6667
+
+zookeeper:
+  broker:
+    address: node1.hde.h3c.com:2181,node2.hde.h3c.com:2181
+
+---
+spring:
+  profiles: test
+  datasource:
+    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true
+    username: root
+    password: 123456
+
+  data:
+    mongodb:
+      host: 192.168.1.220
+      port: 27017
+      username: admin
+      password: admin
+      authenticationDatabase: admin
+      database: ehr
+
+---
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true
+    username: root
+    password: 123456
+
+  data:
+    mongodb:
+      host: 192.168.1.220
+      port: 27017
+      username: admin
+      password: admin
+      authenticationDatabase: admin
+      database: ehr
+
+
+---
+spring:
+  profiles: prod
+  datasource:
+    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true
+    username: root
+    password: 123456
+
+  data:
+    mongodb:
+      host: 192.168.1.220
+      port: 27017
+      username: admin
+      password: admin
+      authenticationDatabase: admin
+      database: ehr

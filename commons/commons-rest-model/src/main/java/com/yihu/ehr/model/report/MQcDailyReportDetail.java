@@ -15,7 +15,10 @@ public class MQcDailyReportDetail {
     private Date eventTime;//事件时间
     private Integer acqFlag;//采集状态  0 - 未采集  1 - 已采集（实收） 验证统计用
     private Integer timelyFlag;//及时状态 0 - 不及时  1 -及时，判断条件：采集时间 - 事件时间 > 2天 判断为不及时  不及时条件可以配置定义
-
+    private Date addDate;
+    private Date acqTime;   //  采集时间
+    private Date storageTime;  //入库时间
+    private Integer storageFlag;
 
     public String getId() {
         return id;
@@ -79,5 +82,37 @@ public class MQcDailyReportDetail {
 
     public void setTimelyFlag(Integer timelyFlag) {
         this.timelyFlag = timelyFlag;
+    }
+
+    public Date getAddDate() {
+        return addDate;
+    }
+
+    public void setAddDate(Date addDate) {
+        this.addDate = addDate;
+    }
+
+    public Date getAcqTime() {
+        return acqTime;
+    }
+
+    public void setAcqTime(Date acqTime) {
+        this.acqTime = acqTime;
+    }
+
+    public Date getStorageTime() {
+        return storageTime;
+    }
+
+    public void setStorageTime(Date storageTime) {
+        this.storageTime = storageTime;
+    }
+
+    public Integer getStorageFlag() {
+        return storageFlag;
+    }
+
+    public void setStorageFlag(Integer storageFlag) {
+        this.storageFlag = storageFlag;
     }
 }

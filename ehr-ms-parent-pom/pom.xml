@@ -18,8 +18,8 @@
         <module>../svr-configuration</module>
         <module>../svr-discovery</module>
         <!--<module>../svr/svr-app</module>-->
-        <module>../svr/svr-archive-security</module>
-        <module>../svr/svr-cipher</module>
+        <!--<module>../svr/svr-archive-security</module>
+        <module>../svr/svr-cipher</module>-->
         <!--<module>../svr/svr-dict</module>-->
         <module>../svr/svr-esb</module>
         <!--<module>../svr/svr-family</module>
@@ -41,6 +41,8 @@
         <module>../ag-ehr-cloud</module>
         <module>../ag-portal-cloud</module>
         <module>../svr/svr-redis</module>
+        <module>../svr/svr-quota</module>
+        <!--<module>../svr/svr-logCollection</module>-->
     </modules>
 
     <build>
