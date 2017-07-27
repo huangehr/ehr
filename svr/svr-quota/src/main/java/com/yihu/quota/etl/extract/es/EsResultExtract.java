@@ -43,6 +43,8 @@ public class EsResultExtract {
     private String province;
     private String city;
     private String district;
+    private String slaveKey1;
+    private String slaveKey2;
     private TjQuota tjQuota;
     private String quotaCode;
     private int pageNo;
@@ -95,6 +97,10 @@ public class EsResultExtract {
                             this.city = params.get(key).toString();
                         if(key.equals("district"))
                             this.district = params.get(key).toString();
+                        if(key.equals("slaveKey1"))
+                            this.slaveKey1 = params.get(key).toString();
+                        if(key.equals("slaveKey2"))
+                            this.slaveKey2 = params.get(key).toString();
                     }
                 }
             }
@@ -157,6 +163,14 @@ public class EsResultExtract {
         }
         if( !StringUtils.isEmpty(province) ){
             TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("provinceName", province);
+            boolQueryBuilder.must(termQueryProvince);
+        }
+        if( !StringUtils.isEmpty(slaveKey1) ){
+            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("slaveKey1", province);
+            boolQueryBuilder.must(termQueryProvince);
+        }
+        if( !StringUtils.isEmpty(slaveKey2) ){
+            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("slaveKey2", province);
             boolQueryBuilder.must(termQueryProvince);
         }
         if( !StringUtils.isEmpty(city) ){
