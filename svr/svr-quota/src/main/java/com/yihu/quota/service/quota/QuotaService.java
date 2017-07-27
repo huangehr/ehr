@@ -45,7 +45,11 @@ public class QuotaService {
         for(int i=0 ; i< listMap.size() ;i++){
             ReultModel reultModel = new ReultModel();
             for(String key : listMap.get(i).keySet()){
-                reultModel.setKey(listMap.get(i).get("quotaDate").toString());
+                if(tjQuota.getCode().contains("depart_treat")||tjQuota.getCode().contains("age")){
+                    reultModel.setKey(listMap.get(i).get("slaveKey2Name").toString());
+                }else {
+                    reultModel.setKey(listMap.get(i).get("quotaDate").toString());
+                }
                 reultModel.setValue(listMap.get(i).get("result"));
             }
             reultModelList.add(reultModel);

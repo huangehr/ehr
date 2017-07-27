@@ -152,10 +152,18 @@ public class ElasticsearchUtil {
     }
 
 
-    public boolean save(Client client,Object object) throws JsonProcessingException {
-        String source = objectMapper.writeValueAsString(object);
+    /**
+     *
+     * @param client
+     * @param source 表字段组合json格式
+     * @return
+     * @throws JsonProcessingException
+     */
+    public boolean save(Client client,String source) throws JsonProcessingException {
+//        String source = objectMapper.writeValueAsString(object);
         IndexResponse indexResponse = client
-                .prepareIndex(esClientUtil.getIndex(), esClientUtil.getType(), null).setSource(source).get();
+                .prepareIndex(esClientUtil.getIndex(), esClientUtil.getType(), null)
+                .setSource(source).get();
         boolean result =  indexResponse.isCreated();
         client.close();
         return result;

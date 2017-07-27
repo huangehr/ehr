@@ -136,7 +136,6 @@ public class QuotaController extends BaseController {
         return envelop;
     }
 
-
     /**
      * 获取指标统计结果总量
      * @param id
@@ -146,10 +145,13 @@ public class QuotaController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
     public Envelop getQuotaTotalCount(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
-            @RequestParam(value = "id" , required = true) int id
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters
     ) {
         Envelop envelop = new Envelop();
         try {
+            //累计细维度1 的所有的总和
             long  count = quotaService.getQuotaTotalCount(id, null);
             envelop.setSuccessFlg(true);
             envelop.setObj(count);
