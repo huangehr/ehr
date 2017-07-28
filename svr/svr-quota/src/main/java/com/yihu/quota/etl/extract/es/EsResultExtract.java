@@ -45,6 +45,7 @@ public class EsResultExtract {
     private String district;
     private String slaveKey1;
     private String slaveKey2;
+    private String result;
     private TjQuota tjQuota;
     private String quotaCode;
     private int pageNo;
@@ -85,22 +86,25 @@ public class EsResultExtract {
                     if( params.get(key) != null ){
                         if(key.equals("startTime"))
                             this.startTime = params.get(key).toString();
-                        if(key.equals("endTime"))
+                        else if(key.equals("endTime"))
                             this.endTime = params.get(key).toString();
-                        if(key.equals("orgName"))
+                        else if(key.equals("orgName"))
                             this.orgName = params.get(key).toString();
-                        if(key.equals("org"))
+                        else if(key.equals("org"))
                             this.org = params.get(key).toString();
-                        if(key.equals("province"))
+                        else if(key.equals("province"))
                             this.province = params.get(key).toString();
-                        if(key.equals("city"))
+                        else if(key.equals("city"))
                             this.city = params.get(key).toString();
-                        if(key.equals("district"))
+                        else if(key.equals("district"))
                             this.district = params.get(key).toString();
-                        if(key.equals("slaveKey1"))
+                        else if(key.equals("slaveKey1"))
                             this.slaveKey1 = params.get(key).toString();
-                        if(key.equals("slaveKey2"))
+                        else if(key.equals("slaveKey2"))
                             this.slaveKey2 = params.get(key).toString();
+                        else if(key.equals("result")){
+                            this.result = params.get(key).toString();
+                        }
                     }
                 }
             }
@@ -144,8 +148,11 @@ public class EsResultExtract {
     }
 
     public BoolQueryBuilder getBoolQueryBuilder(BoolQueryBuilder boolQueryBuilder){
-        RangeQueryBuilder rangeQueryResult = QueryBuilders.rangeQuery("result").gte("0");
-        boolQueryBuilder.must(rangeQueryResult);
+
+        if( !StringUtils.isEmpty(result)){
+            RangeQueryBuilder rangeQueryResult = QueryBuilders.rangeQuery("result").gte(result);
+            boolQueryBuilder.must(rangeQueryResult);
+        }
         if( !StringUtils.isEmpty(quotaCode)){
             TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaCode);
             boolQueryBuilder.must(termQueryQuotaCode);
