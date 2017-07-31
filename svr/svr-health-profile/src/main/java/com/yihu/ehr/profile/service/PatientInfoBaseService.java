@@ -243,7 +243,7 @@ public class PatientInfoBaseService {
         return re;
     }
 		
-		/*
+    /*
      * @根据患者最后一次诊断记录获取诊断详情
      */
     public List<Map<String, Object>> getHealthProblemSub(String lastVisitRecord) throws Exception {

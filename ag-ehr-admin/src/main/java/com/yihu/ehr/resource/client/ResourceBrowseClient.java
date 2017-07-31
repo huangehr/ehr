@@ -40,5 +40,11 @@ public interface ResourceBrowseClient {
             @RequestParam(value = "page",required = false) Integer page,
             @RequestParam(value = "size",required = false) Integer size);
 
-
+    /**
+    @ApiOperation("资源浏览详细信息")
+    @RequestMapping(value = ServiceApi.Resources.ResourceViewData, method = RequestMethod.GET)
+    Envelop getResourceDataSub(
+            @RequestParam(value = "resourcesCode") String resourcesCode,
+            @RequestParam(value = "rowKey") String rowKey);
+    */
 }
