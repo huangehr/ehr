@@ -374,7 +374,12 @@ public class OrgDeptController  extends BaseController {
             ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.searchOrgDeptMembers(fields, filters, sorts, size, page);
             List<MOrgMemberRelation> members = responseEntity.getBody();
             for (MOrgMemberRelation deptMember : members) {
-                OrgDeptMemberModel memberModel = convertToModel(deptMember,OrgDeptMemberModel.class);
+                filters="id="+deptMember.getUserId();
+                fields="";
+                ResponseEntity<List<MOrgMemberRelation>> respEntity = orgDeptMemberClient.searchOrgDeptMembers(fields, filters, sorts, size, page);
+                List<MOrgMemberRelation> mem = respEntity.getBody();
+                MOrgMemberRelation mOrgMemberRelation=mem.get(0);
+                OrgDeptMemberModel memberModel = convertToModel(mOrgMemberRelation,OrgDeptMemberModel.class);
 //                if (StringUtils.isNotEmpty(memberModel.getUserId()) ){
 //                    MUser mUser = userClient.getUser(memberModel.getUserId());
 //                    memberModel.setUserName(mUser == null ? "" : mUser.getRealName());
