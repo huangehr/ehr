@@ -209,7 +209,8 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         int total = 0;
         for(int i=1; i<=doctorLs.size(); i++){
             map = doctorLs.get(i-1);
-            sql.append("('"+ UUID.randomUUID().toString()+"'");
+            String uuid=UUID.randomUUID().toString().replace("-","");
+            sql.append("('"+ uuid+"'");
             sql.append(",'"+ null2Space(map.getPhone()) +"'");
             sql.append(",'"+ map .getName() +"'");
             sql.append(",'"+ map .getIdCardNo() +"'");

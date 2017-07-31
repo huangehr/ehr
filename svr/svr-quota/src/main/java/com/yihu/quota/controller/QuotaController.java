@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.model.rest.QuotaReport;
+import com.yihu.quota.model.rest.ReultModel;
 import com.yihu.quota.service.job.JobService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.vo.SaveModel;
@@ -28,7 +29,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(description = "后台-指标控制")
+@Api(description = "指标统计 -指标控制")
 public class QuotaController extends BaseController {
 
     @Autowired
@@ -136,7 +137,6 @@ public class QuotaController extends BaseController {
         return envelop;
     }
 
-
     /**
      * 获取指标统计结果总量
      * @param id
@@ -146,11 +146,21 @@ public class QuotaController extends BaseController {
     @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
     public Envelop getQuotaTotalCount(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
-            @RequestParam(value = "id" , required = true) int id
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters
     ) {
         Envelop envelop = new Envelop();
         try {
-            long  count = quotaService.getQuotaTotalCount(id, null);
+            int  count = 0;
+            QuotaReport quotaReport = quotaService.getQuotaReport(id, filters);
+            if(quotaReport.getReultModelList() != null){
+                for(ReultModel reultModel:quotaReport.getReultModelList()){
+                    count = Integer.valueOf(reultModel.getValue().toString()) + count;
+                }
+            }
+            envelop.setTotalCount(count);
+            envelop.setObj(quotaReport.getTjQuota());
             envelop.setSuccessFlg(true);
             envelop.setObj(count);
             return envelop;

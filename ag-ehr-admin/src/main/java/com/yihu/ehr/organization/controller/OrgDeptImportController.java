@@ -54,6 +54,16 @@ public class OrgDeptImportController extends BaseController {
         return existCode;
     }
 
+    @RequestMapping(value = "/name/existence",method = RequestMethod.POST)
+    @ApiOperation("获取已存在部门名称")
+    public List nameExistence(
+            @ApiParam(name = "name", value = "", defaultValue = "")
+            @RequestParam("name") String name) throws Exception {
+
+        List existName = orgDeptImportClient.nameExistence(name);
+        return existName;
+    }
+
     @RequestMapping(value = "/orgCode/existence",method = RequestMethod.POST)
     @ApiOperation("获取已存在的机构代码")
     public List orgCodeExistence(

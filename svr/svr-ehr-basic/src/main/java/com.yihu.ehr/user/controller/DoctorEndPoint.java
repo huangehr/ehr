@@ -1,9 +1,11 @@
 package com.yihu.ehr.user.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.org.model.OrgMemberRelation;
 import com.yihu.ehr.org.service.OrgDeptService;
@@ -12,12 +14,15 @@ import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.user.service.DoctorService;
 import com.yihu.ehr.user.service.UserManager;
+import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +51,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     private OrgDeptService orgDeptService;
     @Autowired
     private OrgMemberRelationService relationService;
+    @Value("${default.password}")
+    private String default_password = "123456";
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.GET)
     @ApiOperation(value = "获取医生列表", notes = "根据查询条件获取医生列表在前端表格展示")
@@ -78,7 +85,25 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         doctor.setUpdateTime(new Date());
         doctor.setStatus("1");
         doctor.setPyCode(PinyinUtil.getPinYinHeadChar(doctor.getName(), false));
-        doctorService.save(doctor);
+        Doctors d= doctorService.save(doctor);
+
+        User user =new User();
+        user.setId(getObjectId(BizObject.User));
+        user.setCreateDate(new Date());
+        user.setPassword(HashUtil.hash(default_password));
+        user.setUserType("Doctor");
+        user.setIdCardNo(d.getIdCardNo());
+        user.setDoctorId(d.getId().toString());
+        user.setEmail(d.getEmail());
+        user.setGender(d.getSex());
+        user.setTelephone(d.getPhone());
+        user.setLoginCode(d.getPhone());
+        user.setRealName(d.getName());
+        user.setProvinceId(0);
+        user.setCityId(0);
+        user.setAreaId(0);
+        user.setActivated(true);
+        userManager.saveUser(user);
         return convertToModel(doctor, MDoctor.class);
     }
 
@@ -238,8 +263,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Doctors.DoctorsIdCardNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断身份证号码是否存在")
     public boolean isCardNoExists(
-            @ApiParam(name = "idCardNo", value = "身份证号码", defaultValue = "")
-            @PathVariable(value = "idCardNo") String idCardNo) {
+            @ApiParam(name = "doctor_idCardNo", value = "身份证号码", defaultValue = "")
+            @PathVariable(value = "doctor_idCardNo") String idCardNo) {
         return doctorService.getByIdCardNo(idCardNo) != null;
     }
 

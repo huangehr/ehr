@@ -49,6 +49,15 @@ public class OrgDeptImportEndPoint extends EnvelopRestEndPoint {
         return  codes;
     }
 
+    @RequestMapping(value = "/name/existence",method = RequestMethod.POST)
+    @ApiOperation("获取已存在部门名称")
+    public List nameExistence(
+            @ApiParam(name = "name", value = "", defaultValue = "")
+            @RequestBody String name) {
+        List names = orgDeptImportService.nameExistence(toEntity(name, String[].class));
+        return  names;
+    }
+
     @RequestMapping(value = "/orgCode/existence",method = RequestMethod.POST)
     @ApiOperation("获取已存在的机构代码")
     public List orgCodeExistence(

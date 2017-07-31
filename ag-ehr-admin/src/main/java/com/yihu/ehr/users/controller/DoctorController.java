@@ -10,6 +10,7 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.DoctorClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -40,6 +41,9 @@ public class DoctorController extends BaseController {
     private ConventionalDictEntryClient conventionalDictClient;
     @Autowired
     private FileResourceClient fileResourceClient;
+    @Autowired
+    private UserClient userClient;
+
 
 
     @RequestMapping(value = "/doctors", method = RequestMethod.GET)
@@ -94,6 +98,14 @@ public class DoctorController extends BaseController {
                     break;
                 case "idCardNo":
                     bo = doctorClient.isCardNoExists(existenceNm);
+                    break;
+                case "phone":
+                   String ph="phone="+existenceNm;
+                    bo = doctorClient.isExistence(ph);
+                    boolean uf=userClient.isTelephoneExists(existenceNm);
+                    if(bo==true || uf==true){
+                        bo=true;
+                    }
                     break;
             }
             envelop.setSuccessFlg(bo);
