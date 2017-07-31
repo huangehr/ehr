@@ -210,7 +210,7 @@ public class EsExtract {
                 Map<String,Integer> map = new HashMap<>();
                 //递归解析json
                 expainJson(gradeBucketIt, map, null);
-
+                client.close();
                 compute(tjQuotaDimensionSlaves,
                         returnList,
                         one,
