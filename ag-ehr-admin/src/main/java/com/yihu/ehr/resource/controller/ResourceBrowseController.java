@@ -158,9 +158,20 @@ public class ResourceBrowseController extends BaseController {
             @RequestParam(required = false) Integer size) throws Exception {
 
         Envelop categoryResponseEntity = resourceBrowseClient.getResourceData(resourcesCode,orgCode, queryCondition, page, size);
-
         return categoryResponseEntity;
     }
+
+    /**
+    @ApiOperation("资源浏览详细信息")
+    @RequestMapping(value = "/resources/ResourceBrowses/getResourceDataSub", method = RequestMethod.GET)
+    public Envelop getResourceDataSub(
+            @ApiParam("资源代码") @RequestParam String resourcesCode,
+            @ApiParam("最后一个版本记录") @RequestParam String rowKey) throws Exception {
+
+        Envelop categoryResponseEntity = resourceBrowseClient.getResourceDataSub(resourcesCode, rowKey);
+        return categoryResponseEntity;
+    }
+    */
 
     @ApiOperation("资源数据源结构")
     @RequestMapping(value = "/resources/ResourceBrowses/getResourceMetadata", method = RequestMethod.GET)

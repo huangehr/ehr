@@ -106,8 +106,8 @@ public class ResourcesQueryEndPoint {
      */
     @ApiOperation("资源浏览")
     @RequestMapping(value = ServiceApi.Resources.ResourceViewData, method = RequestMethod.GET)
-    public Envelop getResourceData(@ApiParam(name = "resourcesCode", defaultValue = "RS_HOSPITALIZED_DIAGNOSIS") @RequestParam String resourcesCode,
-                                   @ApiParam(name = "机构代码") @RequestParam String orgCode,
+    public Envelop getResourceData(@ApiParam("资源代码") @RequestParam(value = "resourcesCode", required = true, defaultValue = "RS_HOSPITALIZED_DIAGNOSIS") String resourcesCode,
+                                   @ApiParam("机构代码") @RequestParam(value = "orgCode", required = true) String orgCode,
                                    @ApiParam("查询条件") @RequestParam(value = "queryCondition", required = false) String queryCondition,
                                    @ApiParam("第几页") @RequestParam(value = "page", required = false) Integer page,
                                    @ApiParam("每页几条") @RequestParam(value = "size", required = false) Integer size) throws Exception {

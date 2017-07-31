@@ -392,15 +392,12 @@ public class HbaseQuery {
 		if(resultList!=null&&resultList.length>0){
 			for (Result result :resultList) {
 				Map<String,Object> obj = resultToMap(result, fl);
-
 				if(obj!=null)
 				{
 					data.add(obj);
 				}
-
 			}
 		}
-
 		return new PageImpl<Map<String,Object>>(data,new PageRequest(page-1, rows), count);
 	}
 

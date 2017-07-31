@@ -28,7 +28,7 @@ public class HbaseService {
     SolrUtil solrUtil;
 
 
-    public void selectData(Integer id) throws Exception {
+    public List<Map<String,Object>> selectData(Integer id) throws Exception {
 
         List<Map<String,Object>> data = new ArrayList<>();
         /***** Hbase查询 ********/
@@ -57,7 +57,7 @@ public class HbaseService {
                 }
             }
         }
-
+        return  data;
     }
 
     /**
