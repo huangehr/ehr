@@ -189,11 +189,11 @@ public class EsResultExtract {
             boolQueryBuilder.must(termQueryTown);
         }
         if( !StringUtils.isEmpty(startTime) ){
-            RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("createTime").gte(startTime);
+            RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
             boolQueryBuilder.must(rangeQueryStartTime);
         }
         if( !StringUtils.isEmpty(endTime)){
-            RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("createTime").lte(endTime);
+            RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
             boolQueryBuilder.must(rangeQueryEndTime);
         }
         return boolQueryBuilder;
