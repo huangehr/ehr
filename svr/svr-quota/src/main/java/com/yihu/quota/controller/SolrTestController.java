@@ -141,16 +141,16 @@ public class SolrTestController extends BaseController {
         try {
             /***** Solr查询 ********/
             String [] fqs = fq.split(";");
-            SolrDocumentList solrList = solrUtil.queryByfqs("HealthProfile", q, fqs, null, 0, 15);
+//            SolrDocumentList solrList = solrUtil.queryByfqs("HealthProfile", q, fqs, null, 0, 15);
 
             /***** Hbase查询 ********/
-            if(solrList!=null && solrList.getNumFound()>0){
-                long num = solrList.getNumFound();
-                for (SolrDocument doc : solrList){
-                    String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
-                    list.add(rowkey);
-                }
-            }
+//            if(solrList!=null && solrList.getNumFound()>0){
+//                long num = solrList.getNumFound();
+//                for (SolrDocument doc : solrList){
+//                    String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
+//                    list.add(rowkey);
+//                }
+//            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
