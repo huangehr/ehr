@@ -32,6 +32,7 @@ public class Doctors {
     private Date insertTime;
     private Date updateTime;
     private String idCardNo;
+    private String roleType;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -217,5 +218,14 @@ public class Doctors {
 
     public void setIdCardNo(String idCardNo) {
         this.idCardNo = idCardNo;
+    }
+
+    @Column(name = "role_type")
+    public String getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(String roleType) {
+        this.roleType = roleType;
     }
 }
