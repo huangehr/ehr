@@ -41,7 +41,7 @@ public class ElasticFactory {
         try {
             Settings settings = Settings.settingsBuilder()
                     .put("client.transport.sniff", true)
-                    .put("cluster.name", StringUtils.isEmpty(clusterName)?"jkzl":clusterName)
+                    .put("cluster.name", StringUtils.isEmpty(clusterName)?"elasticsearch":clusterName)
                     .build();
 
             Client client = TransportClient.builder().settings(settings).build()

@@ -10,7 +10,7 @@ import java.util.Date;
 public class MMessageRemind {
 
     private Long id;
-    private Integer appId;
+    private String appId;
     private String appName;
     private String fromUserId;
     private String fromUserName;
@@ -48,11 +48,11 @@ public class MMessageRemind {
         this.id = id;
     }
 
-    public Integer getAppId() {
+    public String getAppId() {
         return appId;
     }
 
-    public void setAppId(Integer appId) {
+    public void setAppId(String appId) {
         this.appId = appId;
     }
 
