@@ -44,7 +44,7 @@ public class QuotaService {
         List<ReultModel> reultModelList = new ArrayList<>();
         for(int i=0 ; i< listMap.size() ;i++){
             ReultModel reultModel = new ReultModel();
-            if(tjQuota.getCode().contains("depart_treat")){
+            if(tjQuota.getCode().contains("depart_treat")||tjQuota.getCode().contains("disease")){
                 if(listMap.get(i).get("slaveKey2Name") !=null){
                     reultModel.setKey(listMap.get(i).get("slaveKey2Name").toString());
                 }else {
