@@ -120,6 +120,8 @@ public class ServiceApi {
         public static final String CategoryByPid = "/resources/categories/pid";
         public static final String CategoryExitSelfAndChild = "/resources/categories/parent";
 
+        public static final String NoPageCustomizeList = "/resources/customize_list";
+
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
         public static final String AdapterDict = "/resources/adapter/dict/{id}";
