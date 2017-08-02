@@ -1,25 +1,20 @@
 package com.yihu.quota.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.solr.SolrUtil;
-import com.yihu.quota.etl.extract.ElasticsearchUtil;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.etl.model.EsConfig;
+import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.service.quota.StatisticsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -61,8 +56,8 @@ public class SolrTestController extends BaseController {
             esConfig.setClusterName("elasticsearch");
             esConfig.setIndex("quota");
             esConfig.setType("quota_test");
-            esResultExtract.getEsClient(esConfig);
-            f = elasticsearchUtil.save(esResultExtract.getEsClient(esConfig),jsonString);
+//            esResultExtract.getEsClient();
+//            f = elasticsearchUtil.save(esResultExtract.getEsClient(),jsonString);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -85,7 +80,7 @@ public class SolrTestController extends BaseController {
             esConfig.setClusterName("elasticsearch");
             esConfig.setIndex("quota");
             esConfig.setType("quota_test");
-            esResultExtract.getEsClient(esConfig);
+//            esResultExtract.getEsClient(esConfig);
 
             if( !file.isEmpty()){
                 FileInputStream fis = null;
@@ -102,7 +97,7 @@ public class SolrTestController extends BaseController {
                         jsonString = str;
                         System.out.println(jsonString);// 打印
                         //添加到es库
-                        f = elasticsearchUtil.save(esResultExtract.getEsClient(esConfig),jsonString);
+//                        f = elasticsearchUtil.save(esResultExtract.getEsClient(esConfig),jsonString);
                     }
                 } catch (FileNotFoundException e) {
                     System.out.println("找不到指定文件");

@@ -2,10 +2,10 @@ package com.yihu.quota.etl.extract.es;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.quota.etl.extract.ElasticsearchUtil;
-import com.yihu.quota.etl.extract.EsClientUtil;
 import com.yihu.quota.etl.model.EsConfig;
-import com.yihu.quota.etl.save.es.ElasticFactory;
+import com.yihu.quota.etl.util.ElasticsearchUtil;
+import com.yihu.quota.etl.util.EsClientUtil;
+import com.yihu.quota.etl.util.EsConfigUtil;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.save.TjDataSave;
 import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
@@ -52,31 +52,15 @@ public class EsResultExtract {
     private int pageSize;
     private EsConfig esConfig;
     @Autowired
-    private EsClientUtil esClientUtil;
-    @Autowired
     ElasticsearchUtil elasticsearchUtil;
+    @Autowired
+    EsConfigUtil esConfigUtil;
+    @Autowired
+    EsClientUtil esClientUtil;
     @Autowired
     private TjDataSaveService tjDataSaveService;
     @Autowired
     private ObjectMapper objectMapper;
-
-    public EsConfig getEsConfig(TjQuota tjQuota) throws Exception {
-        //得到该指标的数据存储
-        TjQuotaDataSave quotaDataSave = tjDataSaveService.findByQuota(tjQuota.getCode());
-        //如果为空说明数据错误
-        if (quotaDataSave == null) {
-            throw new Exception("quotaDataSave data error");
-        }
-        //判断数据源是什么类型,根据类型和数据库相关的配置信息抽取数据
-        EsConfig esConfig = null;
-        if (TjDataSave.type_es.equals(quotaDataSave.getType())) {
-            JSONObject obj = new JSONObject().fromObject(quotaDataSave.getConfigJson());
-            esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
-        }
-        //初始化es链接
-        esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(esConfig), EsConfig.class);
-        return esConfig;
-    }
 
     public void initialize(TjQuota tjQuota ,String filters) throws Exception {
         if(!StringUtils.isEmpty(filters)){
@@ -115,36 +99,57 @@ public class EsResultExtract {
         EsConfig esConfig = null;
         esConfig = getEsConfig(tjQuota);
         this.esConfig = esConfig;
+        esConfigUtil.getConfig(esConfig);
     }
 
-    public Client getEsClient(EsConfig esConfig){
-        esClientUtil.getConfig(esConfig);
-        Client client = esClientUtil.getClient();
-        return  client;
+    public EsConfig getEsConfig(TjQuota tjQuota) throws Exception {
+        //得到该指标的数据存储
+        TjQuotaDataSave quotaDataSave = tjDataSaveService.findByQuota(tjQuota.getCode());
+        //如果为空说明数据错误
+        if (quotaDataSave == null) {
+            throw new Exception("quotaDataSave data error");
+        }
+        //判断数据源是什么类型,根据类型和数据库相关的配置信息抽取数据
+        EsConfig esConfig = null;
+        if (TjDataSave.type_es.equals(quotaDataSave.getType())) {
+            JSONObject obj = new JSONObject().fromObject(quotaDataSave.getConfigJson());
+            esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+        }else {
+            // wait TO DO
+        }
+        //初始化es链接
+        esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(esConfig), EsConfig.class);
+        return esConfig;
+    }
+
+    public Client getEsClient(){
+        esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
+        return esClientUtil.getClient(esConfig.getClusterName());
     }
 
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
-        initialize(tjQuota,filters);
         this.pageNo = pageNo-1;
         this.pageSize = pageSize;
-        List<Map<String, Object>> restltList = queryPageList(esConfig);
-        for(Map<String,Object> map : restltList){
-            System.out.println(map);
-        }
-        return restltList;
-    }
-
-    private List<Map<String, Object>> queryPageList(EsConfig esConfig){
+        initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        return elasticsearchUtil.queryPageList(getEsClient(esConfig),boolQueryBuilder,pageNo,pageSize,"quotaDate");
+        List<Map<String, Object>> restltList =  elasticsearchUtil.queryPageList(getEsClient(),boolQueryBuilder,pageNo,pageSize,"quotaDate");
+        return restltList;
     }
 
     public int getQuotaTotalCount(TjQuota tjQuota,String filters) throws Exception {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        return (int)elasticsearchUtil.getTotalCount(getEsClient(esConfig),boolQueryBuilder);
+        return (int)elasticsearchUtil.getTotalCount(getEsClient(),boolQueryBuilder);
+    }
+
+    public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters) throws Exception {
+        initialize(tjQuota,filters);
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        getBoolQueryBuilder(boolQueryBuilder);
+        List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(),boolQueryBuilder, "quotaDate");
+        return  list;
     }
 
     public BoolQueryBuilder getBoolQueryBuilder(BoolQueryBuilder boolQueryBuilder){
@@ -199,15 +204,7 @@ public class EsResultExtract {
         return boolQueryBuilder;
     }
 
-    public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters) throws Exception {
-        initialize(tjQuota,filters);
-        EsConfig esConfig = getEsConfig(tjQuota);
 
-        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
-        getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(esConfig),boolQueryBuilder, "quotaDate");
-        return  list;
-    }
 
     /**
      * 递归解析json

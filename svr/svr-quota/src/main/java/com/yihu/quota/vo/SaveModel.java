@@ -15,6 +15,7 @@ public class SaveModel {
     private String id;
     private String saasId;//saasId
     private String quotaCode;//指标code
+    private String quotaName;//指标名称
     private String quotaDate;//统计时间
     private String org;     //机构代码
     private String orgName;//机构名字
@@ -250,4 +251,11 @@ public class SaveModel {
         this.id = id;
     }
 
+    public String getQuotaName() {
+        return quotaName;
+    }
+
+    public void setQuotaName(String quotaName) {
+        this.quotaName = quotaName;
+    }
 }

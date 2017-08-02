@@ -641,7 +641,7 @@ public class ResourcesQueryService  {
                     envelop.setDetailModelList(list);
                 }
                 if (isSpecialScan) {
-                    if (resourcesCode.equals("RS_OUTPATIENT_DIAGNOSIS") && envelop.getDetailModelList() != null) {
+                    if ((resourcesCode.equals("RS_OUTPATIENT_DIAGNOSIS") || resourcesCode.equals("RS_HOSPITALIZED_DIAGNOSIS")) && envelop.getDetailModelList() != null) {
                         List<Map<String, Object>> transformKeyList = new ArrayList<>();
                         for (Map<String, Object> temp : (List<Map<String, Object>>) envelop.getDetailModelList()) {
                             Map<String, Object> newKeyObject = new HashMap<String, Object>();

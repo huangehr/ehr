@@ -3,12 +3,12 @@ package com.yihu.quota.job;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaLogDao;
 import com.yihu.quota.etl.Contant;
-import com.yihu.quota.etl.extract.ElasticsearchUtil;
-import com.yihu.quota.etl.extract.EsClientUtil;
 import com.yihu.quota.etl.extract.ExtractHelper;
-import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.SaveHelper;
+import com.yihu.quota.etl.util.ElasticsearchUtil;
+import com.yihu.quota.etl.util.EsClientUtil;
+import com.yihu.quota.etl.util.EsConfigUtil;
 import com.yihu.quota.model.jpa.TjQuotaLog;
 import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.QuotaVo;
@@ -94,8 +94,8 @@ public class EsQuotaJob implements Job {
                 TermQueryBuilder termQueryQuotaDate = QueryBuilders.termQuery("quotaDate", quoataDate);
                 boolQueryBuilder.must(termQueryQuotaCode);
                 boolQueryBuilder.must(termQueryQuotaDate);
-                esClientUtil.getConfig(esConfig);
-                Client client = esClientUtil.getClient();
+                esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
+                Client client = esClientUtil.getClient(esConfig.getClusterName());
                 elasticsearchUtil.queryDelete(client,boolQueryBuilder);
 
                 List<SaveModel> dataSaveModels = new ArrayList<>();

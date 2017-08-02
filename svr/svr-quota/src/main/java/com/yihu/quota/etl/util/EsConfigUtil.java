@@ -1,20 +1,16 @@
-package com.yihu.quota.etl.extract;
+package com.yihu.quota.etl.util;
 
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.es.ElasticFactory;
 import org.elasticsearch.client.Client;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * Created by janseny on 2017/7/24.
  */
 @Component
-public class EsClientUtil {
+public class EsConfigUtil {
 
-    @Autowired
-    private ElasticFactory elasticFactory;
-    private Client client;
     private String host;//地址
     private Integer port;//端口
     private String index;// 索引 es相当与数据库
@@ -27,16 +23,6 @@ public class EsClientUtil {
         this.index = esConfig.getIndex();
         this.type = esConfig.getType();
         this.clusterName = esConfig.getClusterName();
-        this.client = elasticFactory.getClient(host, 9300, clusterName);
-    }
-
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     public String getHost() {

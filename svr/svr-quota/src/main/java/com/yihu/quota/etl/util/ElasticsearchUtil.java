@@ -1,23 +1,13 @@
-package com.yihu.quota.etl.extract;
+package com.yihu.quota.etl.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.quota.etl.model.EsConfig;
-import com.yihu.quota.etl.save.es.ElasticFactory;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.config.HttpClientConfig;
-import net.sf.json.JSON;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -27,11 +17,8 @@ import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
-import java.net.InetAddress;
 import java.util.*;
 
 /**
@@ -44,7 +31,7 @@ public class ElasticsearchUtil {
     ObjectMapper objectMapper;
 
     @Autowired
-    private EsClientUtil esClientUtil;
+    private EsConfigUtil esClientUtil;
 
 
     /**
@@ -68,7 +55,6 @@ public class ElasticsearchUtil {
         for (SearchHit hit : hits.getHits()){
             matchRsult.add(hit.getSource());
         }
-        client.close();
         return matchRsult;
     }
 
@@ -83,7 +69,6 @@ public class ElasticsearchUtil {
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
-        client.close();
        if(hits != null){
            return hits.totalHits();
        }
@@ -109,7 +94,6 @@ public class ElasticsearchUtil {
                 .addSort(dealSorter)
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
-        client.close();
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
         for (SearchHit hit : hits.getHits()){
             Map<String, Object> map = new HashMap<>() ;
@@ -142,7 +126,6 @@ public class ElasticsearchUtil {
         //解析返回数据，获取分组名称为aggs-class的数据
         Terms terms = searchResponse.getAggregations().get(aggsField +"_count");
         Collection<Terms.Bucket> buckets = terms.getBuckets();
-        client.close();
         Map<String, Object> dataMap = new HashMap<String, Object>();
         for (Terms.Bucket bucket : buckets) {
             String key = bucket.getKey().toString();
@@ -165,7 +148,6 @@ public class ElasticsearchUtil {
                 .prepareIndex(esClientUtil.getIndex(), esClientUtil.getType(), null)
                 .setSource(source).get();
         boolean result =  indexResponse.isCreated();
-        client.close();
         return result;
     }
 
@@ -174,7 +156,6 @@ public class ElasticsearchUtil {
 //                .execute().actionGet();
         DeleteRequestBuilder drBuilder = client.prepareDelete(esClientUtil.getIndex(), esClientUtil.getType(), id);
         drBuilder.execute().actionGet();
-        client.close();
     }
 
     /**
@@ -194,7 +175,6 @@ public class ElasticsearchUtil {
             DeleteRequestBuilder drBuilder = client.prepareDelete(esClientUtil.getIndex(), esClientUtil.getType(), hit.getId());
             drBuilder.execute().actionGet();
         }
-        client.close();
     }
 
 }

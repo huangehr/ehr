@@ -166,6 +166,7 @@ public class EsExtract {
         LocalDate today = LocalDate.now();
         one.setQuotaDate(today.toString());
         one.setQuotaCode(quotaVo.getCode());
+        one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);
         one.setSaasId(saasid);
         allData.put(key, one);

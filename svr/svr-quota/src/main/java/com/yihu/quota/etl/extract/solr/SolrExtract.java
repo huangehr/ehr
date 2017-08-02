@@ -270,6 +270,7 @@ public class SolrExtract {
         LocalDate today = LocalDate.now();
         one.setQuotaDate(today.toString());
         one.setQuotaCode(quotaVo.getCode());
+        one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);
         one.setSaasId(null);
         allData.put(key, one);
