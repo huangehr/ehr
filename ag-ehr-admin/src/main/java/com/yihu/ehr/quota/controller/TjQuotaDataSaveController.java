@@ -3,7 +3,7 @@ package com.yihu.ehr.quota.controller;
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.entity.tj.TjQuotaDataSave;
+import com.yihu.ehr.entity.quota.TjQuotaDataSave;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;

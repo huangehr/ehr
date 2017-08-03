@@ -4,7 +4,7 @@ import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.tj.TjQuotaLogModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.entity.tj.TjQuotaLog;
+import com.yihu.ehr.entity.quota.TjQuotaLog;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.tj.MTjQuotaLog;
 import com.yihu.ehr.quota.service.TjQuotaLogClient;

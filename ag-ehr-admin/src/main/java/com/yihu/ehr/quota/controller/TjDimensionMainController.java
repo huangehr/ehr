@@ -5,7 +5,7 @@ import com.yihu.ehr.agModel.tj.TjDimensionMainModel;
 import com.yihu.ehr.agModel.tj.TjQuotaDimensionMainModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.entity.tj.TjDimensionMain;
+import com.yihu.ehr.entity.quota.TjDimensionMain;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
