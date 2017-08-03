@@ -1,65 +1,86 @@
-package com.yihu.ehr.entity.tj;
+package com.yihu.ehr.entity.quota;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by Administrator on 2017/6/8.
+ * 统计主纬度
+ *
+ * @author janseny
+ * @version 1.0
+ * @updated 2017年6月8日
  */
 @Entity
-@Table(name = "tj_data_source")
+@Table(name = "tj_dimension_main")
 @Access(value = AccessType.PROPERTY)
-public class TjDataSource implements Serializable {
-    private Long id;
-    private String code;
-    private String type;
-    private String name;
-    private Date createTime;
-    private String createUser;
-    private String createUserName;
-    private Date updateTime;
-    private String updateUser;
-    private String updateUserName;
-    private Integer status;
-    private String remark;
+public class TjDimensionMain implements Serializable{
+
+
+    private long id;
+    private String code;  //业务代码
+    private String name; //主维度名称
+    private String type;//主维度 :1 行政区划
+    private Integer status;//1: 正常 0：不可以用 -1 已删除'
+    private String remark;//备注
+    private Date createTime;//创建时间
+    private String createUser;//创建人
+    private String createUserName;//创建人名
+    private Date updateTime;//修改时间
+    private String updateUser;//修改人
+    private String updateUserName;//修改人名
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", unique = true, nullable = false)
-    public Long getId() {
+    public long getId() {
         return id;
     }
-
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    @Column(name = "code", nullable = true)
+    @Column(name = "code",  nullable = true)
     public String getCode() {
         return code;
     }
-
     public void setCode(String code) {
         this.code = code;
     }
 
-    @Column(name = "type", nullable = true)
+    @Column(name = "name", nullable = false)
+    public String getName() {
+        return this.name;
+    }
+    public void setName(String name){
+        this.name = name;
+    }
+
+    @Column(name = "type", nullable = false)
     public String getType() {
         return type;
     }
-
     public void setType(String type) {
         this.type = type;
     }
 
-    @Column(name = "name", nullable = true)
-    public String getName() {
-        return name;
+
+    @Column(name = "status", nullable = false)
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    @Column(name = "remark", nullable = false)
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     @Column(name = "create_time", nullable = false)
@@ -71,7 +92,7 @@ public class TjDataSource implements Serializable {
         this.createTime = createTime;
     }
 
-    @Column(name = "create_user", nullable = true)
+    @Column(name = "create_user", nullable = false)
     public String getCreateUser() {
         return createUser;
     }
@@ -80,7 +101,7 @@ public class TjDataSource implements Serializable {
         this.createUser = createUser;
     }
 
-    @Column(name = "create_user_name", nullable = true)
+    @Column(name = "create_user_name", nullable = false)
     public String getCreateUserName() {
         return createUserName;
     }
@@ -98,7 +119,7 @@ public class TjDataSource implements Serializable {
         this.updateTime = updateTime;
     }
 
-    @Column(name = "update_user", nullable = true)
+    @Column(name = "update_user", nullable = false)
     public String getUpdateUser() {
         return updateUser;
     }
@@ -107,30 +128,12 @@ public class TjDataSource implements Serializable {
         this.updateUser = updateUser;
     }
 
-    @Column(name = "update_user_name", nullable = true)
+    @Column(name = "update_user_name", nullable = false)
     public String getUpdateUserName() {
         return updateUserName;
     }
 
     public void setUpdateUserName(String updateUserName) {
         this.updateUserName = updateUserName;
-    }
-
-    @Column(name = "status", nullable = true)
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    @Column(name = "remark", nullable = true)
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
     }
 }

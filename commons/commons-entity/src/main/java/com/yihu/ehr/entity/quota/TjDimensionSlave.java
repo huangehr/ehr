@@ -1,28 +1,26 @@
-package com.yihu.ehr.entity.tj;
-
-import com.yihu.ehr.util.phonics.PinyinUtil;
+package com.yihu.ehr.entity.quota;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 统计主纬度
+ * 统计细纬度
  *
  * @author janseny
  * @version 1.0
  * @updated 2017年6月8日
  */
 @Entity
-@Table(name = "tj_dimension_main")
+@Table(name = "tj_dimension_slave")
 @Access(value = AccessType.PROPERTY)
-public class TjDimensionMain implements Serializable{
+public class TjDimensionSlave implements Serializable{
 
 
     private long id;
     private String code;  //业务代码
-    private String name; //主维度名称
-    private String type;//主维度 :1 行政区划
+    private String name; //从维度名称
+    private String type;//类型:1 性别 2 年龄
     private Integer status;//1: 正常 0：不可以用 -1 已删除'
     private String remark;//备注
     private Date createTime;//创建时间
@@ -65,7 +63,6 @@ public class TjDimensionMain implements Serializable{
     public void setType(String type) {
         this.type = type;
     }
-
 
     @Column(name = "status", nullable = false)
     public Integer getStatus() {

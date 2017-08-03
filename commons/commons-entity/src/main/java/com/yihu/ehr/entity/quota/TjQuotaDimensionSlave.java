@@ -1,27 +1,27 @@
-package com.yihu.ehr.entity.tj;
-
+package com.yihu.ehr.entity.quota;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 /**
- * 统计主纬度关联表
+ * 统计细纬度关联表
  *
  * @author janseny
  * @version 1.0
  * @updated 2017年6月8日
  */
 @Entity
-@Table(name = "tj_quota_dimension_main")
+@Table(name = "tj_quota_dimension_slave")
 @Access(value = AccessType.PROPERTY)
-public class TjQuotaDimensionMain implements Serializable{
+public class TjQuotaDimensionSlave implements Serializable{
 
 
     private Long id;
     private String quotaCode;  //关联 tj_quota code
-    private String mainCode; //关联 jt_dimension_main
+    private String slaveCode; //关联 jt_dimension_slave
     private String dictSql;//
     private String keyVal;//
+    private Integer sort;//纬度顺序
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,13 +42,13 @@ public class TjQuotaDimensionMain implements Serializable{
         this.quotaCode = quotaCode;
     }
 
-    @Column(name = "main_code",  nullable = true)
-    public String getMainCode() {
-        return mainCode;
+    @Column(name = "slave_code",  nullable = true)
+    public String getSlaveCode() {
+        return slaveCode;
     }
 
-    public void setMainCode(String mainCode) {
-        this.mainCode = mainCode;
+    public void setSlaveCode(String slaveCode) {
+        this.slaveCode = slaveCode;
     }
 
     @Column(name = "dict_sql",  nullable = true)
@@ -67,5 +67,13 @@ public class TjQuotaDimensionMain implements Serializable{
 
     public void setKeyVal(String keyVal) {
         this.keyVal = keyVal;
+    }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
     }
 }

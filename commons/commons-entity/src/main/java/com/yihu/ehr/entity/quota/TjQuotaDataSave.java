@@ -1,4 +1,4 @@
-package com.yihu.ehr.entity.tj;
+package com.yihu.ehr.entity.quota;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -7,11 +7,11 @@ import java.io.Serializable;
  * Created by Administrator on 2017/6/9.
  */
 @Entity
-@Table(name = "tj_quota_data_source", schema = "", catalog = "healtharchive")
-public class TjQuotaDataSource implements Serializable{
+@Table(name = "tj_quota_data_save", schema = "", catalog = "healtharchive")
+public class TjQuotaDataSave implements Serializable{
     private Long id;
     private String quotaCode;
-    private String sourceCode;
+    private String saveCode;
     private String configJson;
 
     @Id
@@ -34,13 +34,13 @@ public class TjQuotaDataSource implements Serializable{
         this.quotaCode = quotaCode;
     }
 
-    @Column(name = "source_code")
-    public String getSourceCode() {
-        return sourceCode;
+    @Column(name = "save_code")
+    public String getSaveCode() {
+        return saveCode;
     }
 
-    public void setSourceCode(String sourceCode) {
-        this.sourceCode = sourceCode;
+    public void setSaveCode(String saveCode) {
+        this.saveCode = saveCode;
     }
 
     @Column(name = "config_json")

@@ -1,4 +1,4 @@
-package com.yihu.ehr.entity.tj;
+package com.yihu.ehr.entity.quota;
 
 import javax.persistence.*;
 import java.io.Serializable;

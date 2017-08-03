@@ -1,22 +1,20 @@
-package com.yihu.ehr.entity.tj;
+package com.yihu.ehr.entity.quota;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by Administrator on 2017/6/9.
+ * Created by Administrator on 2017/6/8.
  */
 @Entity
-@Table(name = "tj_quota", schema = "", catalog = "healtharchive")
-public class TjQuota implements Serializable {
+@Table(name = "tj_data_source")
+@Access(value = AccessType.PROPERTY)
+public class TjDataSource implements Serializable {
     private Long id;
     private String code;
+    private String type;
     private String name;
-    private String cron;
-    private String execType;
-    private Date execTime;
-    private String jobClazz;
     private Date createTime;
     private String createUser;
     private String createUserName;
@@ -24,9 +22,7 @@ public class TjQuota implements Serializable {
     private String updateUser;
     private String updateUserName;
     private Integer status;
-    private Integer dataLevel;
     private String remark;
-    private Integer quotaType;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,7 +35,7 @@ public class TjQuota implements Serializable {
         this.id = id;
     }
 
-    @Column(name = "code")
+    @Column(name = "code", nullable = true)
     public String getCode() {
         return code;
     }
@@ -48,49 +44,22 @@ public class TjQuota implements Serializable {
         this.code = code;
     }
 
-    @Column(name = "name")
+    @Column(name = "type", nullable = true)
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Column(name = "name", nullable = true)
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Column(name = "cron")
-    public String getCron() {
-        return cron;
-    }
-
-    public void setCron(String cron) {
-        this.cron = cron;
-    }
-
-    @Column(name = "exec_type")
-    public String getExecType() {
-        return execType;
-    }
-
-    public void setExecType(String execType) {
-        this.execType = execType;
-    }
-
-    @Column(name = "exec_time", nullable = false)
-    public Date getExecTime() {
-        return execTime;
-    }
-
-    public void setExecTime(Date execTime) {
-        this.execTime = execTime;
-    }
-
-    @Column(name = "job_clazz")
-    public String getJobClazz() {
-        return jobClazz;
-    }
-
-    public void setJobClazz(String jobClazz) {
-        this.jobClazz = jobClazz;
     }
 
     @Column(name = "create_time", nullable = false)
@@ -102,7 +71,7 @@ public class TjQuota implements Serializable {
         this.createTime = createTime;
     }
 
-    @Column(name = "create_user")
+    @Column(name = "create_user", nullable = true)
     public String getCreateUser() {
         return createUser;
     }
@@ -111,7 +80,7 @@ public class TjQuota implements Serializable {
         this.createUser = createUser;
     }
 
-    @Column(name = "create_user_name")
+    @Column(name = "create_user_name", nullable = true)
     public String getCreateUserName() {
         return createUserName;
     }
@@ -129,7 +98,7 @@ public class TjQuota implements Serializable {
         this.updateTime = updateTime;
     }
 
-    @Column(name = "update_user")
+    @Column(name = "update_user", nullable = true)
     public String getUpdateUser() {
         return updateUser;
     }
@@ -138,7 +107,7 @@ public class TjQuota implements Serializable {
         this.updateUser = updateUser;
     }
 
-    @Column(name = "update_user_name")
+    @Column(name = "update_user_name", nullable = true)
     public String getUpdateUserName() {
         return updateUserName;
     }
@@ -147,7 +116,7 @@ public class TjQuota implements Serializable {
         this.updateUserName = updateUserName;
     }
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = true)
     public Integer getStatus() {
         return status;
     }
@@ -156,25 +125,7 @@ public class TjQuota implements Serializable {
         this.status = status;
     }
 
-    @Column(name = "data_level")
-    public Integer getDataLevel() {
-        return dataLevel;
-    }
-
-    public void setDataLevel(Integer dataLevel) {
-        this.dataLevel = dataLevel;
-    }
-
-    @Column(name = "quota_type")
-    public Integer getQuotaType() {
-        return quotaType;
-    }
-
-    public void setQuotaType(Integer quotaType) {
-        this.quotaType = quotaType;
-    }
-
-    @Column(name = "remark")
+    @Column(name = "remark", nullable = true)
     public String getRemark() {
         return remark;
     }
