@@ -7,17 +7,22 @@ import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.RsCategory;
 import com.yihu.ehr.resource.model.RsMetadata;
 import com.yihu.ehr.resource.model.RsResources;
+import com.yihu.ehr.resource.service.query.ResourcesQueryService;
+import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -25,7 +30,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class ResourcesCustomizeListService extends BaseJpaService<RsCategory,ResourcesCategoryDao> {
+public class ResourcesCustomizeService extends BaseJpaService<RsCategory,ResourcesCategoryDao> {
 
     @Autowired
     private ResourcesCategoryDao rsCategoryDao;
@@ -33,6 +38,8 @@ public class ResourcesCustomizeListService extends BaseJpaService<RsCategory,Res
     private ResourcesDao rsDao;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ResourcesQueryService resourcesQueryService;
 
     /**
      * 获取主体资源列表
@@ -62,7 +69,7 @@ public class ResourcesCustomizeListService extends BaseJpaService<RsCategory,Res
     }
 
     /**
-     * 获取结果集
+     * 获取自定义资源列表树
      * @param filters
      * @return
      */
@@ -72,15 +79,17 @@ public class ResourcesCustomizeListService extends BaseJpaService<RsCategory,Res
         if(rrList != null) {
             for(RsResources rsResources : rrList) {
                 Map<String, Object> masterMap = new HashMap<String, Object>();
-                masterMap.put("masterCode", rsResources.getCode());
-                masterMap.put("masterName", rsResources.getName());
+                masterMap.put("code", rsResources.getCode());
+                masterMap.put("name", rsResources.getName());
+                masterMap.put("level", "1");
                 List<RsMetadata> rmList = findMetadataList(rsResources);
                 if(rmList != null) {
                     List<Map<String, Object>> metadataList = new ArrayList<Map<String, Object>>();
                     for(RsMetadata rsMetadata : rmList) {
                         Map<String, Object> metadataMap = new HashMap<String, Object>();
-                        metadataMap.put("metaDataId", rsMetadata.getId());
-                        metadataMap.put("metaDataName", rsMetadata.getName());
+                        metadataMap.put("leve1", "2");
+                        metadataMap.put("code", rsMetadata.getId());
+                        metadataMap.put("name", rsMetadata.getName());
                         metadataMap.put("metaDataStdCode", rsMetadata.getStdCode());
                         metadataList.add(metadataMap);
                     }
@@ -92,6 +101,40 @@ public class ResourcesCustomizeListService extends BaseJpaService<RsCategory,Res
             }
         }
         return resultList;
+    }
+
+    /**
+     * 获取自定义资源数据
+     * @return
+     */
+    public List<Map<String, Object>> getCustomizeData(String resourcesCode, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception{
+        Pattern pattern = Pattern.compile("\\[.+?\\]");
+        Matcher rcMatcher = pattern.matcher(resourcesCode);
+        if(!rcMatcher.find()) {
+            return null;
+        }
+        if(metaData != null) {
+            Matcher mdMatcher = pattern.matcher(metaData);
+            if(!mdMatcher.find()) {
+                metaData = "";
+            }
+        }else {
+            metaData = "";
+        }
+        if(queryCondition == null) {
+            queryCondition = "[]";
+        }else {
+            Matcher qcMatcher = pattern.matcher(queryCondition);
+            if (!qcMatcher.find()) {
+                queryCondition = "[]";
+            }else {
+                if (!queryCondition.contains("{") || !queryCondition.contains("}")) {
+                    queryCondition = "[]";
+                }
+            }
+        }
+        Envelop envelop = resourcesQueryService.getCustomizeData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
+        return envelop.getDetailModelList();
     }
 
 }
