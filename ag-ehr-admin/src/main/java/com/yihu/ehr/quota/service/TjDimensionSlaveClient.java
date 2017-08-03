@@ -3,7 +3,7 @@ package com.yihu.ehr.quota.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.entity.tj.TjDimensionSlave;
+import com.yihu.ehr.entity.quota.TjDimensionSlave;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -42,7 +42,7 @@ public interface TjDimensionSlaveClient {
     Result delete(@RequestParam(value = "id") Long id);
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveId, method = RequestMethod.GET)
-    @ApiOperation(value = "获取从维度信息", notes = "通知从维度信息")
+    @ApiOperation(value = "获取从维度信息", notes = "获取从维度信息")
     TjDimensionSlave getTjDimensionSlave(@RequestParam(value = "id") Integer id);
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveCode, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
