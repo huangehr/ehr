@@ -95,7 +95,7 @@ public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveId, method = RequestMethod.GET)
-    @ApiOperation(value = "获取从维度信息", notes = "通知从维度信息")
+    @ApiOperation(value = "获取从维度信息", notes = "获取从维度信息")
     TjDimensionSlave getTjDimensionSlave(@PathVariable(value = "id") Integer id){
         return tjDimensionSlaveService.getTjDimensionSlave(id);
     };
