@@ -124,8 +124,9 @@ public class ServiceApi {
         /**
          * 自定义资源服务
          */
-        public static final String NoPageCustomizeList = "/resources/customize_list";
-        public static final String NoPageCustomizeData = "/resources/customize_data";
+        public static final String CustomizeList = "/resources/customize_list";
+        public static final String CustomizeData = "/resources/customize_data";
+        public static final String CustomizeUpdate = "/resources/customize_update";
 
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
