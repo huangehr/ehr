@@ -35,6 +35,14 @@ public interface XResourceClient {
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size);
 
+    @RequestMapping(value = ServiceApi.Resources.ResourcesSubQuery, method = RequestMethod.POST)
+    Envelop getResourcesSub(
+            @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
+            @RequestParam(value = "appId", required = true) String appId,
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @RequestParam(value = "queryParams", required = false) String queryParams,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size);
 
     @RequestMapping(value = ServiceApi.Resources.ResourcesQueryTransform, method = RequestMethod.POST)
     Envelop ResourcesQueryTransform(

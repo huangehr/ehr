@@ -62,6 +62,35 @@ public class ResourcesQueryEndPoint {
     }
 
     /**
+     * （档案浏览器主要健康问题诊断详情）
+     * @param resourcesCode
+     * @param appId
+     * @param orgCode
+     * @param queryParams
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    @ApiOperation("获取资源数据（档案浏览器主要健康问题诊断详情）")
+    @RequestMapping(value = ServiceApi.Resources.ResourcesSubQuery, method = RequestMethod.POST)
+    public Envelop getResourcesSub(@ApiParam("资源代码")
+                                @RequestParam String resourcesCode,
+                                @ApiParam("appId应用ID")
+                                @RequestParam String appId,
+                                @ApiParam("orgCode机构代码")
+                                @RequestParam(required = false) String orgCode,
+                                @ApiParam("json查询条件，{\"q\":\"*:*\"}")
+                                @RequestParam(required = false) String queryParams,
+                                @ApiParam("第几页")
+                                @RequestParam(required = false) Integer page,
+                                @ApiParam("每页几条")
+                                @RequestParam(required = false) Integer size) throws Exception {
+
+        return resourcesQueryService.getResourcesSub(resourcesCode, appId, orgCode, queryParams, page, size);
+    }
+
+    /**
      * 获取资源数据(转译)
      */
     @ApiOperation("获取资源数据(转译)")

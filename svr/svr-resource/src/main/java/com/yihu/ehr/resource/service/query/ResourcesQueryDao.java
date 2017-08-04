@@ -67,19 +67,17 @@ public class ResourcesQueryDao {
                         q = obj.get("saas");
                     }
                 }
-
                 if (obj.containsKey("fl")) {
                     fl = obj.get("fl");
                 }
                 if (obj.containsKey("sort")) {
                     sort = obj.get("sort");
                 }
-
                 //join操作
                 if (obj.containsKey("join")) {
                     String join = obj.get("join");
                     fq = q;
-                    q = "{!join fromIndex="+subJoinCore+" from=profile_id to=rowkey}" +join;
+                    q = "{!join fromIndex=" + subJoinCore + " from=profile_id to=rowkey}" +join;
                 }
             }
             else {
@@ -88,8 +86,7 @@ public class ResourcesQueryDao {
         }
 
         //默认第一页
-        if (page == null)
-        {
+        if (page == null) {
             page = defaultPage;
         }
         //默认行数
@@ -311,7 +308,7 @@ public class ResourcesQueryDao {
                 if (size == null) {
                     size = defaultSize;
                 }
-                return solr.getGroupCount(core, groupFields, q,fq, page, size);
+                return solr.getGroupCount(core, groupFields, q, fq, page, size);
             }
         }
 

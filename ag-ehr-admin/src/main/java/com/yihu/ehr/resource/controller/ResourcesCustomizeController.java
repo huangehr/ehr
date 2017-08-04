@@ -28,15 +28,18 @@ public class ResourcesCustomizeController extends BaseController {
     private ResourcesCustomizeClient resourcesCustomizeClient;
 
     @RequestMapping(value = ServiceApi.Resources.NoPageCustomizeList, method = RequestMethod.GET)
-    @ApiOperation("获取资源列表树")
-    public Envelop getMasterCategories(
-            @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(value="filters",required = false)String filters) throws  Exception {
+    @ApiOperation("获取自定义资源列表树")
+    public Envelop getCustomizeList(
+            @ApiParam(name="filters",value="过滤条件",defaultValue = "")
+            @RequestParam(value="filters",required = false) String filters) throws  Exception {
         Envelop envelop = new Envelop();
         try {
             List<Map<String,Object>> resources = resourcesCustomizeClient.getCustomizeList(filters);
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(resources);
+            if(resources != null) {
+                envelop.setTotalCount(resources.size());
+            }
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -44,5 +47,36 @@ public class ResourcesCustomizeController extends BaseController {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.NoPageCustomizeData, method = RequestMethod.GET)
+    @ApiOperation("获取自定义资源数据")
+    public Envelop getCustomizeData(
+            @ApiParam(name = "resourcesCode", value = "资源代码")
+            @RequestParam(value = "resourcesCode") String resourcesCode,
+            @ApiParam(name = "metadata", value = "数据元")
+            @RequestParam(value = "metaData", required = false) String metaData,
+            @ApiParam(name = "orgCode", value = "机构代码")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(name = "appId", value = "机构代码")
+            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "queryCondition", value = "查询条件")
+            @RequestParam(value = "queryCondition", required = false) String queryCondition,
+            @ApiParam(name = "page", value = "第几页")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "每页几行")
+            @RequestParam(value = "size", required = false) Integer size) throws  Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<Map<String,Object>> resources = resourcesCustomizeClient.getCustomizeData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(resources);
+            if(resources != null) {
+                envelop.setTotalCount(resources.size());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
 
 }
