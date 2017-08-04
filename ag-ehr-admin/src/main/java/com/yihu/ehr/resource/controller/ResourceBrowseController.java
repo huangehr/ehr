@@ -149,7 +149,8 @@ public class ResourceBrowseController extends BaseController {
     public Envelop getResourceData(
             @ApiParam("资源代码")
             @RequestParam String resourcesCode,
-            @ApiParam(name = "机构代码") @RequestParam String orgCode,
+            @ApiParam("机构代码")
+            @RequestParam String orgCode,
             @ApiParam("查询条件")
             @RequestParam(required = false) String queryCondition,
             @ApiParam("第几页")
@@ -157,7 +158,7 @@ public class ResourceBrowseController extends BaseController {
             @ApiParam("每页几行")
             @RequestParam(required = false) Integer size) throws Exception {
 
-        Envelop categoryResponseEntity = resourceBrowseClient.getResourceData(resourcesCode,orgCode, queryCondition, page, size);
+        Envelop categoryResponseEntity = resourceBrowseClient.getResourceData(resourcesCode, orgCode, queryCondition, page, size);
         return categoryResponseEntity;
     }
 

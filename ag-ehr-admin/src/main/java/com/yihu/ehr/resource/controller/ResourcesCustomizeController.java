@@ -27,7 +27,7 @@ public class ResourcesCustomizeController extends BaseController {
     @Autowired
     private ResourcesCustomizeClient resourcesCustomizeClient;
 
-    @RequestMapping(value = ServiceApi.Resources.NoPageCustomizeList, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.CustomizeList, method = RequestMethod.GET)
     @ApiOperation("获取自定义资源列表树")
     public Envelop getCustomizeList(
             @ApiParam(name="filters",value="过滤条件",defaultValue = "")
@@ -47,12 +47,12 @@ public class ResourcesCustomizeController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.NoPageCustomizeData, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.CustomizeData, method = RequestMethod.GET)
     @ApiOperation("获取自定义资源数据")
     public Envelop getCustomizeData(
             @ApiParam(name = "resourcesCode", value = "资源代码")
             @RequestParam(value = "resourcesCode") String resourcesCode,
-            @ApiParam(name = "metadata", value = "数据元")
+            @ApiParam(name = "metaData", value = "数据元")
             @RequestParam(value = "metaData", required = false) String metaData,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode", required = false) String orgCode,
@@ -72,6 +72,21 @@ public class ResourcesCustomizeController extends BaseController {
             if(resources != null) {
                 envelop.setTotalCount(resources.size());
             }
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.POST)
+    @ApiOperation("自定义资源视图保存")
+    public Envelop customizeUpdate(
+            @ApiParam(name="dataJson",value="JSON对象参数")
+            @RequestParam(value="dataJson") String dataJson) throws  Exception {
+        Envelop envelop = new Envelop();
+        try {
+            envelop = resourcesCustomizeClient.customizeUpdate(dataJson);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
