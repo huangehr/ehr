@@ -1,10 +1,9 @@
 package com.yihu.ehr.resource.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.intf.ResourcesCategoryDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
-import com.yihu.ehr.resource.model.RsCategory;
 import com.yihu.ehr.resource.model.RsMetadata;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.service.query.ResourcesQueryService;
@@ -15,7 +14,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,18 +22,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Created by Sxy on 2016/08/01.
  */
 @Service
 @Transactional
-public class ResourcesCustomizeService extends BaseJpaService<RsCategory,ResourcesCategoryDao> {
+public class ResourcesCustomizeService extends BaseJpaService<RsResources, ResourcesDao> {
 
-    @Autowired
-    private ResourcesCategoryDao rsCategoryDao;
-    @Autowired
-    private ResourcesDao rsDao;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -87,7 +80,7 @@ public class ResourcesCustomizeService extends BaseJpaService<RsCategory,Resourc
                     List<Map<String, Object>> metadataList = new ArrayList<Map<String, Object>>();
                     for(RsMetadata rsMetadata : rmList) {
                         Map<String, Object> metadataMap = new HashMap<String, Object>();
-                        metadataMap.put("leve1", "2");
+                        metadataMap.put("level", "2");
                         metadataMap.put("code", rsMetadata.getId());
                         metadataMap.put("name", rsMetadata.getName());
                         metadataMap.put("metaDataStdCode", rsMetadata.getStdCode());
@@ -109,9 +102,11 @@ public class ResourcesCustomizeService extends BaseJpaService<RsCategory,Resourc
      */
     public List<Map<String, Object>> getCustomizeData(String resourcesCode, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception{
         Pattern pattern = Pattern.compile("\\[.+?\\]");
-        Matcher rcMatcher = pattern.matcher(resourcesCode);
-        if(!rcMatcher.find()) {
-            return null;
+        if(resourcesCode != null) {
+            Matcher rcMatcher = pattern.matcher(resourcesCode);
+            if(!rcMatcher.find()) {
+                return null;
+            }
         }
         if(metaData != null) {
             Matcher mdMatcher = pattern.matcher(metaData);
@@ -136,5 +131,4 @@ public class ResourcesCustomizeService extends BaseJpaService<RsCategory,Resourc
         Envelop envelop = resourcesQueryService.getCustomizeData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
         return envelop.getDetailModelList();
     }
-
 }
