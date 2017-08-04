@@ -84,7 +84,7 @@ public class ResourcesCustomizeService extends BaseJpaService<RsResources, Resou
                         metadataMap.put("code", rsMetadata.getId());
                         metadataMap.put("name", rsMetadata.getName());
                         metadataMap.put("metaDataStdCode", rsMetadata.getStdCode());
-                        metadataMap.put("dict_code", rsMetadata.getDictCode());
+                        metadataMap.put("dictCode", rsMetadata.getDictCode());
                         metadataList.add(metadataMap);
                     }
                     masterMap.put("metaDataList", metadataList);
