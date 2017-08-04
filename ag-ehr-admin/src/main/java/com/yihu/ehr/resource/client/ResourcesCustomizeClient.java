@@ -21,7 +21,19 @@ import java.util.Map;
 public interface ResourcesCustomizeClient {
 
     @RequestMapping(value = ServiceApi.Resources.NoPageCustomizeList, method = RequestMethod.GET)
-    @ApiOperation("获取资源列表树")
+    @ApiOperation("获取自定义资源列表树")
     List<Map<String, Object>> getCustomizeList(
             @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value = ServiceApi.Resources.NoPageCustomizeData, method = RequestMethod.GET)
+    @ApiOperation("获取自定义资源数据")
+    List<Map<String, Object>> getCustomizeData(
+            @RequestParam(value = "resourcesCode") String resourcesCode,
+            @RequestParam(value = "metaData", required = false) String metaData,
+            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @RequestParam(value = "appId") String appId,
+            @RequestParam(value = "queryCondition",required = false) String queryCondition,
+            @RequestParam(value = "page",required = false) Integer page,
+            @RequestParam(value = "size",required = false) Integer size);
+
 }

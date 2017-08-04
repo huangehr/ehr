@@ -186,7 +186,7 @@ public class PatientInfoBaseService {
                  }
             }
 
-            for(String healthProblemCode:hpList.keySet())
+            for(String healthProblemCode : hpList.keySet())
             {
                 Map<String, Object> obj = new HashedMap();
                 obj.put("healthProblemCode", healthProblemCode);
@@ -223,6 +223,7 @@ public class PatientInfoBaseService {
                         obj.put("lastVisitOrg", profile.get(BasisConstant.orgName));
                         obj.put("lastVisitRecord", profile.get(BasisConstant.rowkey));
                         obj.put("recentEvent", recentEvent);
+                        obj.put("eventType", eventType);
                     }
 
                     //最后一条
@@ -230,7 +231,6 @@ public class PatientInfoBaseService {
                     {
                         obj.put("ageOfDisease",getAgeOfDisease(profile.get(BasisConstant.eventDate)));
                     }
-
 
                 }
                 obj.put("visitTimes", visitTimes);
@@ -246,10 +246,18 @@ public class PatientInfoBaseService {
     /*
      * @根据患者最后一次诊断记录获取诊断详情
      */
-    public List<Map<String, Object>> getHealthProblemSub(String lastVisitRecord) throws Exception {
+    public List<Map<String, Object>> getHealthProblemSub(String eventType, String lastVisitRecord) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
         //获取门诊断详情
-        Envelop result = resource.getResources(BasisConstant.outpatientDiagnosis, appId, null, "{\"q\":\"profile_id:" + lastVisitRecord + "\"}", null, null);
+        String resourcesCode = "";
+        if (eventType.equals("0")) {
+            resourcesCode = BasisConstant.outpatientDiagnosis;
+        }else if(eventType.equals("1")) {
+            resourcesCode = BasisConstant.hospitalizedDiagnosis;
+        }else if(eventType.equals("2")) {
+            resourcesCode = BasisConstant.examinationReport;
+        }
+        Envelop result = resource.getResourcesSub(resourcesCode, appId, null, "{\"q\":\"profile_id:" + lastVisitRecord + "\"}", null, null);
         re = result.getDetailModelList();
         return re;
     }

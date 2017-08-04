@@ -128,7 +128,7 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      * 通过rowkey获取多行数据
      */
-    public Result[] getResultList(String tableName,List<String> rowKeys) throws Exception {
+    public Result[] getResultList(String tableName, List<String> rowKeys) throws Exception {
         return hbaseTemplate.execute(tableName, new TableCallback<Result[]>() {
 
             public Result[] doInTable(HTableInterface table) throws Throwable {
