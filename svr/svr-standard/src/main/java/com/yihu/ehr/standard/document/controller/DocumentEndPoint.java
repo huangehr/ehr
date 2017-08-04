@@ -345,7 +345,7 @@ public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
         if (localFile.exists() && localFile.isFile()) {
             localFile.delete();
         }
-        if (!strFileGroup.equals("") && !strSchemePath.equals("")) {
+        if (null!=strFileGroup&&!strFileGroup.equals("") && !strSchemePath.equals("")) {
             strLocalFileName = fastDFSUtil.download(strFileGroup, strSchemePath, strXMLFilePath);
 
             File file = new File(strLocalFileName);

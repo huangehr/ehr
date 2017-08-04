@@ -374,12 +374,7 @@ public class OrgDeptController  extends BaseController {
             ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.searchOrgDeptMembers(fields, filters, sorts, size, page);
             List<MOrgMemberRelation> members = responseEntity.getBody();
             for (MOrgMemberRelation deptMember : members) {
-                filters="id="+deptMember.getUserId();
-                fields="";
-                ResponseEntity<List<MOrgMemberRelation>> respEntity = orgDeptMemberClient.searchOrgDeptMembers(fields, filters, sorts, size, page);
-                List<MOrgMemberRelation> mem = respEntity.getBody();
-                MOrgMemberRelation mOrgMemberRelation=mem.get(0);
-                OrgDeptMemberModel memberModel = convertToModel(mOrgMemberRelation,OrgDeptMemberModel.class);
+                OrgDeptMemberModel memberModel = convertToModel(deptMember,OrgDeptMemberModel.class);
 //                if (StringUtils.isNotEmpty(memberModel.getUserId()) ){
 //                    MUser mUser = userClient.getUser(memberModel.getUserId());
 //                    memberModel.setUserName(mUser == null ? "" : mUser.getRealName());
@@ -526,11 +521,11 @@ public class OrgDeptController  extends BaseController {
                 return failed(errorMsg);
             }
 
-            MUser mUser = userClient.getUser(mDeptMember.getUserId());
+         /*   MUser mUser = userClient.getUser(mDeptMember.getUserId());
             mDeptMember.setUserName(mUser == null ? "" : mUser.getRealName());
 
             MUser mUserp = userClient.getUser(mDeptMember.getParentUserId());
-            mDeptMember.setParentUserName(mUserp == null ? "" : mUserp.getRealName());
+            mDeptMember.setParentUserName(mUserp == null ? "" : mUserp.getRealName());*/
 
             MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(mDeptMember.getDeptId());
             mDeptMember.setDeptName(mOrgDept == null ? "" : mOrgDept.getName());
