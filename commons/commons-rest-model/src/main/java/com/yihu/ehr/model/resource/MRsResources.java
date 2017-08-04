@@ -12,6 +12,7 @@ public class MRsResources {
     private String rsInterface;
     private String grantType;
     private String description;
+    private Integer dataSource;
 
     public String getId() {
         return id;
@@ -64,5 +65,13 @@ public class MRsResources {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(Integer dataSource) {
+        this.dataSource = dataSource;
     }
 }
