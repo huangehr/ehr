@@ -103,6 +103,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         user.setCityId(0);
         user.setAreaId(0);
         user.setActivated(true);
+        user.setImgRemotePath(d.getPhoto());
         userManager.saveUser(user);
         return convertToModel(doctor, MDoctor.class);
     }

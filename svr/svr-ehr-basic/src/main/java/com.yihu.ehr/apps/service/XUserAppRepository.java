@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 /**
  * @author yeshijie
  * @version 1.0
@@ -23,4 +25,7 @@ public interface XUserAppRepository extends JpaRepository<UserApp, String> {
 
     @Modifying
     void deleteByAppId(@Param("appId") String appId);
+
+    @Query("select userApp from UserApp userApp where userApp.appId = :appId " )
+    List<UserApp> findByAppId(@Param("appId") String appId);
 }
