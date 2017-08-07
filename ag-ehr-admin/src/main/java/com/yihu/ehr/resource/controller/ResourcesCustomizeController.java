@@ -85,11 +85,11 @@ public class ResourcesCustomizeController extends BaseController {
             @ApiParam(name="dataJson",value="JSON对象参数")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
         try {
             envelop = resourcesCustomizeClient.customizeUpdate(dataJson);
         }catch (Exception e){
             e.printStackTrace();
-            envelop.setSuccessFlg(false);
         }
         return envelop;
     }
