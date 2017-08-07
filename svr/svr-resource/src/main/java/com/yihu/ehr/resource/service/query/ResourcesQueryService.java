@@ -221,7 +221,6 @@ public class ResourcesQueryService  {
             queryParams = addParams(queryParams,"q", "*:*");
         }
         queryParams = addParams(queryParams,"saas", saas);
-
         queryParams = addParams(queryParams,"sort", "{\"event_date\":\"desc\"}");
         /**
          * 基本数据展示

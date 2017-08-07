@@ -66,7 +66,7 @@ public class ResourcesCustomizeEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "metaData", required = false) String metaData,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(name = "appId", value = "机构代码")
+            @ApiParam(name = "appId", value = "应用ID")
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "queryCondition", value = "查询条件")
             @RequestParam(value = "queryCondition", required = false) String queryCondition,
