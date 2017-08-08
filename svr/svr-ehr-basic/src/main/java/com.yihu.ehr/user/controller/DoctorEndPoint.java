@@ -10,6 +10,8 @@ import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.org.model.OrgMemberRelation;
 import com.yihu.ehr.org.service.OrgDeptService;
 import com.yihu.ehr.org.service.OrgMemberRelationService;
+import com.yihu.ehr.patient.service.demographic.DemographicInfo;
+import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.user.service.DoctorService;
@@ -53,6 +55,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     private OrgMemberRelationService relationService;
     @Value("${default.password}")
     private String default_password = "123456";
+    @Autowired
+    private DemographicService demographicService;
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.GET)
     @ApiOperation(value = "获取医生列表", notes = "根据查询条件获取医生列表在前端表格展示")
@@ -86,7 +90,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         doctor.setStatus("1");
         doctor.setPyCode(PinyinUtil.getPinYinHeadChar(doctor.getName(), false));
         Doctors d= doctorService.save(doctor);
-
+        //创建账户
         User user =new User();
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
@@ -105,6 +109,15 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         user.setActivated(true);
         user.setImgRemotePath(d.getPhoto());
         userManager.saveUser(user);
+        //创建居民
+        DemographicInfo demographicInfo =new DemographicInfo();
+        demographicInfo.setPassword(HashUtil.hash(default_password));
+        demographicInfo.setRegisterTime(new Date());
+        demographicInfo.setIdCardNo(d.getIdCardNo());
+        demographicInfo.setName(d.getName());
+        demographicInfo.setTelephoneNo("{\"联系电话\":\""+d.getPhone()+"\"}");
+        demographicInfo.setGender(d.getSex());
+        demographicService.savePatient(demographicInfo);
         return convertToModel(doctor, MDoctor.class);
     }
 
