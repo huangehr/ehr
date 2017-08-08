@@ -3,6 +3,8 @@ package com.yihu.ehr.user.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.org.dao.XOrganizationRepository;
 import com.yihu.ehr.org.model.Organization;
+import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
+import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.user.dao.XDoctorRepository;
 import com.yihu.ehr.user.dao.XUserRepository;
@@ -38,6 +40,8 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     ObjectMapper objectMapper;
     @Autowired
     private XOrganizationRepository organizationRepository;
+    @Autowired
+    private XDemographicInfoRepository demographicInfoRepository;
 
     /**
      * 根据用户ID获取医生信息
@@ -144,6 +148,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         Map<String, Object> map;
         SQLQuery query;
         int total = 0;
+        DemographicInfo demographicInfo =null;
         for(int i=1; i<=doctorLs.size(); i++){
             map = doctorLs.get(i-1);
             sql.append("('"+ null2Space(map .get("code")) +"'");
@@ -172,6 +177,15 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
                 sql = new StringBuilder(header) ;
             }else
                 sql.append(",");
+            //创建居民
+             demographicInfo =new DemographicInfo();
+            demographicInfo.setPassword(HashUtil.hash("123456"));
+            demographicInfo.setRegisterTime(new Date());
+            demographicInfo.setIdCardNo(String.valueOf(map .get("idCardNo")));
+            demographicInfo.setName(String.valueOf(map .get("name")));
+            demographicInfo.setTelephoneNo("{\"联系电话\":\""+String.valueOf(map .get("phone"))+"\"}");
+            demographicInfo.setGender(String.valueOf(map .get("sex")));
+            demographicInfoRepository.save(demographicInfo);
         }
         Map<String, Object> phoneMap;
         StringBuffer stringBuffer = new StringBuffer();

@@ -111,6 +111,14 @@ public class DoctorController extends BaseController {
                         bo=true;
                     }
                     break;
+                case "email":
+                    String email="email="+existenceNm;
+                    bo = doctorClient.isExistence(email);
+                    boolean emailFlag=userClient.isEmailExists(existenceNm);
+                    if(bo==true || emailFlag==true){
+                        bo=true;
+                    }
+                    break;
             }
             envelop.setSuccessFlg(bo);
 
