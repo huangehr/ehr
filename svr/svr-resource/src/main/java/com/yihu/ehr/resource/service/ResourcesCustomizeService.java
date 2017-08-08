@@ -93,6 +93,10 @@ public class ResourcesCustomizeService extends BaseJpaService<RsResources, Resou
         baseMap5.put("code", "patient_name");
         baseMap5.put("name", "病人姓名");
         baseList.add(baseMap5);
+        Map<String, String> baseMap6 = new HashMap<String, String>();
+        baseMap6.put("code", "event_type");
+        baseMap6.put("name", "事件类型");
+        baseList.add(baseMap6);
         baseMap.put("level", "0");
         baseMap.put("baseInfo", baseList);
         resultList.add(baseMap);

@@ -80,7 +80,7 @@ public class ResourcesCustomizeEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.POST)
     @ApiOperation("自定义资源视图保存")
     @Transactional
-    public Envelop customizeUpdate(
+    public Envelop customizeCreate(
             @ApiParam(name="dataJson",value="JSON对象参数")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
@@ -130,6 +130,38 @@ public class ResourcesCustomizeEndPoint extends EnvelopRestEndPoint {
             }
         }
         envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.PUT)
+    @ApiOperation("自定义视图搜索条件更新")
+    @Transactional
+    public Envelop customizeUpdate(
+            @ApiParam(name="dataJson",value="JSON对象参数")
+            @RequestParam(value="dataJson") String dataJson) throws  Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> paraMap = mapper.readValue(dataJson, Map.class);
+        if(!paraMap.containsKey("resourceId") || !paraMap.containsKey("queryCondition")) {
+            return envelop;
+        }
+        String resourceId = (String)paraMap.get("resourceId");
+        RsResources rsResources = rsService.getResourceById(resourceId);
+        if(rsResources != null) {
+            RsResourcesQuery rsResourcesQuery = resourcesDefaultQueryService.findByResourcesId(resourceId);
+            List<Map<String, String>> queryList = (List<Map<String, String>>)paraMap.get("queryCondition");
+            if(queryList != null && queryList.size() > 0) {
+                String queryCondition = mapper.writeValueAsString(queryList);
+                rsResourcesQuery.setQuery(queryCondition);
+                resourcesDefaultQueryService.saveResourceQuery(rsResourcesQuery);
+                envelop.setSuccessFlg(true);
+            }else {
+                throw new Exception("搜索条件不能为空");
+            }
+        }else {
+            throw new Exception("资源不存在");
+        }
         return envelop;
     }
 }
