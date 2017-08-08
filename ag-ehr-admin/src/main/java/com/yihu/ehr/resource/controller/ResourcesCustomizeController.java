@@ -81,6 +81,21 @@ public class ResourcesCustomizeController extends BaseController {
 
     @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.POST)
     @ApiOperation("自定义资源视图保存")
+    public Envelop customizeCreate(
+            @ApiParam(name="dataJson",value="JSON对象参数")
+            @RequestParam(value="dataJson") String dataJson) throws  Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            envelop = resourcesCustomizeClient.customizeCreate(dataJson);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.PUT)
+    @ApiOperation("自定义视图搜索条件更新")
     public Envelop customizeUpdate(
             @ApiParam(name="dataJson",value="JSON对象参数")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
@@ -93,5 +108,4 @@ public class ResourcesCustomizeController extends BaseController {
         }
         return envelop;
     }
-
 }
