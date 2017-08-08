@@ -46,6 +46,16 @@ public class DemographicService {
         return demInfo;
     }
 
+    public DemographicInfo getDemographicInfo(String telephoneNo) {
+        List<DemographicInfo> demInfoList = demographicInfoRepository.getDemographicInfoByTelephoneNo(telephoneNo);
+        DemographicInfo demInfo=null;
+        if(null!=demInfoList&&demInfoList.size()>0){
+            demInfo=demInfoList.get(0);
+        }
+        return demInfo;
+    }
+
+
 
 
     public void save(DemographicInfo demographicInfo) throws JsonProcessingException {
