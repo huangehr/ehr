@@ -56,7 +56,7 @@ public class ResourcesCustomizeController extends BaseController {
             @RequestParam(value = "metaData", required = false) String metaData,
             @ApiParam(name = "orgCode", value = "机构代码")
             @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(name = "appId", value = "机构代码")
+            @ApiParam(name = "appId", value = "应用ID")
             @RequestParam(value = "appId") String appId,
             @ApiParam(name = "queryCondition", value = "查询条件")
             @RequestParam(value = "queryCondition", required = false) String queryCondition,
@@ -81,17 +81,31 @@ public class ResourcesCustomizeController extends BaseController {
 
     @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.POST)
     @ApiOperation("自定义资源视图保存")
-    public Envelop customizeUpdate(
+    public Envelop customizeCreate(
             @ApiParam(name="dataJson",value="JSON对象参数")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
         try {
-            envelop = resourcesCustomizeClient.customizeUpdate(dataJson);
+            envelop = resourcesCustomizeClient.customizeCreate(dataJson);
         }catch (Exception e){
             e.printStackTrace();
-            envelop.setSuccessFlg(false);
         }
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.PUT)
+    @ApiOperation("自定义视图搜索条件更新")
+    public Envelop customizeUpdate(
+            @ApiParam(name="dataJson",value="JSON对象参数")
+            @RequestParam(value="dataJson") String dataJson) throws  Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            envelop = resourcesCustomizeClient.customizeUpdate(dataJson);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return envelop;
+    }
 }

@@ -44,7 +44,8 @@ public enum BizObject {
     RolesResource((short)0x0033),
     RolesResourceMetadata((short)0x0034),
     OrgResource((short)0x0035),
-    OrgResourceMetadata((short)0x0036);
+    OrgResourceMetadata((short)0x0036),
+    ResourcesDefaultQuery((short)0x0037),;
 
 
 

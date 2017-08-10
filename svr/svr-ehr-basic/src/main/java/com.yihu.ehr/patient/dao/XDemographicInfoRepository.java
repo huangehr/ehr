@@ -18,4 +18,8 @@ public interface XDemographicInfoRepository extends PagingAndSortingRepository<D
     @Query("select demographicInfo from DemographicInfo demographicInfo where 1=1")
     public List<DemographicInfo> getOrgByCode(@Param("orgCode") String orgCode);
 
+    @Query("select demographicInfo from DemographicInfo demographicInfo where demographicInfo.telephoneNo=:telephoneNo")
+    public List<DemographicInfo> getDemographicInfoByTelephoneNo(@Param("telephoneNo") String telephoneNo);
+
+
 }

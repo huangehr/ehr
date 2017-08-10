@@ -1,6 +1,7 @@
 package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.model.App;
+import com.yihu.ehr.apps.model.UserApp;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.SQLQuery;
@@ -26,7 +27,8 @@ import java.util.Random;
 public class AppService extends BaseJpaService<App, XAppRepository> {
     private static final int AppIdLength = 10;
     private static final int AppSecretLength = 16;
-
+    @Autowired
+    private XUserAppRepository userAppRepository;
     @Autowired
     private XAppRepository appRepo;
     public AppService() {
@@ -83,8 +85,26 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
 
     public void checkStatus(String appId, String status) {
         App app = appRepo.getOne(appId);
+        //开启：Approved；禁用：Forbidden;
         app.setStatus(status);
         appRepo.save(app);
+        //是否显示showFlag
+        String showFlag="1";
+        if(status.equals("Forbidden")){
+            showFlag="0";
+        }
+
+        List<UserApp> userAppList = findByAppId(appId);
+        if(userAppList != null) {
+            for (UserApp userApp : userAppList) {
+                userApp.setShowFlag(Integer.parseInt(showFlag));
+               userAppRepository.save(userApp);
+            }
+        }
+    }
+
+    public List<UserApp> findByAppId(String appId){
+        return  userAppRepository.findByAppId(appId);
     }
 
     public boolean findByIdAndSecret(String appId, String secret) {
@@ -104,7 +124,7 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
                         " b.source_type as sourceType, b.release_flag as releaseFlag" +
                         " FROM apps b " +
                         "LEFT JOIN user_app m on m.app_id=b.id " +
-                        "WHERE b.catalog= :catalog AND m.user_id=:userId " +
+                        "WHERE b.catalog= :catalog AND m.user_id=:userId AND m.show_flag='1'" +
                         ") p ORDER BY p.id";
 
         SQLQuery query = currentSession().createSQLQuery(sql);

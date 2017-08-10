@@ -68,6 +68,38 @@ public class ResourcesCustomizeService extends BaseJpaService<RsResources, Resou
      */
     public List<Map<String, Object>> getCustomizeList(String filters) {
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> baseMap = new HashMap<String, Object>();
+        List<Map<String, String>> baseList = new ArrayList<Map<String, String>>();
+        /**
+         * 处理基本数据
+         */
+        Map<String, String> baseMap1 = new HashMap<String, String>();
+        baseMap1.put("code", "event_date");
+        baseMap1.put("name", "时间");
+        baseList.add(baseMap1);
+        Map<String, String> baseMap2 = new HashMap<String, String>();
+        baseMap2.put("code", "org_name");
+        baseMap2.put("name", "机构名称");
+        baseList.add(baseMap2);
+        Map<String, String> baseMap3 = new HashMap<String, String>();
+        baseMap3.put("code", "org_code");
+        baseMap3.put("name", "机构编号");
+        baseList.add(baseMap3);
+        Map<String, String> baseMap4 = new HashMap<String, String>();
+        baseMap4.put("code", "demographic_id");
+        baseMap4.put("name", "病人身份证号码");
+        baseList.add(baseMap4);
+        Map<String, String> baseMap5 = new HashMap<String, String>();
+        baseMap5.put("code", "patient_name");
+        baseMap5.put("name", "病人姓名");
+        baseList.add(baseMap5);
+        Map<String, String> baseMap6 = new HashMap<String, String>();
+        baseMap6.put("code", "event_type");
+        baseMap6.put("name", "事件类型");
+        baseList.add(baseMap6);
+        baseMap.put("level", "0");
+        baseMap.put("baseInfo", baseList);
+        resultList.add(baseMap);
         List<RsResources> rrList = findMasterList();
         if(rrList != null) {
             for(RsResources rsResources : rrList) {
@@ -85,6 +117,9 @@ public class ResourcesCustomizeService extends BaseJpaService<RsResources, Resou
                         metadataMap.put("name", rsMetadata.getName());
                         metadataMap.put("metaDataStdCode", rsMetadata.getStdCode());
                         metadataMap.put("dictCode", rsMetadata.getDictCode());
+                        metadataMap.put("description", rsMetadata.getDescription());
+                        metadataMap.put("groupData", "");
+                        metadataMap.put("groupType", "");
                         metadataList.add(metadataMap);
                     }
                     masterMap.put("metaDataList", metadataList);

@@ -39,8 +39,12 @@ public interface ResourcesCustomizeClient {
 
     @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.POST)
     @ApiOperation("自定义资源视图保存")
-    Envelop customizeUpdate(
+    Envelop customizeCreate(
             @RequestParam(value = "dataJson") String dataJson);
 
+    @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.PUT)
+    @ApiOperation("自定义视图搜索条件更新")
+    Envelop customizeUpdate(
+            @RequestParam(value = "dataJson") String dataJson);
 
 }

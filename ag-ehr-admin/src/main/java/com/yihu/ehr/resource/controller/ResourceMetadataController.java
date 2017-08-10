@@ -193,7 +193,7 @@ public class ResourceMetadataController extends BaseController {
 
             List<RsResourceMetadataModel> rsResourceMetadataModels = getRsMetadata(rsMetadatas,filters,page,size);
 
-            Envelop envelop = getResult(rsResourceMetadataModels, getTotalCount(responseEntity), page, size);
+            Envelop envelop = getResult(rsResourceMetadataModels, rsResourceMetadataModels.size(), page, size);
             return envelop;
         }
         catch (Exception e)
