@@ -55,4 +55,9 @@ public interface TjQuotaClient {
     boolean hasConfigDimension(
             @ApiParam(name = "quotaCode", value = "指标编码")
             @RequestParam(value = "quotaCode") String quotaCode);
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaByCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据Code获取指标")
+    public MTjQuotaModel getByCode(@RequestParam(value = "code") String code) ;
+
 }
