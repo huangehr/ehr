@@ -22,6 +22,7 @@ public class RsMetadata {
     private String description;
     private String valid;
     private int dictId;
+    private Integer dataSource;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -112,5 +113,14 @@ public class RsMetadata {
     }
     public void setValid(String valid) {
         this.valid = valid;
+    }
+
+    @Column(name="data_source")
+    public Integer getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(Integer dataSource) {
+        this.dataSource = dataSource;
     }
 }
