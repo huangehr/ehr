@@ -41,4 +41,9 @@ public class TjQuotaChartService extends BaseJpaService<TjQuotaChart, XTjQuotaCh
         List<TjQuotaChart> tjQuotaChart = xTjQuotaChartRepository.getByQuotaCode(quotaCode);
         return tjQuotaChart;
     }
+
+    public List<Integer> getChartTypeByQuotaCode(String quotaCode) {
+        List<Integer> chartTypeList = xTjQuotaChartRepository.findByQuotaCode(quotaCode);
+        return chartTypeList;
+    }
 }

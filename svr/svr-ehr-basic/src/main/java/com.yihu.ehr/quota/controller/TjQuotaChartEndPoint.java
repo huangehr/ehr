@@ -128,4 +128,11 @@ public class TjQuotaChartEndPoint extends EnvelopRestEndPoint {
         return listResult;
     }
 
+    @RequestMapping(value = "tj/getChartTypeByQuotaCode", method = RequestMethod.GET)
+    @ApiOperation(value = "获取所有选中的图表")
+    public List<Integer> getChartTypeByQuotaCode(
+            @RequestParam(value = "quotaCode", required = false) String quotaCode) {
+        List<Integer> chartTypeList = tjQuotaChartService.getChartTypeByQuotaCode(quotaCode);
+        return chartTypeList;
+    }
 }
