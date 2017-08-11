@@ -122,11 +122,13 @@ public class ServiceApi {
         public static final String CategoryExitSelfAndChild = "/resources/categories/parent";
 
         /**
-         * 自定义资源服务
+         * 综合查询服务
          */
-        public static final String CustomizeList = "/resources/customize_list";
-        public static final String CustomizeData = "/resources/customize_data";
-        public static final String CustomizeUpdate = "/resources/customize_update";
+        public static final String IntMetadataList = "/resources/integrated/metadata_list";
+        public static final String IntMetadataData = "/resources/integrated/metadata_data";
+        public static final String IntQuotaList = "/resources/integrated/quota_list";
+        public static final String IntResourceUpdate = "/resources/integrated/resource_update";
+        public static final String IntResourceQueryUpdate = "/resources/integrated/resource_query_update";
 
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
