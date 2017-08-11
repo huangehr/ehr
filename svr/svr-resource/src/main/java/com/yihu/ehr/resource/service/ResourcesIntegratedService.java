@@ -1,7 +1,8 @@
 package com.yihu.ehr.resource.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.entity.health.HealthBusiness;
+import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.RsMetadata;
@@ -14,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.java2d.cmm.kcms.KcmsServiceProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +29,7 @@ import java.util.regex.Pattern;
  */
 @Service
 @Transactional
-public class ResourcesCustomizeService extends BaseJpaService<RsResources, ResourcesDao> {
+public class ResourcesIntegratedService extends BaseJpaService<RsResources, ResourcesDao> {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -35,21 +37,21 @@ public class ResourcesCustomizeService extends BaseJpaService<RsResources, Resou
     private ResourcesQueryService resourcesQueryService;
 
     /**
-     * 获取主体资源列表
+     * 获取档案数据主体列表
      * @return
      */
-    public List<RsResources> findMasterList() {
+    public List<RsResources> findFileMasterList() {
         String sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resources rr where rr.code in (select code from std_data_set_56395d75b854 where multi_record = 0)";
         RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(RsResources.class);
         return this.jdbcTemplate.query(sql, rowMapper);
     }
 
     /**
-     * 根据主体资源获取数据元列表
+     * 根据档案数据主体获取数据元列表
      * @param rsResources
      * @return
      */
-    public List<RsMetadata> findMetadataList(RsResources rsResources) {
+    public List<RsMetadata> findFileMetadataList(RsResources rsResources) {
         String sql = "";
         RowMapper rowMapper = null;
         if(rsResources != null) {
@@ -62,11 +64,88 @@ public class ResourcesCustomizeService extends BaseJpaService<RsResources, Resou
     }
 
     /**
-     * 获取自定义资源列表树
+     * 根据parentId获取指标分类主体列表
+     * @return
+     */
+    public List<HealthBusiness> findHealthBusinessList(int parentId) {
+        String sql = "select * from health_business where parent_id = " + parentId;
+        RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(HealthBusiness.class);
+        return this.jdbcTemplate.query(sql, rowMapper);
+    }
+
+    /**
+     * 根据指标分类获取指标
+     * @param healthBusiness
+     * @return
+     */
+    public List<TjQuota> findQuotaMetadataList(HealthBusiness healthBusiness) {
+        String sql = "";
+        RowMapper rowMapper = null;
+        if(healthBusiness != null) {
+            sql = "select * from tj_quota tj where tj.quota_type = " + healthBusiness.getId();
+            rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(TjQuota.class);
+            return this.jdbcTemplate.query(sql, rowMapper);
+        }else {
+            return null;
+        }
+    }
+
+    /**
+     * 递归获取指标分类包含的子集分类和指标
+     * @param healthBusiness
+     * @return
+     */
+    public Map<String, Object> getTreeMap(HealthBusiness healthBusiness, int level) {
+        Map<String, Object> masterMap = new HashMap<String, Object>();
+        if(healthBusiness != null) {
+            /**
+             * 处理自身数据
+             */
+            masterMap.put("level", level);
+            masterMap.put("id", healthBusiness.getId());
+            masterMap.put("name", healthBusiness.getName());
+            masterMap.put("parent_id", healthBusiness.getParentId());
+            masterMap.put("code", healthBusiness.getCode());
+            masterMap.put("note",healthBusiness.getNote());
+            List<TjQuota> tList = findQuotaMetadataList(healthBusiness);
+            if(tList != null) {
+                List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();
+                for(TjQuota tjQuota : tList) {
+                    Map<String, Object> detailMap = new HashMap<String, Object>();
+                    detailMap.put("level", level + 1);
+                    detailMap.put("id", tjQuota.getId());
+                    detailMap.put("name", tjQuota.getName());
+                    detailMap.put("code", tjQuota.getCode());
+                    detailMap.put("status", tjQuota.getStatus());
+                    detailMap.put("data_level", tjQuota.getDataLevel());
+                    detailMap.put("quota_type", tjQuota.getQuotaType());
+                    detailList.add(detailMap);
+                }
+                masterMap.put("detailList", detailList);
+            }else {
+                masterMap.put("detailList", null);
+            }
+            /**
+             * 处理子集数据
+             */
+            List<HealthBusiness> hList = findHealthBusinessList(healthBusiness.getId());
+            if(hList != null) {
+                List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
+                for(HealthBusiness healthBusiness1: hList) {
+                    childList.add(getTreeMap(healthBusiness1, level + 1));
+                }
+                masterMap.put("child", childList);
+            }
+        }
+        return masterMap;
+    }
+
+    /**
+     * 综合查询档案数据列表树
      * @param filters
      * @return
      */
-    public List<Map<String, Object>> getCustomizeList(String filters) {
+    public List<Map<String, Object>> getMetadataList(String filters) {
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
         Map<String, Object> baseMap = new HashMap<String, Object>();
         List<Map<String, String>> baseList = new ArrayList<Map<String, String>>();
@@ -100,14 +179,14 @@ public class ResourcesCustomizeService extends BaseJpaService<RsResources, Resou
         baseMap.put("level", "0");
         baseMap.put("baseInfo", baseList);
         resultList.add(baseMap);
-        List<RsResources> rrList = findMasterList();
+        List<RsResources> rrList = findFileMasterList();
         if(rrList != null) {
             for(RsResources rsResources : rrList) {
                 Map<String, Object> masterMap = new HashMap<String, Object>();
                 masterMap.put("code", rsResources.getCode());
                 masterMap.put("name", rsResources.getName());
                 masterMap.put("level", "1");
-                List<RsMetadata> rmList = findMetadataList(rsResources);
+                List<RsMetadata> rmList = findFileMetadataList(rsResources);
                 if(rmList != null) {
                     List<Map<String, Object>> metadataList = new ArrayList<Map<String, Object>>();
                     for(RsMetadata rsMetadata : rmList) {
@@ -133,10 +212,10 @@ public class ResourcesCustomizeService extends BaseJpaService<RsResources, Resou
     }
 
     /**
-     * 获取自定义资源数据
+     * 综合查询档案数据检索
      * @return
      */
-    public List<Map<String, Object>> getCustomizeData(String resourcesCode, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception{
+    public List<Map<String, Object>> searchMetadataData(String resourcesCode, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception{
         Pattern pattern = Pattern.compile("\\[.+?\\]");
         if(resourcesCode != null) {
             Matcher rcMatcher = pattern.matcher(resourcesCode);
@@ -166,5 +245,25 @@ public class ResourcesCustomizeService extends BaseJpaService<RsResources, Resou
         }
         Envelop envelop = resourcesQueryService.getCustomizeData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
         return envelop.getDetailModelList();
+    }
+
+    /**
+     * 综合查询指标统计列表树
+     * @param filters
+     * @return
+     */
+    public List<Map<String, Object>> getQuotaList(String filters) {
+        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+        /**
+         * 获取最上级目录
+         */
+        List<HealthBusiness> parentList = findHealthBusinessList(0);
+        if(parentList != null) {
+            for(HealthBusiness healthBusiness : parentList) {
+                Map<String, Object> childMap = getTreeMap(healthBusiness, 0);
+                resultList.add(childMap);
+            }
+        }
+        return resultList;
     }
 }

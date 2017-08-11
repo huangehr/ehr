@@ -178,7 +178,7 @@ public class ResourcesQueryService  {
     }
 
     /**
-     * 自定义资源浏览数据筛选
+     * 综合查询档案数据检索
      * @return
      */
     public Envelop getCustomizeData(String resourcesCodes, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception {
