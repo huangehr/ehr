@@ -65,4 +65,9 @@ public class HealthBusinessService extends BaseJpaService<HealthBusiness, XHealt
     public List<HealthBusiness> getHealthBusinessOfChild(){
         return healthBusinessRepository.getHealthBusinessOfChild();
     }
+
+    public List<HealthBusiness> getHealthBusinessChild(){
+        return healthBusinessRepository.getHealthBusinessChild();
+    }
+
 }

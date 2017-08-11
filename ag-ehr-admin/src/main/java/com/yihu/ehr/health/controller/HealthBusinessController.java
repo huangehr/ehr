@@ -252,4 +252,21 @@ public class HealthBusinessController extends BaseController {
             return failedSystem();
         }
     }
+
+    @ApiOperation(value = "获取指标分类子类列表")
+    @RequestMapping(value = "/healthBusiness/getHealthBusinessChild", method = RequestMethod.GET)
+    public Envelop getHealthBusinessChild() {
+        try {
+            Envelop envelop = new Envelop();
+            envelop.setDetailModelList(healthBusinessClient.getHealthBusinessChild());
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
 }
