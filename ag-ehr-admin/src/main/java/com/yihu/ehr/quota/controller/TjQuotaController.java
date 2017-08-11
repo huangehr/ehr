@@ -1,6 +1,7 @@
 package com.yihu.ehr.quota.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.tj.TjQuotaChartModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.health.service.HealthBusinessClient;
@@ -10,6 +11,7 @@ import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.health.MHealthBusiness;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
@@ -23,29 +25,28 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/6/9.
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api( value = "TjQuota", description = "统计表", tags = {"统计指标管理-统计表"})
+@Api( value = "TjQuota", description = "统计指标表", tags = {"统计指标管理-统计指标表"})
 public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
-    TjQuotaClient tjQuotaClient;
+    private TjQuotaClient tjQuotaClient;
     @Autowired
-    TjQuotaJobClient tjQuotaJobClient;
+    private TjQuotaJobClient tjQuotaJobClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
     @Autowired
-    HealthBusinessClient healthBusinessClient;
+    private HealthBusinessClient healthBusinessClient;
+    @Autowired
+    private TjQuotaChartClient tjQuotaChartClient;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
-    @ApiOperation(value = "统计表")
+    @ApiOperation(value = "统计指标表")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -100,7 +101,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
 
 
     @RequestMapping(value = ServiceApi.TJ.AddTjQuota, method = RequestMethod.POST)
-    @ApiOperation(value = "新增统计")
+    @ApiOperation(value = "新增统计指标")
     public Envelop add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
@@ -118,7 +119,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     }
 
     @RequestMapping(value = ServiceApi.TJ.DeleteTjQuota, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除统计")
+    @ApiOperation(value = "删除统计指标")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) {
@@ -127,7 +128,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             if(result.getCode() == 200){
                 return successMsg(result.getMessage());
             }else{
-                return failed("统计源删除失败！");
+                return failed("统计指标删除失败！");
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -198,4 +199,85 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             @RequestParam(value = "quotaCode") String quotaCode) {
         return tjQuotaClient.hasConfigDimension(quotaCode);
     }
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaChartList, method = RequestMethod.GET)
+    @ApiOperation(value = "指标图表列表")
+    public Envelop getTjQuotaChartList(
+            @ApiParam(name = "dictfilter", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "dictfilter", required = false) String dictfilter,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page){
+
+        ListResult listResult = conventionalDictClient.searchMConventionalDict(dictfilter, sorts, size, page);
+
+        List<MConventionalDict> mainModelList = new ArrayList<>();
+        if (listResult.getTotalCount() != 0) {
+            List<Map<String, Object>> modelList = listResult.getDetailModelList();
+            for (Map<String, Object> map : modelList) {
+                MConventionalDict tjDimensionSlaveModel = objectMapper.convertValue(map, MConventionalDict.class);
+                mainModelList.add(tjDimensionSlaveModel);
+            }
+            Map<String,String> dictMap = new HashMap<>();
+            for(MConventionalDict dict:mainModelList){
+                dictMap.put(dict.getCode(),dict.getValue());
+            }
+
+            ListResult listResult2 = tjQuotaChartClient.search(null, filters, sorts, size, page);
+            List<MConventionalDict> checkedConventionalDicts = new ArrayList<>();
+            if (listResult2.getTotalCount() != 0) {
+                List<Map<String, Object>> modelList2 = listResult2.getDetailModelList();
+                for (Map<String, Object> map : modelList2) {
+                    TjQuotaChartModel tjQuotaChartModel = objectMapper.convertValue(map, TjQuotaChartModel.class);
+                    MConventionalDict mConventionalDict = new MConventionalDict();
+                    if(dictMap.containsKey(tjQuotaChartModel.getChartId())){
+                        mConventionalDict.setCode(tjQuotaChartModel.getChartId());
+                        mConventionalDict.setValue(dictMap.get(tjQuotaChartModel.getChartId()));
+                        checkedConventionalDicts.add(mConventionalDict);
+                    }
+                }
+            }
+            List<String> list = getAllCheckedTjQuotaChart(filters);
+            for (int i = 0; i < list.size(); i++) {
+                if (list.contains(mainModelList.get(i).getCode())) {
+                    mainModelList.get(i).setChecked(true);
+                } else {
+                    mainModelList.get(i).setChecked(false);
+                }
+            }
+            Envelop result = getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            result.setObj(checkedConventionalDicts);
+            return result;
+        } else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.GetAllTjQuotaChart, method = RequestMethod.GET)
+    @ApiOperation(value = "获取所有选中的图表")
+    public List<String> getAllCheckedTjQuotaChart(String filters) {
+        List<String> list = new ArrayList<>();
+        ListResult listResult = tjQuotaChartClient.getTjQuotaChartAll(filters);
+        List<TjQuotaChartModel>  tjQuotaChartModels = new ArrayList<>();
+        if (listResult.getTotalCount() != 0) {
+            List<Map<String, Object>> modelList = listResult.getDetailModelList();
+            for (Map<String, Object> map : modelList) {
+                TjQuotaChartModel tjQuotaChartModel = objectMapper.convertValue(map, TjQuotaChartModel.class);
+                tjQuotaChartModels.add(tjQuotaChartModel);
+            }
+            for (int i=0; i<tjQuotaChartModels.size(); i++) {
+                list.add(tjQuotaChartModels.get(i).getChartId());
+            }
+        }
+        return list;
+    }
+
+
+
 }

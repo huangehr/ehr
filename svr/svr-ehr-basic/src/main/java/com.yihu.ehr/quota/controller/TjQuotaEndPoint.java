@@ -48,7 +48,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     TjQuotaDimensionMainService tjQuotaDimensionMainService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询统计表")
+    @ApiOperation(value = "根据查询条件查询统计指标表")
     public ListResult getTjDataSaveList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -80,15 +80,21 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.TJ.AddTjQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增&修改统计表")
+    @ApiOperation(value = "新增&修改统计指标表")
     public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
-        TjQuotaDataSource tjquotaDataSource = convertToModel(tjQuotaModel.getTjQuotaDataSourceModel(), TjQuotaDataSource.class);
-        TjQuotaDataSave tjQuotaDataSave = convertToModel(tjQuotaModel.getTjQuotaDataSaveModel(), TjQuotaDataSave.class);
-        tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
-        tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
+        TjQuotaDataSource tjquotaDataSource = null;
+        TjQuotaDataSave tjQuotaDataSave = null;
+        if(tjQuotaModel.getTjQuotaDataSourceModel() != null){
+            tjquotaDataSource = convertToModel(tjQuotaModel.getTjQuotaDataSourceModel(), TjQuotaDataSource.class);
+            tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
+        }
+        if(tjQuotaModel.getTjQuotaDataSourceModel() != null){
+            tjQuotaDataSave = convertToModel(tjQuotaModel.getTjQuotaDataSaveModel(), TjQuotaDataSave.class);
+            tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
+        }
         TjQuota tjQuota = convertToModel(tjQuotaModel, TjQuota.class);
         String execTime = tjQuotaModel.getExecTime();
         tjQuota.setExecTime(DateUtil.strToDate(execTime));
@@ -104,7 +110,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
 
 
     @RequestMapping(value = ServiceApi.TJ.DeleteTjQuota, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除统计表")
+    @ApiOperation(value = "删除统计指标表")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
@@ -112,7 +118,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         TjQuota tjQuota = tjQuotaService.getById(id);
         tjQuota.setStatus(-1);
         tjQuotaService.save(tjQuota);
-        return Result.success("统计表删除成功！");
+        return Result.success("统计指标表删除成功！");
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaById, method = RequestMethod.GET)

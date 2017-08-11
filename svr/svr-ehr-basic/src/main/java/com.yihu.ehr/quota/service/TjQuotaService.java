@@ -23,10 +23,14 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
     TjQuotaDataSaveService tjQuotaDataSaveService;
 
     public void saves(TjQuota quota, TjQuotaDataSource dataSource, TjQuotaDataSave dataSave) {
-        tjQuotaDataSourceService.deleteByQuotaCode(dataSource.getQuotaCode());
-        tjQuotaDataSaveService.deleteByQuotaCode(dataSave.getQuotaCode());
-        tjQuotaDataSourceService.save(dataSource);
-        tjQuotaDataSaveService.save(dataSave);
+        if(dataSource != null){
+            tjQuotaDataSourceService.deleteByQuotaCode(dataSource.getQuotaCode());
+            tjQuotaDataSourceService.save(dataSource);
+        }
+        if(dataSave != null){
+            tjQuotaDataSaveService.deleteByQuotaCode(dataSave.getQuotaCode());
+            tjQuotaDataSaveService.save(dataSave);
+        }
         save(quota);
     }
 

@@ -857,6 +857,8 @@ public class ServiceApi {
         public static final String AddTjQuotaDimensionSlave = "/tj/addTjQuotaDimensionSlave";
         public static final String GetTjQuotaDimensionSlaveAll = "/tj/getTjQuotaDimensionSlaveAll";
 
+        public static final String GetTjQuotaChartList = "/tj/getTjQuotaChartList";
+
         public static final String GetTjQuotaLogList = "/tj/getTjQuotaLogList";
         public static final String GetTjDataSaveList = "/tj/getTjDataSaveList";
         public static final String AddTjDataSave = "/tj/addTjDataSave";
@@ -895,6 +897,20 @@ public class ServiceApi {
         public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
 
+        public static final String TjQuotaChart = "/tj/tjQuotaChart";
+        public static final String BatchTjQuotaChart = "/tj/batchTjQuotaChart";
+        public static final String TjQuotaChartId = "/tj/tjQuotaChart/{id}";
+        public static final String GetAllTjQuotaChart = "/tj/getAllTjQuotaChart";
+
+
+
+
+
+
+
+    }
+
+    public static class StasticReport {
 
     }
 
