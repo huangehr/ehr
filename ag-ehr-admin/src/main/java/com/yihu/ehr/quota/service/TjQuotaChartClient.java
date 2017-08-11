@@ -23,7 +23,7 @@ public interface TjQuotaChartClient {
 
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaChart, method = RequestMethod.GET)
-    @ApiOperation(value = "指标输出报表列表")
+    @ApiOperation(value = "指标图表列表")
     ListResult search(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
@@ -33,20 +33,20 @@ public interface TjQuotaChartClient {
 
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaChart, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增/修改指标输出报表")
+    @ApiOperation(value = "新增/修改指标图表")
     ObjectResult add(@RequestBody String model) ;
 
     @RequestMapping(value = ServiceApi.TJ.BatchTjQuotaChart, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "批量新增指标输出报表")
+    @ApiOperation(value = "批量新增指标图表")
     ObjectResult batchAddTjQuotaChart(@RequestBody String model) ;
 
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaChart, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除指标输出报表")
+    @ApiOperation(value = "删除指标图表")
     Result delete(@RequestParam(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaChartId, method = RequestMethod.GET)
-    @ApiOperation(value = "获取指标输出报表信息", notes = "指标输出报表信息")
+    @ApiOperation(value = "获取指标图表信息", notes = "指标图表信息")
     TjQuotaChart getTjQuotaChart(@PathVariable(value = "id") Integer id);
 
     @RequestMapping(value = ServiceApi.TJ.GetAllTjQuotaChart, method = RequestMethod.GET)

@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "TjQuotaChart", description = "指标统计管理", tags = {"指标统计管理--指标输出报表"})
+@Api(value = "TjQuotaChart", description = "指标统计管理", tags = {"指标统计管理--指标图表"})
 public class TjQuotaChartEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -36,7 +36,7 @@ public class TjQuotaChartEndPoint extends EnvelopRestEndPoint {
     TjQuotaChartService tjQuotaChartService;
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaChart, method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询指标输出报表")
+    @ApiOperation(value = "根据查询条件查询指标图表")
     public ListResult getTjQuotaChartList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -68,17 +68,17 @@ public class TjQuotaChartEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaChart, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增&修改指标输出报表")
+    @ApiOperation(value = "新增&修改指标图表")
     public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         TjQuotaChart obj = objectMapper.readValue(model,TjQuotaChart.class);
         obj = tjQuotaChartService.save(obj);
-        return Result.success("指标输出报表更新成功！", obj);
+        return Result.success("指标图表更新成功！", obj);
     }
 
     @RequestMapping(value = ServiceApi.TJ.BatchTjQuotaChart, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增&修改指标输出报表信息")
+    @ApiOperation(value = "新增&修改指标图表信息")
     public ObjectResult batchAddTjQuotaChart(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
@@ -89,12 +89,12 @@ public class TjQuotaChartEndPoint extends EnvelopRestEndPoint {
         for (int i=0; i<list.size(); i++) {
             tjQuotaChartService.save(list.get(i));
         }
-        return Result.success("指标输出报表信息更新成功！", list);
+        return Result.success("指标图表信息更新成功！", list);
     }
 
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaChart, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除指标输出报表")
+    @ApiOperation(value = "删除指标图表")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") String id) throws Exception{
@@ -103,7 +103,7 @@ public class TjQuotaChartEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaChartId, method = RequestMethod.GET)
-    @ApiOperation(value = "获取指标输出报表信息", notes = "获取指标输出报表信息")
+    @ApiOperation(value = "获取指标图表信息", notes = "获取指标图表信息")
     TjQuotaChart getTjDimensionMain(
             @PathVariable(value = "id") Integer id){
         return tjQuotaChartService.getTjQuotaChart(id);
