@@ -235,8 +235,10 @@ public class EsExtract {
             Integer num = map.get(key);
             if(saveModel!=null){
                 saveModel.setResult(num);
-                returnList.add(saveModel);
+            }else{
+                saveModel.setResult(0);
             }
+            returnList.add(saveModel);
         }
     }
 

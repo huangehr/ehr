@@ -27,6 +27,7 @@ public class TjQuotaModel {
 
     private TjQuotaDataSourceModel tjQuotaDataSourceModel;
     private TjQuotaDataSaveModel tjQuotaDataSaveModel;
+    private TjQuotaChartModel tjQuotaChartModel;
 
     public Long getId() {
         return id;
@@ -186,5 +187,13 @@ public class TjQuotaModel {
 
     public void setQuotaTypeName(String quotaTypeName) {
         this.quotaTypeName = quotaTypeName;
+    }
+
+    public TjQuotaChartModel getTjQuotaChartModel() {
+        return tjQuotaChartModel;
+    }
+
+    public void setTjQuotaChartModel(TjQuotaChartModel tjQuotaChartModel) {
+        this.tjQuotaChartModel = tjQuotaChartModel;
     }
 }

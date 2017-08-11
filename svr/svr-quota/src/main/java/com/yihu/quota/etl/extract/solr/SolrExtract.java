@@ -167,8 +167,10 @@ public class SolrExtract {
             Long num = map.get(key);
             if(saveModel != null && num != null){
                 saveModel.setResult(Integer.valueOf(num.toString()));
-                returnList.add(saveModel);
+            }else{
+                saveModel.setResult(0);
             }
+            returnList.add(saveModel);
         }
     }
 
