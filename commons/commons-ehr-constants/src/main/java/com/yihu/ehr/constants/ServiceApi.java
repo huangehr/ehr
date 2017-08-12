@@ -160,6 +160,17 @@ public class ServiceApi {
         public static final String ResourceOrgResMetadataGrants = "/resources/Org_resource/{Org_res_id}/metadata";
         public static final String ResourceOrgRsMetadataGrant = "/resources/Org_resource/metadata/grant";
 
+        /**
+         * 资源报表分类
+         */
+        public static final String RsReportCategory = "/resources/reportCategory/{id}";
+        public static final String RsReportCategoryChildrenByPid = "/resources/reportCategory/getChildrenByPid";
+        public static final String RsReportCategoryTree = "/resources/reportCategoryTree";
+        public static final String RsReportCategoryComboTree = "/resources/reportCategoryComboTree";
+        public static final String RsReportCategories = "/resources/reportCategories";
+        public static final String RsReportCategoryAdd = "/resources/reportCategory/add";
+        public static final String RsReportCategoryUpdate = "/resources/reportCategory/update/{id}";
+        public static final String RsReportCategoryDelete = "/resources/reportCategory/delete/{id}";
 
     }
 
