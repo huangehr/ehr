@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author janseny
  * @version 1.0
@@ -22,4 +24,9 @@ public class TjQuotaDimensionMainService extends BaseJpaService<TjQuotaDimension
     public void deleteByQuotaCode(String quotaCode) {
         tjQuotaDimensionMainRepository.deleteByQuotaCode(quotaCode);
     }
+
+    public List<TjQuotaDimensionMain> getTjQuotaDimensionMainByCode(String code){
+       return tjQuotaDimensionMainRepository.findByQuotaCode(code);
+    }
+
 }
