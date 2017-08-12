@@ -25,17 +25,16 @@ public class ResourcesDefaultQueryService extends BaseJpaService<RsResourcesQuer
     private ResourcesDefaultQueryDao rsQueryDao;
 
     /**
-     * 自定义资源查询条件创建
+     * 资源查询条件创建
      * @param resourcesQuery 资源查询实体
      * @return RsResourcesQuery 资源查询实体
      */
-    public RsResourcesQuery saveResourceQuery(RsResourcesQuery resourcesQuery)
-    {
+    public RsResourcesQuery saveResourceQuery(RsResourcesQuery resourcesQuery) {
         return rsQueryDao.save(resourcesQuery);
     }
 
     /**
-     * 自定义资源查询条件删除
+     * 资源查询条件删除
      *
      * @param id 资源ID
      */
@@ -47,7 +46,27 @@ public class ResourcesDefaultQueryService extends BaseJpaService<RsResourcesQuer
     }
 
     /**
-     * 自定义资源查询条件获取
+     * 根据ID获取自定义资源查询条件
+     *
+     * @param id String Id
+     * @return RsResources
+     */
+    public RsResourcesQuery getResourceQueryById(String id)
+    {
+        return rsQueryDao.findOne(id);
+    }
+
+    /**
+     * 通过资源ID获取查询条件
+     * @param resourcesId
+     * @return
+     */
+    public RsResourcesQuery findByResourcesId(String resourcesId){
+        return rsQueryDao.findByResourcesId(resourcesId);
+    }
+
+    /**
+     * 资源查询条件获取
      *
      * @param sorts 排序
      * @param page 页码
@@ -60,23 +79,11 @@ public class ResourcesDefaultQueryService extends BaseJpaService<RsResourcesQuer
     }
 
     /**
-     * 通过资源ID获取自定义查询条件
-     * @param resourcesId
-     * @return
+     * 根据资源ID删除查询条件
+     * @param resourceId
      */
-    public RsResourcesQuery findByResourcesId(String resourcesId){
-        return rsQueryDao.findByResourcesId(resourcesId);
-    }
-
-    /**
-     * 根据ID获取自定义资源查询条件
-     *
-     * @param id String Id
-     * @return RsResources
-     */
-    public RsResourcesQuery getResourceQueryById(String id)
-    {
-        return rsQueryDao.findOne(id);
+    public void deleteByResourcesId(String resourceId) {
+        rsQueryDao.deleteByResourcesId(resourceId);
     }
 
 }

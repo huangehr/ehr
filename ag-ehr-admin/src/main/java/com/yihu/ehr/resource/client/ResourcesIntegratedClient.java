@@ -19,16 +19,16 @@ import java.util.Map;
 @FeignClient(value = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
-public interface ResourcesCustomizeClient {
+public interface ResourcesIntegratedClient {
 
-    @RequestMapping(value = ServiceApi.Resources.CustomizeList, method = RequestMethod.GET)
-    @ApiOperation("获取自定义资源列表树")
-    List<Map<String, Object>> getCustomizeList(
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
+    @ApiOperation("综合查询档案数据列表树")
+    List<Map<String, Object>> getMetadataList(
             @RequestParam(value = "filters", required = false) String filters);
 
-    @RequestMapping(value = ServiceApi.Resources.CustomizeData, method = RequestMethod.GET)
-    @ApiOperation("获取自定义资源数据")
-    List<Map<String, Object>> getCustomizeData(
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
+    @ApiOperation("综合查询档案数据检索")
+    List<Map<String, Object>> searchMetadataData(
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @RequestParam(value = "metaData", required = false) String metaData,
             @RequestParam(value = "orgCode", required = false) String orgCode,
@@ -37,14 +37,19 @@ public interface ResourcesCustomizeClient {
             @RequestParam(value = "page",required = false) Integer page,
             @RequestParam(value = "size",required = false) Integer size);
 
-    @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.POST)
-    @ApiOperation("自定义资源视图保存")
-    Envelop customizeCreate(
+    @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
+    @ApiOperation("综合查询指标统计列表树")
+    List<Map<String, Object>> getQuotaList(
+            @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
+    @ApiOperation("综合查询视图保存")
+    Envelop updateResource(
             @RequestParam(value = "dataJson") String dataJson);
 
-    @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.PUT)
-    @ApiOperation("自定义视图搜索条件更新")
-    Envelop customizeUpdate(
+    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
+    @ApiOperation("综合查询搜索条件更新")
+    Envelop updateResourceQuery(
             @RequestParam(value = "dataJson") String dataJson);
 
 }
