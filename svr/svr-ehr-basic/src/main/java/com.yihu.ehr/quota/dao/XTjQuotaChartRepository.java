@@ -23,4 +23,7 @@ public interface XTjQuotaChartRepository extends PagingAndSortingRepository<TjQu
     @Modifying
     @Query("delete from TjQuotaChart TjQuotaChart where TjQuotaChart.quotaCode = :quotaCode")
     int deleteByQuotaCode(@Param("quotaCode") String quotaCode);
+
+    @Query("select tc.chartId from TjQuotaChart tc where tc.quotaCode = :quotaCode")
+    List<Integer> findByQuotaCode(@Param("quotaCode") String quotaCode);
 }

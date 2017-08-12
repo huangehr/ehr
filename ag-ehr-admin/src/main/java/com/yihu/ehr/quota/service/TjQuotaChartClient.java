@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+
 /**
  * Created by janseny on 2017/8/3.
  */
@@ -53,5 +55,10 @@ public interface TjQuotaChartClient {
     @ApiOperation(value = "获取所有选中的图表")
     ListResult getTjQuotaChartAll(
             @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value ="/tj/getChartTypeByQuotaCode" , method = RequestMethod.GET)
+    @ApiOperation(value = "获取所有选中的图表")
+    List<Integer> getChartTypeByQuotaCode(
+            @RequestParam(value = "quotaCode", required = false) String quotaCode);
 
 }

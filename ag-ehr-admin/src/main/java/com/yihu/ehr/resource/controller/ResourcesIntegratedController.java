@@ -3,7 +3,7 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.resource.client.ResourcesCustomizeClient;
+import com.yihu.ehr.resource.client.ResourcesIntegratedClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,20 +21,20 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "resourceCustomize", description = "自定义资源服务接口", tags = {"资源管理-自定义资源服务接口"})
-public class ResourcesCustomizeController extends BaseController {
+@Api(value = "resourceIntegrated", description = "资源综合查询数据服务接口", tags = {"资源管理-资源综合查询数据服务接口"})
+public class ResourcesIntegratedController extends BaseController {
 
     @Autowired
-    private ResourcesCustomizeClient resourcesCustomizeClient;
+    private ResourcesIntegratedClient resourcesIntegratedClient;
 
-    @RequestMapping(value = ServiceApi.Resources.CustomizeList, method = RequestMethod.GET)
-    @ApiOperation("获取自定义资源列表树")
-    public Envelop getCustomizeList(
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
+    @ApiOperation("综合查询档案数据列表树")
+    public Envelop getMetadataList(
             @ApiParam(name="filters",value="过滤条件",defaultValue = "")
             @RequestParam(value="filters",required = false) String filters) throws  Exception {
         Envelop envelop = new Envelop();
         try {
-            List<Map<String,Object>> resources = resourcesCustomizeClient.getCustomizeList(filters);
+            List<Map<String,Object>> resources = resourcesIntegratedClient.getMetadataList(filters);
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(resources);
             if(resources != null) {
@@ -47,9 +47,9 @@ public class ResourcesCustomizeController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.CustomizeData, method = RequestMethod.GET)
-    @ApiOperation("获取自定义资源数据")
-    public Envelop getCustomizeData(
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
+    @ApiOperation("综合查询档案数据检索")
+    public Envelop searchMetadataData(
             @ApiParam(name = "resourcesCode", value = "资源代码")
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @ApiParam(name = "metaData", value = "数据元")
@@ -66,7 +66,7 @@ public class ResourcesCustomizeController extends BaseController {
             @RequestParam(value = "size", required = false) Integer size) throws  Exception {
         Envelop envelop = new Envelop();
         try {
-            List<Map<String,Object>> resources = resourcesCustomizeClient.getCustomizeData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
+            List<Map<String,Object>> resources = resourcesIntegratedClient.searchMetadataData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(resources);
             if(resources != null) {
@@ -79,33 +79,55 @@ public class ResourcesCustomizeController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.POST)
-    @ApiOperation("自定义资源视图保存")
-    public Envelop customizeCreate(
+    @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
+    @ApiOperation("综合查询指标统计列表树")
+    public Envelop getStatisticsList(
+            @ApiParam(name="filters",value="过滤条件",defaultValue = "")
+            @RequestParam(value="filters",required = false) String filters) throws  Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<Map<String,Object>> quotas = resourcesIntegratedClient.getQuotaList(filters);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(quotas);
+            if(quotas != null) {
+                envelop.setTotalCount(quotas.size());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
+    @ApiOperation("综合查询视图保存")
+    public Envelop updateResource(
             @ApiParam(name="dataJson",value="JSON对象参数")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            envelop = resourcesCustomizeClient.customizeCreate(dataJson);
+            envelop = resourcesIntegratedClient.updateResource(dataJson);
         }catch (Exception e){
             e.printStackTrace();
         }
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.CustomizeUpdate, method = RequestMethod.PUT)
-    @ApiOperation("自定义视图搜索条件更新")
-    public Envelop customizeUpdate(
+    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
+    @ApiOperation("综合查询搜索条件更新")
+    public Envelop updateResourceQuery(
             @ApiParam(name="dataJson",value="JSON对象参数")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
-            envelop = resourcesCustomizeClient.customizeUpdate(dataJson);
+            envelop = resourcesIntegratedClient.updateResourceQuery(dataJson);
         }catch (Exception e){
             e.printStackTrace();
         }
         return envelop;
     }
+
+
 }

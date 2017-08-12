@@ -8,6 +8,7 @@ import com.yihu.ehr.entity.quota.*;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.tj.MQuotaConfigModel;
 import com.yihu.ehr.model.tj.MTjQuotaDataSaveModel;
 import com.yihu.ehr.model.tj.MTjQuotaDataSourceModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
@@ -212,5 +213,30 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             return true;
         }
         return false;
+    }
+
+    @RequestMapping(value = "/tj/quotaConfigInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "分页获取指标配置")
+    public ListResult quotaConfigInfo(
+            @ApiParam(name = "quotaName", value = "指标名称", defaultValue = "")
+            @RequestParam(value = "quotaName", required = false) String quotaName,
+            @ApiParam(name = "page", value = "页码",defaultValue = "1")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "pageSize", value = "每页大小",defaultValue = "15")
+            @RequestParam(value = "pageSize") Integer pageSize) {
+        ListResult listResult = new ListResult();
+        List<MQuotaConfigModel> quotaConfigList = tjQuotaService.getQuotaConfig(quotaName, page, pageSize);
+        if(quotaConfigList != null){
+            listResult.setDetailModelList(quotaConfigList);
+            listResult.setTotalCount((int)tjQuotaService.getCountInfo(quotaName));
+            listResult.setCode(200);
+            listResult.setCurrPage(page);
+            listResult.setPageSize(pageSize);
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
+        }
+        return listResult;
     }
 }
