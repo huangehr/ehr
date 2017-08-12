@@ -21,6 +21,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
+import org.joda.time.DateTime;
 import org.nlpcn.es4sql.domain.Select;
 import org.nlpcn.es4sql.parse.ElasticSqlExprParser;
 import org.nlpcn.es4sql.parse.SqlParser;
@@ -163,8 +164,8 @@ public class EsExtract {
         one.setAreaLevel(areaLevel);
         one.setResult(0);
         one.setCreateTime(new Date());
-        LocalDate today = LocalDate.now();
-        one.setQuotaDate(today.toString());
+        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+        one.setQuotaDate(yesterDay);
         one.setQuotaCode(quotaVo.getCode());
         one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);
@@ -234,8 +235,10 @@ public class EsExtract {
             Integer num = map.get(key);
             if(saveModel!=null){
                 saveModel.setResult(num);
-                returnList.add(saveModel);
+            }else{
+                saveModel.setResult(0);
             }
+            returnList.add(saveModel);
         }
     }
 

@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(description = "指标统计 -指标控制")
+@Api(description = "指标统计 -指标控制入口")
 public class QuotaController extends BaseController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class QuotaController extends BaseController {
      * @param id
      * @return
      */
-    @ApiOperation(value = "获取指标执行结果")
+    @ApiOperation(value = "获取指标执行结果分页")
     @RequestMapping(value = "/tj/tjGetQuotaResult", method = RequestMethod.GET)
     public Envelop getQuotaResult(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
@@ -94,11 +94,13 @@ public class QuotaController extends BaseController {
             @ApiParam(name = "id", value = "指标任务ID", required = true)
             @RequestParam(value = "id" , required = true) int id,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension
     ) {
         Envelop envelop = new Envelop();
         try {
-            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters);
+            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters,dimension);
             envelop.setSuccessFlg(true);
             envelop.setObj(quotaReport);
             return envelop;
@@ -121,11 +123,13 @@ public class QuotaController extends BaseController {
             @ApiParam(name = "id", value = "指标任务ID", required = true)
             @RequestParam(value = "id" , required = true) int id,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension
     ) {
         Envelop envelop = new Envelop();
         try {
-            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters);
+            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters,dimension);
             envelop.setSuccessFlg(true);
             envelop.setObj(quotaReport);
             return envelop;
@@ -148,12 +152,16 @@ public class QuotaController extends BaseController {
             @ApiParam(name = "id", value = "指标任务ID", required = true)
             @RequestParam(value = "id" , required = true) int id,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension
+
+            //如何根据不同维度 统计总量
     ) {
         Envelop envelop = new Envelop();
         try {
             int  count = 0;
-            QuotaReport quotaReport = quotaService.getQuotaReport(id, filters);
+            QuotaReport quotaReport = quotaService.getQuotaReport(id, filters,dimension);
             if(quotaReport.getReultModelList() != null){
                 for(ReultModel reultModel:quotaReport.getReultModelList()){
                     count = Integer.valueOf(reultModel.getValue().toString()) + count;

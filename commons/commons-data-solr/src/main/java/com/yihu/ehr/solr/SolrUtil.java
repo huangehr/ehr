@@ -98,6 +98,56 @@ public class SolrUtil {
 
     }
 
+
+    /**
+     * Solr查询方法 多个过滤条件
+     *
+     * @param q     查询字符串
+     * @param fq    过滤查询  多个过滤条件
+     * @param sort  过滤条件
+     * @param start 查询起始行
+     * @param rows  查询行数
+     * @return
+     */
+    public SolrDocumentList queryByfqs(String core, String q, String[] fq, Map<String, String> sort, long start, long rows) throws Exception {
+        SolrClient conn = pool.getConnection(core);
+        SolrQuery query = new SolrQuery();
+        if (null != q && !q.equals("")) //设置查询条件
+        {
+            query.setQuery(q);
+        } else {
+            query.setQuery("*:*");
+        }
+        if (null != fq && fq.length>0) //设置过滤条件
+        {
+            query.setFilterQueries(fq);
+        }
+
+        query.setStart(Integer.parseInt(String.valueOf(start)));//设置查询起始行
+        query.setRows(Integer.parseInt(String.valueOf(rows)));//设置查询行数
+
+
+        //设置排序
+        if (sort != null) {
+            for (Object co : sort.keySet()) {
+                if (ASC == sort.get(co).toLowerCase() || ASC.equals(sort.get(co).toLowerCase())) {
+                    query.addSort(co.toString(), SolrQuery.ORDER.asc);
+                } else {
+                    query.addSort(co.toString(), SolrQuery.ORDER.desc);
+                }
+            }
+        }
+
+        QueryResponse rsp = conn.query(query);
+        qtime = rsp.getQTime();
+        System.out.print("Solr Query Time:" + qtime);
+        SolrDocumentList docs = rsp.getResults();
+
+        pool.close(core); //释放连接
+        return docs;
+
+    }
+
     /******************************* Count 统计 ***********************************************/
     /**
      * 总数查询方法

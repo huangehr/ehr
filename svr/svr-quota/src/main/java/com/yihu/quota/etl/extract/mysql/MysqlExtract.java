@@ -15,6 +15,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -153,8 +154,10 @@ public class MysqlExtract {
                Long num = map.get(key);
                if(saveModel != null && num != null){
                    saveModel.setResult(Integer.valueOf(num.toString()));
-                   returnList.add(saveModel);
+               }else{
+                   saveModel.setResult(0);
                }
+               returnList.add(saveModel);
            }
        }
     }
@@ -258,7 +261,8 @@ public class MysqlExtract {
         one.setResult(0);
         one.setCreateTime(new Date());
         LocalDate today = LocalDate.now();
-        one.setQuotaDate(today.toString());
+        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+        one.setQuotaDate(yesterDay);
         one.setQuotaCode(quotaVo.getCode());
         one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);
@@ -270,7 +274,8 @@ public class MysqlExtract {
         one.setResult(0);
         one.setCreateTime(new Date());
         LocalDate today = LocalDate.now();
-        one.setQuotaDate(today.toString());
+        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+        one.setQuotaDate(yesterDay);
         one.setQuotaCode(quotaVo.getCode());
         one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);

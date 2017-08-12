@@ -15,6 +15,7 @@ public class MRsMetadata {
     private String description;
     private String valid;
     private int dictId;
+    private Integer dataSource;
 
     public String getId() {
         return id;
@@ -91,5 +92,13 @@ public class MRsMetadata {
     }
     public void setDictId(int dictId) {
         this.dictId = dictId;
+    }
+
+    public Integer getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(Integer dataSource) {
+        this.dataSource = dataSource;
     }
 }

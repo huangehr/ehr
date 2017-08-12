@@ -1,6 +1,7 @@
 package com.yihu.ehr.quota.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
+import com.yihu.ehr.agModel.tj.TjQuotaChartModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.health.service.HealthBusinessClient;
@@ -10,6 +11,7 @@ import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.health.MHealthBusiness;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
@@ -23,29 +25,28 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/6/9.
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api( value = "TjQuota", description = "统计表", tags = {"统计指标管理-统计表"})
+@Api( value = "TjQuota", description = "统计指标表", tags = {"统计指标管理-统计指标表"})
 public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
-    TjQuotaClient tjQuotaClient;
+    private TjQuotaClient tjQuotaClient;
     @Autowired
-    TjQuotaJobClient tjQuotaJobClient;
+    private TjQuotaJobClient tjQuotaJobClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
     @Autowired
-    HealthBusinessClient healthBusinessClient;
+    private HealthBusinessClient healthBusinessClient;
+    @Autowired
+    private TjQuotaChartClient tjQuotaChartClient;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
-    @ApiOperation(value = "统计表")
+    @ApiOperation(value = "统计指标表")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -100,7 +101,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
 
 
     @RequestMapping(value = ServiceApi.TJ.AddTjQuota, method = RequestMethod.POST)
-    @ApiOperation(value = "新增统计")
+    @ApiOperation(value = "新增统计指标")
     public Envelop add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
@@ -118,7 +119,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     }
 
     @RequestMapping(value = ServiceApi.TJ.DeleteTjQuota, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除统计")
+    @ApiOperation(value = "删除统计指标")
     public Envelop delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) {
@@ -127,7 +128,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             if(result.getCode() == 200){
                 return successMsg(result.getMessage());
             }else{
-                return failed("统计源删除失败！");
+                return failed("统计指标删除失败！");
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -198,4 +199,9 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             @RequestParam(value = "quotaCode") String quotaCode) {
         return tjQuotaClient.hasConfigDimension(quotaCode);
     }
+
+
+
+
+
 }

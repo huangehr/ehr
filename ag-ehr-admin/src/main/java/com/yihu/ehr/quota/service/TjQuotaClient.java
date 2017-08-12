@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.tj.MQuotaConfigModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -13,6 +14,8 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/6/9.
@@ -55,4 +58,15 @@ public interface TjQuotaClient {
     boolean hasConfigDimension(
             @ApiParam(name = "quotaCode", value = "指标编码")
             @RequestParam(value = "quotaCode") String quotaCode);
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaByCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据Code获取指标")
+    public MTjQuotaModel getByCode(@RequestParam(value = "code") String code) ;
+
+    @RequestMapping(value = "/tj/quotaConfigInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "分页获取指标配置")
+    ListResult quotaConfigInfo(
+            @RequestParam(value = "quotaName", required = false) String quotaName,
+            @RequestParam(value = "page") Integer page,
+            @RequestParam(value = "pageSize") Integer pageSize);
 }

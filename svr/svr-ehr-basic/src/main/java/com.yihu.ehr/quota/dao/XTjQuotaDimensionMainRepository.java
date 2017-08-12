@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 /**
  * @author janseny
  * @version 1.0
@@ -16,4 +18,7 @@ public interface XTjQuotaDimensionMainRepository extends PagingAndSortingReposit
     @Modifying
     @Query("delete from TjQuotaDimensionMain DimensionMain where DimensionMain.quotaCode = :quotaCode")
     int deleteByQuotaCode(@Param("quotaCode") String quotaCode);
+
+    List<TjQuotaDimensionMain> findByQuotaCode(String quotaCode);
+
 }

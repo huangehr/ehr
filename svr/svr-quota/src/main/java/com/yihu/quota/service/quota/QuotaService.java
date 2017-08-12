@@ -7,6 +7,7 @@ import com.yihu.quota.model.rest.QuotaReport;
 import com.yihu.quota.model.rest.ReultModel;
 import com.yihu.quota.util.QuartzHelper;
 import com.yihu.quota.vo.QuotaVo;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,25 +38,23 @@ public class QuotaService {
         return count;
     }
 
-    public QuotaReport getQuotaReport(Integer id, String filters) throws Exception {
+    /**
+     *
+     * @param id 指标ID
+     * @param filters 过滤查询条件
+     * @param dimension 返回的维度
+     * @return
+     * @throws Exception
+     */
+    public QuotaReport getQuotaReport(Integer id, String filters,String dimension) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
         List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters);
         List<ReultModel> reultModelList = new ArrayList<>();
         for(int i=0 ; i< listMap.size() ;i++){
             ReultModel reultModel = new ReultModel();
-            if(tjQuota.getCode().contains("depart_treat")||tjQuota.getCode().contains("disease")){
-                if(listMap.get(i).get("slaveKey2Name") !=null){
-                    reultModel.setKey(listMap.get(i).get("slaveKey2Name").toString());
-                }else {
-                    break;
-                }
-            }else if(tjQuota.getCode().contains("age")){
-                if(listMap.get(i).get("slaveKey1Name") !=null){
-                    reultModel.setKey(listMap.get(i).get("slaveKey1Name").toString());
-                }else{
-                    break;
-                }
+            if(StringUtils.isNotEmpty(dimension)){
+                reultModel.setKey(listMap.get(i).get(dimension+"Name").toString());
             }else {
                 reultModel.setKey(listMap.get(i).get("quotaDate").toString());
             }
