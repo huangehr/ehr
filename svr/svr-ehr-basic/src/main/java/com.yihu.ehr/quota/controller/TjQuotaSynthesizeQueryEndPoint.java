@@ -47,7 +47,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaSynthesiseDimension, method = RequestMethod.GET)
     @ApiOperation(value = "查询多个指标交集维度")
-    public Map<String,String>  getTjQuotaSynthesiseDimension(
+    public  Map<String,Map<String,String>>  getTjQuotaSynthesiseDimension(
             @ApiParam(name = "quotaCodes", value = "指标code，多个指标用英文,分开")
             @RequestParam(value = "quotaCodes") String quotaCodes) {
 
@@ -59,18 +59,23 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
         for(int i=0 ; i < quotaCode.length ;i++){
             Map<String,String> map = new HashedMap();
             tjQuotaDimensionMains = tjQuotaDimensionMainService.getTjQuotaDimensionMainByCode(quotaCode[i]);
+            int main = 1;
             for(TjQuotaDimensionMain tjQuotaDimensionMain : tjQuotaDimensionMains){
                 TjDimensionMain tjDimensionMain = tjDimensionMainService.getTjDimensionMainByCode(tjQuotaDimensionMain.getMainCode());
                if(tjDimensionMain !=null){
-                   map.put(tjDimensionMain.getCode(),tjDimensionMain.getName());
+                   map.put(tjDimensionMain.getCode(),tjDimensionMain.getName()+"-mainKey" + main);
                }
+                main ++;
             }
             tjQuotaDimensionSlaves = tjQuotaDimensionSlaveService.getTjQuotaDimensionSlaveByCode(quotaCode[i]);
+
+            int slave = 1;
             for(TjQuotaDimensionSlave tjQuotaDimensionSlave : tjQuotaDimensionSlaves){
                 TjDimensionSlave  tjDimensionSlave =  tjDimensionSlaveService.getTjDimensionMainByCode(tjQuotaDimensionSlave.getSlaveCode());
-                if(tjDimensionSlave !=null){
-                    map.put(tjDimensionSlave.getCode(), tjDimensionSlave.getName());
+                if(tjDimensionSlave != null){
+                    map.put(tjDimensionSlave.getCode(), tjDimensionSlave.getName()+"-slaveKey" + slave);//第几个维度
                 }
+                slave ++;
             }
             dimensionMap.put(quotaCode[i],map);
         }
@@ -85,21 +90,41 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
             break;
         }
 
-        //用于保存共同交集的指标
-        Map<String,String> synthesiseMap = new HashedMap();
+        //用于保存共同交集的指标 key 保存交集的维度code
+        //value 保存 此维度在每个指标统计的结果集中对应的字段名称
+        Map<String,Map<String,String>> synthesiseMap = new HashedMap();
+
+        Map<String,String> saveModelMap = new HashedMap();
         //其他指标与第一个指标维度对比，如果在第一个指标中都存在 交集维度
         for(String tempCode:tempMap.keySet() ){
             int num = 0;
+            String quotaCodeStr = "";
             for(String keyCode:dimensionMap.keySet() ){
+                quotaCodeStr = keyCode;
                 Map<String,String> codeMap = dimensionMap.get(keyCode);
                 for(String code: codeMap.keySet()){
                     if( code.equals(tempCode)){
+                        saveModelMap.put(quotaCodeStr + "-"+ tempCode ,  tempMap.get(tempCode) );
+                        //指标code + 维度编码 ->  科室-slaveKey2
                         num ++;
                     }
                 }
             }
             if(num == dimensionMap.size()){
-                synthesiseMap.put(tempCode,tempMap.get(tempCode));
+                Map<String,String> modelCloumnMap = new HashedMap();
+                modelCloumnMap.put("name",tempMap.get(tempCode).split("-")[0]);
+                for(String keyCode:dimensionMap.keySet() ){
+                    if(saveModelMap.containsKey(keyCode+"-"+ tempCode)) {
+                        String str = keyCode+"-"+ tempCode;
+                        if(saveModelMap.get(str).contains("mainKey")){
+                            modelCloumnMap.put(keyCode,tempCode);
+                        }
+                        if(saveModelMap.get(str).contains("slaveKey")){
+                            modelCloumnMap.put(keyCode,saveModelMap.get(str).split("-")[1]);
+                        }
+                    }
+                }
+                synthesiseMap.put(tempCode,modelCloumnMap);
             }
         }
         return  synthesiseMap;
