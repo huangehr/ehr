@@ -107,6 +107,10 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-entity</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-rest-model</artifactId>
             <scope>compile</scope>
         </dependency>

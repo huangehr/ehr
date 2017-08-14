@@ -3,6 +3,8 @@ package com.yihu.ehr.quota.dao;
 import com.yihu.ehr.entity.quota.TjDimensionMain;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.List;
+
 /**
  * @author janseny
  * @version 1.0
@@ -10,4 +12,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface XTjDimensionMainRepository extends PagingAndSortingRepository<TjDimensionMain, Long> {
 
+    List<TjDimensionMain> findByCode(String code);
 }

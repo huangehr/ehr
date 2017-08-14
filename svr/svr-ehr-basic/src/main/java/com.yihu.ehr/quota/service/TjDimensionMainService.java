@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author janseny
  * @version 1.0
@@ -31,5 +33,14 @@ public class TjDimensionMainService extends BaseJpaService<TjDimensionMain, XTjD
     public TjDimensionMain getTjDimensionMain(Integer id) {
         TjDimensionMain tjDimensionMain = tjDimensionMainRepository.findOne(Long.valueOf(id));
         return tjDimensionMain;
+    }
+
+    public TjDimensionMain getTjDimensionMainByCode(String quotaCode) {
+        List<TjDimensionMain>  dimensionMains = tjDimensionMainRepository.findByCode(quotaCode);
+        if(dimensionMains!=null && dimensionMains.size()>0){
+            return dimensionMains.get(0);
+        }else {
+            return null;
+        }
     }
 }

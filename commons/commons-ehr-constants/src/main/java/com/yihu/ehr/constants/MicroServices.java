@@ -28,7 +28,7 @@ public class MicroServices {
     public static final String Standard = "svr-standard";
     public static final String SpecialDict = "svr-standard";
 
-    public static final String Resource = "svr-resource";
+    public static final String Resource = "svr-resource-zjj";
     public static final String ESB = "svr-esb";
 
     public static final String HealthProfile = "svr-health-profile";
