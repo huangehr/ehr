@@ -184,6 +184,9 @@ public class RsReportCategoryController extends BaseController {
         try {
             boolean result = rsReportCategoryClient.isUniqueCode(id, code);
             envelop.setSuccessFlg(result);
+            if (!result) {
+                envelop.setErrorMsg("该编码已被使用，请重新填写！");
+            }
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
@@ -203,6 +206,9 @@ public class RsReportCategoryController extends BaseController {
         try {
             boolean result = rsReportCategoryClient.isUniqueName(id, name);
             envelop.setSuccessFlg(result);
+            if (!result) {
+                envelop.setErrorMsg("该名称已被使用，请重新填写！");
+            }
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
