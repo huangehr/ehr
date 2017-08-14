@@ -115,7 +115,6 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
-//        tjQuotaService.delete(id);
         TjQuota tjQuota = tjQuotaService.getById(id);
         tjQuota.setStatus(-1);
         tjQuotaService.save(tjQuota);
