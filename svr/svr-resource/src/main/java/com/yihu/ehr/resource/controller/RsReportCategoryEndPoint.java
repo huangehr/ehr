@@ -10,7 +10,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -58,7 +57,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("新增资源报表分类")
-    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryAdd, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)
     public MRsReportCategory add(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON", required = true)
             @RequestBody String rsReportCategory) throws Exception {
@@ -68,7 +67,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("更新资源报表分类")
-    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.PUT)
     public MRsReportCategory update(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON", required = true)
             @RequestBody String rsReportCategory) throws Exception {
