@@ -25,4 +25,10 @@ public interface RsReportCategoryDao extends PagingAndSortingRepository<RsReport
     @Query(" FROM RsReportCategory rc WHERE rc.name LIKE CONCAT('%',:name,'%') ")
     List<RsReportCategory> getComboTreeData(@Param("name") String name);
 
+    @Query(" FROM RsReportCategory rc WHERE rc.id <> :id AND rc.code = :code ")
+    RsReportCategory isUniqueCode(@Param("id") Integer id, @Param("code") String code);
+
+    @Query(" FROM RsReportCategory rc WHERE rc.id <> :id AND rc.name = :name ")
+    RsReportCategory isUniqueName(@Param("id") Integer id, @Param("name") String name);
+
 }

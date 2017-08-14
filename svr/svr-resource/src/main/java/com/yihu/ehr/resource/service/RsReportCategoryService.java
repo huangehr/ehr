@@ -78,4 +78,34 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
         rsReportCategoryDao.delete(rsReportCategory);
     }
 
+    /**
+     * 验证资源报表分类编码是否唯一
+     * @param id 主键
+     * @param code 编码
+     * @return true：唯一，false：不唯一
+     */
+    public Boolean isUniqueCode(Integer id, String code) {
+        RsReportCategory rsReportCategory = rsReportCategoryDao.isUniqueName(id, code);
+        if(rsReportCategory == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 验证资源报表分类编码是否唯一
+     * @param id 主键
+     * @param name 名称
+     * @return true：唯一，false：不唯一
+     */
+    public Boolean isUniqueName(Integer id, String name) {
+        RsReportCategory rsReportCategory = rsReportCategoryDao.isUniqueName(id, name);
+        if(rsReportCategory == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }
