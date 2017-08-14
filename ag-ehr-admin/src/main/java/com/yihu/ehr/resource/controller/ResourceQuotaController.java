@@ -63,7 +63,7 @@ public class ResourceQuotaController extends ExtendController {
     @ApiOperation(value = "新增&修改资源视图-关联指标表")
     public Envelop batchAddResourceQuota(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestBody String model) {
+            @RequestParam String model) {
         try {
             Envelop envelop = new Envelop();
             ObjectResult objectResult = resourceQuotaClient.batchAddResourceQuota(model);
