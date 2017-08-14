@@ -8,6 +8,7 @@ import com.yihu.ehr.entity.quota.*;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.tj.MQuotaConfigModel;
 import com.yihu.ehr.model.tj.MTjQuotaDataSaveModel;
 import com.yihu.ehr.model.tj.MTjQuotaDataSourceModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
@@ -48,7 +49,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     TjQuotaDimensionMainService tjQuotaDimensionMainService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件查询统计表")
+    @ApiOperation(value = "根据查询条件查询统计指标表")
     public ListResult getTjDataSaveList(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
@@ -80,15 +81,21 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.TJ.AddTjQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增&修改统计表")
+    @ApiOperation(value = "新增&修改统计指标表")
     public ObjectResult add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
         MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
-        TjQuotaDataSource tjquotaDataSource = convertToModel(tjQuotaModel.getTjQuotaDataSourceModel(), TjQuotaDataSource.class);
-        TjQuotaDataSave tjQuotaDataSave = convertToModel(tjQuotaModel.getTjQuotaDataSaveModel(), TjQuotaDataSave.class);
-        tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
-        tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
+        TjQuotaDataSource tjquotaDataSource = null;
+        TjQuotaDataSave tjQuotaDataSave = null;
+        if(tjQuotaModel.getTjQuotaDataSourceModel() != null){
+            tjquotaDataSource = convertToModel(tjQuotaModel.getTjQuotaDataSourceModel(), TjQuotaDataSource.class);
+            tjquotaDataSource.setQuotaCode(tjQuotaModel.getCode());
+        }
+        if(tjQuotaModel.getTjQuotaDataSourceModel() != null){
+            tjQuotaDataSave = convertToModel(tjQuotaModel.getTjQuotaDataSaveModel(), TjQuotaDataSave.class);
+            tjQuotaDataSave.setQuotaCode(tjQuotaModel.getCode());
+        }
         TjQuota tjQuota = convertToModel(tjQuotaModel, TjQuota.class);
         String execTime = tjQuotaModel.getExecTime();
         tjQuota.setExecTime(DateUtil.strToDate(execTime));
@@ -104,7 +111,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
 
 
     @RequestMapping(value = ServiceApi.TJ.DeleteTjQuota, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除统计表")
+    @ApiOperation(value = "删除统计指标表")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
@@ -112,7 +119,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         TjQuota tjQuota = tjQuotaService.getById(id);
         tjQuota.setStatus(-1);
         tjQuotaService.save(tjQuota);
-        return Result.success("统计表删除成功！");
+        return Result.success("统计指标表删除成功！");
     }
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaById, method = RequestMethod.GET)
@@ -206,5 +213,30 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             return true;
         }
         return false;
+    }
+
+    @RequestMapping(value = "/tj/quotaConfigInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "分页获取指标配置")
+    public ListResult quotaConfigInfo(
+            @ApiParam(name = "quotaName", value = "指标名称", defaultValue = "")
+            @RequestParam(value = "quotaName", required = false) String quotaName,
+            @ApiParam(name = "page", value = "页码",defaultValue = "1")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "pageSize", value = "每页大小",defaultValue = "15")
+            @RequestParam(value = "pageSize") Integer pageSize) {
+        ListResult listResult = new ListResult();
+        List<MQuotaConfigModel> quotaConfigList = tjQuotaService.getQuotaConfig(quotaName, page, pageSize);
+        if(quotaConfigList != null){
+            listResult.setDetailModelList(quotaConfigList);
+            listResult.setTotalCount((int)tjQuotaService.getCountInfo(quotaName));
+            listResult.setCode(200);
+            listResult.setCurrPage(page);
+            listResult.setPageSize(pageSize);
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
+        }
+        return listResult;
     }
 }

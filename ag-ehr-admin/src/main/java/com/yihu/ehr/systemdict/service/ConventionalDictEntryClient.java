@@ -23,6 +23,14 @@ import java.util.List;
 @ApiIgnore
  public interface ConventionalDictEntryClient {
 
+    @RequestMapping(value = "/dictionaries/getDictionaries", method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典列表", notes = "根据查询条件获取字典列表")
+    ListResult searchMConventionalDict(
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "page", required = false) int page);
+
     @RequestMapping(value = "/dictionaries/app_catalog", method = RequestMethod.GET)
     @ApiOperation(value = "获取应用类别字典项", response = MConventionalDict.class, produces = "application/json")
     MConventionalDict getAppCatalog(
@@ -486,4 +494,7 @@ import java.util.List;
     MConventionalDict getTjQuotaLogStatus(
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
+
+
+
 }

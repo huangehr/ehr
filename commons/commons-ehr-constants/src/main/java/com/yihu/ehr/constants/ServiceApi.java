@@ -122,11 +122,13 @@ public class ServiceApi {
         public static final String CategoryExitSelfAndChild = "/resources/categories/parent";
 
         /**
-         * 自定义资源服务
+         * 综合查询服务
          */
-        public static final String CustomizeList = "/resources/customize_list";
-        public static final String CustomizeData = "/resources/customize_data";
-        public static final String CustomizeUpdate = "/resources/customize_update";
+        public static final String IntMetadataList = "/resources/integrated/metadata_list";
+        public static final String IntMetadataData = "/resources/integrated/metadata_data";
+        public static final String IntQuotaList = "/resources/integrated/quota_list";
+        public static final String IntResourceUpdate = "/resources/integrated/resource_update";
+        public static final String IntResourceQueryUpdate = "/resources/integrated/resource_query_update";
 
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
@@ -160,6 +162,16 @@ public class ServiceApi {
         public static final String ResourceOrgResMetadataGrants = "/resources/Org_resource/{Org_res_id}/metadata";
         public static final String ResourceOrgRsMetadataGrant = "/resources/Org_resource/metadata/grant";
 
+        /**
+         * 资源报表分类
+         */
+        public static final String RsReportCategory = "/resources/reportCategory/{id}";
+        public static final String RsReportCategoryChildrenByPid = "/resources/reportCategory/getChildrenByPid";
+        public static final String RsReportCategoryTree = "/resources/reportCategoryTree";
+        public static final String RsReportCategoryComboTree = "/resources/reportCategoryComboTree";
+        public static final String RsReportCategories = "/resources/reportCategories";
+        public static final String RsReportCategorySave = "/resources/reportCategory/save";
+        public static final String RsReportCategoryDelete = "/resources/reportCategory/delete/{id}";
 
     }
 
@@ -857,6 +869,8 @@ public class ServiceApi {
         public static final String AddTjQuotaDimensionSlave = "/tj/addTjQuotaDimensionSlave";
         public static final String GetTjQuotaDimensionSlaveAll = "/tj/getTjQuotaDimensionSlaveAll";
 
+        public static final String GetTjQuotaChartList = "/tj/getTjQuotaChartList";
+
         public static final String GetTjQuotaLogList = "/tj/getTjQuotaLogList";
         public static final String GetTjDataSaveList = "/tj/getTjDataSaveList";
         public static final String AddTjDataSave = "/tj/addTjDataSave";
@@ -895,6 +909,20 @@ public class ServiceApi {
         public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
 
+        public static final String TjQuotaChart = "/tj/tjQuotaChart";
+        public static final String BatchTjQuotaChart = "/tj/batchTjQuotaChart";
+        public static final String TjQuotaChartId = "/tj/tjQuotaChart/{id}";
+        public static final String GetAllTjQuotaChart = "/tj/getAllTjQuotaChart";
+
+
+
+
+
+
+
+    }
+
+    public static class StasticReport {
 
     }
 

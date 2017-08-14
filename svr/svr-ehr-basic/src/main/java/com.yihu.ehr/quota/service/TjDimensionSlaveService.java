@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author janseny
  * @version 1.0
@@ -32,5 +34,14 @@ public class TjDimensionSlaveService extends BaseJpaService<TjDimensionSlave, XT
     public TjDimensionSlave getTjDimensionSlave(Integer id) {
         TjDimensionSlave tjDimensionSlave = tjDimensionSlaveRepository.findOne(Long.valueOf(id));
         return tjDimensionSlave;
+    }
+
+    public TjDimensionSlave getTjDimensionMainByCode(String quotaCode) {
+        List<TjDimensionSlave>  dimensionSlaves = tjDimensionSlaveRepository.findByCode(quotaCode);
+        if(dimensionSlaves!=null && dimensionSlaves.size()>0){
+            return dimensionSlaves.get(0);
+        }else {
+            return null;
+        }
     }
 }

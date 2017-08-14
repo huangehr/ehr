@@ -79,4 +79,8 @@ public interface HealthBusinessClient {
     MHealthBusiness updateHealthBusiness(
             @ApiParam(name = "jsonData", value = "json信息")
             @RequestBody String jsonData);
+
+    @RequestMapping(value = "/health/getHealthBusinessChild", method = RequestMethod.GET)
+    @ApiOperation(value = "获取指标分类子类列表")
+    public List<MHealthBusiness> getHealthBusinessChild() ;
 }

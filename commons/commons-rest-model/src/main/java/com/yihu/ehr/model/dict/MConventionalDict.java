@@ -15,6 +15,8 @@ public class MConventionalDict {
     Integer sort;
     String phoneticCode;
     String catalog;
+    boolean checked; //是否已选中
+
     public MConventionalDict(){
     }
 
@@ -76,5 +78,13 @@ public class MConventionalDict {
     }
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 }
