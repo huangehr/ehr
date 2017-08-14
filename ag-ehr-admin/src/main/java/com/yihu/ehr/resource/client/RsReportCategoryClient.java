@@ -7,7 +7,6 @@ import com.yihu.ehr.model.resource.MRsReportCategory;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -52,13 +51,13 @@ public interface RsReportCategoryClient {
     );
 
     @ApiOperation("新增资源报表分类")
-    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryAdd, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)
     MRsReportCategory add(
             @ApiParam(name = "mrsReportCategory", value = "报表分类JSON字符串", required = true)
             @RequestBody String mrsReportCategory);
 
     @ApiOperation("更新资源报表分类")
-    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.PUT)
     MRsReportCategory update(
             @ApiParam(name = "mrsReportCategory", value = "报表分类JSON字符串", required = true)
             @RequestBody String mrsReportCategory);
