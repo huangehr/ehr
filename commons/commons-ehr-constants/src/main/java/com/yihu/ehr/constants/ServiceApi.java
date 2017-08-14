@@ -170,8 +170,7 @@ public class ServiceApi {
         public static final String RsReportCategoryTree = "/resources/reportCategoryTree";
         public static final String RsReportCategoryComboTree = "/resources/reportCategoryComboTree";
         public static final String RsReportCategories = "/resources/reportCategories";
-        public static final String RsReportCategoryAdd = "/resources/reportCategory/add";
-        public static final String RsReportCategoryUpdate = "/resources/reportCategory/update/{id}";
+        public static final String RsReportCategorySave = "/resources/reportCategory/save";
         public static final String RsReportCategoryDelete = "/resources/reportCategory/delete/{id}";
 
     }

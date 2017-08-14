@@ -1,7 +1,5 @@
 package com.yihu.ehr.resource.model;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 
 /**
@@ -24,8 +22,7 @@ public class RsReportCategory {
     private String text; // 名称，树形下拉框使用
 
     @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     public Integer getId() {
         return id;
