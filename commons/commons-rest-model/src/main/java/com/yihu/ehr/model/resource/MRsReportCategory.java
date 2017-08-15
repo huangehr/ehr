@@ -1,6 +1,7 @@
 package com.yihu.ehr.model.resource;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 资源报表分类
@@ -16,6 +17,7 @@ public class MRsReportCategory implements Serializable {
     private String name; // 名称
     private String remark; // 备注
     private String text; // 名称：树形下拉框使用
+    private List<MRsReportCategory> children; // 子节点
 
     public Integer getId() {
         return id;
@@ -63,5 +65,13 @@ public class MRsReportCategory implements Serializable {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public List<MRsReportCategory> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<MRsReportCategory> children) {
+        this.children = children;
     }
 }

@@ -1,6 +1,5 @@
 package com.yihu.ehr.resource.controller;
 
-import com.yihu.ehr.agModel.resource.RsReportCategoryModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
@@ -12,11 +11,9 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,40 +55,7 @@ public class RsReportCategoryController extends BaseController {
         try {
             Envelop envelop = new Envelop();
             envelop.setSuccessFlg(true);
-
-            // 获取最顶层的资源报表分类集合
-            List<MRsReportCategory> topNodeList = rsReportCategoryClient.getChildrenByPid(-1);
-            if (topNodeList.size() == 0) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("没有匹配条件的资源报表分类！");
-                return envelop;
-            }
-
-            // 暂存最顶层资源报表分类中，满足条件的集合
-            List<MRsReportCategory> topNodeListIn = new ArrayList<>();
-            // 暂存最顶层资源报表分类中，不满足条件的集合
-            List<MRsReportCategory> topNodeListOut = new ArrayList<>();
-            // 暂存满足条件的结果集
-            List<RsReportCategoryModel> resultList = new ArrayList<>();
-
-            if (StringUtils.isEmpty(codeName)) {
-                resultList = getTreeByParents(topNodeList);
-                envelop.setDetailModelList(resultList);
-                return envelop;
-            }
-
-            for (MRsReportCategory reportCategory : topNodeList) {
-                if (reportCategory.getCode().contains(codeName) || reportCategory.getName().contains(codeName)) {
-                    topNodeListIn.add(reportCategory);
-                    continue;
-                }
-                topNodeListOut.add(reportCategory);
-            }
-            if (topNodeListIn.size() != 0) {
-                resultList.addAll(getTreeByParents(topNodeListIn));
-            }
-            resultList.addAll(getTreeByParentsAndCodeName(topNodeListOut, codeName));
-
+            List<MRsReportCategory> resultList = rsReportCategoryClient.search(codeName);
             envelop.setDetailModelList(resultList);
             return envelop;
         } catch (Exception e) {
@@ -160,7 +124,7 @@ public class RsReportCategoryController extends BaseController {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryDelete, method = RequestMethod.DELETE)
     public Envelop delete(
             @ApiParam(name = "id", value = "主键", required = true)
-            @PathVariable(value = "id") Integer id) throws Exception {
+            @RequestParam(value = "id") Integer id) throws Exception {
         Envelop envelop = new Envelop();
         try {
             rsReportCategoryClient.delete(id);
@@ -215,65 +179,6 @@ public class RsReportCategoryController extends BaseController {
             LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
-    }
-
-    /**
-     * 根据父级集合，递归获取父级及其自子级集合，形成树形结构
-     *
-     * @param parentList 父级集合
-     * @return 父级及其子集的树形结构数据
-     */
-    private List<RsReportCategoryModel> getTreeByParents(List<MRsReportCategory> parentList) {
-        List<RsReportCategoryModel> resultList = new ArrayList<>();
-        for (int i = 0; i < parentList.size(); i++) {
-            MRsReportCategory parent = parentList.get(i);
-
-            List<MRsReportCategory> childList = rsReportCategoryClient.getChildrenByPid(parent.getId());
-            List<RsReportCategoryModel> childModeList = getTreeByParents(childList);
-
-            RsReportCategoryModel parentModel = convertToModel(parent, RsReportCategoryModel.class);
-            parentModel.setChildren(childModeList);
-
-            resultList.add(parentModel);
-        }
-        return resultList;
-    }
-
-    /**
-     * 递归不满足条件的父级集合，获取其满足条件的子集，并返回子集及其父级的树形结构
-     *
-     * @param parents  不满足条件的父级集合
-     * @param codeName 资源报表分类编码或名称
-     * @return 满足条件的子集及其父级的树形结构
-     */
-    private List<RsReportCategoryModel> getTreeByParentsAndCodeName(List<MRsReportCategory> parents, String codeName) {
-        List<RsReportCategoryModel> result = new ArrayList<>();
-        for (MRsReportCategory parent : parents) {
-            RsReportCategoryModel parentModel = convertToModel(parent, RsReportCategoryModel.class);
-            Integer parentId = parent.getId();
-            List<RsReportCategoryModel> childrenModel = new ArrayList<>();
-
-            List<MRsReportCategory> children = rsReportCategoryClient.getChildrenByPid(parentId);
-            if (children.size() == 0) continue;
-
-            // 获取满足条件的子节点
-            String filters = "pid=" + parentId + ";code?" + codeName + " g1;name?" + codeName + " g1;";
-            List<MRsReportCategory> childrenIin = (List<MRsReportCategory>) rsReportCategoryClient.search(filters).getBody();
-            if (childrenIin.size() != 0) {
-                childrenModel.addAll(getTreeByParents(childrenIin));
-            }
-            // 递归不满足条件的子节点
-            children.removeAll(childrenIin);
-            if (children.size() != 0) {
-                childrenModel.addAll(getTreeByParentsAndCodeName(children, codeName));
-            }
-
-            if (childrenModel.size() != 0) {
-                parentModel.setChildren(childrenModel);
-                result.add(parentModel);
-            }
-        }
-        return result;
     }
 
 }

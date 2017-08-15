@@ -1,8 +1,6 @@
 package com.yihu.quota.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.abel533.echarts.Option;
-import com.google.gson.Gson;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;

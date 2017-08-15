@@ -7,11 +7,9 @@ import com.yihu.ehr.model.resource.MRsReportCategory;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,17 +29,11 @@ public interface RsReportCategoryClient {
             @ApiParam(name = "id", value = "主键", required = true)
             @PathVariable(value = "id") Integer id);
 
-    @ApiOperation(value = "根据父级ID获取下级")
-    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryChildrenByPid, method = RequestMethod.GET)
-    List<MRsReportCategory> getChildrenByPid(
-            @ApiParam(name = "pid", value = "父级ID")
-            @RequestParam("pid") Integer pid);
-
     @ApiOperation(value = "根据条件获取资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategories, method = RequestMethod.GET)
-    ResponseEntity<Collection<MRsReportCategory>> search(
-            @ApiParam(name = "filters", value = "筛选条件")
-            @RequestParam(value = "filters", required = false) String filters);
+    List<MRsReportCategory> search(
+            @ApiParam(name = "codeName", value = "资源分类编码或名称")
+            @RequestParam(value = "codeName", required = false) String codeName);
 
     @ApiOperation(value = "获取资源报表分类的树形下拉框数据")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryComboTree, method = RequestMethod.GET)
@@ -64,9 +56,9 @@ public interface RsReportCategoryClient {
 
     @ApiOperation("删除资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryDelete, method = RequestMethod.DELETE)
-    boolean delete(
-            @ApiParam(name = "id", value = "主键", required = true)
-            @PathVariable(value = "id") Integer id);
+    void delete(
+            @ApiParam(name = "id", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "id") Integer id);
 
 
     @ApiOperation("验证资源报表分类编码是否唯一")
