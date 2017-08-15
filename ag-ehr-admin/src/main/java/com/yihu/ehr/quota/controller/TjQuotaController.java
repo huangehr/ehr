@@ -1,7 +1,9 @@
 package com.yihu.ehr.quota.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.tj.TjQuotaChartModel;
+import com.yihu.ehr.agModel.tj.TjQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.health.service.HealthBusinessClient;
@@ -10,10 +12,12 @@ import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.health.MHealthBusiness;
+import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
+import com.yihu.ehr.resource.client.MetadataClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -43,7 +47,9 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
     private HealthBusinessClient healthBusinessClient;
     @Autowired
-    private TjQuotaChartClient tjQuotaChartClient;
+    private MetadataClient metadataClient;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "统计指标表")
@@ -101,13 +107,38 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
 
 
     @RequestMapping(value = ServiceApi.TJ.AddTjQuota, method = RequestMethod.POST)
-    @ApiOperation(value = "新增统计指标")
+    @ApiOperation(value = "新增&修改统计指标表")
     public Envelop add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestParam("model") String model) {
         try {
             ObjectResult objectResult = tjQuotaClient.add(model);
             if (objectResult.getCode() == 200) {
+                MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
+                if(tjQuotaModel.getId()==null){
+                    int maxId = metadataClient.getMaxIdNumber();
+                    maxId = maxId + 1;
+                    String newId = "" + maxId;
+                    for(int i=newId.length() ; i< 6 ;i++){
+                        newId = "0" + newId;
+                    }
+                    //保存数据元
+                    MRsMetadata metadata = new MRsMetadata();
+                    metadata.setDomain("04");
+                    metadata.setId("EHR_"+newId);
+                    metadata.setStdCode("EHR_"+newId);
+                    metadata.setName(tjQuotaModel.getName());
+                    metadata.setColumnType("VARCHAR");
+                    metadata.setNullAble("1");
+                    metadata.setValid("1");
+                    metadata.setDataSource(2);
+                    metadata.setDescription("统计指标:" + tjQuotaModel.getName());
+                    metadataClient.updateMetadata(objectMapper.writeValueAsString(metadata));
+                    //更新指标表中的数据元code
+                    MTjQuotaModel mTjQuotaModel = objectMapper.convertValue(objectResult.getData(), MTjQuotaModel.class);
+                    mTjQuotaModel.setMetadataCode(metadata.getId());
+                    tjQuotaClient.update(objectMapper.writeValueAsString(mTjQuotaModel));
+                }
                 return successObj(objectResult.getData());
             } else {
                 return null;

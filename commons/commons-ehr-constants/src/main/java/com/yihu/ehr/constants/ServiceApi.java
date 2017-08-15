@@ -82,6 +82,8 @@ public class ServiceApi {
         public static final String MetadataExistence = "/resources/metadata/existence";
         public static final String MetadataStdCodeExistence = "/resources/metadata/std_code/existence";
         public static final String MetadataIdExistence = "/resources/metadata/id/existence";
+        public static final String MetadataMaxId = "/resources/metadata/metadataMaxId";
+
 
         public static final String DictList = "/resources/dict";
         public static final String DictBatch = "/resources/dict/batch";
@@ -899,6 +901,7 @@ public class ServiceApi {
 
         public static final String GetTjQuotaList = "tj/getTjQuotaList";
         public static final String AddTjQuota = "tj/addTjQuota";
+        public static final String UpdateTjQuota = "tj/updateTjQuota";
         public static final String DeleteTjQuota = "tj/deleteTjQuota";
         public static final String GetTjQuotaById = "tj/getTjQuotaById/{id}";
         public static final String TjQuotaExistsName = "/tj/tjQuotaExistsName/{name}";
@@ -911,6 +914,7 @@ public class ServiceApi {
 
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
         public static final String GetQuotaReport = "tj/getQuotaReport";
+        public static final String GetQuotaGraphicReport = "tj/getQuotaGraphicReport";
         public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
 

@@ -12,6 +12,7 @@ import com.yihu.ehr.model.tj.MQuotaConfigModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
+import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.resource.client.ResourceQuotaClient;
 import com.yihu.ehr.resource.client.ResourcesCategoryClient;
 import com.yihu.ehr.resource.client.ResourcesClient;
@@ -50,6 +51,8 @@ public class ResourcesController extends BaseController {
     private ResourceQuotaClient resourceQuotaClient;
     @Autowired
     private TjQuotaChartClient tjQuotaChartClient;
+    @Autowired
+    private TjQuotaJobClient tjQuotaJobClient;
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST)
@@ -278,4 +281,20 @@ public class ResourcesController extends BaseController {
             return envelop;
         }
     }
+
+//    @RequestMapping(value = "/getRsQuotaPreview", method = RequestMethod.GET)
+//    @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表")
+//    public List<ResourceQuotaModel> getRsQuotaPreview(
+//            @ApiParam(name = "filter", value = "过滤器", defaultValue = "")
+//            @RequestParam(value = "filter") String filter,
+//            @ApiParam(name = "filters", value = "图表类型", defaultValue = "")
+//            @RequestParam(value = "filters", required = false) String filters) {
+//        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(filter);
+//        List<String> json = new ArrayList<>();
+//        for (ResourceQuotaModel m : list) {
+//            String report = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), filters);
+//            json.add(report);
+//        }
+//        return list;
+//    }
 }

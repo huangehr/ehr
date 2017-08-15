@@ -11,7 +11,7 @@ public class ResourceQuota {
     private int id;
     private String resourceId;
     private String quotaTypeName;
-    private String quotaChart;
+    private int quotaChart;
     private int quotaId;
 
     @Id
@@ -44,11 +44,11 @@ public class ResourceQuota {
     }
 
     @Column(name = "quota_chart")
-    public String getQuotaChart() {
+    public int getQuotaChart() {
         return quotaChart;
     }
 
-    public void setQuotaChart(String quotaChart) {
+    public void setQuotaChart(int quotaChart) {
         this.quotaChart = quotaChart;
     }
 

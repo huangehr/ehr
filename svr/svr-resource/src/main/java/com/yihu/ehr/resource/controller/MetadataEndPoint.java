@@ -173,4 +173,12 @@ public class MetadataEndPoint extends EnvelopRestEndPoint {
         pagedResponse(request,response,total,page,size);
         return (List<MRsMetadata>)metaList;
     }
+
+
+    @RequestMapping(value = ServiceApi.Resources.MetadataMaxId,method = RequestMethod.GET)
+    @ApiOperation("获取资源标准编码的最大编号")
+    public int getMaxIdNumber( ){
+        return  metadataService.getMaxIdNumber();
+    }
+
 }
