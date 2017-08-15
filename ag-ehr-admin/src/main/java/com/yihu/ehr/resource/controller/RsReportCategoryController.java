@@ -173,6 +173,50 @@ public class RsReportCategoryController extends BaseController {
         }
     }
 
+    @ApiOperation("验证资源报表分类编码是否唯一")
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIsUniqueCode, method = RequestMethod.GET)
+    public Envelop isUniqueCode(
+            @ApiParam(name = "id", value = "资源报表分类ID", required = true)
+            @RequestParam("id") Integer id,
+            @ApiParam(name = "code", value = "资源报表分类编码", required = true)
+            @RequestParam("code") String code) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            boolean result = rsReportCategoryClient.isUniqueCode(id, code);
+            envelop.setSuccessFlg(result);
+            if (!result) {
+                envelop.setErrorMsg("该编码已被使用，请重新填写！");
+            }
+            return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
+    @ApiOperation("验证资源报表分类名称是否唯一")
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIsUniqueName, method = RequestMethod.GET)
+    public Envelop isUniqueName(
+            @ApiParam(name = "id", value = "资源报表分类ID", required = true)
+            @RequestParam("id") Integer id,
+            @ApiParam(name = "name", value = "资源报表分类名称", required = true)
+            @RequestParam("name") String name) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            boolean result = rsReportCategoryClient.isUniqueName(id, name);
+            envelop.setSuccessFlg(result);
+            if (!result) {
+                envelop.setErrorMsg("该名称已被使用，请重新填写！");
+            }
+            return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogService.getLogger(RsReportCategoryController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
     /**
      * 根据父级集合，递归获取父级及其自子级集合，形成树形结构
      *

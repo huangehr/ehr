@@ -78,11 +78,31 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("删除资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryDelete, method = RequestMethod.DELETE)
-    public boolean delete(
+    public Boolean delete(
             @ApiParam(name = "id", value = "资源报表分类ID", required = true)
             @PathVariable("id") Integer id) throws Exception {
         rsReportCategoryService.delete(id);
         return true;
+    }
+
+    @ApiOperation("验证资源报表分类编码是否唯一")
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIsUniqueCode, method = RequestMethod.GET)
+    public Boolean isUniqueCode(
+            @ApiParam(name = "id", value = "资源报表分类ID", required = true)
+            @RequestParam("id") Integer id,
+            @ApiParam(name = "code", value = "资源报表分类编码", required = true)
+            @RequestParam("code") String code) throws Exception {
+        return rsReportCategoryService.isUniqueCode(id, code);
+    }
+
+    @ApiOperation("验证资源报表分类名称是否唯一")
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIsUniqueName, method = RequestMethod.GET)
+    public Boolean isUniqueName(
+            @ApiParam(name = "id", value = "资源报表分类ID", required = true)
+            @RequestParam("id") Integer id,
+            @ApiParam(name = "name", value = "资源报表分类名称", required = true)
+            @RequestParam("name") String name) throws Exception {
+        return rsReportCategoryService.isUniqueName(id, name);
     }
 
 }

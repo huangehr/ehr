@@ -167,6 +167,7 @@ public class ServiceApi {
         /**
          * 资源报表分类
          */
+        public static final String RsReportCategoryPrefix = "/resources/reportCategory/";
         public static final String RsReportCategory = "/resources/reportCategory/{id}";
         public static final String RsReportCategoryChildrenByPid = "/resources/reportCategory/getChildrenByPid";
         public static final String RsReportCategoryTree = "/resources/reportCategoryTree";
@@ -174,6 +175,8 @@ public class ServiceApi {
         public static final String RsReportCategories = "/resources/reportCategories";
         public static final String RsReportCategorySave = "/resources/reportCategory/save";
         public static final String RsReportCategoryDelete = "/resources/reportCategory/delete/{id}";
+        public static final String RsReportCategoryIsUniqueCode = "/resources/reportCategory/isUniqueCode";
+        public static final String RsReportCategoryIsUniqueName = "/resources/reportCategory/isUniqueName";
 
     }
 
