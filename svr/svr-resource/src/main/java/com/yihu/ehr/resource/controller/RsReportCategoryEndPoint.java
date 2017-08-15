@@ -9,9 +9,11 @@ import com.yihu.ehr.resource.service.RsReportCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,13 +39,44 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
         return convertToModel(rsReportCategoryService.getById(id), MRsReportCategory.class);
     }
 
-    @ApiOperation(value = "根据父级ID获取下级")
-    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryChildrenByPid, method = RequestMethod.GET)
-    public List<MRsReportCategory> getChildrenByPid(
-            @ApiParam(name = "pid", value = "父级ID")
-            @RequestParam Integer pid) throws Exception {
-        List<RsReportCategory> children = rsReportCategoryService.getChildrenByPid(pid);
-        return (List<MRsReportCategory>) convertToModels(children, new ArrayList<MRsReportCategory>(children.size()), MRsReportCategory.class, "");
+    @ApiOperation(value = "根据条件获取资源报表分类")
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategories, method = RequestMethod.GET)
+    List<MRsReportCategory> search(
+            @ApiParam(name = "codeName", value = "资源分类编码或名称")
+            @RequestParam(value = "codeName", required = false) String codeName) throws ParseException {
+        List<MRsReportCategory> resultList = new ArrayList<>();
+
+        // 获取最顶层的资源报表分类集合
+        List<RsReportCategory> topNodeList = rsReportCategoryService.getChildrenByPid(-1);
+        if (topNodeList.size() == 0) {
+            return resultList;
+        }
+
+        // 暂存最顶层资源报表分类中，满足条件的集合
+        List<RsReportCategory> topNodeListIn = new ArrayList<>();
+        // 暂存最顶层资源报表分类中，不满足条件的集合
+        List<RsReportCategory> topNodeListOut = new ArrayList<>();
+
+        if (StringUtils.isEmpty(codeName)) {
+            List<RsReportCategory> treeList = rsReportCategoryService.getTreeByParents(topNodeList);
+            return (List<MRsReportCategory>) convertToModels(treeList, resultList, MRsReportCategory.class, "");
+        }
+
+        for (RsReportCategory reportCategory : topNodeList) {
+            if (reportCategory.getCode().contains(codeName) || reportCategory.getName().contains(codeName)) {
+                topNodeListIn.add(reportCategory);
+                continue;
+            }
+            topNodeListOut.add(reportCategory);
+        }
+        if (topNodeListIn.size() != 0) {
+            List<RsReportCategory> inList = rsReportCategoryService.getTreeByParents(topNodeListIn);
+            resultList.addAll(convertToModels(inList, new ArrayList<MRsReportCategory>(), MRsReportCategory.class, ""));
+        }
+        List<RsReportCategory> outList = rsReportCategoryService.getTreeByParentsAndCodeName(topNodeListOut, codeName);
+        resultList.addAll(convertToModels(outList, new ArrayList<MRsReportCategory>(), MRsReportCategory.class, ""));
+
+        return resultList;
     }
 
     @ApiOperation(value = "获取资源报表分类的树形下拉框数据")

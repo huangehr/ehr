@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,6 +129,60 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
             idList.addAll(getDescendantIds(child.getId()));
         }
         return idList;
+    }
+
+    /**
+     * 根据父级集合，递归获取父级及其自子级集合，形成树形结构
+     *
+     * @param parentList 父级集合
+     * @return 父级及其子集的树形结构数据
+     */
+    public List<RsReportCategory> getTreeByParents(List<RsReportCategory> parentList) {
+        List<RsReportCategory> resultList = new ArrayList<>();
+        for (int i = 0; i < parentList.size(); i++) {
+            RsReportCategory parent = parentList.get(i);
+            List<RsReportCategory> childList = this.getChildrenByPid(parent.getId());
+            List<RsReportCategory> childTreeList = getTreeByParents(childList);
+            parent.setChildren(childTreeList);
+            resultList.add(parent);
+        }
+        return resultList;
+    }
+
+    /**
+     * 递归不满足条件的父级集合，获取其满足条件的子集，并返回子集及其父级的树形结构
+     *
+     * @param parents  不满足条件的父级集合
+     * @param codeName 资源报表分类编码或名称
+     * @return 满足条件的子集及其父级的树形结构
+     */
+    public List<RsReportCategory> getTreeByParentsAndCodeName(List<RsReportCategory> parents, String codeName) throws ParseException {
+        List<RsReportCategory> treeData = new ArrayList<>();
+        for (RsReportCategory parent : parents) {
+            Integer parentId = parent.getId();
+            List<RsReportCategory> childrenTree = new ArrayList<>();
+
+            List<RsReportCategory> children = this.getChildrenByPid(parentId);
+            if (children.size() == 0) continue;
+
+            // 获取满足条件的子节点
+            String filters = "pid=" + parentId + ";code?" + codeName + " g1;name?" + codeName + " g1;";
+            List<RsReportCategory> childrenIin = (List<RsReportCategory>) this.search(filters);
+            if (childrenIin.size() != 0) {
+                childrenTree.addAll(getTreeByParents(childrenIin));
+            }
+            // 递归不满足条件的子节点
+            children.removeAll(childrenIin);
+            if (children.size() != 0) {
+                childrenTree.addAll(getTreeByParentsAndCodeName(children, codeName));
+            }
+
+            if (childrenTree.size() != 0) {
+                parent.setChildren(childrenTree);
+                treeData.add(parent);
+            }
+        }
+        return treeData;
     }
 
 }

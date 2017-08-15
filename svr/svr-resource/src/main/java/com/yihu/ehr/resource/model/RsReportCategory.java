@@ -1,6 +1,8 @@
 package com.yihu.ehr.resource.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 资源报表分类 entity
@@ -20,6 +22,7 @@ public class RsReportCategory {
 
     // 临时字段
     private String text; // 名称，树形下拉框使用
+    private List<RsReportCategory> children = new ArrayList<>(); // 子节点
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,6 +78,15 @@ public class RsReportCategory {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    @Transient
+    public List<RsReportCategory> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<RsReportCategory> children) {
+        this.children = children;
     }
 
 }
