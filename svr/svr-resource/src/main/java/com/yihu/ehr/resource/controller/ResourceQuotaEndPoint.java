@@ -94,4 +94,22 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "quotaId", required = false) Integer quotaId) {
         return resourceQuotaService.getQuotaChartByQuotaId(quotaId);
     }
+
+    @RequestMapping(value = "/getByResourceId", method = RequestMethod.GET)
+    @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表")
+    public List<ResourceQuota> getByResourceId(
+            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "filters") String filters) throws Exception{
+        List<ResourceQuota> list = resourceQuotaService.search(filters);
+        return list;
+    }
+
+    @RequestMapping(value = "/searchByQuotaId", method = RequestMethod.GET)
+    @ApiOperation(value = "资源视图指标-根据quotaId查询")
+    public List<ResourceQuota> searchByQuotaId (
+            @ApiParam(name = "quotaId", value = "过滤器", defaultValue = "0")
+            @RequestParam(value = "quotaId") Integer quotaId) throws Exception{
+        List<ResourceQuota> list = resourceQuotaService.search("quotaId=" + quotaId);
+        return list;
+    }
 }

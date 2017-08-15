@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.client;
 
+import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.common.ListResult;
@@ -55,4 +56,16 @@ public interface ResourceQuotaClient {
     public String getQuotaChartByQuotaId(
             @ApiParam(name = "quotaId", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "quotaId", required = false) Integer quotaId);
+
+    @RequestMapping(value = "/getByResourceId", method = RequestMethod.GET)
+    @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表")
+    public List<ResourceQuotaModel> getByResourceId(
+            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "filters") String filters);
+
+    @RequestMapping(value = "/searchByQuotaId", method = RequestMethod.GET)
+    @ApiOperation(value = "资源视图指标-根据quotaId查询")
+    public List<ResourceQuotaModel> searchByQuotaId (
+            @ApiParam(name = "quotaId", value = "过滤器", defaultValue = "0")
+            @RequestParam(value = "quotaId") Integer quotaId);
 }

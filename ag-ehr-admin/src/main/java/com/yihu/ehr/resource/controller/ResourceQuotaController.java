@@ -77,4 +77,12 @@ public class ResourceQuotaController extends ExtendController {
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
+
+    @RequestMapping(value = "/searchByQuotaId", method = RequestMethod.GET)
+    @ApiOperation(value = "资源视图指标-根据quotaId查询")
+    public List<ResourceQuotaModel> searchByQuotaId (
+            @ApiParam(name = "quotaId", value = "过滤器", defaultValue = "0")
+            @RequestParam(value = "quotaId") Integer quotaId) {
+        return resourceQuotaClient.searchByQuotaId(quotaId);
+    }
 }

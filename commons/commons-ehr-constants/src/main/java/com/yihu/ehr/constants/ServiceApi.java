@@ -914,6 +914,7 @@ public class ServiceApi {
 
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
         public static final String GetQuotaReport = "tj/getQuotaReport";
+        public static final String GetQuotaGraphicReport = "tj/getQuotaGraphicReport";
         public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
 
