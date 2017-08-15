@@ -64,9 +64,9 @@ public interface RsReportCategoryClient {
 
     @ApiOperation("删除资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryDelete, method = RequestMethod.DELETE)
-    boolean delete(
-            @ApiParam(name = "id", value = "主键", required = true)
-            @PathVariable(value = "id") Integer id);
+    void delete(
+            @ApiParam(name = "id", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "id") Integer id);
 
 
     @ApiOperation("验证资源报表分类编码是否唯一")
