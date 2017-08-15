@@ -296,7 +296,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "telphone_number", value = "电话号码", defaultValue = "")
             @PathVariable(value = "telphone_number") String telphoneNumber) throws Exception {
 
-        return demographicService.getDemographicInfo(telphoneNumber) != null;
+        return demographicService.getDemographicInfoBytelephoneNo(telphoneNumber) != null;
     }
 
 

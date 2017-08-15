@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.quota.model.ChartInfoModel;
 import com.yihu.quota.model.rest.QuotaReport;
 import com.yihu.quota.model.rest.ReultModel;
 import com.yihu.quota.service.job.JobService;
 import com.yihu.quota.service.quota.QuotaService;
+import com.yihu.quota.util.ReportOption;
 import com.yihu.quota.vo.SaveModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -180,5 +182,49 @@ public class QuotaController extends BaseController {
         return envelop;
     }
 
+    @ApiOperation(value = "获取指标当天统计结果曲线性或柱状报表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaGraphicReport, method = RequestMethod.GET)
+    public ChartInfoModel getQuotaGraphicReport(
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "type", value = "图表类型", defaultValue = "1")
+            @RequestParam(value = "type" , required = true) int type,
+            @ApiParam(name = "filters", value = "图表类型", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension
+    ) {
+        Envelop envelop = new Envelop();
+        ChartInfoModel chartInfoModel = new ChartInfoModel();
+        try {
+           /* ReportOption reportOption = new ReportOption();
+            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters,dimension);
+            envelop.setSuccessFlg(true);
+            envelop.setObj(quotaReport);
+            if (type == 1) {
+                chartInfoModel.setTitle("柱状图");
+                String barEchart = reportOption.getBarEchartOption("柱状图", "", "", envelop.getDetailModelList(), "", null);
+                chartInfoModel.setChartJson(barEchart);
+            } else if (type == 2) {
+                chartInfoModel.setTitle("折线图");
+                String lineEchart = reportOption.getLineEchartOption("折线图", "", "", envelop.getDetailModelList(), 1, "", null);
+                chartInfoModel.setChartJson(lineEchart);
+            } else if (type == 3) {
+                chartInfoModel.setTitle("曲线图");
 
+            } else {
+                chartInfoModel.setTitle("饼状图");
+                String pieEchart = reportOption.getPieEchartOption("饼状图", "", "", envelop.getDetailModelList(), "", null);
+                chartInfoModel.setChartJson(pieEchart);
+            }*/
+
+            return chartInfoModel;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+            envelop.setSuccessFlg(false);
+            return chartInfoModel;
+        }
+
+    }
 }

@@ -25,7 +25,7 @@ import java.util.List;
 @ApiIgnore
 public interface TjQuotaClient {
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList , method = RequestMethod.GET)
-    @ApiOperation(value = "统计列表")
+    @ApiOperation(value = "统计指标列表")
     ListResult search(
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
@@ -34,11 +34,15 @@ public interface TjQuotaClient {
             @RequestParam(value = "page", required = false) int page);
 
     @RequestMapping(value = ServiceApi.TJ.AddTjQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "新增统计")
+    @ApiOperation(value = "新增统计指标")
     ObjectResult add(@RequestBody String model) ;
 
+    @RequestMapping(value = ServiceApi.TJ.UpdateTjQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改统计指标")
+    Result update(@RequestBody String model) ;
+
     @RequestMapping(value = ServiceApi.TJ.DeleteTjQuota, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除统计")
+    @ApiOperation(value = "删除统计指标")
     Result delete(@RequestParam(value = "id") Long id);
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaById, method = RequestMethod.GET)

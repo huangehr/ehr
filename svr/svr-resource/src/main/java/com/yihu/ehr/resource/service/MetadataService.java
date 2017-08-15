@@ -183,4 +183,16 @@ public class MetadataService extends BaseJpaService<RsMetadata,ResourceMetadataD
             keySchema.set(meta.getId(),meta.getDictCode());
         }
     }
+
+    public int getMaxIdNumber() {
+
+        String sql = "SELECT MAX(CONVERT(case when ID is not null  then substring(ID,5) else '0' end ,SIGNED)) from rs_metadata";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        List list = sqlQuery.list();
+        if(list != null && list.size() > 0){
+            return Integer.valueOf(list.get(0).toString());
+        }else{
+            return 0;
+        }
+    }
 }

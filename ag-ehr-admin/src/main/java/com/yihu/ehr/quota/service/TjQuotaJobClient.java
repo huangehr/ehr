@@ -30,5 +30,10 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "pageSize" , required = false) int pageSize
     );
 
-
+    @ApiOperation(value = "获取指标当天统计结果曲线性或柱状报表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaGraphicReport, method = RequestMethod.GET)
+    public String getQuotaGraphicReport(
+            @RequestParam(value = "id" , required = true) int id,
+            @RequestParam(value = "type" , required = true) int type,
+            @RequestParam(value = "filters", required = false) String filters);
 }

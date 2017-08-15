@@ -7,7 +7,7 @@ public class ResourceQuotaModel {
     private int id;
     private String resourceId;
     private String quotaTypeName;
-    private String quotaChart;  //已选择的图表类型
+    private int quotaChart;  //已选择的图表类型
     private int quotaId;
     private String quotaName;
     private String chartType;   //该指标可配置的图表类型
@@ -36,11 +36,11 @@ public class ResourceQuotaModel {
         this.quotaTypeName = quotaTypeName;
     }
 
-    public String getQuotaChart() {
+    public int getQuotaChart() {
         return quotaChart;
     }
 
-    public void setQuotaChart(String quotaChart) {
+    public void setQuotaChart(int quotaChart) {
         this.quotaChart = quotaChart;
     }
 

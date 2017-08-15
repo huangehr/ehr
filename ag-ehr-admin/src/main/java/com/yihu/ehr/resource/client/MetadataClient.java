@@ -76,4 +76,9 @@ public interface MetadataClient {
     @ApiOperation("获取已存在资源标准编码")
     List idExistence(
             @RequestBody String ids);
+
+    @RequestMapping(value = ServiceApi.Resources.MetadataMaxId,method = RequestMethod.GET)
+    @ApiOperation("获取资源标准编码的最大编号")
+    int getMaxIdNumber();
+
 }
