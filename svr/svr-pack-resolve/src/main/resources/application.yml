@@ -117,6 +117,7 @@ ehr:
         - card-type: JDSD00_85_006  #就诊卡类型 CARD_TYPE
   eventIndex: #病人事件索引信息
     patientId:
+      - JDSA00_01_001 #v1.3
       - PATIENT_ID
     eventNo:
       - HDSD00_02_040 # 门（急）诊号 v1.3
