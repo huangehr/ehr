@@ -27,6 +27,7 @@ public class TjQuota implements Serializable {
     private Integer dataLevel;
     private String remark;
     private Integer quotaType;
+    private String metadataCode;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -181,5 +182,14 @@ public class TjQuota implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name = "metadata_code")
+    public String getMetadataCode() {
+        return metadataCode;
+    }
+
+    public void setMetadataCode(String metadataCode) {
+        this.metadataCode = metadataCode;
     }
 }
