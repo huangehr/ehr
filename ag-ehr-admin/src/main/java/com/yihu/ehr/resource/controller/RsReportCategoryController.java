@@ -160,7 +160,7 @@ public class RsReportCategoryController extends BaseController {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryDelete, method = RequestMethod.DELETE)
     public Envelop delete(
             @ApiParam(name = "id", value = "主键", required = true)
-            @PathVariable(value = "id") Integer id) throws Exception {
+            @RequestParam(value = "id") Integer id) throws Exception {
         Envelop envelop = new Envelop();
         try {
             rsReportCategoryClient.delete(id);

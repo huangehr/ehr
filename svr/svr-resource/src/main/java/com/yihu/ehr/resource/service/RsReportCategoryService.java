@@ -17,7 +17,7 @@ import java.util.List;
  * @created 2017.8.8 20:32
  */
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class RsReportCategoryService extends BaseJpaService<RsReportCategory, RsReportCategoryDao> {
 
     @Autowired
@@ -51,6 +51,7 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
 
     /**
      * 获取资源报表分类的树形下拉框数据
+     *
      * @param name 资源报表分类名称
      * @return 资源报表分类的树形下拉框数据
      */
@@ -64,29 +65,33 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
      * @param rsReportCategory 资源报表分类
      * @return MRsReportCategory 资源报表分类
      */
+    @Transactional(readOnly = false)
     public RsReportCategory save(RsReportCategory rsReportCategory) {
         return rsReportCategoryDao.save(rsReportCategory);
     }
 
     /**
-     * 删除资源报表分类
+     * 根据ID删除资源报表分类及其所有后代
      *
      * @param id 资源报表分类ID
      */
+    @Transactional(readOnly = false)
     public void delete(Integer id) {
-        RsReportCategory rsReportCategory = rsReportCategoryDao.findOne(id);
-        rsReportCategoryDao.delete(rsReportCategory);
+        List<RsReportCategory> descendantList = this.getDescendantIds(id);
+        descendantList.add(this.getById(id));
+        rsReportCategoryDao.delete(descendantList);
     }
 
     /**
      * 验证资源报表分类编码是否唯一
-     * @param id 主键
+     *
+     * @param id   主键
      * @param code 编码
      * @return true：唯一，false：不唯一
      */
     public Boolean isUniqueCode(Integer id, String code) {
-        RsReportCategory rsReportCategory = rsReportCategoryDao.isUniqueName(id, code);
-        if(rsReportCategory == null) {
+        RsReportCategory rsReportCategory = rsReportCategoryDao.isUniqueCode(id, code);
+        if (rsReportCategory == null) {
             return true;
         } else {
             return false;
@@ -95,17 +100,34 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
 
     /**
      * 验证资源报表分类编码是否唯一
-     * @param id 主键
+     *
+     * @param id   主键
      * @param name 名称
      * @return true：唯一，false：不唯一
      */
     public Boolean isUniqueName(Integer id, String name) {
         RsReportCategory rsReportCategory = rsReportCategoryDao.isUniqueName(id, name);
-        if(rsReportCategory == null) {
+        if (rsReportCategory == null) {
             return true;
         } else {
             return false;
         }
+    }
+
+    /**
+     * 根据ID获取其所有后代ID
+     *
+     * @param pid 父节点ID
+     * @return 所有后代ID
+     */
+    private List<RsReportCategory> getDescendantIds(Integer pid) {
+        List<RsReportCategory> idList = new ArrayList<>();
+        List<RsReportCategory> children = this.getChildrenByPid(pid);
+        for (RsReportCategory child : children) {
+            idList.add(child);
+            idList.addAll(getDescendantIds(child.getId()));
+        }
+        return idList;
     }
 
 }
