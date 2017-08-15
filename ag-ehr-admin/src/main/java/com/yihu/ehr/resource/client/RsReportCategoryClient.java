@@ -32,7 +32,7 @@ public interface RsReportCategoryClient {
     @ApiOperation(value = "根据条件获取资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategories, method = RequestMethod.GET)
     List<MRsReportCategory> search(
-            @ApiParam(name = "codeName", value = "资源分类编码或名称")
+            @ApiParam(name = "codeName", value = "资源报表分类编码或名称")
             @RequestParam(value = "codeName", required = false) String codeName);
 
     @ApiOperation(value = "获取资源报表分类的树形下拉框数据")
@@ -45,13 +45,13 @@ public interface RsReportCategoryClient {
     @ApiOperation("新增资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)
     MRsReportCategory add(
-            @ApiParam(name = "mrsReportCategory", value = "报表分类JSON字符串", required = true)
+            @ApiParam(name = "mrsReportCategory", value = "资源报表分类JSON字符串", required = true)
             @RequestBody String mrsReportCategory);
 
     @ApiOperation("更新资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.PUT)
     MRsReportCategory update(
-            @ApiParam(name = "mrsReportCategory", value = "报表分类JSON字符串", required = true)
+            @ApiParam(name = "mrsReportCategory", value = "资源报表分类JSON字符串", required = true)
             @RequestBody String mrsReportCategory);
 
     @ApiOperation("删除资源报表分类")
