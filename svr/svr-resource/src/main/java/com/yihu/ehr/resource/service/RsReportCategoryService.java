@@ -28,7 +28,7 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
      * 根据ID，获取资源报表分类
      *
      * @param id 资源报表分类ID
-     * @return MRsReportCategory
+     * @return RsReportCategory
      */
     public RsReportCategory getById(Integer id) {
         return rsReportCategoryDao.findOne(id);
@@ -64,7 +64,7 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
      * 保存资源报表分类
      *
      * @param rsReportCategory 资源报表分类
-     * @return MRsReportCategory 资源报表分类
+     * @return RsReportCategory 资源报表分类
      */
     @Transactional(readOnly = false)
     public RsReportCategory save(RsReportCategory rsReportCategory) {
