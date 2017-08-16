@@ -13,6 +13,8 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
+import org.elasticsearch.search.aggregations.metrics.max.MaxBuilder;
+import org.elasticsearch.search.aggregations.metrics.sum.SumBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
@@ -106,32 +108,47 @@ public class ElasticsearchUtil {
 
 
     /**
-     * 执行搜索（带分组）
+     * 执行搜索（带分组求和）
      * @param queryBuilder 查询内容
      * @param aggsField 要分组的字段
+     * @param sumField 要求和的字段
      * @return
      */
-    public Map<String, Object> searcherByGroup(Client client,BoolQueryBuilder queryBuilder, String aggsField) {
+    public List<Map<String, Object>> searcherByGroup(Client client,BoolQueryBuilder queryBuilder, String aggsField , String sumField) {
         SearchRequestBuilder searchRequestBuilder =
                 client.prepareSearch(esClientUtil.getIndex())
                 .setTypes(esClientUtil.getType())
                 .setQuery(queryBuilder);
 
         //创建TermsBuilder对象，使用term查询，设置该分组的名称为 name_count，并根据aggsField字段进行分组
-        TermsBuilder termsBuilder = AggregationBuilders.terms(aggsField +"_count").field(aggsField);//此处也可继续设置order、size等
-        //添加分组信息
-        searchRequestBuilder.addAggregation(termsBuilder);
-        //执行搜索
-        SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
-        //解析返回数据，获取分组名称为aggs-class的数据
-        Terms terms = searchResponse.getAggregations().get(aggsField +"_count");
-        Collection<Terms.Bucket> buckets = terms.getBuckets();
-        Map<String, Object> dataMap = new HashMap<String, Object>();
-        for (Terms.Bucket bucket : buckets) {
-            String key = bucket.getKey().toString();
-            dataMap.put(key, bucket.getDocCount() + "");
+        TermsBuilder termsBuilder = AggregationBuilders.terms(aggsField).field(aggsField);//此处也可继续设置order、size等
+        SumBuilder ageAgg= AggregationBuilders.sum(sumField).field(sumField);
+
+        searchRequestBuilder.addAggregation(termsBuilder.subAggregation(ageAgg));
+        SearchResponse response = searchRequestBuilder.execute().actionGet();
+
+        SearchHits hits = response.getHits();
+        List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
+        for (SearchHit hit : hits.getHits()){
+            Map<String, Object> map = new HashMap<>() ;
+            map = hit.getSource();
+            matchRsult.add(map);
         }
-        return dataMap;
+        return matchRsult;
+
+//        //添加分组信息
+//        searchRequestBuilder.addAggregation(termsBuilder);
+//        //执行搜索
+//        SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+//        //解析返回数据，获取分组名称为aggs-class的数据
+//        Terms terms = searchResponse.getAggregations().get(aggsField +"_count");
+//        Collection<Terms.Bucket> buckets = terms.getBuckets();
+//        Map<String, Object> dataMap = new HashMap<String, Object>();
+//        for (Terms.Bucket bucket : buckets) {
+//            String key = bucket.getKey().toString();
+//            dataMap.put(key, bucket.getDocCount() + "");
+//        }
+//        return dataMap;
     }
 
 
@@ -143,7 +160,6 @@ public class ElasticsearchUtil {
      * @throws JsonProcessingException
      */
     public boolean save(Client client,String source) throws JsonProcessingException {
-//        String source = objectMapper.writeValueAsString(object);
         IndexResponse indexResponse = client
                 .prepareIndex(esClientUtil.getIndex(), esClientUtil.getType(), null)
                 .setSource(source).get();
@@ -152,8 +168,6 @@ public class ElasticsearchUtil {
     }
 
     public void deleteById(Client client ,String id){
-//        DeleteResponse deleteresponse = client.prepareDelete(esClientUtil.getIndex(), esClientUtil.getType(), id)
-//                .execute().actionGet();
         DeleteRequestBuilder drBuilder = client.prepareDelete(esClientUtil.getIndex(), esClientUtil.getType(), id);
         drBuilder.execute().actionGet();
     }
