@@ -195,6 +195,17 @@ public class ServiceApi {
         public static final String RsReportCategoryIsUniqueCode = "/resources/reportCategory/isUniqueCode";
         public static final String RsReportCategoryIsUniqueName = "/resources/reportCategory/isUniqueName";
 
+        /**
+         * 资源报表
+         */
+        public static final String RsReportPrefix = "/resources/report/";
+        public static final String RsReport = "/resources/report/{id}";
+        public static final String RsReports = "/resources/reports";
+        public static final String RsReportSave = "/resources/report/save";
+        public static final String RsReportDelete = "/resources/report/delete";
+        public static final String RsReportIsUniqueCode = "/resources/report/isUniqueCode";
+        public static final String RsReportIsUniqueName = "/resources/report/isUniqueName";
+
     }
 
     /**

@@ -47,10 +47,10 @@ public class RsReportCategoryController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "根据条件，获取资源分类")
+    @ApiOperation(value = "根据条件，获取资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryTree, method = RequestMethod.GET)
     public Envelop getTreeData(
-            @ApiParam(name = "codeName", value = "资源分类编码或名称")
+            @ApiParam(name = "codeName", value = "资源报表分类编码或名称")
             @RequestParam(value = "codeName", required = false) String codeName) throws Exception {
         try {
             Envelop envelop = new Envelop();
@@ -65,7 +65,7 @@ public class RsReportCategoryController extends BaseController {
         }
     }
 
-    @ApiOperation(value = "获取资源分类树形下拉框数据")
+    @ApiOperation(value = "获取资源报表分类树形下拉框数据")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryComboTree, method = RequestMethod.GET)
     public Envelop getComboTreeData(
             @ApiParam(name = "name", value = "资源报表分类名称")
@@ -87,7 +87,7 @@ public class RsReportCategoryController extends BaseController {
     @ApiOperation("新增资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)
     public Envelop add(
-            @ApiParam(name = "rsReportCategory", value = "报表分类JSON字符串", required = true)
+            @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON字符串", required = true)
             @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
         Envelop envelop = new Envelop();
         try {
@@ -105,7 +105,7 @@ public class RsReportCategoryController extends BaseController {
     @ApiOperation("更新资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.PUT)
     public Envelop update(
-            @ApiParam(name = "rsReportCategory", value = "报表分类JSON字符串", required = true)
+            @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON字符串", required = true)
             @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
         Envelop envelop = new Envelop();
         try {
