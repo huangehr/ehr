@@ -50,9 +50,26 @@ public class ServiceApi {
         public static final String ResourcesMysql = "/resources/query/mysql"; //mysql资源查询接口
 
 
+        //资源视图
         public static final String Resources = "/resources";
         public static final String Resource = "/resources/{id}";
         public static final String NoPageResources = "/NoPageResources";
+        public static final String IsExistName = "/isExistName";
+        public static final String IsExistCode = "/resources/isExistCode/{code}";
+        public static final String GetQuotaList = "/resources/getQuotaList";
+        public static final String GetRsQuotaPreview = "/resources/getRsQuotaPreview";
+
+
+        public static final String SearchInfo = "/resourceQuota/searchInfo";
+        public static final String BatchAddResourceQuota = "/resourceQuota/batchAddResourceQuota";
+        public static final String SearchByQuotaId = "/resourceQuota/searchByQuotaId";
+        public static final String GetByResourceId = "/resourceQuota/getByResourceId";
+        public static final String GetQuotaChartByQuotaId = "/resourceQuota/getQuotaChartByQuotaId";
+        public static final String GetRQNameByResourceId = "/resourceQuota/getRQNameByResourceId";
+
+
+
+
 
         public static final String ResourceMetadataList = "/resources/rs_metadata";
         public static final String ResourceMetadataBatch = "/resources/rs_metadata/batch";
@@ -177,6 +194,17 @@ public class ServiceApi {
         public static final String RsReportCategoryDelete = "/resources/reportCategory/delete";
         public static final String RsReportCategoryIsUniqueCode = "/resources/reportCategory/isUniqueCode";
         public static final String RsReportCategoryIsUniqueName = "/resources/reportCategory/isUniqueName";
+
+        /**
+         * 资源报表
+         */
+        public static final String RsReportPrefix = "/resources/report/";
+        public static final String RsReport = "/resources/report/{id}";
+        public static final String RsReports = "/resources/reports";
+        public static final String RsReportSave = "/resources/report/save";
+        public static final String RsReportDelete = "/resources/report/delete";
+        public static final String RsReportIsUniqueCode = "/resources/report/isUniqueCode";
+        public static final String RsReportIsUniqueName = "/resources/report/isUniqueName";
 
     }
 
@@ -914,7 +942,7 @@ public class ServiceApi {
 
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
         public static final String GetQuotaReport = "tj/getQuotaReport";
-        public static final String GetQuotaGraphicReport = "tj/getQuotaGraphicReport";
+        public static final String GetQuotaGraphicReportPreview = "tj/getQuotaGraphicReportPreview";
         public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
 
