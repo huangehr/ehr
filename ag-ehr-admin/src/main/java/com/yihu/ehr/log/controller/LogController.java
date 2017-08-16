@@ -109,6 +109,48 @@ public class LogController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/searchListLogs", method = RequestMethod.GET)
+    @ApiOperation(value = "获取业务日志列表,姓名模糊查询", notes = "根据查询条件业务日志列表在前端展示")
+    public Envelop searchListLogs(
+            @ApiParam(name = "patient", value = "操作者", defaultValue = "")
+            @RequestParam(value = "patient", required = false) String patient,
+            @ApiParam(name = "logType", value = "日志类型", defaultValue = "")
+            @RequestParam(value = "logType", required = false) String logType,
+            @ApiParam(name = "data", value = "数据", defaultValue = "")
+            @RequestParam(value = "data", required = false) String data,
+            @ApiParam(name = "startDate", value = "查询开始时间", defaultValue = "")
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @ApiParam(name = "endDate", value = "查询结束时间", defaultValue = "")
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @ApiParam(name = "caller", value = "调用者", defaultValue = "")
+            @RequestParam(value = "caller", required = false) String caller,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
+
+        ListResult listResult = null;
+        if(logType !=null){
+            if(logType.equals("1")){
+                listResult = logClient.getOperatorListLogs(patient,data, startDate, endDate, caller, sorts, size, page);
+            }else if(logType.equals("2")){
+                listResult = logClient.getBussinessListLogs(patient,data, startDate, endDate, caller, sorts, size, page);
+            }
+        }else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else{
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
 
 
 }

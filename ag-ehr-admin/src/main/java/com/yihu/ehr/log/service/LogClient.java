@@ -59,4 +59,30 @@ public interface LogClient {
             @RequestParam(value = "logId", required = false) String logId
     );
 
+    @RequestMapping(value = "/log/getBussinessListLogs", method = RequestMethod.GET)
+    @ApiOperation(value = "业务日志列表,姓名模糊查询")
+    ListResult getBussinessListLogs(
+            @RequestParam(value = "patient", required = false) String patient,
+            @RequestParam(value = "data", required = false) String data,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "caller", required = false) String caller,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "page", required = false) int page
+    );
+
+    @RequestMapping(value = "/log/getOperatorListLogs", method = RequestMethod.GET)
+    @ApiOperation(value = "操作日志列表,姓名模糊查询")
+    ListResult getOperatorListLogs(
+            @RequestParam(value = "patient", required = false) String patient,
+            @RequestParam(value = "data", required = false) String data,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "caller", required = false) String caller,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "page", required = false) int page
+    );
+
 }
