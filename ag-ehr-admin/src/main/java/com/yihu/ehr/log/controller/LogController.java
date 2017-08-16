@@ -75,12 +75,12 @@ public class LogController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/getLog/{logId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getLogByIdAndType/{logId}", method = RequestMethod.GET)
     @ApiOperation(value = "获取log信息", notes = "log信息")
-    public Envelop getUser(
+    public Envelop getLogByIdAndType(
             @ApiParam(name = "logId", value = "日志id", defaultValue = "")
             @PathVariable(value = "logId") String logId,
-            @ApiParam(name = "logType", value = "日志类型", defaultValue = "")
+            @ApiParam(name = "logType", value = "日志类型", defaultValue = "2")
             @PathVariable(value = "logType") String logType) {
         try {
             ListResult listResult = null;
