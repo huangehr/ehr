@@ -75,6 +75,40 @@ public class LogController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/getLog/{logId}", method = RequestMethod.GET)
+    @ApiOperation(value = "获取log信息", notes = "log信息")
+    public Envelop getUser(
+            @ApiParam(name = "logId", value = "日志id", defaultValue = "")
+            @PathVariable(value = "logId") String logId,
+            @ApiParam(name = "logType", value = "日志类型", defaultValue = "")
+            @PathVariable(value = "logType") String logType) {
+        try {
+            ListResult listResult = null;
+            if(logType !=null){
+                if(logType.equals("1")){
+                    listResult = logClient.getOperatorLogById(logId);
+                }else if(logType.equals("2")){
+                    listResult = logClient.getBussinessLogById(logId);
+                }
+            }else {
+                Envelop envelop = new Envelop();
+                return envelop;
+            }
+            if(listResult.getTotalCount() != 0){
+                List<Map<String,Object>> list = listResult.getDetailModelList();
+                return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            }else{
+                Envelop envelop = new Envelop();
+                return envelop;
+            }
+
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
 
 
 }

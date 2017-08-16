@@ -47,4 +47,16 @@ public interface LogClient {
             @RequestParam(value = "page", required = false) int page
     );
 
+    @RequestMapping(value = "/getBussinessLogById/{logId}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取业务日志详情")
+    ListResult getBussinessLogById(
+            @RequestParam(value = "logId", required = false) String logId
+    );
+
+    @RequestMapping(value = "/getOperatorLogById/{logId}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id获取操作日志详情")
+    ListResult getOperatorLogById(
+            @RequestParam(value = "logId", required = false) String logId
+    );
+
 }

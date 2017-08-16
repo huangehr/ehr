@@ -167,4 +167,84 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
         return listResult;
     }
 
+
+
+    @RequestMapping(value = "/getBussinessLogById/{logId}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id进行MONGODB日志的查询", response = CloudBusinessLog.class, responseContainer = "List")
+    public ListResult getBussinessLogById(
+            @ApiParam(name = "logId", value = "logId", defaultValue = "")
+            @RequestParam(value = "logId", required = false) String logId) throws Exception{
+        Query query = new Query();
+        Criteria cr = new Criteria();
+        List<Criteria> criteriaList = new ArrayList<>();
+        if(StringUtils.isNotEmpty(logId)){
+            Criteria crCaller = new Criteria().where("id").is(logId);
+            criteriaList.add(crCaller);
+        }
+        if(criteriaList != null && criteriaList.size() > 0 ){
+            Criteria[] criterias = new  Criteria[criteriaList.size()];
+            for(int i=0 ;i < criteriaList.size() ; i++){
+                criterias[i] = criteriaList.get(i);
+            }
+            cr.andOperator(criterias);
+        }
+        query.addCriteria(cr);
+        List<CloudBusinessLog> logsModelList =  mongoTemplate.find(query, CloudBusinessLog.class);
+
+        long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
+        ListResult listResult = new ListResult();
+        if(logsModelList.size() > 0) {
+            listResult.setDetailModelList(logsModelList);
+            listResult.setSuccessFlg(true);
+            listResult.setTotalCount((int)totalCount);
+            listResult.setCode(200);
+            listResult.setMessage("日志查询成功！");
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
+        }
+        return listResult;
+    }
+
+
+    @RequestMapping(value = "/getOperatorLogById/{logId}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据id进行MONGODB日志的查询", response = CloudOperatorLog.class, responseContainer = "List")
+    public ListResult getOperatorLogById(
+            @ApiParam(name = "logId", value = "logId", defaultValue = "")
+            @RequestParam(value = "logId", required = false) String logId) throws Exception{
+
+        Query query = new Query();
+        Criteria cr = new Criteria();
+        List<Criteria> criteriaList = new ArrayList<>();
+        if(StringUtils.isNotEmpty(logId)){
+            Criteria crCaller = new Criteria().where("id").is(logId);
+            criteriaList.add(crCaller);
+        }
+        if(criteriaList != null && criteriaList.size() > 0 ){
+            Criteria[] criterias = new  Criteria[criteriaList.size()];
+            for(int i=0 ;i < criteriaList.size() ; i++){
+                criterias[i] = criteriaList.get(i);
+            }
+            cr.andOperator(criterias);
+        }
+        query.addCriteria(cr);
+        List<CloudOperatorLog> logsModelList =  mongoTemplate.find(query, CloudOperatorLog.class);
+        long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
+        ListResult listResult = new ListResult();
+        if(logsModelList.size() > 0) {
+            listResult.setDetailModelList(logsModelList);
+            listResult.setSuccessFlg(true);
+            listResult.setTotalCount((int)totalCount);
+            listResult.setCode(200);
+            listResult.setMessage("日志查询成功！");
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
+        }
+        return listResult;
+    }
+
+
 }
