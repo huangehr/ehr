@@ -216,8 +216,8 @@
         <groupId>org.springframework.kafka</groupId>
         <artifactId>kafka-clients</artifactId>
         <version>0.9.0.2.3.4.0-3485</version>
-        <scope>system</scope>
-        <systemPath>E:\repository\repository\org\springframework\kafka\kafka-clients\0.9.0.2.3.4.0-3485\kafka-clients-0.9.0.2.3.4.0-3485.jar</systemPath>
+        <!--<scope>system</scope>-->
+        <!--<systemPath>E:\repository\repository\org\springframework\kafka\kafka-clients\0.9.0.2.3.4.0-3485\kafka-clients-0.9.0.2.3.4.0-3485.jar</systemPath>-->
         </dependency>
 
         <dependency>

@@ -5,6 +5,7 @@ import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.resource.MChartInfoModel;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.model.resource.MRsInterface;
 import com.yihu.ehr.model.resource.MRsResources;
@@ -186,7 +187,7 @@ public class ResourcesController extends BaseController {
         }
     }
     @ApiOperation("资源编码是否已存在")
-    @RequestMapping(value = "/resources/isExistCode/{code}" , method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.IsExistCode , method = RequestMethod.GET)
     public Envelop isExistCode(
             @ApiParam(name = "code", value = "code", defaultValue = "")
             @PathVariable(value = "code") String code){
@@ -201,7 +202,7 @@ public class ResourcesController extends BaseController {
     }
 
     @ApiOperation("资源名称是否已存在")
-    @RequestMapping(value = "/resources/isExistName",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.IsExistName,method = RequestMethod.GET)
     public Object isExistName(
             @ApiParam(name = "name", value = "name", defaultValue = "")
             @RequestParam(value = "name") String name){
@@ -216,7 +217,7 @@ public class ResourcesController extends BaseController {
     }
 
     @ApiOperation("指标资源配置")
-    @RequestMapping(value = "/resources/getQuotaList",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.GetQuotaList,method = RequestMethod.GET)
     public Envelop getQuotaList(
             @ApiParam(name = "quotaName", value = "指标名称",defaultValue = "")
             @RequestParam(value = "quotaName", required = false) String quotaName,
@@ -282,19 +283,19 @@ public class ResourcesController extends BaseController {
         }
     }
 
-//    @RequestMapping(value = "/getRsQuotaPreview", method = RequestMethod.GET)
-//    @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表")
-//    public List<ResourceQuotaModel> getRsQuotaPreview(
-//            @ApiParam(name = "filter", value = "过滤器", defaultValue = "")
-//            @RequestParam(value = "filter") String filter,
-//            @ApiParam(name = "filters", value = "图表类型", defaultValue = "")
-//            @RequestParam(value = "filters", required = false) String filters) {
-//        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(filter);
-//        List<String> json = new ArrayList<>();
-//        for (ResourceQuotaModel m : list) {
-//            String report = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), filters);
-//            json.add(report);
-//        }
-//        return list;
-//    }
+    @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.GET)
+    @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表预览")
+    public List<MChartInfoModel> getRsQuotaPreview(
+            @ApiParam(name = "filter", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "filter") String filter,
+            @ApiParam(name = "filters", value = "指标查询过滤条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) {
+        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(filter);
+        List<MChartInfoModel> chartInfoModels = new ArrayList<>();
+        for (ResourceQuotaModel m : list) {
+            MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), filters);
+            chartInfoModels.add(chartInfoModel);
+        }
+        return chartInfoModels;
+    }
 }

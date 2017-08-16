@@ -7,6 +7,7 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.resource.MResourceQuota;
 import com.yihu.ehr.resource.model.ResourceQuota;
 import com.yihu.ehr.resource.service.ResourceQuotaService;
 import io.swagger.annotations.Api;
@@ -29,7 +30,7 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ResourceQuotaService resourceQuotaService;
 
-    @RequestMapping(value = "/searchInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.SearchInfo, method = RequestMethod.GET)
     @ApiOperation(value = "资源视图指标")
     public ListResult search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -58,7 +59,7 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
         return listResult;
     }
 
-    @RequestMapping(value = "/getRQNameByResourceId", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.GetRQNameByResourceId, method = RequestMethod.GET)
     @ApiOperation(value = "资源视图指标-根据resourceId查询")
     public List<Integer> getRQNameByResourceId(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
@@ -71,7 +72,7 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
         return quotaIds;
     }
 
-    @RequestMapping(value = "/batchAddResourceQuota", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.BatchAddResourceQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增&修改资源视图-关联指标表")
     public ObjectResult batchAddResourceQuota(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
@@ -87,7 +88,7 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
         return Result.success("资源视图-关联指标表更新成功！", list);
     }
 
-    @RequestMapping(value = "/getQuotaChartByQuotaId", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.GetQuotaChartByQuotaId, method = RequestMethod.GET)
     @ApiOperation(value = "资源视图指标-获取已选图表值")
     public String getQuotaChartByQuotaId(
             @ApiParam(name = "quotaId", value = "过滤器，为空检索所有条件")
@@ -95,7 +96,7 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
         return resourceQuotaService.getQuotaChartByQuotaId(quotaId);
     }
 
-    @RequestMapping(value = "/getByResourceId", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.GetByResourceId, method = RequestMethod.GET)
     @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表")
     public List<ResourceQuota> getByResourceId(
             @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
@@ -104,12 +105,21 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
         return list;
     }
 
-    @RequestMapping(value = "/searchByQuotaId", method = RequestMethod.GET)
-    @ApiOperation(value = "资源视图指标-根据quotaId查询")
-    public List<ResourceQuota> searchByQuotaId (
-            @ApiParam(name = "quotaId", value = "过滤器", defaultValue = "0")
+    @RequestMapping(value = ServiceApi.Resources.SearchByQuotaId, method = RequestMethod.GET)
+    @ApiOperation(value = "资源视图指标-根据quotaId查询,此指标有被多少个视图选中")
+    public List<MResourceQuota> searchByQuotaId (
+            @ApiParam(name= "quotaId", value = "过滤器", defaultValue = "0")
             @RequestParam(value = "quotaId") Integer quotaId) throws Exception{
         List<ResourceQuota> list = resourceQuotaService.search("quotaId=" + quotaId);
-        return list;
+        List<MResourceQuota> models = new ArrayList<>();
+        if( list != null && list.size() > 0){
+            for(ResourceQuota resourceQuota: list){
+                MResourceQuota mResourceQuota = objectMapper.convertValue(resourceQuota,MResourceQuota.class);
+                models.add(mResourceQuota);
+            }
+            return models;
+        }else {
+            return null;
+        }
     }
 }
