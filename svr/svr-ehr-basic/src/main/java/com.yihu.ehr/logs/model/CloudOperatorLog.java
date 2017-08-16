@@ -15,6 +15,8 @@ public class CloudOperatorLog {
     private String function; // 操作页面名称
     private String operation;// 操作内容（增、删、改、查、导入）
     private String patient;       //关联居民 - 与caller相同
+    private String logType;       //日志类型
+    private String response;     //
 
     public String getId() {
         return id;
@@ -86,5 +88,21 @@ public class CloudOperatorLog {
 
     public void setPatient(String patient) {
         this.patient = patient;
+    }
+
+    public String getLogType() {
+        return logType;
+    }
+
+    public void setLogType(String logType) {
+        this.logType = logType;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
     }
 }
