@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class CloudBusinessLog {
     @Id
     private String id;              //uuid
-    private String caller;         //业务操作�?
+    private String caller;         //业务操作�?
     private String time;           //操作时间
     private String logType;       //日志类型
     private String businessType; //业务代码
@@ -19,6 +19,8 @@ public class CloudBusinessLog {
     private String appKey;
     private String url;
     private String params;
+    private String function; // 操作页面名称
+    private String operation;// 操作内容（增、删、改、查、导入）
 
     public String getId() {
         return id;
@@ -122,5 +124,21 @@ public class CloudBusinessLog {
 
     public void setParams(String params) {
         this.params = params;
+    }
+
+    public String getFunction() {
+        return function;
+    }
+
+    public void setFunction(String function) {
+        this.function = function;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 }
