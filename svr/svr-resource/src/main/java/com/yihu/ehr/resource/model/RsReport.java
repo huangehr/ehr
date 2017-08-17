@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.model;
 
+import com.yihu.ehr.constants.SystemDictId;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
@@ -24,6 +25,7 @@ public class RsReport {
 
     // 临时字段
     private String reportCategory; // 报表分类名称
+    private String statusName; // 报表状态名称
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -99,4 +101,12 @@ public class RsReport {
         this.reportCategory = reportCategory;
     }
 
+    @Formula("(SELECT de.value FROM rs_report r LEFT JOIN system_dict_entries de ON de.dict_id = " + SystemDictId.RsReportStatus + " AND de.code = r.status WHERE r.id = id )")
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
 }

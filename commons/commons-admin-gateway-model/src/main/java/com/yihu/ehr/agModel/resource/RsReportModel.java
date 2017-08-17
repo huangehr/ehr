@@ -17,7 +17,9 @@ public class RsReportModel implements Serializable {
     private String status; // 报表状态
     private String remark; // 备注
     private String templatePath; // 报表模版路径
+
     private String reportCategory; // 报表分类名称
+    private String statusName; // 报表状态名称
 
     public Integer getId() {
         return id;
@@ -83,4 +85,11 @@ public class RsReportModel implements Serializable {
         this.reportCategory = reportCategory;
     }
 
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
 }
