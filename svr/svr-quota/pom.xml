@@ -159,13 +159,20 @@
         </dependency>
 
 
+        <!--<dependency>-->
+            <!--<groupId>com.github.abel533</groupId>-->
+            <!--<artifactId>ECharts</artifactId>-->
+            <!--<version>3.0.0</version>-->
+            <!--<scope>system</scope>-->
+            <!--<systemPath>E:\repository\repository\com\github\abel533\ECharts\ECharts-3.0.0.jar</systemPath>-->
+        <!--</dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.github.abel533/ECharts -->
         <dependency>
             <groupId>com.github.abel533</groupId>
             <artifactId>ECharts</artifactId>
             <version>3.0.0</version>
-            <scope>system</scope>
-            <systemPath>C:\Users\zdm\.m2\repository\com\github\abel533\ECharts\ECharts-3.0.0.jar</systemPath>
         </dependency>
+
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-rest-model</artifactId>
