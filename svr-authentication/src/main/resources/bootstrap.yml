@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-authentication
+    name: svr-authentication-zhoujie
 
 ---
 spring:
@@ -39,4 +39,14 @@ spring:
       username: user
       password: configuration
       uri: http://11.1.2.21:1221
+      label: master
+
+---
+spring:
+  profiles: prod_fz
+  cloud:
+    config:
+      username: user
+      password: configuration
+      uri: http://192.168.135.29:1221
       label: master

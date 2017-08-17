@@ -75,6 +75,85 @@ public class LogController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/getLogByIdAndType", method = RequestMethod.GET)
+    @ApiOperation(value = "获取log信息", notes = "log信息")
+    public Envelop getLogByIdAndType(
+            @ApiParam(name = "logId", value = "日志id", defaultValue = "")
+            @RequestParam(value = "logId") String logId,
+            @ApiParam(name = "logType", value = "日志类型", defaultValue = "2")
+            @RequestParam(value = "logType") String logType) {
+        try {
+            ListResult listResult = null;
+            if(logType !=null){
+                if(logType.equals("1")){
+                    listResult = logClient.getOperatorLogById(logId);
+                }else if(logType.equals("2")){
+                    listResult = logClient.getBussinessLogById(logId);
+                }else{
+                    listResult = logClient.getBussinessLogById(logId);
+                }
+            }else {
+                Envelop envelop = new Envelop();
+                return envelop;
+            }
+            if(null!=listResult&&listResult.getTotalCount() != 0){
+                List<Map<String,Object>> list = listResult.getDetailModelList();
+                if(null!=list&&list.size()>0&&null!=list.get(0).get("response")){
+                    list.get(0).put("response", list.get(0).get("response").toString().replace("\"","\\"+"\""));
+                    //"response" -> "{"result":{"successFlg":true,"message":"登录成功!","errorCode":0,"data":{"userCode":"admin","token":"78df2308-deea-42c3-8939-12b11a1a917f","schema":"hos1","tenant":"yichang","schemaTemp":"hos1","role":null}}}"
+                }
+                return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            }else{
+                Envelop envelop = new Envelop();
+                return envelop;
+            }
+
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = "/searchListLogs", method = RequestMethod.GET)
+    @ApiOperation(value = "获取业务日志列表,姓名模糊查询", notes = "根据查询条件业务日志列表在前端展示")
+    public Envelop searchListLogs(
+            @ApiParam(name = "patient", value = "操作者", defaultValue = "")
+            @RequestParam(value = "patient", required = false) String patient,
+            @ApiParam(name = "logType", value = "日志类型", defaultValue = "")
+            @RequestParam(value = "logType", required = false) String logType,
+            @ApiParam(name = "startDate", value = "查询开始时间", defaultValue = "")
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @ApiParam(name = "endDate", value = "查询结束时间", defaultValue = "")
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @ApiParam(name = "caller", value = "调用者", defaultValue = "")
+            @RequestParam(value = "caller", required = false) String caller,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
+        String data="";
+        String sorts="";
+        ListResult listResult = null;
+        if(logType !=null){
+            if(logType.equals("1")){
+                listResult = logClient.getOperatorListLogs(patient,data, startDate, endDate, caller, sorts, size, page);
+            }else if(logType.equals("2")){
+                listResult = logClient.getBussinessListLogs(patient,data, startDate, endDate, caller, sorts, size, page);
+            }
+        }else {
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> list = listResult.getDetailModelList();
+            return getResult(list, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+        }else{
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
 
 
 }

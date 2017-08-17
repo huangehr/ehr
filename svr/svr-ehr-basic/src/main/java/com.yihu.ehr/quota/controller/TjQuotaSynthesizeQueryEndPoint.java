@@ -47,7 +47,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaSynthesiseDimension, method = RequestMethod.GET)
     @ApiOperation(value = "查询多个指标交集维度")
-    public  Map<String,Map<String,String>>  getTjQuotaSynthesiseDimension(
+    public  List<Map<String,String>>  getTjQuotaSynthesiseDimension(
             @ApiParam(name = "quotaCodes", value = "指标code，多个指标用英文,分开")
             @RequestParam(value = "quotaCodes") String quotaCodes) {
 
@@ -127,7 +127,12 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
                 synthesiseMap.put(tempCode,modelCloumnMap);
             }
         }
-        return  synthesiseMap;
+
+        List<Map<String,String>> resultList = new ArrayList<>();
+        for(String key : synthesiseMap.keySet()){
+            resultList.add(synthesiseMap.get(key));
+        }
+        return  resultList;
     }
 
 

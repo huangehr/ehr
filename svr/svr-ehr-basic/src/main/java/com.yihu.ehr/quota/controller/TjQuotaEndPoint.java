@@ -109,13 +109,22 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         return Result.success("统计表更新成功！", tjQuotaModel);
     }
 
+    @RequestMapping(value = ServiceApi.TJ.UpdateTjQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改统计指标表")
+    public Result update(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestBody String model) throws Exception{
+        MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
+        TjQuota tjQuota = convertToModel(tjQuotaModel, TjQuota.class);
+        tjQuotaService.save(tjQuota);
+        return Result.success("统计指标表成功！");
+    }
 
     @RequestMapping(value = ServiceApi.TJ.DeleteTjQuota, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除统计指标表")
     public Result delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
             @RequestParam(value = "id") Long id) throws Exception{
-//        tjQuotaService.delete(id);
         TjQuota tjQuota = tjQuotaService.getById(id);
         tjQuota.setStatus(-1);
         tjQuotaService.save(tjQuota);

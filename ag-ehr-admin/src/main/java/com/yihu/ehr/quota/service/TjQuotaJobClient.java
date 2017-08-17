@@ -3,6 +3,7 @@ package com.yihu.ehr.quota.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.model.resource.MChartInfoModel;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -30,5 +31,10 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "pageSize" , required = false) int pageSize
     );
 
-
+    @ApiOperation(value = "获取指标统计结果曲线性或柱状报表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaGraphicReportPreview, method = RequestMethod.GET)
+    public MChartInfoModel getQuotaGraphicReport(
+            @RequestParam(value = "id" , required = true) int id,
+            @RequestParam(value = "type" , required = true) int type,
+            @RequestParam(value = "filters", required = false) String filters);
 }

@@ -3,9 +3,11 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.resource.MResourceQuota;
 import com.yihu.ehr.resource.client.ResourceQuotaClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.rest.Envelop;
@@ -31,7 +33,7 @@ public class ResourceQuotaController extends ExtendController {
     @Autowired
     private ResourceQuotaClient resourceQuotaClient;
 
-    @RequestMapping(value = "/searchInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.SearchInfo, method = RequestMethod.GET)
     @ApiOperation(value = "资源视图指标")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
@@ -59,7 +61,7 @@ public class ResourceQuotaController extends ExtendController {
         }
     }
 
-    @RequestMapping(value = "/batchAddResourceQuota", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.BatchAddResourceQuota, method = RequestMethod.POST)
     @ApiOperation(value = "新增&修改资源视图-关联指标表")
     public Envelop batchAddResourceQuota(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
@@ -77,4 +79,15 @@ public class ResourceQuotaController extends ExtendController {
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
+
+    @RequestMapping(value = ServiceApi.Resources.SearchByQuotaId, method = RequestMethod.GET)
+    @ApiOperation(value = "资源视图指标-根据quotaId查询")
+    public Envelop searchByQuotaId (
+            @ApiParam(name = "quotaId", value = "过滤器", defaultValue = "0")
+            @RequestParam(value = "quotaId") Integer quotaId) {
+        List<MResourceQuota> resourceQuotaModels = resourceQuotaClient.searchByQuotaId(quotaId);
+        return successObj(resourceQuotaModels);
+    }
+
+
 }

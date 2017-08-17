@@ -29,6 +29,7 @@ public class MTjQuotaModel {
     private String dataLevelName;
     private Integer quotaType;
     private String quotaTypeName;
+    private String metadataCode;
 
     public String getQuotaTypeName() {
         return quotaTypeName;
@@ -214,5 +215,11 @@ public class MTjQuotaModel {
         this.dataLevelName = dataLevelName;
     }
 
+    public String getMetadataCode() {
+        return metadataCode;
+    }
 
+    public void setMetadataCode(String metadataCode) {
+        this.metadataCode = metadataCode;
+    }
 }

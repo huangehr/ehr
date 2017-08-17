@@ -12,6 +12,11 @@ public class CloudOperatorLog {
     private String responseTime;       //响应时间
     private String params;          //参数
     private String data;          //相关信息
+    private String function; // 操作页面名称
+    private String operation;// 操作内容（增、删、改、查、导入）
+    private String patient;       //关联居民 - 与caller相同
+    private String logType;       //日志类型
+    private String response;     //
 
     public String getId() {
         return id;
@@ -59,5 +64,45 @@ public class CloudOperatorLog {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public String getFunction() {
+        return function;
+    }
+
+    public void setFunction(String function) {
+        this.function = function;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
+    }
+
+    public String getPatient() {
+        return patient;
+    }
+
+    public void setPatient(String patient) {
+        this.patient = patient;
+    }
+
+    public String getLogType() {
+        return logType;
+    }
+
+    public void setLogType(String logType) {
+        this.logType = logType;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
     }
 }

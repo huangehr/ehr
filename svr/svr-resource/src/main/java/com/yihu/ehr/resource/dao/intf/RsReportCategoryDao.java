@@ -2,11 +2,10 @@ package com.yihu.ehr.resource.dao.intf;
 
 import com.yihu.ehr.resource.model.RsReportCategory;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 资源报表分类 DAO
@@ -14,7 +13,7 @@ import java.util.Map;
  * @author 张进军
  * @created 2017.8.8 20:32
  */
-public interface RsReportCategoryDao extends PagingAndSortingRepository<RsReportCategory, Integer> {
+public interface RsReportCategoryDao extends CrudRepository<RsReportCategory, Integer> {
 
     @Query(" FROM RsReportCategory rc WHERE rc.pid = :pid ")
     List<RsReportCategory> getChildrenByPid(@Param("pid") Integer pid);
@@ -24,5 +23,11 @@ public interface RsReportCategoryDao extends PagingAndSortingRepository<RsReport
 
     @Query(" FROM RsReportCategory rc WHERE rc.name LIKE CONCAT('%',:name,'%') ")
     List<RsReportCategory> getComboTreeData(@Param("name") String name);
+
+    @Query(" FROM RsReportCategory rc WHERE rc.id <> :id AND rc.code = :code ")
+    RsReportCategory isUniqueCode(@Param("id") Integer id, @Param("code") String code);
+
+    @Query(" FROM RsReportCategory rc WHERE rc.id <> :id AND rc.name = :name ")
+    RsReportCategory isUniqueName(@Param("id") Integer id, @Param("name") String name);
 
 }

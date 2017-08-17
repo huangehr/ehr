@@ -46,7 +46,7 @@ public class DemographicService {
         return demInfo;
     }
 
-    public DemographicInfo getDemographicInfo(String telephoneNo) {
+    public DemographicInfo getDemographicInfoBytelephoneNo(String telephoneNo) {
         //{"联系电话":"15965368965"}
         telephoneNo="{\"联系电话\":\""+telephoneNo+"\"}";
         List<DemographicInfo> demInfoList = demographicInfoRepository.getDemographicInfoByTelephoneNo(telephoneNo);
