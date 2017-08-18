@@ -92,8 +92,10 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "资源视图指标-获取已选图表值")
     public String getQuotaChartByQuotaId(
             @ApiParam(name = "quotaId", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "quotaId", required = false) Integer quotaId) {
-        return resourceQuotaService.getQuotaChartByQuotaId(quotaId);
+            @RequestParam(value = "quotaId", required = false) Integer quotaId,
+            @ApiParam(name = "resourceId", value = "资源Id")
+            @RequestParam(value = "resourceId") String resourceId) {
+        return resourceQuotaService.getQuotaChartByQuotaId(quotaId, resourceId);
     }
 
     @RequestMapping(value = ServiceApi.Resources.GetByResourceId, method = RequestMethod.GET)

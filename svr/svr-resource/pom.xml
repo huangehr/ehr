@@ -144,6 +144,10 @@
             <artifactId>commons-data-query</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-entity</artifactId>
+        </dependency>
     </dependencies>
 
     <!--<repositories>

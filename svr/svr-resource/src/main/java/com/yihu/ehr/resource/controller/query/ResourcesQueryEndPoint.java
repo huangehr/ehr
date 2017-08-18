@@ -203,12 +203,14 @@ public class ResourcesQueryEndPoint {
         re.setCurrPage(result.getNumber());
         re.setPageSize(result.getSize());
         re.setTotalCount(new Long(result.getTotalElements()).intValue());
-        if(version!=null && version.length()>0)
-        {
+        if(version!=null && version.length()>0) {
             re.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(),version,null));
         }
         else{
-            re.setDetailModelList(result.getContent());
+            if(result != null) {
+                re.setSuccessFlg(true);
+                re.setDetailModelList(result.getContent());
+            }
         }
         return re;
     }

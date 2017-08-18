@@ -24,6 +24,7 @@ public class PackageDataSet {
     protected Date eventTime;
     protected Date createTime;
     protected boolean isMultiRecord = false;
+    protected Map<String, MetaDataRecord> records = new TreeMap<>();
 
     protected String pk ; //非档案类型数据集主键 add by HZY at 2017/07/06
 
@@ -34,8 +35,6 @@ public class PackageDataSet {
     public void setPk(String pk) {
         this.pk = pk;
     }
-
-    protected Map<String, MetaDataRecord> records = new TreeMap<>();
 
     public String getCode() {
         return code;

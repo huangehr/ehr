@@ -114,7 +114,7 @@ public class ResourcesQueryService  {
             //设置参数
             if (!StringUtils.isEmpty(queryCondition) && !queryCondition.equals("{}")) {
                 ql = parseCondition(queryCondition);
-            }else if(resourcesQuery != null) {
+            }else if(resourcesQuery != null && resourcesQuery.getResourcesType() == 1) {
                 String defaultQuery = resourcesQuery.getQuery();
                 ql = parseCondition(defaultQuery);
             }
@@ -178,7 +178,7 @@ public class ResourcesQueryService  {
     }
 
     /**
-     * 自定义资源浏览数据筛选
+     * 综合查询档案数据检索
      * @return
      */
     public Envelop getCustomizeData(String resourcesCodes, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception {
@@ -223,7 +223,7 @@ public class ResourcesQueryService  {
         queryParams = addParams(queryParams,"saas", saas);
         queryParams = addParams(queryParams,"sort", "{\"event_date\":\"desc\"}");
         /**
-         * 基本数据展示
+         * 基础数据展示
          */
         String igStr = ignoreField.toString();
         String dealIgStr = igStr.substring(1, igStr.length() - 1).replaceAll(" ", "");

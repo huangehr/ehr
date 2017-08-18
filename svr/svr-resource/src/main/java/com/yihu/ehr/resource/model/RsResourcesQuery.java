@@ -15,6 +15,7 @@ public class RsResourcesQuery {
     private String id;
     private String resourcesId;
     private String query;
+    private int resourcesType;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -44,5 +45,14 @@ public class RsResourcesQuery {
 
     public void setQuery(String query) {
         this.query = query;
+    }
+
+    @Column(name="resources_type",nullable = false)
+    public int getResourcesType() {
+        return resourcesType;
+    }
+
+    public void setResourcesType(int resourcesType) {
+        this.resourcesType = resourcesType;
     }
 }

@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.service;
 
+
 import com.yihu.ehr.entity.health.HealthBusiness;
 import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.query.BaseJpaService;
@@ -40,7 +41,7 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
      * @return
      */
     public List<RsResources> findFileMasterList() {
-        String sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resources rr where rr.code in (select code from std_data_set_56395d75b854 where multi_record = 0)";
+        String sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resources rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0)";
         RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(RsResources.class);
         return this.jdbcTemplate.query(sql, rowMapper);
     }
@@ -105,24 +106,26 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
             masterMap.put("name", healthBusiness.getName());
             masterMap.put("parent_id", healthBusiness.getParentId());
             masterMap.put("code", healthBusiness.getCode());
-            masterMap.put("note",healthBusiness.getNote());
+            masterMap.put("note", healthBusiness.getNote());
             List<TjQuota> tList = findQuotaMetadataList(healthBusiness);
-            if(tList != null) {
-                List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();
-                for(TjQuota tjQuota : tList) {
-                    Map<String, Object> detailMap = new HashMap<String, Object>();
-                    detailMap.put("level", level + 1);
-                    detailMap.put("id", tjQuota.getId());
-                    detailMap.put("name", tjQuota.getName());
-                    detailMap.put("code", tjQuota.getCode());
-                    detailMap.put("status", tjQuota.getStatus());
-                    detailMap.put("data_level", tjQuota.getDataLevel());
-                    detailMap.put("quota_type", tjQuota.getQuotaType());
-                    detailList.add(detailMap);
+            if (level != 0) {
+                if (tList != null) {
+                    List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();
+                    for (TjQuota tjQuota : tList) {
+                        Map<String, Object> detailMap = new HashMap<String, Object>();
+                        detailMap.put("level", level + 1);
+                        detailMap.put("id", tjQuota.getId());
+                        detailMap.put("name", tjQuota.getName());
+                        detailMap.put("code", tjQuota.getCode());
+                        detailMap.put("status", tjQuota.getStatus());
+                        detailMap.put("data_level", tjQuota.getDataLevel());
+                        detailMap.put("quota_type", tjQuota.getQuotaType());
+                        detailList.add(detailMap);
+                    }
+                    masterMap.put("detailList", detailList);
+                } else {
+                    masterMap.put("detailList", null);
                 }
-                masterMap.put("detailList", detailList);
-            }else {
-                masterMap.put("detailList", null);
             }
             /**
              * 处理子集数据
