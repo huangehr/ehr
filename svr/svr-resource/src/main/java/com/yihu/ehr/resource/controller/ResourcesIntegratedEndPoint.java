@@ -7,19 +7,16 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.resource.model.ResourceQuota;
 import com.yihu.ehr.resource.model.RsResourceMetadata;
 import com.yihu.ehr.resource.model.RsResources;
 import com.yihu.ehr.resource.model.RsResourcesQuery;
-import com.yihu.ehr.resource.service.ResourceMetadataService;
-import com.yihu.ehr.resource.service.ResourcesIntegratedService;
-import com.yihu.ehr.resource.service.ResourcesDefaultQueryService;
-import com.yihu.ehr.resource.service.ResourcesService;
+import com.yihu.ehr.resource.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +40,8 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
     private ResourceMetadataService rsMetadataService;
     @Autowired
     private ResourcesDefaultQueryService resourcesDefaultQueryService;
+    @Autowired
+    private ResourceQuotaService resourceQuotaService;
 
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据列表树")
@@ -91,7 +90,7 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
             envelop.setSuccessFlg(false);
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> paraMap = mapper.readValue(dataJson, Map.class);
-            if (!paraMap.containsKey("resource") || !paraMap.containsKey("metadatas")) {
+            if (!paraMap.containsKey("resource")) {
                 return envelop;
             }
             //处理资源视图
@@ -111,10 +110,17 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
                 envelop.setErrorMsg("资源保存失败");
                 return envelop;
             }
+            /**
+             * 根据资源数据类型保存相关数据元和搜索条件
+             */
             if (newResources.getDataSource() == 1) { //档案数据
-                //处理关联数据元
-                String metadatas = mapper.writeValueAsString(paraMap.get("metadatas"));
-                RsResourceMetadata[] rsMetadatas = toEntity(metadatas, RsResourceMetadata[].class);
+                //处理关联档案数据元
+                if(!paraMap.containsKey("metadatas")) {
+                    envelop.setErrorMsg("档案数据元不能为空");
+                    return envelop;
+                }
+                String rsMetadatasStr = mapper.writeValueAsString(paraMap.get("metadatas"));
+                RsResourceMetadata[] rsMetadatas = toEntity(rsMetadatasStr, RsResourceMetadata[].class);
                 for (RsResourceMetadata rsMetadata : rsMetadatas) {
                     rsMetadata.setResourcesId(reId);
                     rsMetadata.setId(getObjectId(BizObject.ResourceMetadata));
@@ -122,10 +128,10 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
                 List<RsResourceMetadata> rsMetadataList = rsMetadataService.saveMetadataBatch(rsMetadatas);
                 if (rsMetadataList == null || rsMetadataList.size() == 0) {
                     /**
-                     * 数据元关联失败，删除资源
+                     * 档案数据元关联失败，删除资源
                      */
                     rsService.delete(newResources);
-                    envelop.setErrorMsg("资源数据元关联失败");
+                    envelop.setErrorMsg("档案数据元关联失败");
                     return envelop;
                 }
                 //处理默认搜索条件
@@ -135,26 +141,66 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
                 resourcesQuery.setId(getObjectId(BizObject.ResourcesDefaultQuery));
                 resourcesQuery.setQuery(queryCondition);
                 resourcesQuery.setResourcesId(reId);
+                resourcesQuery.setResourcesType(1);
                 RsResourcesQuery newRsResourcesQuery = resourcesDefaultQueryService.saveResourceQuery(resourcesQuery);
                 if (newRsResourcesQuery == null) {
                     /**
-                     * 默认搜索条件保存失败，删除资源和关联数据元
+                     * 默认搜索条件保存失败，删除资源和关联档案数据元
                      */
-                    for (RsResourceMetadata rsResourceMetadata : rsMetadataList) {
-                        rsMetadataService.delete(rsResourceMetadata);
-                    }
+                    rsMetadataService.deleteRsMetadataByResourceId(newResources.getId());
                     rsService.delete(newResources);
                     envelop.setErrorMsg("资源默认搜索条件保存失败");
                     return envelop;
                 }
             } else if (newResources.getDataSource() == 2) { //统计指标
-
+                //处理关联指标数据元
+                if(!paraMap.containsKey("quotas")) {
+                    envelop.setErrorMsg("指标数据元不能为空");
+                    return envelop;
+                }
+                String rsQuotasStr = mapper.writeValueAsString(paraMap.get("quotas"));
+                ResourceQuota[] rsQuotas = toEntity(rsQuotasStr, ResourceQuota[].class);
+                for(ResourceQuota resourceQuota : rsQuotas) {
+                    resourceQuota.setResourceId(reId);
+                    ResourceQuota newResourceQuota = resourceQuotaService.save(resourceQuota);
+                    if(newResourceQuota == null) {
+                        /**
+                         * 指标数据元关联失败，删除资源和已关联的指标数据元
+                         */
+                        resourceQuotaService.deleteByResourceId(newResources.getId());
+                        rsService.delete(newResources);
+                        envelop.setErrorMsg("指标数据元关联失败");
+                        return envelop;
+                    }
+                }
+                //处理默认搜索条件
+                Map<String, Object> queryMap = (Map<String, Object>)paraMap.get("queryCondition");
+                String queryCondition = mapper.writeValueAsString(queryMap);
+                RsResourcesQuery resourcesQuery = new RsResourcesQuery();
+                resourcesQuery.setId(getObjectId(BizObject.ResourcesDefaultQuery));
+                resourcesQuery.setQuery(queryCondition);
+                resourcesQuery.setResourcesId(reId);
+                resourcesQuery.setResourcesType(2);
+                RsResourcesQuery newRsResourcesQuery = resourcesDefaultQueryService.saveResourceQuery(resourcesQuery);
+                if (newRsResourcesQuery == null) {
+                    /**
+                     * 默认搜索条件保存失败，删除资源和关联指标数据元
+                     */
+                    resourceQuotaService.deleteByResourceId(newResources.getId());
+                    rsService.delete(newResources);
+                    envelop.setErrorMsg("资源默认搜索条件保存失败");
+                    return envelop;
+                }
             }
             envelop.setSuccessFlg(true);
         }catch (Exception e) {
             if(newResources != null) {
+                /**
+                 * 报异常则删除所有已保存的数据
+                 */
                 resourcesDefaultQueryService.deleteByResourcesId(newResources.getId());
                 rsMetadataService.deleteRsMetadataByResourceId(newResources.getId());
+                resourceQuotaService.deleteByResourceId(newResources.getId());
                 rsService.delete(newResources);
             }
             envelop.setErrorMsg(ErrorCode.SystemError.toString());
