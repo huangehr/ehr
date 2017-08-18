@@ -23,8 +23,8 @@ public class ResourceQuotaService extends BaseJpaService<ResourceQuota, Resource
         resourceQuotaDao.deleteByResourceId(resourceId);
     }
 
-    public String getQuotaChartByQuotaId(Integer quotaId) {
-        List<Integer> quotaChartList = resourceQuotaDao.findQuotaChartByQuotaId(quotaId);
+    public String getQuotaChartByQuotaId(Integer quotaId, String resourceId) {
+        List<Integer> quotaChartList = resourceQuotaDao.findQuotaChartByQuotaId(quotaId, resourceId);
         if (null != quotaChartList && quotaChartList.size() > 0) {
             return quotaChartList.get(0) + "";
         }

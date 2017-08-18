@@ -257,11 +257,13 @@ public class ResourcesController extends BaseController {
                 }
             }
             List<Integer> list = resourceQuotaClient.getRQNameByResourceId(filters);//根据资源ID查询
+            String[] split = filters.split("=");    //获取resourceId
+            String resourceId = split[split.length-1];
             for (int i=0; i<mainModelList.size(); i++) {
                 if (list.contains(mainModelList.get(i).getQuotaId())) {
                     mainModelList.get(i).setFlag(true);
-                    // 根据quotaId查询resourceQuota表，获取已选择的图表值
-                    String quotaChart = resourceQuotaClient.getQuotaChartByQuotaId(mainModelList.get(i).getQuotaId());
+                    // 根据quotaId及resourceId查询resourceQuota表，获取已选择的图表值
+                    String quotaChart = resourceQuotaClient.getQuotaChartByQuotaId(mainModelList.get(i).getQuotaId(), resourceId);
                     mainModelList.get(i).setQuotaChart(quotaChart);
                 } else {
                     mainModelList.get(i).setFlag(false);

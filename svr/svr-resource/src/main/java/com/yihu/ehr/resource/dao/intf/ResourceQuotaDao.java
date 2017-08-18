@@ -17,6 +17,6 @@ public interface ResourceQuotaDao extends PagingAndSortingRepository<ResourceQuo
     @Modifying
     int deleteByResourceId(@Param("resourceId") String resourceId);
 
-    @Query("select rq.quotaChart from ResourceQuota rq where rq.quotaId = :quotaId")
-    List<Integer> findQuotaChartByQuotaId(@Param("quotaId")Integer quotaId);
+    @Query("select rq.quotaChart from ResourceQuota rq where rq.quotaId = :quotaId and rq.resourceId = :resourceId")
+    List<Integer> findQuotaChartByQuotaId(@Param("quotaId")Integer quotaId, @Param("resourceId") String resourceId);
 }
