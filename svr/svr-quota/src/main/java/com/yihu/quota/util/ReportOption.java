@@ -4,6 +4,7 @@ package com.yihu.quota.util;
 import com.github.abel533.echarts.Option;
 import com.github.abel533.echarts.axis.CategoryAxis;
 import com.github.abel533.echarts.axis.ValueAxis;
+import com.github.abel533.echarts.code.AxisType;
 import com.github.abel533.echarts.code.Magic;
 import com.github.abel533.echarts.code.Tool;
 import com.github.abel533.echarts.code.Trigger;
@@ -41,12 +42,13 @@ public class ReportOption {
 //        option.tooltip().trigger(Trigger.axis).formatter("Temperature : <br/>{b}km : {c}°C");
 
         ValueAxis valueAxis = new ValueAxis();
-        valueAxis.axisLabel().formatter("{value} °C");
+        valueAxis.axisLabel().formatter("摄氏度");
         option.xAxis(valueAxis);
 
         CategoryAxis categoryAxis = new CategoryAxis();
         categoryAxis.axisLine().onZero(false);
-        categoryAxis.axisLabel().formatter("{value} km");
+        categoryAxis.type(AxisType.value);
+        categoryAxis.axisLabel().formatter("千米");
         categoryAxis.boundaryGap(false);
         categoryAxis.data(0, 10, 20, 30, 40, 50, 60, 70, 80);
         option.yAxis(categoryAxis);

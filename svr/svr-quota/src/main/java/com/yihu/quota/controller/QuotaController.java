@@ -150,31 +150,21 @@ public class QuotaController extends BaseController {
      * @param id
      * @return
      */
-    @ApiOperation(value = "获取指标统计结果总量")
+    @ApiOperation(value = "获取指标统计不同维度结果总量")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
     public Envelop getQuotaTotalCount(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
             @RequestParam(value = "id" , required = true) int id,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "dimension", value = "需要统计维度字段", defaultValue = "quotaDate")
+            @ApiParam(name = "dimension", value = "需要统计不同维度字段多个维度用;隔开", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
-
-            //统计不同维度总量
     ) {
         Envelop envelop = new Envelop();
         try {
-            int  count = 0;
-            QuotaReport quotaReport = quotaService.getQuotaReport(id, filters,dimension);
-            if(quotaReport.getReultModelList() != null){
-                for(ReultModel reultModel:quotaReport.getReultModelList()){
-                    count = Integer.valueOf(reultModel.getValue().toString()) + count;
-                }
-            }
-            envelop.setTotalCount(count);
-            envelop.setObj(quotaReport.getTjQuota());
+            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters, dimension);
+            envelop.setDetailModelList(quotaReport.getReultModelList());
             envelop.setSuccessFlg(true);
-            envelop.setObj(count);
             return envelop;
         } catch (Exception e) {
             error(e);
@@ -237,6 +227,73 @@ public class QuotaController extends BaseController {
             envelop.setSuccessFlg(false);
             return chartInfoModel;
         }
+    }
+
+
+    @ApiOperation(value = "分组查询指标统计 支持单个字段")
+    @RequestMapping(value = "/tj/tjGetQuotaResultGroup", method = RequestMethod.GET)
+    public Envelop getQuotaResult(
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "aggsField", value = "分组字段", defaultValue = "")
+            @RequestParam(value = "aggsField", required = false) String aggsField,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters
+    ) {
+        Envelop envelop = new Envelop();
+        try {
+            List<Map<String, Object>> resultList = quotaService.searcherByGroup(id, filters,aggsField);
+            List<SaveModel> saveModelList = new ArrayList<SaveModel>();
+            for(Map<String, Object> map : resultList){
+                SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
+                if(saveModel != null){
+                    saveModelList.add(saveModel);
+                }
+            }
+            long totalCount = quotaService.getQuotaTotalCount(id,filters);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(saveModelList);
+            envelop.setTotalCount((int)totalCount);
+            return envelop;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+        }
+        envelop.setSuccessFlg(false);
+        return envelop;
+    }
+
+    @ApiOperation(value = "分组查询指标统计 支持单个及以上字段")
+    @RequestMapping(value = "/tj/tjGetQuotaByGroupBySql", method = RequestMethod.GET)
+    public Envelop getQuotaByGroupBySql(
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "aggsField", value = "分组字段", defaultValue = "")
+            @RequestParam(value = "aggsField", required = true) String aggsField,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters
+    ) {
+        Envelop envelop = new Envelop();
+        List<SaveModel> saveModelList = new ArrayList<SaveModel>();
+        try {
+            Map<String, Integer> map = quotaService.searcherByGroupBySql(id, aggsField,filters);
+            for(String str: map.keySet()){
+                SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
+                if(saveModel != null){
+                    saveModelList.add(saveModel);
+                }
+            }
+            long totalCount = quotaService.getQuotaTotalCount(id,filters);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(saveModelList);
+            envelop.setTotalCount((int)totalCount);
+            return envelop;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+        }
+        envelop.setSuccessFlg(false);
+        return envelop;
     }
 
 
