@@ -377,6 +377,8 @@ public class LogsEndPoint extends EnvelopRestEndPoint {
         query.addCriteria(cr);
         query.limit(end - begin).skip(begin);//分页数据
         List<CloudOperatorLog> logsModelList =  mongoTemplate.find(query, CloudOperatorLog.class);
+        System.out.println(mongoTemplate.getDb().getName() + "---" + mongoTemplate.getDb().getMongo().toString() );
+        System.out.println("wangguan 网关查询结果=" + logsModelList.size());
         long totalCount = mongoTemplate.count(query, CloudBusinessLog.class);
         ListResult listResult = new ListResult();
         if(logsModelList.size() > 0) {
