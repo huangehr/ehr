@@ -249,4 +249,29 @@ public class EsResultExtract {
         }
     }
 
+
+
+    //指标分组统计数量
+    public List<Map<String, Object>> searcherByGroup(TjQuota tjQuota, String filters,String aggsField ) throws Exception {
+        initialize(tjQuota,filters);
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        getBoolQueryBuilder(boolQueryBuilder);
+        List<Map<String, Object>> list = elasticsearchUtil.searcherByGroup(getEsClient(),boolQueryBuilder,aggsField, "result");
+        return  list;
+    }
+
+    //根据mysql 指标分组求和
+    public Map<String, Integer> searcherByGroupBySql(TjQuota tjQuota , String aggsFields ,String filter) throws Exception {
+        initialize(tjQuota,null);
+        if(StringUtils.isEmpty(filter)){
+            filter =  " quotaCode='" + tjQuota.getCode() + "' ";
+        }else {
+            filter = filter + " ,quotaCode='" + tjQuota.getCode() + "' ";
+        }
+        Map<String, Integer> map = elasticsearchUtil.searcherByGroupBySql(getEsClient(),esConfig.getIndex(), aggsFields ,filter ,"result");
+        return map;
+    }
+
+
+
 }

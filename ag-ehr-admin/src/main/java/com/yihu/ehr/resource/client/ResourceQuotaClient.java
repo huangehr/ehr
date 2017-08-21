@@ -57,7 +57,9 @@ public interface ResourceQuotaClient {
     @ApiOperation(value = "资源视图指标-获取已选图表值")
     public String getQuotaChartByQuotaId(
             @ApiParam(name = "quotaId", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "quotaId", required = false) Integer quotaId);
+            @RequestParam(value = "quotaId", required = false) Integer quotaId,
+            @ApiParam(name = "resourceId", value = "资源Id")
+            @RequestParam(value = "resourceId") String resourceId);
 
     @RequestMapping(value = ServiceApi.Resources.GetByResourceId, method = RequestMethod.GET)
     @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表")

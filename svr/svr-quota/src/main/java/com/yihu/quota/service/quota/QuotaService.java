@@ -38,32 +38,116 @@ public class QuotaService {
         return count;
     }
 
-    /**
-     *
-     * @param id 指标ID
-     * @param filters 过滤查询条件
-     * @param dimension 返回的维度
-     * @return
-     * @throws Exception
-     */
+    public List<Map<String, Object>> searcherByGroup(Integer id,String filters,String aggsField ) throws Exception {
+        TjQuota tjQuota= quotaDao.findOne(id);
+        return  esResultExtract.searcherByGroup(tjQuota, filters,aggsField );
+    }
+
+
+    public Map<String, Integer> searcherByGroupBySql(Integer id,String aggsField ,String filters ) throws Exception {
+        TjQuota tjQuota= quotaDao.findOne(id);
+        return  esResultExtract.searcherByGroupBySql(tjQuota,aggsField,filters);
+    }
+
+
+//    /**
+//     * 单列
+//     * @param id 指标ID
+//     * @param filters 过滤查询条件
+//     * @param dimension 返回的维度
+//     * @return
+//     * @throws Exception
+//     */
+//    public QuotaReport getQuotaReport(Integer id, String filters,String dimension) throws Exception {
+//        TjQuota tjQuota= quotaDao.findOne(id);
+//        QuotaReport quotaReport = new QuotaReport();
+//        List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters);
+//        List<ReultModel> reultModelList = new ArrayList<>();
+//        for(int i=0 ; i< listMap.size() ;i++){
+//            Object resultVal = listMap.get(i).get("result");
+//            String nameVal = listMap.get(i).get(dimension+"Name").toString();
+//            boolean repeat = false;
+//            ReultModel oldresult = null;
+//            for(ReultModel result:reultModelList){
+//                if(result.getKey().equals(nameVal)){
+//                    repeat = true;
+//                    oldresult = result;
+//                }
+//            }
+//            ReultModel reultModel = new ReultModel();
+//
+//            if( !repeat){
+//                if(StringUtils.isNotEmpty(dimension)){
+//                    reultModel.setKey(nameVal);
+//                }else {
+//                    reultModel.setKey(listMap.get(i).get("quotaDate").toString());
+//                }
+//                reultModel.setValue(resultVal);
+//                reultModelList.add(reultModel);
+//            }else {
+//                //如果有重复 先删除listl里面的数据，然后添加新数据
+//                reultModelList.remove(oldresult);
+//                reultModel.setKey(nameVal);
+//                Object totalResultVal = ( (Integer) resultVal + (Integer)oldresult.getValue());
+//                reultModel.setValue(totalResultVal);
+//                reultModelList.add(reultModel);
+//            }
+//
+//        }
+//        quotaReport.setReultModelList(reultModelList);
+//        quotaReport.setTjQuota(tjQuota);
+//        return quotaReport;
+//    }
+
+    //多列
     public QuotaReport getQuotaReport(Integer id, String filters,String dimension) throws Exception {
+        String[] dimensions = dimension.split(";");
         TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
         List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters);
         List<ReultModel> reultModelList = new ArrayList<>();
         for(int i=0 ; i< listMap.size() ;i++){
-            ReultModel reultModel = new ReultModel();
-            if(StringUtils.isNotEmpty(dimension)){
-                reultModel.setKey(listMap.get(i).get(dimension+"Name").toString());
-            }else {
-                reultModel.setKey(listMap.get(i).get("quotaDate").toString());
+            Object resultVal = listMap.get(i).get("result");
+
+            //多个列
+            List<String> cloumns = new ArrayList<>();
+            String nameVal = null;
+            for(int k=0 ; k <dimensions.length ; k++){
+                nameVal = listMap.get(i).get(dimensions[k]+"Name").toString();
+                cloumns.add(nameVal);
             }
-            reultModel.setValue(listMap.get(i).get("result"));
-            reultModelList.add(reultModel);
+            boolean repeat = false;
+            ReultModel oldresult = null;
+            for(ReultModel result:reultModelList){
+                if(result.getCloumns().equals(cloumns)){
+                    repeat = true;
+                    oldresult = result;
+                }
+            }
+            ReultModel reultModel = new ReultModel();
+
+            if( !repeat){
+                reultModel.setCloumns(cloumns);
+                reultModel.setValue(resultVal);
+                reultModelList.add(reultModel);
+            }else {
+                //如果有重复 先删除listl里面的数据，然后添加新数据
+                reultModelList.remove(oldresult);
+                reultModel.setCloumns(cloumns);
+                Object totalResultVal = ( (Integer) resultVal + (Integer)oldresult.getValue());
+                reultModel.setValue(totalResultVal);
+                reultModelList.add(reultModel);
+            }
+
         }
         quotaReport.setReultModelList(reultModelList);
         quotaReport.setTjQuota(tjQuota);
         return quotaReport;
     }
+
+
+
+
+
 
 }
