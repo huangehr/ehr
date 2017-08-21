@@ -379,29 +379,4 @@ public class ResourcesCategoryController extends BaseController {
         }
         return treeList;
     }
-
-    @RequestMapping(value = ServiceApi.Resources.NoPageCategoriesAndResources, method = RequestMethod.GET)
-    @ApiOperation("获取资源类别及资源树")
-    public Envelop getAllCategoriesAndResources(
-            @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(value="filters",required = false)String filters) throws  Exception {
-        Envelop envelop = new Envelop();
-        try {
-            List<MRsCategory> resources = resourcesCategoryClient.getAllCategories(filters);
-            for (MRsCategory category : resources) {
-                String cause = "categoryId=" + category.getId();
-                if (!StringUtils.isEmpty(filters)) {
-                    cause += ";" + filters;
-                }
-                List<MRsResources> mRsResources = resourcesClient.queryNoPageResources(cause);
-                category.setResourcesList(mRsResources);
-            }
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(resources);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-        }
-        return envelop;
-    }
 }

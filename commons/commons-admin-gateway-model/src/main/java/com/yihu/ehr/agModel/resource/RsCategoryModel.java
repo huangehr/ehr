@@ -13,7 +13,6 @@ public class RsCategoryModel {
     private String pid;
     private String pname;
     private String description;
-    private List<RsResourcesModel> resourcesList;
 
     public String getPname() {
         return pname;
@@ -53,13 +52,5 @@ public class RsCategoryModel {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<RsResourcesModel> getResourcesList() {
-        return resourcesList;
-    }
-
-    public void setResourcesList(List<RsResourcesModel> resourcesList) {
-        this.resourcesList = resourcesList;
     }
 }
