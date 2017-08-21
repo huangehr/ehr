@@ -136,6 +136,7 @@ public class ServiceApi {
 
         public static final String Categories = "/resources/categories/no_paging";
         public static final String NoPageCategories = "/resources/categories";
+        public static final String NoPageCategoriesAndResources = "/resources/categoriesAndResources";
         public static final String Category = "/resources/categories/{id}";
         public static final String CategoryByPid = "/resources/categories/pid";
         public static final String CategoryExitSelfAndChild = "/resources/categories/parent";

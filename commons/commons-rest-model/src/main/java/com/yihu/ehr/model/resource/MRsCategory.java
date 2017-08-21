@@ -1,5 +1,6 @@
 package com.yihu.ehr.model.resource;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -12,6 +13,7 @@ public class MRsCategory  {
     private String name;
     private String pid;
     private String description;
+    private List<MRsResources> resourcesList;
 
 
     public String getId() {
@@ -44,6 +46,14 @@ public class MRsCategory  {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<MRsResources> getResourcesList() {
+        return resourcesList;
+    }
+
+    public void setResourcesList(List<MRsResources> resourcesList) {
+        this.resourcesList = resourcesList;
     }
 
     @Override

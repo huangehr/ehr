@@ -5,7 +5,9 @@ import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsCategory;
+import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.client.ResourcesCategoryClient;
+import com.yihu.ehr.resource.client.ResourcesClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -31,6 +33,8 @@ public class ResourcesCategoryController extends BaseController {
 
     @Autowired
     private ResourcesCategoryClient resourcesCategoryClient;
+    @Autowired
+    private ResourcesClient resourcesClient;
 
     @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.POST)
     @ApiOperation("资源类别创建")
@@ -376,5 +380,28 @@ public class ResourcesCategoryController extends BaseController {
         return treeList;
     }
 
-
+    @RequestMapping(value = ServiceApi.Resources.NoPageCategoriesAndResources, method = RequestMethod.GET)
+    @ApiOperation("获取资源类别及资源树")
+    public Envelop getAllCategoriesAndResources(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws  Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<MRsCategory> resources = resourcesCategoryClient.getAllCategories(filters);
+            for (MRsCategory category : resources) {
+                String cause = "categoryId=" + category.getId();
+                if (!StringUtils.isEmpty(filters)) {
+                    cause += ";" + filters;
+                }
+                List<MRsResources> mRsResources = resourcesClient.queryNoPageResources(cause);
+                category.setResourcesList(mRsResources);
+            }
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(resources);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
 }
