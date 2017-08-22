@@ -194,6 +194,7 @@ public class ServiceApi {
         public static final String RsReportCategoryDelete = "/resources/reportCategory/delete";
         public static final String RsReportCategoryIsUniqueCode = "/resources/reportCategory/isUniqueCode";
         public static final String RsReportCategoryIsUniqueName = "/resources/reportCategory/isUniqueName";
+        public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
 
         /**
          * 资源报表
@@ -205,6 +206,7 @@ public class ServiceApi {
         public static final String RsReportDelete = "/resources/report/delete";
         public static final String RsReportIsUniqueCode = "/resources/report/isUniqueCode";
         public static final String RsReportIsUniqueName = "/resources/report/isUniqueName";
+        public static final String RsReportNoPage = "/resources/report/getReportNoPage";
 
     }
 
@@ -606,6 +608,7 @@ public class ServiceApi {
         public static final String RoleUserByUserId = "/roles/role_user/{user_id}";
         public static final String RoleUsers = "/roles/role_users";
         public static final String RoleUsersNoPage = "/roles/role_users/no_paging";
+        public static final String NoPageCategoriesAndReport = "/roles/report/getCategoryAndReportNoPage";
 
         public static final String RoleFeature = "/roles/role_feature";
         public static final String RoleFeatureId = "/roles/role_feature/{id}";

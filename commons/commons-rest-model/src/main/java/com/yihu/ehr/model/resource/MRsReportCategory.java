@@ -18,6 +18,7 @@ public class MRsReportCategory implements Serializable {
     private String remark; // 备注
     private String text; // 名称：树形下拉框使用
     private List<MRsReportCategory> children; // 子节点
+    private List<MRsReport> reportList; //该分类对应的报表
 
     public Integer getId() {
         return id;
@@ -73,5 +74,13 @@ public class MRsReportCategory implements Serializable {
 
     public void setChildren(List<MRsReportCategory> children) {
         this.children = children;
+    }
+
+    public List<MRsReport> getReportList() {
+        return reportList;
+    }
+
+    public void setReportList(List<MRsReport> reportList) {
+        this.reportList = reportList;
     }
 }
