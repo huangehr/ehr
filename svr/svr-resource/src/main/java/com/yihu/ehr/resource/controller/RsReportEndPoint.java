@@ -107,4 +107,12 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
         return rsReportService.isUniqueName(id, name);
     }
 
+    @ApiOperation("查询报表信息_不分页")
+    @RequestMapping(value = ServiceApi.Resources.RsReportNoPage, method = RequestMethod.GET)
+    public List<MRsReport> queryNoPageResources(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception{
+        List<RsReport> list = rsReportService.search(filters);
+        return (List<MRsReport>) convertToModels(list, new ArrayList<>(list.size()), MRsReport.class, null);
+    }
 }

@@ -77,4 +77,8 @@ public interface RsReportCategoryClient {
             @ApiParam(name = "name", value = "资源报表分类名称", required = true)
             @RequestParam("name") String name);
 
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryNoPageCategories, method = RequestMethod.GET)
+    @ApiOperation("获取资源报表类别")
+    List<MRsReportCategory> getAllCategories(
+            @RequestParam(value="filters",required = false)String filters);
 }

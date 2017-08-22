@@ -4,9 +4,13 @@ import com.yihu.ehr.agModel.user.RoleUserModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.model.resource.MRsReport;
+import com.yihu.ehr.model.resource.MRsReportCategory;
 import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.resource.client.RsReportCategoryClient;
+import com.yihu.ehr.resource.client.RsReportClient;
 import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.users.service.UserClient;
@@ -40,6 +44,12 @@ public class RoleUserController extends BaseController {
 
     @Autowired
     private RolesClient rolesClient;
+
+    @Autowired
+    private RsReportCategoryClient rsReportCategoryClient;
+
+    @Autowired
+    private RsReportClient rsReportClient;
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -217,5 +227,30 @@ public class RoleUserController extends BaseController {
         MRoles roles = rolesClient.getRolesById(m.getRoleId());
         model.setRoleName(roles == null?"":roles.getName());
         return model;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.NoPageCategoriesAndReport, method = RequestMethod.GET)
+    @ApiOperation("获取资源报表类别及报表树")
+    public Envelop getAllCategoriesAndReport(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws  Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<MRsReportCategory> categories = rsReportCategoryClient.getAllCategories("");
+            for (MRsReportCategory category : categories) {
+                String condition = "reportCategoryId=" + category.getId();
+                if (!StringUtils.isEmpty(filters)) {
+                    condition += ";" + filters;
+                }
+                List<MRsReport> mRsResources = rsReportClient.queryNoPageResources(condition);
+                category.setReportList(mRsResources);
+            }
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(categories);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
     }
 }
