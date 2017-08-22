@@ -7,6 +7,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.resource.MResourceQuota;
 import com.yihu.ehr.resource.client.ResourceQuotaClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
@@ -89,5 +90,21 @@ public class ResourceQuotaController extends ExtendController {
         return successObj(resourceQuotaModels);
     }
 
-
+    @RequestMapping(value = ServiceApi.Resources.DelRQNameByResourceId, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除资源视图-关联指标表")
+    public Envelop deleteByResourceId(
+            @ApiParam(name = "resourceId", value = "资源Id", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId) {
+        try {
+            Result result = resourceQuotaClient.deleteByResourceId(resourceId);
+            if(result.getCode() == 200){
+                return successMsg(result.getMessage());
+            }else{
+                return failed("资源视图-关联指标表删除失败！");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return failed(FeignExceptionUtils.getErrorMsg(e));
+        }
+    }
 }

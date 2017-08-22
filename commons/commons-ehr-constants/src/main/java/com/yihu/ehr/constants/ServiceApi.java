@@ -66,6 +66,7 @@ public class ServiceApi {
         public static final String GetByResourceId = "/resourceQuota/getByResourceId";
         public static final String GetQuotaChartByQuotaId = "/resourceQuota/getQuotaChartByQuotaId";
         public static final String GetRQNameByResourceId = "/resourceQuota/getRQNameByResourceId";
+        public static final String DelRQNameByResourceId = "/resourceQuota/delRQNameByResourceId";
 
 
 
@@ -628,6 +629,9 @@ public class ServiceApi {
         public static final String RoleApis = "/roles/role_apis";
         public static final String RoleApisNoPage = "/roles/role_apis/no_paging";
         public static final String RoleApisExistence = "/roles/role_api/existence";
+
+        public static final String BatchAddRoleReportRelation = "/roles/role_report/batchAddRoleReportRelation";
+        public static final String DeleteRoleReportRelationByRoleId = "/roles/role_report/deleteByRoleId";
 
     }
 

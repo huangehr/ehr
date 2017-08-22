@@ -19,7 +19,9 @@ public class MRsReport implements Serializable {
     private String templatePath; // 报表模版路径
 
     private String reportCategory; // 报表分类名称
-    private String statusName; // 报表状态名称
+    private String statusName; //
+
+    private Integer pid;    //资源报表分类ID,前端使用
 
     public Integer getId() {
         return id;
@@ -91,5 +93,13 @@ public class MRsReport implements Serializable {
 
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    public Integer getPid() {
+        return pid;
+    }
+
+    public void setPid(Integer pid) {
+        this.pid = pid;
     }
 }
