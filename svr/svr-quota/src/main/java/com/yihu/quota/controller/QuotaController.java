@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.abel533.echarts.Option;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -209,14 +210,16 @@ public class QuotaController extends BaseController {
                 if (type == 1) {
                     barName = "天气 与 温度关系";
                     option = reportOption.getLineEchartOption(title, legend, barName, envelop.getDetailModelList(), 1, bar2Name, data2list);
-//                    option = reportOption.getBarEchartOption(title, legend, barName, envelop.getDetailModelList(), bar2Name, data2list);
+                    //option = reportOption.getBarEchartOption(title, legend, barName, envelop.getDetailModelList(), bar2Name, data2list);
                 } else if (type == 2) {
                     option = reportOption.getLineEchartOption(title, legend, barName, envelop.getDetailModelList(), 1, bar2Name, data2list);
                 } else if (type == 3) {
+                    option = reportOption.getBarEchartOption(title, legend, barName, envelop.getDetailModelList(), bar2Name, data2list);
                 } else if (type == 4) {
                     option = reportOption.getPieEchartOption(title, legend, barName, envelop.getDetailModelList(), bar2Name, data2list);
                 }
-                chartInfoModel.setOption(objectMapper.writeValueAsString(option));
+                chartInfoModel.setOption(option.toString());
+                chartInfoModel.setTitle(option.getTitle().getText());
                 return chartInfoModel;
             }else {
                 return chartInfoModel;
