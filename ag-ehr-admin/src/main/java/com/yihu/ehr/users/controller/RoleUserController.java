@@ -243,6 +243,11 @@ public class RoleUserController extends BaseController {
                     condition += ";" + filters;
                 }
                 List<MRsReport> mRsResources = rsReportClient.queryNoPageResources(condition);
+                if (null != mRsResources && mRsResources.size() > 0) {
+                    for (MRsReport rp : mRsResources) {
+                        rp.setPid(category.getId());
+                    }
+                }
                 category.setReportList(mRsResources);
             }
             envelop.setSuccessFlg(true);
