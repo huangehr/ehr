@@ -99,7 +99,7 @@ public class QuotaController extends BaseController {
             @RequestParam(value = "id" , required = true) int id,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
         Envelop envelop = new Envelop();
@@ -128,7 +128,7 @@ public class QuotaController extends BaseController {
             @RequestParam(value = "id" , required = true) int id,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
         Envelop envelop = new Envelop();
@@ -146,7 +146,7 @@ public class QuotaController extends BaseController {
     }
 
     /**
-     * 获取指标统计结果总量
+     * 获取指标统计不同维度结果总量
      * @param id
      * @return
      */
@@ -184,7 +184,7 @@ public class QuotaController extends BaseController {
             @RequestParam(value = "type" , required = true) int type,
             @ApiParam(name = "filters", value = "过滤", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
         Envelop envelop = new Envelop();
