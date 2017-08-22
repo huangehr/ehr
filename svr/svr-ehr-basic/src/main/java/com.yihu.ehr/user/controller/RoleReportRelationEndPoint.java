@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.user.MRoleReportRelation;
 import com.yihu.ehr.user.entity.RoleReportRelation;
 import com.yihu.ehr.user.service.RoleReportRelationService;
 import io.swagger.annotations.Api;
@@ -15,6 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -49,5 +54,34 @@ public class RoleReportRelationEndPoint extends EnvelopRestEndPoint {
             roleReportRelationService.save(list.get(i));
         }
         return Result.success("资源视图-关联指标表更新成功！", list);
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.SearchRoleReportRelation, method = RequestMethod.GET)
+    @ApiOperation(value = "查询角色与资源报表的授权关系列表---分页")
+    public Collection<MRoleReportRelation> searchRoleReportRelation(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        List<MRoleReportRelation> roleFeatureRelations = roleReportRelationService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, roleReportRelationService.getCount(filters), page, size);
+        return convertToModels(roleFeatureRelations, new ArrayList<MRoleReportRelation>(roleFeatureRelations.size()), MRoleReportRelation.class, fields);
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.SearchRoleReportRelationNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "查询角色与资源报表的授权关系列表---分页")
+    public List<MRoleReportRelation> searchRoleReportRelationNoPage(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<MRoleReportRelation> list = roleReportRelationService.search(filters);
+        return list;
     }
 }

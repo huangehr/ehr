@@ -632,6 +632,8 @@ public class ServiceApi {
 
         public static final String BatchAddRoleReportRelation = "/roles/role_report/batchAddRoleReportRelation";
         public static final String DeleteRoleReportRelationByRoleId = "/roles/role_report/deleteByRoleId";
+        public static final String SearchRoleReportRelation = "/roles/role_report/search";
+        public static final String SearchRoleReportRelationNoPage = "/roles/role_report/searchNoPage";
 
     }
 
