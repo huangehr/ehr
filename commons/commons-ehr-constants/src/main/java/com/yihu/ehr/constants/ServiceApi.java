@@ -38,6 +38,7 @@ public class ServiceApi {
         public static final String ResourceViewMetadata = "/resources/query/getResourceMetadata"; //资源浏览获取结构
         public static final String ResourceViewData = "/resources/query/getResourceData"; //资源浏览获取数据
         public static final String ResourcesQuery = "/resources/query"; //资源查询接口
+        public static final String ResourcesSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourcesQueryTransform = "/resources/query/transform"; //资源查询接口+转译
         public static final String ResourcesRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourcesRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
@@ -49,9 +50,27 @@ public class ServiceApi {
         public static final String ResourcesMysql = "/resources/query/mysql"; //mysql资源查询接口
 
 
+        //资源视图
         public static final String Resources = "/resources";
         public static final String Resource = "/resources/{id}";
         public static final String NoPageResources = "/NoPageResources";
+        public static final String IsExistName = "/isExistName";
+        public static final String IsExistCode = "/resources/isExistCode/{code}";
+        public static final String GetQuotaList = "/resources/getQuotaList";
+        public static final String GetRsQuotaPreview = "/resources/getRsQuotaPreview";
+
+
+        public static final String SearchInfo = "/resourceQuota/searchInfo";
+        public static final String BatchAddResourceQuota = "/resourceQuota/batchAddResourceQuota";
+        public static final String SearchByQuotaId = "/resourceQuota/searchByQuotaId";
+        public static final String GetByResourceId = "/resourceQuota/getByResourceId";
+        public static final String GetQuotaChartByQuotaId = "/resourceQuota/getQuotaChartByQuotaId";
+        public static final String GetRQNameByResourceId = "/resourceQuota/getRQNameByResourceId";
+        public static final String DelRQNameByResourceId = "/resourceQuota/delRQNameByResourceId";
+
+
+
+
 
         public static final String ResourceMetadataList = "/resources/rs_metadata";
         public static final String ResourceMetadataBatch = "/resources/rs_metadata/batch";
@@ -81,6 +100,8 @@ public class ServiceApi {
         public static final String MetadataExistence = "/resources/metadata/existence";
         public static final String MetadataStdCodeExistence = "/resources/metadata/std_code/existence";
         public static final String MetadataIdExistence = "/resources/metadata/id/existence";
+        public static final String MetadataMaxId = "/resources/metadata/metadataMaxId";
+
 
         public static final String DictList = "/resources/dict";
         public static final String DictBatch = "/resources/dict/batch";
@@ -120,6 +141,15 @@ public class ServiceApi {
         public static final String CategoryByPid = "/resources/categories/pid";
         public static final String CategoryExitSelfAndChild = "/resources/categories/parent";
 
+        /**
+         * 综合查询服务
+         */
+        public static final String IntMetadataList = "/resources/integrated/metadata_list";
+        public static final String IntMetadataData = "/resources/integrated/metadata_data";
+        public static final String IntQuotaList = "/resources/integrated/quota_list";
+        public static final String IntResourceUpdate = "/resources/integrated/resource_update";
+        public static final String IntResourceQueryUpdate = "/resources/integrated/resource_query_update";
+
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
         public static final String AdapterDict = "/resources/adapter/dict/{id}";
@@ -152,6 +182,32 @@ public class ServiceApi {
         public static final String ResourceOrgResMetadataGrants = "/resources/Org_resource/{Org_res_id}/metadata";
         public static final String ResourceOrgRsMetadataGrant = "/resources/Org_resource/metadata/grant";
 
+        /**
+         * 资源报表分类
+         */
+        public static final String RsReportCategoryPrefix = "/resources/reportCategory/";
+        public static final String RsReportCategory = "/resources/reportCategory/{id}";
+        public static final String RsReportCategoryChildrenByPid = "/resources/reportCategory/getChildrenByPid";
+        public static final String RsReportCategoryTree = "/resources/reportCategoryTree";
+        public static final String RsReportCategoryComboTree = "/resources/reportCategoryComboTree";
+        public static final String RsReportCategories = "/resources/reportCategories";
+        public static final String RsReportCategorySave = "/resources/reportCategory/save";
+        public static final String RsReportCategoryDelete = "/resources/reportCategory/delete";
+        public static final String RsReportCategoryIsUniqueCode = "/resources/reportCategory/isUniqueCode";
+        public static final String RsReportCategoryIsUniqueName = "/resources/reportCategory/isUniqueName";
+        public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
+
+        /**
+         * 资源报表
+         */
+        public static final String RsReportPrefix = "/resources/report/";
+        public static final String RsReport = "/resources/report/{id}";
+        public static final String RsReports = "/resources/reports";
+        public static final String RsReportSave = "/resources/report/save";
+        public static final String RsReportDelete = "/resources/report/delete";
+        public static final String RsReportIsUniqueCode = "/resources/report/isUniqueCode";
+        public static final String RsReportIsUniqueName = "/resources/report/isUniqueName";
+        public static final String RsReportNoPage = "/resources/report/getReportNoPage";
 
     }
 
@@ -553,6 +609,7 @@ public class ServiceApi {
         public static final String RoleUserByUserId = "/roles/role_user/{user_id}";
         public static final String RoleUsers = "/roles/role_users";
         public static final String RoleUsersNoPage = "/roles/role_users/no_paging";
+        public static final String NoPageCategoriesAndReport = "/roles/report/getCategoryAndReportNoPage";
 
         public static final String RoleFeature = "/roles/role_feature";
         public static final String RoleFeatureId = "/roles/role_feature/{id}";
@@ -572,6 +629,11 @@ public class ServiceApi {
         public static final String RoleApis = "/roles/role_apis";
         public static final String RoleApisNoPage = "/roles/role_apis/no_paging";
         public static final String RoleApisExistence = "/roles/role_api/existence";
+
+        public static final String BatchAddRoleReportRelation = "/roles/role_report/batchAddRoleReportRelation";
+        public static final String DeleteRoleReportRelationByRoleId = "/roles/role_report/deleteByRoleId";
+        public static final String SearchRoleReportRelation = "/roles/role_report/search";
+        public static final String SearchRoleReportRelationNoPage = "/roles/role_report/searchNoPage";
 
     }
 
@@ -849,6 +911,10 @@ public class ServiceApi {
         public static final String AddTjQuotaDimensionSlave = "/tj/addTjQuotaDimensionSlave";
         public static final String GetTjQuotaDimensionSlaveAll = "/tj/getTjQuotaDimensionSlaveAll";
 
+
+        public static final String GetTjQuotaSynthesiseDimension = "/tj/getTjQuotaSynthesiseDimension";
+        public static final String GetTjQuotaChartList = "/tj/getTjQuotaChartList";
+
         public static final String GetTjQuotaLogList = "/tj/getTjQuotaLogList";
         public static final String GetTjDataSaveList = "/tj/getTjDataSaveList";
         public static final String AddTjDataSave = "/tj/addTjDataSave";
@@ -872,6 +938,7 @@ public class ServiceApi {
 
         public static final String GetTjQuotaList = "tj/getTjQuotaList";
         public static final String AddTjQuota = "tj/addTjQuota";
+        public static final String UpdateTjQuota = "tj/updateTjQuota";
         public static final String DeleteTjQuota = "tj/deleteTjQuota";
         public static final String GetTjQuotaById = "tj/getTjQuotaById/{id}";
         public static final String TjQuotaExistsName = "/tj/tjQuotaExistsName/{name}";
@@ -884,9 +951,24 @@ public class ServiceApi {
 
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
         public static final String GetQuotaReport = "tj/getQuotaReport";
+        public static final String GetQuotaGraphicReportPreview = "tj/getQuotaGraphicReportPreview";
         public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
 
+        public static final String TjQuotaChart = "/tj/tjQuotaChart";
+        public static final String BatchTjQuotaChart = "/tj/batchTjQuotaChart";
+        public static final String TjQuotaChartId = "/tj/tjQuotaChart/{id}";
+        public static final String GetAllTjQuotaChart = "/tj/getAllTjQuotaChart";
+
+
+
+
+
+
+
+    }
+
+    public static class StasticReport {
 
     }
 

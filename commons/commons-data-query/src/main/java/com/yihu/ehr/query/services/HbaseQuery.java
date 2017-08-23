@@ -82,30 +82,25 @@ public class HbaseQuery {
 	 * Result 转 JSON
 	 * @return
 	 */
-	private Map<String,Object> resultToMap(Result result,String fl){
+	private Map<String,Object> resultToMap(Result result, String fl){
 
 		String rowkey = Bytes.toString(result.getRow());
-		if(rowkey!=null && rowkey.length()>0)
-		{
-
+		if(rowkey != null && rowkey.length() >  0) {
 			Map<String,Object> obj = new HashMap<>();
 			obj.put("rowkey", rowkey);
-			for  (Cell cell : result.rawCells()) {
+			for(Cell cell : result.rawCells()) {
 				String fieldName = Bytes.toString(CellUtil.cloneQualifier(cell));
 				String fieldValue = Bytes.toString(CellUtil. cloneValue(cell));
-				if(fl!=null&&!fl.equals("")&&!fl.equals("*"))
-				{
+				if(fl != null && !fl.equals("") && !fl.equals("*")) {
 					String[] fileds = fl.split(",");
 					for(String filed : fileds){
-						if(filed.equals(fieldName))
-						{
+						if(filed.equals(fieldName)) {
 							obj.put(fieldName, fieldValue);
 							continue;
 						}
 					}
 				}
-				else
-				{
+				else {
 					obj.put(fieldName, fieldValue);
 				}
 
@@ -326,7 +321,7 @@ public class HbaseQuery {
 	 * @param json{'q':'*:*','fq':'','sort':'','page':1,'row':10}
 	 * @return
 	 */
-	public Page<Map<String,Object>> queryByJson(String table,String json) throws Exception
+	public Page<Map<String,Object>> queryByJson(String table, String json) throws Exception
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
 		Map<String, String> query = objectMapper.readValue(json, Map.class);
@@ -363,7 +358,7 @@ public class HbaseQuery {
 	/**
 	 * 查询方法
 	 */
-	public Page<Map<String,Object>> queryBySolr(String table,String q,String sort,int page,int rows,String fq,String fl) throws Exception{
+	public Page<Map<String,Object>> queryBySolr(String table, String q, String sort, int page, int rows, String fq, String fl) throws Exception{
 
 		long count = 0;
 		List<Map<String,Object>> data = new ArrayList<>();
@@ -375,12 +370,11 @@ public class HbaseQuery {
 		Map<String, String> sortMap = getSortMap(sort);
 
 		/***** Solr查询 ********/
-		SolrDocumentList solrList = solr.query(table, q, fq, sortMap, start,rows);
+		SolrDocumentList solrList = solr.query(table, q, fq, sortMap, start, rows);
 
 		/***** Hbase查询 ********/
 		List<String> list = new ArrayList<String>();
-		if(solrList!=null && solrList.getNumFound()>0)
-		{
+		if(solrList!=null && solrList.getNumFound()>0) {
 			count = solrList.getNumFound();
 			for (SolrDocument doc : solrList){
 				String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
@@ -388,19 +382,15 @@ public class HbaseQuery {
 			}
 		}
 
-		Result[] resultList = hbaseDao.getResultList(table,list); //hbase结果集
-		if(resultList!=null&&resultList.length>0){
-			for (Result result :resultList) {
+		Result[] resultList = hbaseDao.getResultList(table, list); //hbase结果集
+		if(resultList != null && resultList.length > 0){
+			for (Result result : resultList) {
 				Map<String,Object> obj = resultToMap(result, fl);
-
-				if(obj!=null)
-				{
+				if(obj!=null) {
 					data.add(obj);
 				}
-
 			}
 		}
-
 		return new PageImpl<Map<String,Object>>(data,new PageRequest(page-1, rows), count);
 	}
 

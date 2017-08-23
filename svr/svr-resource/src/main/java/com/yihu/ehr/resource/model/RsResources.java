@@ -19,6 +19,7 @@ public class RsResources {
     private String rsInterface;
     private String grantType;
     private String description;
+    private Integer dataSource;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -81,5 +82,14 @@ public class RsResources {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Column(name="data_source")
+    public Integer getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(Integer dataSource) {
+        this.dataSource = dataSource;
     }
 }

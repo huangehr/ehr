@@ -21,6 +21,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
+import org.joda.time.DateTime;
 import org.nlpcn.es4sql.domain.Select;
 import org.nlpcn.es4sql.parse.ElasticSqlExprParser;
 import org.nlpcn.es4sql.parse.SqlParser;
@@ -163,9 +164,10 @@ public class EsExtract {
         one.setAreaLevel(areaLevel);
         one.setResult(0);
         one.setCreateTime(new Date());
-        LocalDate today = LocalDate.now();
-        one.setQuotaDate(today.toString());
+        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+        one.setQuotaDate(yesterDay);
         one.setQuotaCode(quotaVo.getCode());
+        one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);
         one.setSaasId(saasid);
         allData.put(key, one);
@@ -206,11 +208,11 @@ public class EsExtract {
                 SearchResponse response = (SearchResponse) requestBuilder.get();
                 StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
                 Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
+                client.close();
                 //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
                 Map<String,Integer> map = new HashMap<>();
                 //递归解析json
                 expainJson(gradeBucketIt, map, null);
-
                 compute(tjQuotaDimensionSlaves,
                         returnList,
                         one,
@@ -233,8 +235,10 @@ public class EsExtract {
             Integer num = map.get(key);
             if(saveModel!=null){
                 saveModel.setResult(num);
-                returnList.add(saveModel);
+            }else{
+                saveModel.setResult(0);
             }
+            returnList.add(saveModel);
         }
     }
 

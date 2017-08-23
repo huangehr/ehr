@@ -7,6 +7,7 @@ import com.yihu.quota.model.rest.QuotaReport;
 import com.yihu.quota.model.rest.ReultModel;
 import com.yihu.quota.util.QuartzHelper;
 import com.yihu.quota.vo.QuotaVo;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,26 +38,74 @@ public class QuotaService {
         return count;
     }
 
-    public QuotaReport getQuotaReport(Integer id, String filters) throws Exception {
+    public List<Map<String, Object>> searcherByGroup(Integer id,String filters,String aggsField ) throws Exception {
+        TjQuota tjQuota= quotaDao.findOne(id);
+        return  esResultExtract.searcherByGroup(tjQuota, filters,aggsField );
+    }
+
+
+    public Map<String, Integer> searcherByGroupBySql(Integer id,String aggsField ,String filters ) throws Exception {
+        TjQuota tjQuota= quotaDao.findOne(id);
+        return  esResultExtract.searcherByGroupBySql(tjQuota,aggsField,filters);
+    }
+
+    //多列
+    public QuotaReport getQuotaReport(Integer id, String filters,String dimension) throws Exception {
+        String[] dimensions = null;
+        if(StringUtils.isNotEmpty(dimension)){
+          dimensions = dimension.split(";");
+        }else{
+            dimensions = new String[]{"quotaDate"};
+        }
         TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
         List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters);
         List<ReultModel> reultModelList = new ArrayList<>();
         for(int i=0 ; i< listMap.size() ;i++){
-            ReultModel reultModel = new ReultModel();
-            for(String key : listMap.get(i).keySet()){
-                if(tjQuota.getCode().contains("depart_treat")||tjQuota.getCode().contains("age")){
-                    reultModel.setKey(listMap.get(i).get("slaveKey2Name").toString());
-                }else {
-                    reultModel.setKey(listMap.get(i).get("quotaDate").toString());
+            Object resultVal = listMap.get(i).get("result");
+            //多个列
+            List<String> cloumns = new ArrayList<>();
+            String nameVal = null;
+            for(int k=0 ; k <dimensions.length ; k++){
+                if(dimensions[k].equals("quotaDate")){
+                    nameVal = listMap.get(i).get(dimensions[k]).toString();
+                }else{
+                    nameVal = listMap.get(i).get(dimensions[k]+"Name").toString();
                 }
-                reultModel.setValue(listMap.get(i).get("result"));
+                cloumns.add(nameVal);
             }
-            reultModelList.add(reultModel);
+            boolean repeat = false;
+            ReultModel oldresult = null;
+            for(ReultModel result:reultModelList){
+                if(result.getCloumns().equals(cloumns)){
+                    repeat = true;
+                    oldresult = result;
+                }
+            }
+            ReultModel reultModel = new ReultModel();
+
+            if( !repeat){
+                reultModel.setCloumns(cloumns);
+                reultModel.setValue(resultVal);
+                reultModelList.add(reultModel);
+            }else {
+                //如果有重复 先删除listl里面的数据，然后添加新数据
+                reultModelList.remove(oldresult);
+                reultModel.setCloumns(cloumns);
+                Object totalResultVal = ( (Integer) resultVal + (Integer)oldresult.getValue());
+                reultModel.setValue(totalResultVal);
+                reultModelList.add(reultModel);
+            }
+
         }
         quotaReport.setReultModelList(reultModelList);
         quotaReport.setTjQuota(tjQuota);
         return quotaReport;
     }
+
+
+
+
+
 
 }

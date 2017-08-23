@@ -15,7 +15,8 @@ public class SaveModel {
     private String id;
     private String saasId;//saasId
     private String quotaCode;//指标code
-    private String quotaDate;//统计时间
+    private String quotaName;//指标名称
+    private String quotaDate;//统计的指标对应时间 如今天凌晨统计昨天的数据，那就是昨天的时间
     private String org;     //机构代码
     private String orgName;//机构名字
     private String province;//省级代码 350000
@@ -250,4 +251,11 @@ public class SaveModel {
         this.id = id;
     }
 
+    public String getQuotaName() {
+        return quotaName;
+    }
+
+    public void setQuotaName(String quotaName) {
+        this.quotaName = quotaName;
+    }
 }

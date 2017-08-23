@@ -8,7 +8,7 @@ package com.yihu.ehr.agModel.portal;
 public class MessageRemindModel {
 
     private Long id;
-    private Integer appId;
+    private String appId;
     private String appName;
     private String fromUserId;
     private String fromUserName;
@@ -47,11 +47,11 @@ public class MessageRemindModel {
         this.id = id;
     }
 
-    public Integer getAppId() {
+    public String getAppId() {
         return appId;
     }
 
-    public void setAppId(Integer appId) {
+    public void setAppId(String appId) {
         this.appId = appId;
     }
 

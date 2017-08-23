@@ -100,6 +100,12 @@ public interface PatientClient {
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo);
 
+    @RequestMapping(value = "/populations/telphoneNumberIs_exist/{telphone_number}",method = RequestMethod.GET)
+    @ApiOperation(value = "判断手机号码是否存在")
+    boolean isExisttelphoneNumber(
+            @ApiParam(name = "telphone_number", value = "手机号码", defaultValue = "")
+            @PathVariable(value = "telphone_number") String telphoneNumber);
+
     @RequestMapping(value = "/populations/picture",method = RequestMethod.POST)
     @ApiOperation(value = "头像上传")
     String uploadPicture(

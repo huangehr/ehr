@@ -27,6 +27,7 @@ public class DoctorDetailModel {
     private String insertTime;
     private String updateTime;
     private String idCardNo;
+    private String roleType;
 
     public Long getId() {
         return id;
@@ -210,5 +211,13 @@ public class DoctorDetailModel {
 
     public void setIdCardNo(String idCardNo) {
         this.idCardNo = idCardNo;
+    }
+
+    public String getRoleType() {
+        return roleType;
+    }
+
+    public void setRoleType(String roleType) {
+        this.roleType = roleType;
     }
 }

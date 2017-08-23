@@ -72,6 +72,10 @@ public class DoctorController extends BaseController {
                 MConventionalDict dict = conventionalDictClient.getGender(mDoctor.getSex());
                 doctorsModel.setSex(dict == null ? "" : dict.getValue());
             }
+            if (StringUtils.isNotEmpty(mDoctor.getRoleType())) {
+                MConventionalDict dict = conventionalDictClient.getUserType(mDoctor.getRoleType());
+                doctorsModel.setRoleType(dict == null ? "" : dict.getValue());
+            }
             doctorsModels.add(doctorsModel);
         }
 
@@ -104,6 +108,14 @@ public class DoctorController extends BaseController {
                     bo = doctorClient.isExistence(ph);
                     boolean uf=userClient.isTelephoneExists(existenceNm);
                     if(bo==true || uf==true){
+                        bo=true;
+                    }
+                    break;
+                case "email":
+                    String email="email="+existenceNm;
+                    bo = doctorClient.isExistence(email);
+                    boolean emailFlag=userClient.isEmailExists(existenceNm);
+                    if(bo==true || emailFlag==true){
                         bo=true;
                     }
                     break;

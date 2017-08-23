@@ -1,11 +1,20 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.resource.MChartInfoModel;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.model.resource.MRsInterface;
 import com.yihu.ehr.model.resource.MRsResources;
+import com.yihu.ehr.model.tj.MQuotaConfigModel;
+import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.quota.service.TjQuotaChartClient;
+import com.yihu.ehr.quota.service.TjQuotaClient;
+import com.yihu.ehr.quota.service.TjQuotaJobClient;
+import com.yihu.ehr.resource.client.ResourceQuotaClient;
 import com.yihu.ehr.resource.client.ResourcesCategoryClient;
 import com.yihu.ehr.resource.client.ResourcesClient;
 import com.yihu.ehr.resource.client.RsInterfaceClient;
@@ -21,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author linaz
@@ -36,7 +46,14 @@ public class ResourcesController extends BaseController {
     private RsInterfaceClient rsInterfaceClient;
     @Autowired
     private ResourcesCategoryClient rsCategoryClient;
-
+    @Autowired
+    private TjQuotaClient tjQuotaClient;
+    @Autowired
+    private ResourceQuotaClient resourceQuotaClient;
+    @Autowired
+    private TjQuotaChartClient tjQuotaChartClient;
+    @Autowired
+    private TjQuotaJobClient tjQuotaJobClient;
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST)
@@ -170,7 +187,7 @@ public class ResourcesController extends BaseController {
         }
     }
     @ApiOperation("资源编码是否已存在")
-    @RequestMapping(value = "/resources/isExistCode/{code}" , method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.IsExistCode , method = RequestMethod.GET)
     public Envelop isExistCode(
             @ApiParam(name = "code", value = "code", defaultValue = "")
             @PathVariable(value = "code") String code){
@@ -185,7 +202,7 @@ public class ResourcesController extends BaseController {
     }
 
     @ApiOperation("资源名称是否已存在")
-    @RequestMapping(value = "/resources/isExistName",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.IsExistName,method = RequestMethod.GET)
     public Object isExistName(
             @ApiParam(name = "name", value = "name", defaultValue = "")
             @RequestParam(value = "name") String name){
@@ -197,5 +214,90 @@ public class ResourcesController extends BaseController {
             envelop.setSuccessFlg(true);
         }
         return envelop;
+    }
+
+    @ApiOperation("指标资源配置")
+    @RequestMapping(value = ServiceApi.Resources.GetQuotaList,method = RequestMethod.GET)
+    public Envelop getQuotaList(
+            @ApiParam(name = "quotaName", value = "指标名称",defaultValue = "")
+            @RequestParam(value = "quotaName", required = false) String quotaName,
+            @ApiParam(name = "filters", value = "过滤条件")
+            @RequestParam(value = "filters") String filters,
+            @ApiParam(name = "page", value = "页码",defaultValue = "1")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "pageSize", value = "每页大小",defaultValue = "15")
+            @RequestParam(value = "pageSize") Integer pageSize) {
+        ListResult listResult = tjQuotaClient.quotaConfigInfo(quotaName, page, pageSize);
+
+        List<MQuotaConfigModel> mainModelList  = new ArrayList<>();
+        if(listResult.getTotalCount() != 0){
+            List<Map<String,Object>> modelList = listResult.getDetailModelList();
+            for(Map<String,Object> map : modelList){
+                MQuotaConfigModel quotaConfigModel = objectMapper.convertValue(map,MQuotaConfigModel.class);
+                mainModelList.add(quotaConfigModel);
+            }
+            ListResult listResult2 = resourceQuotaClient.search("", filters, "", pageSize, page);
+            List<ResourceQuotaModel> mainModelList2  = new ArrayList<>();
+            if(listResult2.getTotalCount() != 0) {
+                List<Map<String, Object>> modelList2 = listResult2.getDetailModelList();
+                for (Map<String, Object> map : modelList2) {
+                    ResourceQuotaModel resourceQuotaModel = objectMapper.convertValue(map, ResourceQuotaModel.class);
+                    MTjQuotaModel mTjQuotaModel = tjQuotaClient.getById(Long.valueOf(resourceQuotaModel.getQuotaId()));
+                    if (mTjQuotaModel != null) {
+                        resourceQuotaModel.setQuotaName(mTjQuotaModel.getName());
+                        //根据指标编码查询tjQuotaChart表，获取chartId
+                        List<Integer> chartTypeList = tjQuotaChartClient.getChartTypeByQuotaCode(mTjQuotaModel.getCode());
+                        StringBuilder chartType = new StringBuilder();
+                        for (Integer i : chartTypeList) {
+                            chartType.append(i).append(",");
+                        }
+                        resourceQuotaModel.setChartType(chartType.length() > 0 ? chartType.substring(0, chartType.length() -1) : "");
+                    }
+                    mainModelList2.add(resourceQuotaModel);
+                }
+            }
+            List<Integer> list = resourceQuotaClient.getRQNameByResourceId(filters);//根据资源ID查询
+            String[] split = filters.split("=");    //获取resourceId
+            String resourceId = split[split.length-1];
+            for (int i=0; i<mainModelList.size(); i++) {
+                if (list.contains(mainModelList.get(i).getQuotaId())) {
+                    mainModelList.get(i).setFlag(true);
+                    // 根据quotaId及resourceId查询resourceQuota表，获取已选择的图表值
+                    String quotaChart = resourceQuotaClient.getQuotaChartByQuotaId(mainModelList.get(i).getQuotaId(), resourceId);
+                    mainModelList.get(i).setQuotaChart(quotaChart);
+                } else {
+                    mainModelList.get(i).setFlag(false);
+                }
+                //根据指标编码查询tjQuotaChart表，获取chartId
+                List<Integer> chartTypeList = tjQuotaChartClient.getChartTypeByQuotaCode(mainModelList.get(i).getQuotaCode());
+                StringBuilder chartType = new StringBuilder();
+                for (Integer c : chartTypeList) {
+                    chartType.append(c).append(",");
+                }
+                mainModelList.get(i).setChartType(chartType.length() > 0 ? chartType.substring(0, chartType.length() -1) : "");
+            }
+            Envelop result = getResult(mainModelList, listResult.getTotalCount(), listResult.getCurrPage(), listResult.getPageSize());
+            result.setObj(mainModelList2);
+            return result;
+        }else{
+            Envelop envelop = new Envelop();
+            return envelop;
+        }
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.GET)
+    @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表预览")
+    public List<MChartInfoModel> getRsQuotaPreview(
+            @ApiParam(name = "filter", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "filter") String filter,
+            @ApiParam(name = "filters", value = "指标查询过滤条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) {
+        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(filter);
+        List<MChartInfoModel> chartInfoModels = new ArrayList<>();
+        for (ResourceQuotaModel m : list) {
+            MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), filters);
+            chartInfoModels.add(chartInfoModel);
+        }
+        return chartInfoModels;
     }
 }

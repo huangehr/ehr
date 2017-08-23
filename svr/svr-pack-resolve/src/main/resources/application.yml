@@ -74,21 +74,23 @@ ehr:
       data-sets:
         - HDSC01_01: Clinic
         - HDSC01_02: Clinic
-        - HDSD00_85: Clinic
+        - HDSD00_85: Clinic #门诊-挂号
         - HDSD00_72: Clinic
         - HDSC02_01: Resident
         - HDSC02_02: Resident
         - HDSC02_09: Resident
-        - HDSD00_13: Resident
+        - HDSD00_13: Resident #住院-入院记录
         - HDSD00_77: Resident
         - HDSD00_76: Resident
       meta-data:
         - HDSD00_01_457 # 挂号时间
-        - HDSD00_01_575 # 入院时间
         - HDSD00_13_057 # 入院时间-v1.3
+        - HDSD00_01_575 # 入院时间
+
     #诊断信息
     diagnosis:
       data-sets:
+        - HDSD00_73 #门诊-诊断记录
         - HDSC01_03
         - HDSC02_17
       meta-data:
@@ -100,30 +102,33 @@ ehr:
       meta-data:
         id-card-no: HDSA00_01_017     # 身份标识
         id-card-type: HDSA00_01_016   # 身份类型
-        patient-name: HDSD00_01_002  # 姓名
+        patient-name: HDSA00_01_009  # 姓名  HDSD00_01_002
     # 卡提取参数，从就诊摘要提取
     card:
       data-sets:
+        - HDSD00_85: 门诊-挂号 # -v1.3
+        - HDSD00_13: 住院-入院记录 # -v1.3
         - HDSC01_01: 门诊-病人摘要
         - HDSC01_02: 门诊-挂号
         - HDSC02_01: 住院-病人摘要
         - HDSC02_02: 住院-首页
       meta-data:
-        - card-no: CARD_NO #就诊卡号
-        - card-type: CARD_TYPE  #就诊卡类型
+        - card-no: JDSD00_85_005 #就诊卡号 CARD_NO
+        - card-type: JDSD00_85_006  #就诊卡类型 CARD_TYPE
   eventIndex: #病人事件索引信息
     patientId:
+      - JDSA00_01_001 #v1.3
       - PATIENT_ID
     eventNo:
+      - HDSD00_02_040 # 门（急）诊号 v1.3
+      - HDSD00_02_066 # 住院号 v1.3
       - HDSD03_01_031
-      - HDSD00_01_579
+      - HDSD00_01_579 #会诊记录表编号
       - EVENT_NO
-      - HDSD00_02_040 #v1.3
-      - HDSD00_02_066 #v1.3
     eventTime:
-      - HDSD00_01_457
-      - HDSD00_01_185
+      - HDSD00_01_457 #就诊日期时间 v1.3
       - HDSD00_16_005 #v1.3出院时间
+      - HDSD00_01_185
 #error code and message
 
 ---

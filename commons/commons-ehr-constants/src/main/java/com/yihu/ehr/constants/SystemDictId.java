@@ -44,6 +44,7 @@ public class SystemDictId {
     public final static long loginAddress = 20;                    // 登入地址API Id
     public final static String AddressAPI = "baidu_APIStore_API";       //登入地址API
     public final static String Apikey = "baidu_apikey";                                 //登入地址apikey
+    public final static int RsReportStatus = 92; // 资源报表状态
 
 }
 

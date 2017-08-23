@@ -11,11 +11,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +36,31 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
     MConventionalDict getDictModel(Object dictEntry) {
         return convertToModel(dictEntry, MConventionalDict.class, null);
     }
+
+    @RequestMapping(value = "/dictionaries/getDictionaries", method = RequestMethod.GET)
+    @ApiOperation(value = "获取字典列表", notes = "根据查询条件获取字典列表")
+    ListResult searchMConventionalDict(
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "page", required = false) int page) throws ParseException {
+
+        ListResult listResult = new ListResult();
+        List<MConventionalDict> conventionalDictList = dictEntryService.search(null, filters, sorts, page, size);
+        if(conventionalDictList != null){
+            listResult.setDetailModelList(conventionalDictList);
+            listResult.setTotalCount((int)dictEntryService.getCount(filters));
+            listResult.setCode(200);
+            listResult.setCurrPage(page);
+            listResult.setPageSize(size);
+        }else{
+            listResult.setCode(200);
+            listResult.setMessage("查询无数据");
+            listResult.setTotalCount(0);
+        }
+        return listResult;
+    };
+
 
     @RequestMapping(value = "/dictionaries/app_catalog", method = RequestMethod.GET)
     @ApiOperation(value = "获取应用类别字典项", response = MConventionalDict.class)

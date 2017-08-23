@@ -1,3 +1,10 @@
+##如果有配置服务的话，远程服务器和本地服务器配置不一致的情况下，优先远程的为主  git上 svr-base ->  git application ->本地 appliction ->本地 bootstarp
+server:
+  port: ${svr-quota.server.port}
+
+management:
+  port: ${server.port}
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -6,12 +13,6 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
-
-server:
-  port: ${svr-quota.server.port}
-
-management:
-  port: ${server.port}
 
 logging:
   level:
@@ -22,8 +23,15 @@ logging:
         web: INFO
       hibernate: ERROR
 
----
+hadoop:
+  hbase-properties:
+    - hbase.zookeeper.property.clientPort: 2181
+    - zookeeper.znode.parent: /hbase-unsecure
+    - hbase.zookeeper.quorum: node1,node2,node3
+  user:
+    name: root
 
+---
 spring:
   profiles: dev
 
@@ -31,6 +39,12 @@ spring:
     url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: ha
     password: ha
+
+  data:
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+
+
 
 ---
 spring:
@@ -41,6 +55,10 @@ spring:
     username: weifuwu
     password: weifuwu
 
+  data:
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+
 
 ---
 spring:
@@ -50,4 +68,9 @@ spring:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: ha
     password: jkzlxm
+
+  data:
+    solr:
+      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+
 

@@ -2,10 +2,10 @@ package com.yihu.quota.etl.extract.es;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.quota.etl.extract.ElasticsearchUtil;
-import com.yihu.quota.etl.extract.EsClientUtil;
 import com.yihu.quota.etl.model.EsConfig;
-import com.yihu.quota.etl.save.es.ElasticFactory;
+import com.yihu.quota.etl.util.ElasticsearchUtil;
+import com.yihu.quota.etl.util.EsClientUtil;
+import com.yihu.quota.etl.util.EsConfigUtil;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.save.TjDataSave;
 import com.yihu.quota.model.jpa.save.TjQuotaDataSave;
@@ -45,19 +45,62 @@ public class EsResultExtract {
     private String district;
     private String slaveKey1;
     private String slaveKey2;
+    private String result;
     private TjQuota tjQuota;
     private String quotaCode;
     private int pageNo;
     private int pageSize;
     private EsConfig esConfig;
     @Autowired
-    private EsClientUtil esClientUtil;
-    @Autowired
     ElasticsearchUtil elasticsearchUtil;
+    @Autowired
+    EsConfigUtil esConfigUtil;
+    @Autowired
+    EsClientUtil esClientUtil;
     @Autowired
     private TjDataSaveService tjDataSaveService;
     @Autowired
     private ObjectMapper objectMapper;
+
+    public void initialize(TjQuota tjQuota ,String filters) throws Exception {
+        if(!StringUtils.isEmpty(filters)){
+            Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
+            if (params !=null && params.size() > 0){
+                for(String key : params.keySet()){
+                    if( params.get(key) != null ){
+                        if(key.equals("startTime"))
+                            this.startTime = params.get(key).toString();
+                        else if(key.equals("endTime"))
+                            this.endTime = params.get(key).toString();
+                        else if(key.equals("orgName"))
+                            this.orgName = params.get(key).toString();
+                        else if(key.equals("org"))
+                            this.org = params.get(key).toString();
+                        else if(key.equals("province"))
+                            this.province = params.get(key).toString();
+                        else if(key.equals("city"))
+                            this.city = params.get(key).toString();
+                        else if(key.equals("district"))
+                            this.district = params.get(key).toString();
+                        else if(key.equals("slaveKey1"))
+                            this.slaveKey1 = params.get(key).toString();
+                        else if(key.equals("slaveKey2"))
+                            this.slaveKey2 = params.get(key).toString();
+                        else if(key.equals("result")){
+                            this.result = params.get(key).toString();
+                        }
+                    }
+                }
+            }
+        }
+        this.tjQuota = tjQuota;
+        if(tjQuota.getCode() != null)
+            this.quotaCode = tjQuota.getCode();
+        EsConfig esConfig = null;
+        esConfig = getEsConfig(tjQuota);
+        this.esConfig = esConfig;
+        esConfigUtil.getConfig(esConfig);
+    }
 
     public EsConfig getEsConfig(TjQuota tjQuota) throws Exception {
         //得到该指标的数据存储
@@ -71,81 +114,50 @@ public class EsResultExtract {
         if (TjDataSave.type_es.equals(quotaDataSave.getType())) {
             JSONObject obj = new JSONObject().fromObject(quotaDataSave.getConfigJson());
             esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+        }else {
+            // wait TO DO
         }
         //初始化es链接
         esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(esConfig), EsConfig.class);
         return esConfig;
     }
 
-    public void initialize(TjQuota tjQuota ,String filters) throws Exception {
-        if(!StringUtils.isEmpty(filters)){
-            Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
-            if (params !=null && params.size() > 0){
-                for(String key : params.keySet()){
-                    if( params.get(key) != null ){
-                        if(key.equals("startTime"))
-                            this.startTime = params.get(key).toString();
-                        if(key.equals("endTime"))
-                            this.endTime = params.get(key).toString();
-                        if(key.equals("orgName"))
-                            this.orgName = params.get(key).toString();
-                        if(key.equals("org"))
-                            this.org = params.get(key).toString();
-                        if(key.equals("province"))
-                            this.province = params.get(key).toString();
-                        if(key.equals("city"))
-                            this.city = params.get(key).toString();
-                        if(key.equals("district"))
-                            this.district = params.get(key).toString();
-                        if(key.equals("slaveKey1"))
-                            this.slaveKey1 = params.get(key).toString();
-                        if(key.equals("slaveKey2"))
-                            this.slaveKey2 = params.get(key).toString();
-                    }
-                }
-            }
-        }
-        this.tjQuota = tjQuota;
-        if(tjQuota.getCode() != null)
-            this.quotaCode = tjQuota.getCode();
-        EsConfig esConfig = null;
-        esConfig = getEsConfig(tjQuota);
-        this.esConfig = esConfig;
-    }
-
-    public Client getEsClient(EsConfig esConfig){
-        esClientUtil.getConfig(esConfig);
-        Client client = esClientUtil.getClient();
-        return  client;
+    public Client getEsClient(){
+        esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
+        return esClientUtil.getClient(esConfig.getClusterName());
     }
 
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
-        initialize(tjQuota,filters);
         this.pageNo = pageNo-1;
         this.pageSize = pageSize;
-        List<Map<String, Object>> restltList = queryPageList(esConfig);
-        for(Map<String,Object> map : restltList){
-            System.out.println(map);
-        }
-        return restltList;
-    }
-
-    private List<Map<String, Object>> queryPageList(EsConfig esConfig){
+        initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        return elasticsearchUtil.queryPageList(getEsClient(esConfig),boolQueryBuilder,pageNo,pageSize,"quotaDate");
+        List<Map<String, Object>> restltList =  elasticsearchUtil.queryPageList(getEsClient(),boolQueryBuilder,pageNo,pageSize,"quotaDate");
+        return restltList;
     }
 
     public int getQuotaTotalCount(TjQuota tjQuota,String filters) throws Exception {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        return (int)elasticsearchUtil.getTotalCount(getEsClient(esConfig),boolQueryBuilder);
+        return (int)elasticsearchUtil.getTotalCount(getEsClient(),boolQueryBuilder);
+    }
+
+    public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters) throws Exception {
+        initialize(tjQuota,filters);
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        getBoolQueryBuilder(boolQueryBuilder);
+        List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(),boolQueryBuilder, "quotaDate");
+        return  list;
     }
 
     public BoolQueryBuilder getBoolQueryBuilder(BoolQueryBuilder boolQueryBuilder){
-        RangeQueryBuilder rangeQueryResult = QueryBuilders.rangeQuery("result").gte("0");
-        boolQueryBuilder.must(rangeQueryResult);
+
+        if( !StringUtils.isEmpty(result)){
+            RangeQueryBuilder rangeQueryResult = QueryBuilders.rangeQuery("result").gte(result);
+            boolQueryBuilder.must(rangeQueryResult);
+        }
         if( !StringUtils.isEmpty(quotaCode)){
             TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaCode);
             boolQueryBuilder.must(termQueryQuotaCode);
@@ -182,25 +194,17 @@ public class EsResultExtract {
             boolQueryBuilder.must(termQueryTown);
         }
         if( !StringUtils.isEmpty(startTime) ){
-            RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("createTime").gte(startTime);
+            RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
             boolQueryBuilder.must(rangeQueryStartTime);
         }
         if( !StringUtils.isEmpty(endTime)){
-            RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("createTime").lte(endTime);
+            RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
             boolQueryBuilder.must(rangeQueryEndTime);
         }
         return boolQueryBuilder;
     }
 
-    public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters) throws Exception {
-        initialize(tjQuota,filters);
-        EsConfig esConfig = getEsConfig(tjQuota);
 
-        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
-        getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(esConfig),boolQueryBuilder, "quotaDate");
-        return  list;
-    }
 
     /**
      * 递归解析json
@@ -244,5 +248,30 @@ public class EsResultExtract {
             }
         }
     }
+
+
+
+    //指标分组统计数量
+    public List<Map<String, Object>> searcherByGroup(TjQuota tjQuota, String filters,String aggsField ) throws Exception {
+        initialize(tjQuota,filters);
+        BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+        getBoolQueryBuilder(boolQueryBuilder);
+        List<Map<String, Object>> list = elasticsearchUtil.searcherByGroup(getEsClient(),boolQueryBuilder,aggsField, "result");
+        return  list;
+    }
+
+    //根据mysql 指标分组求和
+    public Map<String, Integer> searcherByGroupBySql(TjQuota tjQuota , String aggsFields ,String filter) throws Exception {
+        initialize(tjQuota,null);
+        if(StringUtils.isEmpty(filter)){
+            filter =  " quotaCode='" + tjQuota.getCode() + "' ";
+        }else {
+            filter = filter + " ,quotaCode='" + tjQuota.getCode() + "' ";
+        }
+        Map<String, Integer> map = elasticsearchUtil.searcherByGroupBySql(getEsClient(),esConfig.getIndex(), aggsFields ,filter ,"result");
+        return map;
+    }
+
+
 
 }

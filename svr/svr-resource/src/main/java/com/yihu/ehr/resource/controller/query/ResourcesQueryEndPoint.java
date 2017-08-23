@@ -62,6 +62,35 @@ public class ResourcesQueryEndPoint {
     }
 
     /**
+     * （档案浏览器主要健康问题诊断详情）
+     * @param resourcesCode
+     * @param appId
+     * @param orgCode
+     * @param queryParams
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    @ApiOperation("获取资源数据（档案浏览器主要健康问题诊断详情）")
+    @RequestMapping(value = ServiceApi.Resources.ResourcesSubQuery, method = RequestMethod.POST)
+    public Envelop getResourcesSub(@ApiParam("资源代码")
+                                @RequestParam String resourcesCode,
+                                @ApiParam("appId应用ID")
+                                @RequestParam String appId,
+                                @ApiParam("orgCode机构代码")
+                                @RequestParam(required = false) String orgCode,
+                                @ApiParam("json查询条件，{\"q\":\"*:*\"}")
+                                @RequestParam(required = false) String queryParams,
+                                @ApiParam("第几页")
+                                @RequestParam(required = false) Integer page,
+                                @ApiParam("每页几条")
+                                @RequestParam(required = false) Integer size) throws Exception {
+
+        return resourcesQueryService.getResourcesSub(resourcesCode, appId, orgCode, queryParams, page, size);
+    }
+
+    /**
      * 获取资源数据(转译)
      */
     @ApiOperation("获取资源数据(转译)")
@@ -106,8 +135,8 @@ public class ResourcesQueryEndPoint {
      */
     @ApiOperation("资源浏览")
     @RequestMapping(value = ServiceApi.Resources.ResourceViewData, method = RequestMethod.GET)
-    public Envelop getResourceData(@ApiParam(name = "resourcesCode", defaultValue = "RS_HOSPITALIZED_DIAGNOSIS") @RequestParam String resourcesCode,
-                                   @ApiParam(name = "机构代码") @RequestParam String orgCode,
+    public Envelop getResourceData(@ApiParam("资源代码") @RequestParam(value = "resourcesCode", required = true, defaultValue = "RS_HOSPITALIZED_DIAGNOSIS") String resourcesCode,
+                                   @ApiParam("机构代码") @RequestParam(value = "orgCode", required = true) String orgCode,
                                    @ApiParam("查询条件") @RequestParam(value = "queryCondition", required = false) String queryCondition,
                                    @ApiParam("第几页") @RequestParam(value = "page", required = false) Integer page,
                                    @ApiParam("每页几条") @RequestParam(value = "size", required = false) Integer size) throws Exception {
@@ -174,12 +203,14 @@ public class ResourcesQueryEndPoint {
         re.setCurrPage(result.getNumber());
         re.setPageSize(result.getSize());
         re.setTotalCount(new Long(result.getTotalElements()).intValue());
-        if(version!=null && version.length()>0)
-        {
+        if(version!=null && version.length()>0) {
             re.setDetailModelList(resourcesTransformService.displayCodeConvert(result.getContent(),version,null));
         }
         else{
-            re.setDetailModelList(result.getContent());
+            if(result != null) {
+                re.setSuccessFlg(true);
+                re.setDetailModelList(result.getContent());
+            }
         }
         return re;
     }

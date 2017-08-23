@@ -11,6 +11,7 @@ import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
 import org.apache.solr.client.solrj.response.PivotField;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -166,8 +167,10 @@ public class SolrExtract {
             Long num = map.get(key);
             if(saveModel != null && num != null){
                 saveModel.setResult(Integer.valueOf(num.toString()));
-                returnList.add(saveModel);
+            }else{
+                saveModel.setResult(0);
             }
+            returnList.add(saveModel);
         }
     }
 
@@ -268,8 +271,10 @@ public class SolrExtract {
         one.setResult(0);
         one.setCreateTime(new Date());
         LocalDate today = LocalDate.now();
-        one.setQuotaDate(today.toString());
+        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+        one.setQuotaDate(yesterDay);
         one.setQuotaCode(quotaVo.getCode());
+        one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);
         one.setSaasId(null);
         allData.put(key, one);

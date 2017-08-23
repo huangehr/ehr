@@ -513,6 +513,20 @@ public class PatientController extends BaseController {
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
         return patientClient.isExistIdCardNo(idCardNo);
     }
+    /**
+     * 手机号码是否已存在校验
+     *
+     * @param telphoneNumber
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations/telphoneNumberIs_exist/{telphone_number}", method = RequestMethod.GET)
+    @ApiOperation(value = "判断手机号码是否存在")
+    public boolean isExisttelphoneNumber(
+            @ApiParam(name = "telphone_number", value = "手机号码", defaultValue = "")
+            @PathVariable(value = "telphone_number") String telphoneNumber) throws Exception {
+        return patientClient.isExisttelphoneNumber(telphoneNumber);
+    }
 
     /**
      * 初始化密码

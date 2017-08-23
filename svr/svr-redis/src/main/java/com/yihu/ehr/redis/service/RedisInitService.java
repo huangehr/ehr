@@ -28,9 +28,6 @@ public class RedisInitService {
     @Autowired
     JdbcTemplate jdbc;
 
-
-
-
     /****************************** 缓存行政地址Redis ***********************************************/
     @Autowired
     XGeographyClient geographyClient;
@@ -76,8 +73,7 @@ public class RedisInitService {
     /**
      * 缓存ICD10 Redis
      */
-    public boolean cacheIcd10()
-    {
+    public boolean cacheIcd10() {
         String sql = "select t.hp_code,d.code,d.name from\n" +
                 "(select r.icd10_id,group_concat(p.`code` separator ';') hp_code \n" +
                 "from hp_icd10_relation r\n" +
@@ -104,8 +100,7 @@ public class RedisInitService {
     /**
      * 缓存机构名称Redis
      */
-    public boolean cacheOrgName()
-    {
+    public boolean cacheOrgName() {
         String sql = "select org_code, full_name from organizations";
 
         //清空相关Redis
@@ -121,8 +116,7 @@ public class RedisInitService {
     /**
      * 缓存机构区域Redis
      */
-    public boolean cacheOrgArea()
-    {
+    public boolean cacheOrgArea() {
         String sql = "select org_code, administrative_division from organizations";
 
         //清空相关Redis
@@ -138,8 +132,7 @@ public class RedisInitService {
     /**
      * 缓存机构Saas区域Redis
      */
-    public boolean cacheOrgSaasArea()
-    {
+    public boolean cacheOrgSaasArea() {
         String sql = "select org_code,saas_code from org_saas where type='1' order by org_code";
 
         //清空相关Redis
@@ -152,15 +145,13 @@ public class RedisInitService {
         for(Map<String,Object> map:list){
             String orgCodeCurrent =  String.valueOf(map.get("org_code"));
             String saasCodeCurrent =  String.valueOf(map.get("saas_code"));
-            if(!orgCode.equals(orgCodeCurrent) && !StringUtils.isEmpty(orgCode))
-            {
+            if(!orgCode.equals(orgCodeCurrent) && !StringUtils.isEmpty(orgCode)) {
                 orgKeySchema.setOrgSaasArea(orgCode,val);
                 val = saasCodeCurrent;
                 orgCode = orgCodeCurrent;
             }
             else{
-                if(StringUtils.isEmpty(val))
-                {
+                if(StringUtils.isEmpty(val)) {
                     orgCode = orgCodeCurrent;
                     val =  saasCodeCurrent;
                 }
@@ -171,8 +162,7 @@ public class RedisInitService {
             }
         }
 
-        if(!StringUtils.isEmpty(orgCode))
-        {
+        if(!StringUtils.isEmpty(orgCode)) {
             orgKeySchema.setOrgSaasArea(orgCode,val);
         }
 
@@ -182,8 +172,7 @@ public class RedisInitService {
     /**
      * 缓存机构Saas机构Redis
      */
-    public boolean cacheOrgSaasOrg()
-    {
+    public boolean cacheOrgSaasOrg() {
         String sql = "select org_code,saas_code from org_saas where type='2' order by org_code";
 
         //清空相关Redis
@@ -196,15 +185,13 @@ public class RedisInitService {
         for(Map<String,Object> map:list){
             String orgCodeCurrent =  String.valueOf(map.get("org_code"));
             String saasCodeCurrent =  String.valueOf(map.get("saas_code"));
-            if(!orgCode.equals(orgCodeCurrent) && !StringUtils.isEmpty(orgCode))
-            {
+            if(!orgCode.equals(orgCodeCurrent) && !StringUtils.isEmpty(orgCode)) {
                 orgKeySchema.setOrgSaasOrg(orgCode,val);
                 val = saasCodeCurrent;
                 orgCode = orgCodeCurrent;
             }
             else{
-                if(StringUtils.isEmpty(val))
-                {
+                if(StringUtils.isEmpty(val)) {
                     orgCode = orgCodeCurrent;
                     val =  saasCodeCurrent;
                 }
@@ -215,8 +202,7 @@ public class RedisInitService {
             }
         }
 
-        if(!StringUtils.isEmpty(orgCode))
-        {
+        if(!StringUtils.isEmpty(orgCode)) {
             orgKeySchema.setOrgSaasOrg(orgCode,val);
         }
 

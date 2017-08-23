@@ -290,6 +290,15 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
         return demographicService.getDemographicInfo(new DemographicId(idCardNo)) != null;
     }
 
+    @RequestMapping(value = "/populations/telphoneNumberIs_exist/{telphone_number}",method = RequestMethod.GET)
+    @ApiOperation(value = "判断电话号码是否存在")
+    public boolean isExisttelphoneNumber(
+            @ApiParam(name = "telphone_number", value = "电话号码", defaultValue = "")
+            @PathVariable(value = "telphone_number") String telphoneNumber) throws Exception {
+
+        return demographicService.getDemographicInfoBytelephoneNo(telphoneNumber) != null;
+    }
+
 
             /**
              * 用户信息 查询（添加查询条件修改）

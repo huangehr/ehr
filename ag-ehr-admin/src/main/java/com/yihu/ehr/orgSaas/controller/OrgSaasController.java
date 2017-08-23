@@ -180,11 +180,10 @@ public class OrgSaasController extends BaseController{
         OrgSaasModel orgSaasModel = new OrgSaasModel();
         jsonData=URLDecoder.decode(jsonData);
         String[] newJsonData=jsonData.split("&");
-        String id = orgSaasClient.saveOrgSaas(orgCode,type,newJsonData[0]);
-
-        if(id != null){
+        boolean succe = orgSaasClient.saveOrgSaas(orgCode,type,newJsonData[0]);
+        if(succe){
             envelop.setSuccessFlg(true);
-            orgSaasModel.setId(id);
+//            orgSaasModel.setId(id);
         }else{
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构授权新增失败");

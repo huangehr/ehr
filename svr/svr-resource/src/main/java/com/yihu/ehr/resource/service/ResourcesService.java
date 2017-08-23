@@ -4,7 +4,9 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourceMetadataDao;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
+import com.yihu.ehr.resource.dao.intf.ResourcesDefaultQueryDao;
 import com.yihu.ehr.resource.model.RsResources;
+import com.yihu.ehr.resource.service.query.ResourcesQueryDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,8 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
     private ResourcesDao rsDao;
     @Autowired
     private ResourceMetadataDao rsMetadataDao;
+    @Autowired
+    private ResourcesDefaultQueryDao resourcesDefaultQueryDao;
 
     /**
      * 资源创建
@@ -48,6 +52,7 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
 
         for(String id_ : ids)
         {
+            resourcesDefaultQueryDao.deleteByResourcesId(id_);
             rsMetadataDao.deleteByResourcesId(id_);
             rsDao.delete(id_);
         }
@@ -81,6 +86,15 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
     public RsResources getResourceById(String id)
     {
         return rsDao.findOne(id);
+    }
+
+    /**
+     * 根据code获取资源
+     * @param code
+     * @return
+     */
+    public RsResources getResourceByCode(String code) {
+        return rsDao.findByCode(code);
     }
 
 }

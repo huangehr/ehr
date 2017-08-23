@@ -25,4 +25,8 @@ public interface XHealthBusinessRepository extends PagingAndSortingRepository<He
 
     @Query("select business from HealthBusiness business where business.parentId = 1")
     List<HealthBusiness> getHealthBusinessOfChild();
+
+    @Query("select business from HealthBusiness business where business.parentId != 0 ")
+    List<HealthBusiness> getHealthBusinessChild();
+
 }

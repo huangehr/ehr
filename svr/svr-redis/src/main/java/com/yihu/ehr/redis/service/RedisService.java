@@ -26,14 +26,12 @@ public class RedisService {
     IndicatorsDictKeySchema indicatorsDictKeySchema;
     @Autowired
     OrgKeySchema orgKeySchema;
-
     @Autowired
     ResourceAdaptionDictSchema resourceAdaptionDictSchema;
     @Autowired
     ResourceAdaptionKeySchema resourceAdaptionKeySchema;
     @Autowired
     ResourceMetadataSchema resourceMetadataSchema;
-
     @Autowired
     StdVersionKeySchema stdVersionKeySchema;
     @Autowired
@@ -54,8 +52,7 @@ public class RedisService {
      *获取健康问题redis
      * @return
      */
-    public String getHealthProblemRedis(String key)
-    {
+    public String getHealthProblemRedis(String key) {
         return healthProblemDictKeySchema.get(key);
     }
 
@@ -71,8 +68,7 @@ public class RedisService {
     /**
      *获取ICD10名称 redis
      */
-    public String getIcd10NameRedis(String key)
-    {
+    public String getIcd10NameRedis(String key) {
         return icd10KeySchema.get(key);
     }
 
@@ -124,13 +120,11 @@ public class RedisService {
      *获取机构Saas机构权限范围redis
      * @return
      */
-    public String getOrgSaasOrg(String key)
-    {
+    public String getOrgSaasOrg(String key) {
         String saasOrg = orgKeySchema.getOrgSaasOrg(key);
 
         //未设置权限，默认自身机构
-        if(StringUtils.isEmpty(saasOrg))
-        {
+        if(StringUtils.isEmpty(saasOrg)) {
             saasOrg = key;
         }
 
@@ -142,8 +136,7 @@ public class RedisService {
      *获取资源化字典映射 redis
      * @return
      */
-    public String getRsAdaptionDict(String cdaVersion, String dictCode, String srcDictEntryCode)
-    {
+    public String getRsAdaptionDict(String cdaVersion, String dictCode, String srcDictEntryCode) {
         return resourceAdaptionDictSchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
     }
 
@@ -151,8 +144,7 @@ public class RedisService {
      *获取资源化数据元映射 redis
      * @return
      */
-    public String getRsAdaptionMetaData(String cdaVersion, String dictCode, String srcDictEntryCode)
-    {
+    public String getRsAdaptionMetaData(String cdaVersion, String dictCode, String srcDictEntryCode) {
         return resourceAdaptionKeySchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
     }
 
