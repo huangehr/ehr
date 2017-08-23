@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.resource.MRsReport;
 import com.yihu.ehr.model.resource.MRsReportCategory;
+import com.yihu.ehr.model.resource.MRsReportCategoryInfo;
 import com.yihu.ehr.model.user.MRoleReportRelation;
 import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MRoles;
@@ -243,10 +244,10 @@ public class RoleUserController extends BaseController {
             @ApiParam(name="roleId",value="角色Id",defaultValue = "")
             @RequestParam(value="roleId",required = false)String roleId) throws  Exception {
         Envelop envelop = new Envelop();
-        List<MRsReport> list = new ArrayList<>();
         try {
             List<MRsReportCategory> categories = rsReportCategoryClient.getAllCategories("");
-            for (MRsReportCategory category : categories) {
+            List<MRsReportCategoryInfo> mRsReportCategoryInfos = (List<MRsReportCategoryInfo>) convertToModels(categories, new ArrayList<>(categories.size()), MRsReportCategoryInfo.class, null);
+            for (MRsReportCategoryInfo category : mRsReportCategoryInfos) {
                 String condition = "reportCategoryId=" + category.getId();
                 if (!StringUtils.isEmpty(filters)) {
                     condition += ";" + filters;
@@ -254,20 +255,17 @@ public class RoleUserController extends BaseController {
                 List<MRsReport> mRsResources = rsReportClient.queryNoPageResources(condition);
                 if (null != mRsResources && mRsResources.size() > 0) {
                     for (MRsReport rp : mRsResources) {
-                        rp.setPid(category.getId());
                         setFlag(rp, roleId);
                     }
                 }
-//                category.setReportList(mRsResources);
-                list.addAll(mRsResources);
-                MRsReport rsReport = new MRsReport();
-                BeanUtils.copyProperties(category, rsReport);
-                list.add(rsReport);
+                category.setReportList(mRsResources);
             }
-            List<MRoleReportRelation> roleReportRelations = roleReportRelationClient.searchRoleReportRelationNoPage("roleId=" + roleId);
+            //获取已配置的资源报表信息
+            List<MRsReportCategoryInfo> mRsReportCategoryInfoList = getReportConfigInfo(roleId);
+
             envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(list);
-            envelop.setObj(roleReportRelations);
+            envelop.setDetailModelList(mRsReportCategoryInfos);
+            envelop.setObj(mRsReportCategoryInfoList);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -281,5 +279,23 @@ public class RoleUserController extends BaseController {
         if (roleReportRelations != null && roleReportRelations.size() > 0) {
             mRsReport.setFlag(true);
         }
+    }
+
+    public List<MRsReportCategoryInfo> getReportConfigInfo(String roleId) {
+        List<MRsReportCategory> mRsReportCategories = new ArrayList<>();
+        List<MRoleReportRelation> roleReportRelations = roleReportRelationClient.searchRoleReportRelationNoPage("roleId=" + roleId);
+        if (null != roleReportRelations && roleReportRelations.size() > 0) {
+            for (MRoleReportRelation roleReportRelation : roleReportRelations) {
+                ResponseEntity<List<MRsReport>> listResponseEntity = rsReportClient.search("", "id=" + roleReportRelation.getRsReportId(), "", 1, 1);
+                List<MRsReport> rsReportList = listResponseEntity.getBody();
+                if (null != rsReportList && rsReportList.size() > 0) {
+                    MRsReportCategory rsReportCategory = rsReportCategoryClient.getById(rsReportList.get(0).getReportCategoryId());
+                    rsReportCategory.setReportList(rsReportList);
+                    mRsReportCategories.add(rsReportCategory);
+                }
+            }
+        }
+        List<MRsReportCategoryInfo> mRsReportCategoryInfosList = (List<MRsReportCategoryInfo>) convertToModels(mRsReportCategories, new ArrayList<>(mRsReportCategories.size()), MRsReportCategoryInfo.class, null);
+        return mRsReportCategoryInfosList;
     }
 }
