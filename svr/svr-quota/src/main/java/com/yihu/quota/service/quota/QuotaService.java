@@ -25,6 +25,9 @@ public class QuotaService {
     @Autowired
     private EsResultExtract esResultExtract;
 
+    public TjQuota findOne(int id){
+        return quotaDao.findOne(id);
+    }
 
     public List<Map<String, Object>> queryResultPage(Integer id,String filters ,int pageNo,int pageSize) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
@@ -50,7 +53,7 @@ public class QuotaService {
     }
 
     //多列
-    public QuotaReport getQuotaReport(Integer id, String filters,String dimension) throws Exception {
+    public QuotaReport getQuotaReport(Integer id, String filters,String dimension,int size) throws Exception {
         String[] dimensions = null;
         if(StringUtils.isNotEmpty(dimension)){
           dimensions = dimension.split(";");
@@ -59,7 +62,7 @@ public class QuotaService {
         }
         TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
-        List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters);
+        List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters,size);
         List<ReultModel> reultModelList = new ArrayList<>();
         for(int i=0 ; i< listMap.size() ;i++){
             Object resultVal = listMap.get(i).get("result");
@@ -101,6 +104,27 @@ public class QuotaService {
         quotaReport.setReultModelList(reultModelList);
         quotaReport.setTjQuota(tjQuota);
         return quotaReport;
+    }
+
+    public List<Map<String, Object>> getOpetionData(List<Map<String, Object>> resultList ){
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        for(Map<String, Object> reultModel:resultList){
+            Map<String, Object> map = new HashMap<>();
+            if(reultModel.get("orgName") !=null){
+                map.put("NAME",reultModel.get("orgName"));
+            }else  if(reultModel.get("townName") !=null){
+                map.put("NAME",reultModel.get("townName"));
+            }else  if(reultModel.get("cityName") !=null){
+                map.put("NAME",reultModel.get("cityName"));
+            }else  if(reultModel.get("cityName") !=null){
+                map.put("NAME",reultModel.get("cityName"));
+            }else {
+                map.put("NAME",reultModel.get("slaveKey1Name"));
+            }
+            map.put("TOTAL",reultModel.get("result"));
+            dataList.add(map);
+        }
+        return dataList;
     }
 
 
