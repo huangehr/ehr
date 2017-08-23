@@ -43,16 +43,13 @@ public class QuotaController extends BaseController {
     @Autowired
     private QuotaService quotaService;
 
-
-
-
     /**
      * 查询结果
      * @param id
      * @return
      */
     @ApiOperation(value = "获取指标执行结果分页")
-    @RequestMapping(value = "/tj/tjGetQuotaResult", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjGetQuotaResult, method = RequestMethod.GET)
     public Envelop getQuotaResult(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
             @RequestParam(value = "id" , required = true) int id,
@@ -87,4 +84,35 @@ public class QuotaController extends BaseController {
         envelop.setSuccessFlg(false);
         return envelop;
     }
+
+    /**
+     * 获取指标统计不同维度结果总量
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "获取指标统计不同维度结果总量")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
+    public Envelop getQuotaTotalCount(
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "dimension", value = "需要统计不同维度字段多个维度用;隔开", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension
+    ) {
+        Envelop envelop = new Envelop();
+        try {
+            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters, dimension,10);
+            envelop.setDetailModelList(quotaReport.getReultModelList());
+            envelop.setSuccessFlg(true);
+            return envelop;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+        }
+        envelop.setSuccessFlg(false);
+        return envelop;
+    }
+
+
 }
