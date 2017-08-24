@@ -6,11 +6,14 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.resource.MRsReport;
 import com.yihu.ehr.model.resource.MRsReportCategory;
+import com.yihu.ehr.model.resource.MRsReportCategoryInfo;
+import com.yihu.ehr.model.user.MRoleReportRelation;
 import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.resource.client.RsReportCategoryClient;
 import com.yihu.ehr.resource.client.RsReportClient;
+import com.yihu.ehr.users.service.RoleReportRelationClient;
 import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.users.service.UserClient;
@@ -19,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +54,9 @@ public class RoleUserController extends BaseController {
 
     @Autowired
     private RsReportClient rsReportClient;
+
+    @Autowired
+    private RoleReportRelationClient roleReportRelationClient;
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -233,11 +240,14 @@ public class RoleUserController extends BaseController {
     @ApiOperation("获取资源报表类别及报表树")
     public Envelop getAllCategoriesAndReport(
             @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(value="filters",required = false)String filters) throws  Exception {
+            @RequestParam(value="filters",required = false)String filters,
+            @ApiParam(name="roleId",value="角色Id",defaultValue = "")
+            @RequestParam(value="roleId",required = false)String roleId) throws  Exception {
         Envelop envelop = new Envelop();
         try {
             List<MRsReportCategory> categories = rsReportCategoryClient.getAllCategories("");
-            for (MRsReportCategory category : categories) {
+            List<MRsReportCategoryInfo> mRsReportCategoryInfos = (List<MRsReportCategoryInfo>) convertToModels(categories, new ArrayList<>(categories.size()), MRsReportCategoryInfo.class, null);
+            for (MRsReportCategoryInfo category : mRsReportCategoryInfos) {
                 String condition = "reportCategoryId=" + category.getId();
                 if (!StringUtils.isEmpty(filters)) {
                     condition += ";" + filters;
@@ -245,17 +255,47 @@ public class RoleUserController extends BaseController {
                 List<MRsReport> mRsResources = rsReportClient.queryNoPageResources(condition);
                 if (null != mRsResources && mRsResources.size() > 0) {
                     for (MRsReport rp : mRsResources) {
-                        rp.setPid(category.getId());
+                        setFlag(rp, roleId);
                     }
                 }
                 category.setReportList(mRsResources);
             }
+            //获取已配置的资源报表信息
+            List<MRsReportCategoryInfo> mRsReportCategoryInfoList = getReportConfigInfo(roleId);
+
             envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(categories);
+            envelop.setDetailModelList(mRsReportCategoryInfos);
+            envelop.setObj(mRsReportCategoryInfoList);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
         }
         return envelop;
+    }
+
+    public void setFlag(MRsReport mRsReport, String roleId) {
+        ResponseEntity<Collection<MRoleReportRelation>> responseEntity = roleReportRelationClient.searchRoleReportRelation("", "rsReportId=" + mRsReport.getId() + ";roleId=" + roleId, "", 1, 1);
+        Collection<MRoleReportRelation> roleReportRelations = responseEntity.getBody();
+        if (roleReportRelations != null && roleReportRelations.size() > 0) {
+            mRsReport.setFlag(true);
+        }
+    }
+
+    public List<MRsReportCategoryInfo> getReportConfigInfo(String roleId) {
+        List<MRsReportCategory> mRsReportCategories = new ArrayList<>();
+        List<MRoleReportRelation> roleReportRelations = roleReportRelationClient.searchRoleReportRelationNoPage("roleId=" + roleId);
+        if (null != roleReportRelations && roleReportRelations.size() > 0) {
+            for (MRoleReportRelation roleReportRelation : roleReportRelations) {
+                ResponseEntity<List<MRsReport>> listResponseEntity = rsReportClient.search("", "id=" + roleReportRelation.getRsReportId(), "", 1, 1);
+                List<MRsReport> rsReportList = listResponseEntity.getBody();
+                if (null != rsReportList && rsReportList.size() > 0) {
+                    MRsReportCategory rsReportCategory = rsReportCategoryClient.getById(rsReportList.get(0).getReportCategoryId());
+                    rsReportCategory.setReportList(rsReportList);
+                    mRsReportCategories.add(rsReportCategory);
+                }
+            }
+        }
+        List<MRsReportCategoryInfo> mRsReportCategoryInfosList = (List<MRsReportCategoryInfo>) convertToModels(mRsReportCategories, new ArrayList<>(mRsReportCategories.size()), MRsReportCategoryInfo.class, null);
+        return mRsReportCategoryInfosList;
     }
 }

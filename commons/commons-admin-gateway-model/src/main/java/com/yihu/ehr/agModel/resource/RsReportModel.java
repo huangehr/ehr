@@ -21,7 +21,7 @@ public class RsReportModel implements Serializable {
     private String reportCategory; // 报表分类名称
     private String statusName; // 报表状态名称
 
-    private Integer pid;    //资源报表分类ID,前端使用
+    private boolean flag;   //界面显示，是否选中
 
     public Integer getId() {
         return id;
@@ -95,11 +95,11 @@ public class RsReportModel implements Serializable {
         this.statusName = statusName;
     }
 
-    public Integer getPid() {
-        return pid;
+    public boolean isFlag() {
+        return flag;
     }
 
-    public void setPid(Integer pid) {
-        this.pid = pid;
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 }

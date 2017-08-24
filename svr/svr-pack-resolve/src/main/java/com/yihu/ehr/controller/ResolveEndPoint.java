@@ -10,8 +10,10 @@ import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XDatasetPackageMgrClient;
 import com.yihu.ehr.feign.XPackageMgrClient;
+import com.yihu.ehr.feign.XPatientEndClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.service.resource.stage1.DatasetPackage;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
@@ -19,6 +21,7 @@ import com.yihu.ehr.service.resource.stage2.PackMill;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.ResourceService;
 import com.yihu.ehr.service.resource.stage2.repo.DatasetPackageRepository;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -62,6 +65,9 @@ public class ResolveEndPoint {
     @Autowired
     private DatasetPackageRepository datasetPackageRepository;
 
+    @Autowired
+    private XPatientEndClient xPatientEndClient;
+
     @ApiOperation(value = "健康档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析健康档案包")
     @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
     public String resolve(
@@ -104,6 +110,24 @@ public class ResolveEndPoint {
 
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
+            //TODO 居民注册
+            //验证居民的存在性
+            String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString();
+            Boolean result = xPatientEndClient.isRegistered(idCardNo);
+            if(!result){
+                MDemographicInfo demoInfo = new MDemographicInfo();
+                demoInfo.setName(resourceBucket.getPatientName() == null ? "":resourceBucket.getPatientName().toString());
+                demoInfo.setIdCardNo(resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString());
+                demoInfo.setBirthday(resourceBucket.getMasterRecord().getResourceValue("EHR_000007") == null? null:DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000007")));
+                demoInfo.setGender(resourceBucket.getMasterRecord().getResourceValue("EHR_000019")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString());
+                demoInfo.setNation(resourceBucket.getMasterRecord().getResourceValue("EHR_000016")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000016").toString());
+                demoInfo.setMartialStatus(resourceBucket.getMasterRecord().getResourceValue("EHR_000014")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000014").toString());
+                demoInfo.setNativePlace(resourceBucket.getMasterRecord().getResourceValue("EHR_000015")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000015").toString());
+                demoInfo.setEmail(resourceBucket.getMasterRecord().getResourceValue("EHR_000008")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000008").toString());
+                demoInfo.setTelephoneNo(resourceBucket.getMasterRecord().getResourceValue("EHR_000003")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString());
+                //验证居民注册
+                xPatientEndClient.registerPatient(objectMapper.writeValueAsString(demoInfo));
+            }
             if (echo) {
                 return standardPackage.toJson();
             } else {
