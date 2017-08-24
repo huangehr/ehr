@@ -18,6 +18,7 @@ public class MRsReportCategoryInfo implements Serializable {
     private String remark; // 备注
     private String text; // 名称：树形下拉框使用
     private List<MRsReport> reportList; //该分类对应的报表
+    private boolean flag;   //是否选中
 
     public Integer getId() {
         return id;
@@ -73,5 +74,13 @@ public class MRsReportCategoryInfo implements Serializable {
 
     public void setReportList(List<MRsReport> reportList) {
         this.reportList = reportList;
+    }
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 }
