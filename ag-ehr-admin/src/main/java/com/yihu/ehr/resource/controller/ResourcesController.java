@@ -2,8 +2,9 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.resource.MChartInfoModel;
 import com.yihu.ehr.model.resource.MRsCategory;
@@ -19,7 +20,6 @@ import com.yihu.ehr.resource.client.ResourcesCategoryClient;
 import com.yihu.ehr.resource.client.ResourcesClient;
 import com.yihu.ehr.resource.client.RsInterfaceClient;
 import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -201,6 +201,23 @@ public class ResourcesController extends BaseController {
         return envelop;
     }
 
+    @ApiOperation(value = "资源查询_不分页")
+    @RequestMapping(value = ServiceApi.Resources.NoPageResources, method = RequestMethod.GET)
+    public Envelop queryNoPageResources(
+            @ApiParam(name = "filters", value = "过滤条件")
+            @RequestParam(value = "filters", required = false) String filters) {
+        Envelop envelop = new Envelop();
+        try{
+            List<MRsResources> list = resourcesClient.queryNoPageResources(filters);
+            envelop.setDetailModelList(list);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
     @ApiOperation("资源名称是否已存在")
     @RequestMapping(value = ServiceApi.Resources.IsExistName,method = RequestMethod.GET)
     public Object isExistName(
@@ -300,4 +317,5 @@ public class ResourcesController extends BaseController {
         }
         return chartInfoModels;
     }
+
 }

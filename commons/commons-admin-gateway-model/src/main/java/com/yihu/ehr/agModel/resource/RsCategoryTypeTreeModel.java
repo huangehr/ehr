@@ -12,9 +12,9 @@ public class RsCategoryTypeTreeModel {
     private String description;
     private List<RsCategoryTypeTreeModel> children;
     private  List<RsResourcesModel>  rsResourceslist;
-//    private List<RsResourcesModel> resourceIds;
     private String resourceIds;
     private String resourceCode;
+    private boolean realCategory = true; // 是否是真的类别（报表视图配置用到）
 
     public String getId() {
         return id;
@@ -78,5 +78,13 @@ public class RsCategoryTypeTreeModel {
 
     public void setRsResourceslist(List<RsResourcesModel> rsResourceslist) {
         this.rsResourceslist = rsResourceslist;
+    }
+
+    public boolean isRealCategory() {
+        return realCategory;
+    }
+
+    public void setRealCategory(boolean realCategory) {
+        this.realCategory = realCategory;
     }
 }
