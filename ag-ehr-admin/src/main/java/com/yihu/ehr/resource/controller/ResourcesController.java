@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ServiceApi;
@@ -29,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -291,11 +293,16 @@ public class ResourcesController extends BaseController {
             @ApiParam(name = "filter", value = "过滤器", defaultValue = "")
             @RequestParam(value = "filter") String filter,
             @ApiParam(name = "filters", value = "指标查询过滤条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) {
+            @RequestParam(value = "filters", required = false) String filters) throws JsonProcessingException {
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(filter);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
         for (ResourceQuotaModel m : list) {
-            MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), filters);
+            Map<String, Object> map = new HashMap<>();
+            if(StringUtils.isNotEmpty(filters)){
+                map.put(filters.split("=")[0],filters.split("=")[1]);
+            }
+            String quaFilter = objectMapper.writeValueAsString(map);
+            MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), map!=null?quaFilter:null);
             chartInfoModels.add(chartInfoModel);
         }
         return chartInfoModels;

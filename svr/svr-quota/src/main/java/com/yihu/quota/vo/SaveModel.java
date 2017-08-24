@@ -35,7 +35,7 @@ public class SaveModel {
     private String slaveKey3Name;
     private String slaveKey4;//从维度  4级维度
     private String slaveKey4Name;
-    private Integer result;//统计结果
+    private String result;//统计结果
     private String timeLevel;// 1 日 2 周 3 月 4 年
     private String areaLevel;// 1 省 2 市 3 区县 4 机构 5团队
 
@@ -131,11 +131,11 @@ public class SaveModel {
         this.slaveKey4 = slaveKey4;
     }
 
-    public Integer getResult() {
+    public String getResult() {
         return result;
     }
 
-    public void setResult(Integer result) {
+    public void setResult(String result) {
         this.result = result;
     }
 

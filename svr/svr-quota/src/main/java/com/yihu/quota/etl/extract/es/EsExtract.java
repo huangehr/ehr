@@ -162,7 +162,7 @@ public class EsExtract {
 
     private void setOneData(Map<String, SaveModel> allData, String key, SaveModel one, String areaLevel) {
         one.setAreaLevel(areaLevel);
-        one.setResult(0);
+        one.setResult("0");
         one.setCreateTime(new Date());
         String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
         one.setQuotaDate(yesterDay);
@@ -234,9 +234,9 @@ public class EsExtract {
             SaveModel saveModel=oneMap.getValue();
             Integer num = map.get(key);
             if(saveModel!=null){
-                saveModel.setResult(num);
+                saveModel.setResult(num.toString());
             }else{
-                saveModel.setResult(0);
+                saveModel.setResult("0");
             }
             returnList.add(saveModel);
         }
