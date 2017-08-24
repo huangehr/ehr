@@ -64,7 +64,7 @@ public class ElasticsearchUtil {
         actionGet = client.prepareSearch(esClientUtil.getIndex())
                 .setTypes(esClientUtil.getType())
                 .setQuery(boolQueryBuilder)
-                .setFrom(pageNo).setSize(pageSize).addSort(dealSorter)
+                .setFrom(pageNo-1).setSize(pageSize).addSort(dealSorter)//从0开始算
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
