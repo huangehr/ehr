@@ -14,7 +14,7 @@ public class RsCategoryTypeTreeModel {
     private  List<RsResourcesModel>  rsResourceslist;
     private String resourceIds;
     private String resourceCode;
-    private boolean realCategory = true; // 是否是真的类别（报表视图配置用到）
+    private boolean ischecked = false; // 是否选中（报表视图配置用到）
 
     public String getId() {
         return id;
@@ -80,11 +80,11 @@ public class RsCategoryTypeTreeModel {
         this.rsResourceslist = rsResourceslist;
     }
 
-    public boolean isRealCategory() {
-        return realCategory;
+    public boolean getIschecked() {
+        return ischecked;
     }
 
-    public void setRealCategory(boolean realCategory) {
-        this.realCategory = realCategory;
+    public void setIschecked(boolean ischecked) {
+        this.ischecked = ischecked;
     }
 }

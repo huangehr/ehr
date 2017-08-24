@@ -18,6 +18,8 @@ public interface RsReportViewDao extends PagingAndSortingRepository<RsReportView
 
     List<RsReportView> findByReportId(Integer reportId);
 
+    RsReportView findByReportIdAndResourceId(Integer reportId, String resourceId);
+
     @Modifying
     @Query(" DELETE FROM RsReportView rv WHERE rv.reportId = :reportId")
     void deleteByReportId(@Param("reportId") Integer reportId);
