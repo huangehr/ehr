@@ -36,5 +36,5 @@ public interface TjQuotaJobClient {
     public MChartInfoModel getQuotaGraphicReport(
             @RequestParam(value = "id" , required = true) int id,
             @RequestParam(value = "type" , required = true) int type,
-            @RequestParam(value = "filter", required = false) String filters);
+            @RequestParam(value = "filters", required = false) String filters);
 }
