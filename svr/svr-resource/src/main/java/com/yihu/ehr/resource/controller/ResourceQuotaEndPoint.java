@@ -124,4 +124,13 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
             return null;
         }
     }
+
+    @RequestMapping(value = ServiceApi.Resources.DelRQNameByResourceId, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除资源视图-关联指标表")
+    public Result deleteByResourceId(
+            @ApiParam(name = "resourceId", value = "资源Id", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId) {
+        resourceQuotaService.deleteByResourceId(resourceId);
+        return Result.success("资源视图-关联指标表删除成功！");
+    }
 }

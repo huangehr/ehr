@@ -5,7 +5,9 @@ import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsCategory;
+import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.client.ResourcesCategoryClient;
+import com.yihu.ehr.resource.client.ResourcesClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -31,6 +33,8 @@ public class ResourcesCategoryController extends BaseController {
 
     @Autowired
     private ResourcesCategoryClient resourcesCategoryClient;
+    @Autowired
+    private ResourcesClient resourcesClient;
 
     @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.POST)
     @ApiOperation("资源类别创建")
@@ -375,6 +379,4 @@ public class ResourcesCategoryController extends BaseController {
         }
         return treeList;
     }
-
-
 }

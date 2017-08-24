@@ -137,4 +137,12 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
         return rsReportCategoryService.isUniqueName(id, name);
     }
 
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryNoPageCategories, method = RequestMethod.GET)
+    @ApiOperation("获取资源报表类别")
+    public List<MRsReportCategory> getAllCategories(
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters) throws Exception{
+        List<RsReportCategory> list = rsReportCategoryService.search(filters);
+        return (List<MRsReportCategory>) convertToModels(list, new ArrayList<>(list.size()), MRsReportCategory.class, null);
+    }
 }

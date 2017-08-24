@@ -6,7 +6,9 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.resource.MResourceQuota;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -72,4 +74,10 @@ public interface ResourceQuotaClient {
     public List<MResourceQuota> searchByQuotaId (
             @ApiParam(name = "quotaId", value = "过滤器", defaultValue = "0")
             @RequestParam(value = "quotaId") Integer quotaId);
+
+    @RequestMapping(value = ServiceApi.Resources.DelRQNameByResourceId, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除资源视图-关联指标表")
+    Result deleteByResourceId(
+            @ApiParam(name = "resourceId", value = "资源Id", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId);
 }

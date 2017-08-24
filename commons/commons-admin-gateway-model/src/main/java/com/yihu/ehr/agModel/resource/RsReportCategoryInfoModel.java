@@ -1,24 +1,22 @@
-package com.yihu.ehr.model.resource;
+package com.yihu.ehr.agModel.resource;
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * 资源报表分类
+ * 资源报表分类 model
  *
- * @author 张进军
- * @created 2017.8.8 19:22
+ * @author
+ * @date 2017/8/9 17:20
  */
-public class MRsReportCategory implements Serializable {
+public class RsReportCategoryInfoModel implements Serializable {
 
     private Integer id; // 主键
     private Integer pid; // 父级ID
     private String code; // 编码
     private String name; // 名称
     private String remark; // 备注
-    private String text; // 名称：树形下拉框使用
-    private List<MRsReportCategory> children; // 子节点
-    private List<MRsReport> reportList; //该分类对应的报表
+    private List<RsReportModel> reportList; //该分类对应的报表
 
     public Integer getId() {
         return id;
@@ -60,27 +58,11 @@ public class MRsReportCategory implements Serializable {
         this.remark = remark;
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public List<MRsReportCategory> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<MRsReportCategory> children) {
-        this.children = children;
-    }
-
-    public List<MRsReport> getReportList() {
+    public List<RsReportModel> getReportList() {
         return reportList;
     }
 
-    public void setReportList(List<MRsReport> reportList) {
+    public void setReportList(List<RsReportModel> reportList) {
         this.reportList = reportList;
     }
 }

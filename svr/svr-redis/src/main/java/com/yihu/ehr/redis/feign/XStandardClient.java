@@ -15,7 +15,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * @created 2017.05.09
  */
 @ApiIgnore
-@FeignClient(name = MicroServices.Resource)
+@FeignClient(name = MicroServices.Standard)
 @RequestMapping(ApiVersion.Version1_0)
 public interface XStandardClient {
 

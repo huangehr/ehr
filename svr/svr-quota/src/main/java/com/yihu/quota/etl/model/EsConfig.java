@@ -11,6 +11,8 @@ public class EsConfig {
     private String type;// 类型 es 相当于表
     private String clusterName;//es clusterName
     private String table;// 数据库表
+    private String molecular;  // 统计百分比时的分子  指标code
+    private String denominator;// 统计百分比时的分母  指标code
     private String timekey;//根据sql去查询的key
 
     public String getHost() {
@@ -68,5 +70,21 @@ public class EsConfig {
 
     public void setTable(String table) {
         this.table = table;
+    }
+
+    public String getMolecular() {
+        return molecular;
+    }
+
+    public void setMolecular(String molecular) {
+        this.molecular = molecular;
+    }
+
+    public String getDenominator() {
+        return denominator;
+    }
+
+    public void setDenominator(String denominator) {
+        this.denominator = denominator;
     }
 }

@@ -144,11 +144,11 @@ public class EsResultExtract {
         return (int)elasticsearchUtil.getTotalCount(getEsClient(),boolQueryBuilder);
     }
 
-    public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters) throws Exception {
+    public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters,int size) throws Exception {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(),boolQueryBuilder, "quotaDate");
+        List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(),boolQueryBuilder, "quotaDate",size);
         return  list;
     }
 

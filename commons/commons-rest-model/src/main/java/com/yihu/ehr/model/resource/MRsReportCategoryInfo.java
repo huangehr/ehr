@@ -6,10 +6,10 @@ import java.util.List;
 /**
  * 资源报表分类
  *
- * @author 张进军
+ * @author
  * @created 2017.8.8 19:22
  */
-public class MRsReportCategory implements Serializable {
+public class MRsReportCategoryInfo implements Serializable {
 
     private Integer id; // 主键
     private Integer pid; // 父级ID
@@ -17,7 +17,6 @@ public class MRsReportCategory implements Serializable {
     private String name; // 名称
     private String remark; // 备注
     private String text; // 名称：树形下拉框使用
-    private List<MRsReportCategory> children; // 子节点
     private List<MRsReport> reportList; //该分类对应的报表
 
     public Integer getId() {
@@ -66,14 +65,6 @@ public class MRsReportCategory implements Serializable {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public List<MRsReportCategory> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<MRsReportCategory> children) {
-        this.children = children;
     }
 
     public List<MRsReport> getReportList() {

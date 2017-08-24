@@ -21,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
@@ -52,7 +53,6 @@ public class TemplateController extends ExtendController<TemplateModel> {
     public Envelop create(
             @ApiParam(name = "model", value = "数据模型")
             @RequestParam(value = "model") String model) {
-
         try {
             TemplateModel templateModel = jsonToObj(model);
             ValidateResult validateResult = validate(templateModel);
@@ -122,7 +122,6 @@ public class TemplateController extends ExtendController<TemplateModel> {
             return failed(e.getMessage());
         }
     }
-
 
     @RequestMapping(value = "/templates", method = RequestMethod.GET)
     @ApiOperation(value = "查询模版")
@@ -213,6 +212,33 @@ public class TemplateController extends ExtendController<TemplateModel> {
             e.printStackTrace();
             return failed(e.getMessage());
         }
+    }
+
+    /**
+     * 此接口因为程序整改牵扯代码量很大，暂时不提供使用
+     * @param id
+     * @param pc
+     * @param file
+     * @return
+     */
+    @RequestMapping(value = "/templates/{id}/content", method = RequestMethod.POST)
+    @ApiOperation(value = "更新模板展示文件")
+    public Envelop setTemplateContent(
+            @ApiParam(value = "模板ID")
+            @PathVariable(value = "id") int id,
+            @ApiParam(value = "true表示PC端，false表示移动端")
+            @RequestParam(value = "pc", defaultValue = "true") boolean pc,
+            @ApiParam(value = "展示文件")
+            @RequestPart() MultipartFile file) {
+        Envelop envelop = new Envelop();
+        try {
+            templateClient.setTemplateContent(id, pc, file);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("保存失败");
+        }
+        return envelop;
     }
 
     private List<TemplateModel> convertToTplModels(List<MTemplate> tpls){

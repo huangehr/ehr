@@ -1,5 +1,7 @@
 package com.yihu.ehr.agModel.resource;
 
+import java.util.List;
+
 /**
  * Created by hzp on 2016/5/4.
  * 资源类别

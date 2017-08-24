@@ -137,7 +137,7 @@ public class MysqlExtract {
            SaveModel saveModel = new SaveModel();
            Long num = map.get("result");
            saveModel = setSaveModel(saveModel);
-           saveModel.setResult(Integer.valueOf(num.toString()));
+           saveModel.setResult(num.toString());
            returnList.add(saveModel);
        }else {
            //初始化主细维度
@@ -153,9 +153,9 @@ public class MysqlExtract {
                SaveModel saveModel = oneMap.getValue();
                Long num = map.get(key);
                if(saveModel != null && num != null){
-                   saveModel.setResult(Integer.valueOf(num.toString()));
+                   saveModel.setResult(num.toString());
                }else{
-                   saveModel.setResult(0);
+                   saveModel.setResult("0");
                }
                returnList.add(saveModel);
            }
@@ -258,7 +258,7 @@ public class MysqlExtract {
 
     private void setOneData(Map<String, SaveModel> allData, String key, SaveModel one, String areaLevel) {
         one.setAreaLevel(areaLevel);
-        one.setResult(0);
+        one.setResult("0");
         one.setCreateTime(new Date());
         LocalDate today = LocalDate.now();
         String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
@@ -271,7 +271,7 @@ public class MysqlExtract {
     }
 
     private SaveModel setSaveModel(SaveModel one ) {
-        one.setResult(0);
+        one.setResult("0");
         one.setCreateTime(new Date());
         LocalDate today = LocalDate.now();
         String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");

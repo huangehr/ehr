@@ -21,6 +21,8 @@ public class RsReportModel implements Serializable {
     private String reportCategory; // 报表分类名称
     private String statusName; // 报表状态名称
 
+    private boolean flag;   //界面显示，是否选中
+
     public Integer getId() {
         return id;
     }
@@ -91,5 +93,13 @@ public class RsReportModel implements Serializable {
 
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 }

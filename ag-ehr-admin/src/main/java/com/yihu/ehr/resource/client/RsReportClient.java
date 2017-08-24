@@ -78,4 +78,8 @@ public interface RsReportClient {
             @ApiParam(name = "name", value = "资源报表名称", required = true)
             @RequestParam("name") String name);
 
+    @ApiOperation("查询报表信息_不分页")
+    @RequestMapping(value = ServiceApi.Resources.RsReportNoPage, method = RequestMethod.GET)
+    List<MRsReport> queryNoPageResources(
+            @RequestParam(value = "filters", required = false) String filters);
 }
