@@ -114,13 +114,13 @@ public class ExtractPercentHelper {
                 TjQuota denoTjQuota = quotaService.findByCode(esConfig.getDenominator());
 
                 Map<String,String> param =  new HashMap<>();
-                String quotaDate = "2017-08-23";
+                String quotaDate = "2017-08-22";
                 param.put("startTime",quotaDate);
                 param.put("endTime",quotaDate);
                 Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1), 10000);
                 Map<String,Map<String, Object>>  denoResultMap = quotaService.getQuotaResult(denoTjQuota.getId(), objectMapper.writeValueAsString(param), denoDimension.substring(0, denoDimension.length() - 1), 10000);
 
-                List<SaveModel>  resultModel = getPercentResult(moleResultMap, denoResultMap);
+                List<SaveModel>  resultModel = getPercentResult(moleResultMap, denoResultMap,quotaVo);
 
                 return resultModel;
             }else{
@@ -161,39 +161,36 @@ public class ExtractPercentHelper {
         return map;
     }
 
-    public List<SaveModel> getPercentResult(Map<String,Map<String, Object>> moleReultMap,Map<String,Map<String, Object>> denoReultMap){
+    public List<SaveModel> getPercentResult(Map<String,Map<String, Object>> moleReultMap,Map<String,Map<String, Object>> denoReultMap,QuotaVo quotaVo){
 
         List<SaveModel> saveModelList = new ArrayList<>();
         for(String dekey :denoReultMap.keySet()){
             Map<String, Object> map = new HashMap<>();
-            Map<String, Object> denoResutMap = denoReultMap.get(dekey);
-            if(denoResutMap.get("result").toString().equals("0")){
-                denoResutMap.remove("result");
-                denoResutMap.put("result","0%");
-                map = denoResutMap;
+            Map<String, Object> denoMap = denoReultMap.get(dekey);
+            if(denoMap.get("result").toString().equals("0")){
+                map = denoMap;
             }else {
                 for(String mokey :moleReultMap.keySet()){
-                    Map<String, Object> moleResultMap = moleReultMap.get(mokey);
+                    Map<String, Object> moleMap = moleReultMap.get(mokey);
                     if(dekey.equals(mokey)) {
-                        if(moleReultMap.get("result").toString().equals("0")){
-                            moleResultMap.remove("result");
-                            moleResultMap.put("result","0%");
-                            map = moleResultMap;
+                        if(moleMap.get("result").toString().equals("0")){
+                            map = moleMap;
                        }else{
-                           DecimalFormat df = new DecimalFormat("0.00");
-                           String point ="0.00";
-                           float moleVal = Float.valueOf(moleReultMap.get("result").toString());
-                           float denoVal = Float.valueOf(denoReultMap.get("result").toString());
-                           point = df.format( (moleVal/denoVal)*100 )+"%";
-                            moleResultMap.remove("result");
-                            moleResultMap.put("result",point);
-                           map = moleResultMap;
+                           int point = 0;
+                           float moleVal = Float.valueOf(moleMap.get("result").toString());
+                           float denoVal = Float.valueOf(denoMap.get("result").toString());
+                           point = (int)(moleVal/denoVal)*100;
+                           moleMap.remove("result");
+                           moleMap.put("result",point);
+                           map = moleMap;
                        }
                         break;
                     }
                 }
             }
             SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
+            saveModel.setQuotaName(quotaVo.getName());
+            saveModel.setQuotaCode(quotaVo.getCode());
             saveModelList.add(saveModel);
         }
         return saveModelList;
