@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -244,6 +245,7 @@ public class RoleUserController extends BaseController {
             @ApiParam(name="roleId",value="角色Id",defaultValue = "")
             @RequestParam(value="roleId",required = false)String roleId) throws  Exception {
         Envelop envelop = new Envelop();
+        List<Integer> categoryIdList = new ArrayList<>();
         try {
             List<MRsReportCategory> categories = rsReportCategoryClient.getAllCategories("");
             List<MRsReportCategoryInfo> mRsReportCategoryInfos = (List<MRsReportCategoryInfo>) convertToModels(categories, new ArrayList<>(categories.size()), MRsReportCategoryInfo.class, null);
@@ -259,10 +261,22 @@ public class RoleUserController extends BaseController {
                     }
                 }
                 category.setReportList(mRsResources);
+
             }
             //获取已配置的资源报表信息
             List<MRsReportCategoryInfo> mRsReportCategoryInfoList = getReportConfigInfo(roleId);
-
+            //将已配置的资源报表的id存储在hashset中
+            HashSet<Integer> h = new HashSet<>();
+            for (MRsReportCategoryInfo categoryInfo : mRsReportCategoryInfoList) {
+                h.add(categoryInfo.getId());
+            }
+            categoryIdList.clear();
+            categoryIdList.addAll(h);
+            for (MRsReportCategoryInfo rc : mRsReportCategoryInfos) {
+                if (categoryIdList.contains(rc.getId())) {
+                    rc.setFlag(true);
+                }
+            }
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(mRsReportCategoryInfos);
             envelop.setObj(mRsReportCategoryInfoList);
@@ -281,6 +295,7 @@ public class RoleUserController extends BaseController {
         }
     }
 
+    //获取已配置的报表信息
     public List<MRsReportCategoryInfo> getReportConfigInfo(String roleId) {
         List<MRsReportCategory> mRsReportCategories = new ArrayList<>();
         List<MRoleReportRelation> roleReportRelations = roleReportRelationClient.searchRoleReportRelationNoPage("roleId=" + roleId);
@@ -292,6 +307,24 @@ public class RoleUserController extends BaseController {
                     MRsReportCategory rsReportCategory = rsReportCategoryClient.getById(rsReportList.get(0).getReportCategoryId());
                     rsReportCategory.setReportList(rsReportList);
                     mRsReportCategories.add(rsReportCategory);
+                }
+            }
+        }
+        if (null != mRsReportCategories && mRsReportCategories.size() > 0) {
+            List<Integer> pidList = new ArrayList<>();
+            for (MRsReportCategory rp : mRsReportCategories) {
+                pidList.add(rp.getPid());
+            }
+            //删除重复的pid
+            if (null != pidList && pidList.size() > 0) {
+                HashSet h = new HashSet(pidList);
+                pidList.clear();
+                pidList.addAll(h);
+            }
+            for(Integer pid : pidList) {
+                if (null != pid) {
+                    MRsReportCategory mRsReportCategory = rsReportCategoryClient.getById(pid);
+                    mRsReportCategories.add(mRsReportCategory);
                 }
             }
         }

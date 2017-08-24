@@ -77,11 +77,11 @@ public class RsReportController extends BaseController {
     @ApiOperation("新增资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST)
     public Envelop add(
-            @ApiParam(name = "rsReportCategory", value = "资源报表JSON字符串", required = true)
-            @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
+            @ApiParam(name = "mrsReport", value = "资源报表JSON字符串", required = true)
+            @RequestParam(value = "mrsReport") String mrsReport) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            MRsReport newMRsReport = rsReportClient.add(rsReportCategory);
+            MRsReport newMRsReport = rsReportClient.add(mrsReport);
             envelop.setObj(newMRsReport);
             envelop.setSuccessFlg(true);
             return envelop;
@@ -95,11 +95,11 @@ public class RsReportController extends BaseController {
     @ApiOperation("更新资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
     public Envelop update(
-            @ApiParam(name = "rsReportCategory", value = "资源报表JSON字符串", required = true)
-            @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
+            @ApiParam(name = "mrsReport", value = "资源报表JSON字符串", required = true)
+            @RequestParam(value = "mrsReport") String mrsReport) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            MRsReport newMRsReport = rsReportClient.update(rsReportCategory);
+            MRsReport newMRsReport = rsReportClient.update(mrsReport);
             envelop.setObj(newMRsReport);
             envelop.setSuccessFlg(true);
             return envelop;

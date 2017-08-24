@@ -279,7 +279,7 @@ public class ResourcesCategoryController extends BaseController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/resources/categories/tree", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.CategoryTree, method = RequestMethod.GET)
     @ApiOperation(value = "获取所有资源类别转成的RsCategoryTypeTreeModel列表，初始页面显示")
     public Envelop getRsCategoryTreeModels(
             @ApiParam(name = "name", value = "资源类别的名称")
