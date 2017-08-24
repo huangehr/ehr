@@ -79,11 +79,12 @@ public class EsQuotaJob implements Job {
      * 统计过程
      */
     private void quota() {
+        TjQuotaLog tjQuotaLog = new TjQuotaLog();
+        String message = "";
+        tjQuotaLog.setQuotaCode(quotaVo.getCode());
+        tjQuotaLog.setSaasId(saasid);
+        tjQuotaLog.setStartTime(new Date());
         try {
-            TjQuotaLog tjQuotaLog = new TjQuotaLog();
-            tjQuotaLog.setQuotaCode(quotaVo.getCode());
-            tjQuotaLog.setSaasId(saasid);
-            tjQuotaLog.setStartTime(new Date());
             //抽取数据 如果是累加就是 List<DataModel>  如果是相除 Map<String,List<DataModel>>
             List<SaveModel> dataModels = extract();
             if(dataModels != null && dataModels.size() > 0){
@@ -111,15 +112,20 @@ public class EsQuotaJob implements Job {
                 //保存数据
                 Boolean success = saveDate(dataSaveModels);
                 tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                tjQuotaLog.setEndTime(new Date());
+                tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据保存失败");
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
-                tjQuotaLog.setContent("error:dataModels=[]");
+                tjQuotaLog.setContent("没有抽取到数据");
             }
-            saveLog(tjQuotaLog);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
+            message = e.getMessage();
+            tjQuotaLog.setStatus(Contant.save_status.fail);
+            tjQuotaLog.setContent(message);
         }
+        tjQuotaLog.setEndTime(new Date());
+        saveLog(tjQuotaLog);
     }
 
     /**
@@ -127,13 +133,8 @@ public class EsQuotaJob implements Job {
      *
      * @return
      */
-    private List<SaveModel> extract() {
-        try {
-            return SpringUtil.getBean(ExtractHelper.class).extractData(quotaVo, startTime, endTime,timeLevel,saasid);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    private List<SaveModel> extract() throws Exception {
+        return SpringUtil.getBean(ExtractHelper.class).extractData(quotaVo, startTime, endTime,timeLevel,saasid);
     }
 
     /**

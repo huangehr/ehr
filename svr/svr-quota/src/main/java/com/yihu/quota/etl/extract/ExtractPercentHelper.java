@@ -65,12 +65,14 @@ public class ExtractPercentHelper {
      * @throws Exception
      */
     public List<SaveModel> extractData(QuotaVo quotaVo, String startTime, String endTime,String timeLevel) throws Exception {
-            String message = "";
+        String message = "";
+        try {
             //得到该指标的数据来源
             TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(quotaVo.getCode());
             //如果为空说明数据错误
             if (quotaDataSource == null) {
-                throw new Exception("数据源配置错误");
+                message = "数据源配置错误";
+                throw new Exception(message);
             }
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
@@ -121,12 +123,15 @@ public class ExtractPercentHelper {
                 Map<String,Map<String, Object>>  denoResultMap = quotaService.getQuotaResult(denoTjQuota.getId(), objectMapper.writeValueAsString(param), denoDimension.substring(0, denoDimension.length() - 1), 10000);
 
                 List<SaveModel>  resultModel = getPercentResult(moleResultMap, denoResultMap,quotaVo);
-
                 return resultModel;
             }else{
                 message = "配置错误，分子或分母指标没有配置";
                 throw new Exception(message);
             }
+        } catch (Exception e) {
+            message = "数据抽取错误";
+            throw new Exception(message);
+        }
     }
 
     //获取指标维度

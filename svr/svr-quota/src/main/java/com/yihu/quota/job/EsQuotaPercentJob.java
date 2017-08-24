@@ -17,6 +17,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -88,7 +89,8 @@ public class EsQuotaPercentJob implements Job {
             List<SaveModel> dataModels = extract();
 
             if(dataModels != null && dataModels.size() > 0){
-                String quoataDate = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+//                String quoataDate = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                String quoataDate =  new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd");
                 //查询是否已经统计过,如果已统计 先删除后保存
                 EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
 
@@ -111,12 +113,11 @@ public class EsQuotaPercentJob implements Job {
                 //保存数据
                 Boolean success = saveDate(dataSaveModels);
                 tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                tjQuotaLog.setEndTime(new Date());
+                tjQuotaLog.setContent(success?"统计保存成功":"统计数据保存失败");
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
-                tjQuotaLog.setContent("error:dataModels=[]");
+                tjQuotaLog.setContent("没有抽取到数据");
             }
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
             logger.error(e.getMessage());
@@ -124,6 +125,7 @@ public class EsQuotaPercentJob implements Job {
             tjQuotaLog.setStatus(Contant.save_status.fail);
             tjQuotaLog.setContent(message);
         }
+        tjQuotaLog.setEndTime(new Date());
         saveLog(tjQuotaLog);
     }
 
