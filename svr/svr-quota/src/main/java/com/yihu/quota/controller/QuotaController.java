@@ -3,15 +3,9 @@ package com.yihu.quota.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.resource.MChartInfoModel;
 import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.quota.model.ChartInfoModel;
-import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.rest.QuotaReport;
-import com.yihu.quota.model.rest.ReultModel;
-import com.yihu.quota.service.job.JobService;
 import com.yihu.quota.service.quota.QuotaService;
-import com.yihu.quota.util.ReportOption;
 import com.yihu.quota.vo.SaveModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.github.abel533.echarts.Option;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +56,7 @@ public class QuotaController extends BaseController {
     ) {
         Envelop envelop = new Envelop();
         try {
+            filters = URLDecoder.decode(filters, "UTF-8");
             List<Map<String, Object>> resultList = quotaService.queryResultPage(id, filters, pageNo, pageSize);
             List<SaveModel> saveModelList = new ArrayList<SaveModel>();
             for(Map<String, Object> map : resultList){

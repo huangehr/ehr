@@ -4,7 +4,7 @@ import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaLogDao;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractHelper;
-import com.yihu.quota.etl.extract.solr.ExtractPercentHelper;
+import com.yihu.quota.etl.extract.ExtractPercentHelper;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.SaveHelper;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
@@ -17,6 +17,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -32,7 +33,6 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by janseny on 2017/8/22.
@@ -79,16 +79,18 @@ public class EsQuotaPercentJob implements Job {
      * 统计过程
      */
     private void quota() {
-        try {
-            TjQuotaLog tjQuotaLog = new TjQuotaLog();
-            tjQuotaLog.setQuotaCode(quotaVo.getCode());
-            tjQuotaLog.setStartTime(new Date());
 
+        TjQuotaLog tjQuotaLog = new TjQuotaLog();
+        tjQuotaLog.setQuotaCode(quotaVo.getCode());
+        tjQuotaLog.setStartTime(new Date());
+        String message = "";
+        try {
             //抽取数据计算数据
             List<SaveModel> dataModels = extract();
 
             if(dataModels != null && dataModels.size() > 0){
-                String quoataDate = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+//                String quoataDate = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
+                String quoataDate =  new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd");
                 //查询是否已经统计过,如果已统计 先删除后保存
                 EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
 
@@ -111,15 +113,20 @@ public class EsQuotaPercentJob implements Job {
                 //保存数据
                 Boolean success = saveDate(dataSaveModels);
                 tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                tjQuotaLog.setEndTime(new Date());
+                tjQuotaLog.setContent(success?"统计保存成功":"统计数据保存失败");
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
-                tjQuotaLog.setContent("error:dataModels=[]");
+                tjQuotaLog.setContent("没有抽取到数据");
             }
-            saveLog(tjQuotaLog);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
+            message = e.getMessage();
+            tjQuotaLog.setStatus(Contant.save_status.fail);
+            tjQuotaLog.setContent(message);
         }
+        tjQuotaLog.setEndTime(new Date());
+        saveLog(tjQuotaLog);
     }
 
     /**
@@ -127,13 +134,8 @@ public class EsQuotaPercentJob implements Job {
      *
      * @return
      */
-    private List<SaveModel> extract() {
-        try {
-            return SpringUtil.getBean(ExtractPercentHelper.class).extractData(quotaVo, startTime, endTime,timeLevel);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    private List<SaveModel> extract() throws Exception {
+        return SpringUtil.getBean(ExtractPercentHelper.class).extractData(quotaVo, startTime, endTime,timeLevel);
     }
 
     /**
@@ -157,6 +159,10 @@ public class EsQuotaPercentJob implements Job {
         if (StringUtils.isEmpty(this.timeLevel)) {
             this.timeLevel = Contant.main_dimension_timeLevel.day;
         }
+        Object object =  map.get("quota");
+        if(object!=null){
+            BeanUtils.copyProperties(object, this.quotaVo);
+        }
     }
 
     @Transactional
@@ -166,7 +172,6 @@ public class EsQuotaPercentJob implements Job {
 
     /**
      * 保存数据
-     *
      * @param dataModels
      */
     private Boolean saveDate(List<SaveModel> dataModels) {
