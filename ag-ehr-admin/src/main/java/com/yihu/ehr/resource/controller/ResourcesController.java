@@ -186,6 +186,7 @@ public class ResourcesController extends BaseController {
             return envelop;
         }
     }
+
     @ApiOperation("资源编码是否已存在")
     @RequestMapping(value = ServiceApi.Resources.IsExistCode , method = RequestMethod.GET)
     public Envelop isExistCode(
@@ -286,7 +287,7 @@ public class ResourcesController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.GET)
-    @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表预览")
+    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览")
     public List<MChartInfoModel> getRsQuotaPreview(
             @ApiParam(name = "filter", value = "过滤器", defaultValue = "")
             @RequestParam(value = "filter") String filter,
