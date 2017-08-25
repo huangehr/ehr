@@ -21,9 +21,6 @@ public interface RsReportCategoryDao extends CrudRepository<RsReportCategory, In
     @Query(" FROM RsReportCategory rc WHERE rc.pid = null ")
     List<RsReportCategory> getTopParents();
 
-    @Query(" FROM RsReportCategory rc WHERE rc.name LIKE CONCAT('%',:name,'%') ")
-    List<RsReportCategory> getComboTreeData(@Param("name") String name);
-
     @Query(" FROM RsReportCategory rc WHERE rc.id <> :id AND rc.code = :code ")
     RsReportCategory isUniqueCode(@Param("id") Integer id, @Param("code") String code);
 

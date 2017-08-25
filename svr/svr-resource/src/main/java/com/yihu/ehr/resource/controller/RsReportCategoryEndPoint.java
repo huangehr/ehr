@@ -81,11 +81,8 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation(value = "获取资源报表分类的树形下拉框数据")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryComboTree, method = RequestMethod.GET)
-    public List<MRsReportCategory> getComboTreeData(
-//            @ApiParam(name = "name", value = "资源报表分类名称")
-//            @RequestParam(value = "name", required = false) String name
-    ) throws Exception {
-        List<RsReportCategory> list = rsReportCategoryService.getComboTreeData("");
+    public List<MRsReportCategory> getComboTreeData() throws Exception {
+        List<RsReportCategory> list = rsReportCategoryService.getAllTreeData();
         return (List<MRsReportCategory>) convertToModels(list, new ArrayList<MRsReportCategory>(list.size()), MRsReportCategory.class, "");
     }
 
