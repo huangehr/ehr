@@ -1,5 +1,7 @@
 package com.yihu.ehr.resource.model;
 
+import org.hibernate.annotations.Formula;
+
 import javax.persistence.*;
 
 /**
@@ -48,7 +50,7 @@ public class RsReportView {
         this.resourceId = resourceId;
     }
 
-    @Transient
+    @Formula("(SELECT rs.name FROM rs_report_view rv LEFT JOIN rs_resources rs ON rs.id = rv.RESOURCE_ID WHERE rv.ID = id )")
     public String getResourceName() {
         return resourceName;
     }

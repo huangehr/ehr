@@ -75,7 +75,7 @@ public class ExtractHelper {
             TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(quotaVo.getCode());
             //如果为空说明数据错误
             if (quotaDataSource == null) {
-                throw new Exception("QuotaDataSource data error");
+                throw new Exception("数据源配置错误");
             }
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
@@ -95,12 +95,10 @@ public class ExtractHelper {
                 //查询 mysql 数据
                 return  SpringUtil.getBean(MysqlExtract.class).extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);
             }
+            return null;
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("extract error:" + e.getMessage());
-            logger.error("quotaVOr:" + quotaVo.toString());
+            throw new Exception("数据抽取错误");
         }
-        return null;
     }
 
     private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData) {

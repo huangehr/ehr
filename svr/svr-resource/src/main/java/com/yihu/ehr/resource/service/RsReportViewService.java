@@ -25,7 +25,7 @@ public class RsReportViewService extends BaseJpaService<RsReportView, RsReportVi
     /**
      * 根据资源报表ID，获取资源报表视图配置
      *
-     * @param id 资源报表ID
+     * @param reportId 资源报表ID
      * @return RsReportView
      */
     public List<RsReportView> findByReportId(Integer reportId) {
@@ -33,15 +33,27 @@ public class RsReportViewService extends BaseJpaService<RsReportView, RsReportVi
     }
 
     /**
+     * 根据资源报表ID、视图ID，获取资源报表视图配置
+     *
+     * @param reportId   资源报表ID
+     * @param resourceId 视图ID
+     * @return RsReportView
+     */
+    public RsReportView findByReportIdAndResourceId(Integer reportId, String resourceId) {
+        return rsReportViewDao.findByReportIdAndResourceId(reportId, resourceId);
+    }
+
+    /**
      * 保存资源报表视图配置
      *
-     * @param rsReportView 资源报表视图配置
+     * @param reportId 资源报表ID
+     * @param list 资源报表视图配置集合
      * @return RsReportView 资源报表视图配置
      */
     @Transactional(readOnly = false)
-    public void save(List<RsReportView> list) {
-        rsReportViewDao.deleteByReportId(list.get(0).getReportId());
-        batchInsert(list);
+    public void save(Integer reportId, List<RsReportView> list) {
+        rsReportViewDao.deleteByReportId(reportId);
+        rsReportViewDao.save(list);
     }
 
 }

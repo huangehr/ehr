@@ -54,11 +54,33 @@ public class RsReportViewController extends BaseController {
     @ApiOperation("保存资源报表视图配置")
     @RequestMapping(value = ServiceApi.Resources.RsReportViewSave, method = RequestMethod.POST)
     public Envelop save(
+            @ApiParam(name = "reportId", value = "资源报表ID", required = true)
+            @RequestParam(value = "reportId") Integer reportId,
             @ApiParam(name = "modelListJson", value = "资源报表视图配置集合JSON字符串", required = true)
             @RequestParam(value = "modelListJson") String modelListJson) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            rsReportViewClient.save(modelListJson);
+            rsReportViewClient.save(reportId, modelListJson);
+            envelop.setSuccessFlg(true);
+            return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogService.getLogger(RsReportViewController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
+    @ApiOperation("判断资源报表视图配置是否存在")
+    @RequestMapping(value = ServiceApi.Resources.RsReportViewExist, method = RequestMethod.GET)
+    public Envelop exist(
+            @ApiParam(name = "reportId", value = "资源报表ID", required = true)
+            @RequestParam(value = "reportId") Integer reportId,
+            @ApiParam(name = "resourceId", value = "视图ID", required = true)
+            @RequestParam(value = "resourceId") String resourceId) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            boolean isExist = rsReportViewClient.exist(reportId, resourceId);
+            envelop.setObj(isExist);
             envelop.setSuccessFlg(true);
             return envelop;
         } catch (Exception e) {

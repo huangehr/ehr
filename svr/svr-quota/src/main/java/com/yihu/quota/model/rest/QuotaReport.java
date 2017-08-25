@@ -3,7 +3,6 @@ package com.yihu.quota.model.rest;
 import com.yihu.quota.model.jpa.TjQuota;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by janseny on 2017/6/30.
@@ -11,7 +10,7 @@ import java.util.Map;
 public class QuotaReport {
 
     private TjQuota tjQuota;
-    private List<ReultModel> reultModelList ;
+    private List<ResultModel> reultModelList ;
 
     public TjQuota getTjQuota() {
         return tjQuota;
@@ -21,11 +20,11 @@ public class QuotaReport {
         this.tjQuota = tjQuota;
     }
 
-    public List<ReultModel> getReultModelList() {
+    public List<ResultModel> getReultModelList() {
         return reultModelList;
     }
 
-    public void setReultModelList(List<ReultModel> reultModelList) {
+    public void setReultModelList(List<ResultModel> reultModelList) {
         this.reultModelList = reultModelList;
     }
 }
