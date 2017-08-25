@@ -34,6 +34,7 @@ public class ServiceApi {
      * 资源管理中心接口
      */
     public static class Resources {
+
         //资源查询接口(命名先按原有路径，不规范)
         public static final String ResourceViewMetadata = "/resources/query/getResourceMetadata"; //资源浏览获取结构
         public static final String ResourceViewData = "/resources/query/getResourceData"; //资源浏览获取数据
@@ -49,16 +50,22 @@ public class ServiceApi {
         public static final String ResourcesSubStat = "/resources/query/sub_stat"; //细表资源查询接口
         public static final String ResourcesMysql = "/resources/query/mysql"; //mysql资源查询接口
 
+        //资源浏览
+        public static final String ResourceBrowseCategories = "/resources/ResourceBrowses/categories";
+        public static final String ResourceBrowseResourceData = "/resources/ResourceBrowses/getResourceData";
+        public static final String ResourceBrowseQuotaResourceData = "/resources/ResourceBrowses/getQuotaResourceData";
+        public static final String ResourceBrowseResourceMetadata = "/resources/ResourceBrowses/getResourceMetadata";
+        public static final String ResourceBrowseTree = "/resourceBrowseTree";
+        public static final String ResourceBrowseGetRsByCategoryId = "/getResourceByCategoryId";
 
         //资源视图
         public static final String Resources = "/resources";
         public static final String Resource = "/resources/{id}";
         public static final String NoPageResources = "/NoPageResources";
-        public static final String IsExistName = "/isExistName";
+        public static final String IsExistName = "/resources/isExistName";
         public static final String IsExistCode = "/resources/isExistCode/{code}";
         public static final String GetQuotaList = "/resources/getQuotaList";
         public static final String GetRsQuotaPreview = "/resources/getRsQuotaPreview";
-
 
         public static final String SearchInfo = "/resourceQuota/searchInfo";
         public static final String BatchAddResourceQuota = "/resourceQuota/batchAddResourceQuota";
@@ -67,10 +74,6 @@ public class ServiceApi {
         public static final String GetQuotaChartByQuotaId = "/resourceQuota/getQuotaChartByQuotaId";
         public static final String GetRQNameByResourceId = "/resourceQuota/getRQNameByResourceId";
         public static final String DelRQNameByResourceId = "/resourceQuota/delRQNameByResourceId";
-
-
-
-
 
         public static final String ResourceMetadataList = "/resources/rs_metadata";
         public static final String ResourceMetadataBatch = "/resources/rs_metadata/batch";
@@ -117,6 +120,7 @@ public class ServiceApi {
         public static final String ParamById = "/resources/param/{id}";
         public static final String ParamKeyValueExistence = "/resources/param/key_value_existence";
 
+        public static final String QueryById = "/resources/query/{id}";
 
         public static final String DictEntries = "/resources/dict_entries";
         public static final String NoPageDictEntries = "/resources/noPage_dict_entries";
@@ -147,6 +151,7 @@ public class ServiceApi {
         public static final String IntMetadataList = "/resources/integrated/metadata_list";
         public static final String IntMetadataData = "/resources/integrated/metadata_data";
         public static final String IntQuotaList = "/resources/integrated/quota_list";
+        public static final String IntQuotaData = "/resources/integrated/quota_data";
         public static final String IntResourceUpdate = "/resources/integrated/resource_update";
         public static final String IntResourceQueryUpdate = "/resources/integrated/resource_query_update";
 
@@ -942,6 +947,9 @@ public class ServiceApi {
         public static final String TjQuotaExistsName = "/tj/tjQuotaExistsName/{name}";
         public static final String TjQuotaExistsCode = "/tj/tjQuotaExistsCode/{code}";
         public static final String GetTjQuotaByCode = "/tj/getTjQuotaByCode";
+        public static final String TjQuotaConfigInfo = "/tj/quotaConfigInfo";
+        public static final String TjHasConfigDimension = "/tj/hasConfigDimension";
+
 
         public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
         public static final String TjQuotaExecute = "/job/execuJob";
