@@ -64,7 +64,7 @@ public class ElasticsearchUtil {
         actionGet = client.prepareSearch(esClientUtil.getIndex())
                 .setTypes(esClientUtil.getType())
                 .setQuery(boolQueryBuilder)
-                .setFrom(pageNo).setSize(pageSize).addSort(dealSorter)
+                .setFrom(pageNo-1).setSize(pageSize).addSort(dealSorter)//从0开始算
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
@@ -96,7 +96,7 @@ public class ElasticsearchUtil {
      * @param sortName 排序字段名称
      * @return
      */
-    public List<Map<String, Object>> queryList(Client client,BoolQueryBuilder boolQueryBuilder,String sortName){
+    public List<Map<String, Object>> queryList(Client client,BoolQueryBuilder boolQueryBuilder,String sortName,int size){
         SearchResponse actionGet = null;
         SortBuilder dealSorter = null;
         if(sortName != null){
@@ -106,6 +106,7 @@ public class ElasticsearchUtil {
         }
         actionGet = client.prepareSearch(esClientUtil.getIndex())
                 .setTypes(esClientUtil.getType())
+                .setSize(size)
                 .setQuery(boolQueryBuilder)
                 .addSort(dealSorter)
                 .execute().actionGet();
@@ -130,34 +131,32 @@ public class ElasticsearchUtil {
      */
     public List<Map<String, Object>> searcherByGroup(Client client,BoolQueryBuilder queryBuilder, String aggsField , String sumField) {
 
-        searcherByGroupBySql(client,"quota","org","quotaCode='depart_treat_count'","result");
-
         List<Map<String, Object>> list = new ArrayList<>();
-//        SearchRequestBuilder searchRequestBuilder =
-//                client.prepareSearch(esClientUtil.getIndex())
-//                .setTypes(esClientUtil.getType())
-//                .setQuery(queryBuilder);
-//
-//        //创建TermsBuilder对象，使用term查询，设置该分组的名称为 name_count，并根据aggsField字段进行分组
-//        TermsBuilder termsBuilder = AggregationBuilders.terms(aggsField+"_val").field(aggsField);
-//        SumBuilder ageAgg = AggregationBuilders.sum(sumField+"_count").field(sumField);
-//        searchRequestBuilder.addAggregation(termsBuilder.subAggregation(ageAgg));
-//
-//
-//        Map<String, Object> dataMap = new HashMap<String, Object>();
-//        //执行搜索
-//        SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
-//        //解析返回数据，获取分组名称为aggs-class的数据
-//        Terms terms = searchResponse.getAggregations().get(aggsField+"_val");
-//        Collection<Terms.Bucket> buckets = terms.getBuckets();
-//        for (Terms.Bucket bucket : buckets) {
-//            String key = bucket.getKey().toString();
-//            if (bucket.getAggregations().asList().get(0) instanceof InternalSum) {//(sum(xx))
-//                InternalSum count = (InternalSum) bucket.getAggregations().asList().get(0);
-//                dataMap.put(key, count.value());
-//            }
-//        }
-//        list.add(dataMap);
+        SearchRequestBuilder searchRequestBuilder =
+                client.prepareSearch(esClientUtil.getIndex())
+                .setTypes(esClientUtil.getType())
+                .setQuery(queryBuilder);
+
+        //创建TermsBuilder对象，使用term查询，设置该分组的名称为 name_count，并根据aggsField字段进行分组
+        TermsBuilder termsBuilder = AggregationBuilders.terms(aggsField+"_val").field(aggsField);
+        SumBuilder ageAgg = AggregationBuilders.sum(sumField+"_count").field(sumField);
+        searchRequestBuilder.addAggregation(termsBuilder.subAggregation(ageAgg));
+
+
+        Map<String, Object> dataMap = new HashMap<String, Object>();
+        //执行搜索
+        SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+        //解析返回数据，获取分组名称为aggs-class的数据
+        Terms terms = searchResponse.getAggregations().get(aggsField+"_val");
+        Collection<Terms.Bucket> buckets = terms.getBuckets();
+        for (Terms.Bucket bucket : buckets) {
+            String key = bucket.getKey().toString();
+            if (bucket.getAggregations().asList().get(0) instanceof InternalSum) {//(sum(xx))
+                InternalSum count = (InternalSum) bucket.getAggregations().asList().get(0);
+                dataMap.put(key, count.value());
+            }
+        }
+        list.add(dataMap);
         return list;
     }
 
@@ -248,6 +247,7 @@ public class ElasticsearchUtil {
         SearchResponse actionGet = null;
         actionGet = client.prepareSearch(esClientUtil.getIndex())
                 .setTypes(esClientUtil.getType())
+                .setSize(10000)
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();

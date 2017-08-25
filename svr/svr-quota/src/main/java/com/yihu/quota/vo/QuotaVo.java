@@ -14,7 +14,7 @@ public class QuotaVo implements Serializable {
     private String compute;
     private String name;
     private String cron;//quartz时间表达式
-    private String dataLevel;//1 全量  2增量
+    private String dataLevel;//1 全量  2增量 3 百分比
     private String jobClazz;
     private Date createTime;
     private String createUser;

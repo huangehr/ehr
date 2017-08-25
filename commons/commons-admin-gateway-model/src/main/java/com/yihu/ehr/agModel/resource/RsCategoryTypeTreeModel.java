@@ -12,9 +12,9 @@ public class RsCategoryTypeTreeModel {
     private String description;
     private List<RsCategoryTypeTreeModel> children;
     private  List<RsResourcesModel>  rsResourceslist;
-//    private List<RsResourcesModel> resourceIds;
     private String resourceIds;
     private String resourceCode;
+    private boolean ischecked = false; // 是否选中（报表视图配置用到）
 
     public String getId() {
         return id;
@@ -78,5 +78,13 @@ public class RsCategoryTypeTreeModel {
 
     public void setRsResourceslist(List<RsResourcesModel> rsResourceslist) {
         this.rsResourceslist = rsResourceslist;
+    }
+
+    public boolean getIschecked() {
+        return ischecked;
+    }
+
+    public void setIschecked(boolean ischecked) {
+        this.ischecked = ischecked;
     }
 }

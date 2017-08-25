@@ -166,9 +166,9 @@ public class SolrExtract {
             SaveModel saveModel = oneMap.getValue();
             Long num = map.get(key);
             if(saveModel != null && num != null){
-                saveModel.setResult(Integer.valueOf(num.toString()));
+                saveModel.setResult(num.toString());
             }else{
-                saveModel.setResult(0);
+                saveModel.setResult("0");
             }
             returnList.add(saveModel);
         }
@@ -268,7 +268,7 @@ public class SolrExtract {
 
     private void setOneData(Map<String, SaveModel> allData, String key, SaveModel one, String areaLevel) {
         one.setAreaLevel(areaLevel);
-        one.setResult(0);
+        one.setResult("0");
         one.setCreateTime(new Date());
         LocalDate today = LocalDate.now();
         String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");

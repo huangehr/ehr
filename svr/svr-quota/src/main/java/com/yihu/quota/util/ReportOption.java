@@ -27,22 +27,23 @@ public class ReportOption {
      * 折线图
      * @param title  标题
      * @param legend 副标题
+     * @param xName x轴名称
+     * @param yName yz轴名称
      * @param lineName 折线1名称
-     * @param datalist 数据集 1
-     * @param lineCount  图表中折线数 小于等于2
+     * @param datalist 数据集 1，key x 坐标轴数据列，val y轴坐标数据列
      * @param lineName 折线2名称
      * @param data2list 当lineCount大于1时 Data2list 不为空
      */
-    public Option getLineEchartOption(String title, String legend , String lineName, List<Map<String, Object>> datalist, int lineCount, String line2Name, List<Map<String, Object>> data2list) {
+    public Option getLineEchartOption(String title, String legend ,String xName,String yName,String lineName, List<Map<String, Object>> datalist, String line2Name, List<Map<String, Object>> data2list) {
         Option option = new GsonOption();
         //title
         option.title().setText(title);
-        option.title().setSubtext(title + "(subText)");
+//        option.title().setSubtext(title);//小标题
         option.title().x("center");
         //tooltip
         option.tooltip().trigger(Trigger.axis);
         //toolbox
-        option.toolbox().show(true);
+        option.toolbox().show(false);
         DataView dataView = new DataView();
         dataView.show(true);
         dataView.readOnly(false);
@@ -60,12 +61,12 @@ public class ReportOption {
         SaveAsImage saveAsImage = new SaveAsImage();
         saveAsImage.show(true);
         option.toolbox().feature().put("saveAsImage", saveAsImage);
+
         //legend (数据需填充)
         option.legend().orient(Orient.vertical);
         option.legend().left(X.left);
         List<String> legendDataList = new ArrayList<String>();
-        legendDataList.add("legend1");
-        legendDataList.add("legend2");
+        legendDataList.add(legend);
         option.legend().data(legendDataList);
         //grid
         option.grid().left("3%");
@@ -75,44 +76,48 @@ public class ReportOption {
         option.grid().containLabel(true);
         //yAxis
         ValueAxis valueAxis = new ValueAxis();
-        valueAxis.name("摄氏度");
+        valueAxis.name(yName);
         valueAxis.type(AxisType.value);
-        valueAxis.axisLabel().formatter("{value}℃");
+//        valueAxis.axisLabel().formatter("℃");//单位
         option.yAxis(valueAxis);
+
         //xAxis
         CategoryAxis categoryAxis = new CategoryAxis();
-        categoryAxis.name("千米");
-        //categoryAxis.axisLine().onZero(false);
+        categoryAxis.name(xName);
         categoryAxis.type(AxisType.category);
-        //categoryAxis.axisLabel().formatter("千米");
+//        categoryAxis.axisLabel().formatter("千米");//单位
         categoryAxis.boundaryGap(false);
-        categoryAxis.data(0, 10, 20, 30, 40, 50, 60, 70, 80);
+
+        List<Object> lineNameList = getList(datalist,"NAME");
+        List<Object> lineValList = getList(datalist,"TOTAL");
+        Object[] lineName1 = (String[])lineNameList.toArray(new String[lineNameList.size()]);
+        categoryAxis.data(lineName1);
         option.xAxis(categoryAxis);
+
         //series
         Line line = new Line();
-        line.name("legend1");
+        line.name(lineName);
         line.type(SeriesType.line);
         line.smooth(true);
         line.stack("stack");
         line.itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0.4)");
-        line.data(15, 50, 56.5, 46.5, 22.1, 2.5, 27.7, 55.7, 76.5);
+
+        Object[] lineVal1 = (Object[])lineValList.toArray(new Object[lineValList.size()]);
+        line.data(lineVal1);
         option.series().add(line);
 
-        Line line2 = new Line();
-        line2.name("legend2");
-        line2.type(SeriesType.line);
-        line2.smooth(true);
-        line2.stack("stack2");
-        line2.itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0.4)");
-        /**
         if(data2list != null){
-            for (Map<String, Object> objectMap : data2list) {
-                line2.data(objectMap.get("TOTAL"));
-            }
+            Line line2 = new Line();
+            line2.name(line2Name);
+            line2.type(SeriesType.line);
+            line2.smooth(true);
+            line2.stack("stack2");
+            line2.itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0.4)");
+
+            List<Object> lineValList2 = getList(data2list,"TOTAL");
+            line2.data(lineValList2);
+            option.series().add(line2);
         }
-        */
-        line2.data(16, 51, 57.5, 47.5, 23.1, 3.5, 28.7, 56.7, 77.5);
-        option.series().add(line2);
         return option;
     }
 
@@ -123,17 +128,17 @@ public class ReportOption {
      * @param datalist 数据集1
      * @param data2list 数据集2
      */
-    public Option getBarEchartOption(String title,String legend ,String barName,List<Map<String, Object>> datalist, String bar2Name ,List<Map<String, Object>> data2list) {
+    public Option getBarEchartOption(String title,String legend ,String xName,String yName ,String barName,List<Map<String, Object>> datalist, String bar2Name ,List<Map<String, Object>> data2list) {
         Option option = new GsonOption();
         //title
         option.title().setText(title);
-        option.title().setSubtext(title + "(subText)");
+//        option.title().setSubtext(title );
         option.title().x("center");
         //tooltip
         option.tooltip().trigger(Trigger.axis);
         option.tooltip().axisPointer().type(PointerType.shadow);
         //toolbox
-        option.toolbox().show(true);
+        option.toolbox().show(false);
         DataView dataView = new DataView();
         dataView.show(true);
         dataView.readOnly(false);
@@ -151,12 +156,12 @@ public class ReportOption {
         SaveAsImage saveAsImage = new SaveAsImage();
         saveAsImage.show(true);
         option.toolbox().feature().put("saveAsImage", saveAsImage);
+
         //legend (数据需填充)
         option.legend().orient(Orient.vertical);
         option.legend().left(X.left);
         List<String> legendDataList = new ArrayList<String>();
-        legendDataList.add("legend1");
-        legendDataList.add("legend2");
+        legendDataList.add(legend);
         option.legend().data(legendDataList);
         //grid
         option.grid().left("3%");
@@ -166,49 +171,67 @@ public class ReportOption {
         option.grid().containLabel(true);
         //yAxis
         ValueAxis valueAxis = new ValueAxis();
-        valueAxis.name("摄氏度");
+        valueAxis.name(yName);
         valueAxis.type(AxisType.value);
-        valueAxis.axisLabel().formatter("{value}℃");
+//        valueAxis.axisLabel().formatter("{value}℃");
         option.yAxis(valueAxis);
+
         //xAxis
         CategoryAxis categoryAxis = new CategoryAxis();
-        categoryAxis.name("千米");
+        categoryAxis.name(xName);
         //categoryAxis.axisLine().onZero(false);
         categoryAxis.type(AxisType.category);
         //categoryAxis.axisLabel().formatter("千米");
         categoryAxis.boundaryGap(false);
-        categoryAxis.data(0, 10, 20, 30, 40, 50, 60, 70, 80);
+
+        List<Object> lineNameList = getList(datalist,"NAME");
+        List<Object> lineValList = getList(datalist,"TOTAL");
+        Object[] nameVal1 = (Object[])lineNameList.toArray(new Object[lineNameList.size()]);
+        categoryAxis.data(nameVal1);
         categoryAxis.splitLine().show(false);
         option.xAxis(categoryAxis);
+
         //series
         Bar bar = new Bar();
-        bar.name("legend1");
+        bar.name(barName);
         bar.type(SeriesType.bar);
         bar.barWidth(20);
         bar.clickable(true);
         bar.itemStyle().normal().label().show(true);
         bar.itemStyle().normal().label().position(Position.top);
-        bar.data(15, 50, 56.5, 46.5, 22.1, 2.5, 27.7, 55.7, 76.5);
+
+        Object[] lineVal1 = (Object[])lineValList.toArray(new Object[lineValList.size()]);
+        bar.data(lineVal1);
         option.series().add(bar);
 
-        Bar bar2 = new Bar();
-        bar2.name("legend2");
-        bar2.type(SeriesType.bar);
-        bar2.barWidth(20);
-        bar2.clickable(true);
-        bar2.itemStyle().normal().label().show(true);
-        bar2.itemStyle().normal().label().position(Position.top);
-        /**
-         if(data2list != null){
-         for (Map<String, Object> objectMap : data2list) {
-         line2.data(objectMap.get("TOTAL"));
-         }
-         }
-         */
-        bar2.data(16, 51, 57.5, 47.5, 23.1, 3.5, 28.7, 56.7, 77.5);
-        option.series().add(bar2);
+        if(data2list != null){
+            Bar bar2 = new Bar();
+            bar2.name(bar2Name);
+            bar2.type(SeriesType.bar);
+            bar2.barWidth(20);
+            bar2.clickable(true);
+            bar2.itemStyle().normal().label().show(true);
+            bar2.itemStyle().normal().label().position(Position.top);
+
+            List<Object> lineValList2 = getList(data2list,"TOTAL");
+            Object[] lineVal2 = (Object[])lineValList2.toArray(new Object[lineValList2.size()]);
+            bar2.data(lineVal2);
+            option.series().add(bar2);
+        }
+
         return option;
     }
+
+    public List<Object> getList(List<Map<String, Object>> dataList,String keyName){
+        List<Object> returnList = new ArrayList<>();
+        for (Map<String, Object> objectMap : dataList) {
+            for(String key:objectMap.keySet()){
+                returnList.add(objectMap.get(keyName));
+            }
+        }
+        return  returnList;
+    }
+
 
     /**
      * 饼状图
@@ -217,17 +240,20 @@ public class ReportOption {
      * @param datalist 数据集1
      * @param data2list 数据集2
      */
-    public Option getPieEchartOption(String title,String legend ,String pieName,List<Map<String, Object>> datalist ,String pie2Name,List<Map<String, Object>> data2list) {
+    public Option getPieEchartOption(String title,String legend ,String pieName,List<Map<String, Object>> datalist ,
+                                     String pie2Name,List<Map<String, Object>> data2list) {
         Option option = new GsonOption();
         //title
         option.title().setText(title);
-        option.title().setSubtext(title + "(subText)");
+        option.title().setSubtext(title);
         option.title().x("center");
+
         //tooltip
         option.tooltip().trigger(Trigger.item);
-        option.tooltip().formatter("{a} <br/>{b} : {c} ({d}%)");
+//        option.tooltip().formatter("{a} <br/>{b} : {c} ({d}%)");
+
         //toolbox
-        option.toolbox().show(true);
+        option.toolbox().show(false);
         DataView dataView = new DataView();
         dataView.show(true);
         dataView.readOnly(false);
@@ -245,13 +271,14 @@ public class ReportOption {
         SaveAsImage saveAsImage = new SaveAsImage();
         saveAsImage.show(true);
         option.toolbox().feature().put("saveAsImage", saveAsImage);
+
         //legend (数据需填充)
         option.legend().orient(Orient.vertical);
         option.legend().left(X.left);
         List<String> legendDataList = new ArrayList<String>();
-        legendDataList.add("legend1");
-        legendDataList.add("legend2");
+        legendDataList.add(legend);
         option.legend().data(legendDataList);
+
         //grid
         option.grid().left("3%");
         option.grid().right("4%");
@@ -259,47 +286,49 @@ public class ReportOption {
         option.grid().containLabel(true);
         //series
         Pie pie = new Pie();
-        pie.name("legend1");
+        pie.name(pieName);
         pie.type(SeriesType.pie);
         pie.radius("55%");
-        pie.center(new String[]{"50", "60"});
+        pie.center(new String[]{"50%", "60%"});
         pie.itemStyle().emphasis().shadowBlur(10);
         pie.itemStyle().emphasis().shadowOffsetX(0);
         pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
-        List<Map<String, Object>> dataList1 = new ArrayList<Map<String, Object>>();
-        for(int i = 0; i < 10; i ++) {
-            Map<String, Object> temp = new HashMap<String, Object>();
-            temp.put("name", "legend1");
-            temp.put("value", i + 5);
-            dataList1.add(temp);
+
+        List<Object> lineNameList = getList(datalist,"NAME");
+        List<Object> lineValList = getList(datalist,"TOTAL");
+        List<Map<String,Object>> dataList = new ArrayList<Map<String,Object>>();
+        for(int i =0 ;i < lineValList.size() ; i++){
+            Map<String,Object> map = new HashMap<>();
+            map.put("value",lineValList.get(i));
+            map.put("name",lineNameList.get(i));
+            dataList.add(map);
         }
-        pie.setData(dataList1);
+
+        pie.setData(dataList);
         option.series().add(pie);
 
-        Pie pie2 = new Pie();
-        pie2.name("legend2");
-        pie2.type(SeriesType.pie);
-        pie2.radius("55%");
-        pie2.center(new String[]{"50%", "60%"});
-        pie2.itemStyle().emphasis().shadowBlur(10);
-        pie2.itemStyle().emphasis().shadowOffsetX(0);
-        pie2.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
-        /**
-         if(data2list != null){
-         for (Map<String, Object> objectMap : data2list) {
-         line2.data(objectMap.get("TOTAL"));
-         }
-         }
-         */
-        List<Map<String, Object>> dataList2 = new ArrayList<Map<String, Object>>();
-        for(int i = 0; i < 10; i ++) {
-            Map<String, Object> temp = new HashMap<String, Object>();
-            temp.put("name", "legend2");
-            temp.put("value", i + 10);
-            dataList2.add(temp);
+        if(data2list != null && data2list.size() > 0){
+            Pie pie2 = new Pie();
+            pie2.name(pie2Name);
+            pie2.type(SeriesType.pie);
+            pie2.radius("55%");
+            pie2.center(new String[]{"50%", "60%"});
+            pie2.itemStyle().emphasis().shadowBlur(10);
+            pie2.itemStyle().emphasis().shadowOffsetX(0);
+            pie2.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
+
+            List<Object> lineNameList2 = getList(data2list,"NAME");
+            List<Object> lineValList2 = getList(data2list,"TOTAL");
+            List<Map<String,Object>> dataList2 = new ArrayList<Map<String,Object>>();
+            for(int i =0 ;i < lineValList2.size() ; i++){
+                Map<String,Object> map = new HashMap<>();
+                map.put("value",lineValList2.get(i));
+                map.put("name",lineNameList2.get(i));
+                dataList2.add(map);
+            }
+            pie2.setData(dataList2);
+            option.series().add(pie2);
         }
-        pie2.setData(dataList2);
-        option.series().add(pie2);
         return option;
     }
 
