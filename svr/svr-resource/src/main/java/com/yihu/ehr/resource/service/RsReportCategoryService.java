@@ -53,11 +53,10 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
     /**
      * 获取资源报表分类的树形下拉框数据
      *
-     * @param name 资源报表分类名称
      * @return 资源报表分类的树形下拉框数据
      */
-    public List<RsReportCategory> getComboTreeData(String name) {
-        return rsReportCategoryDao.getComboTreeData(name);
+    public List<RsReportCategory> getAllTreeData() {
+        return (List<RsReportCategory>) rsReportCategoryDao.findAll();
     }
 
     /**

@@ -40,8 +40,13 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
      * 获取档案数据主体列表
      * @return
      */
-    public List<RsResources> findFileMasterList() {
-        String sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resources rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0)";
+    public List<RsResources> findFileMasterList(String filters) {
+        String sql = "";
+        if (filters != null) {
+            sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resources rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0) AND rr.name like " + "'%" + filters + "%'";
+        } else {
+            sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resources rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0)";
+        }
         RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(RsResources.class);
         return this.jdbcTemplate.query(sql, rowMapper);
     }
@@ -67,8 +72,13 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
      * 根据parentId获取指标分类主体列表
      * @return
      */
-    public List<HealthBusiness> findHealthBusinessList(int parentId) {
-        String sql = "select * from health_business where parent_id = " + parentId;
+    public List<HealthBusiness> findHealthBusinessList(int parentId, String filters) {
+        String sql = "";
+        if(parentId != 0 && filters != null) {
+            sql = "select * from health_business where parent_id = " + parentId + " AND name like " + "'%" + filters + "%'";
+        }else {
+            sql = "select * from health_business where parent_id = " + parentId;
+        }
         RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(HealthBusiness.class);
         return this.jdbcTemplate.query(sql, rowMapper);
     }
@@ -95,7 +105,7 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
      * @param healthBusiness
      * @return
      */
-    public Map<String, Object> getTreeMap(HealthBusiness healthBusiness, int level) {
+    public Map<String, Object> getTreeMap(HealthBusiness healthBusiness, int level, String filters) {
         Map<String, Object> masterMap = new HashMap<String, Object>();
         if(healthBusiness != null) {
             /**
@@ -130,11 +140,11 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
             /**
              * 处理子集数据
              */
-            List<HealthBusiness> hList = findHealthBusinessList(healthBusiness.getId());
+            List<HealthBusiness> hList = findHealthBusinessList(healthBusiness.getId(), filters);
             if(hList != null) {
                 List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
                 for(HealthBusiness healthBusiness1: hList) {
-                    childList.add(getTreeMap(healthBusiness1, level + 1));
+                    childList.add(getTreeMap(healthBusiness1, level + 1, filters));
                 }
                 masterMap.put("child", childList);
             }
@@ -181,7 +191,7 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
         baseMap.put("level", "0");
         baseMap.put("baseInfo", baseList);
         resultList.add(baseMap);
-        List<RsResources> rrList = findFileMasterList();
+        List<RsResources> rrList = findFileMasterList(filters);
         if(rrList != null) {
             for(RsResources rsResources : rrList) {
                 Map<String, Object> masterMap = new HashMap<String, Object>();
@@ -259,11 +269,22 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
         /**
          * 获取最上级目录
          */
-        List<HealthBusiness> parentList = findHealthBusinessList(0);
+        List<HealthBusiness> parentList = findHealthBusinessList(0, filters);
         if(parentList != null) {
             for(HealthBusiness healthBusiness : parentList) {
-                Map<String, Object> childMap = getTreeMap(healthBusiness, 0);
-                resultList.add(childMap);
+                Map<String, Object> childMap = getTreeMap(healthBusiness, 0, filters);
+                if (filters != null && !filters.equals("")) {
+                    if(((List<String>) childMap.get("child")).size() > 0) {
+                        resultList.add(childMap);
+                    }
+                }else {
+                    resultList.add(childMap);
+                }
+            }
+        }
+        if(filters != null && !filters.equals("")) {
+            for(Map<String, Object> tempMap : resultList) {
+
             }
         }
         return resultList;

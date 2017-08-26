@@ -7,11 +7,17 @@ import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
+import com.yihu.quota.etl.util.EsClientUtil;
+import com.yihu.quota.etl.util.EsConfigUtil;
 import com.yihu.quota.service.quota.StatisticsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.solr.client.solrj.response.FacetField;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -37,50 +43,58 @@ public class SolrTestController extends BaseController {
     @Autowired
     private ElasticsearchUtil elasticsearchUtil;
     @Autowired
-    private EsResultExtract esResultExtract;
+    private EsClientUtil esClientUtil;
+    @Autowired
+    private EsConfigUtil esConfigUtil;
 
 
-    @RequestMapping(value = "/saveSolrDocument", method = RequestMethod.POST)
-    @ApiOperation("添加solr文档")
+    @RequestMapping(value = "/saveElasticsearchDocument", method = RequestMethod.POST)
+    @ApiOperation("添加elasticsearch文档")
     public String saveDocument(
             @ApiParam(value = "json串")
             @RequestParam(value = "jsonString", required = true) String jsonString
     ){
         boolean f = false;
         try {
-            /***** Solr 保存 ********/
-        //{"host": "172.17.110.17","clusterName":"elasticsearch","index":"quota", "type": "quota_test"}
+            /***** elasticsearch 保存 ********/
             EsConfig esConfig = new EsConfig();
             esConfig.setHost("172.17.110.17");
             esConfig.setPort(9300);
             esConfig.setClusterName("elasticsearch");
             esConfig.setIndex("quota");
             esConfig.setType("quota_test");
-//            esResultExtract.getEsClient();
-//            f = elasticsearchUtil.save(esResultExtract.getEsClient(),jsonString);
+            esConfigUtil.getConfig(esConfig);
+            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
+            Client client = esClientUtil.getClient(esConfig.getClusterName());
+            f = elasticsearchUtil.save(client,jsonString);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         return  String.valueOf(f);
     }
 
-    @RequestMapping(value = "/impSolrDocument", method = RequestMethod.POST)
-    @ApiOperation("文件导入solr文档")
+    @RequestMapping(value = "/impElasticsearchDocument", method = RequestMethod.POST)
+    @ApiOperation("文件导入elasticsearch文档数据")
     public String fileImpDocument(
             @ApiParam(name = "file", value = "file文件")
             @RequestParam(name = "file",required = true) String file,
-            HttpServletRequest request )throws Exception {
+            @ApiParam(name = "index", value = "索引名称")
+            @RequestParam(name = "index",required = true) String index,
+            @ApiParam(name = "type", value = "类型(表)名称")
+            @RequestParam(name = "type",required = true) String type
+    )throws Exception {
         boolean f = false;
         try {
-            /***** Solr 保存 ********/
-            //{"host": "172.17.110.17","clusterName":"elasticsearch","index":"quota", "type": "quota_test"}
+            /***** elasticsearch 保存 ********/
             EsConfig esConfig = new EsConfig();
             esConfig.setHost("172.17.110.17");
             esConfig.setPort(9300);
             esConfig.setClusterName("elasticsearch");
-            esConfig.setIndex("quota");
-            esConfig.setType("quota_test");
-//            esResultExtract.getEsClient(esConfig);
+            esConfig.setIndex(index);
+            esConfig.setType(type);
+            esConfigUtil.getConfig(esConfig);
+            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
+            Client client = esClientUtil.getClient(esConfig.getClusterName());
 
             if( !file.isEmpty()){
                 FileInputStream fis = null;
@@ -97,7 +111,7 @@ public class SolrTestController extends BaseController {
                         jsonString = str;
                         System.out.println(jsonString);// 打印
                         //添加到es库
-//                        f = elasticsearchUtil.save(esResultExtract.getEsClient(esConfig),jsonString);
+                        f = elasticsearchUtil.save(client,jsonString);
                     }
                 } catch (FileNotFoundException e) {
                     System.out.println("找不到指定文件");
@@ -120,6 +134,35 @@ public class SolrTestController extends BaseController {
             ex.printStackTrace();
         }
         return  String.valueOf(f);
+    }
+
+    @RequestMapping(value = "/getElasticsearchDocument", method = RequestMethod.POST)
+    @ApiOperation("查询elasticsearch文档")
+    public List<Map<String, Object>> getElasticsearchDocument(
+            @ApiParam(value = "filter")
+            @RequestParam(value = "filter", required = true) String filter
+    ){
+        List<Map<String, Object>> list = null;
+        try {
+            EsConfig esConfig = new EsConfig();
+            esConfig.setHost("172.17.110.17");
+            esConfig.setPort(9300);
+            esConfig.setClusterName("elasticsearch");
+            esConfig.setIndex("test");
+            esConfig.setType("aaaa");//aaaa 表中机构名 设置不分词  -- 只支持全词匹配查询
+            esConfigUtil.getConfig(esConfig);
+            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
+            Client client = esClientUtil.getClient(esConfig.getClusterName());
+            BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
+
+            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("orgName", filter);
+            boolQueryBuilder.must(termQueryQuotaCode);
+
+            list = elasticsearchUtil.queryList(client, boolQueryBuilder, null, 200);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return  list;
     }
 
 

@@ -67,10 +67,7 @@ public class RsReportCategoryController extends BaseController {
 
     @ApiOperation(value = "获取资源报表分类树形下拉框数据")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryComboTree, method = RequestMethod.GET)
-    public Envelop getComboTreeData(
-            @ApiParam(name = "name", value = "资源报表分类名称")
-            @RequestParam(value = "name", required = false) String name
-    ) throws Exception {
+    public Envelop getComboTreeData() throws Exception {
         try {
             Envelop envelop = new Envelop();
             envelop.setSuccessFlg(true);
