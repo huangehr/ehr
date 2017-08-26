@@ -7,13 +7,19 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.resource.MChartInfoModel;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.model.jpa.TjQuota;
+import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
+import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.model.rest.QuotaReport;
+import com.yihu.quota.model.rest.ResultModel;
+import com.yihu.quota.service.dimension.TjDimensionMainService;
+import com.yihu.quota.service.dimension.TjDimensionSlaveService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.util.ReportOption;
 import com.yihu.quota.vo.SaveModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +44,12 @@ public class QuotaReportController extends BaseController {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
+    private TjDimensionMainService tjDimensionMainService;
+    @Autowired
+    private TjDimensionSlaveService tjDimensionSlaveService;
+    @Autowired
     private QuotaService quotaService;
+
 
     /**
      * 获取指标当天统计结果曲线性和柱状报表
@@ -97,7 +109,7 @@ public class QuotaReportController extends BaseController {
         return envelop;
     }
 
-    @ApiOperation(value = "获取指标统计结果曲线性或柱状报表")
+    @ApiOperation(value = "获取指标统计结果echart图表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaGraphicReportPreview, method = RequestMethod.GET)
     public MChartInfoModel getQuotaGraphicReport(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
@@ -114,39 +126,72 @@ public class QuotaReportController extends BaseController {
         try {
             ReportOption reportOption = new ReportOption();
             TjQuota tjQuota = quotaService.findOne(id);
-            //查询指标数据
-            List<Map<String, Object>> resultList = quotaService.queryResultPage(id, filter, 1, 10);
-            if( resultList != null){
-                String title = "指标标题";
-                String legend = "";
-                title = tjQuota.getName();
-                legend = tjQuota.getName();
-                String xName = "";
-                String yName = "人数";
-                String barName = "";
-                String bar2Name = "";
-                List<Map<String, Object>> datalist = quotaService.getOpetionData(resultList);
-                List<Map<String, Object>> data2list = null;
 
-                Option option = null;
-                if (type == 1) {
-                    option = reportOption.getBarEchartOption(title, legend ,xName,yName, barName, datalist, bar2Name, data2list);
-                } else if (type == 2) {
-                    option = reportOption.getLineEchartOption(title, legend,xName,yName, barName, datalist, bar2Name, data2list);
-                } else if (type == 4) {
-                    option = reportOption.getPieEchartOption(title, legend, barName, datalist, bar2Name, data2list);
+            //查询维度
+            List<TjQuotaDimensionMain> mains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaIncudeAddress(tjQuota.getCode());
+            List<TjQuotaDimensionSlave> slavess = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(tjQuota.getCode());
+            List<Map<String,String>> dimesionList = new ArrayList<>();
+            for(int i=0 ;i < mains.size();i++){
+                String choose = "false";
+                if(StringUtils.isEmpty(dimension)){
+                    dimension = mains.get(i).getMainCode();
+                    if(i==1){
+                        choose = "true";
+                    }
+                }else {
+                   if( dimension.equals(mains.get(i).getMainCode())){
+                       choose = "true";
+                    }
                 }
-                chartInfoModel.setOption(option.toString());
-                chartInfoModel.setTitle(title);
-                return chartInfoModel;
-            }else {
-                return chartInfoModel;
+                Map<String,String> map = new HashMap<>();
+                map.put(mains.get(i).getMainCode(),choose);
+                dimesionList.add(map);
             }
+            for(int i=0 ;i < slavess.size();i++){
+                String choose = "false";
+                String key = "slaveKey" + (i+1);
+                if( dimension.equals(key)){
+                    choose = "true";
+                }
+                Map<String,String> map = new HashMap<>();
+                map.put(key,choose);
+                dimesionList.add(map);
+            }
+            chartInfoModel.setListMap(dimesionList);
+
+            List<Map<String, Object>> data2list = null;
+            List<Map<String, Object>> datalist = new ArrayList<>();
+            QuotaReport quotaReport = quotaService.getQuotaReport(tjQuota.getId(), filter, dimension, 10000);
+            for(ResultModel resultModel :quotaReport.getReultModelList()){
+                Map<String, Object> map = new HashMap<>();
+                map.put("NAME",resultModel.getCloumns().get(0));
+                map.put("TOTAL",resultModel.getValue());
+                datalist.add(map);
+            }
+            String title = "指标标题";
+            String legend = "";
+            title = tjQuota.getName();
+            legend = tjQuota.getName();
+            String xName = "";
+            String yName = "数量";
+            String barName = "";
+            String bar2Name = "";
+            Option option = null;
+            if (type == 1) {
+                option = reportOption.getBarEchartOption(title, legend ,xName,yName, barName, datalist, bar2Name, data2list);
+            } else if (type == 2) {
+                option = reportOption.getLineEchartOption(title, legend,xName,yName, barName, datalist, bar2Name, data2list);
+            } else if (type == 4) {
+                option = reportOption.getPieEchartOption(title, legend, barName, datalist, bar2Name, data2list);
+            }
+            chartInfoModel.setOption(option.toString());
+            chartInfoModel.setTitle(title);
+            return chartInfoModel;
         } catch (Exception e) {
             error(e);
             invalidUserException(e, -1, "查询失败:" + e.getMessage());
             envelop.setSuccessFlg(false);
-            return chartInfoModel;
+            return null;
         }
     }
 
