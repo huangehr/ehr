@@ -22,9 +22,9 @@ zookeeper:
 spring:
   profiles: test
   datasource:
-    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true
-    username: root
-    password: 123456
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: chenweishan
+    password: chenweishan
 
   data:
     mongodb:
@@ -39,9 +39,9 @@ spring:
 spring:
   profiles: dev
   datasource:
-    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true
-    username: root
-    password: 123456
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: chenweishan
+    password: chenweishan
 
   data:
     mongodb:
