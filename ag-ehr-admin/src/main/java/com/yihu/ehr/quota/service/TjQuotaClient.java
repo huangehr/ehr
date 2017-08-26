@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/6/9.
@@ -57,7 +58,7 @@ public interface TjQuotaClient {
     @ApiOperation(value = "校验code是否存在")
     boolean hasExistsCode(@PathVariable("code") String code);
 
-    @RequestMapping(value = "/tj/hasConfigDimension", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjHasConfigDimension, method = RequestMethod.GET)
     @ApiOperation(value = "校验code是否存在")
     boolean hasConfigDimension(
             @ApiParam(name = "quotaCode", value = "指标编码")
@@ -65,12 +66,19 @@ public interface TjQuotaClient {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaByCode, method = RequestMethod.GET)
     @ApiOperation(value = "根据Code获取指标")
-    public MTjQuotaModel getByCode(@RequestParam(value = "code") String code) ;
+    MTjQuotaModel getByCode(@RequestParam(value = "code") String code) ;
 
-    @RequestMapping(value = "/tj/quotaConfigInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaConfigInfo, method = RequestMethod.GET)
     @ApiOperation(value = "分页获取指标配置")
     ListResult quotaConfigInfo(
             @RequestParam(value = "quotaName", required = false) String quotaName,
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "pageSize") Integer pageSize);
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaSynthesiseDimension, method = RequestMethod.GET)
+    @ApiOperation(value = "查询多个指标交集维度")
+    List<Map<String, String>> getTjQuotaSynthesiseDimension(
+            @ApiParam(name = "quotaCodes", value = "指标code，多个指标用英文,分开")
+            @RequestParam(value = "quotaCodes") String quotaCodes);
+
 }

@@ -211,7 +211,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         return mTjQuotaModel;
     }
 
-    @RequestMapping(value = "/tj/hasConfigDimension", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjHasConfigDimension, method = RequestMethod.GET)
     @ApiOperation(value = "校验code是否存在")
     public boolean hasConfigDimension(
             @ApiParam(name = "quotaCode", value = "指标编码")
@@ -224,7 +224,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         return false;
     }
 
-    @RequestMapping(value = "/tj/quotaConfigInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaConfigInfo, method = RequestMethod.GET)
     @ApiOperation(value = "分页获取指标配置")
     public ListResult quotaConfigInfo(
             @ApiParam(name = "quotaName", value = "指标名称", defaultValue = "")
