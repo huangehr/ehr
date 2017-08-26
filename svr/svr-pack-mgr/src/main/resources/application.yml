@@ -53,19 +53,19 @@ spring:
 spring:
   profiles: dev
   datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: ha
-    password: ha
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: chenweishan
+    password: chenweishan
   redis:
-    host: 192.168.1.220 # Redis server host.
+    host: 172.19.103.47 # Redis server host.
   metrics:
     export:
       statsd:
-        host: 192.168.1.221
+        host: 172.19.103.73
         port: 8125
 fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
+  tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
 ---
 spring:
   profiles: alpha
@@ -95,7 +95,7 @@ spring:
   metrics:
     export:
       statsd:
-        host: 192.168.1.221
+        host: 172.19.103.73
         port: 8125
 fast-dfs:
   tracker-server: 172.19.103.13:22122
