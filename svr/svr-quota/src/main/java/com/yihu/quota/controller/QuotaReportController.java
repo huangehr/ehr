@@ -5,8 +5,11 @@ import com.github.abel533.echarts.Option;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.resource.MChartInfoModel;
+import com.yihu.ehr.model.resource.MReportDimension;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.model.jpa.TjQuota;
+import com.yihu.quota.model.jpa.dimension.TjDimensionMain;
+import com.yihu.quota.model.jpa.dimension.TjDimensionSlave;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.model.rest.QuotaReport;
@@ -128,34 +131,40 @@ public class QuotaReportController extends BaseController {
             TjQuota tjQuota = quotaService.findOne(id);
 
             //查询维度
-            List<TjQuotaDimensionMain> mains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaIncudeAddress(tjQuota.getCode());
-            List<TjQuotaDimensionSlave> slavess = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(tjQuota.getCode());
-            List<Map<String,String>> dimesionList = new ArrayList<>();
+            List<TjDimensionMain> mains = tjDimensionMainService.getDimensionMainByQuotaCode(tjQuota.getCode());
+            List<TjDimensionSlave> slaves = tjDimensionSlaveService.getDimensionSlaveByQuotaCode(tjQuota.getCode());
+            List<MReportDimension> dimesionList = new ArrayList<>();
             for(int i=0 ;i < mains.size();i++){
                 String choose = "false";
                 if(StringUtils.isEmpty(dimension)){
-                    dimension = mains.get(i).getMainCode();
+                    dimension = mains.get(i).getCode();
                     if(i==1){
                         choose = "true";
                     }
                 }else {
-                   if( dimension.equals(mains.get(i).getMainCode())){
+                   if( dimension.equals(mains.get(i).getCode())){
                        choose = "true";
                     }
                 }
-                Map<String,String> map = new HashMap<>();
-                map.put(mains.get(i).getMainCode(),choose);
-                dimesionList.add(map);
+                MReportDimension mReportDimension = new MReportDimension();
+                mReportDimension.setIsCheck(choose);
+                mReportDimension.setName(mains.get(i).getName());
+                mReportDimension.setCode(mains.get(i).getCode());
+                mReportDimension.setIsMain("true");
+                dimesionList.add(mReportDimension);
             }
-            for(int i=0 ;i < slavess.size();i++){
+            for(int i=0 ;i < slaves.size();i++){
                 String choose = "false";
                 String key = "slaveKey" + (i+1);
                 if( dimension.equals(key)){
                     choose = "true";
                 }
-                Map<String,String> map = new HashMap<>();
-                map.put(key,choose);
-                dimesionList.add(map);
+                MReportDimension mReportDimension = new MReportDimension();
+                mReportDimension.setIsCheck(choose);
+                mReportDimension.setName(slaves.get(i).getName());
+                mReportDimension.setCode(key);
+                mReportDimension.setIsMain("false");
+                dimesionList.add(mReportDimension);
             }
             chartInfoModel.setListMap(dimesionList);
 

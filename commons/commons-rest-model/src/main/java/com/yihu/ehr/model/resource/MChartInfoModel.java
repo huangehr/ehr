@@ -10,7 +10,7 @@ import java.util.Map;
 public class MChartInfoModel {
     private String title;
     private String option;
-    private List<Map<String,String>> listMap;
+    private List<MReportDimension> listMap;
 
     public String getTitle() {
         return title;
@@ -28,11 +28,11 @@ public class MChartInfoModel {
         this.option = option;
     }
 
-    public List<Map<String, String>> getListMap() {
+    public List<MReportDimension> getListMap() {
         return listMap;
     }
 
-    public void setListMap(List<Map<String, String>> listMap) {
+    public void setListMap(List<MReportDimension> listMap) {
         this.listMap = listMap;
     }
 }
