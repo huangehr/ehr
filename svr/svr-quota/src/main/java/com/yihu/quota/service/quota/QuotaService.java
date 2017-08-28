@@ -108,7 +108,7 @@ public class QuotaService {
 
 
     //多维度数据的总和 结果
-    //返回结果 key 共同维度的组合值，value 数据结果集
+    //返回结果 ：key为共同维度的组合值，value为数据结果集
     public Map<String,Map<String, Object>> getQuotaResult(Integer id, String filters,String dimension,int size) throws Exception {
 
         String[] dimensions = null;
@@ -170,10 +170,16 @@ public class QuotaService {
                 map.put("NAME",reultModel.get("townName"));
             }else  if(reultModel.get("cityName") !=null){
                 map.put("NAME",reultModel.get("cityName"));
-            }else  if(reultModel.get("cityName") !=null){
-                map.put("NAME",reultModel.get("cityName"));
-            }else {
+            }else  if(reultModel.get("provinceName") !=null){
+                map.put("NAME",reultModel.get("provinceName"));
+            }else  if(reultModel.get("teamName") !=null){
+                map.put("NAME",reultModel.get("teamName"));
+            }else  if(reultModel.get("slaveKey1Name") !=null){
                 map.put("NAME",reultModel.get("slaveKey1Name"));
+            } else if(reultModel.get("slaveKey2Name") !=null){
+                map.put("NAME",reultModel.get("slaveKey2Name"));
+            }else if(reultModel.get("slaveKey3Name") !=null){
+                map.put("NAME",reultModel.get("slaveKey3Name"));
             }
             map.put("TOTAL",reultModel.get("result"));
             dataList.add(map);

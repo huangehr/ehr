@@ -310,17 +310,14 @@ public class ResourcesController extends BaseController {
     public List<MChartInfoModel> getRsQuotaPreview(
             @ApiParam(name = "filter", value = "过滤器", defaultValue = "")
             @RequestParam(value = "filter") String filter,
-            @ApiParam(name = "filters", value = "指标查询过滤条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws JsonProcessingException {
+            @ApiParam(name = "quotaFilter", value = "指标查询过滤条件", defaultValue = "")
+            @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension) throws JsonProcessingException {
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(filter);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
         for (ResourceQuotaModel m : list) {
-            Map<String, Object> map = new HashMap<>();
-            if(StringUtils.isNotEmpty(filters)){
-                map.put(filters.split("=")[0],filters.split("=")[1]);
-            }
-            String quaFilter = objectMapper.writeValueAsString(map);
-            MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), map!=null?quaFilter:null);
+            MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
             chartInfoModels.add(chartInfoModel);
         }
         return chartInfoModels;

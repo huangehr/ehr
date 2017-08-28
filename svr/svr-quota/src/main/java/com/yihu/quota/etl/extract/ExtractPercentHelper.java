@@ -154,8 +154,8 @@ public class ExtractPercentHelper {
         String slaveKey = "";
         String slaveVal = "";
         String slaveName = "";
-        for(int i = 1 ;i<= dimensionSlaves.size(); i++){
-            slaveName = slaveName + "slaveKey" + i;
+        for(int i = 0 ;i< dimensionSlaves.size(); i++){
+            slaveName = slaveName + "slaveKey" + (i+1);
             slaveKey =  dimensionSlaves.get(i).getSlaveCode();
             slaveVal =  dimensionSlaves.get(i).getSlaveCode() + " - " + dimensionSlaves.get(i).getDictSql() ;
             DictModel dictModel = new DictModel();
