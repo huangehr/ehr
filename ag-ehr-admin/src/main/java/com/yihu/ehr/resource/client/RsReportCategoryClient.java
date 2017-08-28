@@ -37,10 +37,7 @@ public interface RsReportCategoryClient {
 
     @ApiOperation(value = "获取资源报表分类的树形下拉框数据")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryComboTree, method = RequestMethod.GET)
-    public List<MRsReportCategory> getComboTreeData(
-//            @ApiParam(name = "name", value = "资源报表分类名称")
-//            @RequestParam(value = "name", required = false) String name
-    );
+    public List<MRsReportCategory> getComboTreeData();
 
     @ApiOperation("新增资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)

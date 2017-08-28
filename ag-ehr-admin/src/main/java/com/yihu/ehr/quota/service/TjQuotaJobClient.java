@@ -31,10 +31,18 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "pageSize" , required = false) int pageSize
     );
 
+    @ApiOperation(value = "获取指标统计不同维度结果总量")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
+    Envelop getQuotaTotalCount(
+            @RequestParam(value = "id" , required = true) int id,
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "dimension", required = false) String dimension);
+
     @ApiOperation(value = "获取指标统计结果曲线性或柱状报表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaGraphicReportPreview, method = RequestMethod.GET)
     public MChartInfoModel getQuotaGraphicReport(
             @RequestParam(value = "id" , required = true) int id,
             @RequestParam(value = "type" , required = true) int type,
-            @RequestParam(value = "filters", required = false) String filters);
+            @RequestParam(value = "filter", required = false) String filter,
+            @RequestParam(value = "dimension", required = false) String dimension);
 }

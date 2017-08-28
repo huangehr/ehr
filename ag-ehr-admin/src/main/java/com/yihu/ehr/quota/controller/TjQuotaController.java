@@ -29,6 +29,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -220,19 +221,16 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             @ApiParam(name = "pageSize", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "pageSize" , required = false ,defaultValue ="15") int pageSize
     ) throws Exception {
+        filters = URLEncoder.encode(filters, "UTF-8");
         return tjQuotaJobClient.getQuotaResult(id,filters,pageNo,pageSize);
     }
 
-    @RequestMapping(value = "/tj/hasConfigDimension", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjHasConfigDimension, method = RequestMethod.GET)
     @ApiOperation(value = "校验code是否存在")
     public boolean hasConfigDimension(
             @ApiParam(name = "quotaCode", value = "指标编码")
             @RequestParam(value = "quotaCode") String quotaCode) {
         return tjQuotaClient.hasConfigDimension(quotaCode);
     }
-
-
-
-
 
 }

@@ -40,3 +40,6 @@ spring:
 spring:
   profiles: prod
 
+---
+spring:
+  profiles: prod_fz

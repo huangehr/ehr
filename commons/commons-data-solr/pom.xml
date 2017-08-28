@@ -27,6 +27,11 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
             <scope>${dependency.scope}</scope>

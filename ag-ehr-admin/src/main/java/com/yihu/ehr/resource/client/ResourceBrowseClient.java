@@ -7,6 +7,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,12 +27,12 @@ public interface ResourceBrowseClient {
     /**
      *资源数据源结构
      */
-    @ApiOperation("资源数据源结构")
+    @ApiOperation("档案资源数据元结构")
     @RequestMapping(value = ServiceApi.Resources.ResourceViewMetadata, method = RequestMethod.GET)
-    public String getResourceMetadata(@RequestParam(value = "resourcesCode") String resourcesCode);
+    String getResourceMetadata(@RequestParam(value = "resourcesCode") String resourcesCode);
 
 
-    @ApiOperation("资源浏览")
+    @ApiOperation("档案资源浏览")
     @RequestMapping(value = ServiceApi.Resources.ResourceViewData, method = RequestMethod.GET)
     Envelop getResourceData(
             @RequestParam(value = "resourcesCode") String resourcesCode,
@@ -39,6 +40,12 @@ public interface ResourceBrowseClient {
             @RequestParam(value = "queryCondition",required = false) String queryCondition,
             @RequestParam(value = "page",required = false) Integer page,
             @RequestParam(value = "size",required = false) Integer size);
+
+    @ApiOperation("根据资源id获取默认查询条件值")
+    @RequestMapping(value = ServiceApi.Resources.QueryById, method = RequestMethod.GET)
+    String getResourceDefaultQueryById(
+            @ApiParam(name = "id", value = "资源id")
+            @PathVariable(value = "id") String id);
 
     /**
     @ApiOperation("资源浏览详细信息")
