@@ -33,8 +33,33 @@ public class ResourcesCategoryController extends BaseController {
 
     @Autowired
     private ResourcesCategoryClient resourcesCategoryClient;
-    @Autowired
-    private ResourcesClient resourcesClient;
+
+    @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.GET)
+    @ApiOperation("获取资源类别")
+    public Envelop getRsCategories(
+            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size) throws Exception {
+        try {
+            ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories(fields,filters,sorts,page,size);
+            List<MRsCategory> rsCategories = responseEntity.getBody();
+            Envelop envelop = getResult(rsCategories, getTotalCount(responseEntity), page, size);
+            return envelop;
+        }
+        catch (Exception e) {
+            Envelop envelop = new Envelop();
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            return envelop;
+        }
+    }
 
     @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.POST)
     @ApiOperation("资源类别创建")
@@ -157,7 +182,7 @@ public class ResourcesCategoryController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/resources/categories/pid",method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.CategoryByPid,method = RequestMethod.GET)
     @ApiOperation("根据pid获取资源类别列表")
     public Envelop getRsCategoryByPid(
             @ApiParam(name="pid",value="pid",defaultValue = "")
@@ -174,34 +199,6 @@ public class ResourcesCategoryController extends BaseController {
         return envelop;
     }
 
-
-    @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.GET)
-    @ApiOperation("获取资源类别")
-    public Envelop getRsCategories(
-            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) throws Exception {
-        try {
-            ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories(fields,filters,sorts,page,size);
-            List<MRsCategory> rsCategories = responseEntity.getBody();
-            Envelop envelop = getResult(rsCategories, getTotalCount(responseEntity), page, size);
-            return envelop;
-        }
-        catch (Exception e)
-        {
-            Envelop envelop = new Envelop();
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            return envelop;
-        }
-    }
 
     @RequestMapping(value = "/resources/types/parent", method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")

@@ -104,18 +104,14 @@ public class ResourceBrowseController extends BaseController {
     public Envelop getResourceData(
             @ApiParam("resourcesCode")
             @RequestParam(value = "resourcesCode", required = true) String resourcesCode) {
-
         Envelop envelop = new Envelop();
         List<RsBrowseModel> rsBrowseModelList = new ArrayList<>();
-
         String resourceMetadata = resourceBrowseClient.getResourceMetadata(resourcesCode);
         RsBrowseModel resourceMetadataModel = toEntity(resourceMetadata, RsBrowseModel.class);
-
         List<String> code = resourceMetadataModel.getColunmCode();
         List<String> value = resourceMetadataModel.getColunmName();
         List<String> type = resourceMetadataModel.getColunmType();
         List<String> dict = resourceMetadataModel.getColunmDict();
-
         for (int i = 0; i < code.size(); i++) {
             RsBrowseModel rsBrowseModel = new RsBrowseModel();
             rsBrowseModel.setCode(code.get(i));
@@ -124,7 +120,7 @@ public class ResourceBrowseController extends BaseController {
             rsBrowseModel.setDict(dict.get(i));
             rsBrowseModelList.add(rsBrowseModel);
         }
-
+        envelop.setSuccessFlg(true);
         envelop.setDetailModelList(rsBrowseModelList);
         return envelop;
     }
