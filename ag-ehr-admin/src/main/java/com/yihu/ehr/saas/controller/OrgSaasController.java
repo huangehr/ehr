@@ -1,4 +1,4 @@
-package com.yihu.ehr.orgSaas.controller;
+package com.yihu.ehr.saas.controller;
 
 import com.yihu.ehr.agModel.orgSaas.AreaSaasModel;
 import com.yihu.ehr.agModel.orgSaas.OrgSaasModel;
@@ -7,7 +7,7 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.orgSaas.service.OrgSaasClient;
+import com.yihu.ehr.saas.service.OrgSaasClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;

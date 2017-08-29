@@ -1,10 +1,7 @@
 package com.yihu.ehr.user.service;
 
-import com.yihu.ehr.geography.service.GeographyService;
 import com.yihu.ehr.org.dao.XOrgMemberRelationRepository;
-import com.yihu.ehr.org.service.OrgMemberRelationService;
 import com.yihu.ehr.org.service.OrgService;
-import com.yihu.ehr.orgSaas.service.OrgSaasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
