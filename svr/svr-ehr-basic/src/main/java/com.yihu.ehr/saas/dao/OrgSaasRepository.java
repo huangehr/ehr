@@ -1,6 +1,5 @@
-package com.yihu.ehr.orgSaas.dao;
+package com.yihu.ehr.saas.dao;
 
-import com.yihu.ehr.entity.geography.GeographyDict;
 import com.yihu.ehr.entity.organizations.OrgSaas;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

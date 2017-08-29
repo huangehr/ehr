@@ -73,10 +73,10 @@ public class BusinessDataModel extends DataModel implements Serializable {
 
             String url = chlidren.getString("url");
             if( ! StringUtils.isEmpty(url) ){
-                String a = url.substring(url.lastIndexOf(":"));
+                /*String a = url.substring(url.lastIndexOf(":"));
                 String b = a.substring(a.indexOf("/") + 1);
-                String urlApi = b.substring(b.indexOf("/") + 1);
-                Object obj = appFeatureService.appFeatureFindUrl(urlApi);
+                String urlApi = b.substring(b.indexOf("/") + 1);*/
+                Object obj = appFeatureService.appFeatureFindUrl(url);
                 Map<String,String> map = new HashMap<>();
                 if(obj != null){
                     map = appFeatureService.getOperatPageName(obj);

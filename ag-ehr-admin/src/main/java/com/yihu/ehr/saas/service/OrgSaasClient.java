@@ -1,4 +1,4 @@
-package com.yihu.ehr.orgSaas.service;
+package com.yihu.ehr.saas.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
@@ -6,7 +6,6 @@ import com.yihu.ehr.model.common.ListResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
