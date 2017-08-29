@@ -23,6 +23,7 @@ import java.util.List;
 @Service
 @Transactional
 public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> {
+
     @Autowired
     private ResourcesDao rsDao;
     @Autowired
@@ -32,12 +33,10 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
 
     /**
      * 资源创建
-     *
      * @param resource 资源实体
      * @return RsResources 资源实体
      */
-    public RsResources saveResource(RsResources resource)
-    {
+    public RsResources saveResource(RsResources resource) {
         return rsDao.save(resource);
     }
 
@@ -46,12 +45,9 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
      *
      * @param id 资源ID
      */
-    public void deleteResource(String id)
-    {
+    public void deleteResource(String id) {
         String[] ids = id.split(",");
-
-        for(String id_ : ids)
-        {
+        for(String id_ : ids) {
             resourcesDefaultQueryDao.deleteByResourcesId(id_);
             rsMetadataDao.deleteByResourcesId(id_);
             rsDao.delete(id_);
@@ -60,19 +56,21 @@ public class ResourcesService extends BaseJpaService<RsResources, ResourcesDao> 
 
     /**
      * 资源获取
-     *
      * @param sorts 排序
      * @param page 页码
      * @param size 分页大小
      * @return Page<RsResources> 资源
      */
-    public Page<RsResources> getResources(String sorts, int page, int size)
-    {
+    public Page<RsResources> getResources(String sorts, int page, int size) {
         Pageable pageable =  new PageRequest(page,size,parseSorts(sorts));
-
         return rsDao.findAll(pageable);
     }
 
+    /**
+     * 根据资源分类获取资源
+     * @param CategoryId
+     * @return
+     */
     public List<RsResources> findByCategoryId(String CategoryId){
         return rsDao.findByCategoryId(CategoryId);
     }
