@@ -119,8 +119,8 @@ public class ExtractPercentHelper {
                 String quotaDate = "2017-08-22";
                 param.put("startTime",quotaDate);
                 param.put("endTime",quotaDate);
-                Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1), 10000);
-                Map<String,Map<String, Object>>  denoResultMap = quotaService.getQuotaResult(denoTjQuota.getId(), objectMapper.writeValueAsString(param), denoDimension.substring(0, denoDimension.length() - 1), 10000);
+                Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1));
+                Map<String,Map<String, Object>>  denoResultMap = quotaService.getQuotaResult(denoTjQuota.getId(), objectMapper.writeValueAsString(param), denoDimension.substring(0, denoDimension.length() - 1));
 
                 List<SaveModel>  resultModel = getPercentResult(moleResultMap, denoResultMap,quotaVo);
                 return resultModel;
