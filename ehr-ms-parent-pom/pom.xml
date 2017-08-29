@@ -21,7 +21,7 @@
         <!--<module>../svr/svr-archive-security</module>
         <module>../svr/svr-cipher</module>-->
         <!--<module>../svr/svr-dict</module>-->
-        <module>../svr/svr-esb</module>
+        <!--<module>../svr/svr-esb</module>-->
         <!--<module>../svr/svr-family</module>
         <module>../svr/svr-file-resource</module>
         <module>../svr/svr-geography</module>-->
@@ -42,7 +42,7 @@
         <module>../ag-portal-cloud</module>
         <module>../svr/svr-redis</module>
         <module>../svr/svr-quota</module>
-        <!--<module>../svr/svr-logCollection</module>-->
+        <module>../svr/svr-log-collection</module>
     </modules>
 
     <build>

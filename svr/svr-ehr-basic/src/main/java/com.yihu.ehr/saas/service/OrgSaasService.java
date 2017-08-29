@@ -1,14 +1,9 @@
-package com.yihu.ehr.orgSaas.service;
+package com.yihu.ehr.saas.service;
 
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.entity.geography.GeographyDict;
 import com.yihu.ehr.entity.organizations.OrgSaas;
-import com.yihu.ehr.orgSaas.dao.OrgSaasRepository;
+import com.yihu.ehr.saas.dao.OrgSaasRepository;
 import com.yihu.ehr.query.BaseJpaService;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
