@@ -12,7 +12,7 @@
         <relativePath>../../ehr-ms-parent-pom/</relativePath>
     </parent>
 
-    <artifactId>svr-logCollection</artifactId>
+    <artifactId>svr-log-collection</artifactId>
     <packaging>${packaging.type}</packaging>
 
 

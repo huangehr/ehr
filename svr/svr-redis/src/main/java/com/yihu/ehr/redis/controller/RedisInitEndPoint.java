@@ -24,17 +24,19 @@ import org.springframework.web.bind.annotation.*;
 public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    RedisInitService redisInitService;
+    private RedisInitService redisInitService;
     @Autowired
-    XResourceClient resourceClient;
+    private XResourceClient resourceClient;
     @Autowired
-    XStandardClient standardClient;
+    private XStandardClient standardClient;
     @Autowired
-    RedisClient redis;
+    private RedisClient redis;
 
     @ApiOperation("清除Redis缓存")
     @RequestMapping(value = ServiceApi.Redis.DeleteRedis, method = RequestMethod.POST)
-    public String deleteRedis(@RequestParam("key") String key) throws Exception {
+    public String deleteRedis(
+            @ApiParam(name = "key", value = "机构编码、ICD10编码、健康问题编码等")
+            @RequestParam(value = "key") String key) throws Exception {
         redis.delete(key);
         return "Redis缓存清除成功！";
     }
@@ -88,24 +90,22 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return "Redis缓存机构Saas机构完成！";
     }
 
-    /************************************ 标准Redis *******************************************************************/
     @ApiOperation("Redis缓存标准")
     @RequestMapping(value = ServiceApi.Redis.Versions, method = RequestMethod.POST)
-    public String versions(@ApiParam(value = "版本列表，使用逗号分隔", defaultValue = "000000000000,568ce002559f")
-                         @RequestParam("versions") String versions,
-                         @ApiParam(value = "强制清除再缓存", defaultValue = "true")
-                         @RequestParam("force") boolean force) throws Exception {
+    public String versions(
+            @ApiParam(name = "versions", value = "版本列表，使用逗号分隔", defaultValue = "59083976eebd")
+            @RequestParam("versions") String versions,
+            @ApiParam(name = "force", value = "强制清除再缓存", defaultValue = "true")
+            @RequestParam("force") boolean force) throws Exception {
         standardClient.versions(versions,force);
         return "Redis缓存标准完成！";
     }
 
-
-    /************************************ 资源化Redis *******************************************************************/
-    @RequestMapping(value= ServiceApi.Adaptions.Cache,method = RequestMethod.POST)
+    @RequestMapping(value= ServiceApi.Adaptions.Cache, method = RequestMethod.POST)
     @ApiOperation("缓存适配数据")
     public boolean cacheData(
-            @ApiParam(name="id",value="schema_id",defaultValue = "")
-            @PathVariable(value = "id")String id) throws Exception {
+            @ApiParam(name="id",value="rs_adapter_schema.id")
+            @PathVariable(value = "id") String id) throws Exception {
         return resourceClient.cacheData(id);
     }
 }

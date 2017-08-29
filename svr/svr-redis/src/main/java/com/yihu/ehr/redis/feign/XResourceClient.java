@@ -22,5 +22,5 @@ import java.util.List;
 public interface XResourceClient {
 
     @RequestMapping(value= ServiceApi.Adaptions.Cache,method = RequestMethod.POST)
-    public boolean cacheData(@PathVariable(value = "id")String id);
+    boolean cacheData(@PathVariable(value = "id")String id);
 }

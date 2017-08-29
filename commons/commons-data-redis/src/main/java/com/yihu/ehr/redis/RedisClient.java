@@ -61,7 +61,7 @@ public class RedisClient {
     }
 
     /**
-     * 获取数据。
+     * 获取数据
      *
      * @param key
      * @param <T>
@@ -88,7 +88,7 @@ public class RedisClient {
     }
 
     /**
-     * 删除。支持Key模糊匹配删除。
+     * 删除记录，支持Key模糊匹配删除
      *
      * @param key
      */
@@ -97,8 +97,7 @@ public class RedisClient {
     }
 
     /**
-     * 删除多条记录。如果Key集合过大，建议使用Key模糊匹配删除。
-     *
+     * 删除多条记录，如果Key集合过大，建议使用Key模糊匹配删除
      * @param keys
      */
     public void delete(Collection<String> keys) {
@@ -106,27 +105,23 @@ public class RedisClient {
     }
 
     /**
-     * 匹配特定模式的Key列表。
-     *
+     * 匹配特定模式的Key列表
      * @param pattern
      * @return
      */
     public Set<String> keys(String pattern) {
         return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
             Set<byte[]> keys = connection.keys(pattern.getBytes());
-
             Set<String> returnKeys = new HashSet<>();
             for (byte[] key : keys) {
                 returnKeys.add(new String(key));
             }
-
             return returnKeys;
         });
     }
 
     /**
-     * 是否包含指定Key。
-     *
+     * 是否包含指定Key
      * @param key
      * @return
      */
