@@ -182,10 +182,10 @@ public class ResourcesQueryService  {
      * @return
      */
     public Envelop getCustomizeData(String resourcesCodes, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception {
+        Envelop envelop = new Envelop();
         ObjectMapper mapper = new ObjectMapper();
         String queryParams = "";
         String saas = "";
-        Envelop envelop = new Envelop();
         //获取资源信息
         List<String> codeList = (List<String>) mapper.readValue(resourcesCodes, List.class);
         /**
@@ -241,11 +241,11 @@ public class ResourcesQueryService  {
             envelop.setCurrPage(result.getNumber());
             envelop.setPageSize(result.getSize());
             envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
-            if(result.getContent() != null && result.getContent().size() > 0) {
+            if(result.getContent() != null) {
                 envelop.setDetailModelList(result.getContent());
             }
         }else {
-            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("数据库数据检索失败");
         }
         return envelop;
     }
@@ -379,11 +379,11 @@ public class ResourcesQueryService  {
                     }
                 }
                 else {
-                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("数据库数据检索失败");
                 }
             }
         }else {
-            throw new Exception("无效资源！");
+            envelop.setErrorMsg("无效资源！");
         }
         return envelop;
     }
