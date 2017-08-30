@@ -45,36 +45,36 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据列表树")
-    public List<Map<String, Object>> getMetadataList(
-            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+    public Envelop getMetadataList(
+            @ApiParam(name = "filters", value = "过滤条件(name)", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) {
         return resourcesIntegratedService.getMetadataList(filters);
     }
 
     @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据检索")
-    public List<Map<String, Object>> searchMetadataData(
-            @ApiParam(name = "resourcesCode", value = "资源代码")
+    public Envelop searchMetadataData(
+            @ApiParam(name = "resourcesCode", value = "资源代码([\"code\"])")
             @RequestParam(value = "resourcesCode") String resourcesCode,
-            @ApiParam(name = "metaData", value = "数据元")
+            @ApiParam(name = "metaData", value = "数据元([\"metadataId\"])")
             @RequestParam(value = "metaData", required = false) String metaData,
-            @ApiParam(name = "orgCode", value = "机构代码")
+            @ApiParam(name = "orgCode", value = "机构代码(orgCode)")
             @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(name = "appId", value = "应用ID")
+            @ApiParam(name = "appId", value = "应用ID(appId)")
             @RequestParam(value = "appId") String appId,
-            @ApiParam(name = "queryCondition", value = "查询条件")
+            @ApiParam(name = "queryCondition", value = "查询条件[{\"andOr\":\"(AND)(OR)\",\"condition\":\"(<)(=)(>)\",\"field\":\"fieldName\",\"value\":\"value\"}]")
             @RequestParam(value = "queryCondition", required = false) String queryCondition,
-            @ApiParam(name = "page", value = "第几页")
+            @ApiParam(name = "page", value = "第几页(>0)")
             @RequestParam(value = "page", required = false) Integer page,
-            @ApiParam(name = "size", value = "每页几行")
-            @RequestParam(value = "size", required = false) Integer size) throws Exception {
+            @ApiParam(name = "size", value = "每页几行(>0)")
+            @RequestParam(value = "size", required = false) Integer size) throws Exception{
         return resourcesIntegratedService.searchMetadataData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
     }
 
     @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
     @ApiOperation("综合查询指标统计列表树")
-    public List<Map<String, Object>> getQuotaList(
-            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+    public Envelop getQuotaList(
+            @ApiParam(name = "filters", value = "过滤条件(name)", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
         return resourcesIntegratedService.getQuotaList(filters);
     }
@@ -82,7 +82,7 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     @ApiOperation("综合查询视图保存")
     public Envelop updateResource(
-            @ApiParam(name="dataJson",value="JSON对象参数")
+            @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})")
             @RequestParam(value="dataJson") String dataJson) {
         Envelop envelop = new Envelop();
         RsResources newResources = null;
@@ -96,6 +96,10 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
             //处理资源视图
             String resource = mapper.writeValueAsString(paraMap.get("resource"));
             RsResources rsResources = toEntity(resource, RsResources.class);
+            if(rsService.findByField("name", rsResources.getName()).size() > 0) {
+                envelop.setErrorMsg("资源名称重复");
+                return envelop;
+            }
             if (rsService.getResourceByCode(rsResources.getCode()) != null) {
                 envelop.setErrorMsg("资源编码重复");
                 return envelop;
@@ -194,6 +198,7 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
             }
             envelop.setSuccessFlg(true);
         }catch (Exception e) {
+            e.printStackTrace();
             if(newResources != null) {
                 /**
                  * 报异常则删除所有已保存的数据
@@ -211,10 +216,9 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
     @ApiOperation("综合查询搜索条件更新")
     public Envelop customizeUpdate(
-            @ApiParam(name="dataJson",value="JSON对象参数")
+            @ApiParam(name="dataJson",value="JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> paraMap = mapper.readValue(dataJson, Map.class);
         if(!paraMap.containsKey("resourceId") || !paraMap.containsKey("queryCondition")) {
@@ -235,7 +239,7 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
             resourcesDefaultQueryService.saveResourceQuery(rsResourcesQuery);
             envelop.setSuccessFlg(true);
         }else {
-            throw new Exception("资源不存在");
+            envelop.setErrorMsg("资源不存在");
         }
         return envelop;
     }
