@@ -11,8 +11,8 @@
     </parent>
 
     <artifactId>svr-resource</artifactId>
-    <packaging>${packaging.type}</packaging>
-
+    <!--<packaging>${packaging.type}</packaging>-->
+    <packaging>war</packaging>
     <properties>
         <wagonServerId>192.168.1.220</wagonServerId>
         <wagonUrl>scp://sand:timeneverstop@192.168.1.221/home/sand/ehr-release</wagonUrl>
