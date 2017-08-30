@@ -29,7 +29,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "resourceIntegrated", description = "资源综合查询数据服务接口")
+@Api(value = "ResourceIntegrated", description = "资源综合查询数据服务接口")
 public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -43,16 +43,16 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ResourceQuotaService resourceQuotaService;
 
-    @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据列表树")
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     public Envelop getMetadataList(
             @ApiParam(name = "filters", value = "过滤条件(name)", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters) {
         return resourcesIntegratedService.getMetadataList(filters);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据检索")
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
     public Envelop searchMetadataData(
             @ApiParam(name = "resourcesCode", value = "资源代码([\"code\"])")
             @RequestParam(value = "resourcesCode") String resourcesCode,
@@ -71,16 +71,16 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
         return resourcesIntegratedService.searchMetadataData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
     @ApiOperation("综合查询指标统计列表树")
+    @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
     public Envelop getQuotaList(
             @ApiParam(name = "filters", value = "过滤条件(name)", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
         return resourcesIntegratedService.getQuotaList(filters);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     @ApiOperation("综合查询视图保存")
+    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     public Envelop updateResource(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})")
             @RequestParam(value="dataJson") String dataJson) {
@@ -213,8 +213,8 @@ public class ResourcesIntegratedEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
     @ApiOperation("综合查询搜索条件更新")
+    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
     public Envelop customizeUpdate(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {

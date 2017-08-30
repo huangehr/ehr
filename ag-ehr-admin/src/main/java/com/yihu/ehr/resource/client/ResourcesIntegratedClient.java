@@ -13,21 +13,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Sxy
- * @created 2016.08.01 17:27
+ * @created by Sxy on 2016/08/01.
  */
 @FeignClient(value = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
 public interface ResourcesIntegratedClient {
 
-    @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据列表树")
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     Envelop getMetadataList(
             @RequestParam(value = "filters", required = false) String filters);
 
-    @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据检索")
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
     Envelop searchMetadataData(
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @RequestParam(value = "metaData", required = false) String metaData,
@@ -37,18 +36,18 @@ public interface ResourcesIntegratedClient {
             @RequestParam(value = "page",required = false) Integer page,
             @RequestParam(value = "size",required = false) Integer size);
 
-    @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
     @ApiOperation("综合查询指标统计列表树")
+    @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
     Envelop getQuotaList(
             @RequestParam(value = "filters", required = false) String filters);
 
-    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     @ApiOperation("综合查询视图保存")
+    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     Envelop updateResource(
             @RequestParam(value = "dataJson") String dataJson);
 
-    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
     @ApiOperation("综合查询搜索条件更新")
+    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
     Envelop updateResourceQuery(
             @RequestParam(value = "dataJson") String dataJson);
 
