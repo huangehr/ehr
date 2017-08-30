@@ -76,11 +76,11 @@ public class ResolveJsonFileUtil {
         }
     }
 
-    public static void  main (String args[]){
-        String s = "2017-06-08T11:40:37Z";
-        Date createDate = DateUtil.parseDate(s, "yyyy-MM-dd'T'HH:mm:ss");
-        System.out.println("");
-
-    }
+//    public static void  main (String args[]){
+//        String s = "2017-06-08T11:40:37Z";
+//        Date createDate = DateUtil.parseDate(s, "yyyy-MM-dd'T'HH:mm:ss");
+//        System.out.println("");
+//
+//    }
 
 }
