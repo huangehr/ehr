@@ -1,8 +1,6 @@
 package com.yihu.ehr.users.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.discovery.converters.Auto;
-import com.unboundid.util.json.JSONObject;
 import com.yihu.ehr.agModel.app.AppFeatureModel;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.patient.PatientDetailModel;
@@ -12,6 +10,7 @@ import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.app.MAppFeature;
@@ -32,21 +31,21 @@ import com.yihu.ehr.users.service.RoleFeatureRelationClient;
 import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.httpClient.HttpClientUtil;
-import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by AndyCai on 2016/1/21.
@@ -783,7 +782,7 @@ public class UserController extends BaseController {
             @PathVariable(value = "imageId") String imageId) {
 
         try {
-            String imagePath = fileResourceClient.imageFindById(imageId);
+            String imagePath = fileResourceClient.getRealPathById(imageId);
             if (imagePath == null) {
                 return "用户头像获取失败!";
             }

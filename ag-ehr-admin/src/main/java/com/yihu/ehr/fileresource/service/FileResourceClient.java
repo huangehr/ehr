@@ -61,10 +61,9 @@ public interface FileResourceClient {
     boolean filesDeleteByPath(
             @RequestParam(value = "storagePath") String storagePath);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/imageFindById", method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + "/file/getRealPathById", method = RequestMethod.GET)
     @ApiOperation(value = "根据文件的id,查找文件路径")
-    String imageFindById(
-            @RequestParam(value = "imageId") String imageId);
+    String getRealPathById(@RequestParam(value = "fileId") String fileId);
 
 
 }

@@ -221,20 +221,20 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     /**
      * 根据文件的id,查找文件路径
      *
-     * @param imageId
+     * @param fileId
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/imageFindById", method = RequestMethod.GET)
+    @RequestMapping(value = "/file/getRealPathById", method = RequestMethod.GET)
     @ApiOperation(value = "根据文件的id,查找文件路径")
-    public String imageFindById(
-            @ApiParam(name = "imageId", value = "文件路径")
-            @RequestParam(value = "imageId") String imageId) throws Exception {
-        String s = java.net.URLDecoder.decode(imageId, "UTF-8");
-        String imgRemotePath=fileResourceManager.imageFindById(s);
-        imgRemotePath = imgRemotePath.replace(":","/");
-        imgRemotePath= fastDfsPublicServers +"/"+imgRemotePath ;
-        return imgRemotePath;
+    public String getRealPathById(
+            @ApiParam(name = "fileId", value = "文件ID")
+            @RequestParam(value = "fileId") String fileId) throws Exception {
+        String s = java.net.URLDecoder.decode(fileId, "UTF-8");
+        String path=fileResourceManager.getStoragePathById(s);
+        path = path.replace(":","/");
+        path= fastDfsPublicServers +"/"+path ;
+        return path;
     }
 
 
