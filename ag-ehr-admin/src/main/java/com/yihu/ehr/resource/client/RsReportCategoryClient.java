@@ -42,14 +42,14 @@ public interface RsReportCategoryClient {
     @ApiOperation("新增资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)
     MRsReportCategory add(
-            @ApiParam(name = "mrsReportCategory", value = "资源报表分类JSON字符串", required = true)
-            @RequestBody String mrsReportCategory);
+            @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON字符串", required = true)
+            @RequestParam(value = "rsReportCategory") String rsReportCategory);
 
     @ApiOperation("更新资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.PUT)
     MRsReportCategory update(
-            @ApiParam(name = "mrsReportCategory", value = "资源报表分类JSON字符串", required = true)
-            @RequestBody String mrsReportCategory);
+            @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON字符串", required = true)
+            @RequestParam(value = "rsReportCategory") String rsReportCategory);
 
     @ApiOperation("删除资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryDelete, method = RequestMethod.DELETE)

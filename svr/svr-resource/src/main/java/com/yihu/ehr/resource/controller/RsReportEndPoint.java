@@ -35,7 +35,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReport, method = RequestMethod.GET)
     public MRsReport getById(
             @ApiParam(name = "id", value = "id", required = true)
-            @PathVariable("id") Integer id) throws Exception {
+            @PathVariable(value = "id") Integer id) throws Exception {
         return convertToModel(rsReportService.getById(id), MRsReport.class);
     }
 
@@ -63,7 +63,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST)
     public MRsReport add(
             @ApiParam(name = "rsReport", value = "资源报表JSON", required = true)
-            @RequestBody String rsReport) throws Exception {
+            @RequestParam(value = "rsReport") String rsReport) throws Exception {
         RsReport newRsReport = toEntity(rsReport, RsReport.class);
         newRsReport = rsReportService.save(newRsReport);
         return convertToModel(newRsReport, MRsReport.class);
@@ -73,7 +73,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
     public MRsReport update(
             @ApiParam(name = "rsReport", value = "资源报表JSON", required = true)
-            @RequestBody String rsReport) throws Exception {
+            @RequestParam(value = "rsReport") String rsReport) throws Exception {
         RsReport newRsReport = toEntity(rsReport, RsReport.class);
         newRsReport = rsReportService.save(newRsReport);
         return convertToModel(newRsReport, MRsReport.class);
@@ -83,7 +83,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportDelete, method = RequestMethod.DELETE)
     public void delete(
             @ApiParam(name = "id", value = "资源报表ID", required = true)
-            @RequestParam("id") Integer id) throws Exception {
+            @RequestParam(value = "id") Integer id) throws Exception {
         rsReportService.delete(id);
     }
 
@@ -91,9 +91,9 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportIsUniqueCode, method = RequestMethod.GET)
     public boolean isUniqueCode(
             @ApiParam(name = "id", value = "资源报表ID", required = true)
-            @RequestParam("id") Integer id,
+            @RequestParam(value = "id") Integer id,
             @ApiParam(name = "code", value = "资源报表编码", required = true)
-            @RequestParam("code") String code) throws Exception {
+            @RequestParam(value = "code") String code) throws Exception {
         return rsReportService.isUniqueCode(id, code);
     }
 
@@ -101,13 +101,13 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportIsUniqueName, method = RequestMethod.GET)
     public boolean isUniqueName(
             @ApiParam(name = "id", value = "资源报表ID", required = true)
-            @RequestParam("id") Integer id,
+            @RequestParam(value = "id") Integer id,
             @ApiParam(name = "name", value = "资源报表名称", required = true)
-            @RequestParam("name") String name) throws Exception {
+            @RequestParam(value = "name") String name) throws Exception {
         return rsReportService.isUniqueName(id, name);
     }
 
-    @ApiOperation("查询报表信息_不分页")
+    @ApiOperation("查询报表信息（不分页）")
     @RequestMapping(value = ServiceApi.Resources.RsReportNoPage, method = RequestMethod.GET)
     public List<MRsReport> queryNoPageResources(
             @ApiParam(name="filters",value="过滤",defaultValue = "")
