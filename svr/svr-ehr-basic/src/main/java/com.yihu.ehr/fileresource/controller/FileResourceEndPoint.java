@@ -203,11 +203,11 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/image_view/{storagePath}", method = RequestMethod.GET)
+    @RequestMapping(value = "/image_view", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
     public String imageView(
             @ApiParam(name = "storagePath", value = "文件路径", defaultValue = "")
-         @PathVariable(value = "storagePath") String storagePath)throws Exception{
+         @RequestParam(value = "storagePath") String storagePath)throws Exception{
         String s = java.net.URLDecoder.decode(storagePath, "UTF-8");
         String groupName = s.split(":")[0];
         String remoteFileName = s.split(":")[1];
