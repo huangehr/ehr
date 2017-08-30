@@ -109,7 +109,7 @@ public class QuotaService {
 
     //多维度数据的总和 结果
     //返回结果 ：key为共同维度的组合值，value为数据结果集
-    public Map<String,Map<String, Object>> getQuotaResult(Integer id, String filters,String dimension,int size) throws Exception {
+    public Map<String,Map<String, Object>> getQuotaResult(Integer id, String filters,String dimension) throws Exception {
 
         String[] dimensions = null;
         if(StringUtils.isNotEmpty(dimension)){
@@ -118,7 +118,7 @@ public class QuotaService {
             dimensions = new String[]{"quotaDate"};
         }
         TjQuota tjQuota= quotaDao.findOne(id);
-        List<Map<String, Object>> resultListMap = esResultExtract.getQuotaReport(tjQuota, filters,size);
+        List<Map<String, Object>> resultListMap = esResultExtract.getQuotaReport(tjQuota, filters,10000);
 
         Map<String,Map<String, Object>> cloumnMap = new HashMap<>();
 
@@ -133,7 +133,7 @@ public class QuotaService {
             }
             boolean repeat = false;
             Object oldResultVal = null;
-            if( cloumnMap.size() == 0 ){
+            if( cloumnMap.size() == 0 ){//第一个
                 cloumnMap.put(cloumnStr,resultMap);
             }else {
                 for(String key:cloumnMap.keySet()){

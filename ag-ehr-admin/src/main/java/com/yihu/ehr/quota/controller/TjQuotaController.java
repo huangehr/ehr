@@ -221,7 +221,10 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             @ApiParam(name = "pageSize", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "pageSize" , required = false ,defaultValue ="15") int pageSize
     ) throws Exception {
-        filters = URLEncoder.encode(filters, "UTF-8");
+        if(filters!=null){
+            filters = URLEncoder.encode(filters, "UTF-8");
+        }
+        System.out.println("ag:" + filters);
         return tjQuotaJobClient.getQuotaResult(id,filters,pageNo,pageSize);
     }
 
