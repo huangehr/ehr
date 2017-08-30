@@ -216,17 +216,8 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
         return fileStream;
     }
 
-
-
-    /**
-     * 根据文件的id,查找文件路径
-     *
-     * @param fileId
-     * @return
-     * @throws Exception
-     */
+    @ApiOperation(value = "根据文件ID，获取文件的真实访问路径")
     @RequestMapping(value = "/file/getRealPathById", method = RequestMethod.GET)
-    @ApiOperation(value = "根据文件的id,查找文件路径")
     public String getRealPathById(
             @ApiParam(name = "fileId", value = "文件ID")
             @RequestParam(value = "fileId") String fileId) throws Exception {
@@ -237,5 +228,13 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
         return path;
     }
 
+    @ApiOperation(value = "根据文件的存储路径，获取文件的真实访问路径")
+    @RequestMapping(value = "/file/getRealPathByStoragePath", method = RequestMethod.GET)
+    public String getRealPathByStoragePath(
+            @ApiParam(name = "storagePath", value = "文件存储路径")
+            @RequestParam(value = "storagePath") String storagePath) throws Exception {
+        String realPath= fastDfsPublicServers + "/" + storagePath.replace(":", "/");
+        return realPath;
+    }
 
 }
