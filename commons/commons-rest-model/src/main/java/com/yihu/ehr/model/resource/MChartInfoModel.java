@@ -11,6 +11,7 @@ public class MChartInfoModel {
     private String title;
     private String option;
     private List<MReportDimension> listMap;
+    private Map<String,Object> dimensionMap;//维度真实值的 code ,中文说明 对应关系
 
     public String getTitle() {
         return title;
@@ -34,5 +35,13 @@ public class MChartInfoModel {
 
     public void setListMap(List<MReportDimension> listMap) {
         this.listMap = listMap;
+    }
+
+    public Map<String, Object> getDimensionMap() {
+        return dimensionMap;
+    }
+
+    public void setDimensionMap(Map<String, Object> dimensionMap) {
+        this.dimensionMap = dimensionMap;
     }
 }

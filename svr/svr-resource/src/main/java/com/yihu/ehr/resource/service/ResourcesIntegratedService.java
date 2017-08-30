@@ -15,7 +15,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sun.java2d.cmm.kcms.KcmsServiceProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,7 +156,8 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
      * @param filters
      * @return
      */
-    public List<Map<String, Object>> getMetadataList(String filters) {
+    public Envelop getMetadataList(String filters) {
+        Envelop envelop = new Envelop();
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
         Map<String, Object> baseMap = new HashMap<String, Object>();
         List<Map<String, String>> baseList = new ArrayList<Map<String, String>>();
@@ -220,14 +220,16 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
                 resultList.add(masterMap);
             }
         }
-        return resultList;
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
+        return envelop;
     }
 
     /**
      * 综合查询档案数据检索
      * @return
      */
-    public List<Map<String, Object>> searchMetadataData(String resourcesCode, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception{
+    public Envelop searchMetadataData(String resourcesCode, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception{
         Pattern pattern = Pattern.compile("\\[.+?\\]");
         if(resourcesCode != null) {
             Matcher rcMatcher = pattern.matcher(resourcesCode);
@@ -255,8 +257,7 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
                 }
             }
         }
-        Envelop envelop = resourcesQueryService.getCustomizeData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
-        return envelop.getDetailModelList();
+        return resourcesQueryService.getCustomizeData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
     }
 
     /**
@@ -264,7 +265,8 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
      * @param filters
      * @return
      */
-    public List<Map<String, Object>> getQuotaList(String filters) {
+    public Envelop getQuotaList(String filters) {
+        Envelop envelop = new Envelop();
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
         /**
          * 获取最上级目录
@@ -282,11 +284,9 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
                 }
             }
         }
-        if(filters != null && !filters.equals("")) {
-            for(Map<String, Object> tempMap : resultList) {
-
-            }
-        }
-        return resultList;
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
+        return envelop;
     }
+
 }

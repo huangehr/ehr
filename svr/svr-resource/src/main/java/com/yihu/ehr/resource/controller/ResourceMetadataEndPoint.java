@@ -48,18 +48,12 @@ public class ResourceMetadataEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadataBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Collection<MRsResourceMetadata> createResourceMetadataBatch(
             @ApiParam(name = "metadatas", value = "资源数据元", defaultValue = "")
-            @RequestParam(value = "metadatas") String metadatas
-//            @RequestBody String metadatas
-
-    ) throws Exception {
+            @RequestParam(value = "metadatas") String metadatas) throws Exception {
         RsResourceMetadata[] rsMetadata = toEntity(metadatas, RsResourceMetadata[].class);
-
         for (RsResourceMetadata metadata : rsMetadata) {
             metadata.setId(getObjectId(BizObject.ResourceMetadata));
         }
-
         List<RsResourceMetadata> metadataList = rsMetadataService.saveMetadataBatch(rsMetadata);
-
         return convertToModels(metadataList, new ArrayList<MRsResourceMetadata>(), MRsResourceMetadata.class, "");
     }
 
@@ -143,7 +137,6 @@ public class ResourceMetadataEndPoint extends EnvelopRestEndPoint {
             HttpServletResponse response) throws Exception {
         long total = 0;
         Collection<MRsResourceMetadata> rsAppMetaList;
-
         //过滤条件为空
         if (StringUtils.isEmpty(filters)) {
             Page<RsResourceMetadata> dimensions = rsMetadataService.getResourceMetadata(sorts, reducePage(page), size);
@@ -154,7 +147,6 @@ public class ResourceMetadataEndPoint extends EnvelopRestEndPoint {
             total = rsMetadataService.getCount(filters);
             rsAppMetaList = convertToModels(dimensions, new ArrayList<>(dimensions.size()), MRsResourceMetadata.class, fields);
         }
-
         pagedResponse(request, response, total, page, size);
         return (List<MRsResourceMetadata>) rsAppMetaList;
     }

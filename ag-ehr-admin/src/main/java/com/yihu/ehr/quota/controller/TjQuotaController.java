@@ -6,6 +6,7 @@ import com.yihu.ehr.agModel.tj.TjQuotaChartModel;
 import com.yihu.ehr.agModel.tj.TjQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.health.service.HealthBusinessClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
@@ -136,9 +137,9 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
                     metadata.setDescription("统计指标:" + tjQuotaModel.getName());
                     metadataClient.updateMetadata(objectMapper.writeValueAsString(metadata));
                     //更新指标表中的数据元code
-                    MTjQuotaModel mTjQuotaModel = objectMapper.convertValue(objectResult.getData(), MTjQuotaModel.class);
-                    mTjQuotaModel.setMetadataCode(metadata.getId());
-                    tjQuotaClient.update(objectMapper.writeValueAsString(mTjQuotaModel));
+                    TjQuota tjQuota = objectMapper.convertValue(objectResult.getData(), TjQuota.class);
+                    tjQuota.setMetadataCode(metadata.getId());
+                    tjQuotaClient.update(objectMapper.writeValueAsString(tjQuota));
                 }
                 return successObj(objectResult.getData());
             } else {
@@ -221,7 +222,10 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             @ApiParam(name = "pageSize", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "pageSize" , required = false ,defaultValue ="15") int pageSize
     ) throws Exception {
-        filters = URLEncoder.encode(filters, "UTF-8");
+        if(filters!=null){
+            filters = URLEncoder.encode(filters, "UTF-8");
+        }
+        System.out.println();
         return tjQuotaJobClient.getQuotaResult(id,filters,pageNo,pageSize);
     }
 

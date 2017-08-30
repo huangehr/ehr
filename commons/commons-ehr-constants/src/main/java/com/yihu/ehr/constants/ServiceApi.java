@@ -810,6 +810,12 @@ public class ServiceApi {
         public static final String OrgSaasAreaRedis = "/redis/orgSaasAreaRedis";
         public static final String OrgSaasOrgRedis = "/redis/orgSaasOrgRedis";
 
+        //更新服务
+        public static final String UpdateOrgName = "/redis/update/orgName";
+        public static final String UpdateOrgArea = "/redis/update/orgArea";
+        public static final String UpdateOrgSaasArea = "/redis/update/orgSaasArea";
+        public static final String UpdateOrgSaasOrg = "/redis/update/orgSaasOrg";
+
         /******************************************* 资源化相关Redis *******************************************************************/
         public static final String RsAdaptionDict = "/redis/rsAdaptionDict";
         public static final String RsAdaptionMetaData = "/redis/rsAdaptionMetaData";

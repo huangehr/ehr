@@ -8,7 +8,7 @@ logging:
 service-gateway:
   username: user
   password: eureka
-  url: http://localhost:10000/api/v1.0/admin
+  url: http://192.168.1.221:10000/api/v1.0/admin
 
 kafka:
   broker:
@@ -23,8 +23,8 @@ spring:
   profiles: test
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: chenweishan
-    password: chenweishan
+    username: weifuwu
+    password: weifuwu
 
   data:
     mongodb:
@@ -40,8 +40,8 @@ spring:
   profiles: dev
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: chenweishan
-    password: chenweishan
+    username: weifuwu
+    password: weifuwu
 
   data:
     mongodb:

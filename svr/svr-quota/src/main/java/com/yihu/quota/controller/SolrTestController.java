@@ -31,7 +31,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "statistics", description = "档案、人次指标统计")
+@Api(value = "statistics", description = "solr数据查询")
 public class SolrTestController extends BaseController {
 
     @Autowired
@@ -40,131 +40,6 @@ public class SolrTestController extends BaseController {
     private  StatisticsService statisticsService;
     @Autowired
     private  SolrUtil solrUtil;
-    @Autowired
-    private ElasticsearchUtil elasticsearchUtil;
-    @Autowired
-    private EsClientUtil esClientUtil;
-    @Autowired
-    private EsConfigUtil esConfigUtil;
-
-
-    @RequestMapping(value = "/saveElasticsearchDocument", method = RequestMethod.POST)
-    @ApiOperation("添加elasticsearch文档")
-    public String saveDocument(
-            @ApiParam(value = "json串")
-            @RequestParam(value = "jsonString", required = true) String jsonString
-    ){
-        boolean f = false;
-        try {
-            /***** elasticsearch 保存 ********/
-            EsConfig esConfig = new EsConfig();
-            esConfig.setHost("172.17.110.17");
-            esConfig.setPort(9300);
-            esConfig.setClusterName("elasticsearch");
-            esConfig.setIndex("quota");
-            esConfig.setType("quota_test");
-            esConfigUtil.getConfig(esConfig);
-            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-            Client client = esClientUtil.getClient(esConfig.getClusterName());
-            f = elasticsearchUtil.save(client,jsonString);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return  String.valueOf(f);
-    }
-
-    @RequestMapping(value = "/impElasticsearchDocument", method = RequestMethod.POST)
-    @ApiOperation("文件导入elasticsearch文档数据")
-    public String fileImpDocument(
-            @ApiParam(name = "file", value = "file文件")
-            @RequestParam(name = "file",required = true) String file,
-            @ApiParam(name = "index", value = "索引名称")
-            @RequestParam(name = "index",required = true) String index,
-            @ApiParam(name = "type", value = "类型(表)名称")
-            @RequestParam(name = "type",required = true) String type
-    )throws Exception {
-        boolean f = false;
-        try {
-            /***** elasticsearch 保存 ********/
-            EsConfig esConfig = new EsConfig();
-            esConfig.setHost("172.17.110.17");
-            esConfig.setPort(9300);
-            esConfig.setClusterName("elasticsearch");
-            esConfig.setIndex(index);
-            esConfig.setType(type);
-            esConfigUtil.getConfig(esConfig);
-            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-            Client client = esClientUtil.getClient(esConfig.getClusterName());
-
-            if( !file.isEmpty()){
-                FileInputStream fis = null;
-                InputStreamReader isr = null;
-                BufferedReader br = null; //用于包装InputStreamReader,提高处理性能。因为BufferedReader有缓冲的，而InputStreamReader没有。
-                try {
-                    String str = "";
-                    String jsonString = "";
-                    fis = new FileInputStream(file);// FileInputStream
-                    // 从文件系统中的某个文件中获取字节
-                    isr = new InputStreamReader(fis);// InputStreamReader 是字节流通向字符流的桥梁,
-                    br = new BufferedReader(isr);// 从字符输入流中读取文件中的内容,封装了一个new InputStreamReader的对象
-                    while ((str = br.readLine()) != null) {
-                        jsonString = str;
-                        System.out.println(jsonString);// 打印
-                        //添加到es库
-                        f = elasticsearchUtil.save(client,jsonString);
-                    }
-                } catch (FileNotFoundException e) {
-                    System.out.println("找不到指定文件");
-                } catch (IOException e) {
-                    System.out.println("读取文件失败");
-                } finally {
-                    try {
-                        br.close();
-                        isr.close();
-                        fis.close();
-                        // 关闭的时候最好按照先后顺序关闭最后开的先关闭所以先关s,再关n,最后关m
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return  String.valueOf(f);
-    }
-
-    @RequestMapping(value = "/getElasticsearchDocument", method = RequestMethod.POST)
-    @ApiOperation("查询elasticsearch文档")
-    public List<Map<String, Object>> getElasticsearchDocument(
-            @ApiParam(value = "filter")
-            @RequestParam(value = "filter", required = true) String filter
-    ){
-        List<Map<String, Object>> list = null;
-        try {
-            EsConfig esConfig = new EsConfig();
-            esConfig.setHost("172.17.110.17");
-            esConfig.setPort(9300);
-            esConfig.setClusterName("elasticsearch");
-            esConfig.setIndex("test");
-            esConfig.setType("aaaa");//aaaa 表中机构名 设置不分词  -- 只支持全词匹配查询
-            esConfigUtil.getConfig(esConfig);
-            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-            Client client = esClientUtil.getClient(esConfig.getClusterName());
-            BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
-
-            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("orgName", filter);
-            boolQueryBuilder.must(termQueryQuotaCode);
-
-            list = elasticsearchUtil.queryList(client, boolQueryBuilder, null, 200);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return  list;
-    }
-
 
 
     @RequestMapping(value = "/querySolrDocument", method = RequestMethod.GET)

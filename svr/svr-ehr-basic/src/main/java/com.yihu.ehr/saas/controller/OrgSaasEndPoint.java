@@ -1,29 +1,21 @@
-package com.yihu.ehr.orgSaas.controller;
+package com.yihu.ehr.saas.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unboundid.util.json.JSONArray;
-import com.unboundid.util.json.JSONObject;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.organizations.OrgSaas;
 import com.yihu.ehr.model.common.ListResult;
-import com.yihu.ehr.orgSaas.service.OrgSaasService;
+import com.yihu.ehr.saas.service.OrgSaasService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.jmx.support.ObjectNameManager;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *

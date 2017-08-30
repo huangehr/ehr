@@ -170,10 +170,13 @@ public class QuotaReportController extends BaseController {
 
             List<Map<String, Object>> data2list = null;
             List<Map<String, Object>> datalist = new ArrayList<>();
-            QuotaReport quotaReport = quotaService.getQuotaReport(tjQuota.getId(), filter, dimension, 10000);
+            String dimensions = dimension + ";" + dimension + "Name";
+            QuotaReport quotaReport = quotaService.getQuotaReportGeneral(tjQuota.getId(), filter, dimensions, 10000);
+            Map<String,Object> dimensionMap = new HashMap<>();
             for(ResultModel resultModel :quotaReport.getReultModelList()){
+                dimensionMap.put(resultModel.getCloumns().get(1),resultModel.getCloumns().get(0));
                 Map<String, Object> map = new HashMap<>();
-                map.put("NAME",resultModel.getCloumns().get(0));
+                map.put("NAME",resultModel.getCloumns().get(1));
                 map.put("TOTAL",resultModel.getValue());
                 datalist.add(map);
             }
@@ -186,15 +189,16 @@ public class QuotaReportController extends BaseController {
             String barName = "";
             String bar2Name = "";
             Option option = null;
-            if (type == 1) {
+            if (type == ReportOption.bar) {
                 option = reportOption.getBarEchartOption(title, legend ,xName,yName, barName, datalist, bar2Name, data2list);
-            } else if (type == 2) {
+            } else if (type == ReportOption.line) {
                 option = reportOption.getLineEchartOption(title, legend,xName,yName, barName, datalist, bar2Name, data2list);
-            } else if (type == 4) {
+            } else if (type == ReportOption.pie) {
                 option = reportOption.getPieEchartOption(title, legend, barName, datalist, bar2Name, data2list);
             }
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
+            chartInfoModel.setDimensionMap(dimensionMap);
             return chartInfoModel;
         } catch (Exception e) {
             error(e);

@@ -1,4 +1,4 @@
-package com.yihu.ehr.orgSaas.controller;
+package com.yihu.ehr.saas.controller;
 
 import com.yihu.ehr.agModel.orgSaas.AreaSaasModel;
 import com.yihu.ehr.agModel.orgSaas.OrgSaasModel;
@@ -7,7 +7,8 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.orgSaas.service.OrgSaasClient;
+import com.yihu.ehr.redis.client.RedisUpdateClient;
+import com.yihu.ehr.saas.service.OrgSaasClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -34,6 +35,8 @@ public class OrgSaasController extends BaseController{
     private OrganizationClient orgClient;
     @Autowired
     private AddressClient addressClient;
+    @Autowired
+    private RedisUpdateClient redisUpdateClient;
 
     @RequestMapping(value = "/OrgSaasByOrg", method = RequestMethod.GET)
     @ApiOperation(value = "根据机构获取机构相关授权")
@@ -183,7 +186,17 @@ public class OrgSaasController extends BaseController{
         boolean succe = orgSaasClient.saveOrgSaas(orgCode,type,newJsonData[0]);
         if(succe){
             envelop.setSuccessFlg(true);
-//            orgSaasModel.setId(id);
+            //更新相关缓存数据（原则上如果更新失败不能影响实际更新结果）
+            try {
+                if (type.equals("1")) {
+                    redisUpdateClient.updateOrgSaasArea(orgCode);
+                } else {
+                    redisUpdateClient.updateOrgSaasOrg(orgCode);
+                }
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+            //orgSaasModel.setId(id);
         }else{
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("机构授权新增失败");
