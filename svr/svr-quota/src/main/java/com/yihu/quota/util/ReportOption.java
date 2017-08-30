@@ -23,6 +23,10 @@ import java.util.Map;
  */
 public class ReportOption {
 
+    public static int bar = 1;
+    public static int line = 2;
+    public static int pie = 3;
+
     /**
      * 折线图
      * @param title  标题
