@@ -102,11 +102,12 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         if (tjQuotaModel.getId() != null) {
             tjQuota.setUpdateTime(new Date());
             tjQuota.setCreateTime(DateUtil.strToDate(tjQuotaModel.getCreateTime()));
+            tjQuota.setStatus(1);
         } else{
             tjQuota.setCreateTime(new Date());
         }
-        tjQuotaService.saves(tjQuota, tjquotaDataSource, tjQuotaDataSave);
-        return Result.success("统计表更新成功！", tjQuotaModel);
+        tjQuota = tjQuotaService.saves(tjQuota, tjquotaDataSource, tjQuotaDataSave);
+        return Result.success("统计表更新成功！", tjQuota);
     }
 
     @RequestMapping(value = ServiceApi.TJ.UpdateTjQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -114,8 +115,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     public Result update(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception{
-        MTjQuotaModel tjQuotaModel = objectMapper.readValue(model, MTjQuotaModel.class);
-        TjQuota tjQuota = convertToModel(tjQuotaModel, TjQuota.class);
+        TjQuota tjQuota = objectMapper.readValue(model, TjQuota.class);
         tjQuotaService.save(tjQuota);
         return Result.success("统计指标表成功！");
     }
