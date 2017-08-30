@@ -101,7 +101,6 @@ public class ResourcesIntegratedController extends BaseController {
             }
         }catch (Exception e){
             e.printStackTrace();
-            envelop.setSuccessFlg(false);
         }
         return envelop;
     }
@@ -153,107 +152,51 @@ public class ResourcesIntegratedController extends BaseController {
                 envelopList.add(tempEnvelop);
             }
             List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-            List<String> emptyList = new ArrayList<String>();
             //遍历数据集，拼装结果集
             for(int i = 0; i < envelopList.size(); i ++ ) {
                 Envelop envelop1 = envelopList.get(i);
-                if(envelop1.getDetailModelList().size() > 0) {
-                    //遍历当前数据集内的数据
-                    for (Map<String, Object> tempMap1 : (List<Map<String, Object>>) envelop1.getDetailModelList()) {
+                //遍历当前数据
+                for (Map<String, Object> tempMap1 : (List<Map<String, Object>>) envelop1.getDetailModelList()) {
+                    //判断是否已记录数据
+                    boolean isRecode = false;
+                    for (Map<String, Object> resultMap : resultList) {
+                        if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) resultMap.get("cloumns")).toArray())) {
+                            isRecode = true;
+                        }
+                    }
+                    //未记录的数据
+                    if (!isRecode) {
                         Map<String, Object> newMap = new HashMap<String, Object>();
-                        //当记录为最后一个数据集的时候
+                        //初始化基本列名
+                        newMap.put("cloumns", tempMap1.get("cloumns"));
+                        //初始化为空数据
+                        for(int p = 0; p < i; p ++) {
+                            newMap.put(quotaCodeArr[p], 0);
+                        }
+                        //当数据为最后一个数据集中的一个时
                         if ((envelopList.size() - 1) == i) {
-                            boolean isInResult = false;
-                            for (Map<String, Object> tempMap4 : resultList) {
-                                if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap4.get("cloumns")).toArray())) {
-                                    isInResult = true;
-                                }
-                            }
-                            if (!isInResult) {
-                                newMap.put("cloumns", tempMap1.get("cloumns"));
-                                for (int j = 0; j < quotaCodeArr.length; j++) {
-                                    if (i == j) {
-                                        newMap.put(quotaCodeArr[j], tempMap1.get("value"));
-                                    } else {
-                                        newMap.put(quotaCodeArr[j], 0);
-                                    }
-                                }
-                            }
+                            newMap.put(quotaCodeArr[i], tempMap1.get("value"));
                         } else {
+                            //与其他数据集进行对比
                             for (int j = i + 1; j < envelopList.size(); j++) {
-                                //是否匹配
+                                //判断是否匹配
                                 boolean isMatch = false;
-                                //时候已记录数据
-                                boolean isRecode = false;
-                                //与其他结果集进行对比
                                 Envelop envelop2 = envelopList.get(j);
-                                if(envelop2.getDetailModelList().size() > 0) {
-                                    for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
-                                        if (resultList.size() > 0) {
-                                            for (Map<String, Object> tempMap3 : resultList) {
-                                                if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap3.get("cloumns")).toArray())) {
-                                                    isRecode = true;
-                                                }
-                                            }
-                                            if (!isRecode) {
-                                                if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
-                                                    newMap.put("cloumns", tempMap1.get("cloumns"));
-                                                    newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                                                    newMap.put(quotaCodeArr[j], tempMap2.get("value"));
-                                                    for(int p = 0; p < i; p ++) {
-                                                        newMap.put(quotaCodeArr[p], 0);
-                                                    }
-                                                    isMatch = true;
-                                                }
-                                            }
-                                        } else {
-                                            if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
-                                                newMap.put("cloumns", tempMap1.get("cloumns"));
-                                                    newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                                                    newMap.put(quotaCodeArr[j], tempMap2.get("value"));
-                                                for(String tempCode : emptyList) {
-                                                    newMap.put(tempCode, 0);
-                                                }
-                                                isMatch = true;
-                                            }
-                                        }
-                                    }
-                                    if (!isRecode && !isMatch) {
-                                        newMap.put("cloumns", tempMap1.get("cloumns"));
+                                for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
+                                    if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
                                         newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                                        newMap.put(quotaCodeArr[j], 0);
-                                        for(int p = 0; p < i; p ++) {
-                                            newMap.put(quotaCodeArr[p], 0);
-                                        }
+                                        newMap.put(quotaCodeArr[j], tempMap2.get("value"));
+                                        isMatch = true;
                                     }
-                                }else {
-                                    if(!emptyList.contains(quotaCodeArr[j])) {
-                                        emptyList.add(quotaCodeArr[j]);
-                                    }
-                                    if(emptyList.size() > 0) {
-                                        for (Map<String, Object> tempMap : resultList) {
-                                            for (String tempCode : emptyList) {
-                                                tempMap.put(tempCode, 0);
-                                            }
-                                        }
-                                    }
+                                }
+                                //未匹配到数据
+                                if (!isMatch) {
+                                    newMap.put(quotaCodeArr[i], tempMap1.get("value"));
+                                    newMap.put(quotaCodeArr[j], 0);
                                 }
                             }
                         }
-                        if (newMap.size() > 0) {
-                            resultList.add(newMap);
-                        }
-                    }
-                }else {
-                    if(!emptyList.contains(quotaCodeArr[i])) {
-                        emptyList.add(quotaCodeArr[i]);
-                    }
-                    if(emptyList.size() > 0) {
-                        for (Map<String, Object> tempMap : resultList) {
-                            for (String tempCode : emptyList) {
-                                tempMap.put(tempCode, 0);
-                            }
-                        }
+                        resultList.add(newMap);
                     }
                 }
             }
@@ -280,7 +223,6 @@ public class ResourcesIntegratedController extends BaseController {
             }
         }catch (Exception e){
             e.printStackTrace();
-            envelop.setSuccessFlg(false);
         }
         return envelop;
     }
@@ -291,7 +233,6 @@ public class ResourcesIntegratedController extends BaseController {
             @ApiParam(name="dataJson",value="JSON对象参数")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
         try {
             envelop = resourcesIntegratedClient.updateResource(dataJson);
         }catch (Exception e){
@@ -306,7 +247,6 @@ public class ResourcesIntegratedController extends BaseController {
             @ApiParam(name="dataJson",value="JSON对象参数")
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(false);
         try {
             envelop = resourcesIntegratedClient.updateResourceQuery(dataJson);
         }catch (Exception e){
