@@ -19,12 +19,11 @@ import java.util.*;
 
 
 /**
- * @author Sxy
- * @created 2016.08.01 17:46
+ * @Created by Sxy on 2017/08/01.
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "resourceIntegrated", description = "资源综合查询数据服务接口", tags = {"资源管理-资源综合查询数据服务接口"})
+@Api(value = "ResourceIntegrated", description = "资源综合查询数据服务接口", tags = {"资源管理-资源综合查询数据服务接口"})
 public class ResourcesIntegratedController extends BaseController {
 
     @Autowired
@@ -34,16 +33,16 @@ public class ResourcesIntegratedController extends BaseController {
     @Autowired
     private TjQuotaJobClient tjQuotaJobClient;
 
-    @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据列表树")
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     public Envelop getMetadataList(
             @ApiParam(name="filters",value="过滤条件(name)",defaultValue = "")
             @RequestParam(value="filters",required = false) String filters) {
         return resourcesIntegratedClient.getMetadataList(filters);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据检索")
+    @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
     public Envelop searchMetadataData(
             @ApiParam(name = "resourcesCode", value = "资源代码([\"code\"])")
             @RequestParam(value = "resourcesCode") String resourcesCode,
@@ -62,16 +61,16 @@ public class ResourcesIntegratedController extends BaseController {
         return resourcesIntegratedClient.searchMetadataData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
     @ApiOperation("综合查询指标统计列表树")
+    @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
     public Envelop getStatisticsList(
             @ApiParam(name="filters",value="过滤条件(name)",defaultValue = "")
             @RequestParam(value="filters",required = false) String filters) throws  Exception {
         return resourcesIntegratedClient.getQuotaList(filters);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.IntQuotaData, method = RequestMethod.GET)
     @ApiOperation("综合查询指标统计数据检索")
+    @RequestMapping(value = ServiceApi.Resources.IntQuotaData, method = RequestMethod.GET)
     public Envelop getStatisticsData(
             @ApiParam(name="quotaIds", value = "指标ID列表(id1,id2,id3,...)", defaultValue = "")
             @RequestParam(name = "quotaIds") String quotaIds,
@@ -188,16 +187,16 @@ public class ResourcesIntegratedController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     @ApiOperation("综合查询视图保存")
+    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     public Envelop updateResource(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})")
             @RequestParam(value="dataJson") String dataJson) {
         return resourcesIntegratedClient.updateResource(dataJson);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
     @ApiOperation("综合查询搜索条件更新")
+    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
     public Envelop updateResourceQuery(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})")
             @RequestParam(value="dataJson") String dataJson) {

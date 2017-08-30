@@ -5,6 +5,7 @@ import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.redis.client.RedisUpdateClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.adapter.service.PlanClient;
@@ -53,36 +54,28 @@ public class OrganizationController extends BaseController {
 
     @Autowired
     private OrganizationClient orgClient;
-
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
-
     @Autowired
     AddressClient addressClient;
-
     @Autowired
     SecurityClient securityClient;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private UserClient userClient;
-
     @Autowired
     private AdapterOrgClient adapterOrgClient;
-
     @Autowired
     private PlanClient planClient;
-
     @Autowired
     private TemplateClient templateClient;
-
     @Autowired
     private FileResourceClient fileResourceClient;
-
     @Autowired
     private AppClient appClient;
+    @Autowired
+    private RedisUpdateClient redisUpdateClient;
 
     @ApiOperation(value = "获取所有部门列表")
     @RequestMapping(value = "/organizations/getAllOrgs", method = RequestMethod.GET)
@@ -335,8 +328,7 @@ public class OrganizationController extends BaseController {
             if (StringUtils.isEmpty(mOrganization.getTel())) {
                 errorMsg+="联系方式不能为空！";
             }
-            if(StringUtils.isNotEmpty(errorMsg))
-            {
+            if(StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
             String locationId = null;
@@ -354,12 +346,18 @@ public class OrganizationController extends BaseController {
                     return failed(errorMsg);
                 }
             }
-
             mOrganization.setLocation(locationId);
             String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
             MOrganization mOrgNew = orgClient.create(mOrganizationJson);
             if (mOrgNew == null) {
                 return failed("保存失败!");
+            }
+            //新增机构名称缓存（原则上如果缓存新增失败不能影响实际新增结果）
+            try {
+                redisUpdateClient.updateOrgName(mOrgNew.getOrgCode());
+                redisUpdateClient.updateOrgArea(mOrgNew.getOrgCode());
+            }catch (Exception e) {
+                e.printStackTrace();
             }
             return success(convertToOrgDetailModel(mOrgNew));
         }
@@ -383,7 +381,6 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "imageName", required = false) String imageName) {
       try {
           String errorMsg ="";
-
           //头像上传,接收头像保存的远程路径  path
           String path = null;
           if (!StringUtils.isEmpty(inputStream)) {
@@ -413,7 +410,6 @@ public class OrganizationController extends BaseController {
               orgDetailModel.setImgRemotePath(path);
               orgDetailModel.setImgLocalPath("");
           }
-
           MOrganization mOrganization = convertToMOrganization(orgDetailModel);
           if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
               errorMsg+="机构代码不能为空！";
@@ -427,18 +423,25 @@ public class OrganizationController extends BaseController {
           if (StringUtils.isEmpty(mOrganization.getTel())) {
               errorMsg+="联系方式不能为空！";
           }
-
+          if(StringUtils.isNotEmpty(errorMsg)) {
+              return failed(errorMsg);
+          }
           mOrganization.setLocation(locationId);
           String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
           MOrganization mOrgNew = orgClient.update(mOrganizationJson);
           if (mOrgNew == null) {
              return  failed("更新失败");
           }
+          //更新机构名称缓存（原则上如果缓存更新失败不能影响实际更新结果）
+          try {
+              redisUpdateClient.updateOrgName(mOrgNew.getOrgCode());
+              redisUpdateClient.updateOrgArea(mOrgNew.getOrgCode());
+          }catch (Exception e) {
+              e.printStackTrace();
+          }
           return success(convertToOrgDetailModel(mOrgNew));
-      }
-      catch (Exception ex)
-      {
-          ex.printStackTrace();
+      } catch (Exception e) {
+          e.printStackTrace();
           return failedSystem();
       }
     }
