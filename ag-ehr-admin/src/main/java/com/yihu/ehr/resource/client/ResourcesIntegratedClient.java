@@ -23,12 +23,12 @@ public interface ResourcesIntegratedClient {
 
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据列表树")
-    List<Map<String, Object>> getMetadataList(
+    Envelop getMetadataList(
             @RequestParam(value = "filters", required = false) String filters);
 
     @RequestMapping(value = ServiceApi.Resources.IntMetadataData, method = RequestMethod.GET)
     @ApiOperation("综合查询档案数据检索")
-    List<Map<String, Object>> searchMetadataData(
+    Envelop searchMetadataData(
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @RequestParam(value = "metaData", required = false) String metaData,
             @RequestParam(value = "orgCode", required = false) String orgCode,
@@ -39,7 +39,7 @@ public interface ResourcesIntegratedClient {
 
     @RequestMapping(value = ServiceApi.Resources.IntQuotaList, method = RequestMethod.GET)
     @ApiOperation("综合查询指标统计列表树")
-    List<Map<String, Object>> getQuotaList(
+    Envelop getQuotaList(
             @RequestParam(value = "filters", required = false) String filters);
 
     @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)

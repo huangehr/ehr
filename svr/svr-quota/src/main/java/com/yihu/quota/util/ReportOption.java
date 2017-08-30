@@ -227,6 +227,7 @@ public class ReportOption {
         for (Map<String, Object> objectMap : dataList) {
             for(String key:objectMap.keySet()){
                 returnList.add(objectMap.get(keyName));
+                break;
             }
         }
         return  returnList;
