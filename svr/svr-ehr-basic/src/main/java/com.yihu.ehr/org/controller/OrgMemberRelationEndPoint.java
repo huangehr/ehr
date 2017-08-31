@@ -128,9 +128,11 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "orgId", value = "机构ID")
             @RequestParam(value = "orgId", required = true) Integer orgId,
             @ApiParam(name = "userId", value = "用户ID")
-            @RequestParam(value = "userId", required = true) String userId
+            @RequestParam(value = "userId", required = true) String userId,
+            @ApiParam(name = "deptId", value = "部门ID")
+            @RequestParam(value = "deptId", required = true) Integer deptId
     ) throws Exception {
-        return relationService.getCountByOrgIdAndUserId(orgId.toString(), userId);
+        return relationService.getCountByOrgIdAndUserId(orgId.toString(), userId, deptId);
     }
 
 

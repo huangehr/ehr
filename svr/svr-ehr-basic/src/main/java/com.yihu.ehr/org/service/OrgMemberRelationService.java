@@ -58,8 +58,8 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
         return relation;
     }
 
-    public int getCountByOrgIdAndUserId(String orgId,String userId) {
-        List<OrgMemberRelation> orgOrgMemberRelations = relationRepository.searchByOrgIdAndUserId(orgId, userId);
+    public int getCountByOrgIdAndUserId(String orgId,String userId, Integer deptId) {
+        List<OrgMemberRelation> orgOrgMemberRelations = relationRepository.searchByOrgIdAndUserId(orgId, userId, deptId);
         if (orgOrgMemberRelations!=null && !orgOrgMemberRelations.isEmpty()){
             return orgOrgMemberRelations.size();
         }else {
