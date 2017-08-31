@@ -198,6 +198,7 @@ public class QuotaReportController extends BaseController {
             }
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
+            chartInfoModel.setQuotaId(tjQuota.getId().toString());
             chartInfoModel.setDimensionMap(dimensionMap);
             return chartInfoModel;
         } catch (Exception e) {
