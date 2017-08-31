@@ -203,11 +203,11 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/image_view/{storagePath}", method = RequestMethod.GET)
+    @RequestMapping(value = "/image_view", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
     public String imageView(
             @ApiParam(name = "storagePath", value = "文件路径", defaultValue = "")
-         @PathVariable(value = "storagePath") String storagePath)throws Exception{
+         @RequestParam(value = "storagePath") String storagePath)throws Exception{
         String s = java.net.URLDecoder.decode(storagePath, "UTF-8");
         String groupName = s.split(":")[0];
         String remoteFileName = s.split(":")[1];
@@ -216,26 +216,25 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
         return fileStream;
     }
 
-
-
-    /**
-     * 根据文件的id,查找文件路径
-     *
-     * @param imageId
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = "/imageFindById", method = RequestMethod.GET)
-    @ApiOperation(value = "根据文件的id,查找文件路径")
-    public String imageFindById(
-            @ApiParam(name = "imageId", value = "文件路径")
-            @RequestParam(value = "imageId") String imageId) throws Exception {
-        String s = java.net.URLDecoder.decode(imageId, "UTF-8");
-        String imgRemotePath=fileResourceManager.imageFindById(s);
-        imgRemotePath = imgRemotePath.replace(":","/");
-        imgRemotePath= fastDfsPublicServers +"/"+imgRemotePath ;
-        return imgRemotePath;
+    @ApiOperation(value = "根据文件ID，获取文件的真实访问路径")
+    @RequestMapping(value = "/file/getRealPathById", method = RequestMethod.GET)
+    public String getRealPathById(
+            @ApiParam(name = "fileId", value = "文件ID")
+            @RequestParam(value = "fileId") String fileId) throws Exception {
+        String s = java.net.URLDecoder.decode(fileId, "UTF-8");
+        String path=fileResourceManager.getStoragePathById(s);
+        path = path.replace(":","/");
+        path= fastDfsPublicServers +"/"+path ;
+        return path;
     }
 
+    @ApiOperation(value = "根据文件的存储路径，获取文件的真实访问路径")
+    @RequestMapping(value = "/file/getRealPathByStoragePath", method = RequestMethod.GET)
+    public String getRealPathByStoragePath(
+            @ApiParam(name = "storagePath", value = "文件存储路径")
+            @RequestParam(value = "storagePath") String storagePath) throws Exception {
+        String realPath= fastDfsPublicServers + "/" + storagePath.replace(":", "/");
+        return realPath;
+    }
 
 }

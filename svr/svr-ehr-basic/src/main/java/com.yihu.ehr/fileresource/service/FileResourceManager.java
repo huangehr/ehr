@@ -102,8 +102,8 @@ public class FileResourceManager extends BaseJpaService<FileResource, XFileResou
         return true;
     }
 
-    public String imageFindById(String imageId) {
-        FileResource file= resourceRepository.findById(imageId);
+    public String getStoragePathById(String id) {
+        FileResource file= resourceRepository.findById(id);
         String storage_path=file.getStoragePath();
         return storage_path;
     }

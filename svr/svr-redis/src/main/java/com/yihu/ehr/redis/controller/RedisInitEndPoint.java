@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/redisInit")
-@Api(value = "Redis初始化服务", description = "Redis初始化服务")
+@Api(value = "RedisInit", description = "Redis初始化服务")
 public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

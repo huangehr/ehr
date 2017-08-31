@@ -108,4 +108,20 @@ public class FileResourceController {
         return envelop;
     }
 
+    @ApiOperation(value = "根据文件ID，获取文件的真实访问路径")
+    @RequestMapping(value = "/file/getRealPathById", method = RequestMethod.GET)
+    public String getRealPathById(
+            @ApiParam(value = "文件ID", required = true)
+            @RequestParam(value = "fileId") String fileId) throws Exception {
+        return fileResourceClient.getRealPathById(fileId);
+    }
+
+    @ApiOperation(value = "根据文件的存储路径，获取文件的真实访问路径")
+    @RequestMapping(value = "/file/getRealPathByStoragePath", method = RequestMethod.GET)
+    public String getRealPathByStoragePath(
+            @ApiParam(value = "文件存储路径", required = true)
+            @RequestParam(value = "storagePath") String storagePath) throws Exception {
+        return fileResourceClient.getRealPathByStoragePath(storagePath);
+    }
+
 }
