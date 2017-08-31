@@ -136,9 +136,9 @@ public class QuotaReportController extends BaseController {
             List<MReportDimension> dimesionList = new ArrayList<>();
             for(int i=0 ;i < mains.size();i++){
                 String choose = "false";
-                if(StringUtils.isEmpty(dimension)){
+                if(StringUtils.isEmpty(dimension) || dimension.equals("null") || dimension.equals("")){
                     dimension = mains.get(i).getCode();
-                    if(i==1){
+                    if(i==0){
                         choose = "true";
                     }
                 }else {
