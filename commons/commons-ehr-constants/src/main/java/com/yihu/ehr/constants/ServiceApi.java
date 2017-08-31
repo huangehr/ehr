@@ -292,8 +292,8 @@ public class ServiceApi {
         public static final String Family = "/families/{id}";
 
         public static final String FamiliesMembers = "/families/members";
-        public static final String FamilyMembers = "/families/{family_id}/members";
-        public static final String FamilyMember = "/families/{family_id}/members/{id_card_no}";
+        public static final String FamilyMembers = "/families/{families_id}/members";
+        public static final String FamilyMember = "/families/{families_id}/members/{id_card_no}";
     }
 
     public static class Cipher {
