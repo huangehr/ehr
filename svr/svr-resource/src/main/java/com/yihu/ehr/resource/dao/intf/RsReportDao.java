@@ -19,4 +19,6 @@ public interface RsReportDao extends PagingAndSortingRepository<RsReport, Intege
     @Query(" FROM RsReport rc WHERE rc.id <> :id AND rc.name = :name ")
     RsReport isUniqueName(@Param("id") Integer id, @Param("name") String name);
 
+    RsReport findByCode(@Param("code") String code);
+
 }

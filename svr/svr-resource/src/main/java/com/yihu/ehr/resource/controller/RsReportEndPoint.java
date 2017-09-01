@@ -3,13 +3,17 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.resource.MRsReport;
 import com.yihu.ehr.resource.model.RsReport;
 import com.yihu.ehr.resource.service.RsReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +34,8 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private RsReportService rsReportService;
+    @Autowired
+    private FastDFSUtil fastDFSUtil;
 
     @ApiOperation("根据ID获取资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReport, method = RequestMethod.GET)
@@ -115,4 +121,21 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
         List<RsReport> list = rsReportService.search(filters);
         return (List<MRsReport>) convertToModels(list, new ArrayList<>(list.size()), MRsReport.class, null);
     }
+
+    @ApiOperation("获取报表模版内容")
+    @RequestMapping(value = ServiceApi.Resources.RsReportTemplateContent, method = RequestMethod.GET)
+    public String getTemplateContent(
+            @ApiParam(name = "reportCode", value = "资源报表Code", required = true)
+            @RequestParam(value = "reportCode") String reportCode,
+            HttpServletResponse response) throws Exception {
+        RsReport rsReport = rsReportService.getByCode(reportCode);
+        if(rsReport == null || StringUtils.isEmpty(rsReport.getTemplatePath())) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "模版未找到");
+        }
+        String[] paths = rsReport.getTemplatePath().split(":");
+        byte[] bytes = fastDFSUtil.download(paths[0], paths[1]);
+        String templateContent = new String(bytes);
+        return templateContent;
+    }
+
 }

@@ -82,4 +82,11 @@ public interface RsReportClient {
     @RequestMapping(value = ServiceApi.Resources.RsReportNoPage, method = RequestMethod.GET)
     List<MRsReport> queryNoPageResources(
             @RequestParam(value = "filters", required = false) String filters);
+
+    @ApiOperation("获取报表模版内容")
+    @RequestMapping(value = ServiceApi.Resources.RsReportTemplateContent, method = RequestMethod.GET)
+    String getTemplateContent(
+            @ApiParam(name = "reportCode", value = "资源报表Code", required = true)
+            @RequestParam(value = "reportCode") String reportCode);
+
 }

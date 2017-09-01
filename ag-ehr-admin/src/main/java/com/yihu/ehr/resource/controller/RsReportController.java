@@ -171,4 +171,22 @@ public class RsReportController extends BaseController {
         }
     }
 
+    @ApiOperation("获取报表模版内容")
+    @RequestMapping(value = ServiceApi.Resources.RsReportTemplateContent, method = RequestMethod.GET)
+    public Envelop getTemplateContent(
+            @ApiParam(name = "reportCode", value = "资源报表Code", required = true)
+            @RequestParam("reportCode") String reportCode) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            String templateContent = rsReportClient.getTemplateContent(reportCode);
+            envelop.setObj(templateContent);
+            envelop.setSuccessFlg(true);
+            return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
 }

@@ -216,6 +216,7 @@ public class ServiceApi {
         public static final String RsReportIsUniqueCode = "/resources/report/isUniqueCode";
         public static final String RsReportIsUniqueName = "/resources/report/isUniqueName";
         public static final String RsReportNoPage = "/resources/report/getReportNoPage";
+        public static final String RsReportTemplateContent = "/resources/report/getTemplateContent";
 
         /**
          * 资源报表视图配置

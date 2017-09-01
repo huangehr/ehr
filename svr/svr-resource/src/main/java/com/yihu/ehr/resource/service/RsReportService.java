@@ -31,6 +31,16 @@ public class RsReportService extends BaseJpaService<RsReport, RsReportDao> {
     }
 
     /**
+     * 根据Code，获取资源报表
+     *
+     * @param code 资源报表Code
+     * @return RsReport
+     */
+    public RsReport getByCode(String code) {
+        return rsReportDao.findByCode(code);
+    }
+
+    /**
      * 保存资源报表
      *
      * @param rsReport 资源报表

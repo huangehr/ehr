@@ -148,6 +148,10 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-entity</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-fastdfs</artifactId>
+        </dependency>
     </dependencies>
 
     <!--<repositories>
