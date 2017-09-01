@@ -1,11 +1,9 @@
-package com.yihu.ehr.agModel.health;
-
-import java.io.Serializable;
+package com.yihu.ehr.agModel.tj;
 
 /**
- * Created by Administrator on 2017/6/22.
+ * Created by wxw on 2017/8/31.
  */
-public class HealthBusinessModel implements Serializable{
+public class QuotaCategoryModel {
     private int id;
     private String name;
     private int parentId;

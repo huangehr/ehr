@@ -310,6 +310,8 @@ public class ResourcesController extends BaseController {
     public List<MChartInfoModel> getRsQuotaPreview(
             @ApiParam(name = "filter", value = "过滤器", defaultValue = "")
             @RequestParam(value = "filter") String filter,
+            @ApiParam(name = "quotaId", value = "上卷下钻的指标ID", defaultValue = "")
+            @RequestParam(value = "quotaId", required = false) String quotaId,
             @ApiParam(name = "quotaFilter", value = "指标查询过滤条件", defaultValue = "")
             @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
@@ -317,8 +319,10 @@ public class ResourcesController extends BaseController {
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(filter);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
         for (ResourceQuotaModel m : list) {
-            MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
-            chartInfoModels.add(chartInfoModel);
+            if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){
+                MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
+                chartInfoModels.add(chartInfoModel);
+            }
         }
         return chartInfoModels;
     }
