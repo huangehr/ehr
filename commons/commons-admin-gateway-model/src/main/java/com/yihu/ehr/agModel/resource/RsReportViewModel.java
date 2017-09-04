@@ -1,14 +1,14 @@
-package com.yihu.ehr.model.resource;
+package com.yihu.ehr.agModel.resource;
 
 import java.io.Serializable;
 
 /**
- * 资源报表视图配置
+ * 资源报表视图配置 model
  *
  * @author 张进军
- * @created 2017.8.22 14:05
+ * @created 2017.9.1 16:54
  */
-public class MRsReportView implements Serializable {
+public class RsReportViewModel implements Serializable {
 
     private Integer id; // 主键
     private Integer reportId; // 资源报表ID

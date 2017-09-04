@@ -48,6 +48,23 @@ public class RsReportController extends BaseController {
         }
     }
 
+    @ApiOperation("根据编码获取资源报表")
+    @RequestMapping(value = ServiceApi.Resources.RsReportFindByCode, method = RequestMethod.GET)
+    public Envelop findByCode(
+            @ApiParam(name = "code", value = "编码")
+            @RequestParam(value = "code") String code) throws Exception {
+        try {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(true);
+            MRsReport mRsReport = rsReportClient.findByCode(code);
+            envelop.setObj(mRsReport);
+            return envelop;
+        } catch (Exception e) {
+            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
     @ApiOperation(value = "根据条件获取资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReports, method = RequestMethod.GET)
     public Envelop search(

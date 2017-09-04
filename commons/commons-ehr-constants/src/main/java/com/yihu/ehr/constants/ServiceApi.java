@@ -208,6 +208,7 @@ public class ServiceApi {
          */
         public static final String RsReportPrefix = "/resources/report/";
         public static final String RsReport = "/resources/report/{id}";
+        public static final String RsReportFindByCode = "/resources/report/findByCode";
         public static final String RsReports = "/resources/reports";
         public static final String RsReportViewsTreeData = "/resources/report/viewsTreeData";
         public static final String RsReportSelectedViews = "/resources/report/selectedViews";

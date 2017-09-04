@@ -40,9 +40,17 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("根据ID获取资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReport, method = RequestMethod.GET)
     public MRsReport getById(
-            @ApiParam(name = "id", value = "id", required = true)
+            @ApiParam(name = "id", value = "主键", required = true)
             @PathVariable(value = "id") Integer id) throws Exception {
         return convertToModel(rsReportService.getById(id), MRsReport.class);
+    }
+
+    @ApiOperation("根据编码获取资源报表")
+    @RequestMapping(value = ServiceApi.Resources.RsReportFindByCode, method = RequestMethod.GET)
+    public MRsReport findByCode(
+            @ApiParam(name = "code", value = "编码", required = true)
+            @RequestParam(value = "code") String code) throws Exception {
+        return convertToModel(rsReportService.getByCode(code), MRsReport.class);
     }
 
     @ApiOperation(value = "根据条件获取资源报表")
