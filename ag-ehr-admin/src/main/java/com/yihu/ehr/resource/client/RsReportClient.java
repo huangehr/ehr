@@ -30,6 +30,12 @@ public interface RsReportClient {
             @ApiParam(name = "id", value = "主键", required = true)
             @PathVariable(value = "id") Integer id);
 
+    @ApiOperation("根据编码获取资源报表")
+    @RequestMapping(value = ServiceApi.Resources.RsReportFindByCode, method = RequestMethod.GET)
+    MRsReport findByCode(
+            @ApiParam(name = "code", value = "编码", required = true)
+            @RequestParam(value = "code") String code);
+
     @ApiOperation(value = "根据条件获取资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReports, method = RequestMethod.GET)
     ResponseEntity<List<MRsReport>> search(
