@@ -318,10 +318,12 @@ public class ResourcesController extends BaseController {
             @RequestParam(value = "dimension", required = false) String dimension) throws JsonProcessingException {
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
-        for (ResourceQuotaModel m : list) {
-            if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){
-                MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
-                chartInfoModels.add(chartInfoModel);
+        if(list!=null && list.size() > 0){
+            for (ResourceQuotaModel m : list) {
+                if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){
+                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
+                    chartInfoModels.add(chartInfoModel);
+                }
             }
         }
         return chartInfoModels;

@@ -10,6 +10,7 @@ import java.util.Map;
 public class MChartInfoModel {
     private String title; //报表标题
     private String quotaId; //指标ID
+    private String quotaCode; //指标Code
     private String option;
     private List<MReportDimension> listMap;
     private Map<String,Object> dimensionMap;//维度真实值的 code ,中文说明 对应关系
@@ -28,6 +29,14 @@ public class MChartInfoModel {
 
     public void setQuotaId(String quotaId) {
         this.quotaId = quotaId;
+    }
+
+    public String getQuotaCode() {
+        return quotaCode;
+    }
+
+    public void setQuotaCode(String quotaCode) {
+        this.quotaCode = quotaCode;
     }
 
     public String getOption() {
