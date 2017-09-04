@@ -308,15 +308,15 @@ public class ResourcesController extends BaseController {
     @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.GET)
     @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览")
     public List<MChartInfoModel> getRsQuotaPreview(
-            @ApiParam(name = "filter", value = "过滤器", defaultValue = "")
-            @RequestParam(value = "filter") String filter,
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId,
             @ApiParam(name = "quotaId", value = "上卷下钻的指标ID", defaultValue = "")
             @RequestParam(value = "quotaId", required = false) String quotaId,
             @ApiParam(name = "quotaFilter", value = "指标查询过滤条件", defaultValue = "")
             @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension) throws JsonProcessingException {
-        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(filter);
+        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
         for (ResourceQuotaModel m : list) {
             if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){

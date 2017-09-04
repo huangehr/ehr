@@ -74,9 +74,9 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
     public List<QuotaCategory> findQuotaCategoryList(int parentId, String filters) {
         String sql = "";
         if(parentId != 0 && filters != null) {
-            sql = "select * from quota_category where parent_id = " + parentId + " AND name like " + "'%" + filters + "%'";
+            sql = "select * from tj_quota_category where parent_id = " + parentId + " AND name like " + "'%" + filters + "%'";
         }else {
-            sql = "select * from quota_category where parent_id = " + parentId;
+            sql = "select * from tj_quota_category where parent_id = " + parentId;
         }
         RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(QuotaCategory.class);
         return this.jdbcTemplate.query(sql, rowMapper);

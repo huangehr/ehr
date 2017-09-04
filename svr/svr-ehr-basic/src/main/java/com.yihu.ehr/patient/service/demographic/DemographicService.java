@@ -398,4 +398,13 @@ public class DemographicService {
         }
         return locationList;
     }
+
+    public DemographicInfo getDemographicInfoByIdCardNo(String idCardNo) {
+        List<DemographicInfo> demInfoList = demographicInfoRepository.getDemographicInfoByIdCardNo(idCardNo);
+        DemographicInfo demInfo=null;
+        if(null!=demInfoList&&demInfoList.size()>0){
+            demInfo=demInfoList.get(0);
+        }
+        return demInfo;
+    }
 }

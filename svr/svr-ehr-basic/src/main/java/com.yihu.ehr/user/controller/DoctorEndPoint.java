@@ -5,7 +5,6 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.org.model.OrgMemberRelation;
 import com.yihu.ehr.org.service.OrgDeptService;
@@ -16,13 +15,11 @@ import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.user.service.DoctorService;
 import com.yihu.ehr.user.service.UserManager;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -35,7 +32,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 2017-02-04 add  by hzp
@@ -129,6 +125,21 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         Doctors doctors = toEntity(doctoJsonData, Doctors.class);
         doctors.setUpdateTime(new Date());
         doctorService.save(doctors);
+        //同时修改用户表
+        User user = userManager.getUserByIdCardNo(doctors.getIdCardNo());
+        if (!StringUtils.isEmpty(user)) {
+            user.setRealName(doctors.getName());
+            user.setGender(doctors.getSex());
+            user.setTelephone(doctors.getPhone());
+            userManager.save(user);
+        }
+        DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(doctors.getIdCardNo());
+        if (!StringUtils.isEmpty(demographicInfo)) {
+            demographicInfo.setName(doctors.getName());
+            demographicInfo.setGender(doctors.getSex());
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + doctors.getPhone() + "\"}");
+            demographicService.save(demographicInfo);
+        }
         return convertToModel(doctors, MDoctor.class);
     }
 

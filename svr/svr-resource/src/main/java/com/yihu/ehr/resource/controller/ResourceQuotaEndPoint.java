@@ -101,9 +101,9 @@ public class ResourceQuotaEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.GetByResourceId, method = RequestMethod.GET)
     @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表")
     public List<ResourceQuota> getByResourceId(
-            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
-            @RequestParam(value = "filters") String filters) throws Exception{
-        List<ResourceQuota> list = resourceQuotaService.search(filters);
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId) throws Exception{
+        List<ResourceQuota> list = resourceQuotaService.search("resourceId=" + resourceId);
         return list;
     }
 

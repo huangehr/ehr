@@ -3,6 +3,7 @@ package com.yihu.ehr.patient.controller;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.unboundid.util.json.JSONObject;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -11,9 +12,14 @@ import com.yihu.ehr.patient.service.demographic.DemographicId;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.RoleUser;
+import com.yihu.ehr.user.entity.User;
+import com.yihu.ehr.user.service.DoctorService;
 import com.yihu.ehr.user.service.RoleUserService;
+import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
@@ -24,6 +30,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +58,10 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     ObjectMapper objectMapper;
     @Autowired
     private RoleUserService roleUserService;
+    @Autowired
+    private UserManager userManager;
+    @Autowired
+    private DoctorService doctorService;
 
     /**
      * 根据条件查询人口信息
@@ -180,10 +191,28 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             throw new ApiException(HttpStatus.NOT_FOUND, "该对象没找到");
         BeanUtils.copyProperties(demographicInfo, old, "registerTime");
         demographicService.savePatient(old);
+        //同时修改用户信息
+        String telNo = demographicInfo.getTelephoneNo();
+        JSONObject object = new JSONObject(telNo);
+        String tel = object.getField("联系电话").toString();
+        User user = userManager.getUserByIdCardNo(demographicInfo.getIdCardNo());
+        if (!StringUtils.isEmpty(user)) {
+            user.setRealName(demographicInfo.getName());
+            user.setGender(demographicInfo.getGender());
+            user.setTelephone(tel.substring(1,tel.length() - 1));
+            user.setMartialStatus(demographicInfo.getMartialStatus());
+            user.setBirthday(DateUtil.toString(demographicInfo.getBirthday()));
+            userManager.save(user);
+        }
+        Doctors doctors = doctorService.getByIdCardNo(demographicInfo.getIdCardNo());
+        if (!StringUtils.isEmpty(doctors)) {
+            doctors.setName(demographicInfo.getName());
+            doctors.setSex(demographicInfo.getGender());
+            doctors.setPhone(tel.substring(1,tel.length() - 1));
+            doctorService.save(doctors);
+        }
         return convertToModel(demographicInfo,MDemographicInfo.class);
     }
-
-
 
     /**
      * 初始化密码
