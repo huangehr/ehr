@@ -58,7 +58,7 @@ public interface ResourceQuotaClient {
     @RequestMapping(value = ServiceApi.Resources.GetQuotaChartByQuotaId, method = RequestMethod.GET)
     @ApiOperation(value = "资源视图指标-获取已选图表值")
     public String getQuotaChartByQuotaId(
-            @ApiParam(name = "quotaId", value = "过滤器，为空检索所有条件")
+            @ApiParam(name = "quotaId", value = "指标ID")
             @RequestParam(value = "quotaId", required = false) Integer quotaId,
             @ApiParam(name = "resourceId", value = "资源Id")
             @RequestParam(value = "resourceId") String resourceId);
@@ -66,13 +66,13 @@ public interface ResourceQuotaClient {
     @RequestMapping(value = ServiceApi.Resources.GetByResourceId, method = RequestMethod.GET)
     @ApiOperation(value = "根据资源Id获取资源视图 关联指标列表")
     public List<ResourceQuotaModel> getByResourceId(
-            @ApiParam(name = "filters", value = "过滤器", defaultValue = "")
-            @RequestParam(value = "filters") String filters);
+            @ApiParam(name = "resourceId", value = "过滤器", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId);
 
     @RequestMapping(value = ServiceApi.Resources.SearchByQuotaId, method = RequestMethod.GET)
     @ApiOperation(value = "资源视图指标-根据quotaId查询")
     public List<MResourceQuota> searchByQuotaId (
-            @ApiParam(name = "quotaId", value = "过滤器", defaultValue = "0")
+            @ApiParam(name = "quotaId", value = "指标ID", defaultValue = "0")
             @RequestParam(value = "quotaId") Integer quotaId);
 
     @RequestMapping(value = ServiceApi.Resources.DelRQNameByResourceId, method = RequestMethod.DELETE)
