@@ -22,6 +22,7 @@ import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.log.LogService;
+import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -207,6 +208,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
         Doctors doctors = doctorService.getByIdCardNo(demographicInfo.getIdCardNo());
         if (!StringUtils.isEmpty(doctors)) {
             doctors.setName(demographicInfo.getName());
+            doctors.setPyCode(PinyinUtil.getPinYinHeadChar(demographicInfo.getName(), false));
             doctors.setSex(demographicInfo.getGender());
             doctors.setPhone(tel.substring(1,tel.length() - 1));
             doctorService.save(doctors);
