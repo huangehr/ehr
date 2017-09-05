@@ -2,20 +2,17 @@ package com.yihu.ehr.quota.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adapter.utils.ExtendController;
-import com.yihu.ehr.agModel.tj.TjQuotaChartModel;
-import com.yihu.ehr.agModel.tj.TjQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.quota.TjQuota;
-import com.yihu.ehr.health.service.HealthBusinessClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.health.MHealthBusiness;
 import com.yihu.ehr.model.resource.MRsMetadata;
+import com.yihu.ehr.model.tj.MQuotaCategory;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
-import com.yihu.ehr.quota.service.TjQuotaChartClient;
+import com.yihu.ehr.quota.service.QuotaCategoryClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.resource.client.MetadataClient;
@@ -47,7 +44,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
     @Autowired
-    private HealthBusinessClient healthBusinessClient;
+    private QuotaCategoryClient quotaCategoryClient;
     @Autowired
     private MetadataClient metadataClient;
     @Autowired
@@ -94,8 +91,8 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
                 tjQuotaModel.setDataLevelName(dict3 == null ? "" : dict3.getValue());
 
                 if(tjQuotaModel.getQuotaType() != null){
-                    MHealthBusiness mHealthBusiness = healthBusinessClient.searchHealthBusinessDetail(tjQuotaModel.getQuotaType());
-                    tjQuotaModel.setQuotaTypeName(mHealthBusiness == null ? "" :mHealthBusiness.getName());
+                    MQuotaCategory mQuotaCategory = quotaCategoryClient.searchQuotaCategoryDetail(tjQuotaModel.getQuotaType());
+                    tjQuotaModel.setQuotaTypeName(mQuotaCategory == null ? "" :mQuotaCategory.getName());
                 }
 
                 mainModelList.add(tjQuotaModel);
@@ -178,8 +175,8 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
                 return failed("获取指标失败");
             }
             if(tjQuotaModel.getQuotaType() != null){
-                MHealthBusiness mHealthBusiness = healthBusinessClient.searchHealthBusinessDetail(tjQuotaModel.getQuotaType());
-                tjQuotaModel.setQuotaTypeName(mHealthBusiness.getName());
+                MQuotaCategory mQuotaCategory = quotaCategoryClient.searchQuotaCategoryDetail(tjQuotaModel.getQuotaType());
+                tjQuotaModel.setQuotaTypeName(mQuotaCategory.getName());
             }
             return success(tjQuotaModel);
         } catch (Exception e) {

@@ -1,8 +1,8 @@
 package com.yihu.ehr.resource.service;
 
 
-import com.yihu.ehr.entity.health.HealthBusiness;
 import com.yihu.ehr.entity.quota.TjQuota;
+import com.yihu.ehr.entity.report.QuotaCategory;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.intf.ResourcesDao;
 import com.yihu.ehr.resource.model.RsMetadata;
@@ -71,27 +71,27 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
      * 根据parentId获取指标分类主体列表
      * @return
      */
-    public List<HealthBusiness> findHealthBusinessList(int parentId, String filters) {
+    public List<QuotaCategory> findQuotaCategoryList(int parentId, String filters) {
         String sql = "";
         if(parentId != 0 && filters != null) {
-            sql = "select * from health_business where parent_id = " + parentId + " AND name like " + "'%" + filters + "%'";
+            sql = "select * from tj_quota_category where parent_id = " + parentId + " AND name like " + "'%" + filters + "%'";
         }else {
-            sql = "select * from health_business where parent_id = " + parentId;
+            sql = "select * from tj_quota_category where parent_id = " + parentId;
         }
-        RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(HealthBusiness.class);
+        RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(QuotaCategory.class);
         return this.jdbcTemplate.query(sql, rowMapper);
     }
 
     /**
      * 根据指标分类获取指标
-     * @param healthBusiness
+     * @param quotaCategory
      * @return
      */
-    public List<TjQuota> findQuotaMetadataList(HealthBusiness healthBusiness) {
+    public List<TjQuota> findQuotaMetadataList(QuotaCategory quotaCategory) {
         String sql = "";
         RowMapper rowMapper = null;
-        if(healthBusiness != null) {
-            sql = "select * from tj_quota tj where tj.quota_type = " + healthBusiness.getId();
+        if(quotaCategory != null) {
+            sql = "select * from tj_quota tj where tj.quota_type = " + quotaCategory.getId();
             rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(TjQuota.class);
             return this.jdbcTemplate.query(sql, rowMapper);
         }else {
@@ -101,22 +101,22 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
 
     /**
      * 递归获取指标分类包含的子集分类和指标
-     * @param healthBusiness
+     * @param quotaCategory
      * @return
      */
-    public Map<String, Object> getTreeMap(HealthBusiness healthBusiness, int level, String filters) {
+    public Map<String, Object> getTreeMap(QuotaCategory quotaCategory, int level, String filters) {
         Map<String, Object> masterMap = new HashMap<String, Object>();
-        if(healthBusiness != null) {
+        if(quotaCategory != null) {
             /**
              * 处理自身数据
              */
             masterMap.put("level", level);
-            masterMap.put("id", healthBusiness.getId());
-            masterMap.put("name", healthBusiness.getName());
-            masterMap.put("parent_id", healthBusiness.getParentId());
-            masterMap.put("code", healthBusiness.getCode());
-            masterMap.put("note", healthBusiness.getNote());
-            List<TjQuota> tList = findQuotaMetadataList(healthBusiness);
+            masterMap.put("id", quotaCategory.getId());
+            masterMap.put("name", quotaCategory.getName());
+            masterMap.put("parent_id", quotaCategory.getParentId());
+            masterMap.put("code", quotaCategory.getCode());
+            masterMap.put("note", quotaCategory.getNote());
+            List<TjQuota> tList = findQuotaMetadataList(quotaCategory);
             if (level != 0) {
                 if (tList != null) {
                     List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();
@@ -139,11 +139,11 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
             /**
              * 处理子集数据
              */
-            List<HealthBusiness> hList = findHealthBusinessList(healthBusiness.getId(), filters);
+            List<QuotaCategory> hList = findQuotaCategoryList(quotaCategory.getId(), filters);
             if(hList != null) {
                 List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
-                for(HealthBusiness healthBusiness1: hList) {
-                    childList.add(getTreeMap(healthBusiness1, level + 1, filters));
+                for(QuotaCategory quotaCategory1: hList) {
+                    childList.add(getTreeMap(quotaCategory1, level + 1, filters));
                 }
                 masterMap.put("child", childList);
             }
@@ -271,10 +271,10 @@ public class ResourcesIntegratedService extends BaseJpaService<RsResources, Reso
         /**
          * 获取最上级目录
          */
-        List<HealthBusiness> parentList = findHealthBusinessList(0, filters);
+        List<QuotaCategory> parentList = findQuotaCategoryList(0, filters);
         if(parentList != null) {
-            for(HealthBusiness healthBusiness : parentList) {
-                Map<String, Object> childMap = getTreeMap(healthBusiness, 0, filters);
+            for(QuotaCategory quotaCategory : parentList) {
+                Map<String, Object> childMap = getTreeMap(quotaCategory, 0, filters);
                 if (filters != null && !filters.equals("")) {
                     if(((List<String>) childMap.get("child")).size() > 0) {
                         resultList.add(childMap);

@@ -208,6 +208,7 @@ public class ServiceApi {
          */
         public static final String RsReportPrefix = "/resources/report/";
         public static final String RsReport = "/resources/report/{id}";
+        public static final String RsReportFindByCode = "/resources/report/findByCode";
         public static final String RsReports = "/resources/reports";
         public static final String RsReportViewsTreeData = "/resources/report/viewsTreeData";
         public static final String RsReportSelectedViews = "/resources/report/selectedViews";
@@ -216,6 +217,7 @@ public class ServiceApi {
         public static final String RsReportIsUniqueCode = "/resources/report/isUniqueCode";
         public static final String RsReportIsUniqueName = "/resources/report/isUniqueName";
         public static final String RsReportNoPage = "/resources/report/getReportNoPage";
+        public static final String RsReportTemplateContent = "/resources/report/getTemplateContent";
 
         /**
          * 资源报表视图配置
@@ -292,8 +294,8 @@ public class ServiceApi {
         public static final String Family = "/families/{id}";
 
         public static final String FamiliesMembers = "/families/members";
-        public static final String FamilyMembers = "/families/{family_id}/members";
-        public static final String FamilyMember = "/families/{family_id}/members/{id_card_no}";
+        public static final String FamilyMembers = "/families/{families_id}/members";
+        public static final String FamilyMember = "/families/{families_id}/members/{id_card_no}";
     }
 
     public static class Cipher {

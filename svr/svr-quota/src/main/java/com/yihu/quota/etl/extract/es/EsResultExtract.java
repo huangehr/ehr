@@ -42,7 +42,7 @@ public class EsResultExtract {
     private String orgName;
     private String province;
     private String city;
-    private String district;
+    private String town;
     private String slaveKey1;
     private String slaveKey2;
     private String result;
@@ -63,6 +63,18 @@ public class EsResultExtract {
     private ObjectMapper objectMapper;
 
     public void initialize(TjQuota tjQuota ,String filters) throws Exception {
+        this.startTime = null;
+        this.endTime = null;
+        this.orgName = null;
+        this.org = null;
+        this.province = null;
+        this.city = null;
+        this.town = null;
+        this.quotaCode = null;
+        this.result = null;
+        this.slaveKey1 = null;
+        this.slaveKey2 = null;
+
         if(!StringUtils.isEmpty(filters)){
             Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
             if (params !=null && params.size() > 0){
@@ -80,8 +92,8 @@ public class EsResultExtract {
                             this.province = params.get(key).toString();
                         else if(key.equals("city"))
                             this.city = params.get(key).toString();
-                        else if(key.equals("district"))
-                            this.district = params.get(key).toString();
+                        else if(key.equals("town"))
+                            this.town = params.get(key).toString();
                         else if(key.equals("slaveKey1"))
                             this.slaveKey1 = params.get(key).toString();
                         else if(key.equals("slaveKey2"))
@@ -173,24 +185,24 @@ public class EsResultExtract {
                 boolQueryBuilder.mustNot(termQueryOrg);
             }
         }
-        if( !StringUtils.isEmpty(province) ){
-            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("provinceName", province);
-            boolQueryBuilder.must(termQueryProvince);
-        }
         if( !StringUtils.isEmpty(slaveKey1) ){
-            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("slaveKey1", province);
+            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("slaveKey1", slaveKey1);
             boolQueryBuilder.must(termQueryProvince);
         }
         if( !StringUtils.isEmpty(slaveKey2) ){
-            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("slaveKey2", province);
+            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("slaveKey2", slaveKey2);
+            boolQueryBuilder.must(termQueryProvince);
+        }
+        if( !StringUtils.isEmpty(province) ){
+            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("province", province);
             boolQueryBuilder.must(termQueryProvince);
         }
         if( !StringUtils.isEmpty(city) ){
-            TermQueryBuilder termQueryCity = QueryBuilders.termQuery("cityName", city);
+            TermQueryBuilder termQueryCity = QueryBuilders.termQuery("city", city);
             boolQueryBuilder.must(termQueryCity);
         }
-        if( !StringUtils.isEmpty(district) ){
-            TermQueryBuilder termQueryTown = QueryBuilders.termQuery("townName", district);
+        if( !StringUtils.isEmpty(town) ){
+            TermQueryBuilder termQueryTown = QueryBuilders.termQuery("town", town);
             boolQueryBuilder.must(termQueryTown);
         }
         if( !StringUtils.isEmpty(startTime) ){

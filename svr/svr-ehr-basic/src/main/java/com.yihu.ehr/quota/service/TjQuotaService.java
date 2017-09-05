@@ -58,7 +58,7 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
 
     public List<MQuotaConfigModel> getQuotaConfig(String quotaName, Integer page, Integer pageSize) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String sql = "SELECT h.name as quotaTypeName,tj.name as quotaName,tj.code as quotaCode,tj.id as quotaId from tj_quota tj left join health_business h on tj.quota_type = h.id where 1 = 1";
+        String sql = "SELECT h.name as quotaTypeName,tj.name as quotaName,tj.code as quotaCode,tj.id as quotaId from tj_quota tj left join tj_quota_category h on tj.quota_type = h.id where 1 = 1";
         if (!StringUtils.isEmpty(quotaName)) {
             sql += " AND tj.name LIKE :quotaName";
         }
@@ -74,7 +74,7 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
 
     public int getCountInfo(String quotaName) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
-        String sql = "SELECT count(*) from tj_quota tj left join health_business h on tj.quota_type = h.id where 1 = 1";
+        String sql = "SELECT count(*) from tj_quota tj left join tj_quota_category h on tj.quota_type = h.id where 1 = 1";
         if (!StringUtils.isEmpty(quotaName)) {
             sql += " AND tj.name LIKE :quotaName";
         }

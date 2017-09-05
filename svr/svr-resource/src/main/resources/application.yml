@@ -35,6 +35,19 @@ spring:
     validation-query: SELECT 1
     test-on-borrow: true
 
+fast-dfs:
+  pool:
+    init-size: 5
+    max-size: 20
+    wait-time: 500
+  connect-timeout: 2
+  network-timeout: 30
+  charset: ISO8859-1
+  http:
+    tracker-http-port: 80
+    anti-steal-token: no
+    secret-key: FastDFS1234567890
+
 ---
 spring:
   profiles: dev
@@ -50,6 +63,10 @@ spring:
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+fast-dfs:
+  tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
+
 ---
 spring:
   profiles: alpha
@@ -65,6 +82,10 @@ spring:
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+fast-dfs:
+  tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
+
 ---
 spring:
   profiles: test
@@ -80,6 +101,10 @@ spring:
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node1.hde.h3c.com,node2.hde.h3c.com,node3.hde.h3c.com
+fast-dfs:
+  tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
+
 ---
 spring:
   profiles: prod
@@ -96,4 +121,7 @@ spring:
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
+fast-dfs:
+  tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
 

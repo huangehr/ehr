@@ -75,7 +75,9 @@ public interface OrgDeptClient {
             @ApiParam(name = "orgId", value = "机构ID")
             @RequestParam(value = "orgId", required = true) Integer orgId,
             @ApiParam(name = "userId", value = "用户ID")
-            @RequestParam(value = "userId", required = true) String userId
+            @RequestParam(value = "userId", required = true) String userId,
+            @ApiParam(name = "deptId", value = "部门ID")
+            @RequestParam(value = "deptId", required = true) Integer deptId
     );
 
     @RequestMapping(value = "/orgDept/resetName", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

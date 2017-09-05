@@ -48,6 +48,23 @@ public class RsReportController extends BaseController {
         }
     }
 
+    @ApiOperation("根据编码获取资源报表")
+    @RequestMapping(value = ServiceApi.Resources.RsReportFindByCode, method = RequestMethod.GET)
+    public Envelop findByCode(
+            @ApiParam(name = "code", value = "编码")
+            @RequestParam(value = "code") String code) throws Exception {
+        try {
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(true);
+            MRsReport mRsReport = rsReportClient.findByCode(code);
+            envelop.setObj(mRsReport);
+            return envelop;
+        } catch (Exception e) {
+            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
     @ApiOperation(value = "根据条件获取资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReports, method = RequestMethod.GET)
     public Envelop search(
@@ -77,11 +94,11 @@ public class RsReportController extends BaseController {
     @ApiOperation("新增资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST)
     public Envelop add(
-            @ApiParam(name = "mrsReport", value = "资源报表JSON字符串", required = true)
-            @RequestParam(value = "mrsReport") String mrsReport) throws Exception {
+            @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
+            @RequestParam(value = "rsReport") String rsReport) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            MRsReport newMRsReport = rsReportClient.add(mrsReport);
+            MRsReport newMRsReport = rsReportClient.add(rsReport);
             envelop.setObj(newMRsReport);
             envelop.setSuccessFlg(true);
             return envelop;
@@ -95,11 +112,11 @@ public class RsReportController extends BaseController {
     @ApiOperation("更新资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
     public Envelop update(
-            @ApiParam(name = "mrsReport", value = "资源报表JSON字符串", required = true)
-            @RequestParam(value = "mrsReport") String mrsReport) throws Exception {
+            @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
+            @RequestParam(value = "rsReport") String rsReport) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            MRsReport newMRsReport = rsReportClient.update(mrsReport);
+            MRsReport newMRsReport = rsReportClient.update(rsReport);
             envelop.setObj(newMRsReport);
             envelop.setSuccessFlg(true);
             return envelop;
@@ -163,6 +180,24 @@ public class RsReportController extends BaseController {
             if (!result) {
                 envelop.setErrorMsg("该名称已被使用，请重新填写！");
             }
+            return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
+    @ApiOperation("获取报表模版内容")
+    @RequestMapping(value = ServiceApi.Resources.RsReportTemplateContent, method = RequestMethod.GET)
+    public Envelop getTemplateContent(
+            @ApiParam(name = "reportCode", value = "资源报表Code", required = true)
+            @RequestParam("reportCode") String reportCode) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            String templateContent = rsReportClient.getTemplateContent(reportCode);
+            envelop.setObj(templateContent);
+            envelop.setSuccessFlg(true);
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();

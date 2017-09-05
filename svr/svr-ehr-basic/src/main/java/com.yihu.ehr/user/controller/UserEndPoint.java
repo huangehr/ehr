@@ -8,13 +8,19 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.patient.service.demographic.DemographicInfo;
+import com.yihu.ehr.patient.service.demographic.DemographicService;
+import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.feign.ConventionalDictClient;
 import com.yihu.ehr.user.feign.SecurityClient;
 import com.yihu.ehr.user.entity.User;
+import com.yihu.ehr.user.service.DoctorService;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.log.LogService;
+import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -58,6 +64,12 @@ public class UserEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private FastDFSUtil fastDFSUtil;
+
+    @Autowired
+    private DoctorService doctorService;
+
+    @Autowired
+    private DemographicService demographicService;
 
     @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.GET)
     @ApiOperation(value = "获取用户列表", notes = "根据查询条件获取用户列表在前端表格展示")
@@ -115,6 +127,24 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             user.setDType(userType);
         }
         userManager.saveUser(user);
+        //同时修改医生表及用户表信息
+        Doctors doctors = doctorService.getByIdCardNo(user.getIdCardNo());
+        if (!StringUtils.isEmpty(doctors)) {
+            doctors.setName(user.getRealName());
+            doctors.setPyCode(PinyinUtil.getPinYinHeadChar(user.getRealName(), false));
+            doctors.setSex(user.getGender());
+            doctors.setPhone(user.getTelephone());
+            doctorService.save(doctors);
+        }
+        DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(user.getIdCardNo());
+        if (!StringUtils.isEmpty(demographicInfo)) {
+            demographicInfo.setName(user.getRealName());
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + user.getTelephone() + "\"}");
+            demographicInfo.setGender(user.getGender());
+            demographicInfo.setMartialStatus(user.getMartialStatus());
+            demographicInfo.setBirthday(DateUtil.strToDate(user.getBirthday()));
+            demographicService.save(demographicInfo);
+        }
         return convertToModel(user, MUser.class);
     }
 

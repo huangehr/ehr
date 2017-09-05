@@ -5,24 +5,24 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.user.MDoctor;
+import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.model.OrgMemberRelation;
+import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.org.service.OrgDeptService;
 import com.yihu.ehr.org.service.OrgMemberRelationService;
+import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.user.service.DoctorService;
 import com.yihu.ehr.user.service.UserManager;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -35,7 +35,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 2017-02-04 add  by hzp
@@ -57,6 +56,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     private String default_password = "123456";
     @Autowired
     private DemographicService demographicService;
+    @Autowired
+    private OrgService orgService;
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.GET)
     @ApiOperation(value = "获取医生列表", notes = "根据查询条件获取医生列表在前端表格展示")
@@ -83,7 +84,11 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "创建医生", notes = "创建医生信息")
     public MDoctor createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
-            @RequestBody String doctoJsonData) throws Exception {
+            @RequestBody String doctoJsonData,
+            @ApiParam(name = "orgId", value = "", defaultValue = "")
+            @RequestParam(value = "orgId") String orgId,
+            @ApiParam(name = "deptId", value = "", defaultValue = "")
+            @RequestParam(value = "deptId") String deptId) throws Exception {
         Doctors doctor = toEntity(doctoJsonData, Doctors.class);
         doctor.setInsertTime(new Date());
         doctor.setUpdateTime(new Date());
@@ -108,7 +113,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         user.setAreaId(0);
         user.setActivated(true);
         user.setImgRemotePath(d.getPhoto());
-        userManager.saveUser(user);
+        user = userManager.saveUser(user);
+
         //创建居民
         DemographicInfo demographicInfo =new DemographicInfo();
         demographicInfo.setPassword(HashUtil.hash(default_password));
@@ -118,6 +124,22 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         demographicInfo.setTelephoneNo("{\"联系电话\":\""+d.getPhone()+"\"}");
         demographicInfo.setGender(d.getSex());
         demographicService.savePatient(demographicInfo);
+        //创建用户与机构关系
+        if (!StringUtils.isEmpty(orgId) && !StringUtils.isEmpty(deptId)) {
+            OrgMemberRelation memberRelation = new OrgMemberRelation();
+            Organization organization = orgService.getOrgById(orgId);
+            OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(deptId));
+            if (null != organization && null != orgDept) {
+                memberRelation.setOrgId(orgId);
+                memberRelation.setOrgName(organization.getFullName());
+                memberRelation.setDeptId(Integer.parseInt(deptId));
+                memberRelation.setDeptName(orgDept.getName());
+                memberRelation.setUserId(user.getId());
+                memberRelation.setUserName(user.getRealName());
+                memberRelation.setStatus(0);
+                relationService.save(memberRelation);
+            }
+        }
         return convertToModel(doctor, MDoctor.class);
     }
 
@@ -129,6 +151,21 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         Doctors doctors = toEntity(doctoJsonData, Doctors.class);
         doctors.setUpdateTime(new Date());
         doctorService.save(doctors);
+        //同时修改用户表
+        User user = userManager.getUserByIdCardNo(doctors.getIdCardNo());
+        if (!StringUtils.isEmpty(user)) {
+            user.setRealName(doctors.getName());
+            user.setGender(doctors.getSex());
+            user.setTelephone(doctors.getPhone());
+            userManager.save(user);
+        }
+        DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(doctors.getIdCardNo());
+        if (!StringUtils.isEmpty(demographicInfo)) {
+            demographicInfo.setName(doctors.getName());
+            demographicInfo.setGender(doctors.getSex());
+            demographicInfo.setTelephoneNo("{\"联系电话\":\"" + doctors.getPhone() + "\"}");
+            demographicService.save(demographicInfo);
+        }
         return convertToModel(doctors, MDoctor.class);
     }
 
