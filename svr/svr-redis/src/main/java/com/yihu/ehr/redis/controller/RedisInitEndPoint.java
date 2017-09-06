@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * @author hzp add at 20170425
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/redisInit")
+@RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "RedisInit", description = "Redis初始化服务")
 public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
@@ -33,7 +33,7 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
     private RedisClient redis;
 
     @ApiOperation("清除Redis缓存")
-    @RequestMapping(value = ServiceApi.Redis.DeleteRedis, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Redis.Delete, method = RequestMethod.POST)
     public String deleteRedis(
             @ApiParam(name = "key", value = "机构编码、ICD10编码、健康问题编码等")
             @RequestParam(value = "key") String key) throws Exception {
@@ -42,56 +42,56 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("Redis缓存行政地址")
-    @RequestMapping(value = ServiceApi.Redis.AddressRedis, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Redis.InitAddress, method = RequestMethod.POST)
     public String cacheAddressDict() throws Exception {
         redisInitService.cacheAddressDict();
         return "Redis缓存行政地址完成！";
     }
 
     @ApiOperation("Redis缓存健康问题名称")
-    @RequestMapping(value = ServiceApi.Redis.HealthProblemRedis, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Redis.InitHealthProblem, method = RequestMethod.POST)
     public String cacheHpName() throws Exception {
         redisInitService.cacheHpName();
         return "Redis缓存健康问题名称完成！";
     }
 
     @ApiOperation("Redis缓存ICD10")
-    @RequestMapping(value = ServiceApi.Redis.Icd10NameRedis, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Redis.InitIcd10Name, method = RequestMethod.POST)
     public String cacheIcd10() throws Exception {
         redisInitService.cacheIcd10();
         return "Redis缓存ICD10完成！";
     }
 
     @ApiOperation("Redis缓存机构名称")
-    @RequestMapping(value = ServiceApi.Redis.OrgRedis, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Redis.InitOrgName, method = RequestMethod.POST)
     public String cacheOrgName() throws Exception {
         redisInitService.cacheOrgName();
         return "Redis缓存机构名称完成！";
     }
 
     @ApiOperation("Redis缓存机构区域")
-    @RequestMapping(value = ServiceApi.Redis.OrgAreaRedis, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Redis.InitOrgArea, method = RequestMethod.POST)
     public String cacheOrgArea() throws Exception {
         redisInitService.cacheOrgArea();
         return "Redis缓存机构区域完成！";
     }
 
     @ApiOperation("Redis缓存机构Saas区域")
-    @RequestMapping(value = ServiceApi.Redis.OrgSaasAreaRedis, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Redis.InitOrgSaasArea, method = RequestMethod.POST)
     public String cacheOrgSaasArea() throws Exception {
         redisInitService.cacheOrgSaasArea();
         return "Redis缓存机构Saas区域完成！";
     }
 
     @ApiOperation("Redis缓存机构Saas机构")
-    @RequestMapping(value = ServiceApi.Redis.OrgSaasOrgRedis, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Redis.InitOrgSaasOrg, method = RequestMethod.POST)
     public String cacheOrgSaasOrg() throws Exception {
         redisInitService.cacheOrgSaasOrg();
         return "Redis缓存机构Saas机构完成！";
     }
 
     @ApiOperation("Redis缓存标准")
-    @RequestMapping(value = ServiceApi.Redis.Versions, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Redis.InitVersions, method = RequestMethod.POST)
     public String versions(
             @ApiParam(name = "versions", value = "版本列表，使用逗号分隔", defaultValue = "59083976eebd")
             @RequestParam("versions") String versions,
@@ -101,7 +101,7 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return "Redis缓存标准完成！";
     }
 
-    @RequestMapping(value= ServiceApi.Adaptions.Cache, method = RequestMethod.POST)
+    @RequestMapping(value= ServiceApi.Redis.InitAdaptions, method = RequestMethod.POST)
     @ApiOperation("缓存适配数据")
     public boolean cacheData(
             @ApiParam(name="id",value="rs_adapter_schema.id")

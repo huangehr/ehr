@@ -18,11 +18,12 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "standard cache", description = "CDA标准缓存服务，缓存CDA标准数据至Redis")
 public class CacheEndPoint {
+
     @Autowired
-    StdCache stdCache;
+    private StdCache stdCache;
 
     @ApiOperation("缓存标准")
-    @RequestMapping(value = ServiceApi.Redis.Versions, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Standards.Caches, method = RequestMethod.POST)
     public void versions(@ApiParam(value = "版本列表，使用逗号分隔", defaultValue = "000000000000,568ce002559f")
                          @RequestParam("versions") String versions,
                          @ApiParam(value = "强制清除再缓存", defaultValue = "true")
@@ -33,7 +34,7 @@ public class CacheEndPoint {
     }
 
     @ApiOperation("获取缓存版本列表")
-    @RequestMapping(value = ServiceApi.Redis.Versions, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Caches, method = RequestMethod.GET)
     public ResponseEntity<List<MCDAVersion>> versions() {
         List<MCDAVersion> versions = stdCache.versions();
         if(versions.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "Not cached yet.");
@@ -42,7 +43,7 @@ public class CacheEndPoint {
     }
 
     @ApiOperation("获取缓存版本")
-    @RequestMapping(value = ServiceApi.Redis.Version, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Standards.Cache, method = RequestMethod.GET)
     public ResponseEntity<MCDAVersion> version(@ApiParam(value = "version", defaultValue = "568ce002559f")
                                                @PathVariable("version") String version) {
         MCDAVersion mcdaVersion = stdCache.version(version);

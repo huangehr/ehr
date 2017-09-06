@@ -501,6 +501,8 @@ public class ServiceApi {
 
 
     public static class Standards {
+        public static final String Caches = "/std/caches";
+        public static final String Cache = "/std/caches/{version}";
         public static final String Sources = "/std/sources";
         public static final String NoPageSources = "/std/sources/no_paging";
         public static final String Source = "/std/sources/{id}";
@@ -800,7 +802,28 @@ public class ServiceApi {
      *Redis服务
      */
     public static class Redis {
-        public static final String DeleteRedis = "/redis/delete";
+
+        //初始化缓存
+        public static final String InitAddress = "/redis/init/address";
+        public static final String InitHealthProblem = "/redis/init/healthProblem";
+        public static final String InitIcd10Name = "/redis/init/icd10Name";
+        public static final String InitOrgName = "/redis/init/orgName";
+        public static final String InitOrgArea = "/redis/init/orgArea";
+        public static final String InitOrgSaasArea = "/redis/init/orgSaasArea";
+        public static final String InitOrgSaasOrg = "/redis/init/orgSaasOrg";
+        public static final String InitVersions = "/redis/init/versions";
+        public static final String InitAdaptions = "/redis/init/adaptions/{id}";
+
+        //更新缓存
+        public static final String UpdateOrgName = "/redis/update/orgName";
+        public static final String UpdateOrgArea = "/redis/update/orgArea";
+        public static final String UpdateOrgSaasArea = "/redis/update/orgSaasArea";
+        public static final String UpdateOrgSaasOrg = "/redis/update/orgSaasOrg";
+
+        //清除缓存
+        public static final String Delete = "/redis/delete";
+
+        /******************************************* Redis缓存数据 *******************************************************************/
         public static final String AddressRedis = "/redis/addressRedis";
         public static final String HealthProblemRedis = "/redis/healthProblemRedis";
         public static final String Icd10HpRelationRedis = "/redis/icd10HpRelationRedis";
@@ -811,12 +834,6 @@ public class ServiceApi {
         public static final String OrgAreaRedis = "/redis/orgAreaRedis";
         public static final String OrgSaasAreaRedis = "/redis/orgSaasAreaRedis";
         public static final String OrgSaasOrgRedis = "/redis/orgSaasOrgRedis";
-
-        //更新服务
-        public static final String UpdateOrgName = "/redis/update/orgName";
-        public static final String UpdateOrgArea = "/redis/update/orgArea";
-        public static final String UpdateOrgSaasArea = "/redis/update/orgSaasArea";
-        public static final String UpdateOrgSaasOrg = "/redis/update/orgSaasOrg";
 
         /******************************************* 资源化相关Redis *******************************************************************/
         public static final String RsAdaptionDict = "/redis/rsAdaptionDict";
@@ -833,9 +850,6 @@ public class ServiceApi {
         public static final String MetaDataDict = "/redis/metaDataDict";
         public static final String DictEntryValue = "/redis/dictEntryValue";
 
-
-        public static final String Versions = "/caches/standards/versions";
-        public static final String Version = "/caches/standards/versions/{version}";
     }
 
     /**

@@ -19,8 +19,8 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping(ApiVersion.Version1_0)
 public interface XStandardClient {
 
-    @RequestMapping(value = ServiceApi.Redis.Versions, method = RequestMethod.PUT)
-    public void versions(@RequestParam("versions") String versions,
+    @RequestMapping(value = ServiceApi.Standards.Caches, method = RequestMethod.POST)
+    void versions(@RequestParam("versions") String versions,
                          @RequestParam("force") boolean force);
 
 }

@@ -21,6 +21,6 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 public interface XResourceClient {
 
-    @RequestMapping(value= ServiceApi.Adaptions.Cache,method = RequestMethod.POST)
-    boolean cacheData(@PathVariable(value = "id")String id);
+    @RequestMapping(value= ServiceApi.Adaptions.Cache, method = RequestMethod.POST)
+    boolean cacheData(@PathVariable(value = "id") String id);
 }

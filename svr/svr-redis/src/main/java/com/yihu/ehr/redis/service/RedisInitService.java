@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
@@ -23,17 +22,17 @@ import java.util.Map;
 public class RedisInitService {
 
     @Autowired
-    JdbcTemplate jdbc;
+    private JdbcTemplate jdbc;
     @Autowired
-    XGeographyClient geographyClient;
+    private XGeographyClient geographyClient;
     @Autowired
-    AddressDictKeySchema addressDictKeySchema;
+    private AddressDictKeySchema addressDictKeySchema;
     @Autowired
-    HealthProblemDictKeySchema healthProblemDictKeySchema;
+    private HealthProblemDictKeySchema healthProblemDictKeySchema;
     @Autowired
-    Icd10KeySchema icd10KeySchema;
+    private Icd10KeySchema icd10KeySchema;
     @Autowired
-    OrgKeySchema orgKeySchema;
+    private OrgKeySchema orgKeySchema;
 
     /**
      * 缓存行政地址Redis
@@ -179,4 +178,5 @@ public class RedisInitService {
         }
         return true;
     }
+
 }
