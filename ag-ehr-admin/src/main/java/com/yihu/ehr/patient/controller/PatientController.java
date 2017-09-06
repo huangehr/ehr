@@ -2,6 +2,7 @@ package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unboundid.util.json.JSONObject;
+import com.yihu.ehr.agModel.app.AppModel;
 import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
 import com.yihu.ehr.agModel.user.RoleUserModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
@@ -936,6 +937,11 @@ public class PatientController extends BaseController {
                 mr=new MRoleUser();
                 mr.setRoleId(m.getRoleId());
                 mr.setRoleName(appRolesTreeModelMap.get(String.valueOf(m.getRoleId())));
+                MRoles roles = rolesClient.getRolesById(m.getRoleId());
+                Collection<MApp> appCollection = appClient.getAppsNoPage("id=" + roles.getAppId());
+                for(MApp app : appCollection){
+                    mr.setAppName(app.getName());
+                }
                 mRoleUserList.add(mr);
             }
         }

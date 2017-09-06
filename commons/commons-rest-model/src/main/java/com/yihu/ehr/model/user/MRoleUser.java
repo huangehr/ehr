@@ -8,6 +8,7 @@ public class MRoleUser {
     private long roleId;
     private String userId;
     private String  roleName;
+    private String appName;
 
     public long getId() {
         return id;
@@ -36,5 +37,13 @@ public class MRoleUser {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 }
