@@ -46,7 +46,7 @@ public interface HealthProblemDictClient {
             @ApiParam(name = "dictionary", value = "字典JSON结构")
             @RequestBody String dictJson) ;
 
-    @RequestMapping(value = "/dict/hp/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getHpDict/hp/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据ID获取相应的健康问题字典信息。" )
     MHealthProblemDict getHpDict(
             @ApiParam(name = "id", value = "字典内码")
