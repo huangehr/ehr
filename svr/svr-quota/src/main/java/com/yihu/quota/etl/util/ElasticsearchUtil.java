@@ -13,6 +13,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -64,7 +65,7 @@ public class ElasticsearchUtil {
         actionGet = client.prepareSearch(esClientUtil.getIndex())
                 .setTypes(esClientUtil.getType())
                 .setQuery(boolQueryBuilder)
-                .setFrom(pageNo-1).setSize(pageSize).addSort(dealSorter)//从0开始算
+                .setFrom(pageNo - 1).setSize(pageSize).addSort(dealSorter)//从0开始算
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
