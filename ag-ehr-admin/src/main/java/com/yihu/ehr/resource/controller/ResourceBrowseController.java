@@ -156,7 +156,7 @@ public class ResourceBrowseController extends BaseController {
         String [] quotaCodeArr = null;
         try {
             //获取资源关联指标
-            List<ResourceQuotaModel> rqmList = resourceQuotaClient.getByResourceId("resourceId=" + resourcesId);
+            List<ResourceQuotaModel> rqmList = resourceQuotaClient.getByResourceId(resourcesId);
             //获取资源默认查询条件
             String query = resourceBrowseClient.getResourceDefaultQueryById(resourcesId);
             //拼接指标code字符串作为维度交集查询参数
