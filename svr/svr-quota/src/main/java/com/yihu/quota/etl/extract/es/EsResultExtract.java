@@ -172,39 +172,39 @@ public class EsResultExtract {
         }
         if( !StringUtils.isEmpty(quotaCode)){
 //            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaCode);
-            QueryStringQueryBuilder termQuotaCode = QueryBuilders.queryStringQuery("quotaCode" + quotaCode);
+            QueryStringQueryBuilder termQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaCode);
             boolQueryBuilder.must(termQuotaCode);
         }
         if( !StringUtils.isEmpty(orgName) ){
 //            TermQueryBuilder termQueryOrgName = QueryBuilders.termQuery("orgName", orgName);
-            QueryStringQueryBuilder termOrgName = QueryBuilders.queryStringQuery("orgName" + orgName);
+            QueryStringQueryBuilder termOrgName = QueryBuilders.queryStringQuery("orgName:" + orgName);
             boolQueryBuilder.must(termOrgName);
         }
         if( !StringUtils.isEmpty(org) ){
             String [] orgvals =org.split(",");
             for(int i=0;i<orgvals.length ; i++){
-                QueryStringQueryBuilder termOrg = QueryBuilders.queryStringQuery("org" +  orgvals[i]);
+                QueryStringQueryBuilder termOrg = QueryBuilders.queryStringQuery("org:" +  orgvals[i]);
                 boolQueryBuilder.mustNot(termOrg);
             }
         }
         if( !StringUtils.isEmpty(slaveKey1) ){
-            QueryStringQueryBuilder termSlaveKey1 = QueryBuilders.queryStringQuery("slaveKey1" + slaveKey1);
+            QueryStringQueryBuilder termSlaveKey1 = QueryBuilders.queryStringQuery("slaveKey1:" + slaveKey1);
             boolQueryBuilder.must(termSlaveKey1);
         }
         if( !StringUtils.isEmpty(slaveKey2) ){
-            QueryStringQueryBuilder termSlaveKey2 = QueryBuilders.queryStringQuery("slaveKey2" + slaveKey2);
+            QueryStringQueryBuilder termSlaveKey2 = QueryBuilders.queryStringQuery("slaveKey2:" + slaveKey2);
             boolQueryBuilder.must(termSlaveKey2);
         }
         if( !StringUtils.isEmpty(province) ){
-            QueryStringQueryBuilder termProvince = QueryBuilders.queryStringQuery("province" + province);
+            QueryStringQueryBuilder termProvince = QueryBuilders.queryStringQuery("province:" + province);
             boolQueryBuilder.must(termProvince);
         }
         if( !StringUtils.isEmpty(city) ){
-            QueryStringQueryBuilder termCity = QueryBuilders.queryStringQuery("city" + city);
+            QueryStringQueryBuilder termCity = QueryBuilders.queryStringQuery("city:" + city);
             boolQueryBuilder.must(termCity);
         }
         if( !StringUtils.isEmpty(town) ){
-            QueryStringQueryBuilder termTown = QueryBuilders.queryStringQuery("town" + town);
+            QueryStringQueryBuilder termTown = QueryBuilders.queryStringQuery("town:" + town);
             boolQueryBuilder.must(termTown);
         }
         if( !StringUtils.isEmpty(startTime) ){
