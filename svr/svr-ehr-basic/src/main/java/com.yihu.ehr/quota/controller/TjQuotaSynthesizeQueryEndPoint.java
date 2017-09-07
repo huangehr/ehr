@@ -5,8 +5,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.quota.*;
-import com.yihu.ehr.model.tj.MTjQuotaModel;
-import com.yihu.ehr.model.tj.MTjQuotaWarn;
+import com.yihu.ehr.model.tj.DictModel;
+import com.yihu.ehr.model.tj.SaveModel;
 import com.yihu.ehr.quota.service.TjDimensionMainService;
 import com.yihu.ehr.quota.service.TjDimensionSlaveService;
 import com.yihu.ehr.quota.service.TjQuotaDimensionMainService;
@@ -16,11 +16,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +46,8 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
     TjDimensionMainService tjDimensionMainService;
     @Autowired
     TjDimensionSlaveService tjDimensionSlaveService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaSynthesiseDimension, method = RequestMethod.GET)
@@ -82,10 +87,10 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
         //取出第一个指标的所有维度
         Map<String,String> tempMap = new HashedMap();
-        for(String idKey:dimensionMap.keySet() ){
-            Map<String,String> codeMap = dimensionMap.get(idKey);
-            for(String code: codeMap.keySet()){
-                tempMap.put(code, codeMap.get(code));
+        for(String quotaCodeKey:dimensionMap.keySet() ){
+            Map<String,String> codeMap = dimensionMap.get(quotaCodeKey);
+            for(String dimenCode: codeMap.keySet()){
+                tempMap.put(dimenCode, codeMap.get(dimenCode));
             }
             break;
         }
@@ -96,15 +101,15 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
         Map<String,String> saveModelMap = new HashedMap();
         //其他指标与第一个指标维度对比，如果在第一个指标中都存在 交集维度
-        for(String tempCode:tempMap.keySet() ){
+        for(String tempDimenCode:tempMap.keySet() ){
             int num = 0;
             String quotaCodeStr = "";
             for(String keyCode:dimensionMap.keySet() ){
                 quotaCodeStr = keyCode;
                 Map<String,String> codeMap = dimensionMap.get(keyCode);
                 for(String code: codeMap.keySet()){
-                    if( code.equals(tempCode)){
-                        saveModelMap.put(quotaCodeStr + "-"+ tempCode ,  tempMap.get(tempCode) );
+                    if( code.equals(tempDimenCode) &&  tempMap.get(tempDimenCode).equals(codeMap.get(code))){
+                        saveModelMap.put(quotaCodeStr + "-"+ tempDimenCode ,  tempMap.get(tempDimenCode) );
                         //指标code + 维度编码 ->  科室-slaveKey2
                         num ++;
                     }
@@ -112,19 +117,19 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
             }
             if(num == dimensionMap.size()){
                 Map<String,String> modelCloumnMap = new HashedMap();
-                modelCloumnMap.put("name",tempMap.get(tempCode).split("-")[0]);
+                modelCloumnMap.put("name",tempMap.get(tempDimenCode).split("-")[0]);
                 for(String keyCode:dimensionMap.keySet() ){
-                    if(saveModelMap.containsKey(keyCode+"-"+ tempCode)) {
-                        String str = keyCode+"-"+ tempCode;
+                    if(saveModelMap.containsKey(keyCode+"-"+ tempDimenCode)) {
+                        String str = keyCode+"-"+ tempDimenCode;
                         if(saveModelMap.get(str).contains("mainKey")){
-                            modelCloumnMap.put(keyCode,tempCode);
+                            modelCloumnMap.put(keyCode,tempDimenCode);
                         }
                         if(saveModelMap.get(str).contains("slaveKey")){
                             modelCloumnMap.put(keyCode,saveModelMap.get(str).split("-")[1]);
                         }
                     }
                 }
-                synthesiseMap.put(tempCode,modelCloumnMap);
+                synthesiseMap.put(tempDimenCode,modelCloumnMap);
             }
         }
 
@@ -135,6 +140,79 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
         return  resultList;
     }
 
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaSynthesiseDimensionKeyVal, method = RequestMethod.GET)
+    @ApiOperation(value = "查询多个指标交集维度的字典项")
+    public  Map<String,Map<String,String>>  getTjQuotaSynthesiseDimensionKeyVal(
+            @ApiParam(name = "quotaCode", value = "指标code多个指标其中一个")
+            @RequestParam(value = "quotaCode") String quotaCode,
+            @ApiParam(name = "dimensions", value = "维度编码，多个维度用英文,分开")
+            @RequestParam(value = "dimensions") String dimensions) {
+
+        List<TjQuotaDimensionMain> tjQuotaDimensionMains = null;
+        List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = null;
+        String [] dimensionArr = dimensions.split(",");
+        Map<String, Map<String,String>> resultMap = new HashedMap();
+        tjQuotaDimensionMains = tjQuotaDimensionMainService.getTjQuotaDimensionMainByCode(quotaCode);
+        if(tjQuotaDimensionMains != null){
+            for(TjQuotaDimensionMain tjQuotaDimensionMain : tjQuotaDimensionMains){
+                for(int i=0 ;i < dimensionArr.length ; i++){
+                    if(dimensionArr[i].equals(tjQuotaDimensionMain.getMainCode())){
+                        Map<String, String> map = new HashedMap();
+                        //查询字典数据
+                        List<SaveModel> dictData = jdbcTemplate.query(tjQuotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+                        if(dictData != null ){
+                            for(SaveModel saveModel :dictData){
+                                String name = getFieldValueByName(tjQuotaDimensionMain.getMainCode()+"Name",saveModel).toString();
+                                String val = getFieldValueByName(tjQuotaDimensionMain.getMainCode(),saveModel).toString();
+                                map.put(name,val);
+                            }
+                            resultMap.put(tjQuotaDimensionMain.getMainCode(),map);
+                        }
+                    }
+                }
+            }
+        }
+
+        tjQuotaDimensionSlaves = tjQuotaDimensionSlaveService.getTjQuotaDimensionSlaveByCode(quotaCode);
+        if(tjQuotaDimensionSlaves != null){
+            for(TjQuotaDimensionSlave tjQuotaDimensionSlave : tjQuotaDimensionSlaves){
+                for(int i=0 ;i < dimensionArr.length ; i++){
+                    String slave = "slaveKey"+(i+1);
+                    if( dimensionArr[i].equals(slave) ){
+                        Map<String, String> map = new HashedMap();
+                        //查询字典数据
+                        List<DictModel> dictDataList = jdbcTemplate.query(tjQuotaDimensionSlave.getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                        if(dictDataList != null ){
+                            for(DictModel dictModel :dictDataList){
+                                String name = getFieldValueByName(slave+"Name",dictModel).toString();
+                                String val = getFieldValueByName(slave,dictModel).toString();
+                                map.put(name,val);
+                            }
+                            resultMap.put(tjQuotaDimensionSlave.getSlaveCode(),map);
+                        }
+                    }
+                }
+            }
+        }
+        return resultMap;
+    }
+
+
+    /**
+     * 根据属性名获取属性值
+     * */
+    private Object getFieldValueByName(String fieldName, Object o) {
+        try {
+            String firstLetter = fieldName.substring(0, 1).toUpperCase();
+            String getter = "get" + firstLetter + fieldName.substring(1);
+            Method method = o.getClass().getMethod(getter, new Class[] {});
+            Object value = method.invoke(o, new Object[] {});
+            return value;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 
 }
