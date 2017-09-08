@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -178,6 +179,10 @@ public class ResourceBrowseController extends BaseController {
             }
             //拼接交集维度字符串作为查询参数
             String dimension = "";
+            if(StringUtils.isEmpty(quotaCodes)) {
+                envelop.setErrorMsg("交集维度为空");
+                return envelop;
+            }
             List<Map<String, String>> qsdList = tjQuotaClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
             if(qsdList == null || qsdList.size() <= 0) {
                 envelop.setSuccessFlg(true);
