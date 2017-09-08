@@ -8,9 +8,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,14 +25,14 @@ public class RsResourceDefaultQueryEndPoint {
     @Autowired
     private ResourcesDefaultQueryService resourcesDefaultQueryService;
 
-    @RequestMapping(value = ServiceApi.Resources.QueryById, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.QueryByResourceId, method = RequestMethod.GET)
     @ApiOperation("根据资源id获取默认查询条件值")
-    public String getResourceDefaultQueryById(
-            @ApiParam(name = "id", value = "资源id")
-            @PathVariable(value = "id") String id){
-        RsResourcesQuery resourcesQuery = resourcesDefaultQueryService.findByResourcesId(id);
+    public String getByResourceId(
+            @ApiParam(name = "resourceId", value = "资源id")
+            @RequestParam(value = "resourceId") String resourceId){
+        RsResourcesQuery resourcesQuery = resourcesDefaultQueryService.findByResourcesId(resourceId);
         if(resourcesQuery == null){
-            return null;
+            return "{}";
         }
         return resourcesQuery.getQuery();
     }
