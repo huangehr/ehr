@@ -71,20 +71,25 @@ public class MysqlExtract {
         if( !StringUtils.isEmpty(mysql)){
             Map<String,Long> resultMap = new HashMap<>();
             //执行MySQL
-            List<Map<String, Object>> mapList =  jdbcTemplate.queryForList(mysql);
-
-            for(Map<String, Object> map :mapList){
-                String keyVal  = "";
-                for(String key :map.keySet()){
-                    if(!key.equals("result")){
-                        keyVal = keyVal + map.get(key) +  "-";
-                    }
-                }
-                resultMap.put(keyVal.substring(0, keyVal.length() - 1), (long) map.get("result"));
+            List<Map<String, Object>> mapList = null;
+            try {
+                 mapList =  jdbcTemplate.queryForList(mysql);
+            }catch (Exception e){
+                throw new Exception("mysql查询数据出错" + e.getMessage());
             }
-            compute(qdm, qds, returnList, resultMap);
+            if(mapList != null){
+                for(Map<String, Object> map :mapList){
+                    String keyVal  = "";
+                    for(String key :map.keySet()){
+                        if(!key.equals("result")){
+                            keyVal = keyVal + map.get(key) +  "-";
+                        }
+                    }
+                    resultMap.put(keyVal.substring(0, keyVal.length() - 1), (long) map.get("result"));
+                }
+                compute(qdm, qds, returnList, resultMap);
+            }
         }
-
         return returnList;
 
     }
@@ -131,7 +136,7 @@ public class MysqlExtract {
 
 
     private void compute(List<TjQuotaDimensionMain> qdm,List<TjQuotaDimensionSlave> qds,
-            List<SaveModel> returnList, Map<String, Long> map) {
+            List<SaveModel> returnList, Map<String, Long> map) throws Exception {
         Map<String, SaveModel> allData = new HashMap<>();
        if(qdm.size() + qds.size() == 0){
            SaveModel saveModel = new SaveModel();
@@ -165,16 +170,28 @@ public class MysqlExtract {
     /**
      * 初始化主细维度
      */
-    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, TjQuotaDimensionMain quotaDimensionMain, Map<String, SaveModel> allData) {
-        if(quotaDimensionMain !=null){
-            //查询字典数据
-            List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-            //设置到map里面
-            setAllData(allData, dictData, quotaDimensionMain.getType());
-        }
-        for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-            List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-            allData = setAllSlaveData(allData, dictDataSlave,i);
+    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, TjQuotaDimensionMain quotaDimensionMain, Map<String, SaveModel> allData) throws Exception {
+        try{
+            if(quotaDimensionMain !=null){
+                //查询字典数据
+                List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+                if (dictData == null) {
+                    throw new Exception("主纬度配置有误");
+                }else {
+                    //设置到map里面
+                    setAllData(allData, dictData, quotaDimensionMain.getType());
+                }
+            }
+            for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
+                List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                if (dictDataSlave == null) {
+                    throw new Exception("细纬度配置有误");
+                }else {
+                    allData = setAllSlaveData(allData, dictDataSlave,i);
+                }
+            }
+        }catch (Exception e){
+            throw new Exception("纬度配置有误");
         }
         return allData;
     }
