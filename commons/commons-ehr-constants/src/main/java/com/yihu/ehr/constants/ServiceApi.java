@@ -120,7 +120,10 @@ public class ServiceApi {
         public static final String ParamById = "/resources/param/{id}";
         public static final String ParamKeyValueExistence = "/resources/param/key_value_existence";
 
-        public static final String QueryById = "/resources/query/{id}";
+        /**
+         * 固化视图筛选条件
+         */
+        public static final String QueryByResourceId = "/resources/query/QueryByResourceId";
 
         public static final String DictEntries = "/resources/dict_entries";
         public static final String NoPageDictEntries = "/resources/noPage_dict_entries";
