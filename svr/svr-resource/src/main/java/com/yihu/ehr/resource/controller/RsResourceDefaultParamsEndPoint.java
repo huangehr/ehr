@@ -4,8 +4,8 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.resource.MResourceDefaultParam;
-import com.yihu.ehr.resource.model.ResourceDefaultParam;
-import com.yihu.ehr.resource.service.ResourceDefaultParamService;
+import com.yihu.ehr.resource.model.RsResourceDefaultParam;
+import com.yihu.ehr.resource.service.RsResourceDefaultParamService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,15 +27,16 @@ import java.util.List;
 @RequestMapping(value= ApiVersion.Version1_0)
 @Api(value = "ResourceDefaultParams", description = "资源默认参数")
 public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
+
     @Autowired
-    private ResourceDefaultParamService resourceDefaultParamService;
+    private RsResourceDefaultParamService resourceDefaultParamService;
 
     @RequestMapping(value = ServiceApi.Resources.ParamById,method = RequestMethod.GET)
     @ApiOperation("根据id获取参数信息")
     public MResourceDefaultParam getResourceDefaultParamById(
             @ApiParam(name = "id", value = "资源默认参数信息id")
             @PathVariable(value = "id") String id){
-        ResourceDefaultParam resourceDefaultParam = resourceDefaultParamService.findById(id);
+        RsResourceDefaultParam resourceDefaultParam = resourceDefaultParamService.findById(id);
         if(resourceDefaultParam == null){
             return null;
         }
@@ -47,8 +48,8 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
     public MResourceDefaultParam addResourceDefaultParams(
             @ApiParam(name = "json_data", value = "资源默认参数json串")
             @RequestBody String jsonData){
-        ResourceDefaultParam resourceDefaultParam = toEntity(jsonData, ResourceDefaultParam.class);
-        ResourceDefaultParam resourceDefaultParamNew = resourceDefaultParamService.save(resourceDefaultParam);
+        RsResourceDefaultParam resourceDefaultParam = toEntity(jsonData, RsResourceDefaultParam.class);
+        RsResourceDefaultParam resourceDefaultParamNew = resourceDefaultParamService.save(resourceDefaultParam);
         return convertToModel(resourceDefaultParamNew, MResourceDefaultParam.class);
     }
 
@@ -57,8 +58,8 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
     public MResourceDefaultParam updateResourceDefaultParams(
             @ApiParam(name = "json_data", value = "资源默认参数json串")
             @RequestBody String jsonData){
-        ResourceDefaultParam resourceDefaultParam = toEntity(jsonData, ResourceDefaultParam.class);
-        ResourceDefaultParam resourceDefaultParamNew = resourceDefaultParamService.save(resourceDefaultParam);
+        RsResourceDefaultParam resourceDefaultParam = toEntity(jsonData, RsResourceDefaultParam.class);
+        RsResourceDefaultParam resourceDefaultParamNew = resourceDefaultParamService.save(resourceDefaultParam);
         return convertToModel(resourceDefaultParamNew, MResourceDefaultParam.class);
     }
 
@@ -86,7 +87,7 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size", required = false) int size,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        List<ResourceDefaultParam>  rsDefaultParams = resourceDefaultParamService.search(fields, filters, sorts, page, size);
+        List<RsResourceDefaultParam>  rsDefaultParams = resourceDefaultParamService.search(fields, filters, sorts, page, size);
         pagedResponse(request, response, resourceDefaultParamService.getCount(filters), page, size);
         return (List<MResourceDefaultParam>) convertToModels(rsDefaultParams, new ArrayList<MResourceDefaultParam>(rsDefaultParams.size()), MResourceDefaultParam.class, fields);
     }
@@ -96,7 +97,7 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
     public Collection<MResourceDefaultParam> searchRsDefaultParamsNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        List<ResourceDefaultParam> rsDefaultParams = resourceDefaultParamService.search(filters);
+        List<RsResourceDefaultParam> rsDefaultParams = resourceDefaultParamService.search(filters);
         return convertToModels(rsDefaultParams, new ArrayList<MResourceDefaultParam>(rsDefaultParams.size()), MResourceDefaultParam.class,null);
     }
 
@@ -111,7 +112,7 @@ public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "param_value") String paramValue){
         String[] fields = {"resourcesId","paramKey","paramValue"};
         String[] values = {resourcesId,paramKey,paramValue};
-        List<ResourceDefaultParam> list = resourceDefaultParamService.findByFields(fields, values);
+        List<RsResourceDefaultParam> list = resourceDefaultParamService.findByFields(fields, values);
         if(list != null && list.size()>0){
             return true;
         }

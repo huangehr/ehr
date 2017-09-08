@@ -2,7 +2,7 @@ package com.yihu.ehr.resource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.resource.model.RsMetadata;
-import com.yihu.ehr.resource.service.MetadataService;
+import com.yihu.ehr.resource.service.RsMetadataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,16 +27,17 @@ import java.util.Map;
  * @created 2016.05.20 14:03
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/rs/solr_schema")
-@Api(value = "资源Solr模式更新接口", description = "资源数据元与Solr Schema同步服务")
+@RequestMapping(value = ApiVersion.Version1_0)
+@Api(value = "SolrSchema", description = "资源数据元与SolrSchema同步服务")
 public class SolrSchemaEndPoint {
+
     @Autowired
-    MetadataService metaDataService;
+    RsMetadataService metaDataService;
 
     @Autowired
     SolrClient solrClient;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "/rs/solr_schema", method = RequestMethod.GET)
     @ApiOperation(value = "导出档案的SolrSchema字段")
     public List<Map<String, Object>> exportProfileSolrSchema(
             @ApiParam(value = "core", defaultValue = "HealthProfile")
@@ -49,7 +50,7 @@ public class SolrSchemaEndPoint {
         return fields;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/rs/solr_schema", method = RequestMethod.POST)
     @ApiOperation(value = "更新SolrSchema字段", notes = "对比现有的资源数据元与Solr中的Schema字段列表，若不存在则添加")
     public void updateSolrSchema(
             @ApiParam(value = "core", defaultValue = "HealthProfile")

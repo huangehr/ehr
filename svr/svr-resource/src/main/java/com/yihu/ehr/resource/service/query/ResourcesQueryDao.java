@@ -25,15 +25,15 @@ import java.util.Map;
  * Created by hzp on 2016/4/22.
  * 资源查询底层接口
  */
-@Service("resourcesQueryDao")
+@Service
 public class ResourcesQueryDao {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
     @Autowired
-    HbaseQuery hbase;
+    private HbaseQuery hbase;
     @Autowired
-    SolrQuery solr;
+    private SolrQuery solr;
 
     private Integer defaultPage = 1;
     private Integer defaultSize = 1000;

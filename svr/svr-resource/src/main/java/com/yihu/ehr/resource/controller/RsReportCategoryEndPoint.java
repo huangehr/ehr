@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(description = "资源报表分类服务接口")
+@Api(value = "RsReportCategory", description = "资源报表分类服务接口")
 public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

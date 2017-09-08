@@ -15,11 +15,11 @@ import java.util.List;
 /**
  * Created by hzp on 2016/5/14.
  */
-@Service("resourcesMetadataQueryDao")
+@Service
 public class ResourcesMetadataQueryDao {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * 获取某资源所有数据元

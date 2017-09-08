@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.intf.RsDictionaryDao;
+import com.yihu.ehr.resource.dao.RsDictionaryDao;
 import com.yihu.ehr.resource.model.RsDictionary;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;

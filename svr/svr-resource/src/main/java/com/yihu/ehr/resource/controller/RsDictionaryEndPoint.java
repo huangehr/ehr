@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/dictionaries")
-@Api(value = "dictionaries", description = "标准字典服务接口")
+@Api(value = "RsDictionary", description = "标准字典服务接口")
 public class RsDictionaryEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

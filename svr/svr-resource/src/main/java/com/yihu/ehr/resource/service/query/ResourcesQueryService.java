@@ -8,9 +8,9 @@ import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.query.services.SolrQuery;
-import com.yihu.ehr.resource.dao.intf.*;
-import com.yihu.ehr.resource.feign.XAppClient;
-import com.yihu.ehr.resource.feign.XRedisServiceClient;
+import com.yihu.ehr.resource.dao.*;
+import com.yihu.ehr.resource.feign.AppClient;
+import com.yihu.ehr.resource.feign.RedisClient;
 import com.yihu.ehr.resource.model.*;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.lang.model.type.ArrayType;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -31,43 +29,27 @@ import java.util.*;
 public class ResourcesQueryService  {
 
     @Autowired
-    SolrQuery solr;
-
+    private SolrQuery solr;
     @Autowired
-    HbaseQuery hbase;
-
+    private HbaseQuery hbase;
     @Autowired
-    ResourcesDao resourcesDao;
-
+    private RsResourceDao resourcesDao;
     @Autowired
-    ResourcesMetadataQueryDao resourceMetadataQueryDao;
-
+    private ResourcesMetadataQueryDao resourceMetadataQueryDao;
     @Autowired
-    ResourcesQueryDao resourcesQueryDao;
-
+    private ResourcesQueryDao resourcesQueryDao;
     @Autowired
-    ResourceDefaultParamDao resourceDefaultParamDao;
-
+    private RsResourceDefaultParamDao resourceDefaultParamDao;
     @Autowired
-    AdapterSchemeDao adapterSchemeDao;
-
+    private RsAppResourceDao appResourceDao;
     @Autowired
-    AdapterMetadataDao adapterMetadataDao;
-
+    private RedisClient redisServiceClient;
     @Autowired
-    AppResourceDao appResourceDao;
-
+    private AppClient appClient;
     @Autowired
-    XRedisServiceClient redisServiceClient;
-
+    private ObjectMapper objectMapper;
     @Autowired
-    XAppClient appClient;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    ResourcesDefaultQueryDao resourcesDefaultQueryDao;
+    private RsResourceDefaultQueryDao resourcesDefaultQueryDao;
 
     //忽略字段
     private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","demographic_id", "patient_id","org_code","org_name","profile_id", "cda_version", "client_id","profile_type","patient_name","org_area","diagnosis","health_problem"));
@@ -107,9 +89,9 @@ public class ResourcesQueryService  {
     public Envelop getResourceData(String resourcesCode, String orgCode, String queryCondition, Integer page, Integer size) throws Exception {
         String queryParams = "";
         //获取资源信息
-        RsResources rsResources = resourcesDao.findByCode(resourcesCode);
+        RsResource rsResources = resourcesDao.findByCode(resourcesCode);
         if(rsResources != null) {
-            RsResourcesQuery resourcesQuery = resourcesDefaultQueryDao.findByResourcesId(rsResources.getId());
+            RsResourceDefaultQuery resourcesQuery = resourcesDefaultQueryDao.findByResourcesId(rsResources.getId());
             List<QueryCondition> ql = new ArrayList<>();
             //设置参数
             if (!StringUtils.isEmpty(queryCondition) && !queryCondition.equals("{}")) {
@@ -138,7 +120,7 @@ public class ResourcesQueryService  {
     public Envelop resourcesBrowse(String resourcesCode, String appId, String orgCode, String queryParams, Integer page, Integer size) throws Exception {
         Envelop envelop = null;
         //获取资源信息
-        RsResources rsResources = resourcesDao.findByCode(resourcesCode);
+        RsResource rsResources = resourcesDao.findByCode(resourcesCode);
         if(rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
             //获取结果集
@@ -192,7 +174,7 @@ public class ResourcesQueryService  {
          * 权限控制
          */
         for(String code : codeList) {
-            RsResources rsResources = resourcesDao.findByCode(code);
+            RsResource rsResources = resourcesDao.findByCode(code);
             if(rsResources != null) {
                 String grantType = rsResources.getGrantType(); //访问方式 0开放 1授权
                 //获取资源结构，检查APP权限
@@ -264,7 +246,7 @@ public class ResourcesQueryService  {
      */
     private Envelop getResultData(String resourcesCode, String appId, String orgCode, String queryParams, Integer page, Integer size, boolean isSpecialScan) throws Exception{
         Envelop envelop = new Envelop();
-        RsResources rsResources = resourcesDao.findByCode(resourcesCode);
+        RsResource rsResources = resourcesDao.findByCode(resourcesCode);
         if(rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
             String grantType = rsResources.getGrantType(); //访问方式 0开放 1授权
@@ -279,8 +261,8 @@ public class ResourcesQueryService  {
                 queryParams = addParams(queryParams,"saas",saas);
             }
             //通过资源代码获取默认参数
-            List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
-            for(ResourceDefaultParam param:paramsList) {
+            List<RsResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
+            for(RsResourceDefaultParam param:paramsList) {
                 queryParams = addParams(queryParams, param.getParamKey(), param.getParamValue());
             }
             //分组统计数据元
@@ -708,7 +690,7 @@ public class ResourcesQueryService  {
         Map<String, Object> mapParam = new HashMap<String, Object>();
         try {
             //获取资源信息
-            RsResources rs = resourcesDao.findByCode(resourcesCode);
+            RsResource rs = resourcesDao.findByCode(resourcesCode);
             //资源结构
             List<DtoResourceMetadata> metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode);
             List<String> colunmName = new ArrayList<String>();
