@@ -11,6 +11,7 @@ public class ResourceQuota {
     private int id;
     private String resourceId;
     private String quotaTypeName;
+    private String quotaCode;
     private int quotaChart;
     private int quotaId;
 
@@ -41,6 +42,15 @@ public class ResourceQuota {
 
     public void setQuotaTypeName(String quotaTypeName) {
         this.quotaTypeName = quotaTypeName;
+    }
+
+    @Column(name = "quota_code")
+    public String getQuotaCode() {
+        return quotaCode;
+    }
+
+    public void setQuotaCode(String quotaCode) {
+        this.quotaCode = quotaCode;
     }
 
     @Column(name = "quota_chart")
