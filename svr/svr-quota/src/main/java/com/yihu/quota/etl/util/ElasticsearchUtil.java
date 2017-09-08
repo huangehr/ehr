@@ -48,7 +48,7 @@ public class ElasticsearchUtil {
     ObjectMapper objectMapper;
 
     @Autowired
-    private EsConfigUtil esClientUtil;
+    private EsConfigUtil esConfigUtil;
 
 
     /**
@@ -62,8 +62,8 @@ public class ElasticsearchUtil {
                                                    int pageNo,int pageSize,String sortName){
         SearchResponse actionGet = null;
         SortBuilder dealSorter = SortBuilders.fieldSort(sortName).order(SortOrder.DESC);
-        actionGet = client.prepareSearch(esClientUtil.getIndex())
-                .setTypes(esClientUtil.getType())
+        actionGet = client.prepareSearch(esConfigUtil.getIndex())
+                .setTypes(esConfigUtil.getType())
                 .setQuery(boolQueryBuilder)
                 .setFrom(pageNo - 1).setSize(pageSize).addSort(dealSorter)//从0开始算
                 .execute().actionGet();
@@ -81,8 +81,8 @@ public class ElasticsearchUtil {
      */
     public long getTotalCount(Client client,BoolQueryBuilder boolQueryBuilder){
         SearchResponse actionGet = null;
-        actionGet = client.prepareSearch(esClientUtil.getIndex())
-                .setTypes(esClientUtil.getType())
+        actionGet = client.prepareSearch(esConfigUtil.getIndex())
+                .setTypes(esConfigUtil.getType())
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
         SearchHits hits = actionGet.getHits();
@@ -105,8 +105,8 @@ public class ElasticsearchUtil {
         }else{
             dealSorter = SortBuilders.fieldSort("_id").order(SortOrder.DESC);
         }
-        actionGet = client.prepareSearch(esClientUtil.getIndex())
-                .setTypes(esClientUtil.getType())
+        actionGet = client.prepareSearch(esConfigUtil.getIndex())
+                .setTypes(esConfigUtil.getType())
                 .setSize(size)
                 .setQuery(boolQueryBuilder)
                 .addSort(dealSorter)
@@ -134,8 +134,8 @@ public class ElasticsearchUtil {
 
         List<Map<String, Object>> list = new ArrayList<>();
         SearchRequestBuilder searchRequestBuilder =
-                client.prepareSearch(esClientUtil.getIndex())
-                .setTypes(esClientUtil.getType())
+                client.prepareSearch(esConfigUtil.getIndex())
+                .setTypes(esConfigUtil.getType())
                 .setQuery(queryBuilder);
 
         //创建TermsBuilder对象，使用term查询，设置该分组的名称为 name_count，并根据aggsField字段进行分组
@@ -229,14 +229,14 @@ public class ElasticsearchUtil {
      */
     public boolean save(Client client,String source) throws JsonProcessingException {
         IndexResponse indexResponse = client
-                .prepareIndex(esClientUtil.getIndex(), esClientUtil.getType(), null)
+                .prepareIndex(esConfigUtil.getIndex(), esConfigUtil.getType(), null)
                 .setSource(source).get();
         boolean result =  indexResponse.isCreated();
         return result;
     }
 
     public void deleteById(Client client ,String id){
-        DeleteRequestBuilder drBuilder = client.prepareDelete(esClientUtil.getIndex(), esClientUtil.getType(), id);
+        DeleteRequestBuilder drBuilder = client.prepareDelete(esConfigUtil.getIndex(), esConfigUtil.getType(), id);
         drBuilder.execute().actionGet();
     }
 
@@ -246,8 +246,8 @@ public class ElasticsearchUtil {
      */
     public void queryDelete(Client client,BoolQueryBuilder boolQueryBuilder){
         SearchResponse actionGet = null;
-        actionGet = client.prepareSearch(esClientUtil.getIndex())
-                .setTypes(esClientUtil.getType())
+        actionGet = client.prepareSearch(esConfigUtil.getIndex())
+                .setTypes(esConfigUtil.getType())
                 .setSize(10000)
                 .setQuery(boolQueryBuilder)
                 .execute().actionGet();
@@ -255,7 +255,7 @@ public class ElasticsearchUtil {
         List<Map<String, Object>> matchRsult = new LinkedList<Map<String, Object>>();
         for (SearchHit hit : hits.getHits()){
             matchRsult.add(hit.getSource());
-            DeleteRequestBuilder drBuilder = client.prepareDelete(esClientUtil.getIndex(), esClientUtil.getType(), hit.getId());
+            DeleteRequestBuilder drBuilder = client.prepareDelete(esConfigUtil.getIndex(), esConfigUtil.getType(), hit.getId());
             drBuilder.execute().actionGet();
         }
     }

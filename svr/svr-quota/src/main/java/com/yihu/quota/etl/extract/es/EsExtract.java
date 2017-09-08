@@ -68,7 +68,7 @@ public class EsExtract {
                                    String saasid,//saasid
                                    QuotaVo quotaVo,//指标code
                                    EsConfig esConfig //es配置
-    ) {
+    ) throws Exception {
         this.startTime = startTime;
         this.endTime = endTime;
         this.timeLevel = timeLevel;
@@ -79,7 +79,13 @@ public class EsExtract {
         //拼凑查询的sql
         Map<String, TjQuotaDimensionMain> sqls = getSql(qdm, qds);
         //根据sql查询ES
-        return queryEsBySql(sqls, qds);
+        List<SaveModel> saveModels = null;
+        try {
+            saveModels = queryEsBySql(sqls, qds);
+        }catch (Exception e){
+            throw new Exception("es 查询数据出错！" +e.getMessage() );
+        }
+        return saveModels;
 
     }
 
@@ -224,7 +230,7 @@ public class EsExtract {
         return returnList;
     }
 
-    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, Integer> map) {
+    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, Integer> map) throws Exception {
         Map<String, SaveModel> allData = new HashMap<>();
         //初始化主细维度
         allData= initDimension(tjQuotaDimensionSlaves, one, allData);
@@ -245,17 +251,28 @@ public class EsExtract {
     /**
      * 初始化主细维度
      */
-    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, SaveModel> allData) {
-        TjQuotaDimensionMain quotaDimensionMain = one.getValue();
-        //查询字典数据
-        List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-        //设置到map里面
-        setAllData(allData, dictData, quotaDimensionMain.getType());
-
-
-        for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-           List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-            allData = setAllSlaveData(allData, dictDataSlave,i);
+    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, Map.Entry<String,
+            TjQuotaDimensionMain> one, Map<String, SaveModel> allData) throws Exception {
+        try {
+            TjQuotaDimensionMain quotaDimensionMain = one.getValue();
+            //查询字典数据
+            List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+            if (dictData == null) {
+                throw new Exception("主纬度配置有误");
+            }else{
+                //设置到map里面
+                setAllData(allData, dictData, quotaDimensionMain.getType());
+                for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
+                    List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                    if (dictDataSlave == null) {
+                        throw new Exception("细纬度配置有误");
+                    }else{
+                        allData = setAllSlaveData(allData, dictDataSlave,i);
+                    }
+                }
+            }
+        }catch (Exception e){
+            throw new Exception("纬度配置有误");
         }
         return allData;
     }

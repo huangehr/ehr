@@ -54,6 +54,8 @@ public class EsQuotaJob implements Job {
     @Autowired
     private EsClientUtil esClientUtil;
     @Autowired
+    EsConfigUtil esConfigUtil;
+    @Autowired
     private ExtractHelper extractHelper;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
@@ -100,6 +102,7 @@ public class EsQuotaJob implements Job {
                 boolQueryBuilder.must(termQueryQuotaDate);
                 esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
                 Client client = esClientUtil.getClient(esConfig.getClusterName());
+                esConfigUtil.getConfig(esConfig);
                 elasticsearchUtil.queryDelete(client,boolQueryBuilder);
 
                 List<SaveModel> dataSaveModels = new ArrayList<>();
@@ -109,10 +112,15 @@ public class EsQuotaJob implements Job {
                         dataSaveModels.add(saveModel);
                     }
                 }
-                //保存数据
-                Boolean success = saveDate(dataSaveModels);
-                tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据保存失败");
+                if(dataSaveModels != null && dataSaveModels.size() > 0){
+                    //保存数据
+                    Boolean success = saveDate(dataSaveModels);
+                    tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
+                    tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据保存失败");
+                }else {
+                    tjQuotaLog.setStatus(Contant.save_status.success);
+                    tjQuotaLog.setContent("统计结果大于0的数据为0条");
+                }
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent("没有抽取到数据");
