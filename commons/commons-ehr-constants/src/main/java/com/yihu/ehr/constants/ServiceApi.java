@@ -12,22 +12,16 @@ public class ServiceApi {
 
 
     public static class Adaptions {
-        public static final String Cache = "/adaptions/{id}/cache";
-        public static final String CacheGet = "/adaptions/{key}/cache";
-
+        //public static final String Cache = "/adaptions/{id}/cache";
+        //public static final String CacheGet = "/adaptions/{key}/cache";
         public static final String Scheme = "/adaptions/schemas/{id}";
         public static final String Schemes = "/adaptions/schemas";
-
         public static final String SchemaMetadataList = "/adaptions/schema/metadata";
         public static final String SchemaMetadata = "/adaptions/schema/metadata/{id}";
         public static final String SchemaMetadataBatch = "/adaptions/schema/metadata/batch";
-
-
         public static final String RsAdapterDictionaries = "/adaptions/adapter/dictionaries";
-        public static final String RsAdapterDictionariesCache = "/adaptions/adapter/dictionaries/{schemaId}/cache";
+        //public static final String RsAdapterDictionariesCache = "/adaptions/adapter/dictionaries/{schemaId}/cache";
         public static final String RsAdapterDictionary = "/adaptions/adapter/dictionaries/{id}";
-
-
     }
 
     /**
@@ -809,13 +803,17 @@ public class ServiceApi {
         //初始化缓存
         public static final String InitAddress = "/redis/init/address";
         public static final String InitHealthProblem = "/redis/init/healthProblem";
-        public static final String InitIcd10Name = "/redis/init/icd10Name";
+        public static final String InitIcd10Hp = "/redis/init/icd10Hp";
+        public static final String InitIcd10 = "/redis/init/icd10";
+        public static final String InitIndicatorsDict = "/redis/init/indicatorsDict";
         public static final String InitOrgName = "/redis/init/orgName";
         public static final String InitOrgArea = "/redis/init/orgArea";
         public static final String InitOrgSaasArea = "/redis/init/orgSaasArea";
         public static final String InitOrgSaasOrg = "/redis/init/orgSaasOrg";
         public static final String InitVersions = "/redis/init/versions";
-        public static final String InitAdaptions = "/redis/init/adaptions/{id}";
+        public static final String InitRsAdapterDict = "/redis/init/rsAdapterDict/{id}";
+        public static final String InitRsAdapterMeta = "/redis/init/rsAdapterMeta/{id}";
+        public static final String InitRsMetadata = "/redis/init/rsMetadata";
 
         //更新缓存
         public static final String UpdateOrgName = "/redis/update/orgName";

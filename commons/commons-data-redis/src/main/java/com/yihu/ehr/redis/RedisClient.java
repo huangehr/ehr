@@ -21,6 +21,7 @@ import java.util.*;
  */
 @Service
 public class RedisClient {
+
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 

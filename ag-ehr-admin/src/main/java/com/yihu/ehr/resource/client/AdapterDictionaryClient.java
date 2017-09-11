@@ -52,9 +52,4 @@ public interface AdapterDictionaryClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
 
-    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionariesCache, method = RequestMethod.GET)
-    @ApiOperation("缓存适配版本字典数据")
-    public boolean dictCache(
-            @ApiParam(name = "schemaId", value = "schemaId", defaultValue = "")
-            @PathVariable(value = "schemaId") String schemaId);
 }

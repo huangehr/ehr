@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
  * Created by hzp on 2017.04.25
  */
 @Service
-public class ResourceAdaptionKeySchema extends KeySchema {
+public class RsAdapterMetaKeySchema extends KeySchema {
 
-    public ResourceAdaptionKeySchema(){
+    public RsAdapterMetaKeySchema(){
         super.table="rs_adapter_metadata";
         super.column="resource_metadata";
     }
@@ -18,7 +18,7 @@ public class ResourceAdaptionKeySchema extends KeySchema {
         return get(String.format("%s.%s.%s", cdaVersion, dataSet, ehrMetaData));
     }
 
-    public void setMetaData(String cdaVersion, String dataSet, String ehrMetaData,String val){
+    public void setMetaData(String cdaVersion, String dataSet, String ehrMetaData, String val){
         set(String.format("%s.%s.%s", cdaVersion, dataSet, ehrMetaData),val);
     }
 }

@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
  * Created by hzp on 2017.04.25
  */
 @Service
-public class ResourceMetadataSchema extends KeySchema {
+public class RsMetadataKeySchema extends KeySchema {
 
-    public ResourceMetadataSchema(){
+    public RsMetadataKeySchema(){
         super.table="rs_metadata";
         super.column="dict_code";
     }

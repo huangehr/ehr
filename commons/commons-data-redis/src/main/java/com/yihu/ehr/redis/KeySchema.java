@@ -12,16 +12,12 @@ import java.util.Set;
  * Created by hzp on 2017.04.25
  */
 public class KeySchema {
+
     @Autowired
     protected RedisClient redisClient;
-
     protected String table="table";
     protected String column="column";
-
     protected String keySchema = "%1:%2:%3";
-
-
-
 
     /**
      * 获取key
