@@ -63,6 +63,8 @@ spring:
 
   redis:
     host: 172.19.103.47 # Redis server host.
+    port: 6379
+    password: redis!@456
 
 fast-dfs:
   tracker-server: 172.19.103.13:22122

@@ -57,6 +57,8 @@ spring:
     password: chenweishan
   redis:
     host: 172.19.103.47 # Redis server host.
+    port: 6379
+    password: redis!@456
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
