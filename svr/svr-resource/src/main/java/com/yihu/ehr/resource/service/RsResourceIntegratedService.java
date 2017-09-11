@@ -42,9 +42,9 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
     public List<RsResource> findFileMasterList(String filters) {
         String sql = "";
         if (filters != null) {
-            sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resources rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0) AND rr.name like " + "'%" + filters + "%'";
+            sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resource rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0) AND rr.name like " + "'%" + filters + "%'";
         } else {
-            sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resources rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0)";
+            sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resource rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0)";
         }
         RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(RsResource.class);
         return this.jdbcTemplate.query(sql, rowMapper);
