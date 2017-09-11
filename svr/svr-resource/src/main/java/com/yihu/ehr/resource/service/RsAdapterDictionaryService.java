@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.schema.ResourceAdaptionDictSchema;
+import com.yihu.ehr.redis.schema.RsAdapterDictKeySchema;
 import com.yihu.ehr.resource.dao.RsAdapterSchemeDao;
 import com.yihu.ehr.resource.dao.RsAdapterDictionaryDao;
 import com.yihu.ehr.resource.model.RsAdapterDictionary;
@@ -22,7 +22,7 @@ import java.util.List;
 public class RsAdapterDictionaryService extends BaseJpaService<RsAdapterDictionary, RsAdapterDictionaryDao>  {
 
     @Autowired
-    private ResourceAdaptionDictSchema keySchema;
+    private RsAdapterDictKeySchema keySchema;
 
     @Autowired
     private RsAdapterSchemeDao schemaDao;
@@ -34,23 +34,4 @@ public class RsAdapterDictionaryService extends BaseJpaService<RsAdapterDictiona
         return adapterDictionaryDao.findOne(id);
     }
 
-
-    public void adaterDictCache(String schemaId)
-    {
-        RsAdapterScheme schema = schemaDao.findOne(schemaId);
-        List<RsAdapterDictionary> adapterDictList = adapterDictionaryDao.findBySchemeId(schemaId);
-
-        if(adapterDictList != null)
-        {
-            for(RsAdapterDictionary dict : adapterDictList)
-            {
-                if(StringUtils.isEmpty(dict.getDictCode().trim()) || StringUtils.isEmpty(dict.getSrcDictEntryCode().trim()))
-                {
-                    continue;
-                }
-
-                keySchema.setMetaData(schema.getAdapterVersion(),dict.getDictCode(),dict.getSrcDictEntryCode(),dict.getDictEntryCode() + "&" + dict.getSrcDictEntryName());
-            }
-        }
-    }
 }

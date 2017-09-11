@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.config.FastDFSConfig;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.profile.dao.TemplateDao;
 import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -24,7 +25,7 @@ import java.util.List;
  * Created by Administrator on 2016/6/14.
  */
 @Service
-public class ThridPrescriptionService extends BaseJpaService<Template, XTemplateRepository> {
+public class ThridPrescriptionService extends BaseJpaService<Template, TemplateDao> {
     @Autowired
     private FastDFSConfig FastDFSConfig;
 

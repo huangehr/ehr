@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
  * Created by hzp on 2017.04.25
  */
 @Service
-public class ResourceAdaptionDictSchema extends KeySchema {
+public class RsAdapterDictKeySchema extends KeySchema {
 
-    public ResourceAdaptionDictSchema(){
+    public RsAdapterDictKeySchema(){
         super.table="rs_adapter_dictionary";
         super.column="code_name";
     }

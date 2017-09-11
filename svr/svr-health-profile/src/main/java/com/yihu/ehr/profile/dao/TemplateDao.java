@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.service;
+package com.yihu.ehr.profile.dao;
 
 import com.yihu.ehr.profile.model.Template;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +11,7 @@ import java.util.List;
  * @version 1.0
  * @created 2016.04.08 11:56
  */
-public interface XTemplateRepository extends PagingAndSortingRepository<Template, Integer> {
+public interface TemplateDao extends PagingAndSortingRepository<Template, Integer> {
     Template findByOrganizationCodeAndCdaDocumentIdAndCdaVersion(String orgCode, String cdaDocumentId, String cdaVersion);
 
     List<Template> findByOrganizationCodeAndCdaVersion(String orgCode, String cdaVersion);

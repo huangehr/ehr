@@ -1,5 +1,6 @@
 package com.yihu.ehr.profile.service;
 
+import com.yihu.ehr.profile.dao.TemplateDao;
 import com.yihu.ehr.profile.model.MedicationStat;
 import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.query.BaseJpaService;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class MedicationStatService extends BaseJpaService<Template, XTemplateRepository> {
+public class MedicationStatService extends BaseJpaService<Template, TemplateDao> {
 
 
 

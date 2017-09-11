@@ -60,7 +60,4 @@ public interface AdapterMetadataClient {
     @ApiOperation("批量创建适配数据元")
     MRsAdapterMetadata createRsMetaDataBatch(@RequestBody String jsonData);
 
-    @RequestMapping(value = ServiceApi.Resources.MetadataCache,method = RequestMethod.POST)
-    @ApiOperation("缓存数据元字典数据")
-    boolean metadataCache();
 }
