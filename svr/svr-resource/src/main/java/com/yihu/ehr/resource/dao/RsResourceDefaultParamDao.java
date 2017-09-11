@@ -15,10 +15,10 @@ public interface RsResourceDefaultParamDao extends PagingAndSortingRepository<Rs
 
     List<RsResourceDefaultParam> findByResourcesCode(String resourcesCode);
 
-    @Query("from ResourceDefaultParam where resourcesId = ?1 or resourcesCode = ?2 ")
+    @Query("from RsResourceDefaultParam where resourcesId = ?1 or resourcesCode = ?2 ")
     List<RsResourceDefaultParam> findByResourcesIdOrResourcesCode(String resourcesId, String resourceCode);
 
-    @Query("from ResourceDefaultParam where ( resourcesId = ?1 or resourcesCode = ?2 ) and paramKey = ?3 ")
+    @Query("from RsResourceDefaultParam where ( resourcesId = ?1 or resourcesCode = ?2 ) and paramKey = ?3 ")
     List<RsResourceDefaultParam> findByResourcesIdOrResourcesCodeWithParamKey(String resourceId, String resourceCode , String ParamKey);
 
     @Query("select rdf from RsResourceDefaultParam rdf where rdf.id = :id")
