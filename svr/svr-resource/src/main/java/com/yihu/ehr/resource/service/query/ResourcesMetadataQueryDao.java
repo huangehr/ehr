@@ -27,7 +27,7 @@ public class ResourcesMetadataQueryDao {
     public List<DtoResourceMetadata> getResourceMetadata(String resourcesCode) throws Exception
     {
         String sql = "select m.id,m.domain,m.name,m.STD_CODE,m.DISPLAY_CODE,m.COLUMN_TYPE,m.NULL_ABLE,m.DICT_CODE,m.DESCRIPTION,m.VALID,a.GROUP_TYPE,a.GROUP_DATA\n" +
-                "from rs_resource_metadata a,rs_resources b,rs_metadata m \n" +
+                "from rs_resource_metadata a,rs_resource b,rs_metadata m \n" +
                 "where a.RESOURCES_ID=b.ID \n" +
                 "and a.METADATA_ID = m.id \n" +
                 "and b.code='"+resourcesCode+"'";
@@ -41,7 +41,7 @@ public class ResourcesMetadataQueryDao {
     public List<DtoResourceMetadata> getResourceMetadata(String resourcesCode,String appResourceId) throws Exception
     {
         String sql = "select m.id,m.domain,m.name,m.STD_CODE,m.DISPLAY_CODE,m.COLUMN_TYPE,m.NULL_ABLE,m.DICT_CODE,m.DESCRIPTION,m.VALID,a.GROUP_TYPE,a.GROUP_DATA\n" +
-                "from rs_resource_metadata a,rs_resources b,rs_metadata m,rs_app_resource_metadata n\n" +
+                "from rs_resource_metadata a,rs_resource b,rs_metadata m,rs_app_resource_metadata n\n" +
                 "where a.RESOURCES_ID=b.ID \n" +
                 "and a.METADATA_ID = m.id\n" +
                 "and a.id = n.RESOURCE_METADATA_ID\n" +
