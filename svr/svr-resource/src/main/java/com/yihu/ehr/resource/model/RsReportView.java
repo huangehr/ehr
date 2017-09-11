@@ -50,7 +50,7 @@ public class RsReportView {
         this.resourceId = resourceId;
     }
 
-    @Formula("(SELECT rs.name FROM rs_report_view rv LEFT JOIN rs_resources rs ON rs.id = rv.RESOURCE_ID WHERE rv.ID = id )")
+    @Formula("(SELECT rs.name FROM rs_report_view rv LEFT JOIN rs_resource rs ON rs.id = rv.RESOURCE_ID WHERE rv.ID = id )")
     public String getResourceName() {
         return resourceName;
     }
