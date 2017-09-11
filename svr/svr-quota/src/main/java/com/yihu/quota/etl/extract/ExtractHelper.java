@@ -97,7 +97,7 @@ public class ExtractHelper {
             }
             return null;
         } catch (Exception e) {
-            throw new Exception("数据抽取错误");
+            throw new Exception("数据抽取错误," + e.getMessage() );
         }
     }
 

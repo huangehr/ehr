@@ -1,10 +1,9 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.redis.schema.ResourceAdaptionDictSchema;
-import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
-import com.yihu.ehr.resource.dao.intf.RsAdapterDictionaryDao;
+import com.yihu.ehr.resource.dao.RsAdapterSchemeDao;
+import com.yihu.ehr.resource.dao.RsAdapterDictionaryDao;
 import com.yihu.ehr.resource.model.RsAdapterDictionary;
 import com.yihu.ehr.resource.model.RsAdapterScheme;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ public class RsAdapterDictionaryService extends BaseJpaService<RsAdapterDictiona
     private ResourceAdaptionDictSchema keySchema;
 
     @Autowired
-    private AdapterSchemeDao schemaDao;
+    private RsAdapterSchemeDao schemaDao;
 
     @Autowired
     private RsAdapterDictionaryDao adapterDictionaryDao;

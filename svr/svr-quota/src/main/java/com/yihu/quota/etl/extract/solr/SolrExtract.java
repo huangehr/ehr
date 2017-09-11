@@ -124,7 +124,12 @@ public class SolrExtract {
             return returnList;
         }else {
             //多分组查询
-            List<Map<String, Object>>   list = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
+            List<Map<String, Object>>   list = null;
+            try {
+                  list = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
+            }catch (Exception e){
+                throw  new Exception("solr查询数据出错！" + e.getMessage());
+            }
             if(list != null && list.size() > 0){
                 for(Map<String, Object> objectMap : list){
                     long count = 0;
@@ -155,7 +160,7 @@ public class SolrExtract {
     }
 
     private void compute(List<TjQuotaDimensionMain> qdm,List<TjQuotaDimensionSlave> qds,
-            List<SaveModel> returnList, Map<String, Long> map) {
+            List<SaveModel> returnList, Map<String, Long> map) throws Exception {
         Map<String, SaveModel> allData = new HashMap<>();
         //初始化主细维度
         for(TjQuotaDimensionMain qmain:qdm){
@@ -177,15 +182,27 @@ public class SolrExtract {
     /**
      * 初始化主细维度
      */
-    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, TjQuotaDimensionMain quotaDimensionMain, Map<String, SaveModel> allData) {
-        //查询字典数据
-        List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-        //设置到map里面
-        setAllData(allData, dictData, quotaDimensionMain.getType());
-        for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-            List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-            allData = setAllSlaveData(allData, dictDataSlave,i);
-        }
+    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, TjQuotaDimensionMain quotaDimensionMain, Map<String, SaveModel> allData) throws Exception {
+       try {
+           //查询字典数据
+           List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+           if (dictData == null) {
+               throw new Exception("主纬度配置有误");
+           }else {
+               //设置到map里面
+               setAllData(allData, dictData, quotaDimensionMain.getType());
+               for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
+                   List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                   if (dictDataSlave == null) {
+                       throw new Exception("细纬度配置有误");
+                   }else {
+                       allData = setAllSlaveData(allData, dictDataSlave,i);
+                   }
+               }
+           }
+       }catch (Exception e){
+           throw new Exception("纬度配置有误");
+       }
         return allData;
     }
 

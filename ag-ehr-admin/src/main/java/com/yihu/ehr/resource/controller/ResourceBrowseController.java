@@ -1,24 +1,26 @@
 package com.yihu.ehr.resource.controller;
 
-import com.yihu.ehr.agModel.resource.*;
+import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
+import com.yihu.ehr.agModel.resource.RsBrowseModel;
+import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
+import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.resource.MRsCategory;
-import com.yihu.ehr.model.resource.MRsMetadata;
-import com.yihu.ehr.model.resource.MRsResourceMetadata;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,6 +53,8 @@ public class ResourceBrowseController extends BaseController {
     private TjQuotaClient tjQuotaClient;
     @Autowired
     private TjQuotaJobClient tjQuotaJobClient;
+    @Autowired
+    private RsResourceDefaultQueryClient rsResourceDefaultQueryClient;
 
     @ApiOperation("获取档案资源分类")
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseCategories, method = RequestMethod.GET)
@@ -158,7 +162,7 @@ public class ResourceBrowseController extends BaseController {
             //获取资源关联指标
             List<ResourceQuotaModel> rqmList = resourceQuotaClient.getByResourceId(resourcesId);
             //获取资源默认查询条件
-            String query = resourceBrowseClient.getResourceDefaultQueryById(resourcesId);
+            String query = rsResourceDefaultQueryClient.getByResourceId(resourcesId);
             //拼接指标code字符串作为维度交集查询参数
             String quotaCodes = "";
             quotaCodeArr = new String [rqmList.size()];
@@ -175,6 +179,10 @@ public class ResourceBrowseController extends BaseController {
             }
             //拼接交集维度字符串作为查询参数
             String dimension = "";
+            if(StringUtils.isEmpty(quotaCodes)) {
+                envelop.setErrorMsg("交集维度为空");
+                return envelop;
+            }
             List<Map<String, String>> qsdList = tjQuotaClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
             if(qsdList == null || qsdList.size() <= 0) {
                 envelop.setSuccessFlg(true);

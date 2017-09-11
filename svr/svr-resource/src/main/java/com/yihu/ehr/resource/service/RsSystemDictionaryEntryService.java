@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.intf.RsSystemDictionaryEntryDao;
+import com.yihu.ehr.resource.dao.RsSystemDictionaryEntryDao;
 import com.yihu.ehr.resource.model.RsSystemDictionaryEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
