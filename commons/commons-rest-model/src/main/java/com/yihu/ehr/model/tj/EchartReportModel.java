@@ -36,4 +36,11 @@ public class EchartReportModel {
         this.yData = yData;
     }
 
+    public List<MapDataModel> getDataModels() {
+        return dataModels;
+    }
+
+    public void setDataModels(List<MapDataModel> dataModels) {
+        this.dataModels = dataModels;
+    }
 }
