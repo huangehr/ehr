@@ -3,7 +3,6 @@ package com.yihu.ehr.redis.service;
 import com.yihu.ehr.redis.schema.*;
 import com.yihu.ehr.util.id.ObjectVersion;
 import com.yihu.ehr.util.log.LogService;
-import jdk.nashorn.internal.scripts.JD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
