@@ -6,6 +6,7 @@ import com.yihu.ehr.entity.patient.ArchiveRelation;
 import com.yihu.ehr.patient.dao.XArchiveRelationDao;
 import com.yihu.ehr.patient.feign.PatientArchiveClient;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -129,5 +131,43 @@ public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XAr
         }
     }
 
+    public int getIdentifyCount() {
+        return archiveRelationDao.findIdentifyCount();
+    }
 
+    public int getUnIdentifyCount() {
+        return archiveRelationDao.findUnIdentifyCount();
+    }
+
+    public int getArchiveCount() {
+        return archiveRelationDao.findArchiveCount();
+    }
+
+    public int getInPatientCount() {
+        return archiveRelationDao.findInPatientCount();
+    }
+
+    public int getOutPatientCount() {
+        return archiveRelationDao.findOutPatientCount();
+    }
+
+    public int getInAndOutPatientCount() {
+        return archiveRelationDao.findInAndOutPatientCount();
+    }
+
+    public int getTodayInWarehouseCount() {
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String curDate = sdf.format(date);
+        int result = archiveRelationDao.findTodayInWarehouseCount(DateUtil.strToDate(curDate));
+        return result;
+    }
+
+    public int getDailyAdd() {
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String curDate = sdf.format(date);
+        int result = archiveRelationDao.FindDailyAdd(DateUtil.strToDate(curDate));
+        return result;
+    }
 }
