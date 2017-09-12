@@ -255,7 +255,8 @@ public class ResourceQueryEndPoint {
 
     @ApiOperation("Hbase主表统计")
     @RequestMapping(value = ServiceApi.Resources.ResourcesMasterStat, method = RequestMethod.GET)
-    public Envelop countEhrCenter(@ApiParam(value = "queryParams", defaultValue = "{\"groupFields\":\"org_code,HDSD00_01_003_VALUE_S,HDSA00_01_015_VALUE_S\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
+    public Envelop countEhrCenter(@ApiParam(value = "queryParams", defaultValue = "{\"groupFields\":\"org_code\"}")
+                                      @RequestParam(value = "queryParams", required = false) String queryParams,
                                                     @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
                                                     @ApiParam("size") @RequestParam(value = "size", required = false) Integer size) throws Exception {
         Page<Map<String, Object>> result = resourcesQueryDao.countEhrCenter(queryParams, page, size);
