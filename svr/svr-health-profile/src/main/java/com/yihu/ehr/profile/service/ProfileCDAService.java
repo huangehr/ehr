@@ -7,6 +7,7 @@ import com.yihu.ehr.model.resource.MCdaTransformDto;
 import com.yihu.ehr.model.standard.MCDADocument;
 import com.yihu.ehr.model.standard.MCdaDataSet;
 import com.yihu.ehr.profile.config.CdaDocumentTypeOptions;
+import com.yihu.ehr.profile.dao.TemplateDao;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.feign.XResourceClient;
 import com.yihu.ehr.profile.feign.XTransformClient;
@@ -30,7 +31,7 @@ public class ProfileCDAService {
 
     //模板服务
     @Autowired
-    XTemplateRepository templateRepository;
+    TemplateDao templateRepository;
 
     @Autowired
     TemplateService templateService;

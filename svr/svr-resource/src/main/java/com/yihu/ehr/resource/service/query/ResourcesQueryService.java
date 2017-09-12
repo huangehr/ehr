@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Created by hzp on 2016/4/13.
  */
-@Service("resourcesQueryService")
+@Service
 public class ResourcesQueryService  {
 
     @Autowired

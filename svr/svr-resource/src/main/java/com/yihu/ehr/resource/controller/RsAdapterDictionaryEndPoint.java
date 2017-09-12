@@ -199,13 +199,5 @@ public class RsAdapterDictionaryEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionariesCache, method = RequestMethod.GET)
-    @ApiOperation("缓存适配版本字典数据")
-    public boolean dictCache(
-            @ApiParam(name = "schemaId", value = "schemaId", defaultValue = "")
-            @PathVariable(value = "schemaId") String schemaId) {
-        adapterDictionaryService.adaterDictCache(schemaId);
-        return true;
-    }
 
 }

@@ -58,6 +58,8 @@ spring:
     password: chenweishan
   redis:
     host: 172.19.103.47 # Redis server host.
+    port: 6379
+    password: redis!@456
   metrics:
     export:
       statsd:

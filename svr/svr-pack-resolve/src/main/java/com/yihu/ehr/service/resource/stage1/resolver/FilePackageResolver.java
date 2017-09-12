@@ -31,9 +31,9 @@ import java.util.*;
  */
 @Component
 public class FilePackageResolver extends PackageResolver {
+
     @Autowired
     XRedisServiceClient redisServiceClient;
-
     @Autowired
     FastDFSUtil fastDFSUtil;
 

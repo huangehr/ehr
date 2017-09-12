@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class RedisEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    RedisService redisService;
+    private RedisService redisService;
 
     @ApiOperation("获取地址")
     @RequestMapping(value = ServiceApi.Redis.AddressRedis, method = RequestMethod.GET)
@@ -36,8 +36,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
         return redisService.getHealthProblemRedis(key);
     }
 
-
-    @ApiOperation("获取ICD10健康问题")
+    @ApiOperation("获取ICD10健康问题名称")
     @RequestMapping(value = ServiceApi.Redis.Icd10HpRelationRedis, method = RequestMethod.GET)
     public String getIcd10HpRelationRedis(@ApiParam(value = "key", defaultValue = "")
                                               @RequestParam("key") String key) {
@@ -64,7 +63,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
                                          @RequestParam("key") String key) {
         return redisService.getIndicatorsRedis(key);
     }
-
 
     @ApiOperation("获取机构名称")
     @RequestMapping(value = ServiceApi.Redis.OrgRedis, method = RequestMethod.GET)
@@ -97,7 +95,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
     }
 
     /******************************************* 资源化相关Redis *******************************************************************/
-
     @ApiOperation("获取资源化字典映射")
     @RequestMapping(value = ServiceApi.Redis.RsAdaptionDict, method = RequestMethod.GET)
     @ResponseBody
@@ -109,7 +106,6 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
                                     @RequestParam("srcDictEntryCode") String srcDictEntryCode) {
         return redisService.getRsAdaptionDict(cdaVersion,dictCode,srcDictEntryCode);
     }
-
 
     @ApiOperation("获取资源化数据元映射")
     @RequestMapping(value = ServiceApi.Redis.RsAdaptionMetaData, method = RequestMethod.GET)
@@ -123,8 +119,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
         return redisService.getRsAdaptionMetaData(cdaVersion,dictCode,srcDictEntryCode);
     }
 
-
-    @ApiOperation("获取资源化数据元映射")
+    @ApiOperation("获取资源化数据元字典")
     @RequestMapping(value = ServiceApi.Redis.RsMetaData, method = RequestMethod.GET)
     @ResponseBody
     public String getRsMetaData(@ApiParam(value = "key", defaultValue = "")
@@ -141,6 +136,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
                                     @RequestParam("key") String key) {
         return redisService.getStdVersion(key);
     }
+
 
 
     @ApiOperation("获取标准数据集代码")
@@ -203,7 +199,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
                                       @RequestParam("dataSetCode") String dataSetCode,
                                   @ApiParam(value = "innerCode", defaultValue = "")
                                       @RequestParam("innerCode") String innerCode) {
-        return redisService.getMetaDataDict(version, dataSetCode,innerCode);
+        return redisService.getMetaDataDict(version, dataSetCode, innerCode);
     }
 
 
@@ -216,8 +212,7 @@ public class RedisEndPoint extends EnvelopRestEndPoint {
                                     @ApiParam(value = "entryCode", defaultValue = "")
                                     @RequestParam("entryCode") String entryCode) {
 
-        return redisService.getDictEntryValue( version, dictId , entryCode);
+        return redisService.getDictEntryValue(version, dictId , entryCode);
     }
-
 
 }

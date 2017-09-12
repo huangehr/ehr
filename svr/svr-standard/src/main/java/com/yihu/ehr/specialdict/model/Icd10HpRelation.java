@@ -12,7 +12,7 @@ import java.util.Date;
  * @updated 02-6月-2015 20:25:02
  */
 @Entity
-@Table(name = "hp_icd10_relation")
+@Table(name = "icd10_hp_relation")
 @Access(value = AccessType.PROPERTY)
 public class Icd10HpRelation implements Serializable{
 

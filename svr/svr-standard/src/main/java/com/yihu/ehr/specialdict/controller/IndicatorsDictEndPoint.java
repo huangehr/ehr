@@ -160,8 +160,6 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
       return result;
     }
 
-
-
     @RequestMapping(value = "/dict/indicators/ids", method = RequestMethod.GET)
     @ApiOperation(value = "根据ids获取相应的指标字典信息" )
     public List<MIndicatorsDict> getIndicatorsDictByIds(
@@ -175,18 +173,4 @@ public class IndicatorsDictEndPoint extends EnvelopRestEndPoint {
         return (List<MIndicatorsDict>)convertToModels(indicatorsDicts, new ArrayList<>(indicatorsDicts.size()), MIndicatorsDict.class, "");
     }
 
-    @RequestMapping(value = "/dict/indicators/CacheIndicatorsDict" , method = RequestMethod.GET)
-    @ApiOperation(value = "缓存健康问题字典/redis缓存")
-    public void CacheHpDictByCodes(){
-
-        indicatorsDictService.CacheIndicatorsDict();
-    }
-
-    @RequestMapping(value = "/dict/indicators/getIndicatorsDictByCode" , method = RequestMethod.GET)
-    @ApiOperation(value = "根据字典代码获取缓存的健康问题字典/redis缓存")
-    public HashMap getHpDictByCodes(
-            @ApiParam(name = "code", value = "code", defaultValue = "")
-            @RequestParam(value = "code") String code){
-        return indicatorsDictService.getIndicatorsDictByCode(code);
-    }
 }

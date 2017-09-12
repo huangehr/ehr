@@ -1,7 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.schema.ResourceMetadataSchema;
+import com.yihu.ehr.redis.schema.RsMetadataKeySchema;
 import com.yihu.ehr.resource.dao.RsResourceMetadataDao;
 import com.yihu.ehr.resource.dao.RsMetadataDao;
 import com.yihu.ehr.resource.model.RsMetadata;
@@ -33,7 +33,7 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
     private RsMetadataDao metadataDao;
 
     @Autowired
-    private ResourceMetadataSchema keySchema;
+    private RsMetadataKeySchema keySchema;
 
 
     /**
@@ -164,24 +164,6 @@ public class RsMetadataService extends BaseJpaService<RsMetadata, RsResourceMeta
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
         sqlQuery.setParameterList("ids", ids);
         return sqlQuery.list();
-    }
-
-    /**
-     * 数据元缓存
-     */
-    public void metadataCache()
-    {
-        Iterable<RsMetadata> metadatas = metadataDao.findMetadataExistDictCode();
-
-        for(RsMetadata meta : metadatas)
-        {
-            if(StringUtils.isEmpty(meta.getDictCode().trim()))
-            {
-                continue;
-            }
-
-            keySchema.set(meta.getId(),meta.getDictCode());
-        }
     }
 
     public int getMaxIdNumber() {

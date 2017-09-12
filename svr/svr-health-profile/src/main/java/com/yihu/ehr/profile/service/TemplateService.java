@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.service;
 
 import com.yihu.ehr.model.standard.MCDADocument;
+import com.yihu.ehr.profile.dao.TemplateDao;
 import com.yihu.ehr.profile.feign.XCDADocumentClient;
 import com.yihu.ehr.profile.model.Template;
 import com.yihu.ehr.query.BaseJpaService;
@@ -26,24 +27,26 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
-public class TemplateService extends BaseJpaService<Template, XTemplateRepository> {
+public class TemplateService extends BaseJpaService<Template, TemplateDao> {
 
 
     @Autowired
-    XCDADocumentClient cdaDocumentClient;
+    private XCDADocumentClient cdaDocumentClient;
+    @Autowired
+    private TemplateDao templateDao;
 
     public Template getTemplate(Integer id) {
-        Template template = getRepo().findOne(id);
+        Template template = templateDao.findOne(id);
         return template;
     }
 
     public Template getTemplate(String orgCode, String cdaDocumentId, String cdaVersion) {
-        Template template = getRepo().findByOrganizationCodeAndCdaDocumentIdAndCdaVersion(orgCode, cdaDocumentId, cdaVersion);
+        Template template = templateDao.findByOrganizationCodeAndCdaDocumentIdAndCdaVersion(orgCode, cdaDocumentId, cdaVersion);
         return template;
     }
 
     public Template getPresriptionTemplate(String orgCode, String cdaVersion, String cdaCode) {
-        Template template = getRepo().findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
+        Template template = templateDao.findByOrganizationCodeAndCdaVersionAndCdaCode(orgCode, cdaVersion, cdaCode);
         return template;
     }
 
@@ -53,8 +56,9 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
 
     public boolean isExistName(String title, String cdaVersion, String orgCode){
 
-        return getRepo().countByTitleAndCdaVersionAndOrgCode(title, cdaVersion, orgCode)>0;
+        return templateDao.countByTitleAndCdaVersionAndOrgCode(title, cdaVersion, orgCode)>0;
     }
+
     public void createTemplate(Template template) {
         save(template);
     }
@@ -64,7 +68,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
     }
 
     public void deleteTemplate(int id) {
-        getRepo().delete(id);
+        templateDao.delete(id);
     }
 
     /**
@@ -76,7 +80,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
      * @return
      */
     public Map<Template, MCDADocument> getOrganizationTemplates(String orgCode, String cdaVersion, String cdaType){
-        List<Template> templates = getRepo().findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
+        List<Template> templates = templateDao.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
         List<String> cdaDocumentIdList = new ArrayList<>(templates.size());
         cdaDocumentIdList.addAll(templates.stream().map(template -> template.getCdaDocumentId()).collect(Collectors.toList()));
 
@@ -107,7 +111,7 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
     }
 
     public Pair<Template, MCDADocument> getOrganizationTemplate(String orgCode, String cdaVersion, String cdaType, String cdaDocumentId) throws Exception {
-        Template template = getRepo().findByOrganizationCodeAndCdaVersionAndCdaDocumentId(orgCode, cdaVersion, cdaDocumentId);
+        Template template = templateDao.findByOrganizationCodeAndCdaVersionAndCdaDocumentId(orgCode, cdaVersion, cdaDocumentId);
         if (template == null) return null;
 
         List<MCDADocument> documentList = cdaDocumentClient.getCDADocumentByIds(
@@ -121,10 +125,6 @@ public class TemplateService extends BaseJpaService<Template, XTemplateRepositor
 
         Pair<Template, MCDADocument> cdaDocumentMap =  new ImmutablePair<>(template, documentList.get(0));
         return cdaDocumentMap;
-    }
-
-    private XTemplateRepository getRepo() {
-        return (XTemplateRepository) getRepository();
     }
 
 }

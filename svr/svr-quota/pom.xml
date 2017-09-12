@@ -72,6 +72,7 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>
+            <scope>${dependency.scope}</scope>
         </dependency>
 
         <dependency>

@@ -119,14 +119,6 @@ public class RsMetadataEndPoint extends EnvelopRestEndPoint {
         return existCodes;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.MetadataCache,method = RequestMethod.POST)
-    @ApiOperation("缓存数据元数据")
-    public boolean metadataCache()
-    {
-        metadataService.metadataCache();
-        return true;
-    }
-
     @RequestMapping(value = ServiceApi.Resources.MetadataIdExistence,method = RequestMethod.POST)
     @ApiOperation("获取已存在资源标准编码")
     public List idExistence(
