@@ -28,6 +28,11 @@ import java.util.Map;
 @Service
 public class ResourcesQueryDao {
 
+    private Integer defaultPage = 1;
+    private Integer defaultSize = 1000;
+    private String mainJoinCore = ResourceCore.MasterTable + "_shard1_replica1";
+    private String subJoinCore = ResourceCore.SubTable + "_shard1_replica1";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -35,22 +40,17 @@ public class ResourcesQueryDao {
     @Autowired
     private SolrQuery solr;
 
-    private Integer defaultPage = 1;
-    private Integer defaultSize = 1000;
-
-    private String mainJoinCore = ResourceCore.MasterTable + "_shard1_replica1";
-    private String subJoinCore = ResourceCore.SubTable + "_shard1_replica1";
-
     /**
      * 获取Hbase主表
      * queryParams可为solr表达式，也可为json例：{"q":"*:*","saas":"*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
      * 有join参数做join操作
      */
-    public Page<Map<String,Object>> getEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
+    public Page<Map<String, Object>> getEhrCenter(String queryParams, Integer page, Integer size) throws Exception {
         String core = ResourceCore.MasterTable;
         String q = "";
         String fq = "";
-        String fl = "";
+        String basicFl = "";
+        String dFl = "";
         String sort = "";
         if (queryParams != null && queryParams.length() > 0) {
             if (queryParams.startsWith("{") && queryParams.endsWith("}")) {
@@ -67,8 +67,11 @@ public class ResourcesQueryDao {
                         q = obj.get("saas");
                     }
                 }
-                if (obj.containsKey("fl")) {
-                    fl = obj.get("fl");
+                if (obj.containsKey("basicFl")) {
+                    basicFl = obj.get("basicFl");
+                }
+                if (obj.containsKey("dFl")) {
+                    dFl = obj.get("dFl");
                 }
                 if (obj.containsKey("sort")) {
                     sort = obj.get("sort");
@@ -93,7 +96,7 @@ public class ResourcesQueryDao {
         if (size == null) {
             size = defaultSize;
         }
-        return hbase.queryBySolr(core, q, sort, page, size, fq, fl);
+        return hbase.queryBySolr(core, q, sort, fq, basicFl, dFl, page, size);
     }
 
     /**
@@ -105,7 +108,8 @@ public class ResourcesQueryDao {
         String core = ResourceCore.SubTable;
         String q = "";
         String fq = "";
-        String fl = "";
+        String basicFl = "";
+        String dFl = "";
         String sort = "";
         if (queryParams != null && queryParams.length() > 0) {
             if (queryParams.startsWith("{") && queryParams.endsWith("}")) {
@@ -114,8 +118,11 @@ public class ResourcesQueryDao {
                 if (obj.containsKey("q")) {
                     q = obj.get("q");
                 }
-                if (obj.containsKey("fl")) {
-                    fl = obj.get("fl");
+                if (obj.containsKey("basicFl")) {
+                    basicFl = obj.get("basicFl");
+                }
+                if (obj.containsKey("dFl")) {
+                    dFl = obj.get("dFl");
                 }
                 if (obj.containsKey("sort")) {
                     sort = obj.get("sort");
@@ -152,7 +159,6 @@ public class ResourcesQueryDao {
                 q = queryParams;
             }
         }
-
         //默认第一页
         if (page == null) {
             page = defaultPage;
@@ -161,7 +167,7 @@ public class ResourcesQueryDao {
         if (size == null) {
             size = defaultSize;
         }
-        return hbase.queryBySolr(core, q, sort, page, size, fq, fl);
+        return hbase.queryBySolr(core, q, sort, fq, basicFl, dFl, page, size);
     }
 
     /**
@@ -172,7 +178,6 @@ public class ResourcesQueryDao {
         String core = ResourceCore.MasterTable;
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> params = objectMapper.readValue(queryParams, Map.class);
-
         String q = "";
         String fq = "";
         String groupFields = "";
@@ -383,7 +388,6 @@ public class ResourcesQueryDao {
                 q = queryParams;
             }
         }
-
         //默认第一页
         if (page == null) {
             page = defaultPage;
@@ -392,7 +396,7 @@ public class ResourcesQueryDao {
         if (size == null) {
             size = defaultSize;
         }
-        return hbase.queryBySolr(core, q, sort, page, size, fq);
+        return hbase.queryBySolr(core, q, sort, fq, page, size);
     }
 
 }

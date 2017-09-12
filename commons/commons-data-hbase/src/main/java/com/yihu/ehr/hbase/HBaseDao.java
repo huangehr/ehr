@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.hadoop.hbase.RowMapper;
 import org.springframework.data.hadoop.hbase.TableCallback;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -22,7 +23,7 @@ import java.util.*;
 public class HBaseDao extends AbstractHBaseClient {
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     /**
      *模糊匹配rowkey
@@ -41,7 +42,6 @@ public class HBaseDao extends AbstractHBaseClient {
                 return null;
             }
         });
-
         return list.toArray(new String[list.size()]);
     }
 
@@ -118,7 +118,6 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public Result getResult(String tableName, String rowKey) throws Exception {
         return hbaseTemplate.get(tableName, rowKey, new RowMapper<Result>() {
-
             public Result mapRow(Result result, int rowNum) throws Exception {
                 return result;
             }
@@ -128,15 +127,27 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      * 通过rowkey获取多行数据
      */
-    public Result[] getResultList(String tableName, List<String> rowKeys) throws Exception {
+    public Result[] getResultList(String tableName, List<String> rowKeys, String basicFl, String dFl) throws Exception {
         return hbaseTemplate.execute(tableName, new TableCallback<Result[]>() {
-
             public Result[] doInTable(HTableInterface table) throws Throwable {
                 List<Get> list = new ArrayList<Get>();
                 for (String rowKey : rowKeys) {
                     Get get = new Get(Bytes.toBytes(rowKey));
+                    if(!StringUtils.isEmpty(basicFl)) {
+                        String [] basicArr = basicFl.split(",");
+                        for (String basicStr : basicArr) {
+                            get.addColumn(Bytes.toBytes("basic"), Bytes.toBytes(basicStr));
+                        }
+                    }
+                    if(!StringUtils.isEmpty(dFl)) {
+                        String [] dArr = dFl.split(",");
+                        for (String dStr : dArr) {
+                            get.addColumn(Bytes.toBytes("d"), Bytes.toBytes(dStr));
+                        }
+                    }
                     list.add(get);
                 }
+
                 return  table.get(list);
             }
         });
@@ -167,13 +178,10 @@ public class HBaseDao extends AbstractHBaseClient {
         });
     }
 
-
-
     /**
      * 修改某行某列值
      */
-    public void put(String tableName ,String rowkey, String familyName, String qualifier,String value) throws Exception
-    {
+    public void put(String tableName ,String rowkey, String familyName, String qualifier,String value) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<String>() {
 
             public String doInTable(HTableInterface table) throws Throwable {
@@ -189,15 +197,11 @@ public class HBaseDao extends AbstractHBaseClient {
     /**
      * 新增行
      */
-    public void add(String tableName , String rowkey, Map<String,Map<String,String>> family) throws Exception
-    {
+    public void add(String tableName , String rowkey, Map<String,Map<String,String>> family) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<String>() {
-
             public String doInTable(HTableInterface table) throws Throwable {
-
                 Put p = new Put(rowkey.getBytes());
-                for(String familyName : family.keySet())
-                {
+                for(String familyName : family.keySet()) {
                     Map<String,String> map = family.get(familyName);
 
                     for (String qualifier : map.keySet())
@@ -207,7 +211,6 @@ public class HBaseDao extends AbstractHBaseClient {
                     }
                 }
                 table.put(p);
-
                 return null;
             }
         });
@@ -218,13 +221,11 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public void add(String tableName, String rowKey, String family, Object[] columns, Object[] values) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
-
             public Object doInTable(HTableInterface htable) throws Throwable {
                 Put put = new Put(Bytes.toBytes(rowKey));
                 for (int j = 0; j < columns.length; j++) {
                     //为空字段不保存
-                    if(values[j]!=null)
-                    {
+                    if(values[j]!=null) {
                         String column = String.valueOf(columns[j]);
                         String value = String.valueOf(values[j]);
                         put.addColumn(Bytes.toBytes(family),
@@ -234,7 +235,6 @@ public class HBaseDao extends AbstractHBaseClient {
                 }
 
                 htable.put(put);
-
                 return null;
             }
         });
@@ -245,7 +245,6 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public void delete(String tableName, String rowkey)  {
         hbaseTemplate.execute(tableName, new TableCallback<String>() {
-
             public String doInTable(HTableInterface table) throws Throwable {
                 Delete d = new Delete(rowkey.getBytes());
                 table.delete(d);
@@ -296,13 +295,10 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public void save(String tableName, TableBundle tableBundle) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
-
             public Object doInTable(HTableInterface htable) throws Throwable {
                 List<Put> puts = tableBundle.putOperations();
-
                 Object[] results = new Object[puts.size()];
                 htable.batch(puts, results);
-
                 return null;
             }
         });

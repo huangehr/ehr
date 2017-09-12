@@ -52,7 +52,7 @@ public class ResourcesQueryService  {
     private RsResourceDefaultQueryDao resourcesDefaultQueryDao;
 
     //忽略字段
-    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","demographic_id", "patient_id","org_code","org_name","profile_id", "cda_version", "client_id","profile_type","patient_name","org_area","diagnosis","health_problem"));
+    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
 
     /**
      * 获取资源数据
@@ -131,7 +131,7 @@ public class ResourcesQueryService  {
                 for(Map<String, Object> temp : oldList) {
                     String masterRowKey = (String)temp.get("profile_id");
                     if(masterRowKey != null) {
-                        Map<String, Object> matsterMap = hbase.queryByRowkey(ResourceCore.MasterTable, masterRowKey);
+                        Map<String, Object> matsterMap = hbase.queryByRowKey(ResourceCore.MasterTable, masterRowKey);
                         temp.put("event_date", matsterMap.get("event_date"));
                         temp.put("org_name", matsterMap.get("org_name"));
                         temp.put("org_code", matsterMap.get("org_code"));
@@ -204,18 +204,18 @@ public class ResourcesQueryService  {
         }
         queryParams = addParams(queryParams,"saas", saas);
         queryParams = addParams(queryParams,"sort", "{\"event_date\":\"desc\"}");
-        /**
-         * 基础数据展示
-         */
-        String igStr = ignoreField.toString();
-        String dealIgStr = igStr.substring(1, igStr.length() - 1).replaceAll(" ", "");
+        //基础数据字段
+        String basicStr = ignoreField.toString();
+        String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
+        queryParams = addParams(queryParams,"basicFl", dealBasicStr);
+        //数据元信息字段
         if(metaData.equals("")) {
-            queryParams = addParams(queryParams,"fl", dealIgStr);
+            queryParams = addParams(queryParams,"dFl", "");
         }else {
             List<String> customizeList = (List<String>) mapper.readValue(metaData, List.class);
-            String customizeStr = customizeList.toString();
-            String dealCustomizeStr = customizeStr.substring(1, customizeStr.length() - 1).replaceAll(" ", "");
-            queryParams = addParams(queryParams,"fl", dealCustomizeStr + "," + dealIgStr);
+            String dStr = customizeList.toString();
+            String dealDStr = dStr.substring(1, dStr.length() - 1).replaceAll(" ", "");
+            queryParams = addParams(queryParams,"dFl", dealDStr);
         }
         Page<Map<String,Object>> result = (Page<Map<String,Object>>)resourcesQueryDao.getEhrCenter(queryParams, page, size);
         if(result != null) {
@@ -270,14 +270,14 @@ public class ResourcesQueryService  {
                 String groupFields = "";
                 String statsFields = "";
                 String customGroup = "";
-                for(DtoResourceMetadata metadada : metadataList) {
-                    String key = metadada.getId();
-                    String groupType = metadada.getGroupType();
-                    String groupData =  metadada.getGroupData();
+                for(DtoResourceMetadata metadata : metadataList) {
+                    String key = metadata.getId();
+                    String groupType = metadata.getGroupType();
+                    String groupData =  metadata.getGroupData();
                     if(groupType != null && groupType.length() > 0) {
                         if(grantType.equals("0")) { //分组字段
                             if(groupData!=null && groupData.length()>0) {
-                                customGroup +="{\"groupField\":\""+key+"\",\"groupCondition\":"+groupData+"},";
+                                customGroup += "{\"groupField\":\"" + key + "\",\"groupCondition\":" + groupData + "},";
                             }
                             else {
                                 groupFields += key + ",";
@@ -288,20 +288,31 @@ public class ResourcesQueryService  {
                         }
                     }
                 }
-                if(groupFields.length()>0) {
-                    groupFields = groupFields.substring(0,groupFields.length()-1);
-                    queryParams = addParams(queryParams,"groupFields",groupFields);
+                if(groupFields.length() > 0) {
+                    groupFields = groupFields.substring(0, groupFields.length() - 1);
+                    queryParams = addParams(queryParams,"groupFields", groupFields);
                 }
-                if(statsFields.length()>0) {
-                    statsFields = statsFields.substring(0,statsFields.length()-1);
-                    queryParams = addParams(queryParams,"statsFields",statsFields);
+                if(statsFields.length() > 0) {
+                    statsFields = statsFields.substring(0, statsFields.length() - 1);
+                    queryParams = addParams(queryParams,"statsFields", statsFields);
                 }
                 if(customGroup.length()>0) {
-                    customGroup = "["+customGroup.substring(0,customGroup.length()-1)+"]";
-                    queryParams = addParams(queryParams,"customGroup",customGroup);
+                    customGroup = "[" + customGroup.substring(0, customGroup.length() -1 ) + "]";
+                    queryParams = addParams(queryParams,"customGroup", customGroup);
                 }
-
-                /************** 执行函数 *************************/
+                //基础信息字段
+                String basicStr = ignoreField.toString();
+                String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
+                queryParams = addParams(queryParams,"basicFl", dealBasicStr);
+                //数据元信息字段
+                List<String> metadataIdList = new ArrayList<String>();
+                for(DtoResourceMetadata metadata : metadataList) {
+                    metadataIdList.add(metadata.getId());
+                }
+                String dStr = metadataIdList.toString();
+                String dealDStr = dStr.substring(1, dStr.length() - 1).replaceAll(" ", "");
+                queryParams = addParams(queryParams,"dFl", dealDStr);
+                //执行函数
                 Class<ResourcesQueryDao> classType = ResourcesQueryDao.class;
                 Method method = classType.getMethod(methodName, new Class[]{String.class, Integer.class, Integer.class});
                 Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
@@ -312,19 +323,20 @@ public class ResourcesQueryService  {
                     envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
                     if(result.getContent() != null && result.getContent().size() > 0) {
                         //转译
-                        List<Map<String,Object>> list = new ArrayList<>();
+                        //List<Map<String,Object>> list = new ArrayList<>();
                         //遍历所有行
+                        /**
                         for(int i=0;i<result.getContent().size();i++) {
-                            Map<String,Object> oldObj = (Map<String,Object>)result.getContent().get(i);
+                            Map<String,Object> oldObj = result.getContent().get(i);
                             Map<String,Object> newObj = new HashMap<>();
                             //遍历资源数据元
-                            for(DtoResourceMetadata metadada : metadataList) {
-                                String key = metadada.getId();
+                            for(DtoResourceMetadata metadata : metadataList) {
+                                String key = metadata.getId();
                                 if(oldObj.containsKey(key)) {
-                                    newObj.put(metadada.getId(),oldObj.get(key));
-                                    if(metadada.getDictCode()!=null && metadada.getDictCode().length()>0 && !metadada.getDictCode().equals("0")) {
+                                    newObj.put(metadata.getId(),oldObj.get(key));
+                                    if(metadata.getDictCode()!=null && metadata.getDictCode().length()>0 && !metadata.getDictCode().equals("0")) {
                                         if(oldObj.containsKey(key+"_VALUE")) {
-                                            newObj.put(metadada.getId()+"_VALUE",oldObj.get(key+"_VALUE"));
+                                            newObj.put(metadata.getId()+"_VALUE",oldObj.get(key+"_VALUE"));
                                         }
                                     }
                                 }
@@ -334,16 +346,13 @@ public class ResourcesQueryService  {
                                 if (key.startsWith("$")) {
                                     newObj.put(key,oldObj.get(key));
                                 }
-                                //忽略字段
-                                if (ignoreField.contains(key)) {
-                                    newObj.put(key,oldObj.get(key));
-                                }
                             }
                             list.add(newObj);
                         }
-                        envelop.setDetailModelList(list);
+                        */
+                        envelop.setDetailModelList(result.getContent());
                     }
-                    // for -> 档案浏览器主要健康问题诊断详情
+                    //for -> 档案浏览器主要健康问题诊断详情
                     if (isSpecialScan) {
                         if ((resourcesCode.equals("RS_OUTPATIENT_DIAGNOSIS") || resourcesCode.equals("RS_HOSPITALIZED_DIAGNOSIS")) && envelop.getDetailModelList() != null) {
                             List<Map<String, Object>> transformKeyList = new ArrayList<>();
@@ -363,9 +372,11 @@ public class ResourcesQueryService  {
                 else {
                     envelop.setErrorMsg("数据库数据检索失败");
                 }
+            }else {
+                envelop.setErrorMsg("资源无相关数据元");
             }
         }else {
-            envelop.setErrorMsg("无效资源！");
+            envelop.setErrorMsg("无效资源");
         }
         return envelop;
     }
