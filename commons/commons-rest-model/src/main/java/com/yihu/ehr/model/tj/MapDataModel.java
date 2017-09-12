@@ -3,16 +3,17 @@ package com.yihu.ehr.model.tj;
 /**
  * Created by janseny
  */
-public class DictModel {
-    private String code;//key
-    private String name;//名称
+public class MapDataModel {
 
-    public String getCode() {
-        return code;
+    private String name;
+    private String value;
+
+    public String getValue() {
+        return value;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public String getName() {

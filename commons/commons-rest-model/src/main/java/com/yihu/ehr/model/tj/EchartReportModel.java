@@ -1,5 +1,6 @@
 package com.yihu.ehr.model.tj;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -9,7 +10,7 @@ public class EchartReportModel {
     private String name;//名称
     private String[] xData;//柱状和线性图数据集
     private int[] yData;//柱状和线性图数据集
-    private Map<String,String> mapData;//饼状图数据集
+    private List<MapDataModel> dataModels;//饼状图数据集
 
     public String getName() {
         return name;
@@ -35,11 +36,4 @@ public class EchartReportModel {
         this.yData = yData;
     }
 
-    public Map<String, String> getMapData() {
-        return mapData;
-    }
-
-    public void setMapData(Map<String, String> mapData) {
-        this.mapData = mapData;
-    }
 }
