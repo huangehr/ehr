@@ -7,7 +7,8 @@ import java.util.Map;
  */
 public class EchartReportModel {
     private String name;//名称
-    private int[] data;//柱状和线性图数据集
+    private String[] xData;//柱状和线性图数据集
+    private int[] yData;//柱状和线性图数据集
     private Map<String,String> mapData;//饼状图数据集
 
     public String getName() {
@@ -18,12 +19,20 @@ public class EchartReportModel {
         this.name = name;
     }
 
-    public int[] getData() {
-        return data;
+    public String[] getxData() {
+        return xData;
     }
 
-    public void setData(int[] data) {
-        this.data = data;
+    public void setxData(String[] xData) {
+        this.xData = xData;
+    }
+
+    public int[] getyData() {
+        return yData;
+    }
+
+    public void setyData(int[] yData) {
+        this.yData = yData;
     }
 
     public Map<String, String> getMapData() {
