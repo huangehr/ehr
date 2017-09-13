@@ -409,6 +409,8 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         }else{
             echartReportModel = new EchartReportModel();
             echartReportModel.setName("医生");
+            echartReportModel.setxData(xdata);
+            echartReportModel.setyData(ydata);
             echartReportModels.add(echartReportModel);
         }
         String [] xDataN = new String[listSize];
@@ -427,6 +429,8 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         }else{
             echartReportModel = new EchartReportModel();
             echartReportModel.setName("护士");
+            echartReportModel.setxData(xDataN);
+            echartReportModel.setyData(yDataN);
             echartReportModels.add(echartReportModel);
         }
 
