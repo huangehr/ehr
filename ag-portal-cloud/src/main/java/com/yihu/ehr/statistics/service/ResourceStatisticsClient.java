@@ -3,20 +3,12 @@ package com.yihu.ehr.statistics.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.tj.EchartReportModel;
-import com.yihu.ehr.model.tj.MapDataModel;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by zdm on 2017/9/12
@@ -26,9 +18,9 @@ import java.util.Map;
 @ApiIgnore
 public interface ResourceStatisticsClient {
 
-    @RequestMapping(value = "/getStatisticsUserCards", method = RequestMethod.GET)
+    @RequestMapping(value =ServiceApi.StasticReport.getStatisticsUserCards, method = RequestMethod.GET)
     @ApiOperation(value = "获取健康卡绑定量")
-    List<EchartReportModel> getStatisticsUserCards();
+    Envelop getStatisticsUserCards();
 
     @RequestMapping(value = ServiceApi.StasticReport.GetArchiveIdentifyReportInfo, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--档案识别")
@@ -57,4 +49,12 @@ public interface ResourceStatisticsClient {
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsDemographicsAgeCount, method = RequestMethod.GET)
     @ApiOperation(value = "全员人口个案库 - 年龄段人数统计")
     Envelop getStatisticsDemographicsAgeCount();
+
+    @RequestMapping(value =  ServiceApi.StasticReport.getStatisticsDoctorByRoleType, method = RequestMethod.GET)
+    @ApiOperation(value = "按机构医生、护士、床位的统计")
+    Envelop getStatisticsDoctorByRoleType();
+
+    @RequestMapping(value =  ServiceApi.StasticReport.getStatisticsCityDoctorByRoleType, method = RequestMethod.GET)
+    @ApiOperation(value = "全市医生、护士、床位的统计")
+    Envelop getStatisticsCityDoctorByRoleType();
 }

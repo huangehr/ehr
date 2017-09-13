@@ -24,14 +24,20 @@ public class ResourceStatisticsController extends BaseController {
     @Autowired
     private ResourceStatisticsClient resourceStatisticsClient;
 
-    @RequestMapping(value = "/getStatisticsUserCards", method = RequestMethod.GET)
+    @RequestMapping(value =ServiceApi.StasticReport.getStatisticsUserCards, method = RequestMethod.GET)
     @ApiOperation(value = "获取健康卡绑定量")
     public Envelop getStatisticsUserCards() {
+        try {
             Envelop envelop = new Envelop();
-            envelop.setDetailModelList(resourceStatisticsClient.getStatisticsUserCards());
-//            envelop.setObj();
+            envelop=resourceStatisticsClient.getStatisticsUserCards();
             envelop.setSuccessFlg(true);
             return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
     @RequestMapping(value = ServiceApi.StasticReport.GetArchiveReportInfo, method = RequestMethod.GET)
@@ -73,6 +79,37 @@ public class ResourceStatisticsController extends BaseController {
     public Envelop getStatisticsDemographicsAgeCount() {
             Envelop envelop = resourceStatisticsClient.getStatisticsElectronicMedicalCount();
             return envelop;
+    }
+
+
+    @RequestMapping(value =  ServiceApi.StasticReport.getStatisticsDoctorByRoleType, method = RequestMethod.GET)
+    @ApiOperation(value = "按机构医生、护士、床位的统计")
+    public Envelop getStatisticsDoctorByRoleType() {
+        try {
+            Envelop envelop =null;
+            envelop=resourceStatisticsClient.getStatisticsDoctorByRoleType();
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value =  ServiceApi.StasticReport.getStatisticsCityDoctorByRoleType, method = RequestMethod.GET)
+    @ApiOperation(value = "全市医生、护士、床位的统计")
+    public Envelop getStatisticsCityDoctorByRoleType() {
+        try {
+            Envelop envelop =null;
+            envelop=resourceStatisticsClient.getStatisticsCityDoctorByRoleType();
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
     }
 
 

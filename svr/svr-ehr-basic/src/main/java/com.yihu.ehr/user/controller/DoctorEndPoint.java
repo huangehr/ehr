@@ -328,4 +328,14 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         List existidCardNos = doctorService.idCardNosExist(toEntity(idCardNos, String[].class));
         return existidCardNos;
     }
+
+    @RequestMapping(value = "/getStatisticsDoctorsByRoleType",method = RequestMethod.GET)
+    @ApiOperation("根据角色获取医院、医生总数")
+    public List getStatisticsDoctorsByRoleType(
+            @ApiParam(name="roleType",value="roleType",defaultValue = "")
+            @RequestParam(value="roleType") String roleType) throws Exception {
+
+        List<Object> statisticsDoctors = doctorService.getStatisticsDoctorsByRoleType(roleType);
+        return statisticsDoctors;
+    }
 }

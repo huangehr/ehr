@@ -1011,6 +1011,10 @@ public class ServiceApi {
         public static final String GetArchiveStatisticalReportInfo = "/stasticReport/getArchiveStatisticalReportInfo";
         public static final String GetArchiveTotalVisitReportInfo = "stasticReport/getArchiveTotalVisitReportInfo";
 
+        public static final String getStatisticsUserCards = "/tj/getStatisticsUserCards";
+        public static final String getStatisticsUserAgeByIdCardNo = "/tj/getStatisticsUserAgeByIdCardNo";
+        public static final String getStatisticsDoctorByRoleType = "/tj/getStatisticsDoctorByRoleType";
+        public static final String getStatisticsCityDoctorByRoleType = "/tj/getStatisticsCityDoctorByRoleType";
     }
 
 
