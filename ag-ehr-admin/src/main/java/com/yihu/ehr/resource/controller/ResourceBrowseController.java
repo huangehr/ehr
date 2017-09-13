@@ -38,17 +38,17 @@ import java.util.*;
 public class ResourceBrowseController extends BaseController {
 
     @Autowired
-    private ResourcesClient resourcesClient;
+    private RsResourceClient resourcesClient;
     @Autowired
-    private ResourceMetadataClient resourceMetadataClient;
+    private RsResourceMetadataClient resourceMetadataClient;
     @Autowired
-    private ResourcesCategoryClient resourcesCategoryClient;
+    private RsResourceCategoryClient resourcesCategoryClient;
     @Autowired
-    private MetadataClient metadataClient;
+    private RsMetadataClient metadataClient;
     @Autowired
     private ResourceBrowseClient resourceBrowseClient;
     @Autowired
-    private ResourceQuotaClient resourceQuotaClient;
+    private RsResourceQuotaClient resourceQuotaClient;
     @Autowired
     private TjQuotaClient tjQuotaClient;
     @Autowired

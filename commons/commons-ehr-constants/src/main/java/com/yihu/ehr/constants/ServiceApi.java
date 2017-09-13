@@ -55,6 +55,7 @@ public class ServiceApi {
         //资源视图
         public static final String Resources = "/resources";
         public static final String Resource = "/resources/{id}";
+        public static final String ResourceTree = "/resources/tree";
         public static final String NoPageResources = "/NoPageResources";
         public static final String IsExistName = "/resources/isExistName";
         public static final String IsExistCode = "/resources/isExistCode/{code}";
@@ -79,7 +80,6 @@ public class ServiceApi {
         public static final String ResourceGrantsNoPage = "/resources/grants/no_paging";
         public static final String AppsGrantResources = "/resources/apps/{appId}/grant";
         public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
-        public static final String ResourceApps = "/resources/{resource_id}/app";
 
         public static final String ResourceMetadatasValid = "/resources/metadatas/valid";
         public static final String ResourceMetadataGrants = "/resources/metadata/grants";
@@ -93,12 +93,10 @@ public class ServiceApi {
         public static final String MetadataList = "/resources/metadata";
         public static final String MetadataBatch = "/resources/metadata/batch";
         public static final String Metadata = "/resources/metadata/{id}";
-        public static final String MetadataCache = "/resources/metadata/cache";
         public static final String MetadataExistence = "/resources/metadata/existence";
         public static final String MetadataStdCodeExistence = "/resources/metadata/std_code/existence";
         public static final String MetadataIdExistence = "/resources/metadata/id/existence";
         public static final String MetadataMaxId = "/resources/metadata/metadataMaxId";
-
 
         public static final String DictList = "/resources/dict";
         public static final String DictBatch = "/resources/dict/batch";
@@ -114,9 +112,7 @@ public class ServiceApi {
         public static final String ParamById = "/resources/param/{id}";
         public static final String ParamKeyValueExistence = "/resources/param/key_value_existence";
 
-        /**
-         * 固化视图筛选条件
-         */
+        //固化视图筛选条件
         public static final String QueryByResourceId = "/resources/query/QueryByResourceId";
 
         public static final String DictEntries = "/resources/dict_entries";
@@ -131,21 +127,22 @@ public class ServiceApi {
         public static final String SystemDictEntries = "/resources/system_dict_entries";
         public static final String SystemDictEntry = "/resources/system_dict_entries/{id}";
 
+        //资源接口
         public static final String Interfaces = "/resources/interfaces";
         public static final String InterfaceById = "/resources/interfaces/{id}";
         public static final String Interface = "/resources/interface";
         public static final String InterfaceNameExistence = "/resources/existence/name";
 
-        public static final String Categories = "/resources/categories/no_paging";
-        public static final String NoPageCategories = "/resources/categories";
-        public static final String Category = "/resources/categories/{id}";
-        public static final String CategoryByPid = "/resources/categories/pid";
-        public static final String CategoryExitSelfAndChild = "/resources/categories/parent";
+        //资源分类
+        public static final String CategoryUpdate = "/resources/category/update";
+        public static final String Category = "/resources/category/{id}";
+        public static final String CategoriesByPid = "/resources/categories/pid";
         public static final String CategoryTree = "/resources/categories/tree";
+        public static final String CategoryExitSelfAndParent = "/resources/categories/selfAndParent";
+        public static final String CategoriesAll = "/resources/categories/all";
+        public static final String CategoriesSearch = "/resources/categories/search";
 
-        /**
-         * 综合查询服务
-         */
+        //综合查询服务
         public static final String IntMetadataList = "/resources/integrated/metadata_list";
         public static final String IntMetadataData = "/resources/integrated/metadata_data";
         public static final String IntQuotaList = "/resources/integrated/quota_list";
@@ -153,23 +150,21 @@ public class ServiceApi {
         public static final String IntResourceUpdate = "/resources/integrated/resource_update";
         public static final String IntResourceQueryUpdate = "/resources/integrated/resource_query_update";
 
+        //貌似没用了
         public static final String AdapterDicts = "/resources/adapter/dict";
         public static final String AdapterDictsBatch = "/resources/adapter/dict/batch";
         public static final String AdapterDict = "/resources/adapter/dict/{id}";
 
-        /**
-         * 应用角色资源授权
-         */
+        //应用角色资源授权
         public static final String ResourceRolesGrants = "/resources/rolesGrants";
         public static final String ResourceRolesGrant = "/resources/rolesGrants/{id}";
         public static final String ResourceRolesMetadatasValid = "/resources/relosMetadatas/valid";
         public static final String ResourceRolesMetadataGrants = "/resources/relosMetadatas/grants";
         public static final String RolesGrantResources = "/resources/roles/{rolesId}/grant";
-//        public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        //public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
         public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
         public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
         public static final String ResourceRolesResMetadataGrants = "/resources/roles_resource/{roles_res_id}/metadata";
-        public static final String ResourceRolesRsMetadataGrant = "/resources/roles_resource/metadata/grant";
 
         /**
          * 机构-资源授权

@@ -20,7 +20,7 @@ import java.util.List;
 @FeignClient(name = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
-public interface ResourceDefaultParamClient {
+public interface RsResourceDefaultParamClient {
 
     @RequestMapping(value = ServiceApi.Resources.ParamById,method = RequestMethod.GET)
     @ApiOperation("根据id获取参数信息")

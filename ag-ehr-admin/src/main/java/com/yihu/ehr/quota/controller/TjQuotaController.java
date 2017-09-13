@@ -15,7 +15,7 @@ import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.quota.service.QuotaCategoryClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
-import com.yihu.ehr.resource.client.MetadataClient;
+import com.yihu.ehr.resource.client.RsMetadataClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -46,7 +46,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
     private QuotaCategoryClient quotaCategoryClient;
     @Autowired
-    private MetadataClient metadataClient;
+    private RsMetadataClient metadataClient;
     @Autowired
     private ObjectMapper objectMapper;
 

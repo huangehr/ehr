@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.resource.MRsDictionary;
 import com.yihu.ehr.model.resource.MRsMetadata;
-import com.yihu.ehr.resource.client.MetadataClient;
+import com.yihu.ehr.resource.client.RsMetadataClient;
 import com.yihu.ehr.resource.client.RsDictionaryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -28,10 +28,10 @@ import java.util.*;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "metadata", description = "数据元服务接口", tags = {"资源管理-数据元服务接口"})
-public class MetadataController extends BaseController {
+public class RsMetadataController extends BaseController {
 
     @Autowired
-    private MetadataClient metadataClient;
+    private RsMetadataClient metadataClient;
 
     @Autowired
     private SystemDictClient systemDictClient;

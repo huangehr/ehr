@@ -21,7 +21,7 @@ import java.util.List;
 @FeignClient(name = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
-public interface ResourceMetadataClient {
+public interface RsResourceMetadataClient {
 
     @ApiOperation("创建资源数据元")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

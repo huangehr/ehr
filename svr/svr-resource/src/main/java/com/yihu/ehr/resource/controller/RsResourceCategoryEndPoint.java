@@ -36,57 +36,13 @@ public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RsResourceCategoryService rsCategoryService;
 
-    @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.GET)
-    @ApiOperation("获取资源类别")
-    public List<MRsCategory> getRsCategories(
-            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
-            @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
-            @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        long total = 0;
-        Collection<MRsCategory> rsList;
-
-        //过滤条件为空
-        if (StringUtils.isEmpty(filters)) {
-            Page<RsResourceCategory> resources = rsCategoryService.getRsCategories(sorts, reducePage(page), size);
-            total = resources.getTotalElements();
-            rsList = convertToModels(resources.getContent(), new ArrayList<>(resources.getNumber()), MRsCategory.class, fields);
-        } else {
-            List<RsResourceCategory> resources = rsCategoryService.search(fields, filters, sorts, page, size);
-            total = rsCategoryService.getCount(filters);
-            rsList = convertToModels(resources, new ArrayList<>(resources.size()), MRsCategory.class, fields);
-        }
-
-        pagedResponse(request, response, total, page, size);
-        return (List<MRsCategory>) rsList;
-    }
-
-    @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Resources.CategoryUpdate, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("资源类别创建")
     public MRsCategory createRsCategory(
             @ApiParam(name = "resourceCategory", value = "资源分类", defaultValue = "{\"name\":\"string\",\"pid\":\"string\",\"description\":\"string\"}")
             @RequestBody String resourceCategory) throws Exception {
         RsResourceCategory rsCategory = toEntity(resourceCategory, RsResourceCategory.class);
         rsCategory.setId(getObjectId(BizObject.ResourceCategory));
-        rsCategoryService.createOrUpdRsCategory(rsCategory);
-
-        return convertToModel(rsCategory, MRsCategory.class);
-    }
-
-    @RequestMapping(value = ServiceApi.Resources.Categories, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation("资源类别更新")
-    public MRsCategory updateRsCategory(
-            @ApiParam(name = "resourceCategory", value = "资源分类", defaultValue = "{\"id\":\"string\",\"name\":\"string\",\"pid\":\"string\",\"description\":\"string\"}")
-            @RequestBody String resourceCategory) throws Exception {
-        RsResourceCategory rsCategory = toEntity(resourceCategory, RsResourceCategory.class);
         rsCategoryService.createOrUpdRsCategory(rsCategory);
 
         return convertToModel(rsCategory, MRsCategory.class);
@@ -108,6 +64,17 @@ public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
         return json;
     }
 
+    @RequestMapping(value = ServiceApi.Resources.CategoryUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("资源类别更新")
+    public MRsCategory updateRsCategory(
+            @ApiParam(name = "resourceCategory", value = "资源分类", defaultValue = "{\"id\":\"string\",\"name\":\"string\",\"pid\":\"string\",\"description\":\"string\"}")
+            @RequestBody String resourceCategory) throws Exception {
+        RsResourceCategory rsCategory = toEntity(resourceCategory, RsResourceCategory.class);
+        rsCategoryService.createOrUpdRsCategory(rsCategory);
+
+        return convertToModel(rsCategory, MRsCategory.class);
+    }
+
     @RequestMapping(value = ServiceApi.Resources.Category, method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源类别")
     public MRsCategory getRsCategoryById(
@@ -116,7 +83,7 @@ public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
         return convertToModel(rsCategoryService.getRsCategoryById(id), MRsCategory.class);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.CategoryByPid,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.CategoriesByPid,method = RequestMethod.GET)
     @ApiOperation("根据pid获取资源类别列表")
     public List<MRsCategory> getRsCategoryByPid(
             @ApiParam(name="pid",value="pid",defaultValue = "")
@@ -127,17 +94,7 @@ public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
         return (List<MRsCategory>) convertToModels(categoryList, new ArrayList<MRsCategory>(categoryList.size()), MRsCategory.class, null);
     }
 
-
-    @RequestMapping(value = ServiceApi.Resources.NoPageCategories, method = RequestMethod.GET)
-    @ApiOperation("获取资源类别")
-    public List<MRsCategory> getAllCategories(
-            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception {
-        List<RsResourceCategory> resources = rsCategoryService.search(filters);
-        return (List<MRsCategory>) convertToModels(resources, new ArrayList<MRsCategory>(resources.size()), MRsCategory.class, null);
-    }
-
-    @RequestMapping(value = ServiceApi.Resources.CategoryExitSelfAndChild, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.CategoryExitSelfAndParent, method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
     public List<MRsCategory> getCateTypeExcludeSelfAndChildren(
             @ApiParam(name = "id", value = "id")
@@ -146,6 +103,47 @@ public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
         String childrenIds = getChildIncludeSelfByParentsAndChildrenIds(parentTypes,id+",");   //递归获取
         List<RsResourceCategory> cdaTypes = rsCategoryService.getCateTypeExcludeSelfAndChildren(childrenIds);
         return  (List<MRsCategory>)convertToModels(cdaTypes,new ArrayList<MRsCategory>(cdaTypes.size()),MRsCategory.class,"");
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.CategoriesAll, method = RequestMethod.GET)
+    @ApiOperation("获取资源类别")
+    public List<MRsCategory> getAllCategories(
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<RsResourceCategory> resources = rsCategoryService.search(filters);
+        return (List<MRsCategory>) convertToModels(resources, new ArrayList<MRsCategory>(resources.size()), MRsCategory.class, null);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.CategoriesSearch, method = RequestMethod.GET)
+    @ApiOperation("获取资源类别")
+    public List<MRsCategory> getRsCategories(
+            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        long total = 0;
+        Collection<MRsCategory> rsList;
+        //过滤条件为空
+        if (StringUtils.isEmpty(filters)) {
+            Page<RsResourceCategory> resources = rsCategoryService.getRsCategories(sorts, reducePage(page), size);
+            total = resources.getTotalElements();
+            rsList = convertToModels(resources.getContent(), new ArrayList<>(resources.getNumber()), MRsCategory.class, fields);
+        } else {
+            List<RsResourceCategory> resources = rsCategoryService.search(fields, filters, sorts, page, size);
+            total = rsCategoryService.getCount(filters);
+            rsList = convertToModels(resources, new ArrayList<>(resources.size()), MRsCategory.class, fields);
+        }
+
+        pagedResponse(request, response, total, page, size);
+        return (List<MRsCategory>) rsList;
     }
 
     public String getChildIncludeSelfByParentsAndChildrenIds(List<RsResourceCategory> parentTypes,String childrenIds) {

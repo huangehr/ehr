@@ -16,9 +16,9 @@ import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
-import com.yihu.ehr.resource.client.ResourceQuotaClient;
-import com.yihu.ehr.resource.client.ResourcesCategoryClient;
-import com.yihu.ehr.resource.client.ResourcesClient;
+import com.yihu.ehr.resource.client.RsResourceQuotaClient;
+import com.yihu.ehr.resource.client.RsResourceCategoryClient;
+import com.yihu.ehr.resource.client.RsResourceClient;
 import com.yihu.ehr.resource.client.RsInterfaceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -30,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,17 +40,17 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "resources", description = "资源服务接口", tags = {"资源管理-资源服务接口"})
-public class ResourcesController extends BaseController {
+public class RsResourceController extends BaseController {
     @Autowired
-    private ResourcesClient resourcesClient;
+    private RsResourceClient resourcesClient;
     @Autowired
     private RsInterfaceClient rsInterfaceClient;
     @Autowired
-    private ResourcesCategoryClient rsCategoryClient;
+    private RsResourceCategoryClient rsCategoryClient;
     @Autowired
     private TjQuotaClient tjQuotaClient;
     @Autowired
-    private ResourceQuotaClient resourceQuotaClient;
+    private RsResourceQuotaClient resourceQuotaClient;
     @Autowired
     private TjQuotaChartClient tjQuotaChartClient;
     @Autowired
@@ -143,6 +142,16 @@ public class ResourcesController extends BaseController {
             envelop.setSuccessFlg(false);
         }
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
+    @ApiOperation("获取资源列表树")
+    public Envelop getResourceTree(
+            @ApiParam(name = "dataSource", value = "数据源")
+            @RequestParam(value = "dataSource") Integer dataSource,
+            @ApiParam(name = "filters", value = "过条件(name)")
+            @RequestParam(value = "filters", required = false) String filters) {
+        return resourcesClient.getResourceTree(dataSource, filters);
     }
 
     @ApiOperation("资源查询")

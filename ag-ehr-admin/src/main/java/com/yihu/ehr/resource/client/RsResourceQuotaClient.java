@@ -27,7 +27,7 @@ import java.util.List;
 @FeignClient(value = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0 + "/resourcesQuota")
 @ApiIgnore
-public interface ResourceQuotaClient {
+public interface RsResourceQuotaClient {
 
     @RequestMapping(value = ServiceApi.Resources.SearchInfo, method = RequestMethod.GET)
     @ApiOperation(value = "资源视图指标")

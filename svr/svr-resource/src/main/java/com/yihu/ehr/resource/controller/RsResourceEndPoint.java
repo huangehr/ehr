@@ -5,8 +5,11 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.model.RsResource;
+import com.yihu.ehr.resource.model.RsResourceCategory;
+import com.yihu.ehr.resource.service.RsResourceCategoryService;
 import com.yihu.ehr.resource.service.RsResourceService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,9 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by lyr on 2016/4/25.
@@ -31,7 +32,9 @@ import java.util.List;
 public class RsResourceEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    private RsResourceService rsService;
+    private RsResourceService rsResourceService;
+    @Autowired
+    private RsResourceCategoryService rsResourceCategoryService;
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -40,7 +43,7 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             @RequestBody String resource) throws Exception {
         RsResource rs = toEntity(resource,RsResource.class);
         rs.setId(getObjectId(BizObject.Resources));
-        rsService.saveResource(rs);
+        rsResourceService.saveResource(rs);
         return convertToModel(rs,MRsResources.class);
     }
 
@@ -50,7 +53,7 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name="resource",value="资源",defaultValue="")
             @RequestBody String resource) throws Exception {
         RsResource rs = toEntity(resource,RsResource.class);
-        rsService.saveResource(rs);
+        rsResourceService.saveResource(rs);
         return convertToModel(rs,MRsResources.class);
     }
 
@@ -59,7 +62,7 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     public boolean deleteResources(
             @ApiParam(name="id",value="资源ID",defaultValue = "")
             @PathVariable(value="id") String id) throws Exception {
-        rsService.deleteResource(id);
+        rsResourceService.deleteResource(id);
         return true;
     }
 
@@ -68,7 +71,7 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     public boolean deleteResourcesBatch(
             @ApiParam(name="ids",value="资源ID",defaultValue = "")
             @RequestParam(value="ids") String ids) throws Exception {
-        rsService.deleteResource(ids);
+        rsResourceService.deleteResource(ids);
         return true;
     }
 
@@ -77,7 +80,22 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     public MRsResources getResourceById(
             @ApiParam(name="id",value="id",defaultValue = "")
             @PathVariable(value="id") String id) throws Exception {
-        return convertToModel(rsService.getResourceById(id),MRsResources.class);
+        return convertToModel(rsResourceService.getResourceById(id),MRsResources.class);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
+    @ApiOperation("获取资源列表树")
+    public Envelop getResourceTree(
+            @ApiParam(name = "dataSource", value = "数据元")
+            @RequestParam(value = "dataSource") Integer dataSource,
+            @ApiParam(name = "filters", value = "过滤条件(name)")
+            @RequestParam(value = "filters", required = false) String filters) {
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> resultList = rsResourceService.getResourceTree(dataSource, filters);
+        envelop.setSuccessFlg(true);
+        envelop.setTotalCount(resultList.size());
+        envelop.setDetailModelList(resultList);
+        return envelop;
     }
 
     @ApiOperation("资源查询")
@@ -99,12 +117,12 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
         Collection<MRsResources> rsList;
         //过滤条件为空
         if(StringUtils.isEmpty(filters)) {
-            Page<RsResource> resources = rsService.getResources(sorts,reducePage(page),size);
+            Page<RsResource> resources = rsResourceService.getResources(sorts,reducePage(page),size);
             total = resources.getTotalElements();
             rsList = convertToModels(resources.getContent(),new ArrayList<>(resources.getNumber()),MRsResources.class,fields);
         } else {
-            List<RsResource> resources = rsService.search(fields,filters,sorts,page,size);
-            total = rsService.getCount(filters);
+            List<RsResource> resources = rsResourceService.search(fields,filters,sorts,page,size);
+            total = rsResourceService.getCount(filters);
             rsList = convertToModels(resources,new ArrayList<>(resources.size()),MRsResources.class,fields);
         }
         pagedResponse(request,response,total,page,size);
@@ -117,9 +135,10 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name="filters",value="过滤",defaultValue = "")
             @RequestParam(value="filters",required = false)String filters) throws Exception {
         Collection<MRsResources> mrsList;
-        Collection<MRsResources> rsList = rsService.search(filters);
+        Collection<MRsResources> rsList = rsResourceService.search(filters);
         mrsList = convertToModels(rsList,new ArrayList<>(rsList.size()),MRsResources.class,"");
         return (List<MRsResources>)mrsList;
     }
+
 
 }

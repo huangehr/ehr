@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.resource.MRsResources;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
@@ -20,7 +21,7 @@ import java.util.List;
 @FeignClient(value = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
-public interface ResourcesClient {
+public interface RsResourceClient {
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -44,8 +45,14 @@ public interface ResourcesClient {
 
     @RequestMapping(value = ServiceApi.Resources.Resource,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源")
-    public MRsResources getResourceById(
+    MRsResources getResourceById(
             @PathVariable(value="id") String id);
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
+    @ApiOperation("获取资源列表树")
+    Envelop getResourceTree(
+            @RequestParam(value = "dataSource") Integer dataSource,
+            @RequestParam(value = "filters", required = false) String filters);
 
     @ApiOperation("资源查询")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.GET)

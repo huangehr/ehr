@@ -14,9 +14,9 @@ import com.yihu.ehr.model.org.MRsOrgResource;
 import com.yihu.ehr.model.org.MRsOrgResourceMetadata;
 import com.yihu.ehr.model.resource.*;
 import com.yihu.ehr.organization.service.OrganizationClient;
-import com.yihu.ehr.resource.client.MetadataClient;
-import com.yihu.ehr.resource.client.ResourceMetadataClient;
-import com.yihu.ehr.resource.client.ResourcesGrantClient;
+import com.yihu.ehr.resource.client.RsMetadataClient;
+import com.yihu.ehr.resource.client.RsResourceMetadataClient;
+import com.yihu.ehr.resource.client.RsResourceGrantClient;
 import com.yihu.ehr.resource.client.RsDictionaryEntryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -38,10 +38,10 @@ import java.util.*;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "resourceGrant", description = "资源授权服务接口", tags = {"资源管理-资源授权服务接口"})
-public class ResourcesGrantController extends BaseController {
+public class RsResourceGrantController extends BaseController {
 
     @Autowired
-    private ResourcesGrantClient resourcesGrantClient;
+    private RsResourceGrantClient resourcesGrantClient;
     @Autowired
     AppClient appClient;
     @Autowired
@@ -49,9 +49,9 @@ public class ResourcesGrantController extends BaseController {
     @Autowired
     SystemDictClient systemDictClient;
     @Autowired
-    ResourceMetadataClient resourceMetadataClient;
+    RsResourceMetadataClient resourceMetadataClient;
     @Autowired
-    MetadataClient metadataClient;
+    RsMetadataClient metadataClient;
     @Autowired
     private RsDictionaryEntryClient rsDictionaryEntryClient;
 

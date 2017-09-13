@@ -20,7 +20,7 @@ import java.util.List;
 @FeignClient(name = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
-public interface AdapterSchemaClient {
+public interface RsAdapterSchemaClient {
 
     @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("创建适配方案")

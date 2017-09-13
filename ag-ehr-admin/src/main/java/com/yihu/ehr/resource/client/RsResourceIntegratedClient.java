@@ -18,7 +18,7 @@ import java.util.Map;
 @FeignClient(value = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
-public interface ResourcesIntegratedClient {
+public interface RsResourceIntegratedClient {
 
     @ApiOperation("综合查询档案数据列表树")
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)

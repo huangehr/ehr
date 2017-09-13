@@ -4,19 +4,17 @@ import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.resource.MResourceQuota;
-import com.yihu.ehr.resource.client.ResourceQuotaClient;
+import com.yihu.ehr.resource.client.RsResourceQuotaClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -29,10 +27,10 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "rs_resources_quota",  description = "资源视图指标", tags = {"资源视图指标"})
-public class ResourceQuotaController extends ExtendController {
+public class RsResourceQuotaController extends ExtendController {
 
     @Autowired
-    private ResourceQuotaClient resourceQuotaClient;
+    private RsResourceQuotaClient resourceQuotaClient;
 
     @RequestMapping(value = ServiceApi.Resources.SearchInfo, method = RequestMethod.GET)
     @ApiOperation(value = "资源视图指标")

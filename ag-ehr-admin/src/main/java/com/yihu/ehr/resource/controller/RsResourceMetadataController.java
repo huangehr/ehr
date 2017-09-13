@@ -5,8 +5,8 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.resource.MRsResourceMetadata;
-import com.yihu.ehr.resource.client.MetadataClient;
-import com.yihu.ehr.resource.client.ResourceMetadataClient;
+import com.yihu.ehr.resource.client.RsMetadataClient;
+import com.yihu.ehr.resource.client.RsResourceMetadataClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
@@ -28,13 +28,13 @@ import java.util.List;
 @RestController
 @Api(value = "ResourceMetadata", description = "资源数据元", tags = {"资源管理-资源数据元"})
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-public class ResourceMetadataController extends BaseController {
+public class RsResourceMetadataController extends BaseController {
 
     @Autowired
-    private ResourceMetadataClient resourceMetadataClient;
+    private RsResourceMetadataClient resourceMetadataClient;
 
     @Autowired
-    private MetadataClient metadataClient;
+    private RsMetadataClient metadataClient;
 
     @ApiOperation("创建资源数据元")
     @RequestMapping(value = ServiceApi.Resources.ResourceMetadataList, method = RequestMethod.POST)

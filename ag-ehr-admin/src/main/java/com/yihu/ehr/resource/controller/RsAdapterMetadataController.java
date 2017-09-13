@@ -6,8 +6,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.resource.MRsAdapterMetadata;
 import com.yihu.ehr.model.resource.MRsMetadata;
-import com.yihu.ehr.resource.client.AdapterMetadataClient;
-import com.yihu.ehr.resource.client.MetadataClient;
+import com.yihu.ehr.resource.client.RsAdapterMetadataClient;
+import com.yihu.ehr.resource.client.RsMetadataClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
@@ -31,16 +31,16 @@ import java.util.List;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "adapterMetadata", description = "适配数据元服务", tags = {"资源管理-适配数据元服务"})
-public class AdapterMetadataController extends BaseController {
+public class RsAdapterMetadataController extends BaseController {
 
     @Autowired
-    private AdapterMetadataClient adapterMetadataClient;
+    private RsAdapterMetadataClient adapterMetadataClient;
 
     @Autowired
     private ConventionalDictEntryClient conventionalDictEntryClient;
 
     @Autowired
-    private MetadataClient metadataClient;
+    private RsMetadataClient metadataClient;
 
     @RequestMapping(value = ServiceApi.Adaptions.SchemaMetadataList, method = RequestMethod.POST)
     @ApiOperation("创建适配数据元")

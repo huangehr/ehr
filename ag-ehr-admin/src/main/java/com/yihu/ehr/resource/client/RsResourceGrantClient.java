@@ -27,7 +27,7 @@ import java.util.Map;
 @FeignClient(value = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
-public interface ResourcesGrantClient {
+public interface RsResourceGrantClient {
 
     @ApiOperation("单个应用授权多个资源")
     @RequestMapping(value = ServiceApi.Resources.AppsGrantResources, method = RequestMethod.POST)

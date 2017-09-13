@@ -6,7 +6,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.resource.MResourceDefaultParam;
-import com.yihu.ehr.resource.client.ResourceDefaultParamClient;
+import com.yihu.ehr.resource.client.RsResourceDefaultParamClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,9 +23,9 @@ import java.util.List;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0+"/admin")
 @Api(value = "resourceDefaultParam", description = "资源默认参数配置", tags = {"资源管理-资源默认参数配置"})
-public class ResourceDefaultParamController extends BaseController {
+public class RsResourceDefaultParamController extends BaseController {
     @Autowired
-    private ResourceDefaultParamClient rsDefaultParamclient;
+    private RsResourceDefaultParamClient rsDefaultParamclient;
 
     @RequestMapping(value = ServiceApi.Resources.ParamById,method = RequestMethod.GET)
     @ApiOperation("根据id获取参数信息")

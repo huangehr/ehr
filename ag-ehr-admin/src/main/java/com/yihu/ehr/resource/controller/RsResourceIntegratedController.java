@@ -6,14 +6,13 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
-import com.yihu.ehr.resource.client.ResourcesIntegratedClient;
+import com.yihu.ehr.resource.client.RsResourceIntegratedClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.w3c.dom.ls.LSInput;
 
 import java.util.*;
 
@@ -24,10 +23,10 @@ import java.util.*;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "ResourceIntegrated", description = "资源综合查询数据服务接口", tags = {"资源管理-资源综合查询数据服务接口"})
-public class ResourcesIntegratedController extends BaseController {
+public class RsResourceIntegratedController extends BaseController {
 
     @Autowired
-    private ResourcesIntegratedClient resourcesIntegratedClient;
+    private RsResourceIntegratedClient resourcesIntegratedClient;
     @Autowired
     private TjQuotaClient tjQuotaClient;
     @Autowired

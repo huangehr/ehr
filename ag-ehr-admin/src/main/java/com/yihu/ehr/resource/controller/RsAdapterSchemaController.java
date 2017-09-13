@@ -8,7 +8,7 @@ import com.yihu.ehr.model.adaption.MAdapterOrg;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.resource.MRsAdapterSchema;
 import com.yihu.ehr.model.standard.MCDAVersion;
-import com.yihu.ehr.resource.client.AdapterSchemaClient;
+import com.yihu.ehr.resource.client.RsAdapterSchemaClient;
 import com.yihu.ehr.std.service.CDAVersionClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -32,10 +32,10 @@ import java.util.List;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "adapterSchema", description = "适配方案服务", tags = {"资源管理-适配方案服务"})
-public class AdapterSchemaController extends BaseController {
+public class RsAdapterSchemaController extends BaseController {
 
     @Autowired
-    private AdapterSchemaClient adapterSchemaClient;
+    private RsAdapterSchemaClient adapterSchemaClient;
 
     @Autowired
     private ConventionalDictEntryClient dictClint;
