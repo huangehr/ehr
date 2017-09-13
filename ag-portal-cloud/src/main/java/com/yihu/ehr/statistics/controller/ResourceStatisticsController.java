@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ApiVersion.Version1_0 +"/portal")
 @RestController
 @Api(value = "ResourceStatistics", description = "数据中心首页统计相关", tags = {"数据中心首页-统计相关"})
-public class StatisticsController extends BaseController {
+public class ResourceStatisticsController extends BaseController {
     @Autowired
     private StatisticsClient statisticsClient;
 
