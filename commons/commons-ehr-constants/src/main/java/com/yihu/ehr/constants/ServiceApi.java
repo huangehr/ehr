@@ -1002,15 +1002,19 @@ public class ServiceApi {
     }
 
     public static class StasticReport {
-        public static final String GetStatisticsElectronicMedicalCount = "/tj/getStatisticsElectronicMedicalCount";
-        public static final String GetStatisticsMedicalEventTypeCount = "/tj/getStatisticsMedicalEventTypeCount";
-        public static final String GetStatisticsDemographicsAgeCount = "/tj/getStatisticsDemographicsAgeCount";
-        public static final String GetArchiveReportInfo = "/archive/getArchiveReportInfo";
-        public static final String GetArchiveIdentifyReportInfo = "/archive/getArchiveIdentifyReportInfo";
-        public static final String GetArchiveHospitalReportInfo = "/archive/getArchiveHospitalReportInfo";
-        public static final String GetArchiveStatisticalReportInfo = "/archive/getArchiveStatisticalReportInfo";
-        public static final String GetArchiveTotalVisitReportInfo = "archive/getArchiveTotalVisitReportInfo";
+        public static final String GetStatisticsElectronicMedicalCount="/stasticReport/getStatisticsElectronicMedicalCount";
+        public static final String GetStatisticsMedicalEventTypeCount = "/stasticReport/getStatisticsMedicalEventTypeCount";
+        public static final String GetStatisticsDemographicsAgeCount = "/stasticReport/getStatisticsDemographicsAgeCount";
+        public static final String GetArchiveReportInfo = "/stasticReport/getArchiveReportInfo";
+        public static final String GetArchiveIdentifyReportInfo = "/stasticReport/getArchiveIdentifyReportInfo";
+        public static final String GetArchiveHospitalReportInfo = "/stasticReport/getArchiveHospitalReportInfo";
+        public static final String GetArchiveStatisticalReportInfo = "/stasticReport/getArchiveStatisticalReportInfo";
+        public static final String GetArchiveTotalVisitReportInfo = "stasticReport/getArchiveTotalVisitReportInfo";
 
+        public static final String getStatisticsUserCards = "/tj/getStatisticsUserCards";
+        public static final String getStatisticsUserAgeByIdCardNo = "/tj/getStatisticsUserAgeByIdCardNo";
+        public static final String getStatisticsDoctorByRoleType = "/tj/getStatisticsDoctorByRoleType";
+        public static final String getStatisticsCityDoctorByRoleType = "/tj/getStatisticsCityDoctorByRoleType";
     }
 
 

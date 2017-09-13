@@ -4,31 +4,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.tj.EchartReportModel;
 import com.yihu.ehr.model.tj.MapDataModel;
+import com.yihu.ehr.patient.service.arapply.ArchiveRelationService;
 import com.yihu.ehr.patient.service.arapply.UserCardsService;
 import com.yihu.ehr.patient.service.demographic.DemographicService;
-import com.yihu.ehr.model.tj.EchartReportModel;
-import com.yihu.ehr.patient.service.arapply.ArchiveRelationService;
+import com.yihu.ehr.user.service.DoctorService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.*;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,6 +42,10 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     UserCardsService userCardsService;
     @Autowired
     private ArchiveRelationService archiveRelationService;
+    @Autowired
+    DoctorService doctorService;
+
+
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsElectronicMedicalCount, method = RequestMethod.GET)
     @ApiOperation(value = "电子病历-最近七天采集总数统计，门诊住院数 - 柱状")
@@ -105,10 +104,10 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setDetailModelList(echartReportModels);
         Map<String,Object> mapObj = new HashMap<>();
         for(MapDataModel dataModel:dataList){
-            if(dataModel.getName().equals("outpatient")){
+            if(null!=dataModel.getName()&&dataModel.getName().equals("outpatient")){
                 mapObj.put("outpatient",dataModel.getValue());
             }
-            if(dataModel.getName().equals("hospital")){
+            if(null!=dataModel.getName()&&dataModel.getName().equals("hospital")){
                 mapObj.put("hospital",dataModel.getValue());
             }
         }
@@ -199,9 +198,10 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
 //        return listResult;
 //    }
 
-    @RequestMapping(value = "/getStatisticsUserCards", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.StasticReport.getStatisticsUserCards, method = RequestMethod.GET)
     @ApiOperation(value = "获取健康卡绑定量")
-    public List<EchartReportModel> getStatisticsUserCards() {
+    public Envelop getStatisticsUserCards() {
+        Envelop envelop = new Envelop();
         //获取居民总数
         Map<String, Object> map=new HashedMap();
         map.put("search",null);
@@ -223,23 +223,33 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         // 计算未绑卡量 nonBindingCardNum、
         DecimalFormat df = new DecimalFormat("0.00");//格式化小数
         int nonBindingCardNum=totalDemographicsNum - userCardsNum;
-        ////获取绑卡率
-        String userCardsScale = df.format((float)userCardsNum/totalDemographicsNum);//返回的是String类型
-        String userCardsN=String.valueOf(userCardsNum)+"("+userCardsScale+"%)";
-
-
-        // 计算未绑卡率
-        String nonBindingCardScale = df.format((float)nonBindingCardNum/totalDemographicsNum);//返回的是String类型
-        String nonBindingCardN=String.valueOf(nonBindingCardNum)+"("+nonBindingCardScale+"%)";
         EchartReportModel echartReportModel=new EchartReportModel();
-        Map<String, String> mapData=new HashedMap();
-        mapData.put("totalDemographicsNum",String.valueOf(totalDemographicsNum));
-        mapData.put("userCardsNum",userCardsN);
-        mapData.put("nonBindingCardNum",nonBindingCardN);
-//        echartReportModel.setMapData(mapData);
+        List<MapDataModel> mapData=new ArrayList<>();
+        MapDataModel mapDataModel=null;
+        mapDataModel=new MapDataModel();
+        mapDataModel.setName("总量");
+        mapDataModel.setValue(String.valueOf(totalDemographicsNum));
+        mapData.add(mapDataModel);
+
+        mapDataModel=new MapDataModel();
+        mapDataModel.setName("健康卡绑定量");
+        mapDataModel.setValue(String.valueOf(userCardsNum));
+        mapData.add(mapDataModel);
+
+        mapDataModel=new MapDataModel();
+        mapDataModel.setName("未绑定量");
+        mapDataModel.setValue(String.valueOf(nonBindingCardNum));
+        mapData.add(mapDataModel);
+        echartReportModel.setDataModels(mapData);
         List<EchartReportModel> quotaCategories = new ArrayList<>();
         quotaCategories.add(echartReportModel);
-        return (List<EchartReportModel>) convertToModels(quotaCategories, new ArrayList<EchartReportModel>(quotaCategories.size()), EchartReportModel.class, null);
+
+        Map<String, String> ma= new HashMap<>();
+        ma.put("totalDemographicsNum",String.valueOf(totalDemographicsNum));
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(quotaCategories);
+        envelop.setObj(ma);
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.StasticReport.GetArchiveIdentifyReportInfo, method = RequestMethod.GET)
@@ -366,4 +376,77 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setObj(mapData);
         return envelop;
     }
+
+    @RequestMapping(value =  ServiceApi.StasticReport.getStatisticsDoctorByRoleType, method = RequestMethod.GET)
+    @ApiOperation(value = "按机构医生、护士、床位的统计")
+    public Envelop getStatisticsDoctorByRoleType() {
+        Envelop envelop = new Envelop();
+        List<EchartReportModel> echartReportModels = new ArrayList<>();
+        //根据角色/医院获取医生总数
+        List<Object> doctorLost=  doctorService.getStatisticsDoctorsByRoleType("Doctor");
+
+        if( doctorLost != null && doctorLost.size() > 0){
+            EchartReportModel echartReportModel = new EchartReportModel();
+            String [] xdata = new String[doctorLost.size()];
+            int [] ydata = new int[doctorLost.size()];
+            for(int i=0 ; i < doctorLost.size(); i++){
+                Map<Integer,Object> mapVal  = converMapObject(doctorLost.get(i));
+                ydata[i] = Integer.valueOf(mapVal.get(0).toString());
+                xdata[i] = mapVal.get(2).toString();
+            }
+            echartReportModel.setName("医生");
+            echartReportModel.setxData(xdata);
+            echartReportModel.setyData(ydata);
+            echartReportModels.add(echartReportModel);
+        }
+
+        //根据角色/医院获取护士总数
+        List<Object> nurseLost= doctorService.getStatisticsDoctorsByRoleType("Nurse");
+        if( nurseLost != null && nurseLost.size() > 0){
+            EchartReportModel echartReportModel = new EchartReportModel();
+            String [] xdata = new String[nurseLost.size()];
+            int [] ydata = new int[nurseLost.size()];
+            for(int i=0 ; i < nurseLost.size(); i++){
+                Map<Integer,Object> mapVal  = converMapObject(nurseLost.get(i));
+                ydata[i] = Integer.valueOf(mapVal.get(0).toString());
+                xdata[i] = mapVal.get(2).toString();
+            }
+            echartReportModel.setName("护士");
+            echartReportModel.setxData(xdata);
+            echartReportModel.setyData(ydata);
+            echartReportModels.add(echartReportModel);
+        }
+
+        envelop.setDetailModelList(echartReportModels);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+
+    @RequestMapping(value =  ServiceApi.StasticReport.getStatisticsCityDoctorByRoleType, method = RequestMethod.GET)
+    @ApiOperation(value = "全市医生、护士、床位的统计")
+    public Envelop getStatisticsCityDoctorByRoleType() {
+        Envelop envelop = new Envelop();
+        List<EchartReportModel> echartReportModels = new ArrayList<>();
+        EchartReportModel echartReportModel = new EchartReportModel();
+        //根据角色/医院获取医生总数
+        int doctorCount = doctorService.getStatisticsCityDoctorByRoleType("Doctor");
+        List<MapDataModel> MapDataModelList=new ArrayList<>();
+        MapDataModel mapDataModel=null;
+        mapDataModel=new MapDataModel();
+        mapDataModel.setName("医生");
+        mapDataModel.setValue(String.valueOf(doctorCount));
+        MapDataModelList.add(mapDataModel);
+
+        int nurseCount = doctorService.getStatisticsCityDoctorByRoleType("Nurse");
+        mapDataModel=new MapDataModel();
+        mapDataModel.setName("护士");
+        mapDataModel.setValue(String.valueOf(nurseCount));
+        MapDataModelList.add(mapDataModel);
+        echartReportModel.setDataModels(MapDataModelList);
+        envelop.setObj(echartReportModel);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
 }
