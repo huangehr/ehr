@@ -6,9 +6,11 @@ import com.yihu.ehr.statistics.service.StatisticsClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -38,5 +40,28 @@ public class StatisticsController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "archive/getArchiveReportInfo", method = RequestMethod.GET)
+    @ApiOperation(value = "健康档案--图表")
+    public Envelop getArchiveReportInfo(
+            @ApiParam(name = "requestType", value = "类别")
+            @RequestParam(name = "requestType") String requestType) {
+        try {
+            Envelop envelop = new Envelop();
+            if ("archiveIdentify".equalsIgnoreCase(requestType)) {
+                envelop = statisticsClient.getArchiveIdentifyReportInfo();
+            } else if ("archiveHospital".equalsIgnoreCase(requestType)) {
+                envelop = statisticsClient.getArchiveHospitalReportInfo();
+            } else if ("archiveStatistical".equalsIgnoreCase(requestType)) {
+                envelop = statisticsClient.getArchiveStatisticalReportInfo();
+            } else if ("archiveTotalVisit".equalsIgnoreCase(requestType)) {
+                envelop = statisticsClient.getArchiveTotalVisitReportInfo();
+            }
 
+            return envelop;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
 }
