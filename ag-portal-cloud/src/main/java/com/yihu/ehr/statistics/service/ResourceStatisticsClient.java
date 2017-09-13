@@ -2,6 +2,7 @@ package com.yihu.ehr.statistics.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.tj.EchartReportModel;
 import com.yihu.ehr.model.tj.MapDataModel;
 import com.yihu.ehr.util.rest.Envelop;
@@ -44,4 +45,16 @@ public interface ResourceStatisticsClient {
     @RequestMapping(value = "archive/getArchiveTotalVisitReportInfo", method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--累计就诊人次")
     Envelop getArchiveTotalVisitReportInfo();
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsElectronicMedicalCount, method = RequestMethod.GET)
+    @ApiOperation(value = "电子病历-最近七天采集总数统计，门诊住院数")
+    List<EchartReportModel> getStatisticsElectronicMedicalCount();
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsMedicalEventTypeCount, method = RequestMethod.GET)
+    @ApiOperation(value = "电子病历 - 今天 门诊住院数统计")
+    List<EchartReportModel> getStatisticsElectronicMedicalEventTypeCount();
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsDemographicsAgeCount, method = RequestMethod.GET)
+    @ApiOperation(value = "全员人口个案库 - 年龄段人数统计")
+    List<EchartReportModel> getStatisticsDemographicsAgeCount();
 }
