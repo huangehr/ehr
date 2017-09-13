@@ -104,10 +104,10 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setDetailModelList(echartReportModels);
         Map<String,Object> mapObj = new HashMap<>();
         for(MapDataModel dataModel:dataList){
-            if(dataModel.getName().equals("outpatient")){
+            if(null!=dataModel.getName()&&dataModel.getName().equals("outpatient")){
                 mapObj.put("outpatient",dataModel.getValue());
             }
-            if(dataModel.getName().equals("hospital")){
+            if(null!=dataModel.getName()&&dataModel.getName().equals("hospital")){
                 mapObj.put("hospital",dataModel.getValue());
             }
         }
