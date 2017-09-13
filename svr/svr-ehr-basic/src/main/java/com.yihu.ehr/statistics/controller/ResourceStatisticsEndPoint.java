@@ -50,7 +50,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsElectronicMedicalCount, method = RequestMethod.GET)
     @ApiOperation(value = "电子病历-最近七天采集总数统计，门诊住院数 - 柱状")
-    public Envelop getStatisticsElectronicMedical( ) throws Exception {
+    public Envelop getStatisticsElectronicMedicalCount( ) throws Exception {
         Envelop envelop = new Envelop();
         List<EchartReportModel> echartReportModels = new ArrayList<>();
         List<String> dateList = new ArrayList<>();
@@ -81,7 +81,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsMedicalEventTypeCount, method = RequestMethod.GET)
     @ApiOperation(value = "电子病历 - 今天 门诊住院数统计 - 饼状")
-    public Envelop getStatisticsElectronicMedicalEventType( ) throws Exception {
+    public Envelop getStatisticsElectronicMedicalEventTypeCount( ) throws Exception {
         Envelop envelop = new Envelop();
         List<EchartReportModel> echartReportModels = new ArrayList<>();
         List<Object> list = archiveRelationService.getCollectTodayEventTypeCount();
