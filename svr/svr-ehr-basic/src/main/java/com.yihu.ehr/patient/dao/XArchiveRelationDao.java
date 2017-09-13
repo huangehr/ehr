@@ -41,6 +41,9 @@ public interface XArchiveRelationDao extends PagingAndSortingRepository<ArchiveR
     @Query("select count(ar.id) from ArchiveRelation ar where ar.eventType = 1")
     int findInPatientCount();
 
+    @Query("select count(ar.id) from ArchiveRelation ar where ar.eventType = 2")
+    int findPhysicalCount();
+
     @Query("select count(ar.id) from ArchiveRelation ar where ar.eventType = 0 or ar.eventType = 1")
     int findInAndOutPatientCount();
 
