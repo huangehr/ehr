@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.dict.service.SystemDictEntry;
+import com.yihu.ehr.dict.service.SystemDictEntryService;
 import com.yihu.ehr.model.tj.EchartReportModel;
 import com.yihu.ehr.model.tj.MapDataModel;
 import com.yihu.ehr.patient.service.arapply.ArchiveRelationService;
@@ -15,6 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +47,8 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     private ArchiveRelationService archiveRelationService;
     @Autowired
     DoctorService doctorService;
-
+    @Autowired
+    SystemDictEntryService systemDictEntryService;
 
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsElectronicMedicalCount, method = RequestMethod.GET)
@@ -131,20 +135,57 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop getStatisticsDemographicsAgeCount( ) throws Exception {
         Envelop envelop = new Envelop();
         List<EchartReportModel> echartReportModels = new ArrayList<>();
-        List<Object> list = demographicService.getStatisticsDemographicsAgeCount();
-        if( list != null && list.size() > 0){
-            EchartReportModel echartReportModel = new EchartReportModel();
-            String [] xdata = new String[list.size()];
-            int [] ydata = new int[list.size()];
-            for(int i=0 ; i < list.size(); i++){
-                Map<Integer,Object> mapVal  = converMapObject(list.get(i));
-                ydata[i] = Integer.valueOf(mapVal.get(0).toString());
-                xdata[i] = mapVal.get(1).toString();
+
+        Page<SystemDictEntry> systemDictEntryList = systemDictEntryService.findByDictId(89, 0, 1000);
+        if(systemDictEntryList !=null && systemDictEntryList.getContent() != null){
+            List<SystemDictEntry> ageList = systemDictEntryList.getContent();
+            Map<String,Integer> ageMap = new HashMap<>();
+            for(SystemDictEntry systemDictEntry:ageList){
+                ageMap.put(systemDictEntry.getValue(),0);
             }
-            echartReportModel.setxData(xdata);
-            echartReportModel.setyData(ydata);
-            echartReportModels.add(echartReportModel);
+
+            List<Object> list = demographicService.getStatisticsDemographicsAgeCount();
+            if( list != null && list.size() > 0){
+                EchartReportModel echartReportModel = new EchartReportModel();
+                Map<String,Integer> newAgeMap = ageMap;
+                for(int i=0 ; i < list.size(); i++) {
+                    Map<Integer, Object> mapVal = converMapObject(list.get(i));
+                    int val = Integer.valueOf(mapVal.get(0).toString());
+                    String age = mapVal.get(1).toString();
+                    for(String key :ageMap.keySet()){
+                        if(key.equals(age)){
+                            newAgeMap.put(key,val);
+                            break;
+                        }
+                    }
+                }
+                String [] xdata = new String[newAgeMap.size()];
+                Integer [] ydata = new Integer[newAgeMap.size()];
+                ydata = (Integer[]) newAgeMap.values().toArray();
+                xdata = (String[]) newAgeMap.keySet().toArray();
+                echartReportModel.setxData(xdata);
+                echartReportModel.setyData(ydata);
+                echartReportModels.add(echartReportModel);
+            }
+        }else{
+            List<Object> list = demographicService.getStatisticsDemographicsAgeCount();
+            if( list != null && list.size() > 0){
+                EchartReportModel echartReportModel = new EchartReportModel();
+                String [] xdata = new String[list.size()];
+                Integer [] ydata = new Integer[list.size()];
+                for(int i=0 ; i < list.size(); i++){
+                    Map<Integer,Object> mapVal  = converMapObject(list.get(i));
+                    ydata[i] = Integer.valueOf(mapVal.get(0).toString());
+                    xdata[i] = mapVal.get(1).toString();
+                }
+                echartReportModel.setxData(xdata);
+                echartReportModel.setyData(ydata);
+                echartReportModels.add(echartReportModel);
+            }
         }
+
+
+
         envelop.setDetailModelList(echartReportModels);
         envelop.setSuccessFlg(true);
         return envelop;
@@ -156,7 +197,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             echartReportModel.setName(name);
             if(dateList != null){
                 int num = dateList.size();
-                int[] ydata = new int[num];
+                Integer[] ydata = new Integer[num];
                 String[] xdata = new String[num];
                 echartReportModel.setxData(xdata);
                 for(int k=0 ; k < dateList.size() ; k++){
@@ -393,7 +434,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         }
 
         String [] xdata = new String[listSize];
-        int [] ydata = new int[listSize];
+        Integer [] ydata = new Integer[listSize];
         EchartReportModel echartReportModel = null;
         if( doctorLost != null && doctorLost.size() > 0){
             echartReportModel = new EchartReportModel();
@@ -414,7 +455,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             echartReportModels.add(echartReportModel);
         }
         String [] xDataN = new String[listSize];
-        int [] yDataN = new int[listSize];
+        Integer [] yDataN = new Integer[listSize];
         if( nurseLost != null && nurseLost.size() > 0){
             echartReportModel = new EchartReportModel();
             for(int i=0 ; i < nurseLost.size(); i++){

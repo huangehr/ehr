@@ -9,7 +9,7 @@ import java.util.Map;
 public class EchartReportModel {
     private String name;//名称
     private String[] xData;//柱状和线性图数据集
-    private int[] yData;//柱状和线性图数据集
+    private Integer[] yData;//柱状和线性图数据集
     private List<MapDataModel> dataModels;//饼状图数据集
 
     public String getName() {
@@ -28,11 +28,11 @@ public class EchartReportModel {
         this.xData = xData;
     }
 
-    public int[] getyData() {
+    public Integer[] getyData() {
         return yData;
     }
 
-    public void setyData(int[] yData) {
+    public void setyData(Integer[] yData) {
         this.yData = yData;
     }
 
