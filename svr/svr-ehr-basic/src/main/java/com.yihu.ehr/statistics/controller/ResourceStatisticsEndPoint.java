@@ -382,11 +382,21 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         List<EchartReportModel> echartReportModels = new ArrayList<>();
         //根据角色/医院获取医生总数
         List<Object> doctorLost=  doctorService.getStatisticsDoctorsByRoleType("Doctor");
+        //根据角色/医院获取护士总数
+        List<Object> nurseLost= doctorService.getStatisticsDoctorsByRoleType("Nurse");
+        int listSize=0;
+        if( doctorLost != null && doctorLost.size() > 0&&doctorLost.size()>listSize){
+            listSize=doctorLost.size();
+        }
+        if( nurseLost != null && nurseLost.size() > 0&& nurseLost.size()>listSize){
+            listSize=nurseLost.size();
+        }
+
+        String [] xdata = new String[listSize];
+        int [] ydata = new int[listSize];
         EchartReportModel echartReportModel = null;
         if( doctorLost != null && doctorLost.size() > 0){
             echartReportModel = new EchartReportModel();
-            String [] xdata = new String[doctorLost.size()];
-            int [] ydata = new int[doctorLost.size()];
             for(int i=0 ; i < doctorLost.size(); i++){
                 Map<Integer,Object> mapVal  = converMapObject(doctorLost.get(i));
                 ydata[i] = Integer.valueOf(mapVal.get(0).toString());
@@ -401,21 +411,18 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             echartReportModel.setName("医生");
             echartReportModels.add(echartReportModel);
         }
-
-        //根据角色/医院获取护士总数
-        List<Object> nurseLost= doctorService.getStatisticsDoctorsByRoleType("Nurse");
+        String [] xDataN = new String[listSize];
+        int [] yDataN = new int[listSize];
         if( nurseLost != null && nurseLost.size() > 0){
             echartReportModel = new EchartReportModel();
-            String [] xdata = new String[nurseLost.size()];
-            int [] ydata = new int[nurseLost.size()];
             for(int i=0 ; i < nurseLost.size(); i++){
                 Map<Integer,Object> mapVal  = converMapObject(nurseLost.get(i));
-                ydata[i] = Integer.valueOf(mapVal.get(0).toString());
-                xdata[i] = mapVal.get(2).toString();
+                yDataN[i] = Integer.valueOf(mapVal.get(0).toString());
+                xDataN[i] = mapVal.get(2).toString();
             }
             echartReportModel.setName("护士");
-            echartReportModel.setxData(xdata);
-            echartReportModel.setyData(ydata);
+            echartReportModel.setxData(xDataN);
+            echartReportModel.setyData(yDataN);
             echartReportModels.add(echartReportModel);
         }else{
             echartReportModel = new EchartReportModel();
