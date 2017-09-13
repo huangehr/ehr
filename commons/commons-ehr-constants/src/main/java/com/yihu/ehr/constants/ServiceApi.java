@@ -1004,13 +1004,12 @@ public class ServiceApi {
 
 
 
-
-
-
-
     }
 
     public static class StasticReport {
+        public static final String GetStatisticsElectronicMedicalCount = "/tj/getStatisticsElectronicMedicalCount";
+        public static final String GetStatisticsMedicalEventTypeCount = "/tj/getStatisticsMedicalEventTypeCount";
+        public static final String GetStatisticsDemographicsAgeCount = "/tj/getStatisticsDemographicsAgeCount";
 
     }
 

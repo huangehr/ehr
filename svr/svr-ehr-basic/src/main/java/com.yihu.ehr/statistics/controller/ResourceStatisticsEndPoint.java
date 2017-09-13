@@ -48,6 +48,143 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ArchiveRelationService archiveRelationService;
 
+    @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsElectronicMedicalCount, method = RequestMethod.GET)
+    @ApiOperation(value = "电子病历-最近七天采集总数统计，门诊住院数 - 柱状")
+    public Envelop getStatisticsElectronicMedical( ) throws Exception {
+        Envelop envelop = new Envelop();
+        List<EchartReportModel> echartReportModels = new ArrayList<>();
+        List<String> dateList = new ArrayList<>();
+        List<Object> list = archiveRelationService.getCollectTocalCount();
+        if( list != null && list.size() > 0){
+            for(int i=0 ; i < list.size(); i++){
+                Map<Integer,Object> mapVal  = converMapObject(list.get(i));
+                dateList.add(mapVal.get(1).toString());
+            }
+            EchartReportModel echartReportModel = setEchartReportModel(list,"采集总数",dateList);
+            echartReportModels.add(echartReportModel);
+        }
+        List<Object> list0 = archiveRelationService.getCollectEventTypeCount(0);
+        if( list0 != null && list0.size() > 0){
+            EchartReportModel echartReportModel = setEchartReportModel(list0,"outpatient",dateList);
+            echartReportModels.add(echartReportModel);
+        }
+        List<Object> list1 = archiveRelationService.getCollectEventTypeCount(1);
+        if( list1 != null && list1.size() > 0){
+            EchartReportModel echartReportModel = setEchartReportModel(list1,"hospital",dateList);
+            echartReportModels.add(echartReportModel);
+        }
+        envelop.setDetailModelList(echartReportModels);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsMedicalEventTypeCount, method = RequestMethod.GET)
+    @ApiOperation(value = "电子病历 - 今天 门诊住院数统计 - 饼状")
+    public Envelop getStatisticsElectronicMedicalEventType( ) throws Exception {
+        Envelop envelop = new Envelop();
+        List<EchartReportModel> echartReportModels = new ArrayList<>();
+        List<Object> list = archiveRelationService.getCollectTodayEventTypeCount();
+        List<MapDataModel> dataList = new ArrayList<>();
+        if( list != null && list.size() > 0){
+            EchartReportModel echartReportModel = new EchartReportModel();
+            for(int i=0 ; i < list.size(); i++){
+                MapDataModel mapDataModel = new MapDataModel();
+                Map<Integer,Object> mapVal  = converMapObject(list.get(i));
+                if(mapVal.get(1).toString().equals("0")){
+                    mapDataModel.setName("outpatient");
+                }else  if(mapVal.get(1).toString().equals("1")){
+                    mapDataModel.setName("hospital");
+                }
+                mapDataModel.setValue(mapVal.get(0).toString());
+                dataList.add(mapDataModel);
+            }
+            echartReportModel.setDataModels(dataList);
+            echartReportModels.add(echartReportModel);
+        }
+        envelop.setDetailModelList(echartReportModels);
+        Map<String,Object> mapObj = new HashMap<>();
+        for(MapDataModel dataModel:dataList){
+            if(dataModel.getName().equals("outpatient")){
+                mapObj.put("outpatient",dataModel.getValue());
+            }
+            if(dataModel.getName().equals("hospital")){
+                mapObj.put("hospital",dataModel.getValue());
+            }
+        }
+        int total = 0;
+        if (mapObj != null && mapObj.size() > 0 ){
+            for(String key :mapObj.keySet()){
+                total = total + Integer.valueOf(mapObj.get(key).toString());
+            }
+        }
+        mapObj.put("hospital/outpatient",total);
+        envelop.setObj(mapObj);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsDemographicsAgeCount, method = RequestMethod.GET)
+    @ApiOperation(value = "全员人口个案库 - 年龄段人数统计 -柱状")
+    public Envelop getStatisticsDemographicsAgeCount( ) throws Exception {
+        Envelop envelop = new Envelop();
+        List<EchartReportModel> echartReportModels = new ArrayList<>();
+        List<Object> list = demographicService.getStatisticsDemographicsAgeCount();
+        if( list != null && list.size() > 0){
+            EchartReportModel echartReportModel = new EchartReportModel();
+            String [] xdata = new String[list.size()];
+            int [] ydata = new int[list.size()];
+            for(int i=0 ; i < list.size(); i++){
+                Map<Integer,Object> mapVal  = converMapObject(list.get(i));
+                ydata[i] = Integer.valueOf(mapVal.get(0).toString());
+                xdata[i] = mapVal.get(1).toString();
+            }
+            echartReportModel.setxData(xdata);
+            echartReportModel.setyData(ydata);
+            echartReportModels.add(echartReportModel);
+        }
+        envelop.setDetailModelList(echartReportModels);
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    public EchartReportModel setEchartReportModel(List<Object> objectList,String name,List<String> dateList){
+        EchartReportModel echartReportModel = new EchartReportModel();
+        if( objectList != null && objectList.size() > 0){
+            echartReportModel.setName(name);
+            if(dateList != null){
+                int num = dateList.size();
+                int[] ydata = new int[num];
+                String[] xdata = new String[num];
+                echartReportModel.setxData(xdata);
+                for(int k=0 ; k < dateList.size() ; k++){
+                    int val = 0;
+                    for(int i=0 ; i < objectList.size() ; i++){
+                        Map<Integer,Object> mapVal  = converMapObject(objectList.get(i));
+                        if(mapVal.get(1).toString().equals(dateList.get(k))){
+                            val = Integer.valueOf(mapVal.get(0).toString());
+                            break;
+                        }
+                    }
+                    ydata[k] = val;
+                    xdata[k] = dateList.get(k).toString().substring(5);
+                }
+                echartReportModel.setyData(ydata);
+            }
+        }
+        return echartReportModel;
+    }
+
+    public Map<Integer,Object> converMapObject(Object object){
+        Map<Integer,Object> map = new HashMap<>();
+        Object[] obj = (Object[]) object;
+        for (int i = 0; i < obj.length; i++) {
+            map.put(i, obj[i].toString());
+        }
+        return map;
+    }
+
+
 //    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
 //    @ApiOperation(value = "全员人口个案-健康卡绑定量")
 //    public ListResult getTjDataSaveList(
