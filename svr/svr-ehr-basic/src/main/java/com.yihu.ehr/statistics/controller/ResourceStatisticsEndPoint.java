@@ -118,10 +118,10 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         for (int i = 0; i < 2; i++) {
             MapDataModel mapData = new MapDataModel();
             if (i == 0) {
-                mapData.setName("unIdentify");
+                mapData.setName("不可识别");
                 mapData.setValue(unIdentifyCount + "");
             } else if (i == 1) {
-                mapData.setName("identify");
+                mapData.setName("可识别");
                 mapData.setValue(identifyCount + "");
             } /*else if (i == 2) {
                 mapData.setName("archiveIdentify");
@@ -155,10 +155,10 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         for (int i = 0; i < 2; i++) {
             MapDataModel mapData = new MapDataModel();
             if (i == 0) {
-                mapData.setName("hospital");
+                mapData.setName("住院");
                 mapData.setValue(inPatientCount + "");
             } else if (i == 1) {
-                mapData.setName("outpatient");
+                mapData.setName("门诊");
                 mapData.setValue(outPatientCount + "");
             } /*else if (i == 2) {
                 mapData.setName("hospital/outpatient");
@@ -190,15 +190,15 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         for (int i = 0; i < 2; i++) {
             MapDataModel mapData = new MapDataModel();
             if (i == 0) {
-                mapData.setName("todayInWarehouse");
+                mapData.setName("今日人数");
                 mapData.setValue(todayInWarehouseCount + "");
             } else if (i == 1) {
-                mapData.setName("dailyUpdate");
+                mapData.setName("每日更新");
                 mapData.setValue("");
-            } else if (i == 2) {
+            } /*else if (i == 2) {
                 mapData.setName("dataStatistical");
                 mapData.setValue("");
-            }
+            }*/
             mapDataModels.add(mapData);
         }
         echartReportModel.setDataModels(mapDataModels);
