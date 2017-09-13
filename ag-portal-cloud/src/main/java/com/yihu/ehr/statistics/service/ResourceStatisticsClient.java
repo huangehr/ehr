@@ -48,13 +48,13 @@ public interface ResourceStatisticsClient {
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsElectronicMedicalCount, method = RequestMethod.GET)
     @ApiOperation(value = "电子病历-最近七天采集总数统计，门诊住院数")
-    List<EchartReportModel> getStatisticsElectronicMedicalCount();
+    Envelop getStatisticsElectronicMedicalCount();
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsMedicalEventTypeCount, method = RequestMethod.GET)
     @ApiOperation(value = "电子病历 - 今天 门诊住院数统计")
-    List<EchartReportModel> getStatisticsElectronicMedicalEventTypeCount();
+    Envelop getStatisticsElectronicMedicalEventTypeCount();
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsDemographicsAgeCount, method = RequestMethod.GET)
     @ApiOperation(value = "全员人口个案库 - 年龄段人数统计")
-    List<EchartReportModel> getStatisticsDemographicsAgeCount();
+    Envelop getStatisticsDemographicsAgeCount();
 }

@@ -27,18 +27,11 @@ public class ResourceStatisticsController extends BaseController {
     @RequestMapping(value = "/getStatisticsUserCards", method = RequestMethod.GET)
     @ApiOperation(value = "获取健康卡绑定量")
     public Envelop getStatisticsUserCards() {
-        try {
             Envelop envelop = new Envelop();
             envelop.setDetailModelList(resourceStatisticsClient.getStatisticsUserCards());
 //            envelop.setObj();
             envelop.setSuccessFlg(true);
             return envelop;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return failedSystem();
-        }
     }
 
     @RequestMapping(value = ServiceApi.StasticReport.GetArchiveReportInfo, method = RequestMethod.GET)
@@ -46,7 +39,6 @@ public class ResourceStatisticsController extends BaseController {
     public Envelop getArchiveReportInfo(
             @ApiParam(name = "requestType", value = "类别")
             @RequestParam(name = "requestType") String requestType) {
-        try {
             Envelop envelop = new Envelop();
             if ("archiveIdentify".equalsIgnoreCase(requestType)) {
                 envelop = resourceStatisticsClient.getArchiveIdentifyReportInfo();
@@ -59,60 +51,28 @@ public class ResourceStatisticsController extends BaseController {
             }
 
             return envelop;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return failedSystem();
-        }
     }
 
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsElectronicMedicalCount, method = RequestMethod.GET)
     @ApiOperation(value = "电子病历-最近七天采集总数统计，门诊住院数 - 柱状")
     public Envelop getStatisticsElectronicMedicalCount() {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setDetailModelList(resourceStatisticsClient.getStatisticsElectronicMedicalCount());
-            envelop.setSuccessFlg(true);
+            Envelop envelop = resourceStatisticsClient.getStatisticsElectronicMedicalCount();
             return envelop;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return failedSystem();
-        }
     }
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsMedicalEventTypeCount, method = RequestMethod.GET)
     @ApiOperation(value = "电子病历 - 今天 门诊住院数统计 - 饼状")
     public Envelop getStatisticsElectronicMedicalEventTypeCount() {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setDetailModelList(resourceStatisticsClient.getStatisticsElectronicMedicalEventTypeCount());
-            envelop.setSuccessFlg(true);
+            Envelop  envelop = resourceStatisticsClient.getStatisticsElectronicMedicalCount();
             return envelop;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return failedSystem();
-        }
     }
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsDemographicsAgeCount, method = RequestMethod.GET)
     @ApiOperation(value = "全员人口个案库 - 年龄段人数统计 -柱状")
     public Envelop getStatisticsDemographicsAgeCount() {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setDetailModelList(resourceStatisticsClient.getStatisticsDemographicsAgeCount());
-            envelop.setSuccessFlg(true);
+            Envelop envelop = resourceStatisticsClient.getStatisticsElectronicMedicalCount();
             return envelop;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            return failedSystem();
-        }
     }
 
 
