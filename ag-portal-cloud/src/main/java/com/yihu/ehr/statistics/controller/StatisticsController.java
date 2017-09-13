@@ -40,7 +40,7 @@ public class StatisticsController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "archive/getArchiveReportInfo", method = RequestMethod.GET)
+    @RequestMapping(value = "/archive/getArchiveReportInfo", method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--图表")
     public Envelop getArchiveReportInfo(
             @ApiParam(name = "requestType", value = "类别")

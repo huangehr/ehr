@@ -148,11 +148,12 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         int inPatientCount = archiveRelationService.getInPatientCount();
         int outPatientCount = archiveRelationService.getOutPatientCount();
-        int inAndOutPatientCount = archiveRelationService.getInAndOutPatientCount();
+        int inAndOutPatientCount = archiveRelationService.getArchiveCount();
+        int physicalCount = archiveRelationService.getPhysicalCount();
         List<EchartReportModel> echartReportModelList = new ArrayList<>();
         EchartReportModel echartReportModel = new EchartReportModel();
         List<MapDataModel> mapDataModels = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             MapDataModel mapData = new MapDataModel();
             if (i == 0) {
                 mapData.setName("住院");
@@ -160,10 +161,10 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             } else if (i == 1) {
                 mapData.setName("门诊");
                 mapData.setValue(outPatientCount + "");
-            } /*else if (i == 2) {
-                mapData.setName("hospital/outpatient");
-                mapData.setValue(inAndOutPatientCount + "");
-            }*/
+            } else if (i == 2) {
+                mapData.setName("体检");
+                mapData.setValue(physicalCount + "");
+            }
             mapDataModels.add(mapData);
         }
         echartReportModel.setDataModels(mapDataModels);
@@ -173,6 +174,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         mapData.put("hospital/outpatient",inAndOutPatientCount + "");
         mapData.put("hospital",inPatientCount + "");
         mapData.put("outpatient",outPatientCount + "");
+        mapData.put("physical",physicalCount + "");
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(echartReportModelList);
         envelop.setObj(mapData);
@@ -184,17 +186,18 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop getArchiveStatisticalReportInfo() throws Exception {
         Envelop envelop = new Envelop();
         int todayInWarehouseCount = archiveRelationService.getTodayInWarehouseCount();
+        int archiveCount = archiveRelationService.getArchiveCount();
         List<EchartReportModel> echartReportModelList = new ArrayList<>();
         EchartReportModel echartReportModel = new EchartReportModel();
         List<MapDataModel> mapDataModels = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             MapDataModel mapData = new MapDataModel();
             if (i == 0) {
-                mapData.setName("今日人数");
+                mapData.setName("今日入库");
                 mapData.setValue(todayInWarehouseCount + "");
             } else if (i == 1) {
-                mapData.setName("每日更新");
-                mapData.setValue("");
+                mapData.setName("数据统计");
+                mapData.setValue(archiveCount + "");
             } /*else if (i == 2) {
                 mapData.setName("dataStatistical");
                 mapData.setValue("");
@@ -205,9 +208,8 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         echartReportModelList.add(echartReportModel);
 
         Map<String,String> mapData = new HashMap<>();
-        mapData.put("dataStatistical", "");
+        mapData.put("dataStatistical", archiveCount + "");
         mapData.put("todayInWarehouse", todayInWarehouseCount + "");
-        mapData.put("dailyUpdate", "");
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(echartReportModelList);
         envelop.setObj(mapData);

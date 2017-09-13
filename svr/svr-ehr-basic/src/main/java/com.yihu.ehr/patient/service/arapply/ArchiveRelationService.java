@@ -151,6 +151,10 @@ public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XAr
         return archiveRelationDao.findOutPatientCount();
     }
 
+    public int getPhysicalCount() {
+        return archiveRelationDao.findPhysicalCount();
+    }
+
     public int getInAndOutPatientCount() {
         return archiveRelationDao.findInAndOutPatientCount();
     }
