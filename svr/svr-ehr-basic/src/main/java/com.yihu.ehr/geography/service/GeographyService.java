@@ -121,4 +121,8 @@ public class GeographyService extends BaseJpaService<Geography,XGeographyReposit
         List<Geography> list = query.list();
         return list;
     }
+
+    public List<String> getIdByDistrict(List<String> district) {
+        return geographyRepository.findIdByDistrict(district);
+    }
 }

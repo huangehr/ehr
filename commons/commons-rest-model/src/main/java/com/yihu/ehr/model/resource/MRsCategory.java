@@ -1,5 +1,6 @@
 package com.yihu.ehr.model.resource;
 
+import java.util.List;
 import java.util.Objects;
 
 /**

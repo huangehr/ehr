@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -20,8 +21,19 @@ public class PatientInfoBaseService {
     static class EventDateComparatorDesc implements Comparator<Map<String, Object>> {
         @Override
         public int compare(Map<String, Object> m1, Map<String, Object> m2) {
-            Date v1 = (Date)m1.get(BasisConstant.eventDate);
-            Date v2 = (Date)m2.get(BasisConstant.eventDate);
+            String eventDate1 = (String)m1.get(BasisConstant.eventDate);
+            String eventDate2 = (String)m2.get(BasisConstant.eventDate);
+            String str1 = eventDate1.substring(0, eventDate1.length()-1).replaceAll("[a-zA-Z]"," ");
+            String str2 = eventDate2.substring(0, eventDate1.length()-1).replaceAll("[a-zA-Z]"," ");
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date v1 = null;
+            Date v2 = null;
+            try {
+                v1 = dateFormat.parse(str1);
+                v2 = dateFormat.parse(str2);
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
             if (v2 != null) {
                 return v2.compareTo(v1);
             }
@@ -127,7 +139,6 @@ public class PatientInfoBaseService {
                     }
                 }
                 /*******************************************************/
-
                 return re;
             }
         } else {
@@ -175,7 +186,7 @@ public class PatientInfoBaseService {
                  }
             }
 
-            for(String healthProblemCode:hpList.keySet())
+            for(String healthProblemCode : hpList.keySet())
             {
                 Map<String, Object> obj = new HashedMap();
                 obj.put("healthProblemCode", healthProblemCode);
@@ -212,6 +223,7 @@ public class PatientInfoBaseService {
                         obj.put("lastVisitOrg", profile.get(BasisConstant.orgName));
                         obj.put("lastVisitRecord", profile.get(BasisConstant.rowkey));
                         obj.put("recentEvent", recentEvent);
+                        obj.put("eventType", eventType);
                     }
 
                     //最后一条
@@ -219,7 +231,6 @@ public class PatientInfoBaseService {
                     {
                         obj.put("ageOfDisease",getAgeOfDisease(profile.get(BasisConstant.eventDate)));
                     }
-
 
                 }
                 obj.put("visitTimes", visitTimes);
@@ -231,7 +242,26 @@ public class PatientInfoBaseService {
 
         return re;
     }
-
+		
+    /*
+     * @根据患者最后一次诊断记录获取诊断详情
+     */
+    public List<Map<String, Object>> getHealthProblemSub(String eventType, String lastVisitRecord) throws Exception {
+        List<Map<String, Object>> re = new ArrayList<>();
+        //获取门诊断详情
+        String resourcesCode = "";
+        if (eventType.equals("0")) {
+            resourcesCode = BasisConstant.outpatientDiagnosis;
+        }else if(eventType.equals("1")) {
+            resourcesCode = BasisConstant.hospitalizedDiagnosis;
+        }else if(eventType.equals("2")) {
+            resourcesCode = BasisConstant.examinationReport;
+        }
+        Envelop result = resource.getResourcesSub(resourcesCode, appId, null, "{\"q\":\"profile_id:" + lastVisitRecord + "\"}", null, null);
+        re = result.getDetailModelList();
+        return re;
+    }
+		
     /**
      * 全文检索
      */

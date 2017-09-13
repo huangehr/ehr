@@ -4,9 +4,16 @@ import com.yihu.ehr.agModel.user.RoleUserModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.model.resource.MRsReport;
+import com.yihu.ehr.model.resource.MRsReportCategory;
+import com.yihu.ehr.model.resource.MRsReportCategoryInfo;
+import com.yihu.ehr.model.user.MRoleReportRelation;
 import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.resource.client.RsReportCategoryClient;
+import com.yihu.ehr.resource.client.RsReportClient;
+import com.yihu.ehr.users.service.RoleReportRelationClient;
 import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.users.service.UserClient;
@@ -15,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -40,6 +49,15 @@ public class RoleUserController extends BaseController {
 
     @Autowired
     private RolesClient rolesClient;
+
+    @Autowired
+    private RsReportCategoryClient rsReportCategoryClient;
+
+    @Autowired
+    private RsReportClient rsReportClient;
+
+    @Autowired
+    private RoleReportRelationClient roleReportRelationClient;
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -217,5 +235,100 @@ public class RoleUserController extends BaseController {
         MRoles roles = rolesClient.getRolesById(m.getRoleId());
         model.setRoleName(roles == null?"":roles.getName());
         return model;
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.NoPageCategoriesAndReport, method = RequestMethod.GET)
+    @ApiOperation("获取资源报表类别及报表树")
+    public Envelop getAllCategoriesAndReport(
+            @ApiParam(name="filters",value="过滤",defaultValue = "")
+            @RequestParam(value="filters",required = false)String filters,
+            @ApiParam(name="roleId",value="角色Id",defaultValue = "")
+            @RequestParam(value="roleId",required = false)String roleId) throws  Exception {
+        Envelop envelop = new Envelop();
+        List<Integer> categoryIdList = new ArrayList<>();
+        try {
+            List<MRsReportCategory> categories = rsReportCategoryClient.getAllCategories("");
+            List<MRsReportCategoryInfo> mRsReportCategoryInfos = (List<MRsReportCategoryInfo>) convertToModels(categories, new ArrayList<>(categories.size()), MRsReportCategoryInfo.class, null);
+            for (MRsReportCategoryInfo category : mRsReportCategoryInfos) {
+                String condition = "reportCategoryId=" + category.getId();
+                if (!StringUtils.isEmpty(filters)) {
+                    condition += ";" + filters;
+                }
+                List<MRsReport> mRsResources = rsReportClient.queryNoPageResources(condition);
+                if (null != mRsResources && mRsResources.size() > 0) {
+                    for (MRsReport rp : mRsResources) {
+                        setFlag(rp, roleId);
+                    }
+                }
+                category.setReportList(mRsResources);
+
+            }
+            //获取已配置的资源报表信息
+            List<MRsReportCategoryInfo> mRsReportCategoryInfoList = getReportConfigInfo(roleId);
+            //将已配置的资源报表的id存储在hashset中
+            HashSet<Integer> h = new HashSet<>();
+            for (MRsReportCategoryInfo categoryInfo : mRsReportCategoryInfoList) {
+                h.add(categoryInfo.getId());
+            }
+            categoryIdList.clear();
+            categoryIdList.addAll(h);
+            for (MRsReportCategoryInfo rc : mRsReportCategoryInfos) {
+                if (categoryIdList.contains(rc.getId())) {
+                    rc.setFlag(true);
+                }
+            }
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(mRsReportCategoryInfos);
+            envelop.setObj(mRsReportCategoryInfoList);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    public void setFlag(MRsReport mRsReport, String roleId) {
+        ResponseEntity<Collection<MRoleReportRelation>> responseEntity = roleReportRelationClient.searchRoleReportRelation("", "rsReportId=" + mRsReport.getId() + ";roleId=" + roleId, "", 1, 1);
+        Collection<MRoleReportRelation> roleReportRelations = responseEntity.getBody();
+        if (roleReportRelations != null && roleReportRelations.size() > 0) {
+            mRsReport.setFlag(true);
+        }
+    }
+
+    //获取已配置的报表信息
+    public List<MRsReportCategoryInfo> getReportConfigInfo(String roleId) {
+        List<MRsReportCategory> mRsReportCategories = new ArrayList<>();
+        List<MRoleReportRelation> roleReportRelations = roleReportRelationClient.searchRoleReportRelationNoPage("roleId=" + roleId);
+        if (null != roleReportRelations && roleReportRelations.size() > 0) {
+            for (MRoleReportRelation roleReportRelation : roleReportRelations) {
+                ResponseEntity<List<MRsReport>> listResponseEntity = rsReportClient.search("", "id=" + roleReportRelation.getRsReportId(), "", 1, 1);
+                List<MRsReport> rsReportList = listResponseEntity.getBody();
+                if (null != rsReportList && rsReportList.size() > 0) {
+                    MRsReportCategory rsReportCategory = rsReportCategoryClient.getById(rsReportList.get(0).getReportCategoryId());
+                    rsReportCategory.setReportList(rsReportList);
+                    mRsReportCategories.add(rsReportCategory);
+                }
+            }
+        }
+        if (null != mRsReportCategories && mRsReportCategories.size() > 0) {
+            List<Integer> pidList = new ArrayList<>();
+            for (MRsReportCategory rp : mRsReportCategories) {
+                pidList.add(rp.getPid());
+            }
+            //删除重复的pid
+            if (null != pidList && pidList.size() > 0) {
+                HashSet h = new HashSet(pidList);
+                pidList.clear();
+                pidList.addAll(h);
+            }
+            for(Integer pid : pidList) {
+                if (null != pid) {
+                    MRsReportCategory mRsReportCategory = rsReportCategoryClient.getById(pid);
+                    mRsReportCategories.add(mRsReportCategory);
+                }
+            }
+        }
+        List<MRsReportCategoryInfo> mRsReportCategoryInfosList = (List<MRsReportCategoryInfo>) convertToModels(mRsReportCategories, new ArrayList<>(mRsReportCategories.size()), MRsReportCategoryInfo.class, null);
+        return mRsReportCategoryInfosList;
     }
 }

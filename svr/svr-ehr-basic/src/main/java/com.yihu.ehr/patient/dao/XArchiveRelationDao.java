@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,4 +26,32 @@ public interface XArchiveRelationDao extends PagingAndSortingRepository<ArchiveR
 
     ArchiveRelation findByProfileId(String profileId);
 
+    @Query("select count(ar.id) from ArchiveRelation ar where ar.identifyFlag = 1")
+    int findIdentifyCount();
+
+    @Query("select count(ar.id) from ArchiveRelation ar where ar.identifyFlag = 0")
+    int findUnIdentifyCount();
+
+    @Query("select count(ar.id) from ArchiveRelation ar")
+    int findArchiveCount();
+
+    @Query("select count(ar.id) from ArchiveRelation ar where ar.eventType = 0")
+    int findOutPatientCount();
+
+    @Query("select count(ar.id) from ArchiveRelation ar where ar.eventType = 1")
+    int findInPatientCount();
+
+    @Query("select count(ar.id) from ArchiveRelation ar where ar.eventType = 2")
+    int findPhysicalCount();
+
+    @Query("select count(ar.id) from ArchiveRelation ar where ar.eventType = 0 or ar.eventType = 1")
+    int findInAndOutPatientCount();
+
+    //今日入库
+    @Query("select count(ar.id) from ArchiveRelation ar where ar.createDate >= :curDate")
+    int findTodayInWarehouseCount(@Param("curDate")Date curDate);
+
+    //累计就诊人次--每日新增
+    @Query("select count(ar.id) from ArchiveRelation ar where ar.identifyFlag = 1 and ar.eventDate >= :curDate")
+    int FindDailyAdd(@Param("curDate")Date curDate);
 }

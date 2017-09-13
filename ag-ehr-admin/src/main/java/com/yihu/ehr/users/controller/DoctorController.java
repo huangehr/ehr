@@ -10,6 +10,7 @@ import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.DoctorClient;
+import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -40,6 +41,9 @@ public class DoctorController extends BaseController {
     private ConventionalDictEntryClient conventionalDictClient;
     @Autowired
     private FileResourceClient fileResourceClient;
+    @Autowired
+    private UserClient userClient;
+
 
 
     @RequestMapping(value = "/doctors", method = RequestMethod.GET)
@@ -68,6 +72,10 @@ public class DoctorController extends BaseController {
                 MConventionalDict dict = conventionalDictClient.getGender(mDoctor.getSex());
                 doctorsModel.setSex(dict == null ? "" : dict.getValue());
             }
+            if (StringUtils.isNotEmpty(mDoctor.getRoleType())) {
+                MConventionalDict dict = conventionalDictClient.getUserType(mDoctor.getRoleType());
+                doctorsModel.setRoleType(dict == null ? "" : dict.getValue());
+            }
             doctorsModels.add(doctorsModel);
         }
 
@@ -94,6 +102,22 @@ public class DoctorController extends BaseController {
                     break;
                 case "idCardNo":
                     bo = doctorClient.isCardNoExists(existenceNm);
+                    break;
+                case "phone":
+                   String ph="phone="+existenceNm;
+                    bo = doctorClient.isExistence(ph);
+                    boolean uf=userClient.isTelephoneExists(existenceNm);
+                    if(bo==true || uf==true){
+                        bo=true;
+                    }
+                    break;
+                case "email":
+                    String email="email="+existenceNm;
+                    bo = doctorClient.isExistence(email);
+                    boolean emailFlag=userClient.isEmailExists(existenceNm);
+                    if(bo==true || emailFlag==true){
+                        bo=true;
+                    }
                     break;
             }
             envelop.setSuccessFlg(bo);
@@ -156,7 +180,11 @@ public class DoctorController extends BaseController {
     @ApiOperation(value = "创建医生", notes = "重新绑定医生信息")
     public Envelop createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "doctor_json_data") String doctorJsonData) {
+            @RequestParam(value = "doctor_json_data") String doctorJsonData,
+            @ApiParam(name = "orgId", value = "", defaultValue = "")
+            @RequestParam(value = "orgId") String orgId,
+            @ApiParam(name = "deptId", value = "", defaultValue = "")
+            @RequestParam(value = "deptId") String deptId) {
         try {
             DoctorDetailModel detailModel = objectMapper.readValue(doctorJsonData, DoctorDetailModel.class);
 
@@ -185,7 +213,7 @@ public class DoctorController extends BaseController {
                 return failed(errorMsg);
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
-            mDoctor = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor));
+            mDoctor = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor), orgId, deptId);
             if (mDoctor == null) {
                 return failed("保存失败!");
             }
@@ -277,6 +305,17 @@ public class DoctorController extends BaseController {
         List existPhones = doctorClient.idExistence(phones);
         return existPhones;
     }
+    @RequestMapping(value = ServiceApi.Doctors.DoctoridCardNoExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在身份证号码")
+    public List idCardNoExistence(
+            @ApiParam(name = "idCardNos", value = "", defaultValue = "")
+            @RequestParam("idCardNos") String idCardNos) throws Exception {
+
+        List existPhones = doctorClient.idCardNoExistence(idCardNos);
+        return existPhones;
+    }
+
+
 
     @RequestMapping(value = ServiceApi.Doctors.DoctorBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入医生")

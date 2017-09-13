@@ -47,9 +47,9 @@ public interface FileResourceClient {
             @RequestParam(value = "object_id") String objectId,
             @RequestParam(value = "mime", required = false) String mime);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/image_view/{storagePath}", method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + "/image_view", method = RequestMethod.GET)
     @ApiOperation(value = "查看图片")
-    String imageView(@PathVariable(value = "storagePath") String storagePath);
+    String imageView(@RequestParam(value = "storagePath") String storagePath);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_path", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件路径")
@@ -61,10 +61,12 @@ public interface FileResourceClient {
     boolean filesDeleteByPath(
             @RequestParam(value = "storagePath") String storagePath);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/imageFindById", method = RequestMethod.GET)
-    @ApiOperation(value = "根据文件的id,查找文件路径")
-    String imageFindById(
-            @RequestParam(value = "imageId") String imageId);
+    @ApiOperation(value = "根据文件的id，获取文件的真实访问路径")
+    @RequestMapping(value = ApiVersion.Version1_0 + "/file/getRealPathById", method = RequestMethod.GET)
+    String getRealPathById(@RequestParam(value = "fileId") String fileId);
 
+    @ApiOperation(value = "根据文件的存储路径，获取文件的真实访问路径")
+    @RequestMapping(value = ApiVersion.Version1_0 + "/file/getRealPathByStoragePath", method = RequestMethod.GET)
+    String getRealPathByStoragePath(@RequestParam(value = "storagePath") String storagePath);
 
 }

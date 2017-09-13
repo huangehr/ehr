@@ -14,32 +14,31 @@ import org.springframework.util.StringUtils;
  */
 @Service
 public class RedisService {
-    @Autowired
-    AddressDictKeySchema addressDictKeySchema;
-    @Autowired
-    HealthProblemDictKeySchema healthProblemDictKeySchema;
-    @Autowired
-    Icd10HpRelationKeySchema icd10HpRelationKeySchema;
-    @Autowired
-    Icd10KeySchema icd10KeySchema;
-    @Autowired
-    IndicatorsDictKeySchema indicatorsDictKeySchema;
-    @Autowired
-    OrgKeySchema orgKeySchema;
 
     @Autowired
-    ResourceAdaptionDictSchema resourceAdaptionDictSchema;
+    private AddressDictKeySchema addressDictKeySchema;
     @Autowired
-    ResourceAdaptionKeySchema resourceAdaptionKeySchema;
+    private HealthProblemDictKeySchema healthProblemDictKeySchema;
     @Autowired
-    ResourceMetadataSchema resourceMetadataSchema;
-
+    private Icd10HpRelationKeySchema icd10HpRelationKeySchema;
     @Autowired
-    StdVersionKeySchema stdVersionKeySchema;
+    private Icd10KeySchema icd10KeySchema;
     @Autowired
-    StdDataSetKeySchema stdDataSetKeySchema;
+    private IndicatorsDictKeySchema indicatorsDictKeySchema;
     @Autowired
-    StdMetaDataKeySchema stdMetaDataKeySchema;
+    private OrgKeySchema orgKeySchema;
+    @Autowired
+    private RsAdapterDictKeySchema rsAdapterDictKeySchema;
+    @Autowired
+    private RsAdapterMetaKeySchema rsAdapterMetaKeySchema;
+    @Autowired
+    private RsMetadataKeySchema rsMetadataKeySchema;
+    @Autowired
+    private StdCdaVersionKeySchema stdVersionKeySchema;
+    @Autowired
+    private StdDataSetKeySchema stdDataSetKeySchema;
+    @Autowired
+    private StdMetaDataKeySchema stdMetaDataKeySchema;
 
     /**
      *获取地址redis
@@ -54,8 +53,7 @@ public class RedisService {
      *获取健康问题redis
      * @return
      */
-    public String getHealthProblemRedis(String key)
-    {
+    public String getHealthProblemRedis(String key) {
         return healthProblemDictKeySchema.get(key);
     }
 
@@ -71,8 +69,7 @@ public class RedisService {
     /**
      *获取ICD10名称 redis
      */
-    public String getIcd10NameRedis(String key)
-    {
+    public String getIcd10NameRedis(String key) {
         return icd10KeySchema.get(key);
     }
 
@@ -85,7 +82,7 @@ public class RedisService {
     }
 
     /**
-     *获取指标 redis
+     * 获取指标 redis
      * @return
      */
     public String getIndicatorsRedis(String key)
@@ -124,13 +121,11 @@ public class RedisService {
      *获取机构Saas机构权限范围redis
      * @return
      */
-    public String getOrgSaasOrg(String key)
-    {
+    public String getOrgSaasOrg(String key) {
         String saasOrg = orgKeySchema.getOrgSaasOrg(key);
 
         //未设置权限，默认自身机构
-        if(StringUtils.isEmpty(saasOrg))
-        {
+        if(StringUtils.isEmpty(saasOrg)) {
             saasOrg = key;
         }
 
@@ -142,28 +137,26 @@ public class RedisService {
      *获取资源化字典映射 redis
      * @return
      */
-    public String getRsAdaptionDict(String cdaVersion, String dictCode, String srcDictEntryCode)
-    {
-        return resourceAdaptionDictSchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
+    public String getRsAdaptionDict(String cdaVersion, String dictCode, String srcDictEntryCode) {
+        return rsAdapterDictKeySchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
     }
 
     /**
      *获取资源化数据元映射 redis
      * @return
      */
-    public String getRsAdaptionMetaData(String cdaVersion, String dictCode, String srcDictEntryCode)
-    {
-        return resourceAdaptionKeySchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
+    public String getRsAdaptionMetaData(String cdaVersion, String dictCode, String srcDictEntryCode) {
+        return rsAdapterMetaKeySchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
     }
 
     /**
      *获取资源化数据元映射 redis
      * @return
      */
-    public String getRsMetaData(String key)
-    {
-        return resourceMetadataSchema.get(key);
+    public String getRsMetaData(String key) {
+        return rsMetadataKeySchema.get(key);
     }
+
     /******************************************* 标准相关Redis *******************************************************************/
     /**
      *获取标准版本 redis
@@ -206,7 +199,7 @@ public class RedisService {
      */
     public String getMetaDataType(String version, String dataSetCode, String innerCode) {
 
-        return stdMetaDataKeySchema.metaDataType( version, dataSetCode , innerCode);
+        return stdMetaDataKeySchema.metaDataType(version, dataSetCode , innerCode);
     }
 
     /**
@@ -221,6 +214,6 @@ public class RedisService {
      */
     public String getDictEntryValue(String version, String dictId, String entryCode) {
 
-        return stdMetaDataKeySchema.dictEntryValue( version, dictId , entryCode);
+        return stdMetaDataKeySchema.dictEntryValue(version, dictId , entryCode);
     }
 }

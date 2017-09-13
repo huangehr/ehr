@@ -43,7 +43,11 @@ public interface DoctorClient {
     @ApiOperation(value = "创建医生", notes = "重新绑定医生信息")
     MDoctor createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
-            @RequestBody String doctoJsonData);
+            @RequestBody String doctoJsonData,
+            @ApiParam(name = "orgId", value = "", defaultValue = "")
+            @RequestParam(value = "orgId") String orgId,
+            @ApiParam(name = "deptId", value = "", defaultValue = "")
+            @RequestParam(value = "deptId") String deptId);
 
     @RequestMapping(value = ServiceApi.Doctors.Doctors, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改医生", notes = "重新绑定医生信息")
@@ -162,7 +166,10 @@ public interface DoctorClient {
 
     @RequestMapping(value = ServiceApi.Doctors.DoctorsIdCardNoExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断身份证号是否存在")
-    boolean isCardNoExists(@PathVariable(value = "idCardNo") String idCardNo);
+    boolean isCardNoExists(@PathVariable(value = "doctor_idCardNo") String idCardNo);
 
-
+    @RequestMapping(value = ServiceApi.Doctors.DoctoridCardNoExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在身份证号码")
+    List idCardNoExistence(
+            @RequestBody String idCardNos);
 }

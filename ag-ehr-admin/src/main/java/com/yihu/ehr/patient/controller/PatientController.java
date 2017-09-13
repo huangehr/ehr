@@ -2,6 +2,7 @@ package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unboundid.util.json.JSONObject;
+import com.yihu.ehr.agModel.app.AppModel;
 import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
 import com.yihu.ehr.agModel.user.RoleUserModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
@@ -513,6 +514,20 @@ public class PatientController extends BaseController {
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
         return patientClient.isExistIdCardNo(idCardNo);
     }
+    /**
+     * 手机号码是否已存在校验
+     *
+     * @param telphoneNumber
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/populations/telphoneNumberIs_exist/{telphone_number}", method = RequestMethod.GET)
+    @ApiOperation(value = "判断手机号码是否存在")
+    public boolean isExisttelphoneNumber(
+            @ApiParam(name = "telphone_number", value = "手机号码", defaultValue = "")
+            @PathVariable(value = "telphone_number") String telphoneNumber) throws Exception {
+        return patientClient.isExisttelphoneNumber(telphoneNumber);
+    }
 
     /**
      * 初始化密码
@@ -639,6 +654,86 @@ public class PatientController extends BaseController {
             @RequestParam(value = "rows") Integer rows) {
         try {
             ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatientByParams(search, gender, province, city, district, searchRegisterTimeStart, searchRegisterTimeEnd, page, rows);
+            List<MDemographicInfo> demographicInfos = responseEntity.getBody();
+            List<PatientModel> patients = new ArrayList<>();
+            for (MDemographicInfo patientInfo : demographicInfos) {
+
+                PatientModel patient = convertToModel(patientInfo, PatientModel.class);
+                //patient.setRegisterTime(DateToString(patientInfo.getRegisterTime(), AgAdminConstants.DateTimeFormat));
+                patient.setRegisterTime(patientInfo.getRegisterTime() == null ? "" : DateTimeUtil.simpleDateTimeFormat(patientInfo.getRegisterTime()));
+                //获取家庭地址信息
+                String homeAddressId = patientInfo.getHomeAddress();
+                if (StringUtils.isNotEmpty(homeAddressId)) {
+                    MGeography geography = addressClient.getAddressById(homeAddressId);
+                    String homeAddress = geography != null ? geography.fullAddress() : "";
+                    patient.setHomeAddress(homeAddress);
+                }
+                //性别
+                if (StringUtils.isNotEmpty(patientInfo.getGender())) {
+                    MConventionalDict dict = conventionalDictClient.getGender(patientInfo.getGender());
+                    patient.setGender(dict == null ? "" : dict.getValue());
+                }
+
+                //获取居民账户id
+                String fields= "id,demographicId,realName";
+                String filters="demographicId="+patientInfo.getIdCardNo();
+                String sorts="+demographicId,+realName";
+                ResponseEntity<List<MUser>> userEntity = userClient.searchUsers(fields, filters, sorts, 20, 1);
+                List<MUser> mUsers = userEntity.getBody();
+                if(null!=mUsers&&mUsers.size()>0){
+                    for(MUser u:mUsers){
+                        patient.setUserId(u.getId());
+                    }
+                }
+                //联系电话
+                Map<String, String> telephoneNo;
+                String tag = "联系电话";
+                try {
+                    telephoneNo = objectMapper.readValue(patient.getTelephoneNo(), Map.class);
+                } catch (Exception e) {
+                    telephoneNo = null;
+                }
+                if (telephoneNo != null && telephoneNo.containsKey(tag)) {
+                    patient.setTelephoneNo(telephoneNo.get(tag));
+                } else {
+                    patient.setTelephoneNo(null);
+                }
+
+                patients.add(patient);
+            }
+
+            return getResult(patients, getTotalCount(responseEntity), page, rows);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    @RequestMapping(value = "/populationsByParams2", method = RequestMethod.GET)
+    @ApiOperation(value = "用户信息 查询（添加查询条件修改）")
+    public Envelop searchPatientByParams2(
+            @ApiParam(name = "search", value = "搜索内容", defaultValue = "")
+            @RequestParam(value = "search") String search,
+            @ApiParam(name = "gender", value = "性别", defaultValue = "")
+            @RequestParam(value = "gender") String gender,
+            @ApiParam(name = "home_province", value = "省", defaultValue = "")
+            @RequestParam(value = "home_province") String province,
+            @ApiParam(name = "home_city", value = "市", defaultValue = "")
+            @RequestParam(value = "home_city") String city,
+            @ApiParam(name = "home_district", value = "县", defaultValue = "")
+            @RequestParam(value = "home_district") String district,
+            @ApiParam(name = "searchRegisterTimeStart", value = "注册开始时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeStart") String searchRegisterTimeStart,
+            @ApiParam(name = "searchRegisterTimeEnd", value = "注册结束时间", defaultValue = "")
+            @RequestParam(value = "searchRegisterTimeEnd") String searchRegisterTimeEnd,
+            @ApiParam(name = "districtList", value = "区域", defaultValue = "")
+            @RequestParam(value = "districtList") String districtList,
+            @ApiParam(name = "page", value = "当前页", defaultValue = "")
+            @RequestParam(value = "page") Integer page,
+            @ApiParam(name = "rows", value = "行数", defaultValue = "")
+            @RequestParam(value = "rows") Integer rows) {
+        try {
+            ResponseEntity<List<MDemographicInfo>> responseEntity = patientClient.searchPatientByParams2(search, gender, province, city, district, searchRegisterTimeStart, searchRegisterTimeEnd, districtList, page, rows);
             List<MDemographicInfo> demographicInfos = responseEntity.getBody();
             List<PatientModel> patients = new ArrayList<>();
             for (MDemographicInfo patientInfo : demographicInfos) {
@@ -842,6 +937,11 @@ public class PatientController extends BaseController {
                 mr=new MRoleUser();
                 mr.setRoleId(m.getRoleId());
                 mr.setRoleName(appRolesTreeModelMap.get(String.valueOf(m.getRoleId())));
+                MRoles roles = rolesClient.getRolesById(m.getRoleId());
+                Collection<MApp> appCollection = appClient.getAppsNoPage("id=" + roles.getAppId());
+                for(MApp app : appCollection){
+                    mr.setAppName(app.getName());
+                }
                 mRoleUserList.add(mr);
             }
         }

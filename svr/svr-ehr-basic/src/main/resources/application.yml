@@ -54,22 +54,20 @@ spring:
 spring:
   profiles: dev
   datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: ha
-    password: ha
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: weifuwu
+    password: weifuwu
   data:
     mongodb:
-      host: 172.19.103.57
+      host: 192.168.1.220
       port: 27017
-      username: esb
-      password: esb
+      username: admin
+      password: admin
       authenticationDatabase: admin
-      database: wlyy
-
-
+      database: ehr
 fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54
+  tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
 
 ---
 spring:
@@ -80,12 +78,12 @@ spring:
     password: ha
   data:
     mongodb:
-      host: 172.19.103.57
+      host: 192.168.1.220
       port: 27017
-      username: esb
-      password: esb
+      username: admin
+      password: admin
       authenticationDatabase: admin
-      database: wlyy
+      database: ehr
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54
@@ -94,17 +92,17 @@ fast-dfs:
 spring:
   profiles: test
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive_220?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: weifuwu
     password: weifuwu
   data:
     mongodb:
-      host: 172.19.103.57
+      host: 192.168.1.220
       port: 27017
-      username: esb
-      password: esb
+      username: admin
+      password: admin
       authenticationDatabase: admin
-      database: wlyy
+      database: ehr
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
@@ -124,12 +122,12 @@ spring:
     root: dc=ehr,dc=jkzl
   data:
     mongodb:
-      host: 172.19.103.57
+      host: 192.168.1.220
       port: 27017
-      username: esb
-      password: esb
+      username: admin
+      password: admin
       authenticationDatabase: admin
-      database: wlyy
+      database: ehr
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122

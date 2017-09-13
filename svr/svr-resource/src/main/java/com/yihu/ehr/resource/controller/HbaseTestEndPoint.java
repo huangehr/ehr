@@ -25,22 +25,19 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "hbaseTest", description = "habse测试接口")
+@Api(value = "HbaseTest", description = "habse测试接口")
 public class HbaseTestEndPoint extends EnvelopRestEndPoint {
-    @Autowired
-    HBaseAdmin hbaseAdmin;
 
     @Autowired
-    HBaseDao hbaseDao;
-
+    private HBaseAdmin hbaseAdmin;
     @Autowired
-    SolrAdmin solrAdmin;
-
+    private HBaseDao hbaseDao;
     @Autowired
-    SolrUtil solrUtil;
-
+    private SolrAdmin solrAdmin;
     @Autowired
-    ObjectMapper objectMapper;
+    private SolrUtil solrUtil;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @ApiOperation("模糊匹配表")
     @RequestMapping(value = "getTableList",method = RequestMethod.GET)

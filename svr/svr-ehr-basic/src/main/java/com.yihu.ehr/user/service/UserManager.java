@@ -166,7 +166,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
 
 
     public User saveUser(User user) {
-        userRepository.save(user);
+        user = userRepository.save(user);
         return user;
     }
 
@@ -209,7 +209,8 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         int total = 0;
         for(int i=1; i<=doctorLs.size(); i++){
             map = doctorLs.get(i-1);
-            sql.append("('"+ UUID.randomUUID().toString()+"'");
+            String uuid=UUID.randomUUID().toString().replace("-","");
+            sql.append("('"+ uuid+"'");
             sql.append(",'"+ null2Space(map.getPhone()) +"'");
             sql.append(",'"+ map .getName() +"'");
             sql.append(",'"+ map .getIdCardNo() +"'");
@@ -250,4 +251,17 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         sqlQuery.setParameterList("emails", emails);
         return sqlQuery.list();
     }
+
+    /**
+     * 查询电话号码是否已存在， 返回已存在电话号码
+     */
+    public List idCardNosExist(String[] idCardNos)
+    {
+        String sql = "SELECT id_card_no FROM users WHERE id_card_no in(:idCardNos)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("idCardNos", idCardNos);
+        return sqlQuery.list();
+    }
+
+
 }

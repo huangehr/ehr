@@ -14,14 +14,14 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 /**
- * Created by chenweida on 2017/5/16.
+ * Created by janseny on 2017/06/16.
  */
 @Configuration
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {
         SecurityAutoConfiguration.class,
         ManagementWebSecurityAutoConfiguration.class})
-@ComponentScan
+@ComponentScan(basePackages = { "com.yihu" })
 @EnableFeignClients
 @EnableDiscoveryClient //服务注册到发现服务
 @EnableEurekaClient

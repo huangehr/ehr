@@ -9,4 +9,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface TjQuotaDao extends PagingAndSortingRepository<TjQuota, Integer>, JpaSpecificationExecutor<TjQuota> {
 
+    TjQuota findByCode(String code);
 }

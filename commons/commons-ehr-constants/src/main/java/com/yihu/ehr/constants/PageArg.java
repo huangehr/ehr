@@ -7,8 +7,8 @@ package com.yihu.ehr.constants;
  */
 public class PageArg {
     public static final Integer DefaultPage = 1;
-    public static final Integer DefaultSize = 15;
+    public static final Integer DefaultSize = 30;
 
     public static final String DefaultPageS = "1";
-    public static final String DefaultSizeS = "15";
+    public static final String DefaultSizeS = "30";
 }

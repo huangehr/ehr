@@ -21,6 +21,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
+import org.joda.time.DateTime;
 import org.nlpcn.es4sql.domain.Select;
 import org.nlpcn.es4sql.parse.ElasticSqlExprParser;
 import org.nlpcn.es4sql.parse.SqlParser;
@@ -67,7 +68,7 @@ public class EsExtract {
                                    String saasid,//saasid
                                    QuotaVo quotaVo,//指标code
                                    EsConfig esConfig //es配置
-    ) {
+    ) throws Exception {
         this.startTime = startTime;
         this.endTime = endTime;
         this.timeLevel = timeLevel;
@@ -78,7 +79,13 @@ public class EsExtract {
         //拼凑查询的sql
         Map<String, TjQuotaDimensionMain> sqls = getSql(qdm, qds);
         //根据sql查询ES
-        return queryEsBySql(sqls, qds);
+        List<SaveModel> saveModels = null;
+        try {
+            saveModels = queryEsBySql(sqls, qds);
+        }catch (Exception e){
+            throw new Exception("es 查询数据出错！" +e.getMessage() );
+        }
+        return saveModels;
 
     }
 
@@ -161,11 +168,12 @@ public class EsExtract {
 
     private void setOneData(Map<String, SaveModel> allData, String key, SaveModel one, String areaLevel) {
         one.setAreaLevel(areaLevel);
-        one.setResult(0);
+        one.setResult("0");
         one.setCreateTime(new Date());
-        LocalDate today = LocalDate.now();
-        one.setQuotaDate(today.toString());
+        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+        one.setQuotaDate(yesterDay);
         one.setQuotaCode(quotaVo.getCode());
+        one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);
         one.setSaasId(saasid);
         allData.put(key, one);
@@ -206,11 +214,11 @@ public class EsExtract {
                 SearchResponse response = (SearchResponse) requestBuilder.get();
                 StringTerms stringTerms = (StringTerms) response.getAggregations().asList().get(0);
                 Iterator<Terms.Bucket> gradeBucketIt = stringTerms.getBuckets().iterator();
+                client.close();
                 //里面存放的数据 例  350200-5-2-2    主维度  细维度1  细维度2  值
                 Map<String,Integer> map = new HashMap<>();
                 //递归解析json
                 expainJson(gradeBucketIt, map, null);
-
                 compute(tjQuotaDimensionSlaves,
                         returnList,
                         one,
@@ -222,7 +230,7 @@ public class EsExtract {
         return returnList;
     }
 
-    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, Integer> map) {
+    private void compute(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, List<SaveModel> returnList, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, Integer> map) throws Exception {
         Map<String, SaveModel> allData = new HashMap<>();
         //初始化主细维度
         allData= initDimension(tjQuotaDimensionSlaves, one, allData);
@@ -232,26 +240,39 @@ public class EsExtract {
             SaveModel saveModel=oneMap.getValue();
             Integer num = map.get(key);
             if(saveModel!=null){
-                saveModel.setResult(num);
-                returnList.add(saveModel);
+                saveModel.setResult(num.toString());
+            }else{
+                saveModel.setResult("0");
             }
+            returnList.add(saveModel);
         }
     }
 
     /**
      * 初始化主细维度
      */
-    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, Map.Entry<String, TjQuotaDimensionMain> one, Map<String, SaveModel> allData) {
-        TjQuotaDimensionMain quotaDimensionMain = one.getValue();
-        //查询字典数据
-        List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-        //设置到map里面
-        setAllData(allData, dictData, quotaDimensionMain.getType());
-
-
-        for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-           List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-            allData = setAllSlaveData(allData, dictDataSlave,i);
+    private  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, Map.Entry<String,
+            TjQuotaDimensionMain> one, Map<String, SaveModel> allData) throws Exception {
+        try {
+            TjQuotaDimensionMain quotaDimensionMain = one.getValue();
+            //查询字典数据
+            List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+            if (dictData == null) {
+                throw new Exception("主纬度配置有误");
+            }else{
+                //设置到map里面
+                setAllData(allData, dictData, quotaDimensionMain.getType());
+                for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
+                    List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                    if (dictDataSlave == null) {
+                        throw new Exception("细纬度配置有误");
+                    }else{
+                        allData = setAllSlaveData(allData, dictDataSlave,i);
+                    }
+                }
+            }
+        }catch (Exception e){
+            throw new Exception("纬度配置有误");
         }
         return allData;
     }
@@ -319,15 +340,21 @@ public class EsExtract {
                 }
             }
             //拼凑where语句
-            StringBuffer whereSql = new StringBuffer(" saasId= '" + saasid + "'" );
+            StringBuffer whereSql = new StringBuffer();
             if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
-                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
-                //是否是增量
                 if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
-                    whereSql.append(" and " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+                    whereSql.append("" + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+                    whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
+                }else{
+                    whereSql.append( "" + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
                 }
             }
-            StringBuffer sql = new StringBuffer("select " + allField + " ,count(*) result from " + tableName + " where " + whereSql + " group by " + AllGroupBy);
+            StringBuffer sql = new StringBuffer();
+            if(StringUtils.isEmpty(whereSql) || whereSql.length()==0){
+                 sql.append("select " + allField + " ,count(*) result from " + tableName + " group by " + AllGroupBy);
+            }else {
+                sql.append("select " + allField + " ,count(*) result from " + tableName + " where " + whereSql + " group by " + AllGroupBy);
+            }
             sqlS.put(sql.toString(), one);
         }
         return sqlS;

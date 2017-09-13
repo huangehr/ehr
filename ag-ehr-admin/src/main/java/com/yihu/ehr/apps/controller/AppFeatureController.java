@@ -251,10 +251,13 @@ public class AppFeatureController extends BaseController {
         Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage(filters);
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
-        for (MAppFeature mAppFeature : mAppFeatures) {
-            AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
-            converModelName(appFeatureModel);
-            appFeatureModels.add(appFeatureModel);
+        if(mAppFeatures !=null && mAppFeatures.size() >0 ){
+            for (MAppFeature mAppFeature : mAppFeatures) {
+                AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
+                converModelName(appFeatureModel);
+                appFeatureModels.add(appFeatureModel);
+            }
+            envelop.setSuccessFlg(true);
         }
         envelop.setDetailModelList(appFeatureModels);
         return envelop;

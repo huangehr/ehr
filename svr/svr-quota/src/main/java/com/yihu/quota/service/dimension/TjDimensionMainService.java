@@ -1,5 +1,6 @@
 package com.yihu.quota.service.dimension;
 
+import com.yihu.quota.model.jpa.dimension.TjDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -17,15 +18,24 @@ public class TjDimensionMainService {
     private JdbcTemplate jdbcTemplate;
 
     public List<TjQuotaDimensionMain> findTjQuotaDimensionMainByQuotaIncudeAddress(String code) {
+        String sql = "SELECT  qdm.*, dm.type FROM   tj_dimension_main dm, tj_quota_dimension_main qdm " +
+        "WHERE   dm.`code` = qdm.main_code AND qdm.quota_code = ? order by code desc";
+
+        List<TjQuotaDimensionMain> quotaDataSources = jdbcTemplate.query(sql, new BeanPropertyRowMapper(TjQuotaDimensionMain.class), code);
+        return quotaDataSources;
+    }
+
+
+    public List<TjDimensionMain> getDimensionMainByQuotaCode(String code) {
         String sql = "SELECT " +
-                "  qdm.*, dm.type " +
-                "FROM " +
+                "  dm.* " +
+                " FROM " +
                 "  tj_dimension_main dm, " +
                 "  tj_quota_dimension_main qdm " +
-                "WHERE " +
+                " WHERE " +
                 "  dm.`code` = qdm.main_code " +
-                "AND qdm.quota_code = ? and dm.code > 4 and dm.code <10 order by code desc";
-        List<TjQuotaDimensionMain> quotaDataSources = jdbcTemplate.query(sql, new BeanPropertyRowMapper(TjQuotaDimensionMain.class), code);
+                " AND qdm.quota_code = ? ";
+        List<TjDimensionMain> quotaDataSources = jdbcTemplate.query(sql, new BeanPropertyRowMapper(TjDimensionMain.class), code);
         return quotaDataSources;
     }
 }

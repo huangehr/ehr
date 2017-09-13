@@ -11,7 +11,8 @@
     </parent>
 
     <artifactId>svr-ehr-basic</artifactId>
-    <packaging>${packaging.type}</packaging>
+    <!--<packaging>${packaging.type}</packaging>-->
+    <packaging>war</packaging>
 
     <dependencies>
         <dependency>

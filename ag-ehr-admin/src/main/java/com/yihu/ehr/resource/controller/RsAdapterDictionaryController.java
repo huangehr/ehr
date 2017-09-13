@@ -1,149 +1,156 @@
 package com.yihu.ehr.resource.controller;
 
-import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.agModel.resource.RsAdapterDictionaryModel;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.model.resource.MRsAdapterDictionary;
-import com.yihu.ehr.resource.client.RsAdapterDictionaryClient;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.model.resource.*;
+import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.util.FeignExceptionUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author linaz
- * @created 2016.05.17 16:33
+ * @created 2016.05.23 17:11
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0+"/admin")
-@Api(value = "adapterDictionaries", description = "AdapterDictionary服务接口", tags = {"资源管理-AdapterDictionary服务接口"})
+@RequestMapping(value = ApiVersion.Version1_0 + "/admin")
+@Api(value = "adapterDictionary", description = "适配字典项服务", tags = {"资源管理-适配字典项服务"})
 public class RsAdapterDictionaryController extends BaseController {
 
     @Autowired
-    private RsAdapterDictionaryClient rsAdapterDictionaryClient;
+    private RsAdapterDictionaryClient adapterDictionaryClient;
+    @Autowired
+    private RsDictionaryClient rsDictionaryClient;
+    @Autowired
+    private RsDictionaryEntryClient dictionaryEntryClient;
 
 
-    @RequestMapping(value = ServiceApi.Resources.AdapterDicts, method = RequestMethod.GET)
-    @ApiOperation(value = "根据查询条件获取适配字典列表", notes = "根据查询条件获取适配字典列表")
-    public Envelop searchRsAdapterDictionaries(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
+    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionaries, method = RequestMethod.POST)
+    @ApiOperation("创建适配字典项")
+    public Envelop createDictionaries(
+            @ApiParam(name = "json_data", value = "字典项JSON", defaultValue = "")
+            @RequestParam(value = "jsonData") String jsonData) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            MRsAdapterDictionary mRsAdapterDictionary = adapterDictionaryClient.createDictionaries(jsonData);
+            envelop.setObj(mRsAdapterDictionary);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionaries, method = RequestMethod.PUT)
+    @ApiOperation("更新适配字典项")
+    public Envelop updateDictionary(
+            @ApiParam(name = "json_data", value = "字典项JSON", defaultValue = "")
+            @RequestParam(value = "jsonData") String jsonData) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            MRsAdapterDictionary mRsAdapterDictionary = adapterDictionaryClient.updateDictionary(jsonData);
+            envelop.setObj(mRsAdapterDictionary);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionary, method = RequestMethod.DELETE)
+    @ApiOperation("删除适配字典项")
+    public Envelop deleteDictionary(
+            @ApiParam(name = "id", value = "字典项ID", defaultValue = "")
+            @PathVariable(value = "id") String id) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            adapterDictionaryClient.deleteDictionary(id);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionary,method = RequestMethod.GET)
+    @ApiOperation("根据ID获取适配字典项")
+    public Envelop getDictionaryById(
+            @ApiParam(name="id",value="id",defaultValue = "")
+            @PathVariable(value="id") String id) throws Exception
+    {
+        Envelop envelop = new Envelop();
+        try{
+            MRsAdapterDictionary mRsAdapterDictionary = adapterDictionaryClient.getDictionaryById(id);
+            envelop.setObj(mRsAdapterDictionary);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Adaptions.RsAdapterDictionaries, method = RequestMethod.GET)
+    @ApiOperation("查询适配字典项")
+    public Envelop getDictionaries(
+            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @ApiParam(name = "sorts", value = "排序", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size) throws Exception {
-        Envelop envelop = new Envelop();
-        try {
-            ResponseEntity<List<MRsAdapterDictionary>> responseEntity = rsAdapterDictionaryClient.searchRsAdapterDictionaries(fields,filters,sorts,page,size);
-            List<MRsAdapterDictionary> adapterDictionaries = responseEntity.getBody();
-            envelop = getResult(adapterDictionaries, getTotalCount(responseEntity), page, size);
-        }catch (Exception e){
+        try
+        {
+            ResponseEntity<List<MRsAdapterDictionary>> responseEntity = adapterDictionaryClient.getDictionaries(fields, filters, sorts, page, size);
+            List<MRsAdapterDictionary> mRsAdapterDictionaries = responseEntity.getBody();
+            List<RsAdapterDictionaryModel> rsAdapterDictionaryModels = new ArrayList<>();
+            RsAdapterDictionaryModel rsAdapterDictionaryModel = null;
+            for (MRsAdapterDictionary mRsAdapterDictionary: mRsAdapterDictionaries){
+                rsAdapterDictionaryModel= new RsAdapterDictionaryModel();
+                BeanUtils.copyProperties(mRsAdapterDictionary,rsAdapterDictionaryModel);
+                     if(StringUtils.isNotBlank(rsAdapterDictionaryModel.getDictCode())){
+                    ResponseEntity<List<MRsDictionary>> responseEntitys = rsDictionaryClient.searchRsDictionaries("", "code=" + rsAdapterDictionaryModel.getDictCode()+" g1", "", 1, 1);
+                    List<MRsDictionary> mRsDictionaries = responseEntitys.getBody();
+                    if(mRsDictionaries!=null&&mRsDictionaries.size()>0){
+                        rsAdapterDictionaryModel.setDictName(mRsDictionaries.get(0).getName());
+                    }
+                }
+                if(StringUtils.isNotBlank(rsAdapterDictionaryModel.getDictEntryCode())){
+                    ResponseEntity<List<MRsDictionaryEntry>> responseEntitys = dictionaryEntryClient.searchRsDictionaryEntries("", "dictCode=" + rsAdapterDictionaryModel.getDictCode() + " g1;code=" + rsAdapterDictionaryModel.getDictEntryCode(), "", 1, 1);
+                    List<MRsDictionaryEntry> mRsDictionaryEntries = responseEntitys.getBody();
+                    if(mRsDictionaryEntries!=null&&mRsDictionaryEntries.size()>0){
+                        rsAdapterDictionaryModel.setDictEntryName(mRsDictionaryEntries.get(0).getName());
+                    }
+                }
+                rsAdapterDictionaryModels.add(rsAdapterDictionaryModel);
+            }
+            Envelop envelop = getResult(rsAdapterDictionaryModels, getTotalCount(responseEntity), page, size);
+            return envelop;
+        }
+        catch (Exception e)
+        {
+            Envelop envelop = new Envelop();
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            return envelop;
         }
-        return envelop;
     }
-
-
-
-    @RequestMapping(value = ServiceApi.Resources.AdapterDicts, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "创建适配字典", notes = "创建适配字典")
-    public Envelop createRsAdapterDictionary(
-            @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
-        Envelop envelop = new Envelop();
-        try{
-            MRsAdapterDictionary adapterDictionary = rsAdapterDictionaryClient.createRsAdapterDictionary(jsonData);
-            envelop.setObj(adapterDictionary);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
-        }
-        return envelop;
-    }
-
-    @RequestMapping(value = ServiceApi.Resources.AdapterDicts, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改适配字典", notes = "修改适配字典")
-    public Envelop updateRsAdapterDictionary(
-            @ApiParam(name = "json_data", value = "")
-            @RequestBody String jsonData) throws Exception {
-        Envelop envelop = new Envelop();
-        try{
-            MRsAdapterDictionary adapterDictionary = rsAdapterDictionaryClient.updateRsAdapterDictionary(jsonData);
-            envelop.setObj(adapterDictionary);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
-        }
-        return envelop;
-    }
-
-
-    @RequestMapping(value = ServiceApi.Resources.AdapterDict, method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除适配字典", notes = "删除适配字典")
-    public Envelop deleteRsAdapterDictionary(
-            @ApiParam(name = "id", value = "id", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception {
-        Envelop envelop = new Envelop();
-        try{
-            rsAdapterDictionaryClient.deleteRsAdapterDictionary(id);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
-        }
-        return envelop;
-    }
-
-    @RequestMapping(value = ServiceApi.Resources.AdapterDict, method = RequestMethod.GET)
-    @ApiOperation(value = "根据id获取获取适配字典")
-    public Envelop getRsAdapterDictionaryById(
-            @ApiParam(name = "id", value = "", defaultValue = "")
-            @RequestParam(value = "id") String id) {
-        Envelop envelop = new Envelop();
-        try{
-            MRsAdapterDictionary adapterDictionary = rsAdapterDictionaryClient.getRsAdapterDictionaryById(id);
-            envelop.setObj(adapterDictionary);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
-        }
-        return envelop;
-    }
-
-    @RequestMapping(value = ServiceApi.Resources.AdapterDictsBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "批量创建适配字典", notes = "批量创建适配字典")
-    public Envelop createRsAdapterDictionaries(
-            @ApiParam(name = "json_data", value = "", defaultValue = "")
-            @RequestBody String jsonData) throws Exception {
-        Envelop envelop = new Envelop();
-        try{
-            rsAdapterDictionaryClient.createRsAdapterDictionaries(jsonData);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(FeignExceptionUtils.getErrorMsg(e));
-        }
-        return envelop;
-    }
-
 }

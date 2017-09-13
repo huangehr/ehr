@@ -5,17 +5,15 @@ import com.yihu.ehr.agModel.dict.SystemDictEntryModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppApiClient;
 import com.yihu.ehr.model.app.MAppApi;
-import com.yihu.ehr.model.app.MUserApp;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
-import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsAppResource;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.model.user.MRoleAppRelation;
 import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.organization.service.OrganizationClient;
-import com.yihu.ehr.resource.client.ResourcesClient;
-import com.yihu.ehr.resource.client.ResourcesGrantClient;
+import com.yihu.ehr.resource.client.RsResourceClient;
+import com.yihu.ehr.resource.client.RsResourceGrantClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
@@ -56,9 +54,9 @@ public class AppController extends BaseController {
     @Autowired
     private OrganizationClient organizationClient;
     @Autowired
-    private ResourcesGrantClient resourcesGrantClient;
+    private RsResourceGrantClient resourcesGrantClient;
     @Autowired
-    private ResourcesClient resourcesClient;
+    private RsResourceClient resourcesClient;
     @Autowired
     private RoleAppRelationClient roleAppRelationClient;
     @Autowired

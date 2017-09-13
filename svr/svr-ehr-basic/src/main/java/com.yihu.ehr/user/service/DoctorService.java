@@ -1,6 +1,10 @@
 package com.yihu.ehr.user.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.org.dao.XOrganizationRepository;
+import com.yihu.ehr.org.model.Organization;
+import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
+import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.user.dao.XDoctorRepository;
 import com.yihu.ehr.user.dao.XUserRepository;
@@ -34,6 +38,10 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    private XOrganizationRepository organizationRepository;
+    @Autowired
+    private XDemographicInfoRepository demographicInfoRepository;
 
     /**
      * 根据用户ID获取医生信息
@@ -135,16 +143,22 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     @Transactional(propagation = Propagation.REQUIRED)
     public String addDoctorBatch(List<Map<String, Object>> doctorLs)
     {
-        String header = "INSERT INTO doctors(code, name, sex, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction,id_card_no, office_tel, status) VALUES \n";
+        String header = "INSERT INTO doctors(code, name, sex,orgCode,orgId,org_full_name,dept_name, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction,id_card_no, office_tel, status) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
         int total = 0;
+        DemographicInfo demographicInfo =null;
         for(int i=1; i<=doctorLs.size(); i++){
             map = doctorLs.get(i-1);
             sql.append("('"+ null2Space(map .get("code")) +"'");
             sql.append(",'"+ map .get("name") +"'");
             sql.append(",'"+ map .get("sex") +"'");
+            sql.append(",'"+ map .get("orgCode") +"'");
+            Organization org= getOrg(map .get("orgCode").toString());
+            sql.append(",'"+ org.getId() +"'");
+            sql.append(",'"+ map .get("orgFullName") +"'");
+            sql.append(",'"+ map .get("orgDeptName") +"'");
             sql.append(",'"+ map .get("skill") +"'");
             sql.append(",'"+ map .get("workPortal") +"'");
             sql.append(",'"+ null2Space(map .get("email")) +"'");
@@ -163,6 +177,15 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
                 sql = new StringBuilder(header) ;
             }else
                 sql.append(",");
+            //创建居民
+             demographicInfo =new DemographicInfo();
+            demographicInfo.setPassword(HashUtil.hash("123456"));
+            demographicInfo.setRegisterTime(new Date());
+            demographicInfo.setIdCardNo(String.valueOf(map .get("idCardNo")));
+            demographicInfo.setName(String.valueOf(map .get("name")));
+            demographicInfo.setTelephoneNo("{\"联系电话\":\""+String.valueOf(map .get("phone"))+"\"}");
+            demographicInfo.setGender(String.valueOf(map .get("sex")));
+            demographicInfoRepository.save(demographicInfo);
         }
         Map<String, Object> phoneMap;
         StringBuffer stringBuffer = new StringBuffer();
@@ -205,5 +228,50 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
      */
     public Doctors getByIdCardNo(String idCardNo) {
         return doctorRepository.findByIdCardNo(idCardNo);
+    }
+
+    /**
+     * 查询电话号码是否已存在， 返回已存在电话号码
+     */
+    public List idCardNosExist(String[] idCardNos)
+    {
+        String sql = "SELECT id_card_no FROM doctors WHERE id_card_no in(:idCardNos)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("idCardNos", idCardNos);
+        return sqlQuery.list();
+    }
+
+    public Organization getOrg(String orgCode) {
+        List<Organization> list =  organizationRepository.findOrgByCode(orgCode);
+        if (list.size()>0){
+            return list.get(0);
+        }else {
+            return null;
+        }
+    }
+
+    /**
+     * 机构资源授权获取
+     */
+    public  List<Object>  getStatisticsDoctorsByRoleType(String roleType)
+    {
+        String sql =
+                "SELECT count(1),omr.org_id,omr.org_name " +
+                        "FROM doctors d " +
+                        "LEFT JOIN users u " +
+                        "ON d.id=u.doctor_id " +
+                        "JOIN org_member_relation omr " +
+                        "ON u.id=omr.user_id " +
+                        "WHERE d.role_type=:roleType " +
+                        " GROUP BY omr.org_id,omr.org_name";
+
+        SQLQuery query = currentSession().createSQLQuery(sql);
+        query.setParameter("roleType", roleType);
+        List<Object> list=query.list();
+        return list;
+    }
+
+    public int getStatisticsCityDoctorByRoleType(String roleType) {
+        return doctorRepository.getStatisticsCityDoctorByRoleType(roleType);
     }
 }

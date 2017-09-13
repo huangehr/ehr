@@ -22,7 +22,7 @@ eureka:
   instance:
     ip-address: 127.0.0.1:8761
     #ip-address: 192.168.1.221:8761
-    prefer-ip-address: false
+    prefer-ip-address: true
 
 ---
 spring:
@@ -31,7 +31,7 @@ spring:
 eureka:
   instance:
     ip-address: 172.19.103.11:8761
-    prefer-ip-address: false
+    prefer-ip-address: true
 
 ---
 spring:
@@ -49,4 +49,13 @@ spring:
 eureka:
   instance:
     ip-address: 11.1.2.21:8761
+    prefer-ip-address: true
+
+---
+spring:
+  profiles: prod_fz
+
+eureka:
+  instance:
+    ip-address: 192.168.135.29:8761
     prefer-ip-address: true

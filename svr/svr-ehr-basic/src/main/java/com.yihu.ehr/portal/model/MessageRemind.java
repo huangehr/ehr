@@ -14,7 +14,7 @@ import java.util.Date;
 public class MessageRemind {
 
     private Long id;
-    private Integer appId;
+    private String appId;
     private String appName;
     private String fromUserId;
     private String toUserId;
@@ -45,11 +45,11 @@ public class MessageRemind {
     }
 
     @Column(name = "app_id", nullable = true)
-    public Integer getAppId() {
+    public String getAppId() {
         return appId;
     }
 
-    public void setAppId(Integer appId) {
+    public void setAppId(String appId) {
         this.appId = appId;
     }
 

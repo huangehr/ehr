@@ -4,18 +4,15 @@ import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.rest.QuotaReport;
-import com.yihu.quota.model.rest.ReultModel;
-import com.yihu.quota.util.QuartzHelper;
-import com.yihu.quota.vo.QuotaVo;
-import org.springframework.beans.BeanUtils;
+import com.yihu.quota.model.rest.ResultModel;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
- * @author chenweida
+ * @author janseny
  */
 @Service
 public class QuotaService {
@@ -24,69 +21,194 @@ public class QuotaService {
     @Autowired
     private EsResultExtract esResultExtract;
 
-
-    public List<Map<String, Object>> getQuotaResult(Integer id,String filters ,int pageNo,int pageSize) throws Exception {
-        TjQuota tjQuota= quotaDao.findOne(id);
-        return  esResultExtract.queryResultListBySql(tjQuota,filters,pageNo,pageSize);
+    public TjQuota findOne(int id){
+        return quotaDao.findOne(id);
     }
 
-    public int getQuotaTotalCount(){
-        return  esResultExtract.getQuotaTotalCount();
+    public TjQuota findByCode(String code){
+        return quotaDao.findByCode(code);
     }
 
-    public QuotaReport getQuotaReport(Integer id, String filters) throws Exception {
+    public List<Map<String, Object>> queryResultPage(Integer id,String filters ,int pageNo,int pageSize) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
-        QuotaReport quotaReport = new QuotaReport();
-        Map<String, Integer> map = esResultExtract.getQuotaReport(tjQuota, filters);
+        return  esResultExtract.queryResultPage(tjQuota, filters, pageNo, pageSize);
+    }
 
-        List<ReultModel> reultModels = new ArrayList<>();
-        for (String key :map.keySet()){
-            ReultModel reultModel = new ReultModel();
-            reultModel.setKey(key);
-            reultModel.setValue(map.get(key).toString());
-            reultModels.add(reultModel);
+
+    public long getQuotaTotalCount(Integer id,String filters) throws Exception {
+        TjQuota tjQuota= quotaDao.findOne(id);
+        long count = esResultExtract.getQuotaTotalCount(tjQuota,filters);
+        return count;
+    }
+
+    public List<Map<String, Object>> searcherByGroup(Integer id,String filters,String aggsField ) throws Exception {
+        TjQuota tjQuota= quotaDao.findOne(id);
+        return  esResultExtract.searcherByGroup(tjQuota, filters,aggsField );
+    }
+
+
+    public Map<String, Integer> searcherByGroupBySql(Integer id,String aggsField ,String filters ) throws Exception {
+        TjQuota tjQuota= quotaDao.findOne(id);
+        return  esResultExtract.searcherByGroupBySql(tjQuota,aggsField,filters);
+    }
+
+    //多维度 数据的总和
+    public QuotaReport getQuotaReport(Integer id, String filters,String dimension,int size) throws Exception {
+        String[] dimensions = null;
+        if(StringUtils.isNotEmpty(dimension)){
+          dimensions = dimension.split(";");
+        }else{
+            dimensions = new String[]{"quotaDate"};
         }
-        quotaReport.setReultModelList(reultModels);
-        quotaReport.setTjQuota(tjQuota);
-        return quotaReport;
-    }
-
-    public QuotaReport getQuotaBreadReport(Integer id, String filters) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
-        Map<String, Integer> map = esResultExtract.getQuotaBreadReport(tjQuota, filters);
-
-        List<ReultModel> reultModels = new ArrayList<>();
-        for (String key :map.keySet()){
-            ReultModel reultModel = new ReultModel();
-            reultModel.setValue(map.get(key).toString());
-            switch (key){
-                case  "350203":
-                    key = "思明区";
-                    break;
-                case  "350205":
-                    key = "海沧区";
-                    break;
-                case  "350206":
-                    key = "湖里区";
-                    break;
-                case  "350211":
-                    key = "集美区";
-                    break;
-                case  "350212":
-                    key = "同安区";
-                    break;
-                case  "350213":
-                    key = "翔安区";
-                    break;
+        List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters,size);
+        List<ResultModel> reultModelList = new ArrayList<>();
+        for(int i=0 ; i< listMap.size() ;i++){
+            Object resultVal = listMap.get(i).get("result");
+            //多个列
+            List<String> cloumns = new ArrayList<>();
+            String nameVal = null;
+            for(int k=0 ; k <dimensions.length ; k++){
+                if(dimensions[k].equals("quotaDate")){
+                    nameVal = listMap.get(i).get(dimensions[k]).toString();
+                }else{
+                    nameVal = listMap.get(i).get(dimensions[k]+"Name").toString();
+                }
+                cloumns.add(nameVal);
             }
-            reultModel.setKey(key);
-            reultModels.add(reultModel);
+            boolean repeat = false;
+            ResultModel oldresult = null;
+            for(ResultModel result:reultModelList){
+                if(result.getCloumns().equals(cloumns)){
+                    repeat = true;
+                    oldresult = result;
+                }
+            }
+            ResultModel reultModel = new ResultModel();
+            if( !repeat){
+                reultModel.setCloumns(cloumns);
+                reultModel.setValue(resultVal);
+                reultModelList.add(reultModel);
+            }else {
+                //如果有重复 先删除listl里面的数据，然后添加新数据
+                reultModelList.remove(oldresult);
+                reultModel.setCloumns(cloumns);
+                Object totalResultVal = ( Integer.valueOf(resultVal.toString()) + Integer.valueOf(oldresult.getValue().toString()) );
+                reultModel.setValue(totalResultVal);
+                reultModelList.add(reultModel);
+            }
         }
-        quotaReport.setReultModelList(reultModels);
+        quotaReport.setReultModelList(reultModelList);
         quotaReport.setTjQuota(tjQuota);
         return quotaReport;
     }
+
+
+    //多维度数据的总和 返回数据结果集
+    //返回结果 ：key为共同维度的组合值，value为数据结果集
+    public Map<String,Map<String, Object>> getQuotaResult(Integer id, String filters,String dimension) throws Exception {
+
+        String[] dimensions = null;
+        if(StringUtils.isNotEmpty(dimension)){
+            dimensions = dimension.split(";");
+        }else{
+            dimensions = new String[]{"quotaDate"};
+        }
+        TjQuota tjQuota= quotaDao.findOne(id);
+        List<Map<String, Object>> resultListMap = esResultExtract.getQuotaReport(tjQuota, filters,10000);
+
+        Map<String,Map<String, Object>> cloumnMap = new HashMap<>();
+
+        for(int i=0 ; i < resultListMap.size() ;i++){
+            Map<String, Object> resultMap = resultListMap.get(i);
+            Object resultVal = resultMap.get("result");
+
+            String cloumnStr = "";//多个列 值 拼接串
+            for(int k=0 ; k < dimensions.length ; k++){
+                String nameVal = resultMap.get(dimensions[k]).toString();
+                cloumnStr = cloumnStr + nameVal + "-";
+            }
+            boolean repeat = false;
+            Object oldResultVal = null;
+            if( cloumnMap.size() == 0 ){//第一个
+                cloumnMap.put(cloumnStr,resultMap);
+            }else {
+                for(String key:cloumnMap.keySet()){
+                    if(cloumnStr.equals(key)){
+                        repeat = true;
+                        Map<String, Object> oldMap = cloumnMap.get(key);
+                        oldResultVal = oldMap.get("result");
+                    }
+                }
+            }
+            if( !repeat){
+                cloumnMap.put(cloumnStr,resultMap);
+            }else {
+                //如果有重复 先计删除listl里面的数据，再添加新数据
+                cloumnMap.remove(cloumnStr);
+                resultMap.remove("result");
+                Object newResultVal = ( Integer.valueOf(resultVal.toString()) + Integer.valueOf(oldResultVal.toString()) );
+                resultMap.put("result",newResultVal);
+                cloumnMap.put(cloumnStr, resultMap);
+            }
+
+
+        }
+        return cloumnMap;
+    }
+
+    //多维度 数据的总和
+    public QuotaReport getQuotaReportGeneral(Integer id, String filters,String dimension,int size) throws Exception {
+        String[] dimensions = null;
+        if(StringUtils.isNotEmpty(dimension)){
+            dimensions = dimension.split(";");
+        }else{
+            dimensions = new String[]{"quotaDate"};
+        }
+        TjQuota tjQuota= quotaDao.findOne(id);
+        QuotaReport quotaReport = new QuotaReport();
+        List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters,size);
+        List<ResultModel> reultModelList = new ArrayList<>();
+        for(int i=0 ; i< listMap.size() ;i++){
+            Object resultVal = listMap.get(i).get("result");
+            //多个列
+            List<String> cloumns = new ArrayList<>();
+            String nameVal = null;
+            for(int k=0 ; k <dimensions.length ; k++){
+                nameVal = listMap.get(i).get(dimensions[k]).toString();
+                cloumns.add(nameVal);
+            }
+            boolean repeat = false;
+            ResultModel oldresult = null;
+            for(ResultModel result:reultModelList){
+                if(result.getCloumns().equals(cloumns)){
+                    repeat = true;
+                    oldresult = result;
+                }
+            }
+            ResultModel reultModel = new ResultModel();
+            if( !repeat){
+                reultModel.setCloumns(cloumns);
+                reultModel.setValue(resultVal);
+                reultModelList.add(reultModel);
+            }else {
+                //如果有重复 先删除listl里面的数据，然后添加新数据
+                reultModelList.remove(oldresult);
+                reultModel.setCloumns(cloumns);
+                Object totalResultVal = ( Integer.valueOf(resultVal.toString()) + Integer.valueOf(oldresult.getValue().toString()) );
+                reultModel.setValue(totalResultVal);
+                reultModelList.add(reultModel);
+            }
+        }
+        quotaReport.setReultModelList(reultModelList);
+        quotaReport.setTjQuota(tjQuota);
+        return quotaReport;
+    }
+
+
+
+
 
 
 }

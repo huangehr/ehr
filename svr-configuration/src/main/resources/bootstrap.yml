@@ -45,3 +45,13 @@ spring:
         git:
           uri: http://11.1.2.8:3000/ehr_admin/ehr.config.git
         default-label: master
+
+---
+spring:
+  profiles: prod_fz
+  cloud:
+    config:
+      server:
+        git:
+          uri: http://192.168.135.29:3000/jkzl/ehr.config.git
+        default-label: master

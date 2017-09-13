@@ -431,7 +431,9 @@ public class OrgDeptController  extends BaseController {
             @ApiParam(name = "orgId", value = "机构ID")
             @RequestParam(value = "orgId", required = true) Integer orgId,
             @ApiParam(name = "userId", value = "用户ID")
-            @RequestParam(value = "userId", required = true) String userId
+            @RequestParam(value = "userId", required = true) String userId,
+            @ApiParam(name = "deptId", value = "部门ID")
+            @RequestParam(value = "deptId", required = true) Integer deptId
     ){
         try {
             Envelop envelop = new Envelop();
@@ -444,10 +446,10 @@ public class OrgDeptController  extends BaseController {
                 errorMsg+="用户不能为空！";
                 envelop.setErrorMsg(errorMsg);
             }
-            int num = orgDeptClient.getCountByUserId(orgId, userId);
+            int num = orgDeptClient.getCountByUserId(orgId, userId, deptId);
             if (num > 0) {
                 envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("所在机构已经存在此用户!");
+                envelop.setErrorMsg("所在机构中的部门已经存在此用户!");
             }else{
                 envelop.setSuccessFlg(true);
             }
@@ -521,11 +523,11 @@ public class OrgDeptController  extends BaseController {
                 return failed(errorMsg);
             }
 
-            MUser mUser = userClient.getUser(mDeptMember.getUserId());
+         /*   MUser mUser = userClient.getUser(mDeptMember.getUserId());
             mDeptMember.setUserName(mUser == null ? "" : mUser.getRealName());
 
             MUser mUserp = userClient.getUser(mDeptMember.getParentUserId());
-            mDeptMember.setParentUserName(mUserp == null ? "" : mUserp.getRealName());
+            mDeptMember.setParentUserName(mUserp == null ? "" : mUserp.getRealName());*/
 
             MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(mDeptMember.getDeptId());
             mDeptMember.setDeptName(mOrgDept == null ? "" : mOrgDept.getName());
