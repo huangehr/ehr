@@ -30,19 +30,19 @@ public interface ResourceStatisticsClient {
     @ApiOperation(value = "获取健康卡绑定量")
     List<EchartReportModel> getStatisticsUserCards();
 
-    @RequestMapping(value = "archive/getArchiveIdentifyReportInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveIdentifyReportInfo, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--档案识别")
     Envelop getArchiveIdentifyReportInfo();
 
-    @RequestMapping(value = "archive/getArchiveHospitalReportInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveHospitalReportInfo, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--住院/门诊")
     Envelop getArchiveHospitalReportInfo();
 
-    @RequestMapping(value = "archive/getArchiveStatisticalReportInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveStatisticalReportInfo, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--数据统计")
     Envelop getArchiveStatisticalReportInfo();
 
-    @RequestMapping(value = "archive/getArchiveTotalVisitReportInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveTotalVisitReportInfo, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--累计就诊人次")
     Envelop getArchiveTotalVisitReportInfo();
 

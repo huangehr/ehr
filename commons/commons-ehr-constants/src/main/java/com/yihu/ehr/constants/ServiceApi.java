@@ -1010,6 +1010,11 @@ public class ServiceApi {
         public static final String GetStatisticsElectronicMedicalCount = "/tj/getStatisticsElectronicMedicalCount";
         public static final String GetStatisticsMedicalEventTypeCount = "/tj/getStatisticsMedicalEventTypeCount";
         public static final String GetStatisticsDemographicsAgeCount = "/tj/getStatisticsDemographicsAgeCount";
+        public static final String GetArchiveReportInfo = "/archive/getArchiveReportInfo";
+        public static final String GetArchiveIdentifyReportInfo = "/archive/getArchiveIdentifyReportInfo";
+        public static final String GetArchiveHospitalReportInfo = "/archive/getArchiveHospitalReportInfo";
+        public static final String GetArchiveStatisticalReportInfo = "/archive/getArchiveStatisticalReportInfo";
+        public static final String GetArchiveTotalVisitReportInfo = "archive/getArchiveTotalVisitReportInfo";
 
     }
 

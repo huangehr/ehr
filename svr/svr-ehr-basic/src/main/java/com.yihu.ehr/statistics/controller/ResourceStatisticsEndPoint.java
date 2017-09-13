@@ -242,7 +242,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         return (List<EchartReportModel>) convertToModels(quotaCategories, new ArrayList<EchartReportModel>(quotaCategories.size()), EchartReportModel.class, null);
     }
 
-    @RequestMapping(value = "archive/getArchiveIdentifyReportInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveIdentifyReportInfo, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--档案识别")
     public Envelop getArchiveIdentifyReportInfo() throws Exception {
         Envelop envelop = new Envelop();
@@ -279,7 +279,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "archive/getArchiveHospitalReportInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveHospitalReportInfo, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--住院/门诊")
     public Envelop getArchiveHospitalReportInfo() throws Exception {
         Envelop envelop = new Envelop();
@@ -318,7 +318,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "archive/getArchiveStatisticalReportInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveStatisticalReportInfo, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--数据统计")
     public Envelop getArchiveStatisticalReportInfo() throws Exception {
         Envelop envelop = new Envelop();
@@ -353,7 +353,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "archive/getArchiveTotalVisitReportInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.StasticReport.GetArchiveTotalVisitReportInfo, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案--累计就诊人次")
     public Envelop getArchiveTotalVisitReportInfo() throws Exception {
         Envelop envelop = new Envelop();
