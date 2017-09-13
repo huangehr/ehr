@@ -12,6 +12,7 @@ import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
+import com.yihu.ehr.quota.service.TjQuotaSynthesizeQueryClient;
 import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -40,11 +41,7 @@ public class ResourceBrowseController extends BaseController {
     @Autowired
     private RsResourceClient resourcesClient;
     @Autowired
-    private RsResourceMetadataClient resourceMetadataClient;
-    @Autowired
     private RsResourceCategoryClient resourcesCategoryClient;
-    @Autowired
-    private RsMetadataClient metadataClient;
     @Autowired
     private ResourceBrowseClient resourceBrowseClient;
     @Autowired
@@ -53,6 +50,8 @@ public class ResourceBrowseController extends BaseController {
     private TjQuotaClient tjQuotaClient;
     @Autowired
     private TjQuotaJobClient tjQuotaJobClient;
+    @Autowired
+    private TjQuotaSynthesizeQueryClient tjQuotaSynthesizeQueryClient;
     @Autowired
     private RsResourceDefaultQueryClient rsResourceDefaultQueryClient;
 
@@ -183,7 +182,7 @@ public class ResourceBrowseController extends BaseController {
                 envelop.setErrorMsg("交集维度为空");
                 return envelop;
             }
-            List<Map<String, String>> qsdList = tjQuotaClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
+            List<Map<String, String>> qsdList = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
             if(qsdList == null || qsdList.size() <= 0) {
                 envelop.setSuccessFlg(true);
                 return envelop;
@@ -219,50 +218,53 @@ public class ResourceBrowseController extends BaseController {
             //遍历数据集，拼装结果集
             for(int i = 0; i < envelopList.size(); i ++ ) {
                 Envelop envelop1 = envelopList.get(i);
-                //遍历当前数据
-                for (Map<String, Object> tempMap1 : (List<Map<String, Object>>) envelop1.getDetailModelList()) {
-                    //判断是否已记录数据
-                    boolean isRecode = false;
-                    for (Map<String, Object> resultMap : resultList) {
-                        if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) resultMap.get("cloumns")).toArray())) {
-                            isRecode = true;
-                        }
-                    }
-                    //未记录的数据
-                    if (!isRecode) {
-                        Map<String, Object> newMap = new HashMap<String, Object>();
-                        //初始化基本列名
-                        newMap.put("cloumns", tempMap1.get("cloumns"));
-                        //初始化为空数据
-                        for(int p = 0; p < i; p ++) {
-                            newMap.put(quotaCodeArr[p], 0);
-                        }
-                        //当数据为最后一个数据集中的一个时
-                        if ((envelopList.size() - 1) == i) {
-                            newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                        } else {
-                            //与其他数据集进行对比
-                            for (int j = i + 1; j < envelopList.size(); j++) {
-                                //判断是否匹配
-                                boolean isMatch = false;
-                                Envelop envelop2 = envelopList.get(j);
-                                for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
-                                    if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
-                                        newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                                        newMap.put(quotaCodeArr[j], tempMap2.get("value"));
-                                        isMatch = true;
-                                    }
-                                }
-                                //未匹配到数据
-                                if (!isMatch) {
-                                    newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                                    newMap.put(quotaCodeArr[j], 0);
-                                }
+                if(envelop1.getDetailModelList() != null) {
+                    //遍历当前数据
+                    for (Map<String, Object> tempMap1 : (List<Map<String, Object>>) envelop1.getDetailModelList()) {
+                        //判断是否已记录数据
+                        boolean isRecode = false;
+                        for (Map<String, Object> resultMap : resultList) {
+                            if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) resultMap.get("cloumns")).toArray())) {
+                                isRecode = true;
                             }
                         }
-                        resultList.add(newMap);
+                        //未记录的数据
+                        if (!isRecode) {
+                            Map<String, Object> newMap = new HashMap<String, Object>();
+                            //初始化基本列名
+                            newMap.put("cloumns", tempMap1.get("cloumns"));
+                            //初始化为空数据
+                            for (int p = 0; p < i; p++) {
+                                newMap.put(quotaCodeArr[p], 0);
+                            }
+                            //当数据为最后一个数据集中的一个时
+                            if ((envelopList.size() - 1) == i) {
+                                newMap.put(quotaCodeArr[i], tempMap1.get("value"));
+                            } else {
+                                //与其他数据集进行对比
+                                for (int j = i + 1; j < envelopList.size(); j++) {
+                                    //判断是否匹配
+                                    boolean isMatch = false;
+                                    Envelop envelop2 = envelopList.get(j);
+                                    for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
+                                        if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
+                                            newMap.put(quotaCodeArr[i], tempMap1.get("value"));
+                                            newMap.put(quotaCodeArr[j], tempMap2.get("value"));
+                                            isMatch = true;
+                                        }
+                                    }
+                                    //未匹配到数据
+                                    if (!isMatch) {
+                                        newMap.put(quotaCodeArr[i], tempMap1.get("value"));
+                                        newMap.put(quotaCodeArr[j], 0);
+                                    }
+                                }
+                            }
+                            resultList.add(newMap);
+                        }
                     }
                 }
+
             }
             List<Map<String, Object>> finalList = new ArrayList<Map<String, Object>>();
             String [] dimensionArr = dimension.split(";");

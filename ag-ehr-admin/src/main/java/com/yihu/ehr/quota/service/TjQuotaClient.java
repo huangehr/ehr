@@ -75,10 +75,5 @@ public interface TjQuotaClient {
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "pageSize") Integer pageSize);
 
-    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaSynthesiseDimension, method = RequestMethod.GET)
-    @ApiOperation(value = "查询多个指标交集维度")
-    List<Map<String, String>> getTjQuotaSynthesiseDimension(
-            @ApiParam(name = "quotaCodes", value = "指标code，多个指标用英文,分开")
-            @RequestParam(value = "quotaCodes") String quotaCodes);
 
 }
