@@ -48,7 +48,7 @@ public class HbaseService {
         }
 
         /***** Hbase查询 ********/
-        Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable,list); //hbase结果集
+        Result[] resultList = hbaseDao.getResultList(ResourceCore.MasterTable,list, "", ""); //hbase结果集
         if(resultList!=null&&resultList.length>0){
             for (Result result :resultList) {
                 Map<String,Object> obj = resultToMap(result, "");
