@@ -2,7 +2,7 @@ package com.yihu.ehr.statistics.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.statistics.service.StatisticsClient;
+import com.yihu.ehr.statistics.service.ResourceStatisticsClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,14 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "ResourceStatistics", description = "数据中心首页统计相关", tags = {"数据中心首页-统计相关"})
 public class ResourceStatisticsController extends BaseController {
     @Autowired
-    private StatisticsClient statisticsClient;
+    private ResourceStatisticsClient resourceStatisticsClient;
 
     @RequestMapping(value = "/getStatisticsUserCards", method = RequestMethod.GET)
     @ApiOperation(value = "获取健康卡绑定量")
     public Envelop getStatisticsUserCards() {
         try {
             Envelop envelop = new Envelop();
-            envelop.setDetailModelList(statisticsClient.getStatisticsUserCards());
+            envelop.setDetailModelList(resourceStatisticsClient.getStatisticsUserCards());
 //            envelop.setObj();
             envelop.setSuccessFlg(true);
             return envelop;
@@ -48,13 +48,13 @@ public class ResourceStatisticsController extends BaseController {
         try {
             Envelop envelop = new Envelop();
             if ("archiveIdentify".equalsIgnoreCase(requestType)) {
-                envelop = statisticsClient.getArchiveIdentifyReportInfo();
+                envelop = resourceStatisticsClient.getArchiveIdentifyReportInfo();
             } else if ("archiveHospital".equalsIgnoreCase(requestType)) {
-                envelop = statisticsClient.getArchiveHospitalReportInfo();
+                envelop = resourceStatisticsClient.getArchiveHospitalReportInfo();
             } else if ("archiveStatistical".equalsIgnoreCase(requestType)) {
-                envelop = statisticsClient.getArchiveStatisticalReportInfo();
+                envelop = resourceStatisticsClient.getArchiveStatisticalReportInfo();
             } else if ("archiveTotalVisit".equalsIgnoreCase(requestType)) {
-                envelop = statisticsClient.getArchiveTotalVisitReportInfo();
+                envelop = resourceStatisticsClient.getArchiveTotalVisitReportInfo();
             }
 
             return envelop;

@@ -23,7 +23,7 @@ import java.util.Map;
 @FeignClient(name= MicroServices.Portal)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
-public interface StatisticsClient {
+public interface ResourceStatisticsClient {
 
     @RequestMapping(value = "/getStatisticsUserCards", method = RequestMethod.GET)
     @ApiOperation(value = "获取健康卡绑定量")
