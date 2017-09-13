@@ -162,18 +162,20 @@ public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XAr
     }
 
     public int getTodayInWarehouseCount() {
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String curDate = sdf.format(date);
-        int result = archiveRelationDao.findTodayInWarehouseCount(DateUtil.strToDate(curDate));
+        Session session = entityManager.unwrap(Session.class);
+        String sql = "select count(id) from Archive_Relation WHERE DATE_FORMAT(create_date,'%Y-%m-%d') = CURDATE()";
+        SQLQuery query = session.createSQLQuery(sql);
+        Object ob  = (query.list().get(0));
+        int result = Integer.parseInt(ob.toString());
         return result;
     }
 
     public int getDailyAdd() {
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String curDate = sdf.format(date);
-        int result = archiveRelationDao.FindDailyAdd(DateUtil.strToDate(curDate));
+        Session session = entityManager.unwrap(Session.class);
+        String sql = "select count(id) from Archive_Relation WHERE identify_flag = 1 AND DATE_FORMAT(event_date,'%Y-%m-%d') = CURDATE()";
+        SQLQuery query = session.createSQLQuery(sql);
+        Object ob  = (query.list().get(0));
+        int result = Integer.parseInt(ob.toString());
         return result;
     }
 
