@@ -495,6 +495,10 @@ import java.util.List;
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
 
-
+    @RequestMapping(value = "/dictionaries/tj_quota_algorithm", method = RequestMethod.GET)
+    @ApiOperation(value = "指标算法", response = MConventionalDict.class)
+    MConventionalDict getTjQuotaAlgorithm(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code);
 
 }

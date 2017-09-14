@@ -2,7 +2,6 @@ package com.yihu.ehr.fileresource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
-import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,7 +48,6 @@ public class FileResourceController {
             @RequestParam(value = "file_name",required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
             @RequestParam(value = "json_data",required = false) String jsonData,HttpServletRequest request) {
-        LogService.getLogger(FileResourceController.class).info("zjj-ag-admin-pictureUploadReturnUrl");
         return fileResourceClient.fileUploadReturnUrl(fileStr,fileName,jsonData);
     }
 

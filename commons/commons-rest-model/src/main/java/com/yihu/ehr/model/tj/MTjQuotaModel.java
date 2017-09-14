@@ -30,6 +30,7 @@ public class MTjQuotaModel {
     private Integer quotaType;
     private String quotaTypeName;
     private String metadataCode;
+    private String jobClazzName;
 
     public String getQuotaTypeName() {
         return quotaTypeName;
@@ -221,5 +222,13 @@ public class MTjQuotaModel {
 
     public void setMetadataCode(String metadataCode) {
         this.metadataCode = metadataCode;
+    }
+
+    public String getJobClazzName() {
+        return jobClazzName;
+    }
+
+    public void setJobClazzName(String jobClazzName) {
+        this.jobClazzName = jobClazzName;
     }
 }

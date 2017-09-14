@@ -24,6 +24,7 @@ public class TjQuotaModel {
     private String remark;
     private Integer quotaType;
     private String quotaTypeName;
+    private String jobClazzName;
 
     private TjQuotaDataSourceModel tjQuotaDataSourceModel;
     private TjQuotaDataSaveModel tjQuotaDataSaveModel;
@@ -195,5 +196,13 @@ public class TjQuotaModel {
 
     public void setTjQuotaChartModel(TjQuotaChartModel tjQuotaChartModel) {
         this.tjQuotaChartModel = tjQuotaChartModel;
+    }
+
+    public String getJobClazzName() {
+        return jobClazzName;
+    }
+
+    public void setJobClazzName(String jobClazzName) {
+        this.jobClazzName = jobClazzName;
     }
 }
