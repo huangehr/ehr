@@ -178,6 +178,9 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
                 MQuotaCategory mQuotaCategory = quotaCategoryClient.searchQuotaCategoryDetail(tjQuotaModel.getQuotaType());
                 tjQuotaModel.setQuotaTypeName(mQuotaCategory.getName());
             }
+            //获取字典
+            MConventionalDict dict = conventionalDictClient.getTjQuotaAlgorithm(tjQuotaModel.getJobClazz());
+            tjQuotaModel.setJobClazzName(dict == null ? "" : dict.getCode());
             return success(tjQuotaModel);
         } catch (Exception e) {
             e.printStackTrace();
