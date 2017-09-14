@@ -74,9 +74,11 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
      * @return
      */
     public SystemDictEntry getDictEntry(long dictId, String code) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
-
-        return repo.findOne(new DictEntryKey(code, dictId));
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryRepository.findByDictIdAndCode(dictId, code);
+        if (null != systemDictEntryList && systemDictEntryList.size() > 0) {
+            return systemDictEntryList.get(0);
+        }
+        return null;
     }
 
     public SystemDictEntry getDictEntryByValueAndDictId(String value, long dictId) {
