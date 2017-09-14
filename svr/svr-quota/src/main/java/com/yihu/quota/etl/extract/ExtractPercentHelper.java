@@ -116,9 +116,8 @@ public class ExtractPercentHelper {
                 TjQuota denoTjQuota = quotaService.findByCode(esConfig.getDenominator());
 
                 Map<String,String> param =  new HashMap<>();
-                String quotaDate = "2017-08-22";
-                param.put("startTime",quotaDate);
-                param.put("endTime",quotaDate);
+                param.put("startTime",startTime);
+                param.put("endTime",endTime);
                 Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1));
                 Map<String,Map<String, Object>>  denoResultMap = quotaService.getQuotaResult(denoTjQuota.getId(), objectMapper.writeValueAsString(param), denoDimension.substring(0, denoDimension.length() - 1));
 

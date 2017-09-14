@@ -111,7 +111,6 @@ public class EsResultExtract {
         EsConfig esConfig = null;
         esConfig = getEsConfig(tjQuota);
         this.esConfig = esConfig;
-        esConfigUtil.getConfig(esConfig);
     }
 
     public EsConfig getEsConfig(TjQuota tjQuota) throws Exception {
@@ -135,8 +134,7 @@ public class EsResultExtract {
     }
 
     public Client getEsClient(){
-        esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-        return esClientUtil.getClient(esConfig.getClusterName());
+       return esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
     }
 
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
@@ -145,7 +143,15 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> restltList =  elasticsearchUtil.queryPageList(getEsClient(),boolQueryBuilder,pageNo,pageSize,"quotaDate");
+        Client  client = getEsClient();
+        List<Map<String, Object>> restltList = null;
+        try {
+            restltList =  elasticsearchUtil.queryPageList(client,boolQueryBuilder,pageNo,pageSize,"quotaDate");
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
         return restltList;
     }
 
@@ -153,14 +159,32 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        return (int)elasticsearchUtil.getTotalCount(getEsClient(),boolQueryBuilder);
+        Client  client = getEsClient();
+        int count  = 0;
+        try {
+            count  = (int)elasticsearchUtil.getTotalCount(client,boolQueryBuilder);
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
+        return count;
+
     }
 
     public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters,int size) throws Exception {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(),boolQueryBuilder, "quotaDate",size);
+        Client  client = getEsClient();
+        List<Map<String, Object>> list = null;
+        try {
+           list = elasticsearchUtil.queryList(client,boolQueryBuilder, "quotaDate",size);
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
         return  list;
     }
 
@@ -270,7 +294,15 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> list = elasticsearchUtil.searcherByGroup(getEsClient(),boolQueryBuilder,aggsField, "result");
+        Client client = getEsClient();
+        List<Map<String, Object>> list = null;
+        try {
+            list = elasticsearchUtil.searcherByGroup(client, boolQueryBuilder, aggsField, "result");
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
         return  list;
     }
 
@@ -282,7 +314,15 @@ public class EsResultExtract {
         }else {
             filter = filter + " ,quotaCode='" + tjQuota.getCode() + "' ";
         }
-        Map<String, Integer> map = elasticsearchUtil.searcherByGroupBySql(getEsClient(),esConfig.getIndex(), aggsFields ,filter ,"result");
+        Client client = getEsClient();
+        Map<String, Integer> map = null;
+        try {
+            map = elasticsearchUtil.searcherByGroupBySql(client, esConfig.getIndex(), aggsFields, filter, "result");;
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
         return map;
     }
 

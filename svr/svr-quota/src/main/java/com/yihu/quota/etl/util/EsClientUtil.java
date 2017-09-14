@@ -9,6 +9,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,19 +28,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EsClientUtil {
     private Logger logger = LoggerFactory.getLogger(EsExtract.class);
 
+    @Autowired
+    EsConfigUtil esConfigUtil;
+
     private Settings setting;
 
     private Map<String, Client> clientMap = new ConcurrentHashMap<String, Client>();
 
     private Map<String, Integer> ips = new HashMap<String, Integer>(); // hostname port
 
-    private String ip = "172.17.110.17";// 172.19.103.68
+//    private String ip = "172.17.110.17";// 172.19.103.68
     private int port = 9300;
     private String clusterName = "elasticsearch";//jkzl
-
-    private EsClientUtil() {
-        init();
-    }
+//
+//    private EsClientUtil() {
+//        init();
+//    }
 
     public static final EsClientUtil getInstance() {
         return ClientHolder.INSTANCE;
@@ -49,30 +53,34 @@ public class EsClientUtil {
         private static final EsClientUtil INSTANCE = new EsClientUtil();
     }
 
+//    /**
+//     * 初始化默认的client
+//     */
+//    public void init(){
+//        ips.put(ip, port);
+//        setting = Settings.settingsBuilder()
+//                .put("client.transport.sniff",true)
+//                .put("cluster.name",clusterName).build();
+//        addClient(setting, getAllAddress(ips));
+//    }
+
     /**
-     * 初始化默认的client
+     * 添加新的client
+     * @param ip
+     * @param port
+     * @param clusterName
      */
-    public void init(){
-        ips.put(ip, port);
+    public Client getClient(String ip,int port,String index,String type,String clusterName){
+        ips.put(ip, 9300);
         setting = Settings.settingsBuilder()
                 .put("client.transport.sniff",true)
                 .put("cluster.name",clusterName).build();
         addClient(setting, getAllAddress(ips));
+        esConfigUtil.getConfig(ip,port,index,type,clusterName);
+        return getClient(clusterName);
     }
 
-    /**
-     * 添加新的client
-     * @param newIp
-     * @param newPort
-     * @param newClusterName
-     */
-    public void addNewClient(String newIp,int newPort,String newClusterName){
-        ips.put(newIp, port);
-        setting = Settings.settingsBuilder()
-                .put("client.transport.sniff",true)
-                .put("cluster.name",newClusterName).build();
-        addClient(setting, getAllAddress(ips));
-    }
+
 
     /**
      * 获得所有的地址端口
@@ -91,9 +99,9 @@ public class EsClientUtil {
         return addressList;
     }
 
-    public Client getClient() {
-        return getClient(clusterName);
-    }
+//    public Client getClient() {
+//        return getClient(clusterName);
+//    }
 
     public Client getClient(String clusterName) {
         return clientMap.get(clusterName);
