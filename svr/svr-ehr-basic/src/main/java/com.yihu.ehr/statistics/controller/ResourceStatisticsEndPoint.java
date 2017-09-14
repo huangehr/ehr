@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/6/9.
@@ -63,7 +60,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
                 Map<Integer,Object> mapVal  = converMapObject(list.get(i));
                 dateList.add(mapVal.get(1).toString());
             }
-            EchartReportModel echartReportModel = setEchartReportModel(list,"采集总数",dateList);
+            EchartReportModel echartReportModel = setEchartReportModel(list,"total",dateList);
             echartReportModels.add(echartReportModel);
         }
         List<Object> list0 = archiveRelationService.getCollectEventTypeCount(0);
@@ -107,16 +104,34 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             }
             echartReportModel.setDataModels(dataList);
             echartReportModels.add(echartReportModel);
+        }else{
+            EchartReportModel echartReportModel = new EchartReportModel();
+            MapDataModel hospitalModel = new MapDataModel();
+            hospitalModel.setName("hospital");
+            hospitalModel.setValue("0");
+            dataList.add(hospitalModel);
+            MapDataModel patientModel = new MapDataModel();
+            patientModel.setName("outpatient");
+            patientModel.setValue("0");
+            dataList.add(patientModel);
+
+            echartReportModel.setDataModels(dataList);
+            echartReportModels.add(echartReportModel);
         }
         envelop.setDetailModelList(echartReportModels);
         Map<String,Object> mapObj = new HashMap<>();
-        for(MapDataModel dataModel:dataList){
-            if(null!=dataModel.getName()&&dataModel.getName().equals("outpatient")){
-                mapObj.put("outpatient",dataModel.getValue());
+        if(dataList !=null && dataList.size()>0){
+            for(MapDataModel dataModel:dataList){
+                if(null!=dataModel.getName()&&dataModel.getName().equals("outpatient")){
+                    mapObj.put("outpatient",dataModel.getValue());
+                }
+                if(null!=dataModel.getName()&&dataModel.getName().equals("hospital")){
+                    mapObj.put("hospital",dataModel.getValue());
+                }
             }
-            if(null!=dataModel.getName()&&dataModel.getName().equals("hospital")){
-                mapObj.put("hospital",dataModel.getValue());
-            }
+        }else {
+            mapObj.put("outpatient",0);
+            mapObj.put("hospital",0);
         }
         int total = 0;
         if (mapObj != null && mapObj.size() > 0 ){
@@ -125,6 +140,8 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             }
         }
         mapObj.put("hospital/outpatient",total);
+
+        envelop.setDetailModelList(echartReportModels);
         envelop.setObj(mapObj);
         envelop.setSuccessFlg(true);
         return envelop;
@@ -139,7 +156,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         Page<SystemDictEntry> systemDictEntryList = systemDictEntryService.findByDictId(89, 0, 1000);
         if(systemDictEntryList !=null && systemDictEntryList.getContent() != null){
             List<SystemDictEntry> ageList = systemDictEntryList.getContent();
-            Map<String,Integer> ageMap = new HashMap<>();
+            Map<String,Integer> ageMap = new LinkedHashMap<>();
             for(SystemDictEntry systemDictEntry:ageList){
                 ageMap.put(systemDictEntry.getValue(),0);
             }
@@ -159,10 +176,16 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
                         }
                     }
                 }
+                Object [] xObdata = new String[newAgeMap.size()];
+                Object [] yObdata = new Integer[newAgeMap.size()];
                 String [] xdata = new String[newAgeMap.size()];
-                Integer [] ydata = new Integer[newAgeMap.size()];
-                ydata = (Integer[]) newAgeMap.values().toArray();
-                xdata = (String[]) newAgeMap.keySet().toArray();
+                int [] ydata = new int[newAgeMap.size()];
+                yObdata = newAgeMap.values().toArray();
+                xObdata = newAgeMap.keySet().toArray();
+                for(int i=0;i<newAgeMap.size();i++){
+                    ydata[i] = Integer.valueOf(yObdata[i].toString());
+                    xdata[i] = xObdata[i].toString();
+                }
                 echartReportModel.setxData(xdata);
                 echartReportModel.setyData(ydata);
                 echartReportModels.add(echartReportModel);
@@ -172,7 +195,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             if( list != null && list.size() > 0){
                 EchartReportModel echartReportModel = new EchartReportModel();
                 String [] xdata = new String[list.size()];
-                Integer [] ydata = new Integer[list.size()];
+                int [] ydata = new int[list.size()];
                 for(int i=0 ; i < list.size(); i++){
                     Map<Integer,Object> mapVal  = converMapObject(list.get(i));
                     ydata[i] = Integer.valueOf(mapVal.get(0).toString());
@@ -183,9 +206,6 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
                 echartReportModels.add(echartReportModel);
             }
         }
-
-
-
         envelop.setDetailModelList(echartReportModels);
         envelop.setSuccessFlg(true);
         return envelop;
@@ -197,7 +217,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             echartReportModel.setName(name);
             if(dateList != null){
                 int num = dateList.size();
-                Integer[] ydata = new Integer[num];
+                int[] ydata = new int[num];
                 String[] xdata = new String[num];
                 echartReportModel.setxData(xdata);
                 for(int k=0 ; k < dateList.size() ; k++){
@@ -228,20 +248,6 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     }
 
 
-//    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
-//    @ApiOperation(value = "全员人口个案-健康卡绑定量")
-//    public ListResult getTjDataSaveList(
-//            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "")
-//            @RequestParam(value = "fields", required = false) String fields,
-//            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
-//            @RequestParam(value = "filters", required = false) String filters
-//    ) throws Exception {
-//
-//        ListResult listResult = new ListResult();
-//
-//        return listResult;
-//    }
-
     @RequestMapping(value = ServiceApi.StasticReport.getStatisticsUserCards, method = RequestMethod.GET)
     @ApiOperation(value = "获取健康卡绑定量")
     public Envelop getStatisticsUserCards() {
@@ -271,12 +277,12 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         List<MapDataModel> mapData=new ArrayList<>();
         MapDataModel mapDataModel=null;
         mapDataModel=new MapDataModel();
-        mapDataModel.setName("健康卡绑定量");
+        mapDataModel.setName("bingdCount");
         mapDataModel.setValue(String.valueOf(userCardsNum));
         mapData.add(mapDataModel);
 
         mapDataModel=new MapDataModel();
-        mapDataModel.setName("未绑定量");
+        mapDataModel.setName("noBingCount");
         mapDataModel.setValue(String.valueOf(nonBindingCardNum));
         mapData.add(mapDataModel);
         echartReportModel.setDataModels(mapData);
@@ -304,10 +310,10 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         for (int i = 0; i < 2; i++) {
             MapDataModel mapData = new MapDataModel();
             if (i == 0) {
-                mapData.setName("不可识别");
+                mapData.setName("unIdentify");
                 mapData.setValue(unIdentifyCount + "");
             } else if (i == 1) {
-                mapData.setName("可识别");
+                mapData.setName("identify");
                 mapData.setValue(identifyCount + "");
             } /*else if (i == 2) {
                 mapData.setName("archiveIdentify");
@@ -342,13 +348,13 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         for (int i = 0; i < 3; i++) {
             MapDataModel mapData = new MapDataModel();
             if (i == 0) {
-                mapData.setName("住院");
+                mapData.setName("hospital");
                 mapData.setValue(inPatientCount + "");
             } else if (i == 1) {
-                mapData.setName("门诊");
+                mapData.setName("patient");
                 mapData.setValue(outPatientCount + "");
             } else if (i == 2) {
-                mapData.setName("体检");
+                mapData.setName("healthExamination");
                 mapData.setValue(physicalCount + "");
             }
             mapDataModels.add(mapData);
@@ -379,10 +385,10 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         for (int i = 0; i < 2; i++) {
             MapDataModel mapData = new MapDataModel();
             if (i == 0) {
-                mapData.setName("今日入库");
+                mapData.setName("todayInWarehouse");
                 mapData.setValue(todayInWarehouseCount + "");
             } else if (i == 1) {
-                mapData.setName("数据统计");
+                mapData.setName("statistics");
                 mapData.setValue(archiveCount + "");
             } /*else if (i == 2) {
                 mapData.setName("dataStatistical");
@@ -417,13 +423,13 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value =  ServiceApi.StasticReport.getStatisticsDoctorByRoleType, method = RequestMethod.GET)
-    @ApiOperation(value = "按机构医生、护士、床位的统计")
+    @ApiOperation(value = "按机构Doctorse、Nurse、床位的统计")
     public Envelop getStatisticsDoctorByRoleType() {
         Envelop envelop = new Envelop();
         List<EchartReportModel> echartReportModels = new ArrayList<>();
-        //根据角色/医院获取医生总数
+        //根据角色/医院获取Doctorse总数
         List<Object> doctorLost=  doctorService.getStatisticsDoctorsByRoleType("Doctor");
-        //根据角色/医院获取护士总数
+        //根据角色/医院获取Nurse总数
         List<Object> nurseLost= doctorService.getStatisticsDoctorsByRoleType("Nurse");
         int listSize=0;
         if( doctorLost != null && doctorLost.size() > 0&&doctorLost.size()>listSize){
@@ -434,7 +440,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         }
 
         String [] xdata = new String[listSize];
-        Integer [] ydata = new Integer[listSize];
+        int [] ydata = new int[listSize];
         EchartReportModel echartReportModel = null;
         if( doctorLost != null && doctorLost.size() > 0){
             echartReportModel = new EchartReportModel();
@@ -443,19 +449,19 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
                 ydata[i] = Integer.valueOf(mapVal.get(0).toString());
                 xdata[i] = mapVal.get(2).toString();
             }
-            echartReportModel.setName("医生");
+            echartReportModel.setName("Doctor");
             echartReportModel.setxData(xdata);
             echartReportModel.setyData(ydata);
             echartReportModels.add(echartReportModel);
         }else{
             echartReportModel = new EchartReportModel();
-            echartReportModel.setName("医生");
+            echartReportModel.setName("Doctor");
             echartReportModel.setxData(xdata);
             echartReportModel.setyData(ydata);
             echartReportModels.add(echartReportModel);
         }
         String [] xDataN = new String[listSize];
-        Integer [] yDataN = new Integer[listSize];
+        int [] yDataN = new int[listSize];
         if( nurseLost != null && nurseLost.size() > 0){
             echartReportModel = new EchartReportModel();
             for(int i=0 ; i < nurseLost.size(); i++){
@@ -463,13 +469,13 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
                 yDataN[i] = Integer.valueOf(mapVal.get(0).toString());
                 xDataN[i] = mapVal.get(2).toString();
             }
-            echartReportModel.setName("护士");
+            echartReportModel.setName("Nurse");
             echartReportModel.setxData(xDataN);
             echartReportModel.setyData(yDataN);
             echartReportModels.add(echartReportModel);
         }else{
             echartReportModel = new EchartReportModel();
-            echartReportModel.setName("护士");
+            echartReportModel.setName("Nurse");
             echartReportModel.setxData(xDataN);
             echartReportModel.setyData(yDataN);
             echartReportModels.add(echartReportModel);
@@ -482,23 +488,23 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
 
 
     @RequestMapping(value =  ServiceApi.StasticReport.getStatisticsCityDoctorByRoleType, method = RequestMethod.GET)
-    @ApiOperation(value = "全市医生、护士、床位的统计")
+    @ApiOperation(value = "全市Doctorse、Nurse、床位的统计")
     public Envelop getStatisticsCityDoctorByRoleType() {
         Envelop envelop = new Envelop();
         List<EchartReportModel> echartReportModels = new ArrayList<>();
         EchartReportModel echartReportModel = new EchartReportModel();
-        //根据角色/医院获取医生总数
+        //根据角色/医院获取Doctorse总数
         int doctorCount = doctorService.getStatisticsCityDoctorByRoleType("Doctor");
         List<MapDataModel> MapDataModelList=new ArrayList<>();
         MapDataModel mapDataModel=null;
         mapDataModel=new MapDataModel();
-        mapDataModel.setName("医生");
+        mapDataModel.setName("Doctor");
         mapDataModel.setValue(String.valueOf(doctorCount));
         MapDataModelList.add(mapDataModel);
 
         int nurseCount = doctorService.getStatisticsCityDoctorByRoleType("Nurse");
         mapDataModel=new MapDataModel();
-        mapDataModel.setName("护士");
+        mapDataModel.setName("Nurse");
         mapDataModel.setValue(String.valueOf(nurseCount));
         MapDataModelList.add(mapDataModel);
         echartReportModel.setDataModels(MapDataModelList);
