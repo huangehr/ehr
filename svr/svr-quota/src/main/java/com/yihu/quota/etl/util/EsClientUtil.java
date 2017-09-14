@@ -30,20 +30,11 @@ public class EsClientUtil {
 
     @Autowired
     EsConfigUtil esConfigUtil;
-
     private Settings setting;
-
     private Map<String, Client> clientMap = new ConcurrentHashMap<String, Client>();
-
     private Map<String, Integer> ips = new HashMap<String, Integer>(); // hostname port
-
-//    private String ip = "172.17.110.17";// 172.19.103.68
     private int port = 9300;
     private String clusterName = "elasticsearch";//jkzl
-//
-//    private EsClientUtil() {
-//        init();
-//    }
 
     public static final EsClientUtil getInstance() {
         return ClientHolder.INSTANCE;
@@ -52,17 +43,6 @@ public class EsClientUtil {
     private static class ClientHolder {
         private static final EsClientUtil INSTANCE = new EsClientUtil();
     }
-
-//    /**
-//     * 初始化默认的client
-//     */
-//    public void init(){
-//        ips.put(ip, port);
-//        setting = Settings.settingsBuilder()
-//                .put("client.transport.sniff",true)
-//                .put("cluster.name",clusterName).build();
-//        addClient(setting, getAllAddress(ips));
-//    }
 
     /**
      * 添加新的client
@@ -98,10 +78,6 @@ public class EsClientUtil {
         }
         return addressList;
     }
-
-//    public Client getClient() {
-//        return getClient(clusterName);
-//    }
 
     public Client getClient(String clusterName) {
         return clientMap.get(clusterName);
