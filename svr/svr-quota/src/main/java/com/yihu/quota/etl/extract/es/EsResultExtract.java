@@ -48,8 +48,6 @@ public class EsResultExtract {
     private String result;
     private TjQuota tjQuota;
     private String quotaCode;
-    private int pageNo;
-    private int pageSize;
     private EsConfig esConfig;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
@@ -138,8 +136,7 @@ public class EsResultExtract {
     }
 
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
-        this.pageNo = pageNo-1;
-        this.pageSize = pageSize;
+        pageNo = (pageNo-1)*pageSize;
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
