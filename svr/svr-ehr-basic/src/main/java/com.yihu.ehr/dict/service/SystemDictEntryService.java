@@ -1,6 +1,7 @@
 package com.yihu.ehr.dict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import java.util.List;
 @Transactional
 public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSystemDictEntryRepository> {
 
+    @Autowired
+    private XSystemDictEntryRepository systemDictEntryRepository;
     /**
      * 下一字典项排序号。
      *
@@ -71,9 +74,19 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
      * @return
      */
     public SystemDictEntry getDictEntry(long dictId, String code) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryRepository.findByDictIdAndCode(dictId, code);
+        if (null != systemDictEntryList && systemDictEntryList.size() > 0) {
+            return systemDictEntryList.get(0);
+        }
+        return null;
+    }
 
-        return repo.findOne(new DictEntryKey(code, dictId));
+    public SystemDictEntry getDictEntryByValueAndDictId(String value, long dictId) {
+        List<SystemDictEntry> systemDictEntryList = systemDictEntryRepository.findByDictIdAndValue(dictId, value);
+        if (null != systemDictEntryList && systemDictEntryList.size() > 0) {
+            return systemDictEntryList.get(0);
+        }
+        return null;
     }
 
     /**

@@ -100,7 +100,7 @@ public class QuotaController extends BaseController {
     ) {
         Envelop envelop = new Envelop();
         try {
-            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters, dimension,10);
+            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters, dimension,10000);
             envelop.setDetailModelList(quotaReport.getReultModelList());
             envelop.setSuccessFlg(true);
             return envelop;

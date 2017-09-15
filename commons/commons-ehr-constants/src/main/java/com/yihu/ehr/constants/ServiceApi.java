@@ -210,6 +210,7 @@ public class ServiceApi {
         public static final String RsReportIsUniqueName = "/resources/report/isUniqueName";
         public static final String RsReportNoPage = "/resources/report/getReportNoPage";
         public static final String RsReportTemplateContent = "/resources/report/getTemplateContent";
+        public static final String RsReportIsCategoryApplied = "/resources/report/isCategoryApplied";
 
         /**
          * 资源报表视图配置
@@ -645,6 +646,7 @@ public class ServiceApi {
         public static final String DeleteRoleReportRelationByRoleId = "/roles/role_report/deleteByRoleId";
         public static final String SearchRoleReportRelation = "/roles/role_report/search";
         public static final String SearchRoleReportRelationNoPage = "/roles/role_report/searchNoPage";
+        public static final String SearchRoleReportRelationIsReportAccredited = "/roles/role_report/isReportAccredited";
 
     }
 

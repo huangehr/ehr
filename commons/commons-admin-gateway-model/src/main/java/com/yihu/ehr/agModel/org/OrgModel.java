@@ -46,6 +46,7 @@ public class OrgModel {
     private String ing;     //经度
     private String lat;     //纬度
     private String updateTime;//更新时间
+    private Integer berth;  //核定床位
 
     public Long getId() {
         return id;
@@ -341,5 +342,13 @@ public class OrgModel {
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getBerth() {
+        return berth;
+    }
+
+    public void setBerth(Integer berth) {
+        this.berth = berth;
     }
 }

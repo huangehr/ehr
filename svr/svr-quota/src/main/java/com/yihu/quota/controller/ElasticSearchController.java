@@ -74,10 +74,14 @@ public class ElasticSearchController extends BaseController {
         try {
             /***** elasticsearch 保存 ********/
             EsConfig esConfig = config();
-            esConfigUtil.getConfig(esConfig);
-            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-            Client client = esClientUtil.getClient(esConfig.getClusterName());
+            esConfig.setIndex(index);
+            esConfig.setType(type);
+            esConfig.setHost("172.17.110.17");
+            esConfig.setPort(9300);
+            esConfig.setClusterName("elasticsearch");
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
             f = elasticsearchUtil.save(client,jsonString);
+            client.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -100,10 +104,10 @@ public class ElasticSearchController extends BaseController {
             EsConfig esConfig = config();
             esConfig.setIndex(index);
             esConfig.setType(type);
-            esConfigUtil.getConfig(esConfig);
-            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-            Client client = esClientUtil.getClient(esConfig.getClusterName());
-
+            esConfig.setHost("172.17.110.17");
+            esConfig.setPort(9300);
+            esConfig.setClusterName("elasticsearch");
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
             if( !file.isEmpty()){
                 FileInputStream fis = null;
                 InputStreamReader isr = null;
@@ -130,6 +134,7 @@ public class ElasticSearchController extends BaseController {
                         br.close();
                         isr.close();
                         fis.close();
+                        client.close();
                         // 关闭的时候最好按照先后顺序关闭最后开的先关闭所以先关s,再关n,最后关m
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -158,9 +163,10 @@ public class ElasticSearchController extends BaseController {
             EsConfig esConfig = config();
             esConfig.setIndex(index);
             esConfig.setType(type);
-            esConfigUtil.getConfig(esConfig);
-            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-            Client client = esClientUtil.getClient(esConfig.getClusterName());
+            esConfig.setHost("172.17.110.17");
+            esConfig.setPort(9300);
+            esConfig.setClusterName("elasticsearch");
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
             List<Map<String, Object>> list = elasticsearchUtil.queryList(client, null, null, 10000);
             byte[] buff = new byte[]{};
             StringBuffer docmBuff = new StringBuffer();
@@ -185,7 +191,7 @@ public class ElasticSearchController extends BaseController {
             out.write(buff,0,buff.length);
 
             out.close();
-
+            client.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -202,16 +208,18 @@ public class ElasticSearchController extends BaseController {
         List<Map<String, Object>> list = null;
         try {
             EsConfig esConfig = config();
-            esConfig.setIndex("test");
-            esConfig.setType("aaaa");//aaaa 表中机构名 设置不分词  -- 只支持全词匹配查询
-            esConfigUtil.getConfig(esConfig);
-            esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-            Client client = esClientUtil.getClient(esConfig.getClusterName());
+            esConfig.setIndex(index);
+            esConfig.setType(type);
+            esConfig.setHost("172.17.110.17");
+            esConfig.setPort(9300);
+            esConfig.setClusterName("elasticsearch");
+            Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
             BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
             TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("orgName", filter);
             boolQueryBuilder.must(termQueryQuotaCode);
 
             list = elasticsearchUtil.queryList(client, boolQueryBuilder, null, 200);
+            client.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.resource.MRsReport;
 import com.yihu.ehr.resource.client.RsReportClient;
+import com.yihu.ehr.users.service.RoleReportRelationClient;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -30,6 +31,8 @@ public class RsReportController extends BaseController {
 
     @Autowired
     private RsReportClient rsReportClient;
+    @Autowired
+    private RoleReportRelationClient roleReportRelationClient;
 
     @ApiOperation("根据ID获取资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReport, method = RequestMethod.GET)
@@ -134,6 +137,13 @@ public class RsReportController extends BaseController {
             @RequestParam(value = "id") Integer id) throws Exception {
         Envelop envelop = new Envelop();
         try {
+            boolean isReportAccredited = roleReportRelationClient.isReportAccredited(id);
+            if(isReportAccredited) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("该资源报表已被授权，不能删除。");
+                return envelop;
+            }
+
             rsReportClient.delete(id);
             envelop.setSuccessFlg(true);
             return envelop;

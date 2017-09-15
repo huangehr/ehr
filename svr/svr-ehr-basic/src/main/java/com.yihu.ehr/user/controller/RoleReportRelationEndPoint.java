@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "roleFeature",description = "角色与资源报表的授权关系", tags = {"安全管理-角色与资源报表的授权关系"})
+@Api(value = "roleFeature", description = "角色与资源报表的授权关系", tags = {"安全管理-角色与资源报表的授权关系"})
 public class RoleReportRelationEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RoleReportRelationService roleReportRelationService;
@@ -46,11 +46,12 @@ public class RoleReportRelationEndPoint extends EnvelopRestEndPoint {
     public ObjectResult batchAddRoleReportRelation(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws Exception {
-        List<RoleReportRelation> list = objectMapper.readValue(model, new TypeReference<List<RoleReportRelation>>(){});
+        List<RoleReportRelation> list = objectMapper.readValue(model, new TypeReference<List<RoleReportRelation>>() {
+        });
         if (list != null && list.size() > 0) {
             roleReportRelationService.deleteByRoleId(list.get(0).getRoleId());
         }
-        for (int i=0; i<list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             roleReportRelationService.save(list.get(i));
         }
         return Result.success("资源视图-关联指标表更新成功！", list);
@@ -77,11 +78,21 @@ public class RoleReportRelationEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Roles.SearchRoleReportRelationNoPage, method = RequestMethod.GET)
-    @ApiOperation(value = "查询角色与资源报表的授权关系列表---分页")
+    @ApiOperation(value = "查询角色与资源报表的授权关系列表（未分页）")
     public List<MRoleReportRelation> searchRoleReportRelationNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List<MRoleReportRelation> list = roleReportRelationService.search(filters);
         return list;
     }
+
+    @RequestMapping(value = ServiceApi.Roles.SearchRoleReportRelationIsReportAccredited, method = RequestMethod.GET)
+    @ApiOperation(value = "判断资源报表是否已被授权")
+    public boolean isReportAccredited(
+            @ApiParam(name = "rsReportId", value = "资源报表ID", required = true)
+            @RequestParam(value = "rsReportId") Integer rsReportId) {
+        List<RoleReportRelation> list = roleReportRelationService.findByRsReportId((long) rsReportId);
+        return list.size() == 0 ? false : true;
+    }
+
 }

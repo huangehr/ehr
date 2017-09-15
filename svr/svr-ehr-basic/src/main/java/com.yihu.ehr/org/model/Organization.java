@@ -147,6 +147,9 @@ public class Organization  {
     @Column(name = "update_time",nullable = true)
     private Date updateTime;
 
+    @Column(name = "berth",nullable = true)
+    private Integer berth;  //核定床位
+
     public Organization() {
         //tags = new HashSet<>();
     }
@@ -490,5 +493,13 @@ public class Organization  {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getBerth() {
+        return berth;
+    }
+
+    public void setBerth(Integer berth) {
+        this.berth = berth;
     }
 }

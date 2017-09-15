@@ -99,10 +99,14 @@ public class EsQuotaPercentJob implements Job {
                 TermQueryBuilder termQueryQuotaDate = QueryBuilders.termQuery("quotaDate", quoataDate);
                 boolQueryBuilder.must(termQueryQuotaCode);
                 boolQueryBuilder.must(termQueryQuotaDate);
-                esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-                Client client = esClientUtil.getClient(esConfig.getClusterName());
-                elasticsearchUtil.queryDelete(client,boolQueryBuilder);
-
+                Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+                try {
+                    elasticsearchUtil.queryDelete(client,boolQueryBuilder);
+                }catch (Exception e){
+                    e.getMessage();
+                }finally {
+                    client.close();
+                }
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for(SaveModel saveModel :dataModels){
                     if(saveModel.getResult() != null){

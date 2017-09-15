@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,10 +60,10 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
         List<TjQuotaDimensionMain> tjQuotaDimensionMains = null;
         List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = null;
         //保存指标的 ID 和 所有维度的集合
-        Map<String,Map<String,String>> dimensionMap = new HashedMap();
+        Map<String,Map<String,String>> dimensionMap = new LinkedHashMap();
         String [] quotaCode = quotaCodes.split(",");
         for(int i=0 ; i < quotaCode.length ;i++){
-            Map<String,String> map = new HashedMap();
+            Map<String,String> map = new LinkedHashMap<>();
             tjQuotaDimensionMains = tjQuotaDimensionMainService.getTjQuotaDimensionMainByCode(quotaCode[i]);
             int main = 1;
             for(TjQuotaDimensionMain tjQuotaDimensionMain : tjQuotaDimensionMains){
@@ -86,7 +87,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
         }
 
         //取出第一个指标的所有维度
-        Map<String,String> tempMap = new HashedMap();
+        Map<String,String> tempMap = new LinkedHashMap();
         for(String quotaCodeKey:dimensionMap.keySet() ){
             Map<String,String> codeMap = dimensionMap.get(quotaCodeKey);
             for(String dimenCode: codeMap.keySet()){
@@ -97,9 +98,9 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
         //用于保存共同交集的指标 key 保存交集的维度code
         //value 保存 此维度在每个指标统计的结果集中对应的字段名称
-        Map<String,Map<String,String>> synthesiseMap = new HashedMap();
+        Map<String,Map<String,String>> synthesiseMap = new LinkedHashMap<>();
 
-        Map<String,String> saveModelMap = new HashedMap();
+        Map<String,String> saveModelMap = new LinkedHashMap();
         //其他指标与第一个指标维度对比，如果在第一个指标中都存在 交集维度
         for(String tempDimenCode:tempMap.keySet() ){
             int num = 0;
@@ -116,7 +117,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
                 }
             }
             if(num == dimensionMap.size()){
-                Map<String,String> modelCloumnMap = new HashedMap();
+                Map<String,String> modelCloumnMap = new LinkedHashMap();
                 modelCloumnMap.put("name",tempMap.get(tempDimenCode).split("-")[0]);
                 for(String keyCode:dimensionMap.keySet() ){
                     if(saveModelMap.containsKey(keyCode+"-"+ tempDimenCode)) {
