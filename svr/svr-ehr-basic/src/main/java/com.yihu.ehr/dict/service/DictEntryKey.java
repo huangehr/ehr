@@ -9,6 +9,7 @@ import java.util.Objects;
 public class DictEntryKey implements Serializable{
     String code;
     long dictId;
+    String value;
 
     public DictEntryKey(){
     }
@@ -16,6 +17,11 @@ public class DictEntryKey implements Serializable{
     public DictEntryKey(String code, Long dictId){
         this.code = code == null ? "" : code;
         this.dictId = dictId == null ? null : dictId;
+    }
+
+    public DictEntryKey(Long dictId, String value) {
+        this.dictId = dictId == null ? null : dictId;
+        this.value = value == null ? "" : value;
     }
 
     public String getCode() {
@@ -32,6 +38,14 @@ public class DictEntryKey implements Serializable{
 
     public void setDictId(long dictId) {
         this.dictId = dictId;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override
