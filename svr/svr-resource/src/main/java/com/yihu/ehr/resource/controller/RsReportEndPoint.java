@@ -124,8 +124,8 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("查询报表信息（不分页）")
     @RequestMapping(value = ServiceApi.Resources.RsReportNoPage, method = RequestMethod.GET)
     public List<MRsReport> queryNoPageResources(
-            @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception{
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List<RsReport> list = rsReportService.search(filters);
         return (List<MRsReport>) convertToModels(list, new ArrayList<>(list.size()), MRsReport.class, null);
     }
@@ -137,13 +137,22 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "reportCode") String reportCode,
             HttpServletResponse response) throws Exception {
         RsReport rsReport = rsReportService.getByCode(reportCode);
-        if(rsReport == null || StringUtils.isEmpty(rsReport.getTemplatePath())) {
+        if (rsReport == null || StringUtils.isEmpty(rsReport.getTemplatePath())) {
             throw new ApiException(HttpStatus.NOT_FOUND, "模版未找到");
         }
         String[] paths = rsReport.getTemplatePath().split(":");
         byte[] bytes = fastDFSUtil.download(paths[0], paths[1]);
         String templateContent = new String(bytes);
         return templateContent;
+    }
+
+    @ApiOperation("判断资源报表分类是否被使用")
+    @RequestMapping(value = ServiceApi.Resources.RsReportIsCategoryApplied, method = RequestMethod.GET)
+    public boolean isCategoryApplied(
+            @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "reportCategoryId") Integer reportCategoryId) throws Exception {
+        List<RsReport> list = rsReportService.getByReportCategoryId(reportCategoryId);
+        return list.size() == 0 ? false : true;
     }
 
 }

@@ -95,4 +95,10 @@ public interface RsReportClient {
             @ApiParam(name = "reportCode", value = "资源报表Code", required = true)
             @RequestParam(value = "reportCode") String reportCode);
 
+    @ApiOperation("判断资源报表分类是否被使用")
+    @RequestMapping(value = ServiceApi.Resources.RsReportIsCategoryApplied, method = RequestMethod.GET)
+    boolean isCategoryApplied(
+            @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "reportCategoryId") Integer reportCategoryId);
+
 }
