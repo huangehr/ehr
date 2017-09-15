@@ -51,7 +51,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "上传文件", notes = "图片上传")
     public String fileUpload(
             @ApiParam(name = "file_str", value = "文件字符串")
-            @RequestBody String fileStr,
+            @RequestParam(name = "file_str")  String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
