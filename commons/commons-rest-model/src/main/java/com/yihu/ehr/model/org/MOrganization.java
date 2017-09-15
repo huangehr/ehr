@@ -55,6 +55,8 @@ public class MOrganization implements Serializable{
     private String lat;     //纬度
     private Date updateTime;//更新时间
 
+    private Integer berth;  //核定床位
+
     public MOrganization() {
     }
 
@@ -347,5 +349,13 @@ public class MOrganization implements Serializable{
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getBerth() {
+        return berth;
+    }
+
+    public void setBerth(Integer berth) {
+        this.berth = berth;
     }
 }
