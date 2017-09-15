@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 资源报表 Service
  *
@@ -38,6 +40,16 @@ public class RsReportService extends BaseJpaService<RsReport, RsReportDao> {
      */
     public RsReport getByCode(String code) {
         return rsReportDao.findByCode(code);
+    }
+
+    /**
+     * 根据资源报表分类ID，获取资源报表
+     *
+     * @param reportCategoryId 资源报表分类ID
+     * @return List<RsReport>
+     */
+    public List<RsReport> getByReportCategoryId(Integer reportCategoryId) {
+        return rsReportDao.findByReportCategoryId(reportCategoryId);
     }
 
     /**

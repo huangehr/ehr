@@ -6,10 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 /**
  * Created by wxw on 2017/8/22.
  */
 public interface XRoleReportRelationRepository extends PagingAndSortingRepository<RoleReportRelation,Long> {
+
+    List<RoleReportRelation> findByRsReportId(@Param("rsReportId") Long rsReportId);
 
     @Query("delete from RoleReportRelation roleReport where roleReport.roleId = :roleId")
     @Modifying

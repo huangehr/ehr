@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 /**
  * 资源报表 DAO
  *
@@ -20,5 +22,7 @@ public interface RsReportDao extends PagingAndSortingRepository<RsReport, Intege
     RsReport isUniqueName(@Param("id") Integer id, @Param("name") String name);
 
     RsReport findByCode(@Param("code") String code);
+
+    List<RsReport> findByReportCategoryId(@Param("reportCategoryId") Integer reportCategoryId);
 
 }
