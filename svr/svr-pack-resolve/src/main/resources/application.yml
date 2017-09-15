@@ -69,49 +69,51 @@ ehr:
   pack-extractor:
     # 事件提取参数,用于生成事件摘要
     # 门诊从“门诊摘要”与“挂号”数据集提取事件
-    # 住院从“病人摘要”，“入院记录”与“病案首页”提取事件    Clinic 0门诊 Resident 1住院  MedicalExam 2体检
+    # 住院从“病人摘要”，“入院记录”与“病案首页”提取事件 Clinic 0门诊 Resident 1住院  MedicalExam 2体检
     event:
       data-sets:
-        - HDSC01_01: Clinic
-        - HDSC01_02: Clinic
-        - HDSD00_85: Clinic #门诊-挂号
-        - HDSD00_72: Clinic
-        - HDSC02_01: Resident
-        - HDSC02_02: Resident
-        - HDSC02_09: Resident
-        - HDSD00_13: Resident #住院-入院记录
-        - HDSD00_77: Resident
-        - HDSD00_76: Resident
+        - HDSC01_02: Clinic #门诊-挂号 v1.0
+        - HDSD00_85: Clinic #门诊-挂号 v1.3
+        - HDSD00_72: Clinic #门诊-症状 v1.3
+        - HDSC02_09: Resident #住院-入院记录 v1.0
+        - HDSC02_01: Resident #检验-报告单 v1.0
+        - HDSC02_02: Resident #检验-图片报告单 v1.0
+        - HDSD00_13: Resident #住院-入院记录 v1.3
+        - HDSD00_77: Resident #检验-报告单 v1.3
+        - HDSD00_76: Resident #检验-图片报告单 v1.3
+        - HDSB05_03: MedicalExam #体检-登记信息 v1.3
       meta-data:
-        - HDSD00_01_457 # 挂号时间
-        - HDSD00_13_057 # 入院时间-v1.3
-        - HDSD00_01_575 # 入院时间
-
+        - HDSD00_01_457 #就诊日期时间 v.1.0 & v.13
+        - HDSD00_01_575 #入院日期时间 v1.0
+        - HDSD00_13_057 #入院日期时间 v1.3
+        - HDSB05_03_011 #体检日期 v1.3
     #诊断信息
     diagnosis:
       data-sets:
-        - HDSD00_73 #门诊-诊断记录
-        - HDSC01_03
-        - HDSC02_17
+        - HDSC01_03 #门诊-诊断记录 v1.0
+        - HDSD00_73 #门诊-诊断记录 v1.3
+        - HDSC02_17 #住院-诊断记录 v1.0
+        - HDSD00_69 #住院-诊断记录 v1.3
+        - HDSB05_84 #体检-诊断记录 v1.3
       meta-data:
-        - HDSD00_01_550 # 门诊/住院诊断
-    # 身份提取参数，从人口学提取
+        - HDSD00_01_550 #门诊-疾病临床诊断在特定分类体系中的代码 v1.0(住院代码相同) & v1.3
+        - HDSD00_69_002 #住院-疾病临床诊断在特定分类体系中的代码 v1.3
+        - JDSB05_84_003 #体检-疾病临床诊断在特定分类体系中的代码 v1.3
+    #身份提取参数，从人口学提取
     identity:
       data-sets:
-        - HDSA00_01
+        - HDSA00_01 #人口学信息 v1.0 & v1.3
       meta-data:
-        id-card-no: HDSA00_01_017     # 身份标识
-        id-card-type: HDSA00_01_016   # 身份类型
-        patient-name: HDSA00_01_009  # 姓名  HDSD00_01_002
-    # 卡提取参数，从就诊摘要提取
+        id-card-no: HDSA00_01_017 #身份证号码 v1.0 & v1.3
+        id-card-type: HDSA00_01_016 #身份证类型 v1.0 & v1.3
+        patient-name: HDSA00_01_009 #本人姓名 v1.3    (v1.0:HDSD00_01_002)
+    #卡提取参数，从就诊摘要提取
     card:
       data-sets:
-        - HDSD00_85: 门诊-挂号 # -v1.3
-        - HDSD00_13: 住院-入院记录 # -v1.3
-        - HDSC01_01: 门诊-病人摘要
-        - HDSC01_02: 门诊-挂号
-        - HDSC02_01: 住院-病人摘要
-        - HDSC02_02: 住院-首页
+        - HDSD00_85: 门诊-挂号 #v1.3
+        - HDSD00_13: 住院-入院记录 #v1.3
+        - HDSC01_02: 门诊-挂号 #v1.0
+        - HDSC02_09: 住院-入院记录 #v1.0
       meta-data:
         - card-no: JDSD00_85_005 #就诊卡号 CARD_NO
         - card-type: JDSD00_85_006  #就诊卡类型 CARD_TYPE
@@ -120,15 +122,17 @@ ehr:
       - JDSA00_01_001 #v1.3
       - PATIENT_ID
     eventNo:
-      - HDSD00_02_040 # 门（急）诊号 v1.3
-      - HDSD00_02_066 # 住院号 v1.3
-      - HDSD03_01_031
-      - HDSD00_01_579 #会诊记录表编号
+      - HDSD00_02_040 #门（急）诊号 v1.3
+      - HDSD00_02_066 #住院号 v1.3
+      - HDSD03_01_031 #门诊号（挂号号） v1.0
+      - HDSD00_01_579 #住院号v1.0 会诊记录表编号v1.3
       - EVENT_NO
     eventTime:
-      - HDSD00_01_457 #就诊日期时间 v1.3
-      - HDSD00_16_005 #v1.3出院时间
-      - HDSD00_01_185
+      - HDSD00_01_457 #就诊日期时间 v1.0 & v1.3
+      - HDSD00_16_031 #入院时间 v1.0
+      - HDSD00_13_057 #入院日期时间 v1.3
+      - HDSD00_01_185 #出院日期 v1.0
+      - HDSD00_16_005 #出院日期时间 v1.3
 #error code and message
 
 ---
