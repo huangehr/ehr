@@ -11,17 +11,17 @@ import java.util.List;
  * Created by lyr on 2016/5/17.
  */
 public interface RsAdapterMetadataDao extends PagingAndSortingRepository<RsAdapterMetadata, String> {
-    Iterable<RsAdapterMetadata> findBySchemaId(String schema_id);
+    Iterable<RsAdapterMetadata> findBySchemeId(String scheme_id);
 
-    @Query("from RsAdapterMetadata where schemaId = ?1")
-    List<RsAdapterMetadata> findBySchema(String schemaId);
+    @Query("from RsAdapterMetadata where schemeId = ?1")
+    List<RsAdapterMetadata> findByScheme(String schemeId);
 
-    @Query("from RsAdapterMetadata where schemaId = ?1 and srcDatasetCode = ?2")
-    List<RsAdapterMetadata> findByDataset(String schemaId,String dataset);
+    @Query("from RsAdapterMetadata where schemeId = ?1 and srcDatasetCode = ?2")
+    List<RsAdapterMetadata> findByDataset(String schemeId, String dataset);
 
     @Modifying
-    @Query("delete from RsAdapterMetadata where schemaId = ?1")
-    void deleteBySchemaId(String schemaId);
+    @Query("delete from RsAdapterMetadata where schemeId = ?1")
+    void deleteBySchemeId(String schemeId);
 
-    List<RsAdapterMetadata> findBySchemaIdAndSrcDatasetCode(String schemaId,String srcDatasetCode);
+    List<RsAdapterMetadata> findBySchemeIdAndSrcDatasetCode(String schemeId, String srcDatasetCode);
 }

@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(name="rs_adapter_metadata")
 public class RsAdapterMetadata {
     private String id;
-    private String schemaId;
+    private String schemeId;
     private String metadataId;
     private String srcDatasetCode;
     private String srcMetadataCode;
@@ -31,12 +31,12 @@ public class RsAdapterMetadata {
         this.id = id;
     }
 
-    @Column(name="schema_id",nullable = false)
-    public String getSchemaId() {
-        return schemaId;
+    @Column(name="scheme_id",nullable = false)
+    public String getSchemeId() {
+        return schemeId;
     }
-    public void setSchemaId(String schemaId) {
-        this.schemaId = schemaId;
+    public void setSchemeId(String schemeId) {
+        this.schemeId = schemeId;
     }
 
     @Column(name="metadata_id")

@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RsAdapterSchemeService extends BaseJpaService<RsAdapterScheme, RsAdapterSchemeDao> {
 
     @Autowired
-    private RsAdapterSchemeDao schemaDao;
+    private RsAdapterSchemeDao schemeDao;
 
     @Autowired
     private RsAdapterMetadataDao metadataDao;
@@ -41,37 +41,37 @@ public class RsAdapterSchemeService extends BaseJpaService<RsAdapterScheme, RsAd
     /**
      * 保存适配方案
      *
-     * @param adapterSchema RsAdapterSchema 适配方案
-     * @return RsAdapterSchema 适配方案
+     * @param adapterscheme RsAdapterscheme 适配方案
+     * @return RsAdapterscheme 适配方案
      */
-    public RsAdapterScheme saveAdapterSchema(RsAdapterScheme adapterSchema) throws Exception {
-        String type = adapterSchema.getType();
+    public RsAdapterScheme saveAdapterScheme(RsAdapterScheme adapterscheme) throws Exception {
+        String type = adapterscheme.getType();
         if ("1".equals(type)) {
             //平台标准
-            if (schemaDao.findOne(adapterSchema.getId()) == null) {
-                batchAdapterMetadata(adapterSchema);
-                batchAdapterDictionary(adapterSchema);
+            if (schemeDao.findOne(adapterscheme.getId()) == null) {
+                batchAdapterMetadata(adapterscheme);
+                batchAdapterDictionary(adapterscheme);
             }
         } else if ("2".equals(type)) {
             //第三方标准
-            if (schemaDao.findOne(adapterSchema.getId()) == null) {
-                batchAdapterOrgMetaData(adapterSchema);
-                batchAdapterOrgDictionary(adapterSchema);
+            if (schemeDao.findOne(adapterscheme.getId()) == null) {
+                batchAdapterOrgMetaData(adapterscheme);
+                batchAdapterOrgDictionary(adapterscheme);
             }
         }
-        return schemaDao.save(adapterSchema);
+        return schemeDao.save(adapterscheme);
     }
 
 
     //第三方标准字典适配
-    public void batchAdapterOrgDictionary(RsAdapterScheme adapterSchema) throws Exception {
+    public void batchAdapterOrgDictionary(RsAdapterScheme adapterscheme) throws Exception {
         String sql = "INSERT INTO rs_adapter_dictionary ( " +
                 " scheme_id, " +
                 " src_dict_code, " +
                 " src_dict_entry_code, " +
                 " src_dict_entry_name " +
                 ") SELECT " +
-                " '"+adapterSchema.getId()+"', " +
+                " '"+adapterscheme.getId()+"', " +
                 " osd. CODE, " +
                 " osde. CODE, " +
                 " osde. NAME " +
@@ -82,20 +82,20 @@ public class RsAdapterSchemeService extends BaseJpaService<RsAdapterScheme, RsAd
                 "LEFT JOIN  " +
                 " org_std_dict osd " +
                 "ON osde.org_dict = osd.sequence  and osde.organization =osd.organization " +
-                "WHERE osde.organization = '"+adapterSchema.getAdapterVersion()+"'";
+                "WHERE osde.organization = '"+adapterscheme.getAdapterVersion()+"'";
         jdbcTemplate.execute(sql);
     }
 
 
     //第三方标准数据元适配
-    public void batchAdapterOrgMetaData(RsAdapterScheme adapterSchema) throws Exception {
+    public void batchAdapterOrgMetaData(RsAdapterScheme adapterscheme) throws Exception {
         String sql = "INSERT INTO rs_adapter_metadata (" +
-                " schema_id, " +
+                " scheme_id, " +
                 " src_dataset_code, " +
                 " src_metadata_code, " +
                 " src_metadata_name " +
                 ") SELECT " +
-                " '"+adapterSchema.getId()+"', " +
+                " '"+adapterscheme.getId()+"', " +
                 " osd. CODE, " +
                 " osm. CODE, " +
                 " osm. NAME " +
@@ -105,50 +105,50 @@ public class RsAdapterSchemeService extends BaseJpaService<RsAdapterScheme, RsAd
                 " org_std_dataset osd " +
                 "ON " +
                 " osm.org_dataset = osd.sequence  and osm.organization =osd.organization " +
-                "WHERE osm.organization = '"+adapterSchema.getAdapterVersion()+"'";
+                "WHERE osm.organization = '"+adapterscheme.getAdapterVersion()+"'";
         jdbcTemplate.execute(sql);
     }
 
 
     //平台标准字典适配
-    public void batchAdapterDictionary(RsAdapterScheme adapterSchema) throws Exception {
+    public void batchAdapterDictionary(RsAdapterScheme adapterscheme) throws Exception {
         String sql ="INSERT INTO rs_adapter_dictionary ( " +
                 " scheme_id, " +
                 " src_dict_code, " +
                 " src_dict_entry_code, " +
                 " src_dict_entry_name " +
                 ") SELECT " +
-                " '"+adapterSchema.getId()+"', " +
+                " '"+adapterscheme.getId()+"', " +
                 " sd. CODE, " +
                 " sde. CODE, " +
                 " sde. " +
                 "VALUE " +
                 " " +
                 "FROM " +
-                " std_dictionary_entry_"+adapterSchema.getAdapterVersion()+" sde " +
+                " std_dictionary_entry_"+adapterscheme.getAdapterVersion()+" sde " +
                 "LEFT JOIN" +
-                " std_dictionary_"+adapterSchema.getAdapterVersion()+" sd " +
+                " std_dictionary_"+adapterscheme.getAdapterVersion()+" sd " +
                 "ON " +
                 " sde.dict_id = sd.id where sd.code is not null ";
         jdbcTemplate.execute(sql);
     }
 
     //平台标准数据元适配
-    public void batchAdapterMetadata(RsAdapterScheme adapterSchema) throws Exception {
+    public void batchAdapterMetadata(RsAdapterScheme adapterscheme) throws Exception {
         String sql = "INSERT INTO rs_adapter_metadata ( " +
-                " schema_id,  " +
+                " scheme_id,  " +
                 " src_dataset_code,  " +
                 " src_metadata_code,  " +
                 " src_metadata_name  " +
                 ") SELECT  " +
-                " '"+adapterSchema.getId()+"',  " +
+                " '"+adapterscheme.getId()+"',  " +
                 " sds. CODE,  " +
                 " smd.column_name,  " +
                 " smd. NAME  " +
                 "FROM  " +
-                " std_meta_data_"+adapterSchema.getAdapterVersion()+" smd  " +
+                " std_meta_data_"+adapterscheme.getAdapterVersion()+" smd  " +
                 "LEFT JOIN" +
-                " std_data_set_"+adapterSchema.getAdapterVersion()+" sds  " +
+                " std_data_set_"+adapterscheme.getAdapterVersion()+" sds  " +
                 "ON  " +
                 " smd.dataset_id = sds.id";
         jdbcTemplate.execute(sql);
@@ -161,12 +161,12 @@ public class RsAdapterSchemeService extends BaseJpaService<RsAdapterScheme, RsAd
      * @param ids String 适配方案ID
      */
     @Transactional
-    public void deleteAdapterSchema(String ids) {
+    public void deleteAdapterScheme(String ids) {
         String[] idsArray = ids.split(",");
 
         for (String id_ : idsArray) {
-            metadataDao.deleteBySchemaId(id_);
-            schemaDao.delete(id_);
+            metadataDao.deleteBySchemeId(id_);
+            schemeDao.delete(id_);
         }
     }
 
@@ -176,12 +176,12 @@ public class RsAdapterSchemeService extends BaseJpaService<RsAdapterScheme, RsAd
      * @param sorts String 排序
      * @param page  int 分页
      * @param size  int 分页大小
-     * @return Page<RsAdapterSchema>
+     * @return Page<RsAdapterscheme>
      */
-    public Page<RsAdapterScheme> getAdapterSchema(String sorts, int page, int size) {
+    public Page<RsAdapterScheme> getAdapterScheme(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
 
-        return schemaDao.findAll(pageable);
+        return schemeDao.findAll(pageable);
     }
 
 
@@ -189,15 +189,15 @@ public class RsAdapterSchemeService extends BaseJpaService<RsAdapterScheme, RsAd
      * 获取适配方案
      *
      * @param id String Id
-     * @return RsAdapterSchema
+     * @return RsAdapterscheme
      */
-    public RsAdapterScheme getAdapterSchemaById(String id) {
-        return schemaDao.findOne(id);
+    public RsAdapterScheme getAdapterSchemeById(String id) {
+        return schemeDao.findOne(id);
     }
 
     public void deleteById(String id) {
-        schemaDao.delete(id);
-        metadataDao.deleteBySchemaId(id);
-        adapterDictionaryDao.deleteBySchemaId(id);
+        schemeDao.delete(id);
+        metadataDao.deleteBySchemeId(id);
+        adapterDictionaryDao.deleteBySchemeId(id);
     }
 }
