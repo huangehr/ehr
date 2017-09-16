@@ -41,27 +41,27 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return "Redis缓存行政地址完成！";
     }
 
-    @ApiOperation("Redis缓存健康问题名称")
+    @ApiOperation("Redis缓存HP健康问题名称")
     @RequestMapping(value = ServiceApi.Redis.InitHealthProblem, method = RequestMethod.POST)
     public String cacheHpName() throws Exception {
         redisInitService.cacheHpName();
-        return "Redis缓存健康问题名称完成！";
+        return "Redis缓存HP健康问题名称！";
     }
 
-    @ApiOperation("Redis缓存ICD10健康问题")
-    @RequestMapping(value = ServiceApi.Redis.InitIcd10Hp, method = RequestMethod.POST)
+    @ApiOperation("Redis缓存ICD10对应HP健康问题的编码和名称组合值")
+    @RequestMapping(value = ServiceApi.Redis.InitIcd10HpR, method = RequestMethod.POST)
     public String cacheIcd10HpRelation(
             @ApiParam(name = "force", value = "强制清除再缓存", defaultValue = "true")
             @RequestParam("force") boolean force) throws Exception {
         redisInitService.cacheIcd10HpRelation(force);
-        return "Redis缓存ICD10健康问题完成！";
+        return "Redis缓存ICD10对应HP健康问题的编码和名称组合值！";
     }
 
-    @ApiOperation("Redis缓存ICD10")
+    @ApiOperation("Redis缓存ICD10名称和对应HP健康问题编码")
     @RequestMapping(value = ServiceApi.Redis.InitIcd10, method = RequestMethod.POST)
     public String cacheIcd10() throws Exception {
         redisInitService.cacheIcd10();
-        return "Redis缓存ICD10完成！";
+        return "Redis缓存ICD10名称和对应HP健康问题编码！";
     }
 
     @ApiOperation("Redis缓存指标")
@@ -99,7 +99,7 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
         return "Redis缓存机构Saas机构完成！";
     }
 
-    @ApiOperation("Redis缓存标准")
+    @ApiOperation("Redis缓存标准版本")
     @RequestMapping(value = ServiceApi.Redis.InitVersions, method = RequestMethod.POST)
     public String cacheVersions(
             @ApiParam(name = "versions", value = "版本列表，使用逗号分隔", defaultValue = "59083976eebd")
@@ -107,13 +107,13 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "force", value = "强制清除再缓存", defaultValue = "true")
             @RequestParam("force") boolean force) throws Exception {
         redisInitService.cacheVersions(versions, force);
-        return "Redis缓存标准完成！";
+        return "Redis缓存标准版本完成！";
     }
 
     @RequestMapping(value= ServiceApi.Redis.InitRsAdapterDict, method = RequestMethod.POST)
     @ApiOperation("Redis缓存适配数据字典数据")
     public String cacheAdapterDict(
-            @ApiParam(name="id",value="rs_adapter_schema.id")
+            @ApiParam(name="id",value="rs_adapter_scheme.id")
             @PathVariable(value = "id") String id) throws Exception {
         redisInitService.cacheAdapterDict(id);
         return "Redis缓存适配数据字典数据完成";
@@ -122,17 +122,17 @@ public class RedisInitEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value= ServiceApi.Redis.InitRsAdapterMeta, method = RequestMethod.POST)
     @ApiOperation("Redis缓存适配数据元数据")
     public String cacheAdapterMetadata(
-            @ApiParam(name="id",value="rs_adapter_schema.id")
+            @ApiParam(name="id",value="rs_adapter_scheme.id")
             @PathVariable(value = "id") String id) throws Exception {
        redisInitService.cacheAdapterMetadata(id);
        return "Redis缓存适配数据元数据完成";
     }
 
     @RequestMapping(value= ServiceApi.Redis.InitRsMetadata, method = RequestMethod.POST)
-    @ApiOperation("Redis缓存数据元字典（dict_code不为空）")
+    @ApiOperation("Redis缓存资源化数据元字典（dict_code不为空）")
     public String cacheMetadata() throws Exception {
         redisInitService.cacheMetadata();
-        return "Redis缓存数据元字典完成";
+        return "Redis缓存资源化数据元字典完成";
     }
 
 }
