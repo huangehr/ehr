@@ -176,26 +176,21 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
         }
 
         tjQuotaDimensionSlaves = tjQuotaDimensionSlaveService.getTjQuotaDimensionSlaveByCode(quotaCode);
-        if(tjQuotaDimensionSlaves != null){
-            for(TjQuotaDimensionSlave tjQuotaDimensionSlave : tjQuotaDimensionSlaves){
-                for(int i=0 ;i < dimensionArr.length ; i++){
-                    int num = 1;
-                    while (num <= 3){
-                        String slave = "slaveKey" + num;
-                        if( dimensionArr[i].equals(slave) ){
-                            Map<String, String> map = new HashedMap();
-                            //查询字典数据
-                            List<DictModel> dictDataList = jdbcTemplate.query(tjQuotaDimensionSlave.getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-                            if(dictDataList != null ){
-                                for(DictModel dictModel :dictDataList){
-                                    String name = getFieldValueByName("name",dictModel).toString();
-                                    String val = getFieldValueByName("code",dictModel).toString();
-                                    map.put(name,val);
-                                }
-                                resultMap.put(slave+"Name",map);
-                            }
+        if(tjQuotaDimensionSlaves != null && tjQuotaDimensionSlaves.size() > 0){
+            for(int i=0 ;i < dimensionArr.length ; i++){
+                String slave = "slaveKey1,slaveKey2,slaveKey3";
+                if( slave.contains(dimensionArr[i]) ){
+                    Map<String, String> map = new HashedMap();
+                    int num = Integer.valueOf(dimensionArr[i].substring(dimensionArr[i].length() - 1, dimensionArr[i].length()));
+                    //查询字典数据
+                    List<DictModel> dictDataList = jdbcTemplate.query(tjQuotaDimensionSlaves.get(num-1).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                    if(dictDataList != null ){
+                        for(DictModel dictModel :dictDataList){
+                            String name = getFieldValueByName("name",dictModel).toString();
+                            String val = getFieldValueByName("code",dictModel).toString();
+                            map.put(name,val);
                         }
-                        num ++;
+                        resultMap.put(dimensionArr[i]+"Name",map);
                     }
                 }
             }
