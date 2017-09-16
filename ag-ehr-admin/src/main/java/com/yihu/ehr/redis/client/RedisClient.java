@@ -20,12 +20,12 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 public interface RedisClient {
 
-    @ApiOperation("获取资源化数据元映射")
+    @ApiOperation("获取资源化数据元ID")
     @RequestMapping(value = ServiceApi.Redis.RsAdapterMetadata, method = RequestMethod.GET)
     @ResponseBody
     String getRsAdaptionMetaData(
             @RequestParam("cdaVersion") String cdaVersion,
-            @RequestParam("dictCode") String dictCode,
-            @RequestParam("srcDictEntryCode") String srcDictEntryCode);
+            @RequestParam("srcDataSetCode") String srcDataSetCode,
+            @RequestParam("srcMetadataCode") String srcMetadataCode);
 
 }

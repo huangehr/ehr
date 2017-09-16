@@ -57,14 +57,14 @@ public interface XRedisServiceClient {
     //("获取资源化字典映射 redis")
     @RequestMapping(value = ServiceApi.Redis.RsAdapterDict, method = RequestMethod.GET)
     public String getRsAdaptionDict(@RequestParam("cdaVersion") String cdaVersion,
-                                    @RequestParam("dictCode") String dictCode,
+                                    @RequestParam("srcDictCode") String srcDictCode,
                                     @RequestParam("srcDictEntryCode") String srcDictEntryCode);
 
     //("获取资源化数据元映射 redis")
     @RequestMapping(value = ServiceApi.Redis.RsAdapterMetadata, method = RequestMethod.GET)
     public String getRsAdaptionMetaData(@RequestParam("cdaVersion") String cdaVersion,
-                                        @RequestParam("dictCode") String dictCode,
-                                        @RequestParam("srcDictEntryCode") String srcDictEntryCode);
+                                        @RequestParam("srcDataSetCode") String srcDataSetCode,
+                                        @RequestParam("srcMetadataCode") String srcMetadataCode);
 
 
     //("获取资源化数据元映射 redis")

@@ -25,10 +25,10 @@ public class RedisController {
     @ResponseBody
     public String getRsAdaptionMetaData(@ApiParam(value = "cdaVersion", defaultValue = "")
                                         @RequestParam("cdaVersion") String cdaVersion,
-                                        @ApiParam(value = "dictCode", defaultValue = "")
-                                        @RequestParam("dictCode") String dictCode,
-                                        @ApiParam(value = "srcDictEntryCode", defaultValue = "")
-                                        @RequestParam("srcDictEntryCode") String srcDictEntryCode) {
-        return redisClient.getRsAdaptionMetaData(cdaVersion,dictCode,srcDictEntryCode);
+                                        @ApiParam(value = "srcDataSetCode", defaultValue = "")
+                                        @RequestParam("srcDataSetCode") String srcDataSetCode,
+                                        @ApiParam(value = "srcMetadataCode", defaultValue = "")
+                                        @RequestParam("srcMetadataCode") String srcMetadataCode) {
+        return redisClient.getRsAdaptionMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
     }
 }
