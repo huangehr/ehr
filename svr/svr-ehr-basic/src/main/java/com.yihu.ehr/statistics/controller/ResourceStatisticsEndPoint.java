@@ -277,12 +277,12 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         List<MapDataModel> mapData=new ArrayList<>();
         MapDataModel mapDataModel=null;
         mapDataModel=new MapDataModel();
-        mapDataModel.setName("bingdCount");
+        mapDataModel.setName("已绑定");
         mapDataModel.setValue(String.valueOf(userCardsNum));
         mapData.add(mapDataModel);
 
         mapDataModel=new MapDataModel();
-        mapDataModel.setName("noBingCount");
+        mapDataModel.setName("未绑定");
         mapDataModel.setValue(String.valueOf(nonBindingCardNum));
         mapData.add(mapDataModel);
         echartReportModel.setDataModels(mapData);
