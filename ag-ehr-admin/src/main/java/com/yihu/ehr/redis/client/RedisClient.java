@@ -21,7 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public interface RedisClient {
 
     @ApiOperation("获取资源化数据元映射")
-    @RequestMapping(value = ServiceApi.Redis.RsAdaptionMetaData, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Redis.RsAdapterMetadata, method = RequestMethod.GET)
     @ResponseBody
     String getRsAdaptionMetaData(
             @RequestParam("cdaVersion") String cdaVersion,

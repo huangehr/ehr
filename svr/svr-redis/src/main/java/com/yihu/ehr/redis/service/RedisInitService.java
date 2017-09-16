@@ -101,7 +101,7 @@ public class RedisInitService {
     public boolean cacheIcd10() {
         String sql = "select t.hp_code,d.code,d.name from\n" +
                 "(select r.icd10_id,group_concat(p.`code` separator ';') hp_code \n" +
-                "from hp_icd10_relation r\n" +
+                "from icd10_hp_relation r\n" +
                 "left join health_problem_dict p on p.id = r.hp_id \n" +
                 "group by icd10_id) t\n" +
                 "left join icd10_dict d on t.icd10_id = d.id" ;
@@ -313,8 +313,8 @@ public class RedisInitService {
      * @return
      */
     public boolean cacheAdapterDict(String id){
-        String schemaSql = "SELECT adapter_version FROM rs_adapter_schema WHERE id = " + id;
-        String metaSql = "SELECT dict_code, src_dict_entry_code, dict_entry_code, src_dict_entry_name FROM rs_adapter_dictionary WHERE schema_id = " + id;
+        String schemaSql = "SELECT adapter_version FROM rs_adapter_scheme WHERE id = " + id;
+        String metaSql = "SELECT dict_code, src_dict_entry_code, dict_entry_code, src_dict_entry_name FROM rs_adapter_dictionary WHERE scheme_id = " + id;
         Map<String, Object> schemaMap = jdbc.queryForMap(schemaSql);
         List<Map<String, Object>> dictList = jdbc.queryForList(metaSql);
         //清空相关Redis
@@ -335,8 +335,8 @@ public class RedisInitService {
      * @return
      */
     public boolean cacheAdapterMetadata(String id){
-        String schemaSql = "SELECT adapter_version FROM rs_adapter_schema WHERE id = " + id;
-        String metaSql = "SELECT src_dataset_code, src_metadata_code, metadata_id FROM rs_adapter_metadata WHERE schema_id = " + id;
+        String schemaSql = "SELECT adapter_version FROM rs_adapter_scheme WHERE id = " + id;
+        String metaSql = "SELECT src_dataset_code, src_metadata_code, metadata_id FROM rs_adapter_metadata WHERE scheme_id = " + id;
         Map<String, Object> schemaMap = jdbc.queryForMap(schemaSql);
         List<Map<String, Object>> metaList = jdbc.queryForList(metaSql);
         //清空相关Redis

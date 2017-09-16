@@ -30,7 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
 @Api(value = "RsAdapterSchema", description = "适配方案服务")
-public class RsAdapterSchemaEndPoint extends EnvelopRestEndPoint {
+public class RsAdapterSchemeEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private RsAdapterSchemeService schemaService;

@@ -21,7 +21,7 @@ public class RedisController {
     private RedisClient redisClient;
 
     @ApiOperation("获取资源化数据元映射")
-    @RequestMapping(value = ServiceApi.Redis.RsAdaptionMetaData, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Redis.RsAdapterMetadata, method = RequestMethod.GET)
     @ResponseBody
     public String getRsAdaptionMetaData(@ApiParam(value = "cdaVersion", defaultValue = "")
                                         @RequestParam("cdaVersion") String cdaVersion,
