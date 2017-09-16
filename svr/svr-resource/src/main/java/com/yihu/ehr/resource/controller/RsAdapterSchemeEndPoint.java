@@ -42,7 +42,7 @@ public class RsAdapterSchemeEndPoint extends EnvelopRestEndPoint {
             @RequestBody String adapterSchema) throws Exception {
         RsAdapterScheme schema = toEntity(adapterSchema, RsAdapterScheme.class);
         schema.setId(getObjectId(BizObject.RsAdapterSchema));
-        schema = schemaService.saveAdapterSchema(schema);
+        schema = schemaService.saveAdapterScheme(schema);
         return convertToModel(schema, MRsAdapterSchema.class);
     }
 
@@ -70,7 +70,7 @@ public class RsAdapterSchemeEndPoint extends EnvelopRestEndPoint {
     public boolean deleteSchemaBatch(
             @ApiParam(name = "ids", value = "ids", defaultValue = "")
             @RequestParam(value = "ids") String ids) throws Exception {
-        schemaService.deleteAdapterSchema(ids);
+        schemaService.deleteAdapterScheme(ids);
         return true;
     }
 
@@ -79,7 +79,7 @@ public class RsAdapterSchemeEndPoint extends EnvelopRestEndPoint {
     public MRsAdapterSchema getAdapterSchemaById(
             @ApiParam(name = "id", value = "id", defaultValue = "")
             @PathVariable(value = "id") String id) throws Exception {
-        return convertToModel(schemaService.getAdapterSchemaById(id), MRsAdapterSchema.class);
+        return convertToModel(schemaService.getAdapterSchemeById(id), MRsAdapterSchema.class);
     }
 
     @RequestMapping(value = ServiceApi.Adaptions.Schemes, method = RequestMethod.GET)
@@ -102,7 +102,7 @@ public class RsAdapterSchemeEndPoint extends EnvelopRestEndPoint {
 
         //过滤条件为空
         if (StringUtils.isEmpty(filters)) {
-            Page<RsAdapterScheme> metadataPage = schemaService.getAdapterSchema(sorts, reducePage(page), size);
+            Page<RsAdapterScheme> metadataPage = schemaService.getAdapterScheme(sorts, reducePage(page), size);
             total = metadataPage.getTotalElements();
             metaList = convertToModels(metadataPage.getContent(), new ArrayList<>(metadataPage.getNumber()), MRsAdapterSchema.class, fields);
         } else {

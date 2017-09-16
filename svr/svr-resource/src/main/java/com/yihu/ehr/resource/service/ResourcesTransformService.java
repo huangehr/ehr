@@ -70,11 +70,11 @@ public class ResourcesTransformService {
 
             if(StringUtils.isBlank(dataset))
             {
-                metadataList = adapterMetadataDao.findBySchema(schemeList.get(0).getId());
+                metadataList = adapterMetadataDao.findByScheme(schemeList.get(0).getId());
             }
             else
             {
-                metadataList = adapterMetadataDao.findBySchemaIdAndSrcDatasetCode(schemeList.get(0).getId(),dataset);
+                metadataList = adapterMetadataDao.findBySchemeIdAndSrcDatasetCode(schemeList.get(0).getId(),dataset);
             }
 
             if(metadataList != null && metadataList.size() > 0)
