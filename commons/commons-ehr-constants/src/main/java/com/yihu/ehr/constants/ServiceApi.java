@@ -48,6 +48,7 @@ public class ServiceApi {
         public static final String ResourceBrowseCategories = "/resources/ResourceBrowses/categories";
         public static final String ResourceBrowseResourceData = "/resources/ResourceBrowses/getResourceData";
         public static final String ResourceBrowseQuotaResourceData = "/resources/ResourceBrowses/getQuotaResourceData";
+        public static final String ResourceBrowseQuotaResourceParam = "/resources/ResourceBrowses/getQuotaResourceParam";
         public static final String ResourceBrowseResourceMetadata = "/resources/ResourceBrowses/getResourceMetadata";
         public static final String ResourceBrowseTree = "/resourceBrowseTree";
         public static final String ResourceBrowseGetRsByCategoryId = "/getResourceByCategoryId";
@@ -147,6 +148,7 @@ public class ServiceApi {
         public static final String IntMetadataData = "/resources/integrated/metadata_data";
         public static final String IntQuotaList = "/resources/integrated/quota_list";
         public static final String IntQuotaData = "/resources/integrated/quota_data";
+        public static final String IntQuotaParam = "/resources/integrated/quota_param";
         public static final String IntResourceUpdate = "/resources/integrated/resource_update";
         public static final String IntResourceQueryUpdate = "/resources/integrated/resource_query_update";
 

@@ -30,7 +30,7 @@ public interface TjQuotaSynthesizeQueryClient {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaSynthesiseDimensionKeyVal, method = RequestMethod.GET)
     @ApiOperation(value = "查询多个指标交集维度的字典项")
-    public  Map<String,Map<String,String>>  getTjQuotaSynthesiseDimensionKeyVal(
+    Map<String, List<String>>  getTjQuotaSynthesiseDimensionKeyVal(
             @ApiParam(name = "quotaCode", value = "指标code多个指标其中一个")
             @RequestParam(value = "quotaCode") String quotaCode,
             @ApiParam(name = "dimensions", value = "维度编码，多个维度用英文,分开")
