@@ -36,7 +36,7 @@ public class TjDimensionSlaveService extends BaseJpaService<TjDimensionSlave, XT
         return tjDimensionSlave;
     }
 
-    public TjDimensionSlave getTjDimensionMainByCode(String quotaCode) {
+    public TjDimensionSlave getTjDimensionSlaveByCode(String quotaCode) {
         List<TjDimensionSlave>  dimensionSlaves = tjDimensionSlaveRepository.findByCode(quotaCode);
         if(dimensionSlaves!=null && dimensionSlaves.size()>0){
             return dimensionSlaves.get(0);

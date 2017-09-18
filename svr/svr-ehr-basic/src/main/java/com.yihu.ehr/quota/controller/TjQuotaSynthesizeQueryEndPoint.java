@@ -14,6 +14,7 @@ import com.yihu.ehr.quota.service.TjQuotaDimensionSlaveService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -73,7 +74,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
             int slave = 1;
             for(TjQuotaDimensionSlave tjQuotaDimensionSlave : tjQuotaDimensionSlaves){
-                TjDimensionSlave  tjDimensionSlave =  tjDimensionSlaveService.getTjDimensionMainByCode(tjQuotaDimensionSlave.getSlaveCode());
+                TjDimensionSlave  tjDimensionSlave =  tjDimensionSlaveService.getTjDimensionSlaveByCode(tjQuotaDimensionSlave.getSlaveCode());
                 if(tjDimensionSlave != null){
                     map.put(tjDimensionSlave.getCode(), tjDimensionSlave.getName()+"-slaveKey" + slave);//第几个维度
                 }
@@ -140,7 +141,7 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaSynthesiseDimensionKeyVal, method = RequestMethod.GET)
     @ApiOperation(value = "查询多个指标交集维度的字典项")
-    public  Map<String, List<String>>  getTjQuotaSynthesiseDimensionKeyVal(
+    public  Map<String, Map<String, Object>>  getTjQuotaSynthesiseDimensionKeyVal(
             @ApiParam(name = "quotaCode", value = "指标code多个指标其中一个")
             @RequestParam(value = "quotaCode") String quotaCode,
             @ApiParam(name = "dimensions", value = "维度编码，多个维度用英文,分开")
@@ -149,25 +150,28 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
         List<TjQuotaDimensionMain> tjQuotaDimensionMains = null;
         List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = null;
         String [] dimensionArr = dimensions.split(",");
-        //Map<String, Map<String,String>> resultMap = new HashedMap();
-        Map<String, List<String>> resultMap = new HashMap<String, List<String>>();
+
+        Map<String, Map<String, Object>> resultMap = new HashMap<String, Map<String, Object>>();
         tjQuotaDimensionMains = tjQuotaDimensionMainService.getTjQuotaDimensionMainByCode(quotaCode);
         if(tjQuotaDimensionMains != null){
             for(TjQuotaDimensionMain tjQuotaDimensionMain : tjQuotaDimensionMains){
                 for(int i=0 ;i < dimensionArr.length ; i++){
                     if(dimensionArr[i].equals(tjQuotaDimensionMain.getMainCode())){
-                        //Map<String, String> map = new HashedMap();
+                        Map<String, Object> map = new HashedMap();
                         List<String> list = new ArrayList<String>();
+                        TjDimensionMain tjDimensionMain = tjDimensionMainService.getTjDimensionMainByCode(tjQuotaDimensionMain.getMainCode());
                         //查询字典数据
                         List<SaveModel> dictData = jdbcTemplate.query(tjQuotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
                         if(dictData != null ){
                             for(SaveModel saveModel :dictData){
                                 String name = getFieldValueByName(tjQuotaDimensionMain.getMainCode()+"Name",saveModel).toString();
-                                //String val = getFieldValueByName(tjQuotaDimensionMain.getMainCode(),saveModel).toString();
-                                //map.put(name,val);
+//                                String val = getFieldValueByName(tjQuotaDimensionMain.getMainCode(),saveModel).toString();
                                 list.add(name);
                             }
-                            resultMap.put(tjQuotaDimensionMain.getMainCode()+"Name", list);
+                            map.put("key",tjQuotaDimensionMain.getMainCode()+"Name");
+                            map.put("name",tjDimensionMain.getName());
+                            map.put("value",list);
+                            resultMap.put(tjQuotaDimensionMain.getMainCode(), map);
                         }
                     }
                 }
@@ -179,9 +183,11 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
             for(int i=0 ;i < dimensionArr.length ; i++){
                 String slave = "slaveKey1,slaveKey2,slaveKey3";
                 if( slave.contains(dimensionArr[i]) ){
-                    //Map<String, String> map = new HashedMap();
+                    Map<String, Object> map = new HashedMap();
                     List<String> list = new ArrayList<String>();
                     int num = Integer.valueOf(dimensionArr[i].substring(dimensionArr[i].length() - 1, dimensionArr[i].length()));
+                    TjDimensionSlave tjDimensionSlave = tjDimensionSlaveService.getTjDimensionSlaveByCode(tjQuotaDimensionSlaves.get(num - 1).getSlaveCode());
+
                     //查询字典数据
                     List<DictModel> dictDataList = jdbcTemplate.query(tjQuotaDimensionSlaves.get(num-1).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
                     if(dictDataList != null ){
@@ -190,7 +196,10 @@ public class TjQuotaSynthesizeQueryEndPoint extends EnvelopRestEndPoint {
                             //String val = getFieldValueByName("code",dictModel).toString();
                             list.add(name);
                         }
-                        resultMap.put(dimensionArr[i]+"Name", list);
+                        map.put("key",dimensionArr[i]+"Name");
+                        map.put("name",tjDimensionSlave.getName());
+                        map.put("value",list);
+                        resultMap.put(dimensionArr[i], map);
                     }
                 }
             }
