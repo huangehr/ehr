@@ -345,7 +345,7 @@ public class ResourceBrowseController extends BaseController {
                 }
             }
         }
-        Map<String, List<String>> dataMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(quotaCodeArr[0], dimensions);
+        Map<String, Map<String, Object>> dataMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(quotaCodeArr[0], dimensions);
         if (dataMap != null) {
             envelop.setSuccessFlg(true);
             envelop.setObj(dataMap);
