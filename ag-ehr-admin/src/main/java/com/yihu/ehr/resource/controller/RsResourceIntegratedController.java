@@ -191,6 +191,36 @@ public class RsResourceIntegratedController extends BaseController {
         return envelop;
     }
 
+    @ApiOperation("综合查询指标统计数据检索条件获取")
+    @RequestMapping(value = ServiceApi.Resources.IntQuotaParam, method = RequestMethod.GET)
+    public Envelop getStatisticsParam(
+            @ApiParam(name = "quotaCodes", value = "指标code列表(code1,code2,code3,...)")
+            @RequestParam(value = "quotaCodes") String quotaCodes){
+        Envelop envelop = new Envelop();
+        String dimensions = "";
+        List<Map<String, String>> qsdList = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodes);
+        if(qsdList == null || qsdList.size() <= 0) {
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        for(Map<String, String> temp : qsdList) {
+            for(String codeStr : temp.keySet()){
+                if(quotaCodes.contains(codeStr)) {
+                    //交集维度参数
+                    dimensions += temp.get(codeStr) + ",";
+                    break;
+                }
+            }
+        }
+        String quotaCode = quotaCodes.split(",")[0];
+        Map<String, List<String>> dataMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(quotaCode, dimensions);
+        if (dataMap != null) {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(dataMap);
+        }
+        return envelop;
+    }
+
     @ApiOperation("综合查询视图保存")
     @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
     public Envelop updateResource(

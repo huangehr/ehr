@@ -160,6 +160,10 @@ public class ResourceBrowseController extends BaseController {
         try {
             //获取资源关联指标
             List<ResourceQuotaModel> rqmList = resourceQuotaClient.getByResourceId(resourcesId);
+            if(rqmList == null || rqmList.size() <= 0) {
+                envelop.setErrorMsg("关联指标为空");
+                return envelop;
+            }
             //获取资源默认查询条件
             String query = rsResourceDefaultQueryClient.getByResourceId(resourcesId);
             //拼接指标code字符串作为维度交集查询参数
@@ -170,16 +174,12 @@ public class ResourceBrowseController extends BaseController {
                 ResourceQuotaModel resourceQuotaModel = rqmList.get(i);
                 MTjQuotaModel tjQuotaModel = tjQuotaClient.getById((long) resourceQuotaModel.getQuotaId());
                 quotaCodeArr[i] = tjQuotaModel.getCode();
-                Map<String, String> objMap = new HashMap<String, String>();
-                objMap.put("key", tjQuotaModel.getCode());
-                objMap.put("name", tjQuotaModel.getName());
-                objList.add(objMap);
                 quotaCodes += tjQuotaModel.getCode() + ",";
             }
             //拼接交集维度字符串作为查询参数
             String dimension = "";
             if(StringUtils.isEmpty(quotaCodes)) {
-                envelop.setErrorMsg("交集维度为空");
+                envelop.setErrorMsg("指标编码有误");
                 return envelop;
             }
             List<Map<String, String>> qsdList = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
@@ -200,6 +200,14 @@ public class ResourceBrowseController extends BaseController {
                         break;
                     }
                 }
+            }
+            for (int i = 0; i< rqmList.size(); i ++) {
+                ResourceQuotaModel resourceQuotaModel = rqmList.get(i);
+                MTjQuotaModel tjQuotaModel = tjQuotaClient.getById((long) resourceQuotaModel.getQuotaId());
+                Map<String, String> objMap = new HashMap<String, String>();
+                objMap.put("key", tjQuotaModel.getCode());
+                objMap.put("name", tjQuotaModel.getName());
+                objList.add(objMap);
             }
             //依次获取指标统计不同维度结果总量
             List<Envelop> envelopList = new ArrayList<Envelop>();
@@ -290,6 +298,57 @@ public class ResourceBrowseController extends BaseController {
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
+    @ApiOperation("指标资源浏览数据检索条件获取")
+    @RequestMapping(value = ServiceApi.Resources.ResourceBrowseQuotaResourceParam, method = RequestMethod.GET)
+    public Envelop getStatisticsParam(
+            @ApiParam("资源Id")
+            @RequestParam String resourcesId){
+        Envelop envelop = new Envelop();
+        String [] quotaCodeArr = null;
+        //获取资源关联指标
+        List<ResourceQuotaModel> rqmList = resourceQuotaClient.getByResourceId(resourcesId);
+        if(rqmList == null || rqmList.size() <= 0) {
+            envelop.setErrorMsg("关联指标为空");
+            return envelop;
+        }
+        //拼接指标code字符串作为维度交集查询参数
+        String quotaCodes = "";
+        quotaCodeArr = new String [rqmList.size()];
+        List<Map<String, String>> objList = new ArrayList<Map<String, String>>();
+        for (int i = 0; i< rqmList.size(); i ++) {
+            ResourceQuotaModel resourceQuotaModel = rqmList.get(i);
+            MTjQuotaModel tjQuotaModel = tjQuotaClient.getById((long) resourceQuotaModel.getQuotaId());
+            quotaCodeArr[i] = tjQuotaModel.getCode();
+            quotaCodes += tjQuotaModel.getCode() + ",";
+        }
+        //拼接交集维度字符串作为查询参数
+        String dimensions = "";
+        if(StringUtils.isEmpty(quotaCodes)) {
+            envelop.setErrorMsg("指标编码有误");
+            return envelop;
+        }
+        List<Map<String, String>> qsdList = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
+        if(qsdList == null || qsdList.size() <= 0) {
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        for(Map<String, String> temp : qsdList) {
+            for(String codeStr : temp.keySet()){
+                if(quotaCodes.contains(codeStr)) {
+                    //交集维度参数
+                    dimensions += temp.get(codeStr) + ",";
+                    break;
+                }
+            }
+        }
+        Map<String, List<String>> dataMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(quotaCodeArr[0], dimensions);
+        if (dataMap != null) {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(dataMap);
         }
         return envelop;
     }
