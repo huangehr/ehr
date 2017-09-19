@@ -7,10 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -31,7 +28,7 @@ public class FileResourceController {
     @ApiOperation(value = "资源文件上传")
     public String pictureUpload(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestParam(name = "file_str") String fileStr,
+            @RequestParam(value = "file_str") String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name",required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
@@ -43,7 +40,7 @@ public class FileResourceController {
     @ApiOperation(value = "资源文件上传")
     public String pictureUploadReturnUrl(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestParam(name = "file_str") String fileStr,
+            @RequestParam(value = "file_str") String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name",required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
@@ -55,7 +52,7 @@ public class FileResourceController {
     @ApiOperation(value = "资源文件上传返回完整的http Url")
     public String pictureUploadReturnHttpUrl(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestParam(name = "file_str") String fileStr,
+            @RequestParam(value = "file_str") String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name",required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
@@ -79,7 +76,6 @@ public class FileResourceController {
         return fileResourceClient.filesDeleteByPath(storagePath);
     }
 
-
     @RequestMapping(value = "/files", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
     public Envelop fileDownload(
@@ -91,8 +87,8 @@ public class FileResourceController {
         Envelop envelop = new Envelop();
         envelop.setDetailModelList(filesStr);
         return envelop;
-//        return filesStr;
     }
+
     @RequestMapping(value = "/image_view", method = RequestMethod.GET)
     @ApiOperation(value = "查看图片")
     public String imageView( @ApiParam(value = "查看图片") @RequestParam(value = "storagePath") String storagePath) throws Exception {

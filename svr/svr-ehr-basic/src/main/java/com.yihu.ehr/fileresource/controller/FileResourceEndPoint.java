@@ -50,11 +50,11 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/files_upload", method = RequestMethod.POST)
     @ApiOperation(value = "上传文件", notes = "图片上传")
     public String fileUpload(
-            @ApiParam(name = "file_str", value = "文件字符串")
-            @RequestParam(name = "file_str")  String fileStr,
-            @ApiParam(name = "file_name", value = "文件名")
+            @ApiParam(name = "file_str", value = "文件字符串", required = true)
+            @RequestParam(value = "file_str") String fileStr,
+            @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
-            @ApiParam(name = "json_data", value = "文件资源属性")
+            @ApiParam(name = "json_data", value = "文件资源属性", required = true)
             @RequestParam(value = "json_data") String jsonData) throws Exception {
         FileResource fileResource = toEntity(jsonData, FileResource.class);
         fileResource.setId(getObjectId(BizObject.FileResource));
@@ -75,11 +75,11 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/files_upload_returnUrl", method = RequestMethod.POST)
     @ApiOperation(value = "上传文件", notes = "上传文件返回url")
     public String fileUploadReturnUrl(
-            @ApiParam(name = "file_str", value = "文件字符串")
-            @RequestBody String fileStr,
-            @ApiParam(name = "file_name", value = "文件名")
+            @ApiParam(name = "file_str", value = "文件字符串", required = true)
+            @RequestParam(value = "file_str") String fileStr,
+            @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
-            @ApiParam(name = "json_data", value = "文件资源属性")
+            @ApiParam(name = "json_data", value = "文件资源属性", required = true)
             @RequestParam(value = "json_data") String jsonData) throws Exception {
         FileResource fileResource = toEntity(jsonData, FileResource.class);
         fileResource.setId(getObjectId(BizObject.FileResource));
@@ -99,11 +99,11 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/files_upload_returnHttpUrl", method = RequestMethod.POST)
     @ApiOperation(value = "上传文件", notes = "上传文件返回url")
     public String fileUploadReturnHttpUrl(
-            @ApiParam(name = "file_str", value = "文件字符串")
-            @RequestBody String fileStr,
-            @ApiParam(name = "file_name", value = "文件名")
+            @ApiParam(name = "file_str", value = "文件字符串", required = true)
+            @RequestParam(value = "file_str") String fileStr,
+            @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
-            @ApiParam(name = "json_data", value = "文件资源属性")
+            @ApiParam(name = "json_data", value = "文件资源属性", required = true)
             @RequestParam(value = "json_data") String jsonData) throws Exception {
         FileResource fileResource = toEntity(jsonData, FileResource.class);
         fileResource.setId(getObjectId(BizObject.FileResource));
@@ -120,7 +120,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/files", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源表对应关系，并且删除fastdfs相对应文件")
     public boolean filesDelete(
-            @ApiParam(name = "object_id", value = "文件字符串")
+            @ApiParam(name = "object_id", value = "文件字符串", required = true)
             @RequestParam(value = "object_id") String objectId) throws Exception {
         List<FileResource> fileResources = fileResourceManager.findByObjectId(objectId);
         return fileResourceManager.deleteFileResource(fileResources);
@@ -136,7 +136,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/image_delete", method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源表对应关系，并且删除fastdfs相对应文件")
     public boolean filesDeleteByPath(
-            @ApiParam(name = "storagePath", value = "文件路径")
+            @ApiParam(name = "storagePath", value = "文件路径", required = true)
             @RequestParam(value = "storagePath") String storagePath) throws Exception {
         String s = java.net.URLDecoder.decode(storagePath, "UTF-8");
         List<FileResource> fileResources = fileResourceManager.findByStoragePath(s);
@@ -153,9 +153,9 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/files_download", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
     public List<String> filesDownload(
-            @ApiParam(name = "object_id", value = "文件字符串")
+            @ApiParam(name = "object_id", value = "文件字符串", required = true)
             @RequestParam(value = "object_id") String objectId,
-            @ApiParam(name = "mime", value = "所有者")
+            @ApiParam(name = "mime", value = "所有者", required = true)
             @RequestParam(value = "mime", required = false) String mime) throws Exception {
         List<FileResource> fileResources;
         if(StringUtils.isEmpty(mime))
@@ -185,7 +185,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/files_path", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件路径")
     public List<String> getFilePath(
-            @ApiParam(name = "object_id", value = "文件字符串")
+            @ApiParam(name = "object_id", value = "文件字符串", required = true)
             @RequestParam(value = "object_id") String objectId) throws Exception {
         List<FileResource> fileResources = fileResourceManager.findByObjectId(objectId);
         List<String> filesStrs = new ArrayList<>();
@@ -206,8 +206,8 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = "/image_view", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件")
     public String imageView(
-            @ApiParam(name = "storagePath", value = "文件路径", defaultValue = "")
-         @RequestParam(value = "storagePath") String storagePath)throws Exception{
+            @ApiParam(name = "storagePath", value = "文件路径", required = true)
+            @RequestParam(value = "storagePath") String storagePath)throws Exception{
         String s = java.net.URLDecoder.decode(storagePath, "UTF-8");
         String groupName = s.split(":")[0];
         String remoteFileName = s.split(":")[1];
@@ -219,7 +219,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据文件ID，获取文件的真实访问路径")
     @RequestMapping(value = "/file/getRealPathById", method = RequestMethod.GET)
     public String getRealPathById(
-            @ApiParam(name = "fileId", value = "文件ID")
+            @ApiParam(name = "fileId", value = "文件ID", required = true)
             @RequestParam(value = "fileId") String fileId) throws Exception {
         String s = java.net.URLDecoder.decode(fileId, "UTF-8");
         String path=fileResourceManager.getStoragePathById(s);
@@ -231,7 +231,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据文件的存储路径，获取文件的真实访问路径")
     @RequestMapping(value = "/file/getRealPathByStoragePath", method = RequestMethod.GET)
     public String getRealPathByStoragePath(
-            @ApiParam(name = "storagePath", value = "文件存储路径")
+            @ApiParam(name = "storagePath", value = "文件存储路径", required = true)
             @RequestParam(value = "storagePath") String storagePath) throws Exception {
         String realPath= fastDfsPublicServers + "/" + storagePath.replace(":", "/");
         return realPath;
