@@ -14,10 +14,12 @@ import java.util.*;
  */
 
 public class MApp implements Serializable {
+
     private String id;
     private String name;
     private String secret;
     private String url;
+    private String outUrl;
     private String creator;
     private String auditor;
     private Date createTime;
@@ -29,42 +31,10 @@ public class MApp implements Serializable {
     private String org;
     private String code;
     private int sourceType;
-//    应用图标及在线状态
+    //应用图标及在线状态
     private String icon;
     private int releaseFlag;
-//    应用图标及在线状态setter、getter
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public int getReleaseFlag() {
-        return releaseFlag;
-    }
-
-    public void setReleaseFlag(int releaseFlag) {
-        this.releaseFlag = releaseFlag;
-    }
-
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public int getSourceType() {
-        return sourceType;
-    }
-
-    public void setSourceType(int sourceType) {
-        this.sourceType = sourceType;
-    }
+    //应用图标及在线状态setter、getter
 
     public MApp(){
     }
@@ -72,15 +42,41 @@ public class MApp implements Serializable {
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public int getReleaseFlag() {
+        return releaseFlag;
+    }
+    public void setReleaseFlag(int releaseFlag) {
+        this.releaseFlag = releaseFlag;
+    }
+
+    public String getCode() {
+        return code;
+    }
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public int getSourceType() {
+        return sourceType;
+    }
+    public void setSourceType(int sourceType) {
+        this.sourceType = sourceType;
     }
 
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -88,7 +84,6 @@ public class MApp implements Serializable {
     public String getSecret() {
         return secret;
     }
-
     public void setSecret(String secret) {
         this.secret = secret;
     }
@@ -96,15 +91,20 @@ public class MApp implements Serializable {
     public String getUrl() {
         return url;
     }
-
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getOutUrl() {
+        return outUrl;
+    }
+    public void setOutUrl(String outUrl) {
+        this.outUrl = outUrl;
     }
 
     public String getCreator() {
         return creator;
     }
-
     public void setCreator(String creator) {
         this.creator = creator;
     }
@@ -112,7 +112,6 @@ public class MApp implements Serializable {
     public String getAuditor() {
         return auditor;
     }
-
     public void setAuditor(String auditor) {
         this.auditor = auditor;
     }
@@ -120,7 +119,6 @@ public class MApp implements Serializable {
     public Date getCreateTime() {
         return createTime;
     }
-
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
@@ -128,7 +126,6 @@ public class MApp implements Serializable {
     public Date getAuditTime() {
         return auditTime;
     }
-
     public void setAuditTime(Date auditTime) {
         this.auditTime = auditTime;
     }
@@ -136,7 +133,6 @@ public class MApp implements Serializable {
     public String getCatalog() {
         return catalog;
     }
-
     public void setCatalog(String catalog) {
         this.catalog = catalog;
     }
@@ -144,7 +140,6 @@ public class MApp implements Serializable {
     public String getStatus() {
         return status;
     }
-
     public void setStatus(String status) {
         this.status = status;
     }
@@ -152,7 +147,6 @@ public class MApp implements Serializable {
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -177,7 +171,6 @@ public class MApp implements Serializable {
     public String getOrg() {
         return org;
     }
-
     public void setOrg(String org) {
         this.org = org;
     }
