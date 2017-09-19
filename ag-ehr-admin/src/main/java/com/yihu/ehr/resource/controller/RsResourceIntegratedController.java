@@ -213,7 +213,7 @@ public class RsResourceIntegratedController extends BaseController {
             }
         }
         String quotaCode = quotaCodes.split(",")[0];
-        Map<String, List<String>> dataMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(quotaCode, dimensions);
+        Map<String, Map<String, Object>> dataMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(quotaCode, dimensions);
         if (dataMap != null) {
             envelop.setSuccessFlg(true);
             envelop.setObj(dataMap);

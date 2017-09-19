@@ -1019,7 +1019,9 @@ public class ServiceApi {
         public static final String getStatisticsCityDoctorByRoleType = "/tj/getStatisticsCityDoctorByRoleType";
     }
 
-
+    public static class Org {
+        public static final String getUserOrglistByUserId="/org/getUserOrglistByUserId/";
+    }
 
 
 }

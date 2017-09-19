@@ -118,7 +118,7 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
     {
         String sql =
                 "SELECT * FROM (" +
-                        "SELECT b.id, b.name as name, b.secret as secret, b.url as url, b.creator as creator," +
+                        "SELECT b.id, b.name as name, b.secret as secret, b.url as url, b.out_url as outUrl, b.creator as creator," +
                         "b.auditor as auditor, b.create_time as createTime, b.audit_time as auditTime , b.catalog as catalog, b.status as status, " +
                         "b.description as description, b.org as org, b.code as code," +
                         " b.source_type as sourceType, b.release_flag as releaseFlag" +

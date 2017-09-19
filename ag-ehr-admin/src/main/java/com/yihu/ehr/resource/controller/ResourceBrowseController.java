@@ -174,10 +174,6 @@ public class ResourceBrowseController extends BaseController {
                 ResourceQuotaModel resourceQuotaModel = rqmList.get(i);
                 MTjQuotaModel tjQuotaModel = tjQuotaClient.getById((long) resourceQuotaModel.getQuotaId());
                 quotaCodeArr[i] = tjQuotaModel.getCode();
-                Map<String, String> objMap = new HashMap<String, String>();
-                objMap.put("key", tjQuotaModel.getCode());
-                objMap.put("name", tjQuotaModel.getName());
-                objList.add(objMap);
                 quotaCodes += tjQuotaModel.getCode() + ",";
             }
             //拼接交集维度字符串作为查询参数
@@ -204,6 +200,14 @@ public class ResourceBrowseController extends BaseController {
                         break;
                     }
                 }
+            }
+            for (int i = 0; i< rqmList.size(); i ++) {
+                ResourceQuotaModel resourceQuotaModel = rqmList.get(i);
+                MTjQuotaModel tjQuotaModel = tjQuotaClient.getById((long) resourceQuotaModel.getQuotaId());
+                Map<String, String> objMap = new HashMap<String, String>();
+                objMap.put("key", tjQuotaModel.getCode());
+                objMap.put("name", tjQuotaModel.getName());
+                objList.add(objMap);
             }
             //依次获取指标统计不同维度结果总量
             List<Envelop> envelopList = new ArrayList<Envelop>();
@@ -341,7 +345,7 @@ public class ResourceBrowseController extends BaseController {
                 }
             }
         }
-        Map<String, List<String>> dataMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(quotaCodeArr[0], dimensions);
+        Map<String, Map<String, Object>> dataMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(quotaCodeArr[0], dimensions);
         if (dataMap != null) {
             envelop.setSuccessFlg(true);
             envelop.setObj(dataMap);

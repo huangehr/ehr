@@ -1,10 +1,10 @@
 package com.yihu.ehr.organization.controller;
 
-import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.org.OrgDeptDetailModel;
 import com.yihu.ehr.agModel.org.OrgDeptMemberModel;
 import com.yihu.ehr.agModel.org.OrgDeptModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrgDept;
@@ -635,6 +635,24 @@ public class OrgDeptController  extends BaseController {
         {
             ex.printStackTrace();
             return false;
+        }
+    }
+
+    @ApiOperation(value = "根据用户ＩＤ获取部门列表")
+    @RequestMapping(value = ServiceApi.Org.getUserOrglistByUserId, method = RequestMethod.GET)
+    public Envelop getUserOrglistByUserId(
+            @ApiParam(name = "userId", value = "用户ID", defaultValue = "")
+            @RequestParam(value = "userId") String userId) {
+        try {
+            Envelop envelop = new Envelop();
+            envelop.setDetailModelList(orgDeptClient.getUserOrglistByUserId(userId));
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
         }
     }
 
