@@ -1,20 +1,15 @@
 package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.agModel.app.AppFeatureModel;
-import com.yihu.ehr.agModel.patient.PatientModel;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geography.MGeography;
-import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.model.portal.MPortalNotice;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.RoleFeatureRelationClient;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by linz on 2016年7月8日11:30:18.
@@ -120,7 +114,7 @@ public class AppFeatureController extends BaseController {
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "model", required = false) String appFeature) {
         Envelop envelop = new Envelop();
-        MAppFeature mAppFeature = appFeatureClient.createAppFeature(appFeature);
+        MAppFeature mAppFeature = appFeatureClient.updateAppFeature(appFeature);
         AppFeatureModel appFeatureModel = new AppFeatureModel();
         if (mAppFeature == null) {
             envelop.setSuccessFlg(false);
@@ -162,12 +156,15 @@ public class AppFeatureController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
-    @ApiOperation(value = "获取过滤AppFeature列表")
+    @ApiOperation(value = "获取AppFeature排序后的列表（不分页）")
     public Envelop getAppFeatureNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "roleId", value = "角色ID")
             @RequestParam(value = "roleId", required = false) String roleId) {
-        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage(filters);
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPageSorts(filters, sorts);
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
         for (MAppFeature mAppFeature : mAppFeatures) {
@@ -195,7 +192,7 @@ public class AppFeatureController extends BaseController {
         if (!StringUtils.isEmpty(featureIds)) {
             featureIds = featureIds.substring(0, featureIds.length() - 1);
         }
-        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage("id=" + featureIds);
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPageSorts("id=" + featureIds, "+sort");
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
         for (MAppFeature mAppFeature : mAppFeatures) {

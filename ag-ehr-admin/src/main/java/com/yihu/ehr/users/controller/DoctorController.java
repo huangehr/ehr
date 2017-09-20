@@ -73,7 +73,7 @@ public class DoctorController extends BaseController {
                 doctorsModel.setSex(dict == null ? "" : dict.getValue());
             }
             if (StringUtils.isNotEmpty(mDoctor.getRoleType())) {
-                MConventionalDict dict = conventionalDictClient.getUserType(mDoctor.getRoleType());
+                MConventionalDict dict = conventionalDictClient.getMedicalRole(mDoctor.getRoleType());
                 doctorsModel.setRoleType(dict == null ? "" : dict.getValue());
             }
             doctorsModels.add(doctorsModel);

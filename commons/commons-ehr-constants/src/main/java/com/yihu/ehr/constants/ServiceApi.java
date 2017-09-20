@@ -322,6 +322,7 @@ public class ServiceApi {
         public static final String AppFeatures = "/appFeature";
         public static final String FilterFeatureList = "/filterFeatureList";
         public static final String FilterFeatureNoPage = "/filterFeatureNoPage";
+        public static final String FilterFeatureNoPageSorts = "/filterFeatureNoPageSorts";
         public static final String AppFeature = "/appFeature/{id}";
     }
 
@@ -1019,7 +1020,9 @@ public class ServiceApi {
         public static final String getStatisticsCityDoctorByRoleType = "/tj/getStatisticsCityDoctorByRoleType";
     }
 
-
+    public static class Org {
+        public static final String getUserOrglistByUserId="/org/getUserOrglistByUserId/";
+    }
 
 
 }

@@ -3,6 +3,7 @@ package com.yihu.ehr.org.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.org.dao.XOrgDeptDetailRepository;
 import com.yihu.ehr.org.dao.XOrgDeptRepository;
+import com.yihu.ehr.org.dao.XOrgMemberRelationRepository;
 import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.model.OrgDeptDetail;
 import com.yihu.ehr.query.BaseJpaService;
@@ -36,6 +37,9 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
 
     @Autowired
     protected ObjectMapper objectMapper;
+
+    @Autowired
+    protected XOrgMemberRelationRepository orgMemberRelationRepository;
 
     public OrgDept searchBydeptId(Integer deptId) {
         return orgDeptRepository.findOne(deptId);
@@ -243,6 +247,10 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
         }else {
             return 0;
         }
+    }
+
+    public List<String> searchByUserId(String userId) {
+        return orgMemberRelationRepository.searchByUserId(userId);
     }
 
 }

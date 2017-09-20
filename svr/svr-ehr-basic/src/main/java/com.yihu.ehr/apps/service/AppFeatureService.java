@@ -1,5 +1,7 @@
 package com.yihu.ehr.apps.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.apps.model.AppFeature;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author linz
@@ -42,4 +47,25 @@ public class AppFeatureService extends BaseJpaService<AppFeature, XAppApiFeature
     public void  deleteAppFeature(String id){
         xAppFeatureRepository.delete(id);
     }
+
+    /**
+     * 生成菜单JSON对象字符串
+     * @return AppFeature
+     */
+    public AppFeature joinMenuItemJsonStr(AppFeature appFeature) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> contentMap = new HashMap<>();
+        contentMap.put("id", appFeature.getId());
+        contentMap.put("level", appFeature.getLevel());
+        contentMap.put("text", appFeature.getName());
+        if (!"1".equals(appFeature.getLevel())) {
+            contentMap.put("pid", appFeature.getParentId());
+        }
+        if (appFeature.getUrl().startsWith("/")) {
+            contentMap.put("url", "${contextRoot}" + appFeature.getUrl());
+        }
+        appFeature.setContent(objectMapper.writeValueAsString(contentMap));
+        return appFeature;
+    }
+
 }

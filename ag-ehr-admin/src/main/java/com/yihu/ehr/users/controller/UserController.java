@@ -763,7 +763,7 @@ public class UserController extends BaseController {
             return success(null);
         }
         featureIds = featureIds.substring(0, featureIds.length() - 1);
-        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage("id=" + featureIds);
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPageSorts("id=" + featureIds, "+sort");
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
         for (MAppFeature mAppFeature : mAppFeatures) {
