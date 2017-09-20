@@ -1,18 +1,22 @@
 package com.yihu.ehr.resource.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MChartInfoModel;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.model.resource.MRsInterface;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.model.tj.MQuotaConfigModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
@@ -20,6 +24,7 @@ import com.yihu.ehr.resource.client.RsResourceQuotaClient;
 import com.yihu.ehr.resource.client.RsResourceCategoryClient;
 import com.yihu.ehr.resource.client.RsResourceClient;
 import com.yihu.ehr.resource.client.RsInterfaceClient;
+import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,9 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author linaz
@@ -55,6 +59,12 @@ public class RsResourceController extends BaseController {
     private TjQuotaChartClient tjQuotaChartClient;
     @Autowired
     private TjQuotaJobClient tjQuotaJobClient;
+    @Autowired
+    private GetInfoClient getInfoClient;
+    @Autowired
+    private AddressClient addressClient;
+    @Autowired
+    OrganizationClient organizationClient;
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST)
@@ -321,15 +331,66 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "resourceId") String resourceId,
             @ApiParam(name = "quotaId", value = "上卷下钻的指标ID", defaultValue = "")
             @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "userId" ,value = "用户ID" )
+            @RequestParam(value = "userId" , required = false) String userId,
             @ApiParam(name = "quotaFilter", value = "指标查询过滤条件", defaultValue = "")
             @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension) throws JsonProcessingException {
+            @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
         if(list!=null && list.size() > 0){
             for (ResourceQuotaModel m : list) {
                 if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){
+
+                    //-----------------用户数据权限 start
+                    String org = "";
+                    Map<String,String> orgMap = new HashMap<>();
+                    //获取用户所拥有的  带saaa权限
+                    List<String> orgList = getInfoClient.getOrgCode(userId);
+                    if(orgList != null && orgList.size() > 0){
+                        for(String orgcode : orgList){
+                            orgMap.put(orgcode,orgcode);
+                        }
+                    }
+                    //获取用户所拥有的区域   带saaa权限
+                    Map<String,String> param = new HashMap<>();
+                    List<String> districtList = getInfoClient.getUserDistrictCode(userId);
+                    if(districtList != null && districtList.size() > 0){
+                        for(String code : districtList){
+                            MGeographyDict mGeographyDict = addressClient.getAddressDictById(code);
+                            if(mGeographyDict != null){
+                                String province = "";
+                                String city = "";
+                                String district = "";
+                                if(mGeographyDict.getLevel() == 1){
+                                    province =  mGeographyDict.getName();
+                                }else if(mGeographyDict.getLevel() == 2){
+                                    city =  mGeographyDict.getName();
+                                }else if(mGeographyDict.getLevel() == 3){
+                                    district =  mGeographyDict.getName();
+                                }
+                                Collection<MOrganization> organizations = organizationClient.getOrgsByAddress(province,city ,district );
+                                java.util.Iterator it = organizations.iterator();
+                                while(it.hasNext()){
+                                    MOrganization mOrganization = (MOrganization)it.next();
+                                    orgMap.put(mOrganization.getCode(),mOrganization.getCode());
+                                }
+                            }
+                        }
+                    }
+                    if(orgMap != null){
+                        for(String key :orgMap.keySet()){
+                            if(StringUtils.isNotEmpty(key))
+                                org =   org + key + ",";
+                        }
+                    }
+                    //-----------------用户数据权限 end
+                    if(org.length()>0){
+                        Map<String, Object> params  = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {});
+                        params.put("org",org.substring(0,org.length()-1));
+                        quotaFilter = objectMapper.writeValueAsString(params);
+                    }
                     MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
                     chartInfoModels.add(chartInfoModel);
                 }
