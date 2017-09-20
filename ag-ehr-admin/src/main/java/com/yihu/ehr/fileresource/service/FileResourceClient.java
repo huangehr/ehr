@@ -18,21 +18,21 @@ import java.util.List;
 public interface FileResourceClient {
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload", method = RequestMethod.POST)
-    @ApiOperation(value = "上传图片")
+    @ApiOperation(value = "上传文件")
     String fileUpload(
             @RequestParam(value = "file_str") String fileStr,
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload_returnUrl", method = RequestMethod.POST)
-    @ApiOperation(value = "上传图片")
+    @ApiOperation(value = "上传文件，并返回存储相对路径")
     String fileUploadReturnUrl(
             @RequestParam(value = "file_str") String fileStr,
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload_returnHttpUrl", method = RequestMethod.POST)
-    @ApiOperation(value = "上传图片返回整个httpUrl")
+    @ApiOperation(value = "上传文件，并返回存储绝对路径")
     String fileUploadReturnHttpUrl(
             @RequestParam(value = "file_str") String fileStr,
             @RequestParam(value = "file_name") String fileName,
@@ -54,7 +54,7 @@ public interface FileResourceClient {
     String imageView(@RequestParam(value = "storagePath") String storagePath);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_path", method = RequestMethod.GET)
-    @ApiOperation(value = "下载文件路径")
+    @ApiOperation(value = "获取文件路径")
     List<String> filesPath(
             @RequestParam(value = "object_id") String objectId);
 
