@@ -12,7 +12,7 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface XGeographyDictRepository extends PagingAndSortingRepository<GeographyDict, Integer> {
+public interface XGeographyDictRepository extends PagingAndSortingRepository<GeographyDict, Long> {
 
 
     @Query("select dict from GeographyDict dict where dict.id = :id")

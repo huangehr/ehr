@@ -196,6 +196,9 @@ public class EsResultExtract {
             QueryStringQueryBuilder termQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaCode);
             boolQueryBuilder.must(termQuotaCode);
         }
+
+        BoolQueryBuilder qbChild =  QueryBuilders.boolQuery();
+
         if( !StringUtils.isEmpty(orgName) ){
 //            TermQueryBuilder termQueryOrgName = QueryBuilders.termQuery("orgName", orgName);
             QueryStringQueryBuilder termOrgName = QueryBuilders.queryStringQuery("orgName:" + orgName);
@@ -205,16 +208,19 @@ public class EsResultExtract {
             String [] orgvals =org.split(",");
             for(int i=0;i<orgvals.length ; i++){
                 QueryStringQueryBuilder termOrg = QueryBuilders.queryStringQuery("org:" +  orgvals[i]);
-                boolQueryBuilder.mustNot(termOrg);
+                qbChild.should(termOrg);
             }
+            boolQueryBuilder.must(qbChild);
         }
         if( !StringUtils.isEmpty(slaveKey1) ){
             QueryStringQueryBuilder termSlaveKey1 = QueryBuilders.queryStringQuery("slaveKey1:" + slaveKey1);
-            boolQueryBuilder.must(termSlaveKey1);
+            qbChild.should(termSlaveKey1);
+            boolQueryBuilder.must(qbChild);
         }
         if( !StringUtils.isEmpty(slaveKey2) ){
             QueryStringQueryBuilder termSlaveKey2 = QueryBuilders.queryStringQuery("slaveKey2:" + slaveKey2);
-            boolQueryBuilder.must(termSlaveKey2);
+            qbChild.should(termSlaveKey2);
+            boolQueryBuilder.must(qbChild);
         }
         if( !StringUtils.isEmpty(province) ){
             QueryStringQueryBuilder termProvince = QueryBuilders.queryStringQuery("province:" + province);
