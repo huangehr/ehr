@@ -107,11 +107,22 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
-    @ApiOperation(value = "获取过滤App列表")
+    @ApiOperation(value = "获取AppFeature列表（不分页）")
     public Collection<MAppFeature> getAppFeatureNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List<AppFeature> appFeatureList = appFeatureService.search(filters);
+        return convertToModels(appFeatureList, new ArrayList<>(appFeatureList.size()), MAppFeature.class, "");
+    }
+
+    @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPageSorts, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppFeature排序后的列表（不分页）")
+    public Collection<MAppFeature> getAppFeatureNoPageSorts(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts) throws Exception {
+        List<AppFeature> appFeatureList = appFeatureService.search(filters, sorts);
         return convertToModels(appFeatureList, new ArrayList<>(appFeatureList.size()), MAppFeature.class, "");
     }
 }

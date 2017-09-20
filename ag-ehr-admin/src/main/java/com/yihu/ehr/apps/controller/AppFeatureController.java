@@ -156,12 +156,15 @@ public class AppFeatureController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
-    @ApiOperation(value = "获取过滤AppFeature列表")
+    @ApiOperation(value = "获取AppFeature排序后的列表（不分页）")
     public Envelop getAppFeatureNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "roleId", value = "角色ID")
             @RequestParam(value = "roleId", required = false) String roleId) {
-        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage(filters);
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPageSorts(filters, sorts);
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
         for (MAppFeature mAppFeature : mAppFeatures) {
@@ -189,7 +192,7 @@ public class AppFeatureController extends BaseController {
         if (!StringUtils.isEmpty(featureIds)) {
             featureIds = featureIds.substring(0, featureIds.length() - 1);
         }
-        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage("id=" + featureIds);
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPageSorts("id=" + featureIds, "+sort");
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
         for (MAppFeature mAppFeature : mAppFeatures) {
