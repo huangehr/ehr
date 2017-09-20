@@ -2,12 +2,16 @@ package com.yihu.ehr.fileresource.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -45,7 +49,15 @@ public class FileResourceController {
             @RequestParam(value = "file_name", required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
             @RequestParam(value = "json_data", required = false) String jsonData, HttpServletRequest request) {
-        return fileResourceClient.fileUploadReturnUrl(fileStr, fileName, jsonData);
+        String result = "";
+        try {
+            LogService.getLogger(FileResourceController.class).info("zjj-pictureUploadReturnUrl-开始");
+            result = fileResourceClient.fileUploadReturnUrl(fileStr, fileName, jsonData);
+        } catch (Exception e) {
+            LogService.getLogger(FileResourceController.class).info("zjj-pictureUploadReturnUrl-异常");
+            e.printStackTrace();
+        }
+        return result;
     }
 
     @RequestMapping(value = "/filesReturnHttpUrl", method = RequestMethod.POST)
