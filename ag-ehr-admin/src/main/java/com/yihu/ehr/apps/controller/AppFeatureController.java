@@ -1,20 +1,15 @@
 package com.yihu.ehr.apps.controller;
 
 import com.yihu.ehr.agModel.app.AppFeatureModel;
-import com.yihu.ehr.agModel.patient.PatientModel;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.service.AppFeatureClient;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MAppFeature;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geography.MGeography;
-import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.model.portal.MPortalNotice;
 import com.yihu.ehr.model.user.MRoleFeatureRelation;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.RoleFeatureRelationClient;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by linz on 2016年7月8日11:30:18.
@@ -120,7 +114,7 @@ public class AppFeatureController extends BaseController {
             @ApiParam(name = "model", value = "对象JSON结构体", allowMultiple = true)
             @RequestParam(value = "model", required = false) String appFeature) {
         Envelop envelop = new Envelop();
-        MAppFeature mAppFeature = appFeatureClient.createAppFeature(appFeature);
+        MAppFeature mAppFeature = appFeatureClient.updateAppFeature(appFeature);
         AppFeatureModel appFeatureModel = new AppFeatureModel();
         if (mAppFeature == null) {
             envelop.setSuccessFlg(false);
