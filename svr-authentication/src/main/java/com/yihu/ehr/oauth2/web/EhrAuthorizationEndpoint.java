@@ -1,5 +1,6 @@
 package com.yihu.ehr.oauth2.web;
 
+import com.yihu.ehr.oauth2.oauth2.jdbc.EhrAppsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCAuthorizationCodeService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCClientDetailsService;
 import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCTokenStoreService;
@@ -62,23 +63,19 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
     private EhrJDBCTokenStoreService ehrJDBCTokenStoreService;
     @Autowired
     private EhrJDBCClientDetailsService jdbcClientDetailsService;
+    @Autowired
+    private EhrAppsService ehrAppsService;
 
     private RedirectResolver redirectResolver = new DefaultRedirectResolver();
-
     private UserApprovalHandler userApprovalHandler = new DefaultUserApprovalHandler();
-
     private SessionAttributeStore sessionAttributeStore = new DefaultSessionAttributeStore();
-
     private OAuth2RequestValidator oauth2RequestValidator = new DefaultOAuth2RequestValidator();
-
     private String userApprovalPage = "forward:/oauth/confirm_access";
-
     private String errorPage = "forward:/oauth/error";
-
     private Object implicitLock = new Object();
 
     @Autowired
-    AuthorizationServerEndpointsConfiguration configuration;
+    private AuthorizationServerEndpointsConfiguration configuration;
 
     @PostConstruct
     public void init() throws Exception {
@@ -163,14 +160,18 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
 
             // The resolved redirect URI is either the redirect_uri from the parameters or the one from
             // clientDetails. Either way we need to store it on the AuthorizationRequest.
-            String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
+
+            //String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
+
+            String redirectUriParameter = ehrAppsService.getValidUrl(authorizationRequest.getClientId(), authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI));
 
             String resolvedRedirect = redirectResolver.resolveRedirect(redirectUriParameter, client);
             if (!StringUtils.hasText(resolvedRedirect)) {
                 throw new RedirectMismatchException(
                         "A redirectUri must be either supplied or preconfigured in the ClientDetails");
             }
-            authorizationRequest.setRedirectUri(resolvedRedirect);
+
+            authorizationRequest.setRedirectUri(ehrAppsService.getRealUrl(authorizationRequest.getClientId(), authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI)));
 
             // We intentionally only validate the parameters requested by the client (ignoring any data that may have
             // been added to the request by the manager).
