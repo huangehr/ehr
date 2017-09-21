@@ -97,7 +97,7 @@ public class SolrExtract {
                 }
                 fq += " TO ";
                 //结束时间
-                if (!StringUtils.isEmpty(endTime)) {
+                if (!StringUtils.isEmpty(endTime) && !StringUtils.isEmpty(startTime)) {
                     fq += startTime + "T23:59:59Z";
                 } else {
                     fq += "*";
@@ -106,7 +106,7 @@ public class SolrExtract {
             }else {
                 fq = esConfig.getTimekey()+":[ * TO  ";
                 //结束时间
-                if (!StringUtils.isEmpty(endTime)) {
+                if (!StringUtils.isEmpty(endTime) && !StringUtils.isEmpty(startTime)) {
                     fq += startTime + "T23:59:59Z";
                 } else {
                     fq += "*";
