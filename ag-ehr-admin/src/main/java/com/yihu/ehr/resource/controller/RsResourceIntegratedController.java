@@ -293,7 +293,7 @@ public class RsResourceIntegratedController extends BaseController {
     }
 
     @ApiOperation("综合查询视图保存")
-    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST )
     public Envelop updateResource(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})")
             @RequestParam(value="dataJson") String dataJson) {

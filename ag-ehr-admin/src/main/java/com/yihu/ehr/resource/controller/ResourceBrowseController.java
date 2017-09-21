@@ -229,7 +229,7 @@ public class ResourceBrowseController extends BaseController {
                 Envelop envelop1;
                 //-----------------用户数据权限 start
                 String org = "";
-                Map<String,String> orgMap = new HashMap<>();
+                Map<String, String> orgMap = new HashMap<>();
                 //获取用户所拥有的  带saaa权限
                 List<String> orgList = getInfoClient.getOrgCode(userId);
                 if(orgList != null && orgList.size() > 0){
@@ -273,7 +273,7 @@ public class ResourceBrowseController extends BaseController {
                 }
                 //-----------------用户数据权限 end
                 //判断是否启用默认查询条件
-                if (queryCondition == null || queryCondition == "{}") {
+                if (queryCondition == null || queryCondition.equals("{}")) {
                     if(org.length()>0){
                         Map<String, Object> params  = objectMapper.readValue(query, new TypeReference<Map>() {});
                         params.put("org",org.substring(0,org.length()-1));
