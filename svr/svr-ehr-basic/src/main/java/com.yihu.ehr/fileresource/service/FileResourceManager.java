@@ -66,7 +66,7 @@ public class FileResourceManager extends BaseJpaService<FileResource, XFileResou
     }
 
     public String saveFileResourceReturnHttpUrl(String fileStr, String fileName, FileResource fileResource) throws Exception {
-        fileStr = fileStr.replaceAll(" ","+");
+        //fileStr = fileStr.replaceAll(" ","");
         String replaceFileStr = URLDecoder.decode(fileStr, "UTF-8");
         String newFileStr = replaceFileStr.substring(replaceFileStr.indexOf("=") + 1, replaceFileStr.indexOf("&file_name"));
         byte[] bytes = Base64.getDecoder().decode(newFileStr);
