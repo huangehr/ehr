@@ -5,7 +5,7 @@ package com.yihu.ehr.model.resource;
  */
 public class MRsAdapterMetadata {
     private String id;
-    private String schemaId;
+    private String schemeId;
     private String metadataId;
     private String srcDatasetCode;
     private String srcMetadataCode;
@@ -35,11 +35,12 @@ public class MRsAdapterMetadata {
         this.id = id;
     }
 
-    public String getSchemaId() {
-        return schemaId;
+    public String getSchemeId() {
+        return schemeId;
     }
-    public void setSchemaId(String schemaId) {
-        this.schemaId = schemaId;
+
+    public void setSchemeId(String schemeId) {
+        this.schemeId = schemeId;
     }
 
     public String getMetadataId() {

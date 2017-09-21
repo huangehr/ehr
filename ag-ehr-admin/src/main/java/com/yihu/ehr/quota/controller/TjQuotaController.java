@@ -1,22 +1,28 @@
 package com.yihu.ehr.quota.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.quota.TjQuota;
+import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.tj.MQuotaCategory;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.QuotaCategoryClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.resource.client.RsMetadataClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
+import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -24,6 +30,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +56,12 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     private RsMetadataClient metadataClient;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private GetInfoClient getInfoClient;
+    @Autowired
+    private AddressClient addressClient;
+    @Autowired
+    OrganizationClient organizationClient;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "统计指标表")
@@ -215,6 +228,8 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     public Envelop getQuotaResult(
             @ApiParam(name = "id" ,value = "指标ID" )
             @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "userId" ,value = "用户ID" )
+            @RequestParam(value = "userId" , required = false) String userId,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "pageNo", value = "页码", defaultValue = "0")
@@ -222,10 +237,60 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             @ApiParam(name = "pageSize", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "pageSize" , required = false ,defaultValue ="15") int pageSize
     ) throws Exception {
+        //-----------------用户数据权限 start
+        String org = "";
+        Map<String,String> orgMap = new HashMap<>();
+        //获取用户所拥有的  带saaa权限
+        List<String> orgList = getInfoClient.getOrgCode(userId);
+        if(orgList != null && orgList.size() > 0){
+            for(String orgcode : orgList){
+                orgMap.put(orgcode,orgcode);
+            }
+        }
+        //获取用户所拥有的区域   带saaa权限
+        Map<String,String> param = new HashMap<>();
+        List<String> districtList = getInfoClient.getUserDistrictCode(userId);
+        if(districtList != null && districtList.size() > 0){
+            for(String code : districtList){
+                MGeographyDict mGeographyDict = addressClient.getAddressDictById(code);
+                if(mGeographyDict != null){
+                    String province = "";
+                    String city = "";
+                    String district = "";
+                    if(mGeographyDict.getLevel() == 1){
+                        province =  mGeographyDict.getName();
+                    }else if(mGeographyDict.getLevel() == 2){
+                        city =  mGeographyDict.getName();
+                    }else if(mGeographyDict.getLevel() == 3){
+                        district =  mGeographyDict.getName();
+                    }
+                    Collection<MOrganization> organizations = organizationClient.getOrgsByAddress(province,city ,district );
+                    java.util.Iterator it = organizations.iterator();
+                    while(it.hasNext()){
+                        MOrganization mOrganization = (MOrganization)it.next();
+                        orgMap.put(mOrganization.getCode(),mOrganization.getCode());
+                    }
+                }
+            }
+        }
+        if(orgMap != null){
+            for(String key :orgMap.keySet()){
+                if(StringUtils.isNotEmpty(key))
+                    org =   org + key + ",";
+            }
+        }
+        //-----------------用户数据权限 end
+        if(org.length() > 0){
+            Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
+            Object pOrg = params.get("org");
+            if(pOrg == null ){
+                params.put("org",org.substring(0,org.length()-1));
+            }
+            filters = objectMapper.writeValueAsString(params);
+        }
         if(filters!=null){
             filters = URLEncoder.encode(filters, "UTF-8");
         }
-        System.out.println();
         return tjQuotaJobClient.getQuotaResult(id,filters,pageNo,pageSize);
     }
 

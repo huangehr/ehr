@@ -38,6 +38,12 @@ public interface GetInfoClient {
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId);
 
+    @RequestMapping(value = "/userInfo/getUserDistrictCode", method = RequestMethod.GET)
+    @ApiOperation(value = "获取当前用户所属区域可查询的代码")
+    List<String> getUserDistrictCode(
+            @ApiParam(name = "userId", value = "userId", defaultValue = "")
+            @RequestParam(value = "userId") String userId);
+
     @RequestMapping(value = "/getUserIdList", method = RequestMethod.GET)
     @ApiOperation(value = "获取当前用户管理的机构所对应的userId列表")
     List<String> getUserIdList(

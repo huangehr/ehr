@@ -1,20 +1,29 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.geography.service.AddressClient;
+import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.quota.service.TjQuotaSynthesizeQueryClient;
 import com.yihu.ehr.resource.client.RsResourceIntegratedClient;
+import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -34,6 +43,14 @@ public class RsResourceIntegratedController extends BaseController {
     private TjQuotaSynthesizeQueryClient tjQuotaSynthesizeQueryClient;
     @Autowired
     private TjQuotaJobClient tjQuotaJobClient;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private GetInfoClient getInfoClient;
+    @Autowired
+    private AddressClient addressClient;
+    @Autowired
+    OrganizationClient organizationClient;
 
     @ApiOperation("综合查询档案数据列表树")
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
@@ -79,7 +96,9 @@ public class RsResourceIntegratedController extends BaseController {
             @ApiParam(name="quotaCodes", value = "指标code列表(code1,code2,code3,...)", defaultValue = "")
             @RequestParam(name = "quotaCodes") String quotaCodes,
             @ApiParam(name="queryCondition", value="搜索条件({})",defaultValue = "")
-            @RequestParam(value="queryCondition", required = false) String queryCondition) {
+            @RequestParam(value="queryCondition", required = false) String queryCondition,
+            @ApiParam(name = "userId" ,value = "用户ID" )
+            @RequestParam(value = "userId" , required = false) String userId) throws IOException {
         Envelop envelop = new Envelop();
         String [] quotaIdArr = quotaIds.split(",");
         String [] quotaCodeArr = quotaCodes.split(",");
@@ -113,7 +132,57 @@ public class RsResourceIntegratedController extends BaseController {
             objMap.put("key", tjQuotaModel.getCode());
             objMap.put("name", tjQuotaModel.getName());
             objList.add(objMap);
-            Envelop tempEnvelop = tjQuotaJobClient.getQuotaTotalCount(new Integer(id), queryCondition, dimension.substring(0, dimension.length() - 1));
+            //-----------------用户数据权限 start
+            String filters = queryCondition;
+            String org = "";
+            Map<String,String> orgMap = new HashMap<>();
+            //获取用户所拥有的  带saaa权限
+            List<String> orgList = getInfoClient.getOrgCode(userId);
+            if(orgList != null && orgList.size() > 0){
+                for(String orgcode : orgList){
+                    orgMap.put(orgcode,orgcode);
+                }
+            }
+            //获取用户所拥有的区域   带saaa权限
+            Map<String,String> param = new HashMap<>();
+            List<String> districtList = getInfoClient.getUserDistrictCode(userId);
+            if(districtList != null && districtList.size() > 0){
+                for(String code : districtList){
+                    MGeographyDict mGeographyDict = addressClient.getAddressDictById(code);
+                    if(mGeographyDict != null){
+                        String province = "";
+                        String city = "";
+                        String district = "";
+                        if(mGeographyDict.getLevel() == 1){
+                            province =  mGeographyDict.getName();
+                        }else if(mGeographyDict.getLevel() == 2){
+                            city =  mGeographyDict.getName();
+                        }else if(mGeographyDict.getLevel() == 3){
+                            district =  mGeographyDict.getName();
+                        }
+                        Collection<MOrganization> organizations = organizationClient.getOrgsByAddress(province,city ,district );
+                        java.util.Iterator it = organizations.iterator();
+                        while(it.hasNext()){
+                            MOrganization mOrganization = (MOrganization)it.next();
+                            orgMap.put(mOrganization.getCode(),mOrganization.getCode());
+                        }
+                    }
+                }
+            }
+            if(orgMap != null){
+                for(String key :orgMap.keySet()){
+                    if(StringUtils.isNotEmpty(key))
+                        org =   org + key + ",";
+                }
+            }
+            if(org.length()>0){
+                Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
+                params.put("org",org.substring(0,org.length()-1));
+                filters = objectMapper.writeValueAsString(params);
+            }
+            //-----------------用户数据权限 end
+
+            Envelop tempEnvelop = tjQuotaJobClient.getQuotaTotalCount(new Integer(id), filters, dimension.substring(0, dimension.length() - 1));
             envelopList.add(tempEnvelop);
         }
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();

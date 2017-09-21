@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsBrowseModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
@@ -7,13 +8,18 @@ import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.geography.service.AddressClient;
+import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.quota.service.TjQuotaSynthesizeQueryClient;
 import com.yihu.ehr.resource.client.*;
+import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,6 +60,12 @@ public class ResourceBrowseController extends BaseController {
     private TjQuotaSynthesizeQueryClient tjQuotaSynthesizeQueryClient;
     @Autowired
     private RsResourceDefaultQueryClient rsResourceDefaultQueryClient;
+    @Autowired
+    private GetInfoClient getInfoClient;
+    @Autowired
+    private AddressClient addressClient;
+    @Autowired
+    OrganizationClient organizationClient;
 
     @ApiOperation("获取档案资源分类")
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseCategories, method = RequestMethod.GET)
@@ -154,7 +166,9 @@ public class ResourceBrowseController extends BaseController {
             @ApiParam("机构代码(预留参数)")
             @RequestParam(required = false) String orgCode,
             @ApiParam("查询条件")
-            @RequestParam(required = false) String queryCondition) throws Exception {
+            @RequestParam(required = false) String queryCondition,
+            @ApiParam(name = "userId" ,value = "用户ID" )
+            @RequestParam(value = "userId" , required = false) String userId) throws Exception {
         Envelop envelop = new Envelop();
         String [] quotaCodeArr = null;
         try {
@@ -213,11 +227,64 @@ public class ResourceBrowseController extends BaseController {
             List<Envelop> envelopList = new ArrayList<Envelop>();
             for (ResourceQuotaModel resourceQuotaModel : rqmList) {
                 Envelop envelop1;
+                //-----------------用户数据权限 start
+                String org = "";
+                Map<String,String> orgMap = new HashMap<>();
+                //获取用户所拥有的  带saaa权限
+                List<String> orgList = getInfoClient.getOrgCode(userId);
+                if(orgList != null && orgList.size() > 0){
+                    for(String orgcode : orgList){
+                        orgMap.put(orgcode,orgcode);
+                    }
+                }
+                //获取用户所拥有的区域   带saaa权限
+                Map<String,String> param = new HashMap<>();
+                List<String> districtList = getInfoClient.getUserDistrictCode(userId);
+                if(districtList != null && districtList.size() > 0){
+                    for(String code : districtList){
+                        MGeographyDict mGeographyDict = addressClient.getAddressDictById(code);
+                        if(mGeographyDict != null){
+                            String province = "";
+                            String city = "";
+                            String district = "";
+                            if(mGeographyDict.getLevel() == 1){
+                                province =  mGeographyDict.getName();
+                            }else if(mGeographyDict.getLevel() == 2){
+                                city =  mGeographyDict.getName();
+                            }else if(mGeographyDict.getLevel() == 3){
+                                district =  mGeographyDict.getName();
+                            }
+                            Collection<MOrganization> organizations = organizationClient.getOrgsByAddress(province,city ,district );
+                            java.util.Iterator it = organizations.iterator();
+                            while(it.hasNext()){
+                                MOrganization mOrganization = (MOrganization)it.next();
+                                orgMap.put(mOrganization.getCode(),mOrganization.getCode());
+                            }
+                        }
+                    }
+                }
+                if(orgMap != null){
+                    for(String key :orgMap.keySet()){
+                        if(!StringUtils.isEmpty(key))
+                            org =   org + key + ",";
+                    }
+                }
+                //-----------------用户数据权限 end
                 //判断是否启用默认查询条件
                 if (queryCondition == null || queryCondition == "{}") {
+                    if(org.length()>0){
+                        Map<String, Object> params  = objectMapper.readValue(query, new TypeReference<Map>() {});
+                        params.put("org",org.substring(0,org.length()-1));
+                        query = objectMapper.writeValueAsString(params);
+                    }
                     envelop1 = tjQuotaJobClient.getQuotaTotalCount(resourceQuotaModel.getQuotaId(), query, dimension.substring(0, dimension.length() - 1));
                     envelopList.add(envelop1);
                 } else {
+                    if(org.length()>0){
+                        Map<String, Object> params  = objectMapper.readValue(queryCondition, new TypeReference<Map>() {});
+                        params.put("org",org.substring(0,org.length()-1));
+                        queryCondition = objectMapper.writeValueAsString(params);
+                    }
                     envelop1 = tjQuotaJobClient.getQuotaTotalCount(resourceQuotaModel.getQuotaId(), queryCondition, dimension.substring(0, dimension.length() - 1));
                     envelopList.add(envelop1);
                 }

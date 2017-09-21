@@ -9,9 +9,11 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.model.tj.MTjQuotaWarn;
+import com.yihu.ehr.portal.service.function.GeographyDictClient;
 import com.yihu.ehr.portal.service.function.GetInfoClient;
 import com.yihu.ehr.portal.service.function.OrganizationClient;
 import com.yihu.ehr.portal.service.function.UserClient;
@@ -49,27 +51,51 @@ public class TjQuotaController extends BaseController {
     @Autowired
     OrganizationClient organizationClient;
     @Autowired
+    private GeographyDictClient geographyDictClient;
+    @Autowired
     ObjectMapper objectMapper;
 
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaWarn, method = RequestMethod.GET)
     @ApiOperation(value = "获取指标预警信息", notes = "获取指标预警信息")
     public Result getTjQuotaWarn(@RequestParam(value = "userId") String userId){
+        String filters = "";
         try {
-//            //获取用户所拥有的
+            Map<String,String> orgMap = new HashMap<>();
+////            //获取用户所拥有的  带saaa权限
 //            List<String> orgList = getInfoClient.getOrgCode(userId);
-//            //获取用户所拥有的区域
-//            List<String> districtList = getInfoClient.getDistrictByUserId (userId);
+//            if(orgList != null && orgList.size() > 0){
+//                for(String orgCode : orgList){
+//                    orgMap.put(orgCode,orgCode);
+//                }
+//            }
+////            //获取用户所拥有的区域   带saaa权限
             Map<String,String> param = new HashMap<>();
-            Collection<MOrganization> organizations = organizationClient.getOrgsByAddress("福建省","厦门市" ,null );
-            java.util.Iterator it = organizations.iterator();
-            String filters = "";
-            while(it.hasNext()){
-                MOrganization mOrganization = (MOrganization)it.next();
-                filters = filters + mOrganization.getOrgCode() + ",";
-            }
+//            List<String> districtList = getInfoClient.getUserDistrictCode(userId);
+//            if(districtList != null && districtList.size() > 0){
+//                for(String code : districtList){
+//                    MGeographyDict mGeographyDict = geographyDictClient.getAddressDictById(code);
+//                    if(mGeographyDict != null){
+//                        String province = "";
+//                        String city = "";
+//                        String district = "";
+//                        if(mGeographyDict.getLevel() == 1){
+//                            province =  mGeographyDict.getName();
+//                        }else if(mGeographyDict.getLevel() == 2){
+//                            city =  mGeographyDict.getName();
+//                        }else if(mGeographyDict.getLevel() == 3){
+//                            district =  mGeographyDict.getName();
+//                        }
+//                        Collection<MOrganization> organizations = organizationClient.getOrgsByAddress(province,city ,district );
+//                        java.util.Iterator it = organizations.iterator();
+//                        while(it.hasNext()){
+//                            MOrganization mOrganization = (MOrganization)it.next();
+//                            orgMap.put(mOrganization.getCode(),mOrganization.getFullName());
+//                        }
+//                    }
+//                }
+//            }
             param.put("org",filters);
-            //后续过滤距离现在一个月
 
             List<MTjQuotaWarn> mTjQuotaWarns = tjQuotaClient.getTjQuotaWarn(userId);
             if (mTjQuotaWarns == null) {
