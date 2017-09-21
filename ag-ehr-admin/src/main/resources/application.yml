@@ -43,3 +43,7 @@ spring:
 ---
 spring:
   profiles: prod_fz
+
+---
+spring:
+  profiles: prod_sr
