@@ -8,10 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -32,11 +29,11 @@ public class FileResourceController {
     @ApiOperation(value = "上传文件")
     public String pictureUpload(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name", required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
-            @RequestParam(value = "json_data", required = false) String jsonData, HttpServletRequest request) {
+            @RequestParam(value = "json_data", required = false) String jsonData) {
         return fileResourceClient.fileUpload(fileStr, fileName, jsonData);
     }
 
@@ -44,7 +41,7 @@ public class FileResourceController {
     @ApiOperation(value = "上传文件，并返回存储相对路径")
     public String pictureUploadReturnUrl(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name", required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
@@ -64,7 +61,7 @@ public class FileResourceController {
     @ApiOperation(value = "上传文件，并返回存储绝对路径")
     public String pictureUploadReturnHttpUrl(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name", required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
