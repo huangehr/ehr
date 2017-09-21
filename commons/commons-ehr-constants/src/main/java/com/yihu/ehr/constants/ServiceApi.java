@@ -936,6 +936,9 @@ public class ServiceApi {
         public static final String TjDimensionSlaveCode = "/tj/tjDimensionSlaveCode";
         public static final String TjDimensionSlaveName= "/tj/tjDimensionSlaveName";
         public static final String GetTjDimensionSlaveInfoList= "/tj/getTjDimensionSlaveInfoList";
+        public static final String GetTjDimensionSlaveByCode= "/tj/getTjDimensionSlaveByCode";
+
+
 
         public static final String GetTjQuotaDimensionMainList = "/tj/getTjQuotaDimensionMainList";
         public static final String TjQuotaDimensionMain = "/tj/tjQuotaDimensionMain";
@@ -946,6 +949,8 @@ public class ServiceApi {
         public static final String TjQuotaDimensionSlave = "/tj/tjQuotaDimensionSlave";
         public static final String AddTjQuotaDimensionSlave = "/tj/addTjQuotaDimensionSlave";
         public static final String GetTjQuotaDimensionSlaveAll = "/tj/getTjQuotaDimensionSlaveAll";
+        public static final String DeleteSlaveByQuotaCode = "/tj/deleteSlaveByQuotaCode";
+        public static final String GetDimensionSlaveByQuotaCode = "/tj/getDimensionSlaveByQuotaCode";
 
 
         public static final String GetTjQuotaSynthesiseDimension = "/tj/getTjQuotaSynthesiseDimension";

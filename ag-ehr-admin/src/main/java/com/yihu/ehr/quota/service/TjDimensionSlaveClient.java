@@ -46,7 +46,7 @@ public interface TjDimensionSlaveClient {
     TjDimensionSlave getTjDimensionSlave(@RequestParam(value = "id") Integer id);
 
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveCode, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "根据ID获取从维度")
+    @ApiOperation(value = "根据Code获取从维度")
     public TjDimensionSlave getTjDimensionSlave(
             @RequestParam(value = "code") String code);
 

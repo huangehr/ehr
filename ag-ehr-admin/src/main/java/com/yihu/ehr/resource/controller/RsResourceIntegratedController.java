@@ -161,10 +161,12 @@ public class RsResourceIntegratedController extends BaseController {
                             district =  mGeographyDict.getName();
                         }
                         Collection<MOrganization> organizations = organizationClient.getOrgsByAddress(province,city ,district );
-                        java.util.Iterator it = organizations.iterator();
-                        while(it.hasNext()){
-                            MOrganization mOrganization = (MOrganization)it.next();
-                            orgMap.put(mOrganization.getCode(),mOrganization.getCode());
+                        if(organizations !=null ){
+                            java.util.Iterator it = organizations.iterator();
+                            while(it.hasNext()){
+                                MOrganization mOrganization = (MOrganization)it.next();
+                                orgMap.put(mOrganization.getCode(),mOrganization.getCode());
+                            }
                         }
                     }
                 }

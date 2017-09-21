@@ -180,6 +180,27 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
         }
     }
 
+    @RequestMapping(value =  ServiceApi.TJ.GetTjDimensionSlaveByCode, method = RequestMethod.GET)
+    @ApiOperation(value = "获取从维度信息根据code", notes = "从维度")
+    public Envelop getTjDimensionSlaveByCode(
+            @ApiParam(name = "code", value = "", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        try {
+            TjDimensionSlaveModel tjDimensionSlaveModel = null;
+            TjDimensionSlave tjDimensionSlave = tjDimensionSlaveClient.getTjDimensionSlave(code);
+            if (tjDimensionSlave == null) {
+                return failed("从维度信息获取失败!");
+            }else {
+                tjDimensionSlaveModel = objectMapper.convertValue(tjDimensionSlave,TjDimensionSlaveModel.class);
+            }
+            return success(tjDimensionSlaveModel);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlave, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除从维度")
     public Envelop delete(
