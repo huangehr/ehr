@@ -46,7 +46,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性", required = true)
             @RequestParam(value = "json_data") String jsonData) throws Exception {
-        FileResource fileResource = toEntity(jsonData, FileResource.class);
+        FileResource fileResource = toEntity(jsonData.replace("Prefix", ""), FileResource.class);
         fileResource.setId(getObjectId(BizObject.FileResource));
         return fileResourceManager.saveFileResource(fileStr, fileName, fileResource);
     }
@@ -63,7 +63,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
         String result = "";
         try {
             LogService.getLogger(FileResourceEndPoint.class).info("zjj-fileUploadReturnUrl-开始");
-            FileResource fileResource = toEntity(jsonData, FileResource.class);
+            FileResource fileResource = toEntity(jsonData.replace("Prefix", ""), FileResource.class);
             fileResource.setId(getObjectId(BizObject.FileResource));
             result = fileResourceManager.saveFileResourceReturnUrl(fileStr, fileName, fileResource);
         } catch (Exception e) {
@@ -82,7 +82,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性", required = true)
             @RequestParam(value = "json_data") String jsonData) throws Exception {
-        FileResource fileResource = toEntity(jsonData, FileResource.class);
+        FileResource fileResource = toEntity(jsonData.replace("Prefix", ""), FileResource.class);
         fileResource.setId(getObjectId(BizObject.FileResource));
         return fileResourceManager.saveFileResourceReturnHttpUrl(fileStr, fileName, fileResource);
     }

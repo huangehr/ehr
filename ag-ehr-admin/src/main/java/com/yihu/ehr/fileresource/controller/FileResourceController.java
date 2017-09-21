@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -31,10 +32,10 @@ public class FileResourceController {
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
             @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
-            @RequestParam(value = "file_name", required = false) String fileName,
+            @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
-            @RequestParam(value = "json_data", required = false) String jsonData) {
-        return fileResourceClient.fileUpload(fileStr, fileName, jsonData);
+            @RequestParam(value = "json_data") String jsonData) {
+        return fileResourceClient.fileUpload(fileStr, fileName, "Prefix"+ jsonData);
     }
 
     @RequestMapping(value = "/filesReturnUrl", method = RequestMethod.POST)
@@ -43,18 +44,10 @@ public class FileResourceController {
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
             @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
-            @RequestParam(value = "file_name", required = false) String fileName,
+            @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
-            @RequestParam(value = "json_data", required = false) String jsonData, HttpServletRequest request) {
-        String result = "";
-        try {
-            LogService.getLogger(FileResourceController.class).info("zjj-pictureUploadReturnUrl-开始");
-            result = fileResourceClient.fileUploadReturnUrl(fileStr, fileName, jsonData);
-        } catch (Exception e) {
-            LogService.getLogger(FileResourceController.class).info("zjj-pictureUploadReturnUrl-异常");
-            e.printStackTrace();
-        }
-        return result;
+            @RequestParam(value = "json_data") String jsonData) {
+         return fileResourceClient.fileUploadReturnUrl(fileStr, fileName, "Prefix" + jsonData);
     }
 
     @RequestMapping(value = "/filesReturnHttpUrl", method = RequestMethod.POST)
@@ -63,10 +56,10 @@ public class FileResourceController {
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
             @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
-            @RequestParam(value = "file_name", required = false) String fileName,
+            @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
-            @RequestParam(value = "json_data", required = false) String jsonData, HttpServletRequest request) {
-        return fileResourceClient.fileUploadReturnHttpUrl(fileStr, fileName, jsonData);
+            @RequestParam(value = "json_data") String jsonData) {
+        return fileResourceClient.fileUploadReturnHttpUrl(fileStr, fileName, "Prefix" + jsonData);
     }
 
     @RequestMapping(value = "/files", method = RequestMethod.DELETE)
