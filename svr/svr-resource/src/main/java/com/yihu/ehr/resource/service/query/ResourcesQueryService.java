@@ -554,6 +554,7 @@ public class ResourcesQueryService  {
             appSaasArea = redisServiceClient.getOrgSaasAreaRedis(appOrg);
             appSaasOrg = redisServiceClient.getOrgSaasOrgRedis(appOrg);
         }
+
         //单独APP权限控制
         if(StringUtils.isEmpty(orgCode)) { //机构为空
             //所有权限
@@ -582,80 +583,84 @@ public class ResourcesQueryService  {
         }
         //机构权限控制
         else {
+//            String[] orgCodeList = orgCode.split(",");
+            List<String> areaListApp = new ArrayList<>();
+            List<String> orgListApp = new ArrayList<>();
+//            for (String orgCo:orgCodeList) {
+
+//            String orgSaasArea = redisServiceClient.getOrgSaasAreaRedis(orgCo);
+//            String orgSaasOrg = redisServiceClient.getOrgSaasOrgRedis(orgCo);
             String orgSaasArea = redisServiceClient.getOrgSaasAreaRedis(orgCode);
             String orgSaasOrg = redisServiceClient.getOrgSaasOrgRedis(orgCode);
 
+
             //************* 单独机构权限控制 *************
-            if("*".equals(appSaasArea) && "*".equals(appSaasOrg)) {
+            if ("*".equals(appSaasArea) && "*".equals(appSaasOrg)) {
 
                 //【机构权限】存在区域授权范围
-                if(!StringUtils.isEmpty(orgSaasArea) && !orgSaasArea.equals("*")) {
+                if (!StringUtils.isEmpty(orgSaasArea) && !orgSaasArea.equals("*")) {
                     String[] arrayArea = orgSaasArea.split(",");
-                    for(String area : arrayArea) {
-                        if(!areaList.contains(area)) {
+                    for (String area : arrayArea) {
+                        if (!areaList.contains(area)) {
                             areaList.add(area);
                         }
                     }
                 }
                 //【机构权限】存在机构授权范围
-                if(!StringUtils.isEmpty(orgSaasOrg) && !orgSaasOrg.equals("*")) {
+                if (!StringUtils.isEmpty(orgSaasOrg) && !orgSaasOrg.equals("*")) {
                     String[] arrayOrg = orgSaasOrg.split(",");
-                    for(String org : arrayOrg) {
-                        if(!orgList.contains(org)) {
+                    for (String org : arrayOrg) {
+                        if (!orgList.contains(org)) {
                             orgList.add(org);
                         }
                     }
                 }
                 //所有权限
-                if("*".equals(orgSaasArea) && "*".equals(orgSaasOrg)) {
+                if ("*".equals(orgSaasArea) && "*".equals(orgSaasOrg)) {
                     saas = "*";
                 }
             }
             //************* APP权限和机构权限并集 *************
             else {
-                List<String> areaListApp = new ArrayList<>();
-                List<String> orgListApp = new ArrayList<>();
+
 
                 //【APP权限】存在区域授权范围
-                if(!StringUtils.isEmpty(appSaasArea) && !appSaasArea.equals("*")) {
+                if (!StringUtils.isEmpty(appSaasArea) && !appSaasArea.equals("*")) {
                     String[] arrayArea = appSaasArea.split(",");
-                    for(String area : arrayArea) {
-                        if(!areaListApp.contains(area)) {
+                    for (String area : arrayArea) {
+                        if (!areaListApp.contains(area)) {
                             areaListApp.add(area);
                         }
                     }
                 }
                 //【APP权限】存在机构授权范围
-                if(!StringUtils.isEmpty(appSaasOrg) && !appSaasOrg.equals("*")) {
+                if (!StringUtils.isEmpty(appSaasOrg) && !appSaasOrg.equals("*")) {
                     String[] arrayOrg = appSaasOrg.split(",");
-                    for(String org : arrayOrg) {
-                        if(!orgListApp.contains(org)) {
+                    for (String org : arrayOrg) {
+                        if (!orgListApp.contains(org)) {
                             orgListApp.add(org);
                         }
                     }
                 }
 
                 //********【机构权限】存在区域授权范围【区域并集】  ***************
-                if(!StringUtils.isEmpty(orgSaasArea)) {
-                    if("*".equals(orgSaasArea)) {
+                if (!StringUtils.isEmpty(orgSaasArea)) {
+                    if ("*".equals(orgSaasArea)) {
                         areaList = areaListApp;
-                    }
-                    else{
+                    } else {
                         String[] arrayArea = orgSaasArea.split(",");
-                        areaList = containArea(areaListApp,arrayArea);
+                        areaList = containArea(areaListApp, arrayArea);
                     }
                 }
                 //【机构权限】存在机构授权范围
-                if(!StringUtils.isEmpty(orgSaasOrg)) {
-                    if("*".equals(orgSaasOrg)) {
+                if (!StringUtils.isEmpty(orgSaasOrg)) {
+                    if ("*".equals(orgSaasOrg)) {
                         orgList = orgListApp;
-                    }
-                    else{
+                    } else {
                         String[] arrayOrg = orgSaasOrg.split(",");
-                        for(String org : arrayOrg) {
+                        for (String org : arrayOrg) {
                             //判断机构权限是否在APP权限范围内
-                            if(orgListApp.contains(org))
-                            {
+                            if (orgListApp.contains(org)) {
                                 orgList.add(org);
                             }
                         }
@@ -664,6 +669,7 @@ public class ResourcesQueryService  {
 
             }
         }
+//        }
         if(areaList.size()>0) {
             for(String area : areaList) {
                 if(area.endsWith("0000")) { //省
