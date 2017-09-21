@@ -33,7 +33,7 @@ public class FileResourceController {
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name", required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
-            @RequestParam(value = "json_data", required = false) String jsonData, HttpServletRequest request) {
+            @RequestParam(value = "json_data", required = false) String jsonData) {
         return fileResourceClient.fileUpload(fileStr, fileName, jsonData);
     }
 
