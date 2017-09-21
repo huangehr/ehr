@@ -28,7 +28,7 @@ public class FileResourceController {
     @ApiOperation(value = "资源文件上传")
     public String pictureUpload(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name",required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
@@ -40,7 +40,7 @@ public class FileResourceController {
     @ApiOperation(value = "资源文件上传")
     public String pictureUploadReturnUrl(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name",required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
@@ -52,7 +52,7 @@ public class FileResourceController {
     @ApiOperation(value = "资源文件上传返回完整的http Url")
     public String pictureUploadReturnHttpUrl(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name",required = false) String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")

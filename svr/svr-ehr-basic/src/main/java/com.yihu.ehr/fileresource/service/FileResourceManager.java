@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.util.Base64;
 import java.util.List;
 
@@ -32,9 +33,10 @@ public class FileResourceManager extends BaseJpaService<FileResource, XFileResou
 
 
     public String saveFileResource(String fileStr, String fileName, FileResource fileResource) throws Exception {
-
-//        byte[] bytes = fileStr.getBytes();
-        byte[] bytes = Base64.getDecoder().decode(fileStr);
+        String replaceFileStr = URLDecoder.decode(fileStr, "UTF-8");
+        String newFileStr = replaceFileStr.substring(replaceFileStr.indexOf("=") + 1, replaceFileStr.indexOf("&file_name"));
+        //byte[] bytes = fileStr.getBytes();
+        byte[] bytes = Base64.getDecoder().decode(newFileStr);
         InputStream inputStream = new ByteArrayInputStream(bytes);
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, "");
@@ -47,8 +49,10 @@ public class FileResourceManager extends BaseJpaService<FileResource, XFileResou
     }
 
     public String saveFileResourceReturnUrl(String fileStr, String fileName, FileResource fileResource) throws Exception {
-
-        byte[] bytes = Base64.getDecoder().decode(fileStr);
+        //String replaceFileStr = fileStr.replaceAll("%2F", "/").replaceAll("%2B", "+").replaceAll("%3D", "=");
+        String replaceFileStr = URLDecoder.decode(fileStr, "UTF-8");
+        String newFileStr = replaceFileStr.substring(replaceFileStr.indexOf("=") + 1, replaceFileStr.indexOf("&file_name"));
+        byte[] bytes = Base64.getDecoder().decode(newFileStr);
         InputStream inputStream = new ByteArrayInputStream(bytes);
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, "");
@@ -63,7 +67,9 @@ public class FileResourceManager extends BaseJpaService<FileResource, XFileResou
 
     public String saveFileResourceReturnHttpUrl(String fileStr, String fileName, FileResource fileResource) throws Exception {
         fileStr = fileStr.replaceAll(" ","+");
-        byte[] bytes = Base64.getDecoder().decode(fileStr);
+        String replaceFileStr = URLDecoder.decode(fileStr, "UTF-8");
+        String newFileStr = replaceFileStr.substring(replaceFileStr.indexOf("=") + 1, replaceFileStr.indexOf("&file_name"));
+        byte[] bytes = Base64.getDecoder().decode(newFileStr);
         InputStream inputStream = new ByteArrayInputStream(bytes);
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         ObjectNode objectNode = fastDFSUtil.upload(inputStream, fileExtension, "");

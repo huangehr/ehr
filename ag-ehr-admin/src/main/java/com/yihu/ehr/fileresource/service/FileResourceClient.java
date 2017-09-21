@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,21 +21,21 @@ public interface FileResourceClient {
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload", method = RequestMethod.POST)
     @ApiOperation(value = "上传图片")
     String fileUpload(
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload_returnUrl", method = RequestMethod.POST)
     @ApiOperation(value = "上传图片")
     String fileUploadReturnUrl(
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload_returnHttpUrl", method = RequestMethod.POST)
     @ApiOperation(value = "上传图片返回整个httpUrl")
     String fileUploadReturnHttpUrl(
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);
 

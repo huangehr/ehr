@@ -51,7 +51,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "上传文件", notes = "图片上传")
     public String fileUpload(
             @ApiParam(name = "file_str", value = "文件字符串", required = true)
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性", required = true)
@@ -76,7 +76,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "上传文件", notes = "上传文件返回url")
     public String fileUploadReturnUrl(
             @ApiParam(name = "file_str", value = "文件字符串", required = true)
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性", required = true)
@@ -100,7 +100,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "上传文件", notes = "上传文件返回url")
     public String fileUploadReturnHttpUrl(
             @ApiParam(name = "file_str", value = "文件字符串", required = true)
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性", required = true)
