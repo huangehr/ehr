@@ -14,10 +14,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -44,7 +41,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "上传文件")
     public String fileUpload(
             @ApiParam(name = "file_str", value = "文件字符串", required = true)
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性", required = true)
@@ -58,7 +55,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "上传文件，并返回存储相对路径")
     public String fileUploadReturnUrl(
             @ApiParam(name = "file_str", value = "文件字符串", required = true)
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性", required = true)
@@ -80,7 +77,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "上传文件，并返回存储绝对路径")
     public String fileUploadReturnHttpUrl(
             @ApiParam(name = "file_str", value = "文件字符串", required = true)
-            @RequestParam(value = "file_str") String fileStr,
+            @RequestBody String fileStr,
             @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性", required = true)
