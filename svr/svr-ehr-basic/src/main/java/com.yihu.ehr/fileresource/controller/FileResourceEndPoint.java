@@ -7,7 +7,6 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.fileresource.service.FileResource;
 import com.yihu.ehr.fileresource.service.FileResourceManager;
-import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -59,18 +58,10 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "file_name", value = "文件名", required = true)
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性", required = true)
-            @RequestParam(value = "json_data") String jsonData) {
-        String result = "";
-        try {
-            LogService.getLogger(FileResourceEndPoint.class).info("zjj-fileUploadReturnUrl-开始");
+            @RequestParam(value = "json_data") String jsonData) throws Exception {
             FileResource fileResource = toEntity(jsonData, FileResource.class);
             fileResource.setId(getObjectId(BizObject.FileResource));
-            result = fileResourceManager.saveFileResourceReturnUrl(fileStr, fileName, fileResource);
-        } catch (Exception e) {
-            LogService.getLogger(FileResourceEndPoint.class).info("zjj-fileUploadReturnUrl-异常");
-            e.printStackTrace();
-        }
-        return result;
+            return fileResourceManager.saveFileResourceReturnUrl(fileStr, fileName, fileResource);
     }
 
     @RequestMapping(value = "/files_upload_returnHttpUrl", method = RequestMethod.POST)
