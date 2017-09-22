@@ -620,7 +620,7 @@ public class PatientController extends BaseController {
         String[] values = {name, String.valueOf(code)};
         List<MGeographyDict> geographyDictList = (List<MGeographyDict>) addressClient.getAddressDict(fields, values);
         if (geographyDictList != null && geographyDictList.size() > 0) {
-            return (int)geographyDictList.get(0).getId();
+            return geographyDictList.get(0).getId();
         } else {
             return 0;
         }

@@ -382,6 +382,8 @@ public class PatientCardsController extends ExtendController<UserCards> {
             MUser user = userClient.getUser(userCard.get("auditor").toString());
             if(user!=null){
                 userCard.put("auditor",user.getRealName());
+            } else {
+                userCard.put("auditor", "");
             }
         }
         Map<String, String> statusMap = new HashMap<>();
