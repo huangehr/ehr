@@ -35,7 +35,8 @@ public class FileResourceController {
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
             @RequestParam(value = "json_data") String jsonData) {
-        return fileResourceClient.fileUpload(fileStr, fileName, "Prefix"+ jsonData);
+        //return fileResourceClient.fileUpload(fileStr, fileName, "Prefix"+ jsonData);
+        return fileResourceClient.fileUpload(fileStr, fileName, jsonData);
     }
 
     @RequestMapping(value = "/filesReturnUrl", method = RequestMethod.POST)
@@ -47,7 +48,8 @@ public class FileResourceController {
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
             @RequestParam(value = "json_data") String jsonData) {
-         return fileResourceClient.fileUploadReturnUrl(fileStr, fileName, "Prefix" + jsonData);
+        //return fileResourceClient.fileUploadReturnUrl(fileStr, fileName, "Prefix" + jsonData);
+        return fileResourceClient.fileUploadReturnUrl(fileStr, fileName, jsonData);
     }
 
     @RequestMapping(value = "/filesReturnHttpUrl", method = RequestMethod.POST)
@@ -59,7 +61,8 @@ public class FileResourceController {
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
             @RequestParam(value = "json_data") String jsonData) {
-        return fileResourceClient.fileUploadReturnHttpUrl(fileStr, fileName, "Prefix" + jsonData);
+        //return fileResourceClient.fileUploadReturnHttpUrl(fileStr, fileName, "Prefix" + jsonData);
+        return fileResourceClient.fileUploadReturnHttpUrl(fileStr, fileName, jsonData);
     }
 
     @RequestMapping(value = "/files", method = RequestMethod.DELETE)
