@@ -5,7 +5,7 @@ package com.yihu.ehr.model.geography;
  */
 public class MGeographyDict {
 
-    private int id;   //序号
+    private long id;   //序号
 
     private String abbreviation;    //简称
 
@@ -21,11 +21,11 @@ public class MGeographyDict {
         //id  = Integer.parseInt(UUID.randomUUID().toString());
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

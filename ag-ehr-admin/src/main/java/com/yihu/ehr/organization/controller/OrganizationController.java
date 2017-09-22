@@ -1,12 +1,6 @@
 package com.yihu.ehr.organization.controller;
 
-import com.yihu.ehr.apps.service.AppClient;
-import com.yihu.ehr.fileresource.service.FileResourceClient;
-import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.model.common.ObjectResult;
-import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.redis.client.RedisUpdateClient;
-import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.adapter.service.PlanClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
@@ -18,24 +12,16 @@ import com.yihu.ehr.model.adaption.MAdapterPlan;
 import com.yihu.ehr.model.profile.MTemplate;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrganizationClient;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.agModel.org.OrgModel;
+import com.yihu.ehr.redis.client.RedisUpdateClient;
 import com.yihu.ehr.security.service.SecurityClient;
-import com.yihu.ehr.model.geography.MGeography;
-import com.yihu.ehr.agModel.org.OrgDetailModel;
-import com.yihu.ehr.model.security.MKey;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.template.service.TemplateClient;
 import com.yihu.ehr.users.service.UserClient;
-import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
@@ -601,7 +587,7 @@ public class OrganizationController extends BaseController {
         String[] fields = {"name","pid"};
         String[] values = {name,String.valueOf(code)};
         List<MGeographyDict> geographyDictList = (List<MGeographyDict>) addressClient.getAddressDict(fields,values);
-        return geographyDictList.get(0).getId();
+        return (int)geographyDictList.get(0).getId();
     }
 
     /**
