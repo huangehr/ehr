@@ -21,8 +21,10 @@ import com.yihu.ehr.service.resource.stage2.PackMill;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.ResourceService;
 import com.yihu.ehr.service.resource.stage2.repo.DatasetPackageRepository;
+import com.yihu.ehr.service.resource.stage2.repo.PatientInfoRepository;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -49,24 +51,23 @@ import java.util.Map;
 public class ResolveEndPoint {
 
     @Autowired
-    ResourceService resourceService;
+    private ResourceService resourceService;
     @Autowired
-    PackMill packMill;
+    private PackMill packMill;
     @Autowired
-    FastDFSUtil fastDFSUtil;
+    private FastDFSUtil fastDFSUtil;
     @Autowired
     private PackageResolveEngine packResolveEngine;
     @Autowired
-    XPackageMgrClient packageMgrClient;
+    private XPackageMgrClient packageMgrClient;
     @Autowired
-    XDatasetPackageMgrClient datasetPackageMgrClient;
+    private XDatasetPackageMgrClient datasetPackageMgrClient;
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     @Autowired
     private DatasetPackageRepository datasetPackageRepository;
-
     @Autowired
-    private XPatientEndClient xPatientEndClient;
+    private PatientInfoRepository patientInfoRepository;
 
     @ApiOperation(value = "健康档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析健康档案包")
     @RequestMapping(value = ServiceApi.Packages.PackageResolve, method = RequestMethod.PUT)
@@ -89,10 +90,34 @@ public class ResolveEndPoint {
             long start = System.currentTimeMillis();
             if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
             String zipFile = downloadTo(pack.getRemotePath());
-
             StandardPackage standardPackage = packResolveEngine.doResolve(pack, zipFile);
             ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
             resourceService.save(resourceBucket);
+
+            //获取注册信息
+            String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString();
+            if(!idCardNo.equals("")) {
+                boolean isRegistered = patientInfoRepository.isRegistered(idCardNo);
+                if (!isRegistered) {
+                    MDemographicInfo demoInfo = new MDemographicInfo();
+                    demoInfo.setIdCardNo(resourceBucket.getDemographicId() == null ? "" : resourceBucket.getDemographicId().toString());
+                    demoInfo.setName(resourceBucket.getPatientName() == null ? "" : resourceBucket.getPatientName().toString());
+                    demoInfo.setBirthday(resourceBucket.getMasterRecord().getResourceValue("EHR_000320") == null ? null : DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000320")));
+                    demoInfo.setNativePlace(resourceBucket.getMasterRecord().getResourceValue("EHR_000015") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000015").toString());
+                    demoInfo.setGender(resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString());
+                    demoInfo.setMartialStatus(resourceBucket.getMasterRecord().getResourceValue("EHR_000014") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000014").toString());
+                    demoInfo.setNation(resourceBucket.getMasterRecord().getResourceValue("EHR_000016") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000016").toString());
+                    demoInfo.setTelephoneNo(resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString());
+                    demoInfo.setEmail(resourceBucket.getMasterRecord().getResourceValue("EHR_000008") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000008").toString());
+                    //注册
+                    boolean isSucceed = patientInfoRepository.save(demoInfo);
+                    if (!isSucceed) {
+                        LogService.getLogger().info("idCardNo:" + idCardNo + " registration failed !");
+                    }
+                }
+            }else {
+                LogService.getLogger().info("idCardNo is empty !");
+            }
 
             //回填入库状态
             Map<String, String> map = new HashMap();
@@ -102,32 +127,10 @@ public class ResolveEndPoint {
             map.put("eventNo", standardPackage.getEventNo());
             map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patientId", standardPackage.getPatientId());
-
-            packageMgrClient.reportStatus(packId,
-                    ArchiveStatus.Finished,
-                    objectMapper.writeValueAsString(map));
-
-
+            packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
 
-            //TODO 居民注册
-            //验证居民的存在性
-            String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString();
-            Boolean result = xPatientEndClient.isRegistered(idCardNo);
-            if(!result){
-                MDemographicInfo demoInfo = new MDemographicInfo();
-                demoInfo.setName(resourceBucket.getPatientName() == null ? "":resourceBucket.getPatientName().toString());
-                demoInfo.setIdCardNo(resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString());
-                demoInfo.setBirthday(resourceBucket.getMasterRecord().getResourceValue("EHR_000007") == null? null:DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000007")));
-                demoInfo.setGender(resourceBucket.getMasterRecord().getResourceValue("EHR_000019")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString());
-                demoInfo.setNation(resourceBucket.getMasterRecord().getResourceValue("EHR_000016")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000016").toString());
-                demoInfo.setMartialStatus(resourceBucket.getMasterRecord().getResourceValue("EHR_000014")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000014").toString());
-                demoInfo.setNativePlace(resourceBucket.getMasterRecord().getResourceValue("EHR_000015")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000015").toString());
-                demoInfo.setEmail(resourceBucket.getMasterRecord().getResourceValue("EHR_000008")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000008").toString());
-                demoInfo.setTelephoneNo(resourceBucket.getMasterRecord().getResourceValue("EHR_000003")== null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString());
-                //验证居民注册
-                xPatientEndClient.registerPatient(objectMapper.writeValueAsString(demoInfo));
-            }
+            //是否返回数据
             if (echo) {
                 return standardPackage.toJson();
             } else {
