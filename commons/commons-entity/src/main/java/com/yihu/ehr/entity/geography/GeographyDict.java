@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class GeographyDict {
 
 
-    private long id;   //序号
+    private int id;   //序号
 
     private String abbreviation;    //简称
 
@@ -32,10 +32,10 @@ public class GeographyDict {
 
     @Id
     @Column(name = "id", unique = true, nullable = false)
-    public long getId() {
+    public int getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
