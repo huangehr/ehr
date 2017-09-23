@@ -6,8 +6,10 @@ import com.yihu.ehr.config.MetricNames;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.XPackageMgrClient;
+import com.yihu.ehr.feign.XPatientEndClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
+import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.queue.MessageBuffer;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
@@ -15,12 +17,15 @@ import com.yihu.ehr.service.resource.stage2.PackMill;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import com.yihu.ehr.service.resource.stage2.ResourceService;
 import com.yihu.ehr.profile.exception.LegacyPackageException;
+import com.yihu.ehr.service.resource.stage2.repo.PatientInfoRepository;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
 import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.UnableToInterruptJobException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +39,10 @@ import java.util.NoSuchElementException;
  * @created 2016.03.28 11:30
  */
 public class PackageResourceJob implements InterruptableJob {
+
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
+    @Autowired
+    private PatientInfoRepository patientInfoRepository;
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
@@ -63,9 +71,7 @@ public class PackageResourceJob implements InterruptableJob {
 
         try {
             if (pack == null) return;
-
             long start = System.currentTimeMillis();
-
             StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
             ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
             resourceService.save(resourceBucket);
@@ -78,8 +84,32 @@ public class PackageResourceJob implements InterruptableJob {
             map.put("eventNo",standardPackage.getEventNo());
             map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patientId",standardPackage.getPatientId());
-            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,objectMapper.writeValueAsString(map));
 
+            //获取注册信息
+            String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString();
+            if(!idCardNo.equals("")) {
+                boolean isRegistered = patientInfoRepository.isRegistered(idCardNo);
+                if (!isRegistered) {
+                    MDemographicInfo demoInfo = new MDemographicInfo();
+                    demoInfo.setIdCardNo(resourceBucket.getDemographicId() == null ? "" : resourceBucket.getDemographicId().toString());
+                    demoInfo.setName(resourceBucket.getPatientName() == null ? "" : resourceBucket.getPatientName().toString());
+                    demoInfo.setBirthday(resourceBucket.getMasterRecord().getResourceValue("EHR_000320") == null ? null : DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000320")));
+                    demoInfo.setNativePlace(resourceBucket.getMasterRecord().getResourceValue("EHR_000015") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000015").toString());
+                    demoInfo.setGender(resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString());
+                    demoInfo.setMartialStatus(resourceBucket.getMasterRecord().getResourceValue("EHR_000014") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000014").toString());
+                    demoInfo.setNation(resourceBucket.getMasterRecord().getResourceValue("EHR_000016") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000016").toString());
+                    demoInfo.setTelephoneNo(resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString());
+                    demoInfo.setEmail(resourceBucket.getMasterRecord().getResourceValue("EHR_000008") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000008").toString());
+                    //注册
+                    boolean isSucceed = patientInfoRepository.save(demoInfo);
+                    if (!isSucceed) {
+                        LogService.getLogger().info("idCardNo:" + idCardNo + " registration failed !");
+                    }
+                }
+            }else {
+                LogService.getLogger().info("idCardNo is empty !");
+            }
+            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,objectMapper.writeValueAsString(map));
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
         }
         /*catch (LegacyPackageException e) {
