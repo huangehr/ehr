@@ -248,7 +248,7 @@ public class AppFeatureController extends BaseController {
         Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPage(filters);
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
-        if(mAppFeatures !=null && mAppFeatures.size() >0 ){
+        if (mAppFeatures != null && mAppFeatures.size() > 0) {
             for (MAppFeature mAppFeature : mAppFeatures) {
                 AppFeatureModel appFeatureModel = convertToModel(mAppFeature, AppFeatureModel.class);
                 converModelName(appFeatureModel);
@@ -258,5 +258,23 @@ public class AppFeatureController extends BaseController {
         }
         envelop.setDetailModelList(appFeatureModels);
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.AppFeature.FindAppMenus, method = RequestMethod.GET)
+    @ApiOperation(value = "根据权限，获取应用菜单")
+    public Envelop findAppMenus(
+            @ApiParam(name = "appId", value = "应用ID", required = true)
+            @RequestParam(value = "appId", required = true) String appId,
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId", required = true) String userId) {
+        try {
+            Envelop envelop = new Envelop();
+            List<String> menuList = appFeatureClient.findAppMenus(appId, userId);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(menuList);
+            return envelop;
+        } catch (Exception e) {
+            return failed("获取应用菜单发生异常。");
+        }
     }
 }

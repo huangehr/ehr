@@ -125,4 +125,15 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
         List<AppFeature> appFeatureList = appFeatureService.search(filters, sorts);
         return convertToModels(appFeatureList, new ArrayList<>(appFeatureList.size()), MAppFeature.class, "");
     }
+
+    @RequestMapping(value = ServiceApi.AppFeature.FindAppMenus, method = RequestMethod.GET)
+    @ApiOperation(value = "根据权限，获取应用菜单")
+    public List<String> findAppMenus(
+            @ApiParam(name = "appId", value = "应用ID", required = true)
+            @RequestParam(value = "appId", required = true) String appId,
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId", required = true) String userId) throws Exception {
+        return appFeatureService.findAppMenus(appId, userId, 0);
+    }
+
 }

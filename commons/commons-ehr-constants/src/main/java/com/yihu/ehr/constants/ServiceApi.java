@@ -324,6 +324,7 @@ public class ServiceApi {
         public static final String FilterFeatureNoPage = "/filterFeatureNoPage";
         public static final String FilterFeatureNoPageSorts = "/filterFeatureNoPageSorts";
         public static final String AppFeature = "/appFeature/{id}";
+        public static final String FindAppMenus = "/appFeature/findAppMenus";
     }
 
     public static class AppApiParameter {
