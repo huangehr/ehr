@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by linz on 2016年7月8日11:30:18.
@@ -269,7 +270,7 @@ public class AppFeatureController extends BaseController {
             @RequestParam(value = "userId", required = true) String userId) {
         try {
             Envelop envelop = new Envelop();
-            List<String> menuList = appFeatureClient.findAppMenus(appId, userId);
+            List<Map<String, Object>> menuList = appFeatureClient.findAppMenus(appId, userId);
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(menuList);
             return envelop;

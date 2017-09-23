@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,8 @@ public class AppFeatureService extends BaseJpaService<AppFeature, XAppApiFeature
     private XAppApiFeatureRepository xAppFeatureRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    ObjectMapper objectMapper;
 
     public Page<AppFeature> getAppFeatureList(String sorts, int page, int size){
         XAppApiFeatureRepository repo = (XAppApiFeatureRepository)getJpaRepository();
@@ -78,8 +81,8 @@ public class AppFeatureService extends BaseJpaService<AppFeature, XAppApiFeature
      * @param userId 用户ID
      * @return 菜单JSON字符串集合
      */
-    public List<String> findAppMenus(String appId, String userId, int parentId) {
-        List<String> menuList = new ArrayList<>();
+    public List<Map<String, Object>> findAppMenus(String appId, String userId, int parentId) throws IOException {
+        List<Map<String, Object>> menuList = new ArrayList<>();
 
         String sql = " SELECT af.id AS id, af.content AS content FROM apps_feature af " +
                 " JOIN role_user ru ON ru.user_id = '" + userId + "' " +
@@ -88,7 +91,8 @@ public class AppFeatureService extends BaseJpaService<AppFeature, XAppApiFeature
                 " ORDER BY af.sort ";
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
         for (Map<String, Object> item : list) {
-            menuList.add(item.get("content").toString());
+            Map<String, Object> conMap = objectMapper.readValue(item.get("content").toString(), Map.class);
+            menuList.add(conMap);
             menuList.addAll(findAppMenus(appId, userId, (int) item.get("id")));
         }
 

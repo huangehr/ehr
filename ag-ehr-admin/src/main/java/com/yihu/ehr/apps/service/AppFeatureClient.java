@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by linz on 2016年7月8日11:30:03.
@@ -80,7 +81,7 @@ public interface AppFeatureClient {
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FindAppMenus, method = RequestMethod.GET)
     @ApiOperation(value = "根据权限，获取应用菜单")
-    public List<String> findAppMenus(
+    public List<Map<String, Object>> findAppMenus(
             @ApiParam(name = "appId", value = "应用ID", required = true)
             @RequestParam(value = "appId", required = true) String appId,
             @ApiParam(name = "userId", value = "用户ID", required = true)
