@@ -68,7 +68,7 @@ public class AppFeatureService extends BaseJpaService<AppFeature, XAppApiFeature
             contentMap.put("pid", appFeature.getParentId());
         }
         if (appFeature.getUrl().startsWith("/")) {
-            contentMap.put("url", "${contextRoot}" + appFeature.getUrl());
+            contentMap.put("url", "/ehr" + appFeature.getUrl());
         }
         appFeature.setContent(objectMapper.writeValueAsString(contentMap));
         return appFeature;
