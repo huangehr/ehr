@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -378,7 +379,7 @@ public class PatientCardsController extends ExtendController<UserCards> {
     private Map<String,Object> convertCardModel(Map<String,Object> userCard){
         List<MDictionaryEntry> statusDicts = systemDictClient.getDictEntries("", "dictId=43", "", 10, 1).getBody();
         List<MDictionaryEntry> typeDicts = systemDictClient.getDictEntries("", "dictId=66", "", 10, 1).getBody();
-        if(userCard.get("auditor") != null){
+        if(!StringUtils.isEmpty(userCard.get("auditor"))){
             MUser user = userClient.getUser(userCard.get("auditor").toString());
             if(user!=null){
                 userCard.put("auditor",user.getRealName());
