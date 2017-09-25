@@ -13,7 +13,6 @@ import org.springframework.data.hadoop.hbase.TableCallback;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -52,17 +51,14 @@ public class HBaseDao extends AbstractHBaseClient {
         Scan scan = new Scan();
         scan.addFamily(Bytes.toBytes("basic"));
         scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator("^")));
-
         List<String> list = new LinkedList<>();
         hbaseTemplate.find(tableName, scan, new RowMapper<Void>() {
             @Override
             public Void mapRow(Result result, int rowNum) throws Exception {
                 list.add(Bytes.toString(result.getRow()));
-
                 return null;
             }
         });
-
         return list.size();
     }
 
@@ -73,8 +69,7 @@ public class HBaseDao extends AbstractHBaseClient {
         return hbaseTemplate.get(tableName, rowkey,new RowMapper<String>() {
 
             public String mapRow(Result result, int rowNum) throws Exception {
-                if(!result.isEmpty())
-                {
+                if(!result.isEmpty()) {
                     List<Cell> ceList = result.listCells();
                     Map<String, Object> map = new HashMap<String, Object>();
                     map.put("rowkey",rowkey);
@@ -99,7 +94,7 @@ public class HBaseDao extends AbstractHBaseClient {
      * 通过表名  key 和 列族 和列 获取一个数据
      */
     public String get(String tableName ,String rowkey, String familyName, String qualifier) {
-        return hbaseTemplate.get(tableName, rowkey,familyName,qualifier ,new RowMapper<String>(){
+        return hbaseTemplate.get(tableName, rowkey, familyName, qualifier, new RowMapper<String>(){
             public String mapRow(Result result, int rowNum) throws Exception {
                 List<Cell> ceList =   result.listCells();
                 String res = "";
@@ -147,8 +142,9 @@ public class HBaseDao extends AbstractHBaseClient {
                     }
                     list.add(get);
                 }
-
-                return  table.get(list);
+                Result [] results = table.get(list);
+                table.close();
+                return  results;
             }
         });
     }
@@ -160,7 +156,7 @@ public class HBaseDao extends AbstractHBaseClient {
         return hbaseTemplate.get(tableName, rowKey, new RowMapper<Map<String, Object>>() {
             public Map<String, Object> mapRow(Result result, int rowNum) throws Exception {
                 Map<String, Object> map = null;
-                if(result!=null) {
+                if(result != null) {
                     List<Cell> ceList = result.listCells();
                     if (ceList != null && ceList.size() > 0) {
                         map = new HashMap<String, Object>();
@@ -188,7 +184,7 @@ public class HBaseDao extends AbstractHBaseClient {
                 Put p = new Put(rowkey.getBytes());
                 p.add(familyName.getBytes(), qualifier.getBytes(), value.getBytes());
                 table.put(p);
-
+                table.close();
                 return null;
             }
         });
@@ -211,6 +207,7 @@ public class HBaseDao extends AbstractHBaseClient {
                     }
                 }
                 table.put(p);
+                table.close();
                 return null;
             }
         });
@@ -233,8 +230,8 @@ public class HBaseDao extends AbstractHBaseClient {
                                 Bytes.toBytes(value));
                     }
                 }
-
                 htable.put(put);
+                htable.close();
                 return null;
             }
         });
@@ -248,7 +245,7 @@ public class HBaseDao extends AbstractHBaseClient {
             public String doInTable(HTableInterface table) throws Throwable {
                 Delete d = new Delete(rowkey.getBytes());
                 table.delete(d);
-
+                table.close();
                 return null;
             }
         });
@@ -266,10 +263,9 @@ public class HBaseDao extends AbstractHBaseClient {
                     Delete delete = new Delete(Bytes.toBytes(rowKey));
                     deletes.add(delete);
                 }
-
                 Object[] results = new Object[deletes.size()];
                 table.batch(deletes, results);
-
+                table.close();
                 return results;
             }
         });
@@ -299,6 +295,7 @@ public class HBaseDao extends AbstractHBaseClient {
                 List<Put> puts = tableBundle.putOperations();
                 Object[] results = new Object[puts.size()];
                 htable.batch(puts, results);
+                htable.close();
                 return null;
             }
         });
