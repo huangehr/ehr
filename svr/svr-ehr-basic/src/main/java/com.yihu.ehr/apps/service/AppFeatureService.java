@@ -85,7 +85,7 @@ public class AppFeatureService extends BaseJpaService<AppFeature, XAppApiFeature
     public List<Map<String, Object>> findAppMenus(String appId, String userId, int parentId) throws IOException {
         List<Map<String, Object>> menuList = new ArrayList<>();
 
-        String sql = " SELECT af.id AS id, af.content AS content FROM apps_feature af " +
+        String sql = " SELECT DISTINCT af.id AS id, af.content AS content FROM apps_feature af " +
                 " JOIN role_user ru ON ru.user_id = '" + userId + "' " +
                 " JOIN role_feature_relation rfr ON rfr.feature_id = af.id AND rfr.role_id = ru.role_id " +
                 " WHERE af.app_id = '" + appId + "' AND af.parent_id = " + parentId + " AND af.type <> 3 " +
