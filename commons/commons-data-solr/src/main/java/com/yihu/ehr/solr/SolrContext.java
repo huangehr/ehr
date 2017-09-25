@@ -17,7 +17,7 @@ import org.springframework.data.solr.core.SolrTemplate;
 @Configuration
 public class SolrContext {
     @Value("${spring.data.solr.zk-host}")
-    String zkHost;
+    private String zkHost;
 
     @Bean
     public SolrClient solrClient() {
