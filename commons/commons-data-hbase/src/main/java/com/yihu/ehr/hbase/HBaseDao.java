@@ -31,13 +31,11 @@ public class HBaseDao extends AbstractHBaseClient {
         Scan scan = new Scan();
         scan.addFamily(Bytes.toBytes("basic"));
         scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator(rowkeyRegEx)));
-
         List<String> list = new LinkedList<>();
         hbaseTemplate.find(tableName, scan, new RowMapper<Void>() {
             @Override
             public Void mapRow(Result result, int rowNum) throws Exception {
                 list.add(Bytes.toString(result.getRow()));
-
                 return null;
             }
         });
@@ -67,7 +65,6 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public String get(String tableName, String rowkey) {
         return hbaseTemplate.get(tableName, rowkey,new RowMapper<String>() {
-
             public String mapRow(Result result, int rowNum) throws Exception {
                 if(!result.isEmpty()) {
                     List<Cell> ceList = result.listCells();
@@ -179,7 +176,6 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public void put(String tableName ,String rowkey, String familyName, String qualifier,String value) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<String>() {
-
             public String doInTable(HTableInterface table) throws Throwable {
                 Put p = new Put(rowkey.getBytes());
                 p.add(familyName.getBytes(), qualifier.getBytes(), value.getBytes());
@@ -199,9 +195,7 @@ public class HBaseDao extends AbstractHBaseClient {
                 Put p = new Put(rowkey.getBytes());
                 for(String familyName : family.keySet()) {
                     Map<String,String> map = family.get(familyName);
-
-                    for (String qualifier : map.keySet())
-                    {
+                    for (String qualifier : map.keySet()) {
                         String value = map.get(qualifier);
                         p.add(familyName.getBytes(), qualifier.getBytes(), value.getBytes());
                     }
@@ -306,15 +300,11 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public Object[] get(String tableName, TableBundle tableBundle) {
         return hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
-
             public Object[] doInTable(HTableInterface table) throws Throwable {
                 List<Get> gets = tableBundle.getOperations();
-
                 Object[] results = new Object[gets.size()];
                 table.batch(gets, results);
-
                 if (results.length > 0 && results[0].toString().equals("keyvalues=NONE")) return null;
-
                 return results;
             }
         });
@@ -328,10 +318,8 @@ public class HBaseDao extends AbstractHBaseClient {
 
             public Object[] doInTable(HTableInterface table) throws Throwable {
                 List<Delete> deletes = tableBundle.deleteOperations();
-
                 Object[] results = new Object[deletes.size()];
                 table.batch(deletes, results);
-
                 return null;
             }
         });

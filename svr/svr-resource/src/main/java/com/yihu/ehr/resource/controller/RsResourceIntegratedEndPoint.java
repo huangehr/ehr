@@ -231,11 +231,13 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             RsResourceDefaultQuery rsResourcesQuery = resourcesDefaultQueryService.findByResourcesId(resourceId);
             String queryCondition = "";
             if(rsResources.getDataSource() == 1) {
-                List<Map<String, String>> queryList = (List<Map<String, String>>)paraMap.get("queryCondition");
-                queryCondition = mapper.writeValueAsString(queryList);
+                //List<Map<String, String>> queryList = (List<Map<String, String>>)paraMap.get("queryCondition");
+                //queryCondition = mapper.writeValueAsString(queryList);
+                queryCondition = (String)paraMap.get("queryCondition");
             }else {
-                Map<String, Object> queryMap = (Map<String, Object>)paraMap.get("queryCondition");
-                queryCondition = mapper.writeValueAsString(queryMap);
+                //Map<String, Object> queryMap = (Map<String, Object>)paraMap.get("queryCondition");
+                //queryCondition = mapper.writeValueAsString(queryMap);
+                queryCondition = (String)paraMap.get("queryCondition");
             }
             if(rsResourcesQuery == null) {
                 rsResourcesQuery = new RsResourceDefaultQuery();
