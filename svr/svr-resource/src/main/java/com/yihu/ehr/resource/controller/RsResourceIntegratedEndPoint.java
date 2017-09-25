@@ -90,7 +90,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
         try {
             envelop.setSuccessFlg(false);
             ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> paraMap = mapper.readValue(dataJson.replace("Prefix", ""), Map.class);
+            Map<String, Object> paraMap = mapper.readValue(dataJson, Map.class);
             if (!paraMap.containsKey("resource")) {
                 return envelop;
             }
@@ -221,7 +221,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value="dataJson") String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> paraMap = mapper.readValue(dataJson.replace("Prefix", ""), Map.class);
+        Map<String, Object> paraMap = mapper.readValue(dataJson, Map.class);
         if(!paraMap.containsKey("resourceId") || !paraMap.containsKey("queryCondition")) {
             return envelop;
         }

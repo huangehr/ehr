@@ -305,7 +305,7 @@ public class RsResourceIntegratedController extends BaseController {
     public Envelop updateResource(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})")
             @RequestParam(value="dataJson") String dataJson) {
-        return resourcesIntegratedClient.updateResource("Prefix" + dataJson);
+        return resourcesIntegratedClient.updateResource(dataJson);
     }
 
     @ApiOperation("综合查询搜索条件更新")
@@ -313,6 +313,6 @@ public class RsResourceIntegratedController extends BaseController {
     public Envelop updateResourceQuery(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})")
             @RequestParam(value="dataJson") String dataJson) {
-        return resourcesIntegratedClient.updateResourceQuery("Prefix" + dataJson);
+        return resourcesIntegratedClient.updateResourceQuery(dataJson);
     }
 }
