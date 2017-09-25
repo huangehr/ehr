@@ -230,41 +230,44 @@ public class ResourceBrowseController extends BaseController {
                 //-----------------用户数据权限 start
                 String org = "";
                 Map<String, String> orgMap = new HashMap<>();
-                //获取用户所拥有的  带saaa权限
-                List<String> orgList = getInfoClient.getOrgCode(userId);
-                if(orgList != null && orgList.size() > 0){
-                    for(String orgcode : orgList){
-                        orgMap.put(orgcode,orgcode);
+                if( !StringUtils.isEmpty(userId)){
+                    //获取用户所拥有的  带saaa权限
+                    List<String> orgList = getInfoClient.getOrgCode(userId);
+                    if(orgList != null && orgList.size() > 0){
+                        for(String orgcode : orgList){
+                            orgMap.put(orgcode,orgcode);
+                        }
                     }
-                }
-                //获取用户所拥有的区域   带saaa权限
-                Map<String,String> param = new HashMap<>();
-                List<String> districtList = getInfoClient.getUserDistrictCode(userId);
-                if(districtList != null && districtList.size() > 0){
-                    for(String code : districtList){
-                        MGeographyDict mGeographyDict = addressClient.getAddressDictById(code);
-                        if(mGeographyDict != null){
-                            String province = "";
-                            String city = "";
-                            String district = "";
-                            if(mGeographyDict.getLevel() == 1){
-                                province =  mGeographyDict.getName();
-                            }else if(mGeographyDict.getLevel() == 2){
-                                city =  mGeographyDict.getName();
-                            }else if(mGeographyDict.getLevel() == 3){
-                                district =  mGeographyDict.getName();
-                            }
-                            Collection<MOrganization> organizations = organizationClient.getOrgsByAddress(province,city ,district );
-                            if(organizations !=null ){
-                                java.util.Iterator it = organizations.iterator();
-                                while(it.hasNext()){
-                                    MOrganization mOrganization = (MOrganization)it.next();
-                                    orgMap.put(mOrganization.getCode(),mOrganization.getCode());
+                    //获取用户所拥有的区域   带saaa权限
+                    Map<String,String> param = new HashMap<>();
+                    List<String> districtList = getInfoClient.getUserDistrictCode(userId);
+                    if(districtList != null && districtList.size() > 0){
+                        for(String code : districtList){
+                            MGeographyDict mGeographyDict = addressClient.getAddressDictById(code);
+                            if(mGeographyDict != null){
+                                String province = "";
+                                String city = "";
+                                String district = "";
+                                if(mGeographyDict.getLevel() == 1){
+                                    province =  mGeographyDict.getName();
+                                }else if(mGeographyDict.getLevel() == 2){
+                                    city =  mGeographyDict.getName();
+                                }else if(mGeographyDict.getLevel() == 3){
+                                    district =  mGeographyDict.getName();
+                                }
+                                Collection<MOrganization> organizations = organizationClient.getOrgsByAddress(province,city ,district );
+                                if(organizations !=null ){
+                                    java.util.Iterator it = organizations.iterator();
+                                    while(it.hasNext()){
+                                        MOrganization mOrganization = (MOrganization)it.next();
+                                        orgMap.put(mOrganization.getCode(),mOrganization.getCode());
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
                 if(orgMap != null && orgMap.size() > 0){
                     for(String key :orgMap.keySet()){
                         if(!StringUtils.isEmpty(key))
@@ -273,10 +276,12 @@ public class ResourceBrowseController extends BaseController {
                 }
                 //-----------------用户数据权限 end
                 //判断是否启用默认查询条件
-                Map<String, Object> params  = null;
+                Map<String, Object> params  = new HashMap<>();
                 if (queryCondition == null || queryCondition.equals("{}")) {
                     if(org.length()>0){
-                        params  = objectMapper.readValue(query, new TypeReference<Map>() {});
+                        if( !StringUtils.isEmpty(query)){
+                            params  = objectMapper.readValue(query, new TypeReference<Map>() {});
+                        }
                         params.put("org",org.substring(0,org.length()-1));
                         query = objectMapper.writeValueAsString(params);
                     }else{
