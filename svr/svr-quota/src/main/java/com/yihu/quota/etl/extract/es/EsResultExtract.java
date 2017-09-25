@@ -207,7 +207,7 @@ public class EsResultExtract {
         if( !StringUtils.isEmpty(org) ){
             String [] orgvals =org.split(",");
             for(int i=0;i<orgvals.length ; i++){
-                QueryStringQueryBuilder termOrg = QueryBuilders.queryStringQuery("org:" +  orgvals[i]);
+                MatchQueryBuilder termOrg = QueryBuilders.matchPhraseQuery("org", orgvals[i]);
                 qbChild.should(termOrg);
             }
             boolQueryBuilder.must(qbChild);
