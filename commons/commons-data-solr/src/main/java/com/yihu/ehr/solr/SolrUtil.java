@@ -27,8 +27,9 @@ import java.util.Map;
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SolrUtil {
+
     @Autowired
-    SolrPool pool;
+    private SolrPool pool;
     private final static String ASC = "asc";
 
     /**
@@ -93,7 +94,7 @@ public class SolrUtil {
         System.out.print("Solr Query Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
-        pool.close(core); //释放连接
+        pool.close(conn); //释放连接
         return docs;
 
     }
@@ -143,7 +144,7 @@ public class SolrUtil {
         System.out.print("Solr Query Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
-        pool.close(core); //释放连接
+        pool.close(conn); //释放连接
         return docs;
 
     }
@@ -183,7 +184,7 @@ public class SolrUtil {
         System.out.print("Solr Count Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
-        pool.close(core);
+        pool.close(conn);
         return docs.getNumFound();
     }
 
@@ -223,7 +224,7 @@ public class SolrUtil {
                 rmap.put(count.getName(), (long) count.getCount());
         }
 
-        pool.close(core);
+        pool.close(conn);
         return rmap;
     }
 
@@ -257,7 +258,7 @@ public class SolrUtil {
         System.out.print("Solr Group Time:" + qtime);
         List<FacetField> facets = rsp.getFacetFields();
 
-        pool.close(core);
+        pool.close(conn);
         return facets;
     }
 
@@ -293,7 +294,7 @@ public class SolrUtil {
 
         NamedList<List<PivotField>> namedList = rsp.getFacetPivot();
 
-        pool.close(core);
+        pool.close(conn);
         if (namedList != null && namedList.size() > 0) {
             return namedList.getVal(0);
         } else
@@ -334,7 +335,7 @@ public class SolrUtil {
         System.out.print("Solr Stats Time:" + qtime);
 
         Map<String, FieldStatsInfo> stats = rsp.getFieldStatsInfo();
-        pool.close(core);
+        pool.close(conn);
         if (stats != null && stats.size() > 0) {
             Map<String, List<FieldStatsInfo>> map = stats.get(statsField).getFacets();
             if (map != null) {
