@@ -68,6 +68,7 @@ public class AppFeatureService extends BaseJpaService<AppFeature, XAppApiFeature
             contentMap.put("pid", appFeature.getParentId());
         }
         if (appFeature.getUrl().startsWith("/")) {
+            // 这里“/ehr”为医疗云后台管理系统的 contextPath
             contentMap.put("url", "/ehr" + appFeature.getUrl());
         }
         appFeature.setContent(objectMapper.writeValueAsString(contentMap));
