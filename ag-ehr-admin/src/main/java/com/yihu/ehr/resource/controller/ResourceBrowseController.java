@@ -265,7 +265,7 @@ public class ResourceBrowseController extends BaseController {
                         }
                     }
                 }
-                if(orgMap != null){
+                if(orgMap != null && orgMap.size() > 0){
                     for(String key :orgMap.keySet()){
                         if(!StringUtils.isEmpty(key))
                             org =   org + key + ",";
@@ -273,19 +273,24 @@ public class ResourceBrowseController extends BaseController {
                 }
                 //-----------------用户数据权限 end
                 //判断是否启用默认查询条件
+                Map<String, Object> params  = null;
                 if (queryCondition == null || queryCondition.equals("{}")) {
                     if(org.length()>0){
-                        Map<String, Object> params  = objectMapper.readValue(query, new TypeReference<Map>() {});
+                        params  = objectMapper.readValue(query, new TypeReference<Map>() {});
                         params.put("org",org.substring(0,org.length()-1));
                         query = objectMapper.writeValueAsString(params);
+                    }else{
+                        params.put("org","-000001");
                     }
                     envelop1 = tjQuotaJobClient.getQuotaTotalCount(resourceQuotaModel.getQuotaId(), query, dimension.substring(0, dimension.length() - 1));
                     envelopList.add(envelop1);
                 } else {
                     if(org.length()>0){
-                        Map<String, Object> params  = objectMapper.readValue(queryCondition, new TypeReference<Map>() {});
+                        params  = objectMapper.readValue(queryCondition, new TypeReference<Map>() {});
                         params.put("org",org.substring(0,org.length()-1));
                         queryCondition = objectMapper.writeValueAsString(params);
+                    }else{
+                        params.put("org","-000001");
                     }
                     envelop1 = tjQuotaJobClient.getQuotaTotalCount(resourceQuotaModel.getQuotaId(), queryCondition, dimension.substring(0, dimension.length() - 1));
                     envelopList.add(envelop1);

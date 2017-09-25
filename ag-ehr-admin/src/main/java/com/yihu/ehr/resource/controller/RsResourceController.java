@@ -381,17 +381,20 @@ public class RsResourceController extends BaseController {
                             }
                         }
                     }
-                    if(orgMap != null){
+                    if(orgMap != null && orgMap.size() > 0){
                         for(String key :orgMap.keySet()){
                             if(StringUtils.isNotEmpty(key))
                                 org =   org + key + ",";
                         }
                     }
                     //-----------------用户数据权限 end
+                    Map<String, Object> params  = null;
                     if(org.length()>0){
-                        Map<String, Object> params  = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {});
+                        params  = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {});
                         params.put("org",org.substring(0,org.length()-1));
                         quotaFilter = objectMapper.writeValueAsString(params);
+                    }else{
+                        params.put("org","-000001");
                     }
                     MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
                     chartInfoModels.add(chartInfoModel);

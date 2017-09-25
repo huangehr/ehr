@@ -171,16 +171,19 @@ public class RsResourceIntegratedController extends BaseController {
                     }
                 }
             }
-            if(orgMap != null){
+            if(orgMap != null && orgMap.size() > 0){
                 for(String key :orgMap.keySet()){
                     if(StringUtils.isNotEmpty(key))
                         org =   org + key + ",";
                 }
             }
-            if(org.length()>0){
-                Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
+            Map<String, Object> params  = null;
+            if(org.length() > 0 ){
+                params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
                 params.put("org",org.substring(0,org.length()-1));
                 filters = objectMapper.writeValueAsString(params);
+            }else{
+                params.put("org","-000001");
             }
             //-----------------用户数据权限 end
 
