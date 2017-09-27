@@ -5,9 +5,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,12 +38,6 @@ public interface ResourceBrowseClient {
             @RequestParam(value = "queryCondition",required = false) String queryCondition,
             @RequestParam(value = "page",required = false) Integer page,
             @RequestParam(value = "size",required = false) Integer size);
-
-    @ApiOperation("根据资源id获取默认查询条件值")
-    @RequestMapping(value = ServiceApi.Resources.QueryById, method = RequestMethod.GET)
-    String getResourceDefaultQueryById(
-            @ApiParam(name = "id", value = "资源id")
-            @PathVariable(value = "id") String id);
 
     /**
     @ApiOperation("资源浏览详细信息")

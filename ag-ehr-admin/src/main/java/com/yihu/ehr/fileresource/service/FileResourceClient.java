@@ -4,7 +4,10 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -16,21 +19,21 @@ import java.util.List;
 public interface FileResourceClient {
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload", method = RequestMethod.POST)
-    @ApiOperation(value = "上传图片")
+    @ApiOperation(value = "上传文件")
     String fileUpload(
             @RequestBody String fileStr,
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload_returnUrl", method = RequestMethod.POST)
-    @ApiOperation(value = "上传图片")
+    @ApiOperation(value = "上传文件，并返回存储相对路径")
     String fileUploadReturnUrl(
             @RequestBody String fileStr,
             @RequestParam(value = "file_name") String fileName,
             @RequestParam(value = "json_data") String jsonData);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload_returnHttpUrl", method = RequestMethod.POST)
-    @ApiOperation(value = "上传图片返回整个httpUrl")
+    @ApiOperation(value = "上传文件，并返回存储绝对路径")
     String fileUploadReturnHttpUrl(
             @RequestBody String fileStr,
             @RequestParam(value = "file_name") String fileName,
@@ -47,12 +50,12 @@ public interface FileResourceClient {
             @RequestParam(value = "object_id") String objectId,
             @RequestParam(value = "mime", required = false) String mime);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/image_view/{storagePath}", method = RequestMethod.GET)
+    @RequestMapping(value = ApiVersion.Version1_0 + "/image_view", method = RequestMethod.GET)
     @ApiOperation(value = "查看图片")
-    String imageView(@PathVariable(value = "storagePath") String storagePath);
+    String imageView(@RequestParam(value = "storagePath") String storagePath);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_path", method = RequestMethod.GET)
-    @ApiOperation(value = "下载文件路径")
+    @ApiOperation(value = "获取文件路径")
     List<String> filesPath(
             @RequestParam(value = "object_id") String objectId);
 
@@ -61,10 +64,12 @@ public interface FileResourceClient {
     boolean filesDeleteByPath(
             @RequestParam(value = "storagePath") String storagePath);
 
-    @RequestMapping(value = ApiVersion.Version1_0 + "/imageFindById", method = RequestMethod.GET)
-    @ApiOperation(value = "根据文件的id,查找文件路径")
-    String imageFindById(
-            @RequestParam(value = "imageId") String imageId);
+    @ApiOperation(value = "根据文件的id，获取文件的真实访问路径")
+    @RequestMapping(value = ApiVersion.Version1_0 + "/file/getRealPathById", method = RequestMethod.GET)
+    String getRealPathById(@RequestParam(value = "fileId") String fileId);
 
+    @ApiOperation(value = "根据文件的存储路径，获取文件的真实访问路径")
+    @RequestMapping(value = ApiVersion.Version1_0 + "/file/getRealPathByStoragePath", method = RequestMethod.GET)
+    String getRealPathByStoragePath(@RequestParam(value = "storagePath") String storagePath);
 
 }

@@ -1,10 +1,10 @@
 package com.yihu.ehr.organization.controller;
 
-import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.org.OrgDeptDetailModel;
 import com.yihu.ehr.agModel.org.OrgDeptMemberModel;
 import com.yihu.ehr.agModel.org.OrgDeptModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrgDept;
@@ -431,7 +431,9 @@ public class OrgDeptController  extends BaseController {
             @ApiParam(name = "orgId", value = "机构ID")
             @RequestParam(value = "orgId", required = true) Integer orgId,
             @ApiParam(name = "userId", value = "用户ID")
-            @RequestParam(value = "userId", required = true) String userId
+            @RequestParam(value = "userId", required = true) String userId,
+            @ApiParam(name = "deptId", value = "部门ID")
+            @RequestParam(value = "deptId", required = true) Integer deptId
     ){
         try {
             Envelop envelop = new Envelop();
@@ -444,10 +446,10 @@ public class OrgDeptController  extends BaseController {
                 errorMsg+="用户不能为空！";
                 envelop.setErrorMsg(errorMsg);
             }
-            int num = orgDeptClient.getCountByUserId(orgId, userId);
+            int num = orgDeptClient.getCountByUserId(orgId, userId, deptId);
             if (num > 0) {
                 envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("所在机构已经存在此用户!");
+                envelop.setErrorMsg("所在机构中的部门已经存在此用户!");
             }else{
                 envelop.setSuccessFlg(true);
             }
@@ -633,6 +635,24 @@ public class OrgDeptController  extends BaseController {
         {
             ex.printStackTrace();
             return false;
+        }
+    }
+
+    @ApiOperation(value = "根据用户ＩＤ获取部门列表")
+    @RequestMapping(value = ServiceApi.Org.getUserOrglistByUserId, method = RequestMethod.GET)
+    public Envelop getUserOrglistByUserId(
+            @ApiParam(name = "userId", value = "用户ID", defaultValue = "")
+            @RequestParam(value = "userId") String userId) {
+        try {
+            Envelop envelop = new Envelop();
+            envelop.setDetailModelList(orgDeptClient.getUserOrglistByUserId(userId));
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
         }
     }
 

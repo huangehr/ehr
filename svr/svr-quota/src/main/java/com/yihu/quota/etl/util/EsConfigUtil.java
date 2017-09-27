@@ -1,8 +1,5 @@
 package com.yihu.quota.etl.util;
 
-import com.yihu.quota.etl.model.EsConfig;
-import com.yihu.quota.etl.save.es.ElasticFactory;
-import org.elasticsearch.client.Client;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,12 +14,12 @@ public class EsConfigUtil {
     private String type;// 类型 es 相当于表
     private String clusterName;//es clusterName
 
-    public void getConfig(EsConfig esConfig){
-        this.host = esConfig.getHost();
-        this.port = esConfig.getPort();
-        this.index = esConfig.getIndex();
-        this.type = esConfig.getType();
-        this.clusterName = esConfig.getClusterName();
+    public void getConfig(String host,int port,String index,String type,String clusterName){
+        this.host = host;
+        this.port = port;
+        this.index = index;
+        this.type = type;
+        this.clusterName = clusterName;
     }
 
     public String getHost() {

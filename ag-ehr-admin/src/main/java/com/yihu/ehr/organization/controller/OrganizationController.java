@@ -1,40 +1,40 @@
 package com.yihu.ehr.organization.controller;
 
-import com.yihu.ehr.apps.service.AppClient;
-import com.yihu.ehr.fileresource.service.FileResourceClient;
-import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.model.common.ObjectResult;
-import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.adapter.service.PlanClient;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
+import com.yihu.ehr.agModel.org.OrgDetailModel;
+import com.yihu.ehr.agModel.org.OrgModel;
+import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.adaption.MAdapterOrg;
 import com.yihu.ehr.model.adaption.MAdapterPlan;
+import com.yihu.ehr.model.app.MApp;
+import com.yihu.ehr.model.common.ObjectResult;
+import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.geography.MGeography;
+import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.profile.MTemplate;
+import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.organization.service.OrganizationClient;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.agModel.org.OrgModel;
+import com.yihu.ehr.redis.client.RedisUpdateClient;
 import com.yihu.ehr.security.service.SecurityClient;
-import com.yihu.ehr.model.geography.MGeography;
-import com.yihu.ehr.agModel.org.OrgDetailModel;
-import com.yihu.ehr.model.security.MKey;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.template.service.TemplateClient;
 import com.yihu.ehr.users.service.UserClient;
-import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.ResponseEntity;
@@ -53,36 +53,28 @@ public class OrganizationController extends BaseController {
 
     @Autowired
     private OrganizationClient orgClient;
-
     @Autowired
     private ConventionalDictEntryClient conDictEntryClient;
-
     @Autowired
     AddressClient addressClient;
-
     @Autowired
     SecurityClient securityClient;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private UserClient userClient;
-
     @Autowired
     private AdapterOrgClient adapterOrgClient;
-
     @Autowired
     private PlanClient planClient;
-
     @Autowired
     private TemplateClient templateClient;
-
     @Autowired
     private FileResourceClient fileResourceClient;
-
     @Autowired
     private AppClient appClient;
+    @Autowired
+    private RedisUpdateClient redisUpdateClient;
 
     @ApiOperation(value = "获取所有部门列表")
     @RequestMapping(value = "/organizations/getAllOrgs", method = RequestMethod.GET)
@@ -123,7 +115,7 @@ public class OrganizationController extends BaseController {
         try {
             String address = "";
             if(StringUtils.isNotBlank(province)){
-              List<String> addressList = addressClient.search(province, city, district);
+                List<String> addressList = addressClient.search(province, city, district);
                 String[] addrIdsArrays = addressList.toArray(new String[addressList.size()]);
                 address = String.join(",", addrIdsArrays);
             }
@@ -274,7 +266,7 @@ public class OrganizationController extends BaseController {
                 return failed("删除失败!");
             }
             try {
-               fileResourceClient.filesDelete(orgCode);
+                fileResourceClient.filesDelete(orgCode);
             }catch (Exception e){
                 return success("数据删除成功！图片删除失败！");
             }
@@ -335,8 +327,7 @@ public class OrganizationController extends BaseController {
             if (StringUtils.isEmpty(mOrganization.getTel())) {
                 errorMsg+="联系方式不能为空！";
             }
-            if(StringUtils.isNotEmpty(errorMsg))
-            {
+            if(StringUtils.isNotEmpty(errorMsg)) {
                 return failed(errorMsg);
             }
             String locationId = null;
@@ -354,12 +345,18 @@ public class OrganizationController extends BaseController {
                     return failed(errorMsg);
                 }
             }
-
             mOrganization.setLocation(locationId);
             String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
             MOrganization mOrgNew = orgClient.create(mOrganizationJson);
             if (mOrgNew == null) {
                 return failed("保存失败!");
+            }
+            //新增机构名称缓存（原则上如果缓存新增失败不能影响实际新增结果）
+            try {
+                redisUpdateClient.updateOrgName(mOrgNew.getOrgCode());
+                redisUpdateClient.updateOrgArea(mOrgNew.getOrgCode());
+            }catch (Exception e) {
+                e.printStackTrace();
             }
             return success(convertToOrgDetailModel(mOrgNew));
         }
@@ -381,66 +378,71 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "inputStream", required = false) String inputStream,
             @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
             @RequestParam(value = "imageName", required = false) String imageName) {
-      try {
-          String errorMsg ="";
-
-          //头像上传,接收头像保存的远程路径  path
-          String path = null;
-          if (!StringUtils.isEmpty(inputStream)) {
-              String jsonData = inputStream + "," + imageName;
-              path = orgClient.uploadPicture(jsonData);
-          }
-          String locationId = null;
-          if (!StringUtils.isEmpty(geographyModelJsonData)) {
-              GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData, GeographyModel.class);
-              if (geographyModel.nullAddress()) {
-                  errorMsg+="机构地址不能为空！";
-              }
-              locationId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
-              if (StringUtils.isEmpty(locationId)) {
-                  return failed("保存地址失败！");
-              }
-              if(StringUtils.isNotEmpty(errorMsg))
-              {
-                  return failed(errorMsg);
-              }
-          }
-          OrgDetailModel orgDetailModel = null;
-          if (!StringUtils.isEmpty(mOrganizationJsonData)) {
-              orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
-          }
-          if (!StringUtils.isEmpty(path)) {
-              orgDetailModel.setImgRemotePath(path);
-              orgDetailModel.setImgLocalPath("");
-          }
-
-          MOrganization mOrganization = convertToMOrganization(orgDetailModel);
-          if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
-              errorMsg+="机构代码不能为空！";
-          }
-          if (StringUtils.isEmpty(mOrganization.getFullName())) {
-              errorMsg+="机构全名不能为空！";
-          }
-          if (StringUtils.isEmpty(mOrganization.getShortName())) {
-              errorMsg+="机构简称不能为空！";
-          }
-          if (StringUtils.isEmpty(mOrganization.getTel())) {
-              errorMsg+="联系方式不能为空！";
-          }
-
-          mOrganization.setLocation(locationId);
-          String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
-          MOrganization mOrgNew = orgClient.update(mOrganizationJson);
-          if (mOrgNew == null) {
-             return  failed("更新失败");
-          }
-          return success(convertToOrgDetailModel(mOrgNew));
-      }
-      catch (Exception ex)
-      {
-          ex.printStackTrace();
-          return failedSystem();
-      }
+        try {
+            String errorMsg ="";
+            //头像上传,接收头像保存的远程路径  path
+            String path = null;
+            if (!StringUtils.isEmpty(inputStream)) {
+                String jsonData = inputStream + "," + imageName;
+                path = orgClient.uploadPicture(jsonData);
+            }
+            String locationId = null;
+            if (!StringUtils.isEmpty(geographyModelJsonData)) {
+                GeographyModel geographyModel = objectMapper.readValue(geographyModelJsonData, GeographyModel.class);
+                if (geographyModel.nullAddress()) {
+                    errorMsg+="机构地址不能为空！";
+                }
+                locationId = addressClient.saveAddress(objectMapper.writeValueAsString(geographyModel));
+                if (StringUtils.isEmpty(locationId)) {
+                    return failed("保存地址失败！");
+                }
+                if(StringUtils.isNotEmpty(errorMsg))
+                {
+                    return failed(errorMsg);
+                }
+            }
+            OrgDetailModel orgDetailModel = null;
+            if (!StringUtils.isEmpty(mOrganizationJsonData)) {
+                orgDetailModel = objectMapper.readValue(mOrganizationJsonData, OrgDetailModel.class);
+            }
+            if (!StringUtils.isEmpty(path)) {
+                orgDetailModel.setImgRemotePath(path);
+                orgDetailModel.setImgLocalPath("");
+            }
+            MOrganization mOrganization = convertToMOrganization(orgDetailModel);
+            if (StringUtils.isEmpty(mOrganization.getOrgCode())) {
+                errorMsg+="机构代码不能为空！";
+            }
+            if (StringUtils.isEmpty(mOrganization.getFullName())) {
+                errorMsg+="机构全名不能为空！";
+            }
+            if (StringUtils.isEmpty(mOrganization.getShortName())) {
+                errorMsg+="机构简称不能为空！";
+            }
+            if (StringUtils.isEmpty(mOrganization.getTel())) {
+                errorMsg+="联系方式不能为空！";
+            }
+            if(StringUtils.isNotEmpty(errorMsg)) {
+                return failed(errorMsg);
+            }
+            mOrganization.setLocation(locationId);
+            String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
+            MOrganization mOrgNew = orgClient.update(mOrganizationJson);
+            if (mOrgNew == null) {
+                return  failed("更新失败");
+            }
+            //更新机构名称缓存（原则上如果缓存更新失败不能影响实际更新结果）
+            try {
+                redisUpdateClient.updateOrgName(mOrgNew.getOrgCode());
+                redisUpdateClient.updateOrgArea(mOrgNew.getOrgCode());
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+            return success(convertToOrgDetailModel(mOrgNew));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failedSystem();
+        }
     }
 
     /**
@@ -539,8 +541,8 @@ public class OrganizationController extends BaseController {
 
         //获取机构类别字典值
         if(StringUtils.isNotBlank(mOrg.getOrgType())){
-          MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
-          org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
+            MConventionalDict orgTypeDict = conDictEntryClient.getOrgType(mOrg.getOrgType());
+            org.setOrgTypeName(orgTypeDict == null ? "" : orgTypeDict.getValue());
         }
         //获取接入方式字典字典值
         if(StringUtils.isNotBlank(mOrg.getSettledWay())){
@@ -688,7 +690,7 @@ public class OrganizationController extends BaseController {
         try {
             Map<String, String> key = orgClient.distributeKey(orgCode);
             if (key.size() == 0) {
-               return failed("机构秘钥分发失败!");
+                return failed("机构秘钥分发失败!");
             }
             return success(key);
         }

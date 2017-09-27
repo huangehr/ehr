@@ -166,7 +166,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
 
 
     public User saveUser(User user) {
-        userRepository.save(user);
+        user = userRepository.save(user);
         return user;
     }
 

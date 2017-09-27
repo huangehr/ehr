@@ -20,12 +20,12 @@ import org.springframework.stereotype.Service;
 public class SolrPool {
 
     @Value("${spring.data.solr.zk-host}")
-    String zkHost;
+    private String zkHost;
 
     private MulticoreSolrClientFactory factory;
+
     protected MulticoreSolrClientFactory getFactory(){
-        if(factory==null)
-        {
+        if(factory == null) {
             CloudSolrClient client = new CloudSolrClient(zkHost);
             factory = new MulticoreSolrClientFactory(client);
         }
@@ -44,8 +44,8 @@ public class SolrPool {
     /**
      * 关闭连接
      */
-    public void close(String core) throws Exception{
-        getFactory().removeSolrClient(core);
+    public void close(SolrClient solrClient) throws Exception{
+        solrClient.close();
     }
 
 

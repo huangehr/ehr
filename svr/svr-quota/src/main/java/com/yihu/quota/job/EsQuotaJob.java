@@ -54,6 +54,8 @@ public class EsQuotaJob implements Job {
     @Autowired
     private EsClientUtil esClientUtil;
     @Autowired
+    EsConfigUtil esConfigUtil;
+    @Autowired
     private ExtractHelper extractHelper;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
@@ -98,10 +100,14 @@ public class EsQuotaJob implements Job {
                 TermQueryBuilder termQueryQuotaDate = QueryBuilders.termQuery("quotaDate", quoataDate);
                 boolQueryBuilder.must(termQueryQuotaCode);
                 boolQueryBuilder.must(termQueryQuotaDate);
-                esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-                Client client = esClientUtil.getClient(esConfig.getClusterName());
-                elasticsearchUtil.queryDelete(client,boolQueryBuilder);
-
+                Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+                try {
+                   elasticsearchUtil.queryDelete(client,boolQueryBuilder);
+               }catch (Exception e){
+                   e.getMessage();
+               }finally {
+                   client.close();
+               }
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for(SaveModel saveModel :dataModels){
                     if(saveModel.getResult() != null && Double.valueOf(saveModel.getResult())>0 ){
@@ -109,10 +115,15 @@ public class EsQuotaJob implements Job {
                         dataSaveModels.add(saveModel);
                     }
                 }
-                //保存数据
-                Boolean success = saveDate(dataSaveModels);
-                tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据保存失败");
+                if(dataSaveModels != null && dataSaveModels.size() > 0){
+                    //保存数据
+                    Boolean success = saveDate(dataSaveModels);
+                    tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
+                    tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据保存失败");
+                }else {
+                    tjQuotaLog.setStatus(Contant.save_status.success);
+                    tjQuotaLog.setContent("统计结果大于0的数据为0条");
+                }
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent("没有抽取到数据");

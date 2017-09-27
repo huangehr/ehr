@@ -2,48 +2,45 @@ package com.yihu.ehr.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unboundid.util.json.JSONObject;
+import com.yihu.ehr.agModel.geogrephy.GeographyModel;
+import com.yihu.ehr.agModel.patient.PatientDetailModel;
+import com.yihu.ehr.agModel.patient.PatientModel;
 import com.yihu.ehr.agModel.user.PlatformAppRolesTreeModel;
 import com.yihu.ehr.agModel.user.RoleUserModel;
 import com.yihu.ehr.agModel.user.UserDetailModel;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.AgAdminConstants;
-import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.entity.patient.UserCards;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
+import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.common.ListResult;
-import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
+import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
+import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.patient.MDemographicInfo;
 import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.model.user.MRoles;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.patient.service.PatientCardsClient;
-import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
-import com.yihu.ehr.agModel.geogrephy.GeographyModel;
-import com.yihu.ehr.agModel.patient.PatientDetailModel;
-import com.yihu.ehr.agModel.patient.PatientModel;
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.patient.service.PatientClient;
-import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geography.MGeography;
-import com.yihu.ehr.model.patient.MDemographicInfo;
+import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.systemdict.service.SystemDictClient;
 import com.yihu.ehr.users.service.RoleUserClient;
 import com.yihu.ehr.users.service.RolesClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
-import com.yihu.ehr.controller.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -936,6 +933,11 @@ public class PatientController extends BaseController {
                 mr=new MRoleUser();
                 mr.setRoleId(m.getRoleId());
                 mr.setRoleName(appRolesTreeModelMap.get(String.valueOf(m.getRoleId())));
+                MRoles roles = rolesClient.getRolesById(m.getRoleId());
+                Collection<MApp> appCollection = appClient.getAppsNoPage("id=" + roles.getAppId());
+                for(MApp app : appCollection){
+                    mr.setAppName(app.getName());
+                }
                 mRoleUserList.add(mr);
             }
         }

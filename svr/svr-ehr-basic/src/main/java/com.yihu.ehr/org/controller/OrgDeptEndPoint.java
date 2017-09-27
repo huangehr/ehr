@@ -1,6 +1,7 @@
 package com.yihu.ehr.org.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.org.MOrgDept;
 import com.yihu.ehr.model.org.MOrgDeptDetail;
@@ -203,7 +204,14 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
         System.out.println(list.toString());
         return list;
     }
-
+    @RequestMapping(value =ServiceApi.Org.getUserOrglistByUserId, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据用户ＩＤ获取部门列表")
+    public List<String> getUserOrglistByUserId(
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId", required = true) String userId) throws Exception {
+        List<String> orgDepts = orgDeptService.searchByUserId(userId);
+        return orgDepts;
+    }
 
 
 

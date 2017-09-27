@@ -97,7 +97,7 @@ public class HealthProblemDictController extends BaseController {
         return envelop;
     }
 
-    @RequestMapping(value = "/dict/hp/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getHpDict/hp/{id}", method = RequestMethod.GET)
     @ApiOperation(value = "根据ID获取相应的健康问题字典信息。" )
     public Envelop getHpDict(
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")

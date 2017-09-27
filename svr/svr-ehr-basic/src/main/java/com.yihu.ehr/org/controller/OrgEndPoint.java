@@ -268,7 +268,11 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "district", value = "县")
             @RequestParam(value = "district", required = false) String district) {
         List<Organization> orgList = orgService.searchByAddress(province, city, district);
-        return (List<MOrganization>) convertToModels(orgList, new ArrayList<MOrganization>(orgList.size()), MOrganization.class, null);
+        if(orgList != null && orgList.size() > 0 ){
+            return (List<MOrganization>) convertToModels(orgList, new ArrayList<MOrganization>(orgList.size()), MOrganization.class, null);
+        }else {
+            return null;
+        }
     }
 
     @RequestMapping(value = "organizations/key", method = RequestMethod.POST)

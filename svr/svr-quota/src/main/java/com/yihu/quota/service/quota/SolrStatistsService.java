@@ -102,7 +102,7 @@ public class SolrStatistsService {
         if (size == null) {
             size = defaultSize;
         }
-        return hbase.queryBySolr(core, q, sort, page, size, fq, fl);
+        return hbase.queryBySolr(core, q, sort, fq, "", fl, page, size);
     }
 
     /**

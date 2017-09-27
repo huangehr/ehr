@@ -1,19 +1,15 @@
 package com.yihu.ehr.solr;
 
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.*;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.FacetParams;
-import org.apache.solr.common.util.NamedList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,8 +24,9 @@ import java.util.*;
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SolrAdmin {
+
     @Autowired
-    SolrPool pool;
+    private SolrPool pool;
 
 
     /************************* 基础操作 **************************************************/
@@ -47,7 +44,7 @@ public class SolrAdmin {
         UpdateResponse re = client.add(doc);
         client.commit();
 
-        pool.close(core); //释放连接
+        pool.close(client); //释放连接
 
         if(re.getStatus()!=0) {
             System.out.print("create index cost " + re.getQTime());
@@ -94,7 +91,7 @@ public class SolrAdmin {
 
             UpdateResponse re = client.add(solrList);
             client.commit();
-            pool.close(core); //释放连接
+            pool.close(client); //释放连接
 
             if(re.getStatus()!=0) {
                 System.out.print("update index cost " + re.getQTime());
@@ -120,7 +117,7 @@ public class SolrAdmin {
         SolrClient client = pool.getConnection(core);
         UpdateResponse de = client.deleteByQuery(keyQuery);
         client.commit();
-        pool.close(core); //释放连接
+        pool.close(client); //释放连接
 
         if(de.getStatus()!=0) {
             System.out.print("delete index cost " + de.getQTime());

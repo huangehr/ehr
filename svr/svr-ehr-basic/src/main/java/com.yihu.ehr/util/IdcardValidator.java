@@ -438,14 +438,14 @@ public class IdcardValidator {
         }
         return a;
     }
-
-    public static void main(String[] args) throws Exception {
-
-        String idcard15 = "142431199001145";//15位
-        String idcard18 = "121212121212121212";//18位
-        IdcardValidator iv = new IdcardValidator();
-        System.out.println(iv.isValidatedAllIdcard(idcard15));
-        System.out.println(iv.isValidatedAllIdcard(idcard18));
-
-    }
+//
+//    public static void main(String[] args) throws Exception {
+//
+//        String idcard15 = "142431199001145";//15位
+//        String idcard18 = "121212121212121212";//18位
+//        IdcardValidator iv = new IdcardValidator();
+//        System.out.println(iv.isValidatedAllIdcard(idcard15));
+//        System.out.println(iv.isValidatedAllIdcard(idcard18));
+//
+//    }
 }

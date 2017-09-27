@@ -249,4 +249,29 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             return null;
         }
     }
+
+    /**
+     * 机构资源授权获取
+     */
+    public  List<Object>  getStatisticsDoctorsByRoleType(String roleType)
+    {
+        String sql =
+                "SELECT count(1),omr.org_id,omr.org_name " +
+                        "FROM doctors d " +
+                        "LEFT JOIN users u " +
+                        "ON d.id=u.doctor_id " +
+                        "JOIN org_member_relation omr " +
+                        "ON u.id=omr.user_id " +
+                        "WHERE d.role_type=:roleType " +
+                        " GROUP BY omr.org_id,omr.org_name";
+
+        SQLQuery query = currentSession().createSQLQuery(sql);
+        query.setParameter("roleType", roleType);
+        List<Object> list=query.list();
+        return list;
+    }
+
+    public int getStatisticsCityDoctorByRoleType(String roleType) {
+        return doctorRepository.getStatisticsCityDoctorByRoleType(roleType);
+    }
 }

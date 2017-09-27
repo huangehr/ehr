@@ -73,7 +73,7 @@ public class DoctorController extends BaseController {
                 doctorsModel.setSex(dict == null ? "" : dict.getValue());
             }
             if (StringUtils.isNotEmpty(mDoctor.getRoleType())) {
-                MConventionalDict dict = conventionalDictClient.getUserType(mDoctor.getRoleType());
+                MConventionalDict dict = conventionalDictClient.getMedicalRole(mDoctor.getRoleType());
                 doctorsModel.setRoleType(dict == null ? "" : dict.getValue());
             }
             doctorsModels.add(doctorsModel);
@@ -180,7 +180,11 @@ public class DoctorController extends BaseController {
     @ApiOperation(value = "创建医生", notes = "重新绑定医生信息")
     public Envelop createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "doctor_json_data") String doctorJsonData) {
+            @RequestParam(value = "doctor_json_data") String doctorJsonData,
+            @ApiParam(name = "orgId", value = "", defaultValue = "")
+            @RequestParam(value = "orgId") String orgId,
+            @ApiParam(name = "deptId", value = "", defaultValue = "")
+            @RequestParam(value = "deptId") String deptId) {
         try {
             DoctorDetailModel detailModel = objectMapper.readValue(doctorJsonData, DoctorDetailModel.class);
 
@@ -209,7 +213,7 @@ public class DoctorController extends BaseController {
                 return failed(errorMsg);
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
-            mDoctor = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor));
+            mDoctor = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor), orgId, deptId);
             if (mDoctor == null) {
                 return failed("保存失败!");
             }

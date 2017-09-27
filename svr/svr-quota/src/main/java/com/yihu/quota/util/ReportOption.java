@@ -23,6 +23,10 @@ import java.util.Map;
  */
 public class ReportOption {
 
+    public static int bar = 1;
+    public static int line = 2;
+    public static int pie = 3;
+
     /**
      * 折线图
      * @param title  标题
@@ -43,31 +47,31 @@ public class ReportOption {
         //tooltip
         option.tooltip().trigger(Trigger.axis);
         //toolbox
-        option.toolbox().show(false);
-        DataView dataView = new DataView();
-        dataView.show(true);
-        dataView.readOnly(false);
-        option.toolbox().feature().put("dataView", Feature.dataView);
-        MagicType magicType = new MagicType();
-        magicType.show(true);
-        List<String> typeList = new ArrayList<String>();
-        typeList.add("pie");
-        typeList.add("funnel");
-        magicType.setType(typeList);
-        option.toolbox().feature().put("magicType", magicType);
-        Restore restore = new Restore();
-        restore.show(true);
-        option.toolbox().feature().put("restore", restore);
-        SaveAsImage saveAsImage = new SaveAsImage();
-        saveAsImage.show(true);
-        option.toolbox().feature().put("saveAsImage", saveAsImage);
+//        option.toolbox().show(false);
+//        DataView dataView = new DataView();
+//        dataView.show(true);
+//        dataView.readOnly(false);
+//        option.toolbox().feature().put("dataView", Feature.dataView);
+//        MagicType magicType = new MagicType();
+//        magicType.show(true);
+//        List<String> typeList = new ArrayList<String>();
+//        typeList.add("pie");
+//        typeList.add("funnel");
+//        magicType.setType(typeList);
+//        option.toolbox().feature().put("magicType", magicType);
+//        Restore restore = new Restore();
+//        restore.show(true);
+//        option.toolbox().feature().put("restore", restore);
+//        SaveAsImage saveAsImage = new SaveAsImage();
+//        saveAsImage.show(true);
+//        option.toolbox().feature().put("saveAsImage", saveAsImage);
 
         //legend (数据需填充)
-        option.legend().orient(Orient.vertical);
-        option.legend().left(X.left);
-        List<String> legendDataList = new ArrayList<String>();
-        legendDataList.add(legend);
-        option.legend().data(legendDataList);
+//        option.legend().orient(Orient.vertical);
+//        option.legend().left(X.left);
+//        List<String> legendDataList = new ArrayList<String>();
+//        legendDataList.add(legend);
+//        option.legend().data(legendDataList);
         //grid
         option.grid().left("3%");
         option.grid().right("9%");
@@ -86,7 +90,7 @@ public class ReportOption {
         categoryAxis.name(xName);
         categoryAxis.type(AxisType.category);
 //        categoryAxis.axisLabel().formatter("千米");//单位
-        categoryAxis.boundaryGap(false);
+//        categoryAxis.boundaryGap(false);
 
         List<Object> lineNameList = getList(datalist,"NAME");
         List<Object> lineValList = getList(datalist,"TOTAL");
@@ -138,31 +142,31 @@ public class ReportOption {
         option.tooltip().trigger(Trigger.axis);
         option.tooltip().axisPointer().type(PointerType.shadow);
         //toolbox
-        option.toolbox().show(false);
-        DataView dataView = new DataView();
-        dataView.show(true);
-        dataView.readOnly(false);
-        option.toolbox().feature().put("dataView", Feature.dataView);
-        MagicType magicType = new MagicType();
-        magicType.show(true);
-        List<String> typeList = new ArrayList<String>();
-        typeList.add("pie");
-        typeList.add("funnel");
-        magicType.setType(typeList);
-        option.toolbox().feature().put("magicType", magicType);
-        Restore restore = new Restore();
-        restore.show(true);
-        option.toolbox().feature().put("restore", restore);
-        SaveAsImage saveAsImage = new SaveAsImage();
-        saveAsImage.show(true);
-        option.toolbox().feature().put("saveAsImage", saveAsImage);
+//        option.toolbox().show(false);
+//        DataView dataView = new DataView();
+//        dataView.show(true);
+//        dataView.readOnly(false);
+//        option.toolbox().feature().put("dataView", Feature.dataView);
+//        MagicType magicType = new MagicType();
+//        magicType.show(true);
+//        List<String> typeList = new ArrayList<String>();
+//        typeList.add("pie");
+//        typeList.add("funnel");
+//        magicType.setType(typeList);
+//        option.toolbox().feature().put("magicType", magicType);
+//        Restore restore = new Restore();
+//        restore.show(true);
+//        option.toolbox().feature().put("restore", restore);
+//        SaveAsImage saveAsImage = new SaveAsImage();
+//        saveAsImage.show(true);
+//        option.toolbox().feature().put("saveAsImage", saveAsImage);
 
         //legend (数据需填充)
-        option.legend().orient(Orient.vertical);
-        option.legend().left(X.left);
-        List<String> legendDataList = new ArrayList<String>();
-        legendDataList.add(legend);
-        option.legend().data(legendDataList);
+//        option.legend().orient(Orient.vertical);
+//        option.legend().left(X.left);
+//        List<String> legendDataList = new ArrayList<String>();
+//        legendDataList.add(legend);
+//        option.legend().data(legendDataList);
         //grid
         option.grid().left("3%");
         option.grid().right("9%");
@@ -182,13 +186,13 @@ public class ReportOption {
         //categoryAxis.axisLine().onZero(false);
         categoryAxis.type(AxisType.category);
         //categoryAxis.axisLabel().formatter("千米");
-        categoryAxis.boundaryGap(false);
+//        categoryAxis.boundaryGap(false);
 
         List<Object> lineNameList = getList(datalist,"NAME");
         List<Object> lineValList = getList(datalist,"TOTAL");
         Object[] nameVal1 = (Object[])lineNameList.toArray(new Object[lineNameList.size()]);
         categoryAxis.data(nameVal1);
-        categoryAxis.splitLine().show(false);
+//        categoryAxis.splitLine().show(false);
         option.xAxis(categoryAxis);
 
         //series
@@ -227,6 +231,7 @@ public class ReportOption {
         for (Map<String, Object> objectMap : dataList) {
             for(String key:objectMap.keySet()){
                 returnList.add(objectMap.get(keyName));
+                break;
             }
         }
         return  returnList;
@@ -253,31 +258,31 @@ public class ReportOption {
 //        option.tooltip().formatter("{a} <br/>{b} : {c} ({d}%)");
 
         //toolbox
-        option.toolbox().show(false);
-        DataView dataView = new DataView();
-        dataView.show(true);
-        dataView.readOnly(false);
-        option.toolbox().feature().put("dataView", Feature.dataView);
-        MagicType magicType = new MagicType();
-        magicType.show(true);
-        List<String> typeList = new ArrayList<String>();
-        typeList.add("pie");
-        typeList.add("funnel");
-        magicType.setType(typeList);
-        option.toolbox().feature().put("magicType", magicType);
-        Restore restore = new Restore();
-        restore.show(true);
-        option.toolbox().feature().put("restore", restore);
-        SaveAsImage saveAsImage = new SaveAsImage();
-        saveAsImage.show(true);
-        option.toolbox().feature().put("saveAsImage", saveAsImage);
-
-        //legend (数据需填充)
-        option.legend().orient(Orient.vertical);
-        option.legend().left(X.left);
-        List<String> legendDataList = new ArrayList<String>();
-        legendDataList.add(legend);
-        option.legend().data(legendDataList);
+//        option.toolbox().show(false);
+//        DataView dataView = new DataView();
+//        dataView.show(true);
+//        dataView.readOnly(false);
+//        option.toolbox().feature().put("dataView", Feature.dataView);
+//        MagicType magicType = new MagicType();
+//        magicType.show(true);
+//        List<String> typeList = new ArrayList<String>();
+//        typeList.add("pie");
+//        typeList.add("funnel");
+//        magicType.setType(typeList);
+//        option.toolbox().feature().put("magicType", magicType);
+//        Restore restore = new Restore();
+//        restore.show(true);
+//        option.toolbox().feature().put("restore", restore);
+//        SaveAsImage saveAsImage = new SaveAsImage();
+//        saveAsImage.show(true);
+//        option.toolbox().feature().put("saveAsImage", saveAsImage);
+//
+//        //legend (数据需填充)
+//        option.legend().orient(Orient.vertical);
+//        option.legend().left(X.left);
+//        List<String> legendDataList = new ArrayList<String>();
+//        legendDataList.add(legend);
+//        option.legend().data(legendDataList);
 
         //grid
         option.grid().left("3%");

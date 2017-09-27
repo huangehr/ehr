@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.resource.MRsReportCategory;
 import com.yihu.ehr.resource.client.RsReportCategoryClient;
+import com.yihu.ehr.resource.client.RsReportClient;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -29,6 +30,8 @@ public class RsReportCategoryController extends BaseController {
 
     @Autowired
     private RsReportCategoryClient rsReportCategoryClient;
+    @Autowired
+    private RsReportClient rsReportClient;
 
     @ApiOperation("根据ID获取资源报表分类")
     @RequestMapping(value = ServiceApi.Resources.RsReportCategory, method = RequestMethod.GET)
@@ -124,6 +127,13 @@ public class RsReportCategoryController extends BaseController {
             @RequestParam(value = "id") Integer id) throws Exception {
         Envelop envelop = new Envelop();
         try {
+            boolean isCategoryApplied = rsReportClient.isCategoryApplied(id);
+            if(isCategoryApplied) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("该资源报表分类已经被应用，不能删除。");
+                return envelop;
+            }
+
             rsReportCategoryClient.delete(id);
             envelop.setSuccessFlg(true);
             return envelop;

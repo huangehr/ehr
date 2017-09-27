@@ -35,7 +35,7 @@ public class GeographyDictService extends BaseJpaService<GeographyDict,XGeograph
 	}
 
     public GeographyDict findById(String id) {
-        return geographyDictRepository.findOne(Integer.parseInt(id));
+        return geographyDictRepository.findOne(Integer.valueOf(id));
     }
 
     public GeographyDict findByName(String name) {

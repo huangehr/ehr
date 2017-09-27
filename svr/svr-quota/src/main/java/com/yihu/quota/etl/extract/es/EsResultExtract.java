@@ -42,14 +42,12 @@ public class EsResultExtract {
     private String orgName;
     private String province;
     private String city;
-    private String district;
+    private String town;
     private String slaveKey1;
     private String slaveKey2;
     private String result;
     private TjQuota tjQuota;
     private String quotaCode;
-    private int pageNo;
-    private int pageSize;
     private EsConfig esConfig;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
@@ -63,6 +61,18 @@ public class EsResultExtract {
     private ObjectMapper objectMapper;
 
     public void initialize(TjQuota tjQuota ,String filters) throws Exception {
+        this.startTime = null;
+        this.endTime = null;
+        this.orgName = null;
+        this.org = null;
+        this.province = null;
+        this.city = null;
+        this.town = null;
+        this.quotaCode = null;
+        this.result = null;
+        this.slaveKey1 = null;
+        this.slaveKey2 = null;
+
         if(!StringUtils.isEmpty(filters)){
             Map<String, Object> params  = objectMapper.readValue(filters, new TypeReference<Map>() {});
             if (params !=null && params.size() > 0){
@@ -80,8 +90,8 @@ public class EsResultExtract {
                             this.province = params.get(key).toString();
                         else if(key.equals("city"))
                             this.city = params.get(key).toString();
-                        else if(key.equals("district"))
-                            this.district = params.get(key).toString();
+                        else if(key.equals("town"))
+                            this.town = params.get(key).toString();
                         else if(key.equals("slaveKey1"))
                             this.slaveKey1 = params.get(key).toString();
                         else if(key.equals("slaveKey2"))
@@ -99,7 +109,6 @@ public class EsResultExtract {
         EsConfig esConfig = null;
         esConfig = getEsConfig(tjQuota);
         this.esConfig = esConfig;
-        esConfigUtil.getConfig(esConfig);
     }
 
     public EsConfig getEsConfig(TjQuota tjQuota) throws Exception {
@@ -123,17 +132,23 @@ public class EsResultExtract {
     }
 
     public Client getEsClient(){
-        esClientUtil.addNewClient(esConfig.getHost(),esConfig.getPort(),esConfig.getClusterName());
-        return esClientUtil.getClient(esConfig.getClusterName());
+       return esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
     }
 
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
-        this.pageNo = pageNo-1;
-        this.pageSize = pageSize;
+        pageNo = (pageNo-1)*pageSize;
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> restltList =  elasticsearchUtil.queryPageList(getEsClient(),boolQueryBuilder,pageNo,pageSize,"quotaDate");
+        Client  client = getEsClient();
+        List<Map<String, Object>> restltList = null;
+        try {
+            restltList =  elasticsearchUtil.queryPageList(client,boolQueryBuilder,pageNo,pageSize,"quotaDate");
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
         return restltList;
     }
 
@@ -141,14 +156,32 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        return (int)elasticsearchUtil.getTotalCount(getEsClient(),boolQueryBuilder);
+        Client  client = getEsClient();
+        int count  = 0;
+        try {
+            count  = (int)elasticsearchUtil.getTotalCount(client,boolQueryBuilder);
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
+        return count;
+
     }
 
     public List<Map<String, Object>> getQuotaReport(TjQuota tjQuota, String filters,int size) throws Exception {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> list = elasticsearchUtil.queryList(getEsClient(),boolQueryBuilder, "quotaDate",size);
+        Client  client = getEsClient();
+        List<Map<String, Object>> list = null;
+        try {
+           list = elasticsearchUtil.queryList(client,boolQueryBuilder, "quotaDate",size);
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
         return  list;
     }
 
@@ -159,39 +192,47 @@ public class EsResultExtract {
             boolQueryBuilder.must(rangeQueryResult);
         }
         if( !StringUtils.isEmpty(quotaCode)){
-            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaCode);
-            boolQueryBuilder.must(termQueryQuotaCode);
+//            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaCode);
+            QueryStringQueryBuilder termQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaCode);
+            boolQueryBuilder.must(termQuotaCode);
         }
+
+        BoolQueryBuilder qbChild =  QueryBuilders.boolQuery();
+
         if( !StringUtils.isEmpty(orgName) ){
-            TermQueryBuilder termQueryOrgName = QueryBuilders.termQuery("orgName", orgName);
-            boolQueryBuilder.must(termQueryOrgName);
+//            TermQueryBuilder termQueryOrgName = QueryBuilders.termQuery("orgName", orgName);
+            QueryStringQueryBuilder termOrgName = QueryBuilders.queryStringQuery("orgName:" + orgName);
+            boolQueryBuilder.must(termOrgName);
         }
         if( !StringUtils.isEmpty(org) ){
             String [] orgvals =org.split(",");
             for(int i=0;i<orgvals.length ; i++){
-                TermQueryBuilder termQueryOrg = QueryBuilders.termQuery("org", orgvals[i]);
-                boolQueryBuilder.mustNot(termQueryOrg);
+                MatchQueryBuilder termOrg = QueryBuilders.matchPhraseQuery("org", orgvals[i]);
+                qbChild.should(termOrg);
             }
-        }
-        if( !StringUtils.isEmpty(province) ){
-            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("provinceName", province);
-            boolQueryBuilder.must(termQueryProvince);
+            boolQueryBuilder.must(qbChild);
         }
         if( !StringUtils.isEmpty(slaveKey1) ){
-            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("slaveKey1", province);
-            boolQueryBuilder.must(termQueryProvince);
+            QueryStringQueryBuilder termSlaveKey1 = QueryBuilders.queryStringQuery("slaveKey1:" + slaveKey1);
+            qbChild.should(termSlaveKey1);
+            boolQueryBuilder.must(qbChild);
         }
         if( !StringUtils.isEmpty(slaveKey2) ){
-            TermQueryBuilder termQueryProvince = QueryBuilders.termQuery("slaveKey2", province);
-            boolQueryBuilder.must(termQueryProvince);
+            QueryStringQueryBuilder termSlaveKey2 = QueryBuilders.queryStringQuery("slaveKey2:" + slaveKey2);
+            qbChild.should(termSlaveKey2);
+            boolQueryBuilder.must(qbChild);
+        }
+        if( !StringUtils.isEmpty(province) ){
+            QueryStringQueryBuilder termProvince = QueryBuilders.queryStringQuery("province:" + province);
+            boolQueryBuilder.must(termProvince);
         }
         if( !StringUtils.isEmpty(city) ){
-            TermQueryBuilder termQueryCity = QueryBuilders.termQuery("cityName", city);
-            boolQueryBuilder.must(termQueryCity);
+            QueryStringQueryBuilder termCity = QueryBuilders.queryStringQuery("city:" + city);
+            boolQueryBuilder.must(termCity);
         }
-        if( !StringUtils.isEmpty(district) ){
-            TermQueryBuilder termQueryTown = QueryBuilders.termQuery("townName", district);
-            boolQueryBuilder.must(termQueryTown);
+        if( !StringUtils.isEmpty(town) ){
+            QueryStringQueryBuilder termTown = QueryBuilders.queryStringQuery("town:" + town);
+            boolQueryBuilder.must(termTown);
         }
         if( !StringUtils.isEmpty(startTime) ){
             RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
@@ -256,7 +297,15 @@ public class EsResultExtract {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
         getBoolQueryBuilder(boolQueryBuilder);
-        List<Map<String, Object>> list = elasticsearchUtil.searcherByGroup(getEsClient(),boolQueryBuilder,aggsField, "result");
+        Client client = getEsClient();
+        List<Map<String, Object>> list = null;
+        try {
+            list = elasticsearchUtil.searcherByGroup(client, boolQueryBuilder, aggsField, "result");
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
         return  list;
     }
 
@@ -268,7 +317,15 @@ public class EsResultExtract {
         }else {
             filter = filter + " ,quotaCode='" + tjQuota.getCode() + "' ";
         }
-        Map<String, Integer> map = elasticsearchUtil.searcherByGroupBySql(getEsClient(),esConfig.getIndex(), aggsFields ,filter ,"result");
+        Client client = getEsClient();
+        Map<String, Integer> map = null;
+        try {
+            map = elasticsearchUtil.searcherByGroupBySql(client, esConfig.getIndex(), aggsFields, filter, "result");;
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
         return map;
     }
 

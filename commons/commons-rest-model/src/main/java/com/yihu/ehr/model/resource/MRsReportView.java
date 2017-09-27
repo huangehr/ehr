@@ -3,7 +3,7 @@ package com.yihu.ehr.model.resource;
 import java.io.Serializable;
 
 /**
- * 资源报表
+ * 资源报表视图配置
  *
  * @author 张进军
  * @created 2017.8.22 14:05

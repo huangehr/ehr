@@ -56,7 +56,10 @@ public class QuotaController extends BaseController {
     ) {
         Envelop envelop = new Envelop();
         try {
-            filters = URLDecoder.decode(filters, "UTF-8");
+            if(filters!=null){
+                filters = URLDecoder.decode(filters, "UTF-8");
+            }
+            System.out.println(filters);
             List<Map<String, Object>> resultList = quotaService.queryResultPage(id, filters, pageNo, pageSize);
             List<SaveModel> saveModelList = new ArrayList<SaveModel>();
             for(Map<String, Object> map : resultList){
@@ -70,7 +73,7 @@ public class QuotaController extends BaseController {
             envelop.setDetailModelList(saveModelList);
             envelop.setCurrPage(pageNo);
             envelop.setPageSize(pageSize);
-            envelop.setTotalCount((int)totalCount);
+            envelop.setTotalCount((int) totalCount);
             return envelop;
         } catch (Exception e) {
             error(e);
@@ -97,7 +100,7 @@ public class QuotaController extends BaseController {
     ) {
         Envelop envelop = new Envelop();
         try {
-            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters, dimension,10);
+            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters, dimension,10000);
             envelop.setDetailModelList(quotaReport.getReultModelList());
             envelop.setSuccessFlg(true);
             return envelop;

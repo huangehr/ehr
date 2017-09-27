@@ -62,7 +62,7 @@ public class OrgDetailModel{
     private String ing;
     private String lat;
     private String updateTime;
-
+    private Integer berth;  //核定床位
 
     //公钥信息
     String publicKey;
@@ -500,5 +500,13 @@ public class OrgDetailModel{
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getBerth() {
+        return berth;
+    }
+
+    public void setBerth(Integer berth) {
+        this.berth = berth;
     }
 }

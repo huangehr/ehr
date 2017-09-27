@@ -30,6 +30,12 @@ public interface RsReportClient {
             @ApiParam(name = "id", value = "主键", required = true)
             @PathVariable(value = "id") Integer id);
 
+    @ApiOperation("根据编码获取资源报表")
+    @RequestMapping(value = ServiceApi.Resources.RsReportFindByCode, method = RequestMethod.GET)
+    MRsReport findByCode(
+            @ApiParam(name = "code", value = "编码", required = true)
+            @RequestParam(value = "code") String code);
+
     @ApiOperation(value = "根据条件获取资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReports, method = RequestMethod.GET)
     ResponseEntity<List<MRsReport>> search(
@@ -47,14 +53,14 @@ public interface RsReportClient {
     @ApiOperation("新增资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST)
     MRsReport add(
-            @ApiParam(name = "mrsReport", value = "资源报表JSON字符串", required = true)
-            @RequestBody String mrsReport);
+            @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
+            @RequestParam(value = "rsReport") String rsReport);
 
     @ApiOperation("更新资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
     MRsReport update(
-            @ApiParam(name = "mrsReport", value = "资源报表JSON字符串", required = true)
-            @RequestBody String mrsReport);
+            @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
+            @RequestParam(value = "rsReport") String rsReport);
 
     @ApiOperation("删除资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportDelete, method = RequestMethod.DELETE)
@@ -78,8 +84,21 @@ public interface RsReportClient {
             @ApiParam(name = "name", value = "资源报表名称", required = true)
             @RequestParam("name") String name);
 
-    @ApiOperation("查询报表信息_不分页")
+    @ApiOperation("查询报表信息（不分页）")
     @RequestMapping(value = ServiceApi.Resources.RsReportNoPage, method = RequestMethod.GET)
     List<MRsReport> queryNoPageResources(
             @RequestParam(value = "filters", required = false) String filters);
+
+    @ApiOperation("获取报表模版内容")
+    @RequestMapping(value = ServiceApi.Resources.RsReportTemplateContent, method = RequestMethod.GET)
+    String getTemplateContent(
+            @ApiParam(name = "reportCode", value = "资源报表Code", required = true)
+            @RequestParam(value = "reportCode") String reportCode);
+
+    @ApiOperation("判断资源报表分类是否被使用")
+    @RequestMapping(value = ServiceApi.Resources.RsReportIsCategoryApplied, method = RequestMethod.GET)
+    boolean isCategoryApplied(
+            @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "reportCategoryId") Integer reportCategoryId);
+
 }

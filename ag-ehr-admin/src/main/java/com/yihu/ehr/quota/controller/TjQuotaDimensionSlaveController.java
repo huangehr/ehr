@@ -18,10 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,10 +131,10 @@ public class TjQuotaDimensionSlaveController extends ExtendController<TjQuotaDim
         }
     }
 
-    @RequestMapping(value = "/tj/deleteSlaveByQuotaCode", method = RequestMethod.DELETE)
+    @RequestMapping(value =  ServiceApi.TJ.DeleteSlaveByQuotaCode, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除统计指标从维度关联信息")
     public Envelop deleteSlaveByQuotaCode(
-            @ApiParam(name = "quotaCode", value = "指标Id")
+            @ApiParam(name = "quotaCode", value = "指标Code")
             @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
         try {
             Result result = tjQuotaDimensionSlaveClient.deleteSlaveByQuotaCode(quotaCode);
@@ -150,4 +147,29 @@ public class TjQuotaDimensionSlaveController extends ExtendController<TjQuotaDim
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
     }
+
+
+    @RequestMapping(value =  ServiceApi.TJ.GetDimensionSlaveByQuotaCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据指标ID获取从维度列表信息", notes = "根据指标ID获取从维度列表信息")
+    public Envelop getDimensionSlaveByQuotaCode(
+            @ApiParam(name = "quotaCode", value = "指标Code")
+            @RequestParam(value = "quotaCode") String quotaCode) throws Exception {
+        try {
+            Envelop envelop = new Envelop();
+            List<TjQuotaDimensionSlaveModel>  tjQuotaDimensionSlaveModelList = new ArrayList<>();
+            List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = tjQuotaDimensionSlaveClient.getDimensionSlaveByQuotaCode(quotaCode);
+           for(TjQuotaDimensionSlave slave:tjQuotaDimensionSlaves){
+               TjQuotaDimensionSlaveModel tjQuotaQuotaDimensionSlaveModel = objectMapper.convertValue(slave, TjQuotaDimensionSlaveModel.class);
+               tjQuotaDimensionSlaveModelList.add(tjQuotaQuotaDimensionSlaveModel);
+           }
+            envelop.setDetailModelList(tjQuotaDimensionSlaveModelList);
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+
 }

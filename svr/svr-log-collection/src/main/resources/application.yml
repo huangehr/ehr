@@ -5,11 +5,6 @@ logging:
   level:
     root: INFO
 
-service-gateway:
-  username: user
-  password: eureka
-  url: http://localhost:10000/api/v1.0/admin
-
 kafka:
   broker:
     address: node1.hde.h3c.com:6667
@@ -23,8 +18,8 @@ spring:
   profiles: test
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: chenweishan
-    password: chenweishan
+    username: weifuwu
+    password: weifuwu
 
   data:
     mongodb:
@@ -35,13 +30,21 @@ spring:
       authenticationDatabase: admin
       database: ehr
 
+service-gateway:
+  username: user
+  password: eureka
+  url: http://192.168.1.221:10000/api/v1.0/admin
+
+kafka:
+  broker:
+    address: node1.hde.h3c.com:6667
 ---
 spring:
   profiles: dev
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: chenweishan
-    password: chenweishan
+    username: weifuwu
+    password: weifuwu
 
   data:
     mongodb:
@@ -52,7 +55,14 @@ spring:
       authenticationDatabase: admin
       database: ehr
 
+service-gateway:
+  username: user
+  password: eureka
+  url: http://192.168.1.221:10000/api/v1.0/admin
 
+kafka:
+  broker:
+    address: node1.hde.h3c.com:6667
 ---
 spring:
   profiles: prod
@@ -69,3 +79,64 @@ spring:
       password: admin
       authenticationDatabase: admin
       database: ehr
+
+service-gateway:
+  username: user
+  password: eureka
+  url: http://192.168.135.31:10000/api/v1.0/admin
+
+kafka:
+  broker:
+    address: node1.hde.h3c.com:6667
+---
+spring:
+  profiles: prod_fz
+  datasource:
+    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: sr_healtharchive
+    password: data!@)1
+
+  data:
+    mongodb:
+      host: 192.168.135.41
+      port: 29000
+      username: sr_ehr
+      password: ehr@#(2^
+      authenticationDatabase: admin
+      database: ehr
+
+service-gateway:
+  username: user
+  password: eureka
+  url: http://192.168.135.31:10000/api/v1.0/admin
+
+kafka:
+  broker:
+    address: 192.168.135.46:6667
+
+
+---
+spring:
+  profiles: prod_sr
+  datasource:
+    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: healthcloud
+    password: GP8Qz4qU
+
+  data:
+    mongodb:
+      host: 10.176.97.9
+      port: 29000
+      username: jkzlehr
+      password: GMLBq1LG
+      authenticationDatabase: admin
+      database: ehr
+
+service-gateway:
+  username: user
+  password: eureka
+  url: http://10.176.97.10:10000/api/v1.0/admin
+
+kafka:
+  broker:
+    address: 10.176.97.7:6667

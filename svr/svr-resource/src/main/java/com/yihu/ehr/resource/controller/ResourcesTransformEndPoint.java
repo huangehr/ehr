@@ -19,23 +19,21 @@ import java.util.*;
  */
 
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0 + "/rs/transform")
-@Api(value = "transform", description = "转换格式接口")
+@RequestMapping(value = ApiVersion.Version1_0 )
+@Api(value = "Transform", description = "转换格式接口")
 public class ResourcesTransformEndPoint {
 
     @Autowired
     private ResourcesTransformService resourcesTransformService;
-
     @Autowired
     private ObjectMapper objectMapper;
 
 
     @ApiOperation("EHR内部标准转国家标准")
-    @RequestMapping(value="/stdTransformList",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value="/rs/transform/stdTransformList",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public List<Map<String,Object>> stdTransformList(
             @ApiParam(name="stdTransformDtoJson",value="资源数据模型",required = true)
-            @RequestBody String stdTransformDtoJson) throws Exception
-    {
+            @RequestBody String stdTransformDtoJson) throws Exception {
         MStdTransformDto stdTransformDto = objectMapper.readValue(stdTransformDtoJson,MStdTransformDto.class);
         String resource =  stdTransformDto.getSource();
         String version = stdTransformDto.getVersion();
@@ -47,11 +45,10 @@ public class ResourcesTransformEndPoint {
     }
 
     @ApiOperation("EHR内部标准转国家标准（单条记录）")
-    @RequestMapping(value="/stdTransform",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value="/rs/transform/stdTransform",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Map<String,Object> stdTransform(
             @ApiParam(name="stdTransformDtoJson",value="资源数据模型",required = true)
-            @RequestBody String stdTransformDtoJson) throws Exception
-    {
+            @RequestBody String stdTransformDtoJson) throws Exception {
         MStdTransformDto stdTransformDto = objectMapper.readValue(stdTransformDtoJson,MStdTransformDto.class);
         String resource =  stdTransformDto.getSource();
         String version = stdTransformDto.getVersion();
@@ -65,7 +62,7 @@ public class ResourcesTransformEndPoint {
 
 
     @ApiOperation("EHR主表数据分解")
-    @RequestMapping(value = "/stdMasterTransform", method = RequestMethod.POST)
+    @RequestMapping(value = "/rs/transform/stdMasterTransform", method = RequestMethod.POST)
     public Map<String,Object> stdMasterTransform(
             @ApiParam(name="stdTransformDtoJson",value="资源数据模型",required = true)
             @RequestBody String stdTransformDtoJson) throws Exception {

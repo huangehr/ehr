@@ -48,7 +48,7 @@ public class GeographyDictEndPoint extends EnvelopRestEndPoint {
         @ApiParam(name = "pid", value = "上级id", defaultValue = "")
         @PathVariable(value = "pid") Integer pid) {
         List<GeographyDict> addressDictList = geographyDictService.getPidToAddr(pid);
-        return convertToModels(addressDictList,new ArrayList<>(addressDictList.size()), MGeographyDict.class,"");
+        return convertToModels(addressDictList, new ArrayList<>(addressDictList.size()), MGeographyDict.class,"");
     }
 
 

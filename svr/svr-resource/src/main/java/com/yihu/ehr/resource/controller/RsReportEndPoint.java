@@ -3,13 +3,17 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.resource.MRsReport;
 import com.yihu.ehr.resource.model.RsReport;
 import com.yihu.ehr.resource.service.RsReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,18 +29,28 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(description = "资源报表服务接口")
+@Api(value = "RsReport", description = "资源报表服务接口")
 public class RsReportEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private RsReportService rsReportService;
+    @Autowired
+    private FastDFSUtil fastDFSUtil;
 
     @ApiOperation("根据ID获取资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReport, method = RequestMethod.GET)
     public MRsReport getById(
-            @ApiParam(name = "id", value = "id", required = true)
-            @PathVariable("id") Integer id) throws Exception {
+            @ApiParam(name = "id", value = "主键", required = true)
+            @PathVariable(value = "id") Integer id) throws Exception {
         return convertToModel(rsReportService.getById(id), MRsReport.class);
+    }
+
+    @ApiOperation("根据编码获取资源报表")
+    @RequestMapping(value = ServiceApi.Resources.RsReportFindByCode, method = RequestMethod.GET)
+    public MRsReport findByCode(
+            @ApiParam(name = "code", value = "编码", required = true)
+            @RequestParam(value = "code") String code) throws Exception {
+        return convertToModel(rsReportService.getByCode(code), MRsReport.class);
     }
 
     @ApiOperation(value = "根据条件获取资源报表")
@@ -63,7 +77,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST)
     public MRsReport add(
             @ApiParam(name = "rsReport", value = "资源报表JSON", required = true)
-            @RequestBody String rsReport) throws Exception {
+            @RequestParam(value = "rsReport") String rsReport) throws Exception {
         RsReport newRsReport = toEntity(rsReport, RsReport.class);
         newRsReport = rsReportService.save(newRsReport);
         return convertToModel(newRsReport, MRsReport.class);
@@ -73,7 +87,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
     public MRsReport update(
             @ApiParam(name = "rsReport", value = "资源报表JSON", required = true)
-            @RequestBody String rsReport) throws Exception {
+            @RequestParam(value = "rsReport") String rsReport) throws Exception {
         RsReport newRsReport = toEntity(rsReport, RsReport.class);
         newRsReport = rsReportService.save(newRsReport);
         return convertToModel(newRsReport, MRsReport.class);
@@ -83,7 +97,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportDelete, method = RequestMethod.DELETE)
     public void delete(
             @ApiParam(name = "id", value = "资源报表ID", required = true)
-            @RequestParam("id") Integer id) throws Exception {
+            @RequestParam(value = "id") Integer id) throws Exception {
         rsReportService.delete(id);
     }
 
@@ -91,9 +105,9 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportIsUniqueCode, method = RequestMethod.GET)
     public boolean isUniqueCode(
             @ApiParam(name = "id", value = "资源报表ID", required = true)
-            @RequestParam("id") Integer id,
+            @RequestParam(value = "id") Integer id,
             @ApiParam(name = "code", value = "资源报表编码", required = true)
-            @RequestParam("code") String code) throws Exception {
+            @RequestParam(value = "code") String code) throws Exception {
         return rsReportService.isUniqueCode(id, code);
     }
 
@@ -101,18 +115,44 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportIsUniqueName, method = RequestMethod.GET)
     public boolean isUniqueName(
             @ApiParam(name = "id", value = "资源报表ID", required = true)
-            @RequestParam("id") Integer id,
+            @RequestParam(value = "id") Integer id,
             @ApiParam(name = "name", value = "资源报表名称", required = true)
-            @RequestParam("name") String name) throws Exception {
+            @RequestParam(value = "name") String name) throws Exception {
         return rsReportService.isUniqueName(id, name);
     }
 
-    @ApiOperation("查询报表信息_不分页")
+    @ApiOperation("查询报表信息（不分页）")
     @RequestMapping(value = ServiceApi.Resources.RsReportNoPage, method = RequestMethod.GET)
     public List<MRsReport> queryNoPageResources(
-            @ApiParam(name="filters",value="过滤",defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception{
+            @ApiParam(name = "filters", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List<RsReport> list = rsReportService.search(filters);
         return (List<MRsReport>) convertToModels(list, new ArrayList<>(list.size()), MRsReport.class, null);
     }
+
+    @ApiOperation("获取报表模版内容")
+    @RequestMapping(value = ServiceApi.Resources.RsReportTemplateContent, method = RequestMethod.GET)
+    public String getTemplateContent(
+            @ApiParam(name = "reportCode", value = "资源报表Code", required = true)
+            @RequestParam(value = "reportCode") String reportCode,
+            HttpServletResponse response) throws Exception {
+        RsReport rsReport = rsReportService.getByCode(reportCode);
+        if (rsReport == null || StringUtils.isEmpty(rsReport.getTemplatePath())) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "模版未找到");
+        }
+        String[] paths = rsReport.getTemplatePath().split(":");
+        byte[] bytes = fastDFSUtil.download(paths[0], paths[1]);
+        String templateContent = new String(bytes);
+        return templateContent;
+    }
+
+    @ApiOperation("判断资源报表分类是否被使用")
+    @RequestMapping(value = ServiceApi.Resources.RsReportIsCategoryApplied, method = RequestMethod.GET)
+    public boolean isCategoryApplied(
+            @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "reportCategoryId") Integer reportCategoryId) throws Exception {
+        List<RsReport> list = rsReportService.getByReportCategoryId(reportCategoryId);
+        return list.size() == 0 ? false : true;
+    }
+
 }

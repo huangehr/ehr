@@ -1,9 +1,8 @@
 package com.yihu.ehr.resource.service;
 
 
-import com.yihu.ehr.resource.dao.intf.AdapterMetadataDao;
-import com.yihu.ehr.resource.dao.intf.AdapterSchemeDao;
-import com.yihu.ehr.resource.dao.intf.ResourceDefaultParamDao;
+import com.yihu.ehr.resource.dao.RsAdapterMetadataDao;
+import com.yihu.ehr.resource.dao.RsAdapterSchemeDao;
 import com.yihu.ehr.resource.model.RsAdapterMetadata;
 import com.yihu.ehr.resource.model.RsAdapterScheme;
 import org.apache.commons.lang.StringUtils;
@@ -24,13 +23,9 @@ public class ResourcesTransformService {
 
 
     @Autowired
-    ResourceDefaultParamDao resourceDefaultParamDao;
-
+    RsAdapterSchemeDao adapterSchemeDao;
     @Autowired
-    AdapterSchemeDao adapterSchemeDao;
-
-    @Autowired
-    AdapterMetadataDao adapterMetadataDao;
+    RsAdapterMetadataDao adapterMetadataDao;
 
     /**
      * 资源数据显示代码转换
@@ -75,11 +70,11 @@ public class ResourcesTransformService {
 
             if(StringUtils.isBlank(dataset))
             {
-                metadataList = adapterMetadataDao.findBySchema(schemeList.get(0).getId());
+                metadataList = adapterMetadataDao.findByScheme(schemeList.get(0).getId());
             }
             else
             {
-                metadataList = adapterMetadataDao.findBySchemaIdAndSrcDatasetCode(schemeList.get(0).getId(),dataset);
+                metadataList = adapterMetadataDao.findBySchemeIdAndSrcDatasetCode(schemeList.get(0).getId(),dataset);
             }
 
             if(metadataList != null && metadataList.size() > 0)

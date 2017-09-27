@@ -5,7 +5,7 @@ import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgDetailModel;
 import com.yihu.ehr.agModel.thirdpartystandard.AdapterOrgModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.model.resource.MRsAdapterSchema;
-import com.yihu.ehr.resource.client.AdapterSchemaClient;
+import com.yihu.ehr.resource.client.RsAdapterSchemaClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.adapter.service.AdapterOrgClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
@@ -47,7 +47,7 @@ public class AdapterOrgController extends BaseController {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private AdapterSchemaClient adapterSchemaClient;
+    private RsAdapterSchemaClient adapterSchemaClient;
 
     @RequestMapping(value = "/orgs", method = RequestMethod.GET)
     @ApiOperation(value = "适配采集标准")

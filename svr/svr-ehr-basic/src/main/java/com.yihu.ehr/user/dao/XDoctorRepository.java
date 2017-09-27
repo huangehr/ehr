@@ -1,7 +1,9 @@
 package com.yihu.ehr.user.dao;
 
 import com.yihu.ehr.user.entity.Doctors;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 /**
  * 2017-02-04 add by hzp
@@ -12,5 +14,8 @@ public interface XDoctorRepository extends PagingAndSortingRepository<Doctors, L
 
      Doctors findByCode(String code);
      Doctors findByIdCardNo(String idCardNo);
+
+     @Query("select count(d.id) from Doctors d where d.roleType =:roleType")
+     int getStatisticsCityDoctorByRoleType(@Param("roleType") String roleType);
 
 }

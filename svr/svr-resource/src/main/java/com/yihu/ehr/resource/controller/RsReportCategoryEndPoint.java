@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(description = "资源报表分类服务接口")
+@Api(value = "RsReportCategory", description = "资源报表分类服务接口")
 public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -35,7 +35,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategory, method = RequestMethod.GET)
     public MRsReportCategory getById(
             @ApiParam(name = "id", value = "id", required = true)
-            @PathVariable("id") Integer id) throws Exception {
+            @PathVariable(value = "id") Integer id) throws Exception {
         return convertToModel(rsReportCategoryService.getById(id), MRsReportCategory.class);
     }
 
@@ -90,7 +90,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)
     public MRsReportCategory add(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON", required = true)
-            @RequestBody String rsReportCategory) throws Exception {
+            @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
         RsReportCategory newRsReportCategory = toEntity(rsReportCategory, RsReportCategory.class);
         newRsReportCategory = rsReportCategoryService.save(newRsReportCategory);
         return convertToModel(newRsReportCategory, MRsReportCategory.class);
@@ -100,7 +100,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.PUT)
     public MRsReportCategory update(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON", required = true)
-            @RequestBody String rsReportCategory) throws Exception {
+            @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
         RsReportCategory newRsReportCategory = toEntity(rsReportCategory, RsReportCategory.class);
         newRsReportCategory = rsReportCategoryService.save(newRsReportCategory);
         return convertToModel(newRsReportCategory, MRsReportCategory.class);
@@ -110,7 +110,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryDelete, method = RequestMethod.DELETE)
     public void delete(
             @ApiParam(name = "id", value = "资源报表分类ID", required = true)
-            @RequestParam("id") Integer id) throws Exception {
+            @RequestParam(value = "id") Integer id) throws Exception {
         rsReportCategoryService.delete(id);
     }
 
@@ -118,9 +118,9 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIsUniqueCode, method = RequestMethod.GET)
     public boolean isUniqueCode(
             @ApiParam(name = "id", value = "资源报表分类ID", required = true)
-            @RequestParam("id") Integer id,
+            @RequestParam(value = "id") Integer id,
             @ApiParam(name = "code", value = "资源报表分类编码", required = true)
-            @RequestParam("code") String code) throws Exception {
+            @RequestParam(value = "code") String code) throws Exception {
         return rsReportCategoryService.isUniqueCode(id, code);
     }
 
@@ -128,9 +128,9 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategoryIsUniqueName, method = RequestMethod.GET)
     public boolean isUniqueName(
             @ApiParam(name = "id", value = "资源报表分类ID", required = true)
-            @RequestParam("id") Integer id,
+            @RequestParam(value = "id") Integer id,
             @ApiParam(name = "name", value = "资源报表分类名称", required = true)
-            @RequestParam("name") String name) throws Exception {
+            @RequestParam(value = "name") String name) throws Exception {
         return rsReportCategoryService.isUniqueName(id, name);
     }
 
@@ -138,7 +138,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("获取资源报表类别")
     public List<MRsReportCategory> getAllCategories(
             @ApiParam(name = "filters", value = "过滤", defaultValue = "")
-            @RequestParam(value="filters",required = false)String filters) throws Exception{
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
         List<RsReportCategory> list = rsReportCategoryService.search(filters);
         return (List<MRsReportCategory>) convertToModels(list, new ArrayList<>(list.size()), MRsReportCategory.class, null);
     }

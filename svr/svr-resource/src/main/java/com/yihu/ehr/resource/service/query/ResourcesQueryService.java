@@ -8,9 +8,9 @@ import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.query.services.SolrQuery;
-import com.yihu.ehr.resource.dao.intf.*;
-import com.yihu.ehr.resource.feign.XAppClient;
-import com.yihu.ehr.resource.feign.XRedisServiceClient;
+import com.yihu.ehr.resource.dao.*;
+import com.yihu.ehr.resource.feign.AppClient;
+import com.yihu.ehr.resource.feign.RedisClient;
 import com.yihu.ehr.resource.model.*;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.lang.model.type.ArrayType;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -27,50 +25,34 @@ import java.util.*;
 /**
  * Created by hzp on 2016/4/13.
  */
-@Service("resourcesQueryService")
+@Service
 public class ResourcesQueryService  {
 
     @Autowired
-    SolrQuery solr;
-
+    private SolrQuery solr;
     @Autowired
-    HbaseQuery hbase;
-
+    private HbaseQuery hbase;
     @Autowired
-    ResourcesDao resourcesDao;
-
+    private RsResourceDao resourcesDao;
     @Autowired
-    ResourcesMetadataQueryDao resourceMetadataQueryDao;
-
+    private ResourcesMetadataQueryDao resourceMetadataQueryDao;
     @Autowired
-    ResourcesQueryDao resourcesQueryDao;
-
+    private ResourcesQueryDao resourcesQueryDao;
     @Autowired
-    ResourceDefaultParamDao resourceDefaultParamDao;
-
+    private RsResourceDefaultParamDao resourceDefaultParamDao;
     @Autowired
-    AdapterSchemeDao adapterSchemeDao;
-
+    private RsAppResourceDao appResourceDao;
     @Autowired
-    AdapterMetadataDao adapterMetadataDao;
-
+    private RedisClient redisServiceClient;
     @Autowired
-    AppResourceDao appResourceDao;
-
+    private AppClient appClient;
     @Autowired
-    XRedisServiceClient redisServiceClient;
-
+    private ObjectMapper objectMapper;
     @Autowired
-    XAppClient appClient;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    ResourcesDefaultQueryDao resourcesDefaultQueryDao;
+    private RsResourceDefaultQueryDao resourcesDefaultQueryDao;
 
     //忽略字段
-    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey","event_type", "event_no","event_date","demographic_id", "patient_id","org_code","org_name","profile_id", "cda_version", "client_id","profile_type","patient_name","org_area","diagnosis","health_problem"));
+    private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
 
     /**
      * 获取资源数据
@@ -107,9 +89,9 @@ public class ResourcesQueryService  {
     public Envelop getResourceData(String resourcesCode, String orgCode, String queryCondition, Integer page, Integer size) throws Exception {
         String queryParams = "";
         //获取资源信息
-        RsResources rsResources = resourcesDao.findByCode(resourcesCode);
+        RsResource rsResources = resourcesDao.findByCode(resourcesCode);
         if(rsResources != null) {
-            RsResourcesQuery resourcesQuery = resourcesDefaultQueryDao.findByResourcesId(rsResources.getId());
+            RsResourceDefaultQuery resourcesQuery = resourcesDefaultQueryDao.findByResourcesId(rsResources.getId());
             List<QueryCondition> ql = new ArrayList<>();
             //设置参数
             if (!StringUtils.isEmpty(queryCondition) && !queryCondition.equals("{}")) {
@@ -138,7 +120,7 @@ public class ResourcesQueryService  {
     public Envelop resourcesBrowse(String resourcesCode, String appId, String orgCode, String queryParams, Integer page, Integer size) throws Exception {
         Envelop envelop = null;
         //获取资源信息
-        RsResources rsResources = resourcesDao.findByCode(resourcesCode);
+        RsResource rsResources = resourcesDao.findByCode(resourcesCode);
         if(rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
             //获取结果集
@@ -149,7 +131,7 @@ public class ResourcesQueryService  {
                 for(Map<String, Object> temp : oldList) {
                     String masterRowKey = (String)temp.get("profile_id");
                     if(masterRowKey != null) {
-                        Map<String, Object> matsterMap = hbase.queryByRowkey(ResourceCore.MasterTable, masterRowKey);
+                        Map<String, Object> matsterMap = hbase.queryByRowKey(ResourceCore.MasterTable, masterRowKey);
                         temp.put("event_date", matsterMap.get("event_date"));
                         temp.put("org_name", matsterMap.get("org_name"));
                         temp.put("org_code", matsterMap.get("org_code"));
@@ -182,17 +164,17 @@ public class ResourcesQueryService  {
      * @return
      */
     public Envelop getCustomizeData(String resourcesCodes, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception {
+        Envelop envelop = new Envelop();
         ObjectMapper mapper = new ObjectMapper();
         String queryParams = "";
         String saas = "";
-        Envelop envelop = new Envelop();
         //获取资源信息
         List<String> codeList = (List<String>) mapper.readValue(resourcesCodes, List.class);
         /**
          * 权限控制
          */
         for(String code : codeList) {
-            RsResources rsResources = resourcesDao.findByCode(code);
+            RsResource rsResources = resourcesDao.findByCode(code);
             if(rsResources != null) {
                 String grantType = rsResources.getGrantType(); //访问方式 0开放 1授权
                 //获取资源结构，检查APP权限
@@ -222,18 +204,18 @@ public class ResourcesQueryService  {
         }
         queryParams = addParams(queryParams,"saas", saas);
         queryParams = addParams(queryParams,"sort", "{\"event_date\":\"desc\"}");
-        /**
-         * 基础数据展示
-         */
-        String igStr = ignoreField.toString();
-        String dealIgStr = igStr.substring(1, igStr.length() - 1).replaceAll(" ", "");
+        //基础数据字段
+        String basicStr = ignoreField.toString();
+        String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
+        queryParams = addParams(queryParams,"basicFl", dealBasicStr);
+        //数据元信息字段
         if(metaData.equals("")) {
-            queryParams = addParams(queryParams,"fl", dealIgStr);
+            queryParams = addParams(queryParams,"dFl", "");
         }else {
             List<String> customizeList = (List<String>) mapper.readValue(metaData, List.class);
-            String customizeStr = customizeList.toString();
-            String dealCustomizeStr = customizeStr.substring(1, customizeStr.length() - 1).replaceAll(" ", "");
-            queryParams = addParams(queryParams,"fl", dealCustomizeStr + "," + dealIgStr);
+            String dStr = customizeList.toString();
+            String dealDStr = dStr.substring(1, dStr.length() - 1).replaceAll(" ", "");
+            queryParams = addParams(queryParams,"dFl", dealDStr);
         }
         Page<Map<String,Object>> result = (Page<Map<String,Object>>)resourcesQueryDao.getEhrCenter(queryParams, page, size);
         if(result != null) {
@@ -241,11 +223,11 @@ public class ResourcesQueryService  {
             envelop.setCurrPage(result.getNumber());
             envelop.setPageSize(result.getSize());
             envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
-            if(result.getContent() != null && result.getContent().size() > 0) {
+            if(result.getContent() != null) {
                 envelop.setDetailModelList(result.getContent());
             }
         }else {
-            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("数据库数据检索失败");
         }
         return envelop;
     }
@@ -264,7 +246,7 @@ public class ResourcesQueryService  {
      */
     private Envelop getResultData(String resourcesCode, String appId, String orgCode, String queryParams, Integer page, Integer size, boolean isSpecialScan) throws Exception{
         Envelop envelop = new Envelop();
-        RsResources rsResources = resourcesDao.findByCode(resourcesCode);
+        RsResource rsResources = resourcesDao.findByCode(resourcesCode);
         if(rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
             String grantType = rsResources.getGrantType(); //访问方式 0开放 1授权
@@ -279,8 +261,8 @@ public class ResourcesQueryService  {
                 queryParams = addParams(queryParams,"saas",saas);
             }
             //通过资源代码获取默认参数
-            List<ResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
-            for(ResourceDefaultParam param:paramsList) {
+            List<RsResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
+            for(RsResourceDefaultParam param:paramsList) {
                 queryParams = addParams(queryParams, param.getParamKey(), param.getParamValue());
             }
             //分组统计数据元
@@ -288,14 +270,14 @@ public class ResourcesQueryService  {
                 String groupFields = "";
                 String statsFields = "";
                 String customGroup = "";
-                for(DtoResourceMetadata metadada : metadataList) {
-                    String key = metadada.getId();
-                    String groupType = metadada.getGroupType();
-                    String groupData =  metadada.getGroupData();
+                for(DtoResourceMetadata metadata : metadataList) {
+                    String key = metadata.getId();
+                    String groupType = metadata.getGroupType();
+                    String groupData =  metadata.getGroupData();
                     if(groupType != null && groupType.length() > 0) {
                         if(grantType.equals("0")) { //分组字段
                             if(groupData!=null && groupData.length()>0) {
-                                customGroup +="{\"groupField\":\""+key+"\",\"groupCondition\":"+groupData+"},";
+                                customGroup += "{\"groupField\":\"" + key + "\",\"groupCondition\":" + groupData + "},";
                             }
                             else {
                                 groupFields += key + ",";
@@ -306,20 +288,31 @@ public class ResourcesQueryService  {
                         }
                     }
                 }
-                if(groupFields.length()>0) {
-                    groupFields = groupFields.substring(0,groupFields.length()-1);
-                    queryParams = addParams(queryParams,"groupFields",groupFields);
+                if(groupFields.length() > 0) {
+                    groupFields = groupFields.substring(0, groupFields.length() - 1);
+                    queryParams = addParams(queryParams,"groupFields", groupFields);
                 }
-                if(statsFields.length()>0) {
-                    statsFields = statsFields.substring(0,statsFields.length()-1);
-                    queryParams = addParams(queryParams,"statsFields",statsFields);
+                if(statsFields.length() > 0) {
+                    statsFields = statsFields.substring(0, statsFields.length() - 1);
+                    queryParams = addParams(queryParams,"statsFields", statsFields);
                 }
                 if(customGroup.length()>0) {
-                    customGroup = "["+customGroup.substring(0,customGroup.length()-1)+"]";
-                    queryParams = addParams(queryParams,"customGroup",customGroup);
+                    customGroup = "[" + customGroup.substring(0, customGroup.length() -1 ) + "]";
+                    queryParams = addParams(queryParams,"customGroup", customGroup);
                 }
-
-                /************** 执行函数 *************************/
+                //基础信息字段
+                String basicStr = ignoreField.toString();
+                String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
+                queryParams = addParams(queryParams,"basicFl", dealBasicStr);
+                //数据元信息字段
+                List<String> metadataIdList = new ArrayList<String>();
+                for(DtoResourceMetadata metadata : metadataList) {
+                    metadataIdList.add(metadata.getId());
+                }
+                String dStr = metadataIdList.toString();
+                String dealDStr = dStr.substring(1, dStr.length() - 1).replaceAll(" ", "");
+                queryParams = addParams(queryParams,"dFl", dealDStr);
+                //执行函数
                 Class<ResourcesQueryDao> classType = ResourcesQueryDao.class;
                 Method method = classType.getMethod(methodName, new Class[]{String.class, Integer.class, Integer.class});
                 Page<Map<String,Object>> result = (Page<Map<String,Object>>)method.invoke(resourcesQueryDao, queryParams, page, size);
@@ -330,19 +323,20 @@ public class ResourcesQueryService  {
                     envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
                     if(result.getContent() != null && result.getContent().size() > 0) {
                         //转译
-                        List<Map<String,Object>> list = new ArrayList<>();
+                        //List<Map<String,Object>> list = new ArrayList<>();
                         //遍历所有行
+                        /**
                         for(int i=0;i<result.getContent().size();i++) {
-                            Map<String,Object> oldObj = (Map<String,Object>)result.getContent().get(i);
+                            Map<String,Object> oldObj = result.getContent().get(i);
                             Map<String,Object> newObj = new HashMap<>();
                             //遍历资源数据元
-                            for(DtoResourceMetadata metadada : metadataList) {
-                                String key = metadada.getId();
+                            for(DtoResourceMetadata metadata : metadataList) {
+                                String key = metadata.getId();
                                 if(oldObj.containsKey(key)) {
-                                    newObj.put(metadada.getId(),oldObj.get(key));
-                                    if(metadada.getDictCode()!=null && metadada.getDictCode().length()>0 && !metadada.getDictCode().equals("0")) {
+                                    newObj.put(metadata.getId(),oldObj.get(key));
+                                    if(metadata.getDictCode()!=null && metadata.getDictCode().length()>0 && !metadata.getDictCode().equals("0")) {
                                         if(oldObj.containsKey(key+"_VALUE")) {
-                                            newObj.put(metadada.getId()+"_VALUE",oldObj.get(key+"_VALUE"));
+                                            newObj.put(metadata.getId()+"_VALUE",oldObj.get(key+"_VALUE"));
                                         }
                                     }
                                 }
@@ -352,16 +346,13 @@ public class ResourcesQueryService  {
                                 if (key.startsWith("$")) {
                                     newObj.put(key,oldObj.get(key));
                                 }
-                                //忽略字段
-                                if (ignoreField.contains(key)) {
-                                    newObj.put(key,oldObj.get(key));
-                                }
                             }
                             list.add(newObj);
                         }
-                        envelop.setDetailModelList(list);
+                        */
+                        envelop.setDetailModelList(result.getContent());
                     }
-                    // for -> 档案浏览器主要健康问题诊断详情
+                    //for -> 档案浏览器主要健康问题诊断详情
                     if (isSpecialScan) {
                         if ((resourcesCode.equals("RS_OUTPATIENT_DIAGNOSIS") || resourcesCode.equals("RS_HOSPITALIZED_DIAGNOSIS")) && envelop.getDetailModelList() != null) {
                             List<Map<String, Object>> transformKeyList = new ArrayList<>();
@@ -379,11 +370,13 @@ public class ResourcesQueryService  {
                     }
                 }
                 else {
-                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("数据库数据检索失败");
                 }
+            }else {
+                envelop.setErrorMsg("资源无相关数据元");
             }
         }else {
-            throw new Exception("无效资源！");
+            envelop.setErrorMsg("无效资源");
         }
         return envelop;
     }
@@ -561,6 +554,7 @@ public class ResourcesQueryService  {
             appSaasArea = redisServiceClient.getOrgSaasAreaRedis(appOrg);
             appSaasOrg = redisServiceClient.getOrgSaasOrgRedis(appOrg);
         }
+
         //单独APP权限控制
         if(StringUtils.isEmpty(orgCode)) { //机构为空
             //所有权限
@@ -589,80 +583,84 @@ public class ResourcesQueryService  {
         }
         //机构权限控制
         else {
+//            String[] orgCodeList = orgCode.split(",");
+            List<String> areaListApp = new ArrayList<>();
+            List<String> orgListApp = new ArrayList<>();
+//            for (String orgCo:orgCodeList) {
+
+//            String orgSaasArea = redisServiceClient.getOrgSaasAreaRedis(orgCo);
+//            String orgSaasOrg = redisServiceClient.getOrgSaasOrgRedis(orgCo);
             String orgSaasArea = redisServiceClient.getOrgSaasAreaRedis(orgCode);
             String orgSaasOrg = redisServiceClient.getOrgSaasOrgRedis(orgCode);
 
+
             //************* 单独机构权限控制 *************
-            if("*".equals(appSaasArea) && "*".equals(appSaasOrg)) {
+            if ("*".equals(appSaasArea) && "*".equals(appSaasOrg)) {
 
                 //【机构权限】存在区域授权范围
-                if(!StringUtils.isEmpty(orgSaasArea) && !orgSaasArea.equals("*")) {
+                if (!StringUtils.isEmpty(orgSaasArea) && !orgSaasArea.equals("*")) {
                     String[] arrayArea = orgSaasArea.split(",");
-                    for(String area : arrayArea) {
-                        if(!areaList.contains(area)) {
+                    for (String area : arrayArea) {
+                        if (!areaList.contains(area)) {
                             areaList.add(area);
                         }
                     }
                 }
                 //【机构权限】存在机构授权范围
-                if(!StringUtils.isEmpty(orgSaasOrg) && !orgSaasOrg.equals("*")) {
+                if (!StringUtils.isEmpty(orgSaasOrg) && !orgSaasOrg.equals("*")) {
                     String[] arrayOrg = orgSaasOrg.split(",");
-                    for(String org : arrayOrg) {
-                        if(!orgList.contains(org)) {
+                    for (String org : arrayOrg) {
+                        if (!orgList.contains(org)) {
                             orgList.add(org);
                         }
                     }
                 }
                 //所有权限
-                if("*".equals(orgSaasArea) && "*".equals(orgSaasOrg)) {
+                if ("*".equals(orgSaasArea) && "*".equals(orgSaasOrg)) {
                     saas = "*";
                 }
             }
             //************* APP权限和机构权限并集 *************
             else {
-                List<String> areaListApp = new ArrayList<>();
-                List<String> orgListApp = new ArrayList<>();
+
 
                 //【APP权限】存在区域授权范围
-                if(!StringUtils.isEmpty(appSaasArea) && !appSaasArea.equals("*")) {
+                if (!StringUtils.isEmpty(appSaasArea) && !appSaasArea.equals("*")) {
                     String[] arrayArea = appSaasArea.split(",");
-                    for(String area : arrayArea) {
-                        if(!areaListApp.contains(area)) {
+                    for (String area : arrayArea) {
+                        if (!areaListApp.contains(area)) {
                             areaListApp.add(area);
                         }
                     }
                 }
                 //【APP权限】存在机构授权范围
-                if(!StringUtils.isEmpty(appSaasOrg) && !appSaasOrg.equals("*")) {
+                if (!StringUtils.isEmpty(appSaasOrg) && !appSaasOrg.equals("*")) {
                     String[] arrayOrg = appSaasOrg.split(",");
-                    for(String org : arrayOrg) {
-                        if(!orgListApp.contains(org)) {
+                    for (String org : arrayOrg) {
+                        if (!orgListApp.contains(org)) {
                             orgListApp.add(org);
                         }
                     }
                 }
 
                 //********【机构权限】存在区域授权范围【区域并集】  ***************
-                if(!StringUtils.isEmpty(orgSaasArea)) {
-                    if("*".equals(orgSaasArea)) {
+                if (!StringUtils.isEmpty(orgSaasArea)) {
+                    if ("*".equals(orgSaasArea)) {
                         areaList = areaListApp;
-                    }
-                    else{
+                    } else {
                         String[] arrayArea = orgSaasArea.split(",");
-                        areaList = containArea(areaListApp,arrayArea);
+                        areaList = containArea(areaListApp, arrayArea);
                     }
                 }
                 //【机构权限】存在机构授权范围
-                if(!StringUtils.isEmpty(orgSaasOrg)) {
-                    if("*".equals(orgSaasOrg)) {
+                if (!StringUtils.isEmpty(orgSaasOrg)) {
+                    if ("*".equals(orgSaasOrg)) {
                         orgList = orgListApp;
-                    }
-                    else{
+                    } else {
                         String[] arrayOrg = orgSaasOrg.split(",");
-                        for(String org : arrayOrg) {
+                        for (String org : arrayOrg) {
                             //判断机构权限是否在APP权限范围内
-                            if(orgListApp.contains(org))
-                            {
+                            if (orgListApp.contains(org)) {
                                 orgList.add(org);
                             }
                         }
@@ -671,6 +669,7 @@ public class ResourcesQueryService  {
 
             }
         }
+//        }
         if(areaList.size()>0) {
             for(String area : areaList) {
                 if(area.endsWith("0000")) { //省
@@ -708,7 +707,7 @@ public class ResourcesQueryService  {
         Map<String, Object> mapParam = new HashMap<String, Object>();
         try {
             //获取资源信息
-            RsResources rs = resourcesDao.findByCode(resourcesCode);
+            RsResource rs = resourcesDao.findByCode(resourcesCode);
             //资源结构
             List<DtoResourceMetadata> metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode);
             List<String> colunmName = new ArrayList<String>();
