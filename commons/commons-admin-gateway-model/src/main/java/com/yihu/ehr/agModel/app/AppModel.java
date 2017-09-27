@@ -19,11 +19,11 @@ public class AppModel {
     private int sourceType;
     private String role;
     private String roleJson;
-    //应用图标及在线状态
     private String icon;
     private int releaseFlag;
     private String sourceTypeName;
     private String code;
+    private String manageType; // 管理类型，dictId=94
 
     public String getId() {
         return id;
@@ -38,7 +38,6 @@ public class AppModel {
     public void setName(String name) {
         this.name = name;
     }
-
 
     public String getSecret() {
         return secret;
@@ -157,5 +156,12 @@ public class AppModel {
     }
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getManageType() {
+        return manageType;
+    }
+    public void setManageType(String manageType) {
+        this.manageType = manageType;
     }
 }

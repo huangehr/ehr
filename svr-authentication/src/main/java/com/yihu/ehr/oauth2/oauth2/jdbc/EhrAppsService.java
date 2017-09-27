@@ -28,10 +28,11 @@ public class EhrAppsService {
     public String getRealUrl(String clientId, String redirectUriParameter) {
         String sql = "SELECT url, out_url FROM apps WHERE id = '" + clientId + "'";
         Map<String, Object> resultMap = jdbcTemplate.queryForMap(sql);
+        String queryParam = "?clientId=" + clientId;
         if(redirectUriParameter.equals(resultMap.get("url").toString()) || redirectUriParameter.equals(resultMap.get("out_url").toString())) {
-            return redirectUriParameter;
+            return redirectUriParameter + queryParam;
         }else {
-            return resultMap.get("url").toString();
+            return resultMap.get("url").toString() + queryParam;
         }
     }
 }

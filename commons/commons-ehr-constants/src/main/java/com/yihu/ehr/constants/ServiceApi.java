@@ -306,7 +306,8 @@ public class ServiceApi {
         public static final String AppStatus = "/apps/{app_id}/status";
         public static final String AppNameExistence = "/app/{app_name}/existence";
         public static final String FilterList = "/apps/filterList";
-        public static final String getAppTreeByType = "/getAppTreeByType";
+        public static final String getAppTypeAndApps = "/getAppTypeAndApps";
+        public static final String getApps = "/getApps";
     }
 
     public static class AppApi {

@@ -19,29 +19,23 @@ public class AppDetailModel {
     private String createTime;
     private String auditTime;
     private String catalog;
-    private String catalogName;
     private String status;
-    private String statusName;
     private String description;
     private String tags;
-
     private String org;
-    private String orgName;
-
     private String code;
-
     private int sourceType;
+    private String icon;
+    private int releaseFlag; // 在线状态
+    private String manageType; // 管理类型，dictId=94
 
+    private String statusName;
+    private String catalogName;
+    private String orgName;
     private String sourceTypeName;
-
     private String role;
     private String roleJson;
 
-//    应用图标及在线状态
-    private String icon;
-    private int releaseFlag;
-
-//    应用图标及在线状态setter、getter
     public String getIcon() {
         return icon;
     }
@@ -57,7 +51,6 @@ public class AppDetailModel {
     public void setReleaseFlag(int releaseFlag) {
         this.releaseFlag = releaseFlag;
     }
-
 
     public String getRole() {
         return role;
@@ -234,5 +227,13 @@ public class AppDetailModel {
 
     public void setOrgName(String orgName) {
         this.orgName = orgName;
+    }
+
+    public String getManageType() {
+        return manageType;
+    }
+
+    public void setManageType(String manageType) {
+        this.manageType = manageType;
     }
 }

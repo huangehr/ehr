@@ -142,14 +142,16 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         return count>0?true:false;
     }
 
-    @RequestMapping(value =  ServiceApi.Apps.getAppTreeByType, method = RequestMethod.GET)
-    @ApiOperation(value = "获取app列表，不分页")
-    public Collection<MApp> getAppsByUserIdAndCatalog(
-            @ApiParam(name = "userId", value = "userId")
+    @RequestMapping(value =  ServiceApi.Apps.getApps, method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件，获取app列表")
+    public Collection<MApp> getApps(
+            @ApiParam(name = "userId", value = "userId", required = true)
             @RequestParam(value = "userId") String userId,
-            @ApiParam(name = "catalog", value = "catalog")
-            @RequestParam(value = "catalog") String catalog) throws Exception {
-        List<App> appList = appService.getAppsByUserIdAndCatalog(userId,catalog);
+            @ApiParam(name = "catalog", value = "catalog", required = true)
+            @RequestParam(value = "catalog") String catalog,
+            @ApiParam(name = "manageType", value = "APP管理类型，backStage：后台管理，client：客户端。", required = true)
+            @RequestParam(value = "manageType", required = false) String manageType) throws Exception {
+        List<App> appList = appService.getApps(userId, catalog, manageType);
         return convertToModels(appList,new ArrayList<MApp>(appList.size()),MApp.class,"");
     }
 }

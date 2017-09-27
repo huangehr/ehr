@@ -43,6 +43,7 @@ public class App {
     private int sourceType;
     private String icon;
     private int releaseFlag;
+    private String manageType; // 管理类型，dictId=94
 
     public App() {
     }
@@ -200,5 +201,13 @@ public class App {
     }
     public void setReleaseFlag(int releaseFlag) {
         this.releaseFlag = releaseFlag;
+    }
+
+    @Column(name = "manage_type")
+    public String getManageType() {
+        return manageType;
+    }
+    public void setManageType(String manageType) {
+        this.manageType = manageType;
     }
 }

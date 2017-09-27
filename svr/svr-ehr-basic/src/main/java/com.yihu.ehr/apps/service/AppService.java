@@ -2,8 +2,8 @@ package com.yihu.ehr.apps.service;
 
 import com.yihu.ehr.apps.model.App;
 import com.yihu.ehr.apps.model.UserApp;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.query.BaseJpaService;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,8 +114,7 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
     /**
      * 机构资源授权获取
      */
-    public List<App> getAppsByUserIdAndCatalog(String userId,String catalog)
-    {
+    public List<App> getApps(String userId ,String catalog, String manageType) {
         String sql =
                 "SELECT * FROM (" +
                         "SELECT b.id, b.name as name, b.secret as secret, b.url as url, b.out_url as outUrl, b.creator as creator," +
@@ -124,12 +123,18 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
                         " b.source_type as sourceType, b.release_flag as releaseFlag" +
                         " FROM apps b " +
                         "LEFT JOIN user_app m on m.app_id=b.id " +
-                        "WHERE b.catalog= :catalog AND m.user_id=:userId AND m.show_flag='1'" +
-                        ") p ORDER BY p.id";
+                        "WHERE b.catalog= :catalog AND m.user_id=:userId AND m.show_flag='1'";
+        if (!StringUtils.isEmpty(manageType)) {
+            sql += "AND b.manage_type = :manageType";
+        }
+        sql += ") p ORDER BY p.id";
 
         SQLQuery query = currentSession().createSQLQuery(sql);
         query.setParameter("userId", userId);
         query.setParameter("catalog", catalog);
+        if (!StringUtils.isEmpty(manageType)) {
+            query.setParameter("manageType", manageType);
+        }
         query.setResultTransformer(Transformers.aliasToBean(App.class));
         return query.list();
     }

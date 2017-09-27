@@ -412,11 +412,13 @@ public class AppController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/getAppTreeByType", method = RequestMethod.GET)
-    @ApiOperation(value = "获取App tree")
-    public Envelop getAppTreeByType(
-            @ApiParam(name = "userId", value = "返回的字段，为空返回全部字段", defaultValue = "")
-            @RequestParam(value = "userId", required = false) String userId) {
+    @RequestMapping(value = ServiceApi.Apps.getAppTypeAndApps, method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件，获取APP类型及其所拥有的应用")
+    public Envelop getAppTypeAndApps(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "manageType", value = "APP管理类型，backStage：后台管理，client：客户端。")
+            @RequestParam(value = "manageType", required = false) String manageType) {
         Envelop envelop = new Envelop();
         //获取系统字典项（App类型）
         String filters="dictId="+1;
@@ -433,18 +435,17 @@ public class AppController extends BaseController {
         Map<String,String> map=new HashedMap();
         if(null!=systemDictEntryModelList&&systemDictEntryModelList.size()>0){
             for(SystemDictEntryModel dict:systemDictEntryModelList){
-                Collection<MApp> mAppList = appClient.getAppsByUserIdAndCatalog(userId,dict.getCode());
+                Collection<MApp> mAppList = appClient.getApps(userId, dict.getCode(), manageType);
                 appModelList = (List<AppModel>) convertToModels(mAppList, new ArrayList<AppModel>(mAppList.size()), AppModel.class, null);
                 dict.setChildren(appModelList);
                 DictEntryModelList.add(dict);
-                }
             }
+        }
 
         //应用列表
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(DictEntryModelList);
         return envelop;
     }
-
 
 }

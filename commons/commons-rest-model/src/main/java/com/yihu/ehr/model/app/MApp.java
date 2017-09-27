@@ -31,10 +31,9 @@ public class MApp implements Serializable {
     private String org;
     private String code;
     private int sourceType;
-    //应用图标及在线状态
     private String icon;
     private int releaseFlag;
-    //应用图标及在线状态setter、getter
+    private String manageType; // 管理类型，dictId=94
 
     public MApp(){
     }
@@ -173,5 +172,12 @@ public class MApp implements Serializable {
     }
     public void setOrg(String org) {
         this.org = org;
+    }
+
+    public String getManageType() {
+        return manageType;
+    }
+    public void setManageType(String manageType) {
+        this.manageType = manageType;
     }
 }
