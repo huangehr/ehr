@@ -1029,6 +1029,8 @@ public class ServiceApi {
 
     public static class Org {
         public static final String getUserOrglistByUserId="/org/getUserOrglistByUserId/";
+        public static final String getUserOrgSaasByUserOrgCode="/org/getUserOrgSaasByUserOrgCode/";
+
     }
 
 

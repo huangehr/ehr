@@ -1,6 +1,5 @@
 package com.yihu.ehr.organization.service;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.model.org.MOrganization;
@@ -187,5 +186,16 @@ public interface OrganizationClient {
     List getAllSaasOrgs(
             @ApiParam(name = "saasName", value = "名称", defaultValue = "")
             @RequestParam(value = "saasName", required = false) String saasName);
+
+    /**
+     * 根据机构ID获取机构
+     * @param userOrgCode
+     * @return
+     */
+    @RequestMapping(value = "/organizations/getOrgListById", method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构ID获取机构")
+    List<String> getOrgListById(
+            @ApiParam(name = "userOrgCode", value = "用户所在机构", defaultValue = "")
+            @RequestParam(value = "userOrgCode", required = false) List<Long> userOrgCode) ;
 
 }

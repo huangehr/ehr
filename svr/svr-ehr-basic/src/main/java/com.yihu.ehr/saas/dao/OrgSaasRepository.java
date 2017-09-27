@@ -39,4 +39,8 @@ public interface OrgSaasRepository extends PagingAndSortingRepository<OrgSaas, I
 
     @Query("select os.saasCode from OrgSaas os where os.type = 2 and os.orgCode = :orgCode")
     List<String> findSaasCodeByType(@Param("orgCode") String orgCode);
+
+    //根据机构获取saas机构数据
+    @Query("select os.saasCode from OrgSaas os where  os.orgCode in (:orgCode) and os.type = :type")
+    List<String> getOrgSaasCodeByorgCode(@Param("orgCode")  List<String> orgCode, @Param("type") String type);
 }

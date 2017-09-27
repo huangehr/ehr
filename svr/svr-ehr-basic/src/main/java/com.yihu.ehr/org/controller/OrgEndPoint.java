@@ -380,5 +380,20 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
                 List<Organization> orgs = orgService.getAllSaasOrgs(saasName);
                 return orgs;
             }
+    /**
+     * 根据机构ID获取机构
+     *
+     * @param userOrgCode
+     * @return
+     */
+    @RequestMapping(value = "/organizations/getOrgListById", method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构ID获取机构")
+    public List<String> getOrgListById(
+            @ApiParam(name = "userOrgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "userOrgCode") List<Long> userOrgCode) throws Exception {
+        List<String> organizationList = orgService.getOrgListById(userOrgCode);
+        return organizationList;
+    }
+
 
 }
