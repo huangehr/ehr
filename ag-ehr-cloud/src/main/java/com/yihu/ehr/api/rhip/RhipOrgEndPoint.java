@@ -71,8 +71,8 @@ public class RhipOrgEndPoint extends BaseController {
     public Envelop create(
             @ApiParam(name = "mOrganizationJsonData", value = "机构信息Json", defaultValue = "")
             @RequestParam(value = "mOrganizationJsonData", required = false) String mOrganizationJsonData,
-            @ApiParam(name = "geography_model_json_data",value = "地址信息Json",defaultValue = "")
-            @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData,
+            @ApiParam(name = "geographyModelJsonData",value = "地址信息Json",defaultValue = "")
+            @RequestParam(value = "geographyModelJsonData", required = false) String geographyModelJsonData,
             @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
             @RequestParam(value = "inputStream", required = false) String inputStream,
             @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
@@ -148,8 +148,8 @@ public class RhipOrgEndPoint extends BaseController {
     public Envelop update(
             @ApiParam(name = "mOrganizationJsonData", value = "机构信息Json", defaultValue = "")
             @RequestParam(value = "mOrganizationJsonData", required = true) String mOrganizationJsonData,
-            @ApiParam(name = "geography_model_json_data",value = "地址信息Json",defaultValue = "")
-            @RequestParam(value = "geography_model_json_data", required = false) String geographyModelJsonData,
+            @ApiParam(name = "geographyModelJsonData",value = "地址信息Json",defaultValue = "")
+            @RequestParam(value = "geographyModelJsonData", required = false) String geographyModelJsonData,
             @ApiParam(name = "inputStream", value = "转换后的输入流", defaultValue = "")
             @RequestParam(value = "inputStream", required = false) String inputStream,
             @ApiParam(name = "imageName", value = "图片全名", defaultValue = "")
