@@ -1,18 +1,20 @@
 package com.yihu.ehr.apps.controller;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.model.App;
 import com.yihu.ehr.apps.service.AppService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,8 @@ import java.util.List;
 public class AppEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppService appService;
+    @Value("${fast-dfs.public-server}")
+    private String fastDfsPublicServers;
 
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
@@ -91,6 +95,10 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "app_id", value = "id")
             @PathVariable(value = "app_id") String appId) throws Exception {
         App app = appService.retrieve(appId);
+        if (StringUtils.isNotEmpty(app.getIcon())) {
+            String iconUrl = fastDfsPublicServers + "/" + app.getIcon().replace(":", "/");
+            app.setIcon(iconUrl);
+        }
         return convertToModel(app, MApp.class);
     }
 
