@@ -296,6 +296,10 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             long expires_in = (expiration.getTime() - System.currentTimeMillis()) / 1000;
             vars.put("expires_in", expires_in);
         }
+        Map<String,String> map =authorizationRequest.getRequestParameters();
+        vars.put("redirect_uri",map.get("redirect_uri"));
+
+
         String originalScope = authorizationRequest.getRequestParameters().get(OAuth2Utils.SCOPE);
         if (originalScope == null || !OAuth2Utils.parseParameterList(originalScope).equals(accessToken.getScope())) {
             vars.put("scope", OAuth2Utils.formatParameterList(accessToken.getScope()));
