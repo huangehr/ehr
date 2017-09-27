@@ -7,23 +7,25 @@ public class AppModel {
     private String id;
     private String name;
     private String secret;
-    private String catalog;
-    private String catalogName;
     private String url;
     private String outUrl;
+    private String catalog;
     private String status;
-    private String statusName;
+    private String description;
     private String org;
-    private String orgName;
-    private String resourceNames;
+    private String code;
     private int sourceType;
-    private String role;
-    private String roleJson;
     private String icon;
     private int releaseFlag;
-    private String sourceTypeName;
-    private String code;
     private String manageType; // 管理类型，dictId=94
+
+    private String statusName;
+    private String catalogName;
+    private String resourceNames;
+    private String sourceTypeName;
+    private String orgName;
+    private String role;
+    private String roleJson;
 
     public String getId() {
         return id;
@@ -163,5 +165,12 @@ public class AppModel {
     }
     public void setManageType(String manageType) {
         this.manageType = manageType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
