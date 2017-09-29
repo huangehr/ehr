@@ -109,4 +109,13 @@ public class RoleFeatureRelationEndPoint extends EnvelopRestEndPoint {
         Long count = roleFeatureRelationService.getCount(filters);
         return count>0?true:false;
     }
+
+    @RequestMapping(value = ServiceApi.Roles.HasPermission, method = RequestMethod.GET)
+    @ApiOperation(value = "判断用户是否有权限查看居民身份证信息")
+    public boolean hasPermission(
+            @ApiParam(name = "userId", value = "用户id")
+            @RequestParam(value = "userId", required = false) String userId) throws Exception {
+        boolean hasPermission = roleFeatureRelationService.hasPermission(userId);
+        return hasPermission;
+    }
 }
