@@ -167,8 +167,9 @@ public class ResourceBrowseController extends BaseController {
             @RequestParam(required = false) String orgCode,
             @ApiParam("查询条件")
             @RequestParam(required = false) String queryCondition,
-            @ApiParam(name = "userId" ,value = "用户ID" )
-            @RequestParam(value = "userId" , required = false) String userId) throws Exception {
+            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
+            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList
+    ) throws Exception {
         Envelop envelop = new Envelop();
         String [] quotaCodeArr = null;
         try {
@@ -227,52 +228,11 @@ public class ResourceBrowseController extends BaseController {
             List<Envelop> envelopList = new ArrayList<Envelop>();
             for (ResourceQuotaModel resourceQuotaModel : rqmList) {
                 Envelop envelop1;
+
                 //-----------------用户数据权限 start
                 String org = "";
-                Map<String, String> orgMap = new HashMap<>();
-                if( !StringUtils.isEmpty(userId)){
-                    //获取用户所拥有的  带saaa权限
-                    List<String> orgList = getInfoClient.getOrgCode(userId);
-                    if(orgList != null && orgList.size() > 0){
-                        for(String orgcode : orgList){
-                            orgMap.put(orgcode,orgcode);
-                        }
-                    }
-                    //获取用户所拥有的区域   带saaa权限
-                    Map<String,String> param = new HashMap<>();
-                    List<String> districtList = getInfoClient.getUserDistrictCode(userId);
-                    if(districtList != null && districtList.size() > 0){
-                        for(String code : districtList){
-                            MGeographyDict mGeographyDict = addressClient.getAddressDictById(code);
-                            if(mGeographyDict != null){
-                                String province = "";
-                                String city = "";
-                                String district = "";
-                                if(mGeographyDict.getLevel() == 1){
-                                    province =  mGeographyDict.getName();
-                                }else if(mGeographyDict.getLevel() == 2){
-                                    city =  mGeographyDict.getName();
-                                }else if(mGeographyDict.getLevel() == 3){
-                                    district =  mGeographyDict.getName();
-                                }
-                                Collection<MOrganization> organizations = organizationClient.getOrgsByAddress(province,city ,district );
-                                if(organizations !=null ){
-                                    java.util.Iterator it = organizations.iterator();
-                                    while(it.hasNext()){
-                                        MOrganization mOrganization = (MOrganization)it.next();
-                                        orgMap.put(mOrganization.getCode(),mOrganization.getCode());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if(orgMap != null && orgMap.size() > 0){
-                    for(String key :orgMap.keySet()){
-                        if(!StringUtils.isEmpty(key))
-                            org =   org + key + ",";
-                    }
+                if( userOrgList != null ){
+                    org = String.join(",", userOrgList);
                 }
                 //-----------------用户数据权限 end
                 //判断是否启用默认查询条件
@@ -282,20 +242,16 @@ public class ResourceBrowseController extends BaseController {
                         if( !StringUtils.isEmpty(query)){
                             params  = objectMapper.readValue(query, new TypeReference<Map>() {});
                         }
-                        params.put("org",org.substring(0,org.length()-1));
+                        params.put("org",org);
                         query = objectMapper.writeValueAsString(params);
-                    }else{
-                        params.put("org","-000001");
                     }
                     envelop1 = tjQuotaJobClient.getQuotaTotalCount(resourceQuotaModel.getQuotaId(), query, dimension.substring(0, dimension.length() - 1));
                     envelopList.add(envelop1);
                 } else {
                     if(org.length()>0){
                         params  = objectMapper.readValue(queryCondition, new TypeReference<Map>() {});
-                        params.put("org",org.substring(0,org.length()-1));
+                        params.put("org",org);
                         queryCondition = objectMapper.writeValueAsString(params);
-                    }else{
-                        params.put("org","-000001");
                     }
                     envelop1 = tjQuotaJobClient.getQuotaTotalCount(resourceQuotaModel.getQuotaId(), queryCondition, dimension.substring(0, dimension.length() - 1));
                     envelopList.add(envelop1);

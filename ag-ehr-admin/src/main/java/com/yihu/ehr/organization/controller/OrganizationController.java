@@ -460,6 +460,9 @@ public class OrganizationController extends BaseController {
                 return failed("机构代码不能为空！");
             }
             MOrganization mOrg = orgClient.getOrg(orgCode);
+            if (mOrg == null) {
+                return failed("机构获取失败");
+            }
             if (!StringUtils.isEmpty(mOrg.getImgRemotePath())) {
                 try {
                     String imagePath[] = mOrg.getImgRemotePath().split(":");
@@ -475,11 +478,7 @@ public class OrganizationController extends BaseController {
                     mOrg.setParentHosName(org.getFullName());
                 }
             }
-            if (mOrg == null) {
-                return failed("机构获取失败");
-            }
             OrgDetailModel org = convertToOrgDetailModel(mOrg);
-
             return success(org);
         }
         catch (Exception ex)
