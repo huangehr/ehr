@@ -634,6 +634,7 @@ public class ServiceApi {
         public static final String RoleFeatures = "/roles/role_features";
         public static final String RoleFeaturesNoPage = "/roles/role_features/no_paging";
         public static final String RoleFeatureExistence = "/roles/role_feature/existence";
+        public static final String HasPermission = "/roles/role_feature/hasPermission";
 
         public static final String RoleApp = "/roles/role_app";
         public static final String RoleAppId = "/roles/role_app/{id}";
