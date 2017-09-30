@@ -76,7 +76,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestBody(required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,

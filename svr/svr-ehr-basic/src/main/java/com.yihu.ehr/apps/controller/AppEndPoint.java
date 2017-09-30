@@ -56,8 +56,8 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
-            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sort", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
