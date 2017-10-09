@@ -268,8 +268,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                   orgId=objectList[23].toString();
               }
               String deptName="";
-              if(!StringUtils.isEmpty(objectList[26])){
-                  deptName=objectList[26].toString();
+              if(!StringUtils.isEmpty(objectList[27])){
+                  deptName=objectList[27].toString();
               }
               // 根据机构id和部门名称 获取部门id
             int deptId=  orgDeptService.getOrgDeptByOrgIdAndName(orgId, deptName);
