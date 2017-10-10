@@ -135,7 +135,17 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         return relationService.getCountByOrgIdAndUserId(orgId.toString(), userId, deptId);
     }
 
+    @RequestMapping(value = "/orgDeptMember/getOrgIds", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取orgId列表")
+    public List<String> getOrgIds(String userId) {
+        List<String> list = relationService.getOrgIds(userId);
+        return list;
+    }
 
-
-
+    @RequestMapping(value = "/orgDeptMember/getDeptIds", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取DeptId列表")
+    public List<Integer> getDeptIds(String userId) {
+        List<Integer> list = relationService.getDeptIds(userId);
+        return list;
+    }
 }
