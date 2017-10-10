@@ -152,4 +152,5 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
         List<String> list =  organizationRepository.findOrgListById(orgId);
         return list;
     }
+
 }

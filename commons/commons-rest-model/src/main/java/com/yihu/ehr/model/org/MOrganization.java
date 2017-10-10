@@ -57,6 +57,8 @@ public class MOrganization implements Serializable{
 
     private Integer berth;  //核定床位
 
+    private boolean checked;    //是否选中
+
     public MOrganization() {
     }
 
@@ -357,5 +359,13 @@ public class MOrganization implements Serializable{
 
     public void setBerth(Integer berth) {
         this.berth = berth;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 }

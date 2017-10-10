@@ -395,5 +395,10 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         return organizationList;
     }
 
-
+    @RequestMapping(value = "/organizations/getAllOrgsNoPaging", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有机构列表不分页")
+    public List<MOrganization> getAllOrgsNoPaging() throws Exception {
+        List<MOrganization> orgs = orgService.search(null);
+        return orgs;
+    }
 }

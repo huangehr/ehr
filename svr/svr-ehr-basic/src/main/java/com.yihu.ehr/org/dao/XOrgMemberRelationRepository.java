@@ -37,4 +37,6 @@ public interface XOrgMemberRelationRepository extends PagingAndSortingRepository
     @Query("select distinct(r.orgId) from OrgMemberRelation r where r.userId = :userId and r.status=0")
     List<String> searchByUserId(@Param("userId") String userId);
 
+    @Query("select r.deptId from OrgMemberRelation r where r.status=0 and r.userId = :userId")
+    List<Integer> findDeptIdByUserId(@Param("userId") String userId);
 }

@@ -610,6 +610,7 @@ public class ServiceApi {
         public static final String UserOnePhoneExistence = "/user/onePhone/existence";
         public static final String UserEmailExistence = "/user/email/existence";
         public static final String UseridCardNoExistence = "/user/idCardNo/existence";
+        public static final String UserByIdCardNo = "/user/idCardNo/userByIdCardNo";
 
     }
 
@@ -1031,7 +1032,8 @@ public class ServiceApi {
     public static class Org {
         public static final String getUserOrglistByUserId="/org/getUserOrglistByUserId/";
         public static final String getUserOrgSaasByUserOrgCode="/org/getUserOrgSaasByUserOrgCode/";
-
+        public static final String GetOrgDeptsDate="/org/getOrgDeptsDate";
+        public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
     }
 
 
