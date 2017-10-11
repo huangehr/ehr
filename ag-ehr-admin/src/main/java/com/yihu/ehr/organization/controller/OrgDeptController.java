@@ -225,8 +225,7 @@ public class OrgDeptController  extends BaseController {
             if (StringUtils.isEmpty(mOrgDept.getOrgId())) {
                 errorMsg+="机构不能为空！";
             }
-            if(StringUtils.isNotEmpty(errorMsg))
-            {
+            if(StringUtils.isNotEmpty(errorMsg)){
                 return failed(errorMsg);
             }
 
@@ -477,8 +476,8 @@ public class OrgDeptController  extends BaseController {
                 detailModel.setUserName(mUser == null ? "" : mUser.getRealName());
             }
             if (StringUtils.isNotEmpty(detailModel.getParentUserId()) ){
-                MUser mUser = userClient.getUser(detailModel.getParentUserId());
-                detailModel.setParentUserName(mUser == null ? "" : mUser.getRealName());
+                MOrgMemberRelation memberUser= orgDeptMemberClient.getOrgMemberRelation(Long.valueOf(detailModel.getParentUserId()));
+                detailModel.setParentUserName(memberUser == null ? "" : memberUser.getUserName());
             }
             if (detailModel.getDeptId()!=null && detailModel.getDeptId()!=0 ){
                 MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(detailModel.getDeptId());
