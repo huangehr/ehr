@@ -334,6 +334,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     private void orgMemberRelationInfo(List<MOrgDeptJson> orgDeptJsonList, User user) {
         for (MOrgDeptJson orgDeptJson : orgDeptJsonList) {
             relationService.updateByOrgId(orgDeptJson.getOrgId());
+        }
+        for (MOrgDeptJson orgDeptJson : orgDeptJsonList) {
             Organization organization = orgService.getOrgById(orgDeptJson.getOrgId());
             String deptIds = orgDeptJson.getDeptIds();
             if (!StringUtils.isEmpty(deptIds)) {

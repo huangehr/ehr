@@ -8,6 +8,7 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrgDeptData;
+import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.organization.service.OrgDeptClient;
@@ -157,7 +158,11 @@ public class DoctorController extends BaseController {
             detailModel.setInsertTime(mDoctor.getInsertTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
             detailModel.setUpdateTime(mDoctor.getUpdateTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getUpdateTime()));
 
-            return success(detailModel);
+            Envelop envelop = success(detailModel);
+            String userId = userClient.getUserIdByIdCardNo(detailModel.getIdCardNo());
+            List<MOrgDeptJson> orgDeptJsonList = orgDeptMemberClient.getByUserId(userId);
+            envelop.setDetailModelList(orgDeptJsonList);
+            return envelop;
         }
         catch (Exception ex){
             ex.printStackTrace();
