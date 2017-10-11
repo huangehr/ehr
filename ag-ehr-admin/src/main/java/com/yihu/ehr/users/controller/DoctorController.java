@@ -8,6 +8,7 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrgDeptData;
+import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.organization.service.OrgDeptClient;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -156,7 +158,11 @@ public class DoctorController extends BaseController {
             detailModel.setInsertTime(mDoctor.getInsertTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getInsertTime()));
             detailModel.setUpdateTime(mDoctor.getUpdateTime() == null?"": DateTimeUtil.simpleDateTimeFormat(mDoctor.getUpdateTime()));
 
-            return success(detailModel);
+            Envelop envelop = success(detailModel);
+            String userId = userClient.getUserIdByIdCardNo(detailModel.getIdCardNo());
+            List<MOrgDeptJson> orgDeptJsonList = orgDeptMemberClient.getByUserId(userId);
+            envelop.setDetailModelList(orgDeptJsonList);
+            return envelop;
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -192,10 +198,8 @@ public class DoctorController extends BaseController {
     public Envelop createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
             @RequestParam(value = "doctor_json_data") String doctorJsonData,
-            @ApiParam(name = "orgId", value = "", defaultValue = "")
-            @RequestParam(value = "orgId") String orgId,
-            @ApiParam(name = "deptId", value = "", defaultValue = "")
-            @RequestParam(value = "deptId") String deptId) {
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam("model") String model) {
         try {
             DoctorDetailModel detailModel = objectMapper.readValue(doctorJsonData, DoctorDetailModel.class);
 
@@ -224,7 +228,7 @@ public class DoctorController extends BaseController {
                 return failed(errorMsg);
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
-            mDoctor = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor), orgId, deptId);
+            mDoctor = doctorClient.createDoctor(objectMapper.writeValueAsString(mDoctor), model);
             if (mDoctor == null) {
                 return failed("保存失败!");
             }
@@ -242,7 +246,9 @@ public class DoctorController extends BaseController {
     @ApiOperation(value = "修改医生", notes = "重新绑定医生信息")
     public Envelop updateDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
-            @RequestParam(value = "doctor_json_data") String doctorJsonData) {
+            @RequestParam(value = "doctor_json_data") String doctorJsonData,
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam("model") String model) {
         try {
             DoctorDetailModel detailModel = toEntity(doctorJsonData, DoctorDetailModel.class);
             String errorMsg = null;
@@ -265,7 +271,7 @@ public class DoctorController extends BaseController {
                 return failed(errorMsg);
             }
             MDoctor mDoctor = convertToMDoctor(detailModel);
-            mDoctor = doctorClient.updateDoctor(objectMapper.writeValueAsString(mDoctor));
+            mDoctor = doctorClient.updateDoctor(objectMapper.writeValueAsString(mDoctor), model);
             if(mDoctor==null){
                 return failed("保存失败!");
             }
@@ -382,6 +388,10 @@ public class DoctorController extends BaseController {
             List<MOrganization> list = organizationClient.getAllOrgsNoPaging(); //获取所有机构
             if (null != userId && null != list && list.size() > 0) {
                 List<String> orgIds = orgDeptMemberClient.getOrgIds(userId);    //根据userId获取部门-人员关系表中的机构id
+                //去掉重复的orgId
+                HashSet<String> hashSet = new HashSet<>(orgIds);
+                orgIds.clear();
+                orgIds.addAll(hashSet);
                 if (null != orgIds && orgIds.size() > 0) {
                     for (int i=0; i < list.size(); i++) {
                         if (orgIds.contains(list.get(i).getId().toString())) {

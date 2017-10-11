@@ -77,7 +77,7 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
 
     public OrgDept saveOrgDept(OrgDept dept) {
         dept.setDelFlag(0);
-        dept.setSortNo(searchParentIdOfMaxSortNo(dept.getParentDeptId()));
+        dept.setSortNo(searchParentIdOfMaxSortNo(dept.getParentDeptId())+1);
 
         OrgDeptDetail deptDetail = dept.getDeptDetail();
         OrgDept save = orgDeptRepository.save(dept);
@@ -253,8 +253,5 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
         return orgMemberRelationRepository.searchByUserId(userId);
     }
 
-    public List<OrgDept> searchByOrgIds(String[] orgId) {
-        return orgDeptRepository.searchByOrgIds(orgId);
-    }
 }
 

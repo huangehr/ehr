@@ -91,4 +91,13 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
         List<Integer> deptIds = relationRepository.findDeptIdByUserId(userId);
         return deptIds;
     }
+
+    public void updateByOrgId(String[] orgId) {
+        relationRepository.updateByOrgId(orgId);
+    }
+
+    public List<OrgMemberRelation> getByUserId(String userId) {
+        List<OrgMemberRelation> relationList = relationRepository.findByUserId(userId);
+        return relationList;
+    }
 }

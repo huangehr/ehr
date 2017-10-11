@@ -2,6 +2,7 @@ package com.yihu.ehr.organization.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.org.MOrgMemberRelation;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -80,4 +81,10 @@ public interface OrgDeptMemberClient {
     @ApiOperation(value = "根据userId获取DeptId列表")
     List<Integer> getDeptIds(
             @RequestParam(value = "userId")String userId);
+
+    @RequestMapping(value = "/orgDeptMember/getByUserId", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取orgDeptJson列表")
+    List<MOrgDeptJson> getByUserId(
+            @ApiParam(name = "userId", value = "用户id")
+            @RequestParam(value = "userId") String userId);
 }
