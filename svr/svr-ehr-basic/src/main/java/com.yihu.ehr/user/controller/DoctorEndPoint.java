@@ -332,9 +332,14 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
     //创建用户与机构的关联
     private void orgMemberRelationInfo(List<MOrgDeptJson> orgDeptJsonList, User user) {
-        for (MOrgDeptJson orgDeptJson : orgDeptJsonList) {
-            relationService.updateByOrgId(orgDeptJson.getOrgId());
+        if (null != orgDeptJsonList && orgDeptJsonList.size() > 0) {
+            String[] orgIds = new String[orgDeptJsonList.size()];
+            for (int i=0; i<orgDeptJsonList.size(); i++) {
+                orgIds[i] = orgDeptJsonList.get(i).getOrgId();
+            }
+            relationService.updateByOrgId(orgIds);
         }
+
         for (MOrgDeptJson orgDeptJson : orgDeptJsonList) {
             Organization organization = orgService.getOrgById(orgDeptJson.getOrgId());
             String deptIds = orgDeptJson.getDeptIds();
