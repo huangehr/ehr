@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -382,6 +383,10 @@ public class DoctorController extends BaseController {
             List<MOrganization> list = organizationClient.getAllOrgsNoPaging(); //获取所有机构
             if (null != userId && null != list && list.size() > 0) {
                 List<String> orgIds = orgDeptMemberClient.getOrgIds(userId);    //根据userId获取部门-人员关系表中的机构id
+                //去掉重复的orgId
+                HashSet<String> hashSet = new HashSet<>(orgIds);
+                orgIds.clear();
+                orgIds.addAll(hashSet);
                 if (null != orgIds && orgIds.size() > 0) {
                     for (int i=0; i < list.size(); i++) {
                         if (orgIds.contains(list.get(i).getId().toString())) {
