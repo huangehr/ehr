@@ -419,4 +419,11 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         List existidCardNos = userManager.idCardNosExist(toEntity(idCardNos, String[].class));
         return existidCardNos;
     }
+
+    @RequestMapping(value = ServiceApi.Users.UserByIdCardNo, method = RequestMethod.GET)
+    @ApiOperation("根据身份证号码获取用户id")
+    public String getUserIdByIdCardNo(String idCardNo) {
+        User user = userManager.getUserByIdCardNo(idCardNo);
+        return StringUtils.isEmpty(user) ? "" : user.getId();
+    }
 }

@@ -45,11 +45,11 @@ public interface RsResourceIntegratedClient {
     @ApiOperation("综合查询视图保存")
     @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     Envelop updateResource(
-            @RequestParam(value = "dataJson") String dataJson);
+            @RequestBody String dataJson);
 
     @ApiOperation("综合查询搜索条件更新")
     @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     Envelop updateResourceQuery(
-            @RequestParam(value = "dataJson") String dataJson);
+            @RequestBody String dataJson);
 
 }

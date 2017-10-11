@@ -71,4 +71,13 @@ public interface OrgDeptMemberClient {
     @ApiOperation(value = "查询所有成员列表")
     ResponseEntity<List<MOrgMemberRelation>> getAllOrgDeptMember(
             @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value = "/orgDeptMember/getOrgIds", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取orgId列表")
+    List<String> getOrgIds(@RequestParam(value = "userId")String userId);
+
+    @RequestMapping(value = "/orgDeptMember/getDeptIds", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取DeptId列表")
+    List<Integer> getDeptIds(
+            @RequestParam(value = "userId")String userId);
 }

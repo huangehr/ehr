@@ -106,6 +106,8 @@ public class OrganizationController extends BaseController {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "userOrgList", value = "登录者授权机构", defaultValue = "1")
+            @RequestParam(value = "userOrgList", required = false) List<String> userOrgList,
             @ApiParam(name = "province", value = "省", defaultValue = "")
             @RequestParam(value = "province",required=false) String province,
             @ApiParam(name = "city", value = "市", defaultValue = "")
@@ -113,6 +115,13 @@ public class OrganizationController extends BaseController {
             @ApiParam(name = "district", value = "县", defaultValue = "")
             @RequestParam(value = "district",required=false) String district) {
         try {
+            //根据登录人的机构获取saas化机构 --start
+           String userOrgCode = "";
+            if( userOrgList != null ){
+                userOrgCode = String.join(",", userOrgList);
+            }
+            filters += "orgCode=" + userOrgCode ;
+            //根据登录人的机构获取saas化机构 --end
             String address = "";
             if(StringUtils.isNotBlank(province)){
                 List<String> addressList = addressClient.search(province, city, district);

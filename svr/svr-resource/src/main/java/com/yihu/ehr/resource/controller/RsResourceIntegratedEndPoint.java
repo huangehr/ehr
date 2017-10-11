@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +49,8 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     public Envelop getMetadataList(
             @ApiParam(name = "filters", value = "过滤条件(name)", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) {
+            @RequestParam(value = "filters", required = false) String filters,
+            HttpServletRequest request) {
         return resourcesIntegratedService.getMetadataList(filters);
     }
 
@@ -84,7 +86,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Envelop updateResource(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})")
-            @RequestParam(value="dataJson") String dataJson) {
+            @RequestBody String dataJson) {
         Envelop envelop = new Envelop();
         RsResource newResources = null;
         try {
@@ -218,7 +220,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Envelop customizeUpdate(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})")
-            @RequestParam(value="dataJson") String dataJson) throws  Exception {
+            @RequestBody String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> paraMap = mapper.readValue(dataJson, Map.class);
