@@ -2,6 +2,7 @@ package com.yihu.ehr.org.dao;
 
 import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.model.OrgMemberRelation;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -39,4 +40,8 @@ public interface XOrgMemberRelationRepository extends PagingAndSortingRepository
 
     @Query("select r.deptId from OrgMemberRelation r where r.status=0 and r.userId = :userId")
     List<Integer> findDeptIdByUserId(@Param("userId") String userId);
+
+    @Modifying
+    @Query("update OrgMemberRelation r set r.status = 1 where r.orgId = :orgId")
+    void updateByOrgId(@Param("orgId") String orgId);
 }
