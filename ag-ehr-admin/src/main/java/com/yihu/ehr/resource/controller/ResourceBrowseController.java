@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -232,7 +232,7 @@ public class ResourceBrowseController extends BaseController {
                 //-----------------用户数据权限 start
                 String org = "";
                 if( userOrgList != null ){
-                    org = String.join(",", userOrgList);
+                    org = StringUtils.strip(String.join(",", userOrgList), "[]");
                 }
                 //-----------------用户数据权限 end
                 //判断是否启用默认查询条件

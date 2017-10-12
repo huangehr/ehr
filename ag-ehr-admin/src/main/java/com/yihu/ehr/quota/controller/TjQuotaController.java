@@ -30,7 +30,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -240,7 +240,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         //-----------------用户数据权限 start
         String org = "";
         if( userOrgList != null ){
-            org = String.join(",", userOrgList);
+            org = StringUtils.strip(String.join(",", userOrgList), "[]");
         }
         Map<String, Object> params  = new HashMap<>();
         if(org.length() > 0){
