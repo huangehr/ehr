@@ -29,7 +29,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -345,7 +345,7 @@ public class RsResourceController extends BaseController {
                     //-----------------用户数据权限 start
                     String org = "";
                     if( userOrgList != null ){
-                        org = String.join(",", userOrgList);
+                        org = StringUtils.strip(String.join(",", userOrgList), "[]");
                     }
                     //-----------------用户数据权限 end
                     Map<String, Object> params  = new HashMap<>();

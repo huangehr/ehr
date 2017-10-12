@@ -125,7 +125,7 @@ public class AppService extends BaseJpaService<App, XAppRepository> {
                         "   b.auditor as auditor, b.create_time as createTime, b.audit_time as auditTime , b.catalog as catalog, b.status as status, " +
                         "   b.description as description, b.org as org, b.code as code," +
                         "   IF(b.icon IS NULL OR b.icon = '','',CONCAT('" + fastDfsPublicServers + "','/',REPLACE(b.icon,':','/'))) AS icon," +
-                        "   b.source_type as sourceType, b.release_flag as releaseFlag" +
+                        "   b.source_type as sourceType, b.release_flag as releaseFlag, b.manage_type AS manageType" +
                         "   FROM apps b " +
                         "LEFT JOIN user_app m on m.app_id=b.id " +
                         "WHERE b.catalog= :catalog AND m.user_id=:userId AND m.show_flag='1'";
