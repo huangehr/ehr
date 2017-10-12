@@ -119,8 +119,8 @@ public class OrganizationController extends BaseController {
            String userOrgCode = "";
             if( userOrgList != null ){
                 userOrgCode = StringUtils.strip(String.join(",", userOrgList), "[]");
+                filters += "orgCode=" + userOrgCode ;
             }
-            filters += "orgCode=" + userOrgCode ;
             //根据登录人的机构获取saas化机构 --end
             String address = "";
             if(StringUtils.isNotBlank(province)){
