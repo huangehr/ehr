@@ -19,12 +19,11 @@ public interface XOrgMemberRelationRepository extends PagingAndSortingRepository
     @Query("select relation from OrgMemberRelation relation where relation.deptId = :deptId ")
     List<OrgMemberRelation> searchByDeptId(@Param("deptId") Integer deptId);
 
-    @Query("select count(relation.id) from OrgMemberRelation relation where relation.deptId= :deptId")
+    @Query("select count(relation.id) from OrgMemberRelation relation where relation.status = 0 and relation.deptId= :deptId")
     public Integer countByDeptId(@Param("deptId") Integer deptId);
 
     @Query("select r from OrgMemberRelation r where r.status=0 and r.orgId =?1")
     List<OrgMemberRelation> findByOrgId(String orgId);
-
 
     @Query("select r from OrgMemberRelation r where r.status=0 and r.orgId = :orgId and r.userId=:userId and r.deptId = :deptId")
     List<OrgMemberRelation> searchByOrgIdAndUserId(@Param("orgId") String orgId,@Param("userId") String userId, @Param("deptId") Integer deptId);
