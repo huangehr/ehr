@@ -20,7 +20,8 @@ public class AppFeature {
     private String description; // 菜单描述
     private String type; // 类型，1：模块，2：菜单，3：功能按钮。
     private int parentId; // 父菜单
-    private String url; // 菜单访问路径。模块时没有值，菜单时有值，按钮时不一定有值。
+    private String url; // 菜单相对访问路径。模块时没有值，菜单时有值，按钮时不一定有值。
+    private String prefixUrl; // 菜单相对访问路径前缀，即JavaWeb上下文路径或站点+上下文路径。
     private String iconUrl; // 图标访问路径
     private String auditLevel; // 审计类型，0：不审计，1：审计。
     private String openLevel; // 开放级别，0：私有（不作为授权对象），1：公开（收费/免费）
@@ -92,6 +93,15 @@ public class AppFeature {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @Column(name = "prefix_url", nullable = true)
+    public String getPrefixUrl() {
+        return prefixUrl;
+    }
+
+    public void setPrefixUrl(String prefixUrl) {
+        this.prefixUrl = prefixUrl;
     }
 
     @Column(name = "icon_url", nullable = true)
