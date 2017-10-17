@@ -14,7 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @ApiIgnore
 @FeignClient(name = MicroServices.Package)
-public interface XDatasetPackageMgrClient {
+public interface DataSetPackageMgrClient {
 
     /**
      * 根据ID获取数据集档案包

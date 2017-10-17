@@ -17,9 +17,10 @@ import org.springframework.stereotype.Service;
  * @created 2015.08.27 10:20
  */
 @Service
-public class MasterResourceRepository {
+public class MasterResourceDao {
+
     @Autowired
-    HBaseDao hbaseDao;
+    private HBaseDao hbaseDao;
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Throwable {
         TableBundle bundle = new TableBundle();

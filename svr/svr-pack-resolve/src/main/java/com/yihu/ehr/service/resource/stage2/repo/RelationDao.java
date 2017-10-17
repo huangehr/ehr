@@ -2,7 +2,7 @@ package com.yihu.ehr.service.resource.stage2.repo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.entity.patient.ArchiveRelation;
-import com.yihu.ehr.feign.XArchiveClient;
+import com.yihu.ehr.feign.ArchiveClient;
 import com.yihu.ehr.service.resource.stage2.ResourceBucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +15,13 @@ import java.util.Date;
  * @created 20170519
  */
 @Service
-public class RelationRepository {
+public class RelationDao {
 
     @Autowired
-    XArchiveClient archiveClient;
+    private ArchiveClient archiveClient;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     public void save(ResourceBucket resourceBucket) {
         try {

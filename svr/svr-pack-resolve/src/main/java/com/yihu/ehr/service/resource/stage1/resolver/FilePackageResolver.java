@@ -6,8 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.constants.UrlScope;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.feign.XRedisServiceClient;
-import com.yihu.ehr.profile.exception.LegacyPackageException;
+import com.yihu.ehr.feign.RedisServiceClient;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.service.resource.stage1.*;
@@ -33,7 +32,7 @@ import java.util.*;
 public class FilePackageResolver extends PackageResolver {
 
     @Autowired
-    XRedisServiceClient redisServiceClient;
+    RedisServiceClient redisServiceClient;
     @Autowired
     FastDFSUtil fastDFSUtil;
 

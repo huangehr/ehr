@@ -1,7 +1,7 @@
 package com.yihu.ehr.service.resource.stage2;
 
 import com.yihu.ehr.constants.ProfileType;
-import com.yihu.ehr.feign.XRedisServiceClient;
+import com.yihu.ehr.feign.RedisServiceClient;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.service.resource.stage1.FilePackage;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
@@ -28,8 +28,7 @@ import java.util.Set;
 public class PackMill {
 
     @Autowired
-    private XRedisServiceClient redisServiceClient;
-
+    private RedisServiceClient redisServiceClient;
 
     /**
      * 将解析好的档案拆解成资源。
@@ -40,39 +39,29 @@ public class PackMill {
     public ResourceBucket grindingPackModel(StandardPackage stdPack) throws  Exception{
         ResourceBucket resourceBucket = new ResourceBucket();
         BeanUtils.copyProperties(stdPack, resourceBucket);
-
         //机构名称、机构区域
-        if(!StringUtils.isBlank(resourceBucket.getOrgCode()))
-        {
+        if(!StringUtils.isBlank(resourceBucket.getOrgCode())) {
             //获取机构名称
             String orgName = redisServiceClient.getOrgRedis(resourceBucket.getOrgCode());
-            if(!StringUtils.isBlank(orgName))
-            {
+            if(!StringUtils.isBlank(orgName)) {
                 resourceBucket.setOrgName(orgName);
             }
-
             //获取机构区域
             String orgArea = redisServiceClient.getOrgAreaRedis(resourceBucket.getOrgCode());
-            if(!StringUtils.isBlank(orgArea))
-            {
+            if(!StringUtils.isBlank(orgArea)) {
                 resourceBucket.setOrgArea(orgArea);
             }
         }
 
         //门诊/住院诊断、健康问题
-        if(stdPack.getDiagnosisList()!=null && stdPack.getDiagnosisList().size()>0)
-        {
+        if(stdPack.getDiagnosisList()!=null && stdPack.getDiagnosisList().size()>0) {
             List<String> healthProblemList = new ArrayList<>();
-            for(String diagnosis:stdPack.getDiagnosisList())
-            {
+            for(String diagnosis:stdPack.getDiagnosisList()) {
                 String healthProblem = redisServiceClient.getIcd10HpCodeRedis(diagnosis);//通过ICD10获取健康问题
-                if(!StringUtils.isEmpty(healthProblem))
-                {
+                if(!StringUtils.isEmpty(healthProblem)) {
                     String[] hpCodeList = healthProblem.split(";");
-                    for(String hpCode:hpCodeList)
-                    {
-                        if(!healthProblemList.contains(hpCode))
-                        {
+                    for(String hpCode:hpCodeList) {
+                        if(!healthProblemList.contains(hpCode)) {
                             healthProblemList.add(hpCode);
                         }
                     }
@@ -86,28 +75,23 @@ public class PackMill {
         Collection<PackageDataSet> packageDataSets = stdPack.getDataSets();
         for (PackageDataSet dataSet : packageDataSets){
             if(DataSetUtil.isOriginDataSet(dataSet.getCode())) continue;
-
             Set<String> keys = dataSet.getRecordKeys();
             Boolean isMultiRecord = Boolean.valueOf(redisServiceClient.getDataSetMultiRecord(dataSet.getCdaVersion(), dataSet.getCode()));
             if (isMultiRecord == null || !isMultiRecord){
                 MasterRecord masterRecord = resourceBucket.getMasterRecord();
-
                 for (String key : keys){
                     MetaDataRecord metaDataRecord = dataSet.getRecord(key);
                     for (String metaDataCode : metaDataRecord.getMetaDataCodes()){
                         String resourceMetaData = resourceMetaData(stdPack.getCdaVersion(), dataSet.getCode(), metaDataCode);
                         if (StringUtils.isEmpty(resourceMetaData)) continue;
-
                         //masterRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
                         dictTransform(masterRecord,stdPack.getCdaVersion(),resourceMetaData,metaDataRecord.getMetaData(metaDataCode));
                     }
-
                     // 仅一条记录
                     break;
                 }
             } else {
                 SubRecords subRecords = resourceBucket.getSubRecords();
-
                 int index = 0;
                 for (String key : keys){
                     SubRecord subRecord = new SubRecord();
@@ -127,7 +111,6 @@ public class PackMill {
                         //subRecord.addResource(resourceMetaData, metaDataRecord.getMetaData(metaDataCode));
                         dictTransform(subRecord,stdPack.getCdaVersion(),resourceMetaData,metaDataRecord.getMetaData(metaDataCode));
                     }
-
                     if(subRecord.getDataGroup().size() > 0) subRecords.addRecord(subRecord);
                 }
             }
@@ -137,7 +120,6 @@ public class PackMill {
         if (stdPack.getProfileType() == ProfileType.File){
             resourceBucket.setCdaDocuments(((FilePackage) stdPack).getCdaDocuments());
         }
-
         return resourceBucket;
     }
 
@@ -156,18 +138,14 @@ public class PackMill {
         } else if (metaDataCode.contains("_VALUE")){
             metaDataCode = metaDataCode.substring(0, metaDataCode.indexOf("_VALUE"));
         }
-
-         String resMetaData = redisServiceClient.getRsAdaptionMetaData(cdaVersion, dataSetCode, metaDataCode);
-
-         if (StringUtils.isEmpty(resMetaData)){
+        String resMetaData = redisServiceClient.getRsAdaptionMetaData(cdaVersion, dataSetCode, metaDataCode);
+        if (StringUtils.isEmpty(resMetaData)){
              LogService.getLogger().error(
                      String.format("Unable to get resource meta data code for ehr meta data %s of %s in %s, forget to cache them?",
                              metaDataCode, dataSetCode, cdaVersion));
-
              return null;
-         }
-
-         return resMetaData;
+        }
+        return resMetaData;
      }
 
     /**
@@ -178,32 +156,25 @@ public class PackMill {
      * @param value 原值
      * @throws Exception
      */
-    protected  void dictTransform(ResourceRecord dataRecord,String cdaVersion,String metadataId,String value) throws Exception
-    {
+    protected  void dictTransform(ResourceRecord dataRecord,String cdaVersion,String metadataId,String value) throws Exception {
         //查询对应内部EHR字段是否有对应字典
         String dictCode = getMetadataDict(metadataId);
-
         //内部EHR数据元字典不为空情况
-        if(!org.apache.commons.lang.StringUtils.isBlank(dictCode) && !org.apache.commons.lang.StringUtils.isBlank(value))
-        {
+        if(!org.apache.commons.lang.StringUtils.isBlank(dictCode) && !org.apache.commons.lang.StringUtils.isBlank(value)) {
             //查找对应的字典数据
             String[] dict = getDict(cdaVersion,dictCode,value);
-
             //对应字典不为空情况下，转换EHR内部字典，并保存字典对应值，为空则不处理
-            if(dict != null && dict.length > 1)
-            {
+            if(dict != null && dict.length > 1) {
                 //STD字典代码转换为内部EHR字典代码保存
                 dataRecord.addResource(metadataId, dict[0]);
                 //添加内部EHR字典代码对应中文作为单独字段保存
                 dataRecord.addResource(metadataId + "_VALUE", dict[1]);
             }
-            else
-            {
+            else {
                 dataRecord.addResource(metadataId, value);
             }
         }
-        else
-        {   //内部EHR数据元为空不处理
+        else {   //内部EHR数据元为空不处理
             dataRecord.addResource(metadataId, value);
         }
     }
@@ -213,8 +184,7 @@ public class PackMill {
      * @param metadataId 数据元ID
      * @return
      */
-    public String getMetadataDict(String metadataId)
-    {
+    public String getMetadataDict(String metadataId) {
         String dictCode = redisServiceClient.getRsMetaData(metadataId);
         return dictCode;
     }
@@ -226,16 +196,12 @@ public class PackMill {
      * @param srcDictEntryCode STD字典项代码
      * @return
      */
-    public String[] getDict(String version,String dictCode,String srcDictEntryCode)
-    {
+    public String[] getDict(String version,String dictCode,String srcDictEntryCode) {
         String dict = redisServiceClient.getRsAdaptionMetaData(version,dictCode,srcDictEntryCode);
-
-        if(dict != null)
-        {
+        if(dict != null) {
             return dict.split("&");
         }
-        else
-        {
+        else {
             return null;
         }
     }

@@ -21,9 +21,10 @@ import java.io.IOException;
  * @created 2016.04.15 16:50
  */
 @Service
-public class SubResourceRepository {
+public class SubResourceDao {
+
     @Autowired
-    HBaseDao hbaseDao;
+    private HBaseDao hbaseDao;
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Throwable {
         TableBundle bundle = new TableBundle();

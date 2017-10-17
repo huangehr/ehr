@@ -18,7 +18,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 @FeignClient(name = MicroServices.Redis)
 @RequestMapping(ApiVersion.Version1_0)
-public interface XRedisServiceClient {
+public interface RedisServiceClient {
 
 
     //("获取地址redis")
