@@ -36,6 +36,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -79,7 +80,9 @@ public class ResolveEndPoint {
             @RequestParam("echo") boolean echo) throws Throwable {
         String packString = packageMgrClient.acquirePackage(packageId);
         if (StringUtils.isEmpty(packString)) {
-           return "无可用档案包！";
+            Map<String, String> resultMap = new HashMap<String, String>();
+            resultMap.put("msg", "无可用档案包！");
+            return objectMapper.writeValueAsString(resultMap);
         }
         MPackage pack = objectMapper.readValue(packString, MPackage.class);  //已修改包状态为1 正在入库库
         String packId = pack.getId();
@@ -128,7 +131,9 @@ public class ResolveEndPoint {
             if (echo) {
                 return standardPackage.toJson();
             } else {
-                return "档案包入库成功！";
+                Map<String, String> resultMap = new HashMap<String, String>();
+                resultMap.put("msg", "档案包入库成功！");
+                return objectMapper.writeValueAsString(resultMap);
             }
         } catch (Exception e) {
             packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
@@ -137,11 +142,11 @@ public class ResolveEndPoint {
     }
 
     //new add by HZY in 2017/06/29
-    @ApiOperation(value = "健康档案-（非病人维度-数据集包入库）", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析健康档案包")
+    @ApiOperation(value = "健康档案-（非病人维度-数据集包入库）", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = ServiceApi.Packages.PackageResolve + 2, method = RequestMethod.PUT)
     public List<String> resolveDataSetPackage(
             @ApiParam(value = "档案包ID", defaultValue = "")
-            @RequestParam(required = false) String packageId,
+            @RequestParam String packageId,
             @ApiParam(value = "模拟应用ID", defaultValue = "")
             @RequestParam(required = false) String clientId,
             @ApiParam(value = "返回档案数据", defaultValue = "true")
@@ -188,19 +193,20 @@ public class ResolveEndPoint {
         }
     }
 
-    @ApiOperation(value = "数据集档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, notes = "若包ID为空，则取最旧的未解析数据集档案包")
+    @ApiOperation(value = "数据集档案包入库", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @RequestMapping(value = ServiceApi.DatasetPackages.PackageResolve, method = RequestMethod.PUT)
     public String resolveDataSet(
             @ApiParam(value = "包ID")
-            @RequestParam(required = false) String packageId,
+            @RequestParam String packageId,
             @ApiParam(value = "模拟应用ID")
             @RequestParam(required = false) String clientId,
             @ApiParam(value = "返回档案数据", required = true)
             @RequestParam boolean echo) throws Exception {
-
         String packStr = datasetPackageMgrClient.acquireDatasetPackage(packageId);
         if (StringUtils.isEmpty(packStr)) {
-            return "无可用数据集档案包！";
+            Map<String, String> resultMap = new HashMap<String, String>();
+            resultMap.put("msg", "无可用数据集档案包！");
+            return objectMapper.writeValueAsString(resultMap);
         }
         MPackage pack = objectMapper.readValue(packStr, MPackage.class);
         String packId = pack.getId();
@@ -223,7 +229,9 @@ public class ResolveEndPoint {
             if (echo) {
                 return datasetPackage.toJson();
             } else {
-                return "数据集档案包入库成功！";
+                Map<String, String> resultMap = new HashMap<String, String>();
+                resultMap.put("msg", "数据集档案包入库成功！");
+                return objectMapper.writeValueAsString(resultMap);
             }
         } catch (Exception e) {
             packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
@@ -271,7 +279,7 @@ public class ResolveEndPoint {
             if (persist) resourceService.save(resourceBucket);
             return new ResponseEntity<>(packModel.toJson(), HttpStatus.OK);
         } catch (Exception e) {
-            throw e;
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
