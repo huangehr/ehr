@@ -11,7 +11,6 @@
  */
 package com.yihu.ehr.oauth2.web;
 
-import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.oauth2.model.AccessToken;
 import com.yihu.ehr.oauth2.model.ObjectResult;
@@ -19,8 +18,6 @@ import com.yihu.ehr.oauth2.model.Result;
 import com.yihu.ehr.oauth2.oauth2.EhrTokenServices;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.collections.map.HashedMap;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -28,7 +25,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -190,12 +186,14 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
                     if(authenticationClientId!=null && authenticationClientId.equals(clientId))
                     {
                         String authenticationName = authentication.getName();
+                        String authenticationUserId = authentication.getOAuth2Request().getRequestParameters().get("userId").toString();
                         AccessToken token = new AccessToken();
                         token.setAccessToken(auth2AccessToken.getValue());
                         token.setRefreshToken(auth2AccessToken.getRefreshToken().getValue());
                         token.setTokenType(auth2AccessToken.getTokenType());
                         token.setExpiresIn(auth2AccessToken.getExpiresIn());
                         token.setUser(authenticationName);
+                        token.setUserId(authenticationUserId);
 
                         ObjectResult re = new ObjectResult(true,"accesstoken 可以使用");
                         re.setData(token);

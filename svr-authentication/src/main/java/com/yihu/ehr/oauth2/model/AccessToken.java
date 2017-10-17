@@ -8,6 +8,7 @@ public class AccessToken {
     private String refreshToken;
     private String tokenType;
     private String user;
+    private String userId;
     private int expiresIn;
 
     public String getTokenType() {
@@ -48,5 +49,13 @@ public class AccessToken {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
