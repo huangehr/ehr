@@ -294,7 +294,7 @@ public class AppController extends BaseController {
         rsIds = rsIds.substring(0,rsIds.length()-1);
         //根据rsIds获取资源对象集合-再获取资源名字字符串
         //TODO 提供查询资源不分页方法替代
-        ResponseEntity<List<MRsResources>> entity = resourcesClient.queryResources("", "id=" + rsIds, "", 1, 999);
+        ResponseEntity<List<MRsResources>> entity = resourcesClient.queryResources("", "id=" + rsIds, "", 1, 999, null, null);
         List<MRsResources> mRsResources = entity.getBody();
         if(mRsResources.size() == 0){
             return appModel;

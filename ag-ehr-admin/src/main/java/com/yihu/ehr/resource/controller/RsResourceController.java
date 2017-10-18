@@ -3,6 +3,7 @@ package com.yihu.ehr.resource.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
+import com.yihu.ehr.agModel.resource.RsRolesResourceModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
@@ -10,20 +11,14 @@ import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.org.MOrganization;
-import com.yihu.ehr.model.resource.MChartInfoModel;
-import com.yihu.ehr.model.resource.MRsCategory;
-import com.yihu.ehr.model.resource.MRsInterface;
-import com.yihu.ehr.model.resource.MRsResources;
+import com.yihu.ehr.model.resource.*;
 import com.yihu.ehr.model.tj.MQuotaConfigModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
-import com.yihu.ehr.resource.client.RsResourceQuotaClient;
-import com.yihu.ehr.resource.client.RsResourceCategoryClient;
-import com.yihu.ehr.resource.client.RsResourceClient;
-import com.yihu.ehr.resource.client.RsInterfaceClient;
+import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -176,10 +171,14 @@ public class RsResourceController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) throws Exception {
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "rolesId", value = "角色组Id", defaultValue = "")
+            @RequestParam(value = "rolesId", required = false) String rolesId,
+            @ApiParam(name = "appId", value = "应用Id", defaultValue = "")
+            @RequestParam(value = "appId", required = false) String appId) throws Exception {
         try
         {
-            ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources(fields,filters,sorts,page,size);
+            ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources(fields,filters,sorts,page,size, rolesId, appId);
             List<MRsResources> mRsResources = responseEntity.getBody();
             List<RsResourcesModel> rsResources = new ArrayList<>(mRsResources.size());
             for(MRsResources m:mRsResources){
@@ -215,7 +214,7 @@ public class RsResourceController extends BaseController {
             @PathVariable(value = "code") String code){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
-        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","code="+code,"",1,999);
+        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","code="+code,"",1,999, null, null);
         List<MRsResources> mRsResources = responseEntity.getBody();
         if(mRsResources.size() != 0){
             envelop.setSuccessFlg(true);
@@ -247,7 +246,7 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "name") String name){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
-        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","name="+name,"",1,999);
+        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","name="+name,"",1,999, null, null);
         List<MRsResources> mRsResources = responseEntity.getBody();
         if(mRsResources.size() != 0){
             envelop.setSuccessFlg(true);

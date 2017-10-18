@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.resource.model.RsResource;
 import com.yihu.ehr.resource.model.RsResourceCategory;
+import com.yihu.ehr.resource.service.RsAppResourceService;
 import com.yihu.ehr.resource.service.RsResourceCategoryService;
 import com.yihu.ehr.resource.service.RsResourceService;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -35,6 +36,8 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     private RsResourceService rsResourceService;
     @Autowired
     private RsResourceCategoryService rsResourceCategoryService;
+    @Autowired
+    private RsAppResourceService rsAppResourceService;
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -111,6 +114,10 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
             @RequestParam(value="size",required = false)int size,
+            @ApiParam(name = "rolesId", value = "角色组Id", defaultValue = "")
+            @RequestParam(value = "rolesId", required = false) String rolesId,
+            @ApiParam(name = "appId", value = "应用Id", defaultValue = "")
+            @RequestParam(value = "appId", required = false) String appId,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         long total = 0;
@@ -121,6 +128,14 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             total = resources.getTotalElements();
             rsList = convertToModels(resources.getContent(),new ArrayList<>(resources.getNumber()),MRsResources.class,fields);
         } else {
+            if (!StringUtils.isEmpty(rolesId) && !StringUtils.isEmpty(appId)) {
+                String resourceIds = rsAppResourceService.getResourceIdByAppId(appId);
+                if (!StringUtils.isEmpty(resourceIds)) {
+                    filters += ";id=" + resourceIds + ";" ;
+                } else {
+                    filters += ";id=0000;" ;
+                }
+            }
             List<RsResource> resources = rsResourceService.search(fields,filters,sorts,page,size);
             total = rsResourceService.getCount(filters);
             rsList = convertToModels(resources,new ArrayList<>(resources.size()),MRsResources.class,fields);
