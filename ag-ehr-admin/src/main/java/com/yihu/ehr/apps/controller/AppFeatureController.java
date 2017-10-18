@@ -187,13 +187,17 @@ public class AppFeatureController extends BaseController {
             @RequestParam(value = "role_id") String roleId) {
         Collection<MRoleFeatureRelation> mRoleFeatureRelations = roleFeatureRelationClient.searchRoleFeatureNoPaging("roleId=" + roleId);
         String featureIds = "";
+        String filters = "";
         for (MRoleFeatureRelation m : mRoleFeatureRelations) {
             featureIds += m.getFeatureId() + ",";
         }
         if (!StringUtils.isEmpty(featureIds)) {
             featureIds = featureIds.substring(0, featureIds.length() - 1);
         }
-        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPageSorts("id=" + featureIds, "+sort");
+        if(StringUtils.isNotEmpty(featureIds)){
+            filters = "id=" + featureIds;
+        }
+        Collection<MAppFeature> mAppFeatures = appFeatureClient.getAppFeatureNoPageSorts(filters, "+sort");
         Envelop envelop = new Envelop();
         List<AppFeatureModel> appFeatureModels = new ArrayList<>();
         for (MAppFeature mAppFeature : mAppFeatures) {
