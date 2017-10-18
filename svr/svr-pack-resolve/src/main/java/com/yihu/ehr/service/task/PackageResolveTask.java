@@ -18,8 +18,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 @Component
 public class PackageResolveTask {
 
-    private int total = 8;
-    private String cronExp = "0/2 * * * * ?";
+    private int total = 4;
+    private String cronExp = "0/4 * * * * ?";
 
     @Autowired
     private Scheduler scheduler;

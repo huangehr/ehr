@@ -105,15 +105,19 @@ public class PackageResourceJob implements InterruptableJob {
             }else {
                 LogService.getLogger().info("idCardNo is empty !");
             }
-            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished,objectMapper.writeValueAsString(map));
+            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, throwable.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (null == e.getMessage()) {
+                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal Server Error");
+            }else {
+                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
+            }
             try {
                 scheduler.deleteJob(jobKey);
-            }catch (Exception e) {
-                e.printStackTrace();
+            }catch (SchedulerException se) {
+                se.printStackTrace();
             }
         }
     }

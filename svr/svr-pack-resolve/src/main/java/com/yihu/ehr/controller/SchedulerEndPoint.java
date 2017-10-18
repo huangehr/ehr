@@ -56,13 +56,13 @@ public class SchedulerEndPoint {
 
     @ApiOperation(value = "添加解析任务")
     @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.POST)
-    public ResponseEntity<String> addJob(@ApiParam(name = "count", value = "任务数量（不要超过8）", defaultValue = "8")
+    public ResponseEntity<String> addJob(@ApiParam(name = "count", value = "任务数量（不要超过4）", defaultValue = "4")
                                          @RequestParam(value = "count") int count,
-                                         @ApiParam(name = "cronExp", value = "触发器CRON表达式", defaultValue = "0/2 * * * * ?")
+                                         @ApiParam(name = "cronExp", value = "触发器CRON表达式", defaultValue = "0/4 * * * * ?")
                                          @RequestParam(value = "cronExp") String cronExp) {
         try {
-            if(count > 8) {
-                count = 8;
+            if(count > 4) {
+                count = 4;
             }
             GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
             Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
@@ -89,7 +89,7 @@ public class SchedulerEndPoint {
 
     @ApiOperation(value = "删除解析任务")
     @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.DELETE)
-    public ResponseEntity<String> removeJob(@ApiParam(name = "count", value = "任务数量", defaultValue = "8")
+    public ResponseEntity<String> removeJob(@ApiParam(name = "count", value = "任务数量", defaultValue = "4")
                                             @RequestParam(value = "count") int count) {
         try {
             GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");

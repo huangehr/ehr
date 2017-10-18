@@ -22,7 +22,7 @@ public class MasterResourceDao {
     @Autowired
     private HBaseDao hbaseDao;
 
-    public void saveOrUpdate(ResourceBucket resBucket) throws Throwable {
+    public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
         TableBundle bundle = new TableBundle();
 
         // delete legacy data if they are exist

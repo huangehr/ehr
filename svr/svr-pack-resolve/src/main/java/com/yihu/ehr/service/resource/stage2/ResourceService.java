@@ -31,7 +31,7 @@ public class ResourceService {
     @Autowired
     private RelationDao relationDao;
 
-    public void save(ResourceBucket resourceBucket) throws Throwable {
+    public void save(ResourceBucket resourceBucket) throws Exception {
         // 资源主表
         masterResRepo.saveOrUpdate(resourceBucket);
 
