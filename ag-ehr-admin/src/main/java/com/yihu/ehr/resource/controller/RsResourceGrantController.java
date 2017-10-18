@@ -636,6 +636,8 @@ public class RsResourceGrantController extends BaseController {
     public Envelop queryRolesRsMetadataGrant(
             @ApiParam(name="roles_res_id",value="授权角色编号",defaultValue = "1")
             @PathVariable(value="roles_res_id")String rolesResId,
+            @ApiParam(name="appId",value="应用编号",defaultValue = "1")
+            @RequestParam(value="appId",required = false)String appId,
             @ApiParam(name="page",value="页码",defaultValue = "1")
             @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
@@ -643,7 +645,7 @@ public class RsResourceGrantController extends BaseController {
     {
         try
         {
-            ResponseEntity<List<MRsRolesResourceMetadata>> responseEntity = resourcesGrantClient.getRolesRsMetadatas(rolesResId);
+            ResponseEntity<List<MRsRolesResourceMetadata>> responseEntity = resourcesGrantClient.getRolesRsMetadatas(rolesResId, appId);
             return getResult(responseEntity.getBody(), responseEntity.getBody().size(), 1, 15);
         }
         catch (Exception e)

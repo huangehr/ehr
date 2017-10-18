@@ -490,12 +490,24 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.ResourceRolesResMetadataGrants,method = RequestMethod.GET)
     public Collection<MRsRolesResourceMetadata> getRolesRsMetadatas(
             @ApiParam(name="roles_res_id",value="授权应用编号",defaultValue = "1")
-            @PathVariable(value="roles_res_id")String rolesResId) throws Exception
+            @PathVariable(value="roles_res_id")String rolesResId,
+            @ApiParam(name="appId",value="应用编号",defaultValue = "")
+            @RequestParam(value="appId",required = false)String appId) throws Exception
     {
         RsRolesResource rolesResource = rolesResourceGrantService.retrieve(rolesResId);
         List<RsRolesResourceMetadata> rsMetadataGrant = new ArrayList<>();
+        List<RsRolesResourceMetadata> rsMetadataGrantApp = new ArrayList<>();
         if(rolesResource!=null){
             rsMetadataGrant = rolesResourceMetadataGrantService.getRolesRsMetadatas(rolesResource.getId(), rolesResource.getRolesId(), rolesResource.getResourceId());
+        }
+        if (!StringUtils.isEmpty(appId)) {
+            List<String> list = rsMetadataGrantService.getMetadataIdByAppId(appId);
+            for (RsRolesResourceMetadata resourceMetadata : rsMetadataGrant) {
+                if (list.contains(resourceMetadata.getResourceMetadataId())) {
+                    rsMetadataGrantApp.add(resourceMetadata);
+                }
+            }
+            return convertToModels(rsMetadataGrantApp, new ArrayList<>(rsMetadataGrantApp.size()), MRsRolesResourceMetadata.class, "");
         }
         return convertToModels(rsMetadataGrant, new ArrayList<>(rsMetadataGrant.size()), MRsRolesResourceMetadata.class, "");
     }
