@@ -19,6 +19,7 @@ import com.yihu.ehr.service.resource.stage2.repo.PatientInfoDao;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -109,7 +110,7 @@ public class PackageResourceJob implements InterruptableJob {
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
         } catch (Exception e) {
             e.printStackTrace();
-            if (null == e.getMessage()) {
+            if (StringUtils.isBlank(e.getMessage())) {
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal Server Error");
             }else {
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());

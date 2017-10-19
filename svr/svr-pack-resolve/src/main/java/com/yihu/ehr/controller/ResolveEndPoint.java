@@ -136,7 +136,11 @@ public class ResolveEndPoint {
                 return objectMapper.writeValueAsString(resultMap);
             }
         } catch (Exception e) {
-            packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+            if(StringUtils.isBlank(e.getMessage())) {
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
+            }else {
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+            }
             throw e;
         }
     }
@@ -188,7 +192,11 @@ public class ResolveEndPoint {
                 return returnJson;
             }
         } catch (Exception e) {
-            packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+            if(StringUtils.isBlank(e.getMessage())) {
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
+            }else {
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+            }
             throw e;
         }
     }
@@ -234,7 +242,11 @@ public class ResolveEndPoint {
                 return objectMapper.writeValueAsString(resultMap);
             }
         } catch (Exception e) {
-            packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+            if(StringUtils.isBlank(e.getMessage())) {
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, "Internal Server Error");
+            }else {
+                packageMgrClient.reportStatus(packId, ArchiveStatus.Failed, e.getMessage());
+            }
             throw e;
         }
     }
