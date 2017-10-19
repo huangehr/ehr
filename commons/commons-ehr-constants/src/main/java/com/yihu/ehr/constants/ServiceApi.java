@@ -629,6 +629,10 @@ public class ServiceApi {
         public static final String RoleUsersNoPage = "/roles/role_users/no_paging";
         public static final String NoPageCategoriesAndReport = "/roles/report/getCategoryAndReportNoPage";
 
+        public static final String RoleOrg = "/roles/role_org";
+        public static final String RoleOrgs = "/roles/role_orgs";
+        public static final String RoleOrgsNoPaging = "/roles/role_orgs/no_paging";
+
         public static final String RoleFeature = "/roles/role_feature";
         public static final String RoleFeatureId = "/roles/role_feature/{id}";
         public static final String RoleFeatureByRoleId = "/roles/role_feature/role_id";

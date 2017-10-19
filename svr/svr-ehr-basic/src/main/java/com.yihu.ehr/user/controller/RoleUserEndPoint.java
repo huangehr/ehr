@@ -5,11 +5,14 @@ import com.yihu.ehr.apps.service.UserAppService;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.user.MRoleOrg;
 import com.yihu.ehr.model.user.MRoleUser;
 import com.yihu.ehr.user.entity.RoleAppRelation;
+import com.yihu.ehr.user.entity.RoleOrg;
 import com.yihu.ehr.user.entity.RoleUser;
 import com.yihu.ehr.user.entity.Roles;
 import com.yihu.ehr.user.service.RoleAppRelationService;
+import com.yihu.ehr.user.service.RoleOrgService;
 import com.yihu.ehr.user.service.RoleUserService;
 import com.yihu.ehr.user.service.RolesService;
 import io.swagger.annotations.Api;
@@ -38,6 +41,8 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
     private RolesService rolesService;
     @Autowired
     private UserAppService userAppService;
+    @Autowired
+    private RoleOrgService roleOrgService;
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -174,5 +179,62 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "filters",required = false) String filters) throws  Exception{
         List<RoleUser> roleUserList = roleUserService.search(filters);
         return convertToModels(roleUserList,new ArrayList<MRoleUser>(roleUserList.size()),MRoleUser.class,"");
+    }
+
+
+
+    @RequestMapping(value = ServiceApi.Roles.RoleOrg,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "为角色组配置机构，单个")
+    public MRoleOrg createRoleOrg(
+            @ApiParam(name = "data_json",value = "角色组-机构关系Json串")
+            @RequestBody String dataJson){
+        RoleOrg roleOrg = toEntity(dataJson,RoleOrg.class);
+        roleOrg = roleOrgService.save(roleOrg);
+        return convertToModel(roleOrg,MRoleOrg.class);
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleOrg,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id,删除角色组机构")
+    public boolean deleteRoleOrg(
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") String roleId,
+            @ApiParam(name = "org_code",value = "角色组id")
+            @RequestParam(value = "org_code") String orgCode){
+
+        //删除角色组内机构
+        RoleOrg roleOrg = roleOrgService.findRelation(roleId,orgCode);
+        if(null != roleOrg){
+            roleOrgService.deleteRoleOrg(roleOrg.getId());
+        }
+        return true;
+    }
+
+
+    @RequestMapping(value = ServiceApi.Roles.RoleOrgs,method = RequestMethod.GET)
+    @ApiOperation(value = "查询角色组机构列表---分页")
+    public Collection<MRoleOrg> searchRoleOrg(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,roleId,orgId")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+id")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception{
+        List<RoleOrg> roleOrgList = roleOrgService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, roleOrgService.getCount(filters), page, size);
+        return convertToModels(roleOrgList, new ArrayList<>(roleOrgList.size()), MRoleOrg.class, fields);
+    }
+    @RequestMapping(value = ServiceApi.Roles.RoleOrgsNoPaging,method = RequestMethod.GET)
+    @ApiOperation(value = "查询角色组机构列表---不分页")
+    public Collection<MRoleOrg> searchRoleOrgsNoPaging(
+            @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
+            @RequestParam(value = "filters",required = false) String filters) throws  Exception{
+        List<RoleOrg> roleOrgList = roleOrgService.search(filters);
+        return convertToModels(roleOrgList,new ArrayList<MRoleOrg>(roleOrgList.size()),MRoleOrg.class,"");
     }
 }

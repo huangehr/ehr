@@ -87,7 +87,7 @@ public class ResourceBrowseController extends BaseController {
                 rsCategoryModel.setName(mRsCategory.getName());
                 rsCategoryTypeTreeModelList.add(rsCategoryModel);
 
-                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999);// TODO: 2016/5/30 测试数据15（无不分页查询）
+                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999, null, null);// TODO: 2016/5/30 测试数据15（无不分页查询）
                 rsResources = categoryResponseEntity.getBody();
                 //rsResources = resourcesClient.queryNoPageResources("categoryId=" + mRsCategory.getId());
                 if (rsResources.size() > 0) {
@@ -411,7 +411,7 @@ public class ResourceBrowseController extends BaseController {
                 rsCategoryModel.setPid(mRsCategory.getPid());
                 rsCategoryModel.setName(mRsCategory.getName());
                 //查询资源-数据集
-                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999);// TODO: 2016/5/30 测试数据15（无不分页查询）
+                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999, null, null);// TODO: 2016/5/30 测试数据15（无不分页查询）
                 rsResources = categoryResponseEntity.getBody();
                 if (rsResources.size() > 0) {
                     List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
@@ -437,7 +437,7 @@ public class ResourceBrowseController extends BaseController {
              filters="categoryId=" + categoryId;
         }
 
-        ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", filters, "", 1, 999);
+        ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", filters, "", 1, 999, null, null);
         List<MRsResources>  rsResources = categoryResponseEntity.getBody();
         Integer totalCount = getTotalCount(categoryResponseEntity);
         return getResult(rsResources, totalCount, 1, 999);
