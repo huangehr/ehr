@@ -13,17 +13,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MessageReceiver  {
-    @Autowired
-    MessageBuffer messageBuffer;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private MessageBuffer messageBuffer;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public void receive(Object message) {
         try {
             MPackage pack = objectMapper.readValue((String)message, MPackage.class);
             LogService.getLogger().info("Receive package: " + pack.getId());
-
             messageBuffer.putMessage(pack);
         } catch (Exception e) {
             LogService.getLogger().error(e.getMessage());

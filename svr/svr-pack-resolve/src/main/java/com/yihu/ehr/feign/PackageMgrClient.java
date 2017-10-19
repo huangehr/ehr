@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @ApiIgnore
 @FeignClient(name = MicroServices.Package)
-public interface XPackageMgrClient {
+public interface PackageMgrClient {
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
     String acquirePackage(@RequestParam(value = "id") String id);
 

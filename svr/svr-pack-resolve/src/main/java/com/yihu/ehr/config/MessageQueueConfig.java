@@ -18,11 +18,11 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 public class MessageQueueConfig {
-    @Autowired
-    RedisMessageListenerContainer container;
 
     @Autowired
-    MessageListenerAdapter messageListenerAdapter;
+    private RedisMessageListenerContainer container;
+    @Autowired
+    private MessageListenerAdapter messageListenerAdapter;
 
     @Bean
     MessageListenerAdapter messageListenerAdapter(MessageReceiver receiver){

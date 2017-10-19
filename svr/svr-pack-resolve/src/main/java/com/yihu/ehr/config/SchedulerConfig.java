@@ -16,7 +16,6 @@ public class SchedulerConfig {
         SchedulerFactoryBean bean = new SchedulerFactoryBean();
         bean.setAutoStartup(true);
         bean.setSchedulerName("PackageResolveScheduler");
-
         return bean;
     }
 }

@@ -61,7 +61,9 @@ public interface RsResourceClient {
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "page", required = false) int page,
-            @RequestParam(value = "size", required = false) int size);
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "rolesId", required = false) String rolesId,
+            @RequestParam(value = "appId", required = false) String appId);
 
 
     @ApiOperation("资源查询_不分页")

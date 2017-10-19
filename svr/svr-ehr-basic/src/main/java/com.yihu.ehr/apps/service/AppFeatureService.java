@@ -64,12 +64,13 @@ public class AppFeatureService extends BaseJpaService<AppFeature, XAppApiFeature
         contentMap.put("id", appFeature.getId());
         contentMap.put("level", appFeature.getLevel());
         contentMap.put("text", appFeature.getName());
+        contentMap.put("type", appFeature.getType());
+        contentMap.put("iconUrl", appFeature.getIconUrl());
         if (appFeature.getLevel() != 1) {
             contentMap.put("pid", appFeature.getParentId());
         }
         if (appFeature.getUrl().startsWith("/")) {
-            // 这里“/ehr”为医疗云后台管理系统的 contextPath
-            contentMap.put("url", "/ehr" + appFeature.getUrl());
+            contentMap.put("url", appFeature.getPrefixUrl() + appFeature.getUrl());
         }
         appFeature.setContent(objectMapper.writeValueAsString(contentMap));
         return appFeature;

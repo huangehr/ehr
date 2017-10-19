@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by progr1mmer on 2017/9/22.
  */
 @Repository
-public class PatientInfoRepository {
+public class PatientInfoDao {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,13 +33,14 @@ import static org.quartz.TriggerBuilder.newTrigger;
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "档案包解析调度任务", description = "档案包解析调度服务")
 public class SchedulerEndPoint {
+
     @Autowired
-    Scheduler scheduler;
+    private Scheduler scheduler;
 
     @ApiOperation(value = "设置任务调度器状态")
     @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.PUT)
     public ResponseEntity<String> updateScheduler(
-            @ApiParam(name = "pause", value = "true:暂停 , false: 执行", defaultValue = "true")
+            @ApiParam(name = "pause", value = "true:暂停 , false:执行", defaultValue = "true")
             @RequestParam(value = "pause") boolean pause) {
         try {
             if (pause) {
@@ -46,38 +48,42 @@ public class SchedulerEndPoint {
             } else {
                 scheduler.resumeAll();
             }
-
             return new ResponseEntity<>((String) null, HttpStatus.OK);
         } catch (SchedulerException e) {
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @ApiOperation(value = "添加解析任务")
     @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.POST)
-    public ResponseEntity<String> addJob(@ApiParam(name = "count", value = "任务数量", defaultValue = "8")
+    public ResponseEntity<String> addJob(@ApiParam(name = "count", value = "任务数量（不要超过8）", defaultValue = "8")
                                          @RequestParam(value = "count") int count,
                                          @ApiParam(name = "cronExp", value = "触发器CRON表达式", defaultValue = "0/2 * * * * ?")
                                          @RequestParam(value = "cronExp") String cronExp) {
         try {
-            for (int i = 0; i < count; ++i) {
-                String suffix = UUID.randomUUID().toString().substring(0, 8);
-                JobDetail jobDetail = newJob(PackageResourceJob.class)
-                        .withIdentity("PackResolveJob-" + suffix)
-                        .build();
-
-                CronTrigger trigger = newTrigger()
-                        .withIdentity("PackResolveTrigger-" + suffix)
-                        .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
-                        .startNow()
-                        .build();
-
-                scheduler.scheduleJob(jobDetail, trigger);
+            if(count > 8) {
+                count = 8;
             }
-
+            GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
+            Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
+            if(null != jobKeys) {
+                int activeJob = jobKeys.size();
+                for (int i = 0; i < count - activeJob; ++i) {
+                    String suffix = UUID.randomUUID().toString().substring(0, 8);
+                    JobDetail jobDetail = newJob(PackageResourceJob.class)
+                            .withIdentity("PackResolveJob-" + suffix, "PackResolve")
+                            .build();
+                    CronTrigger trigger = newTrigger()
+                            .withIdentity("PackResolveTrigger-" + suffix)
+                            .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
+                            .startNow()
+                            .build();
+                    scheduler.scheduleJob(jobDetail, trigger);
+                }
+            }
             return new ResponseEntity<>((String) null, HttpStatus.OK);
         } catch (Exception e) {
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -86,16 +92,15 @@ public class SchedulerEndPoint {
     public ResponseEntity<String> removeJob(@ApiParam(name = "count", value = "任务数量", defaultValue = "8")
                                             @RequestParam(value = "count") int count) {
         try {
-            Set<JobKey> jobKeySet = scheduler.getJobKeys(null);
+            GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
+            Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
             for (JobKey jobKey : jobKeySet) {
                 scheduler.deleteJob(jobKey);
-
                 if (--count == 0) break;
             }
-
             return new ResponseEntity<>((String) null, HttpStatus.OK);
         } catch (SchedulerException e) {
-            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
