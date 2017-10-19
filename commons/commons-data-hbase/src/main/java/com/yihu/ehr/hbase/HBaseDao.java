@@ -304,11 +304,10 @@ public class HBaseDao extends AbstractHBaseClient {
                 List<Get> gets = tableBundle.getOperations();
                 Object[] results = new Object[gets.size()];
                 table.batch(gets, results);
+                table.close();
                 if (results.length > 0 && results[0].toString().equals("keyvalues=NONE")){
-                    table.close();
                     return null;
                 }
-                table.close();
                 return results;
             }
         });
