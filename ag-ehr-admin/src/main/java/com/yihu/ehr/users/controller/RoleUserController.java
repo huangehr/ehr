@@ -1,22 +1,19 @@
 package com.yihu.ehr.users.controller;
 
+import com.yihu.ehr.agModel.user.RoleOrgModel;
 import com.yihu.ehr.agModel.user.RoleUserModel;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsReport;
 import com.yihu.ehr.model.resource.MRsReportCategory;
 import com.yihu.ehr.model.resource.MRsReportCategoryInfo;
-import com.yihu.ehr.model.user.MRoleReportRelation;
-import com.yihu.ehr.model.user.MRoleUser;
-import com.yihu.ehr.model.user.MRoles;
-import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.model.user.*;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.resource.client.RsReportCategoryClient;
 import com.yihu.ehr.resource.client.RsReportClient;
-import com.yihu.ehr.users.service.RoleReportRelationClient;
-import com.yihu.ehr.users.service.RoleUserClient;
-import com.yihu.ehr.users.service.RolesClient;
-import com.yihu.ehr.users.service.UserClient;
+import com.yihu.ehr.users.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,21 +40,20 @@ import java.util.List;
 public class RoleUserController extends BaseController {
     @Autowired
     private RoleUserClient roleUserClient;
-
     @Autowired
     private UserClient userClient;
-
     @Autowired
     private RolesClient rolesClient;
-
     @Autowired
     private RsReportCategoryClient rsReportCategoryClient;
-
     @Autowired
     private RsReportClient rsReportClient;
-
     @Autowired
     private RoleReportRelationClient roleReportRelationClient;
+    @Autowired
+    private RoleOrgClient roleOrgClient;
+    @Autowired
+    private OrganizationClient organizationClient;
 
     @RequestMapping(value = ServiceApi.Roles.RoleUser,method = RequestMethod.POST)
     @ApiOperation(value = "为角色组配置人员，单个")
@@ -222,6 +218,87 @@ public class RoleUserController extends BaseController {
             roleIds = roleIds.substring(0,roleIds.length()-1);
         }
         return success(roleIds);
+    }
+
+
+
+    @RequestMapping(value = ServiceApi.Roles.RoleOrg,method = RequestMethod.POST)
+    @ApiOperation(value = "为角色组配置机构，单个")
+    public Envelop createRoleOrg(
+            @ApiParam(name = "data_json",value = "角色组-机构关系Json串")
+            @RequestParam(value = "data_json") String dataJson){
+        MRoleUser mRoleUser = roleOrgClient.createRoleOrg(dataJson);
+        if(null == mRoleUser){
+            return failed("角色组添加机构失败！");
+        }
+        return success(mRoleUser);
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleOrg,method = RequestMethod.DELETE)
+    @ApiOperation(value = "根据角色组id,删除角色组机构")
+    public Envelop deleteRoleOrg(
+            @ApiParam(name = "org_code",value = "机构Code")
+            @RequestParam(value = "org_code") String orgCode,
+            @ApiParam(name = "role_id",value = "角色组id")
+            @RequestParam(value = "role_id") String roleId){
+        if(StringUtils.isEmpty(orgCode)){
+            return failed("机构编码不能为空！");
+        }
+        if(StringUtils.isEmpty(roleId)){
+            return failed("角色组id不能为空！");
+        }
+        boolean bo = roleOrgClient.deleteRoleOrg(orgCode,roleId);
+        if(bo){
+            return success(null);
+        }
+        return failed("角色组删除机构失败！");
+    }
+
+    @RequestMapping(value = ServiceApi.Roles.RoleOrgs,method = RequestMethod.GET)
+    @ApiOperation(value = "查询角色组机构列表---分页")
+    public Envelop searchRoleOrg(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id,roleId,orgId")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+id")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception{
+
+        List<RoleOrgModel> roleOrgModelList = new ArrayList<>();
+        ResponseEntity<Collection<MRoleOrg>> responseEntity = roleOrgClient.searchRoleOrg(fields, filters, sorts, size, page);
+        Collection<MRoleOrg> mRoleOrgs  = responseEntity.getBody();
+        for (MRoleOrg m : mRoleOrgs){
+            RoleOrgModel roleOrgModel = objectMapper.convertValue(m, RoleOrgModel.class);
+            if(roleOrgModel != null && StringUtils.isNotEmpty(roleOrgModel.getOrgCode())){
+                MOrganization organization = organizationClient.getOrg(roleOrgModel.getOrgCode());
+                if(organization != null){
+                    roleOrgModel.setOrgName(organization.getFullName());
+                }
+            }
+            roleOrgModelList.add(roleOrgModel);
+        }
+        Integer totalCount = getTotalCount(responseEntity);
+        return getResult(roleOrgModelList,totalCount,page,size);
+    }
+    @RequestMapping(value = ServiceApi.Roles.RoleOrgsNoPaging,method = RequestMethod.GET)
+    @ApiOperation(value = "查询角色组机构列表---不分页")
+    public Envelop searchRoleOrgsNoPaging(
+            @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")
+            @RequestParam(value = "filters",required = false) String filters) throws  Exception{
+        Envelop envelop = new Envelop();
+        List<RoleOrgModel> roleOrgModelList = new ArrayList<>();
+        Collection<MRoleOrg> mRoleOrgs = roleOrgClient.searchRoleOrgNoPaging(filters);
+        for (MRoleOrg m : mRoleOrgs){
+            RoleOrgModel roleOrgModel = objectMapper.convertValue(m, RoleOrgModel.class);
+            roleOrgModelList.add(roleOrgModel);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(roleOrgModelList);
+        return envelop;
     }
 
     private RoleUserModel changeToModel(MRoleUser m) {

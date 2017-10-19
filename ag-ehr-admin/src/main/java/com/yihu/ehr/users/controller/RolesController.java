@@ -12,7 +12,9 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.entity.organizations.OrgSaas;
 import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.model.app.MAppFeature;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.user.*;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.users.service.*;
 import com.yihu.ehr.util.array.ListUtils;
 import com.yihu.ehr.util.rest.Envelop;
@@ -51,6 +53,8 @@ public class RolesController extends BaseController {
     private AppClient appClient;
     @Autowired
     private AppFeatureClient appFeatureClient;
+    @Autowired
+    private OrganizationClient organizationClient;
 
     @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST)
     @ApiOperation(value = "新增角色组")
@@ -133,7 +137,14 @@ public class RolesController extends BaseController {
         if(null ==mRoles){
             return failed("获取角色组失败！");
         }
-        return success(convertToModel(mRoles,RolesModel.class));
+        RolesModel rolesModel = convertToModel(mRoles, RolesModel.class);
+        if (rolesModel.getOrgCode() != null) {
+            MOrganization mOrganization = organizationClient.getOrg(rolesModel.getOrgCode());
+            if (mOrganization != null) {
+                rolesModel.setOrgName(mOrganization.getFullName());
+            }
+        }
+        return success(rolesModel);
     }
     @RequestMapping(value = ServiceApi.Roles.Roles,method = RequestMethod.GET)
     @ApiOperation(value = "查询用户角色列表---分页")
@@ -153,6 +164,12 @@ public class RolesController extends BaseController {
         Collection<MRoles> mRoles  = responseEntity.getBody();
         for (MRoles m : mRoles){
             RolesModel rolesModel = convertToModel(m, RolesModel.class);
+            if (rolesModel.getOrgCode() != null) {
+                MOrganization mOrganization = organizationClient.getOrg(rolesModel.getOrgCode());
+                if (mOrganization != null) {
+                    rolesModel.setOrgName(mOrganization.getFullName());
+                }
+            }
             rolesModelList.add(rolesModel);
         }
         Integer totalCount = getTotalCount(responseEntity);
