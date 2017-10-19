@@ -212,7 +212,7 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public void add(String tableName, String rowKey, String family, Object[] columns, Object[] values) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
-            public Object doInTable(HTableInterface htable) throws Throwable {
+            public Object doInTable(HTableInterface table) throws Throwable {
                 Put put = new Put(Bytes.toBytes(rowKey));
                 for (int j = 0; j < columns.length; j++) {
                     //为空字段不保存
@@ -224,8 +224,8 @@ public class HBaseDao extends AbstractHBaseClient {
                                 Bytes.toBytes(value));
                     }
                 }
-                htable.put(put);
-                htable.close();
+                table.put(put);
+                table.close();
                 return null;
             }
         });
@@ -285,11 +285,11 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public void save(String tableName, TableBundle tableBundle) throws Exception {
         hbaseTemplate.execute(tableName, new TableCallback<Object>() {
-            public Object doInTable(HTableInterface htable) throws Throwable {
+            public Object doInTable(HTableInterface table) throws Throwable {
                 List<Put> puts = tableBundle.putOperations();
                 Object[] results = new Object[puts.size()];
-                htable.batch(puts, results);
-                htable.close();
+                table.batch(puts, results);
+                table.close();
                 return null;
             }
         });
@@ -304,7 +304,11 @@ public class HBaseDao extends AbstractHBaseClient {
                 List<Get> gets = tableBundle.getOperations();
                 Object[] results = new Object[gets.size()];
                 table.batch(gets, results);
-                if (results.length > 0 && results[0].toString().equals("keyvalues=NONE")) return null;
+                if (results.length > 0 && results[0].toString().equals("keyvalues=NONE")){
+                    table.close();
+                    return null;
+                }
+                table.close();
                 return results;
             }
         });
@@ -315,11 +319,11 @@ public class HBaseDao extends AbstractHBaseClient {
      */
     public void delete(String tableName, TableBundle tableBundle) {
         hbaseTemplate.execute(tableName, new TableCallback<Object[]>() {
-
             public Object[] doInTable(HTableInterface table) throws Throwable {
                 List<Delete> deletes = tableBundle.deleteOperations();
                 Object[] results = new Object[deletes.size()];
                 table.batch(deletes, results);
+                table.close();
                 return null;
             }
         });
