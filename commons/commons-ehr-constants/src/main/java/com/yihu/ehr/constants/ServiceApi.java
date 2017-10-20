@@ -163,6 +163,7 @@ public class ServiceApi {
         public static final String ResourceRolesMetadatasValid = "/resources/relosMetadatas/valid";
         public static final String ResourceRolesMetadataGrants = "/resources/relosMetadatas/grants";
         public static final String RolesGrantResources = "/resources/roles/{rolesId}/grant";
+        public static final String GetRolesGrantResources = "/resources/getRolesGrantResources";
         //public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
         public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
         public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
@@ -618,7 +619,7 @@ public class ServiceApi {
         public static final String Role = "/roles/role";
         public static final String RoleId = "/roles/role/{id}";
         public static final String Roles = "/roles/roles";
-        public static final String RolesNoPage = "/roles/roles/no_paging";
+        public static final String RolesNoPage = "/roles/roles/no_page";
         public static final String RoleNameExistence = "/roles/name/existence";
         public static final String RoleCodeExistence = "/roles/code/existence";
 
@@ -626,18 +627,18 @@ public class ServiceApi {
         public static final String RoleUser = "/roles/role_user";
         public static final String RoleUserByUserId = "/roles/role_user/{user_id}";
         public static final String RoleUsers = "/roles/role_users";
-        public static final String RoleUsersNoPage = "/roles/role_users/no_paging";
+        public static final String RoleUsersNoPage = "/roles/role_users/no_page";
         public static final String NoPageCategoriesAndReport = "/roles/report/getCategoryAndReportNoPage";
 
         public static final String RoleOrg = "/roles/role_org";
         public static final String RoleOrgs = "/roles/role_orgs";
-        public static final String RoleOrgsNoPaging = "/roles/role_orgs/no_paging";
+        public static final String RoleOrgsNoPage = "/roles/role_orgs/no_page";
 
         public static final String RoleFeature = "/roles/role_feature";
         public static final String RoleFeatureId = "/roles/role_feature/{id}";
         public static final String RoleFeatureByRoleId = "/roles/role_feature/role_id";
         public static final String RoleFeatures = "/roles/role_features";
-        public static final String RoleFeaturesNoPage = "/roles/role_features/no_paging";
+        public static final String RoleFeaturesNoPage = "/roles/role_features/no_page";
         public static final String RoleFeatureExistence = "/roles/role_feature/existence";
         public static final String HasPermission = "/roles/role_feature/hasPermission";
 

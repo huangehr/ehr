@@ -229,7 +229,8 @@ public class RoleUserEndPoint extends EnvelopRestEndPoint {
         pagedResponse(request, response, roleOrgService.getCount(filters), page, size);
         return convertToModels(roleOrgList, new ArrayList<>(roleOrgList.size()), MRoleOrg.class, fields);
     }
-    @RequestMapping(value = ServiceApi.Roles.RoleOrgsNoPaging,method = RequestMethod.GET)
+
+    @RequestMapping(value = ServiceApi.Roles.RoleOrgsNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组机构列表---不分页")
     public Collection<MRoleOrg> searchRoleOrgsNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")

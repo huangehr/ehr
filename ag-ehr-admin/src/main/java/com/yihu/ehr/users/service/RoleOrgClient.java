@@ -56,7 +56,7 @@ public interface RoleOrgClient {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page);
 
-    @RequestMapping(value = ServiceApi.Roles.RoleOrgsNoPaging,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Roles.RoleOrgsNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组机构列表---不分页")
     Collection<MRoleOrg> searchRoleOrgNoPaging(
             @ApiParam(name = "filters", value = "过滤条件，为空检索全部", defaultValue = "")
