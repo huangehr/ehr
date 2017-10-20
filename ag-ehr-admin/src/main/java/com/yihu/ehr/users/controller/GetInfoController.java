@@ -1,6 +1,7 @@
 package com.yihu.ehr.users.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -75,5 +76,14 @@ public class GetInfoController extends BaseController {
         List<String> list = getInfoClient.getDistrictList(userId);
         String districtList = StringUtils.join(list, ",");
         return districtList;
+    }
+
+    @RequestMapping(value = ServiceApi.GetInfo.GetAppIdsByUserId, method = RequestMethod.GET)
+    @ApiOperation(value = "获取当前用户所在的角色组所对应的应用列表")
+    public String getAppIdsByUserId(
+            @ApiParam(name = "userId", value = "userId", defaultValue = "")
+            @RequestParam(value = "userId") String userId) {
+        String appsId = getInfoClient.getAppIdsByUserId(userId);
+        return appsId;
     }
 }

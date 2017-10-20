@@ -1,6 +1,7 @@
 package com.yihu.ehr.user.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.geography.GeographyDict;
 import com.yihu.ehr.geography.service.GeographyDictService;
@@ -8,6 +9,7 @@ import com.yihu.ehr.geography.service.GeographyService;
 import com.yihu.ehr.org.service.OrgMemberRelationService;
 import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.saas.service.OrgSaasService;
+import com.yihu.ehr.user.service.GetInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,7 +40,8 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
     private OrgService orgService;
     @Autowired
     private GeographyDictService geographyDictService;
-
+    @Autowired
+    private GetInfoService getInfoService;
 
     @RequestMapping(value = "/userInfo/getOrgCode", method = RequestMethod.GET)
     @ApiOperation(value = "获取当前用户可查询的机构代码")
@@ -196,5 +199,12 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
         return null;
     }
 
-
+    @RequestMapping(value = ServiceApi.GetInfo.GetAppIdsByUserId, method = RequestMethod.GET)
+    @ApiOperation(value = "获取当前用户所在的角色组所对应的应用列表")
+    public String getAppIdsByUserId(
+            @ApiParam(name = "userId", value = "userId", defaultValue = "")
+            @RequestParam(value = "userId") String userId) {
+        String appsId = getInfoService.getAppsId(userId);
+        return appsId;
+    }
 }

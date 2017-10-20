@@ -1040,5 +1040,7 @@ public class ServiceApi {
         public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
     }
 
-
+    public static class GetInfo {
+        public static final String GetAppIdsByUserId = "/BasicInfo/getAppIdsByUserId";
+    }
 }

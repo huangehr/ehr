@@ -41,8 +41,8 @@ public interface XOrgMemberRelationRepository extends PagingAndSortingRepository
     List<Integer> findDeptIdByUserId(@Param("userId") String userId);
 
     @Modifying
-    @Query("update OrgMemberRelation r set r.status = 1 where r.orgId in (:orgId)")
-    void updateByOrgId(@Param("orgId") String[] orgId);
+    @Query("update OrgMemberRelation r set r.status = 1 where r.userId = :userId and r.orgId in (:orgId)")
+    void updateByOrgId(@Param("orgId") String[] orgId, @Param("userId") String userId);
 
     @Query("select r from OrgMemberRelation r where r.status=0 and r.userId=:userId")
     List<OrgMemberRelation> findByUserId(@Param("userId") String userId);
