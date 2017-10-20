@@ -6,7 +6,6 @@ import com.yihu.ehr.config.MetricNames;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.feign.DataSetPackageMgrClient;
 import com.yihu.ehr.feign.PackageMgrClient;
@@ -36,7 +35,6 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -88,7 +86,9 @@ public class ResolveEndPoint {
         String packId = pack.getId();
         try {
             long start = System.currentTimeMillis();
-            if (StringUtils.isEmpty(pack.getClientId())) pack.setClientId(clientId);
+            if (StringUtils.isEmpty(pack.getClientId())){
+                pack.setClientId(clientId);
+            }
             String zipFile = downloadTo(pack.getRemotePath());
             StandardPackage standardPackage = packResolveEngine.doResolve(pack, zipFile);
             ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);

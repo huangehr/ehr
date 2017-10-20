@@ -21,7 +21,7 @@ import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
@@ -32,12 +32,10 @@ import java.util.*;
  * @version 1.0
  * @created 2016.03.28 11:30
  */
+@Component
 public class PackageResourceJob implements InterruptableJob {
 
     private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
-
-    @Autowired
-    private PatientInfoDao patientInfoDao;
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
@@ -64,6 +62,7 @@ public class PackageResourceJob implements InterruptableJob {
     private void doResolve(MPackage pack, Scheduler scheduler, JobKey jobKey) {
         PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
         PackageMgrClient packageMgrClient = SpringContext.getService(PackageMgrClient.class);
+        PatientInfoDao patientInfoDao = SpringContext.getService(PatientInfoDao.class);
         packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
         System.out.println("正在入库中:" + pack.getId() + ", Timestamp:" + new Date().toLocaleString());
         PackMill packMill = SpringContext.getService(PackMill.class);
@@ -74,14 +73,6 @@ public class PackageResourceJob implements InterruptableJob {
             StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
             ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
             resourceService.save(resourceBucket);
-            //回填入库状态
-            Map<String,String> map = new HashMap();
-            map.put("profileId",standardPackage.getId());
-            map.put("demographicId",standardPackage.getDemographicId());
-            map.put("eventType",String.valueOf(standardPackage.getEventType().getType()));
-            map.put("eventNo",standardPackage.getEventNo());
-            map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-            map.put("patientId",standardPackage.getPatientId());
             //获取注册信息
             String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString();
             if(!idCardNo.equals("")) {
@@ -106,6 +97,14 @@ public class PackageResourceJob implements InterruptableJob {
             }else {
                 LogService.getLogger().info("idCardNo is empty !");
             }
+            //回填入库状态
+            Map<String,String> map = new HashMap();
+            map.put("profileId",standardPackage.getId());
+            map.put("demographicId",standardPackage.getDemographicId());
+            map.put("eventType",String.valueOf(standardPackage.getEventType().getType()));
+            map.put("eventNo",standardPackage.getEventNo());
+            map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
+            map.put("patientId",standardPackage.getPatientId());
             packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
         } catch (Exception e) {
