@@ -207,4 +207,13 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
         String appsId = getInfoService.getAppsId(userId);
         return appsId;
     }
+
+    @RequestMapping(value = ServiceApi.GetInfo.GetIdCardNoByOrgCode, method = RequestMethod.GET)
+    @ApiOperation(value = "获取当前用户所在的角色组下机构所对应的人员身份证号")
+    public String getIdCardNoByOrgCode(
+            @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
+            @RequestParam(value = "orgCode") String orgCode) {
+        String idCardNo = getInfoService.getIdCardNo(orgCode);
+        return idCardNo;
+    }
 }

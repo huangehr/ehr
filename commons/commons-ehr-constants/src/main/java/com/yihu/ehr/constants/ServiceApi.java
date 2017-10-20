@@ -1042,5 +1042,6 @@ public class ServiceApi {
 
     public static class GetInfo {
         public static final String GetAppIdsByUserId = "/BasicInfo/getAppIdsByUserId";
+        public static final String GetIdCardNoByOrgCode = "/BasicInfo/getIdCardNoByOrgCode";
     }
 }
