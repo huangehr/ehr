@@ -68,7 +68,7 @@ public class SchedulerEndPoint {
             Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
             if(null != jobKeys) {
                 int activeJob = jobKeys.size();
-                for (int i = 0; i < count - activeJob; ++i) {
+                for (int i = 0; i < count - activeJob; i++) {
                     String suffix = UUID.randomUUID().toString().substring(0, 8);
                     JobDetail jobDetail = newJob(PackageResourceJob.class)
                             .withIdentity("PackResolveJob-" + suffix, "PackResolve")

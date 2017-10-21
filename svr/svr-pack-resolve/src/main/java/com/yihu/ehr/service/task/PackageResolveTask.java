@@ -31,7 +31,7 @@ public class PackageResolveTask {
             Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
             if(null != jobKeySet) {
                 int activeCount = jobKeySet.size();
-                for (int i = 0; i < total - activeCount; ++i) {
+                for (int i = 0; i < total - activeCount; i++) {
                     String suffix = UUID.randomUUID().toString().substring(0, 8);
                     JobDetail jobDetail = newJob(PackageResourceJob.class)
                             .withIdentity("PackResolveJob-" + suffix, "PackResolve")

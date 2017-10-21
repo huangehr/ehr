@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -63,10 +64,10 @@ public class PackageResourceJob implements InterruptableJob {
         PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
         PackageMgrClient packageMgrClient = SpringContext.getService(PackageMgrClient.class);
         PatientInfoDao patientInfoDao = SpringContext.getService(PatientInfoDao.class);
-        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
-        System.out.println("正在入库中:" + pack.getId() + ", Timestamp:" + new Date().toLocaleString());
         PackMill packMill = SpringContext.getService(PackMill.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
+        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
+        System.out.println("正在入库中:" + pack.getId() + ", Timestamp:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             long start = System.currentTimeMillis();
