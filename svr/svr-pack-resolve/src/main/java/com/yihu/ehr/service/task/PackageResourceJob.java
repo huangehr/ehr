@@ -67,7 +67,7 @@ public class PackageResourceJob implements InterruptableJob {
         PackMill packMill = SpringContext.getService(PackMill.class);
         ResourceService resourceService = SpringContext.getService(ResourceService.class);
         packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
-        System.out.println("正在入库中:" + pack.getId() + ", Timestamp:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        System.out.println("正在入库中:" + pack.getId() + ", Timestamp:" + new Date());
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             long start = System.currentTimeMillis();
