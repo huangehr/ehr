@@ -214,16 +214,13 @@ public class OrgSaasController extends BaseController{
     @RequestMapping(value=ServiceApi.Org.getUserOrgSaasByUserOrgCode,method=RequestMethod.GET)
     @ApiOperation(value="根据用户的机构id，获取Saas化的机构或者区域id")
     public Envelop getUserOrgSaasByUserOrgCode(
-            @ApiParam(name = "userOrgCode", value = "用户所在机构", defaultValue = "")
-            @RequestParam(value = "userOrgCode", required = false) String userOrgCode){
+            @ApiParam(name = "orgCodeList", value = "用户所在机构", defaultValue = "")
+            @RequestParam(value = "orgCodeList", required = false) List<String> orgCodeList){
         Envelop envelop = new Envelop();
-        //使用机构id获取机构code
-        List<Long> result = Arrays.asList(userOrgCode.split(",")).stream().map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
-        List<String> list=orgClient.getOrgListById(result);
         //授权类型 1区域 2机构
-        List<String> areaResult =orgSaasClient.getUserOrgSaasByUserOrgCode(list,"1");
+        List<String> areaResult =orgSaasClient.getUserOrgSaasByUserOrgCode(orgCodeList,"1");
 
-        List<String> orgResult =orgSaasClient.getUserOrgSaasByUserOrgCode(list,"2");
+        List<String> orgResult =orgSaasClient.getUserOrgSaasByUserOrgCode(orgCodeList,"2");
         envelop.setSuccessFlg(true);
         envelop.setObj(areaResult);
         envelop.setDetailModelList(orgResult);

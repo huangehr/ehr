@@ -60,4 +60,14 @@ public interface GetInfoClient {
     List<String> getUserDistrictCode(
             @ApiParam(name = "userId", value = "userId", defaultValue = "")
             @RequestParam(value = "userId") String userId);
+
+    @RequestMapping(value = ServiceApi.GetInfo.GetAppIdsByUserId, method = RequestMethod.GET)
+    @ApiOperation(value = "获取当前用户所在的角色组所对应的应用列表")
+    String getAppIdsByUserId(
+            @RequestParam(value = "userId") String userId);
+
+    @RequestMapping(value = ServiceApi.GetInfo.GetIdCardNoByOrgCode, method = RequestMethod.GET)
+    @ApiOperation(value = "获取当前用户所在的角色组下机构所对应的人员身份证号")
+    String getIdCardNoByOrgCode(
+            @RequestParam(value = "orgCode") String orgCode);
 }

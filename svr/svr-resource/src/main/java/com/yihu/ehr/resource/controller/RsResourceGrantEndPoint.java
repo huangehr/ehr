@@ -486,6 +486,19 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
 
         return convertToModels(rolesResourceGrantService.grantResourceBatch(rolesRsList),new ArrayList<>(rolesRsList.size()),MRsRolesResource.class,"");
     }
+
+    @ApiOperation("单个角色组授权资源查询")
+    @RequestMapping(value= ServiceApi.Resources.GetRolesGrantResources ,method = RequestMethod.GET)
+    public List<MRsRolesResource> getRolesGrantResources(
+            @ApiParam(name="rolesId",value="角色组ID",defaultValue = "")
+            @RequestParam(value="rolesId") String rolesId) throws Exception {
+        Collection<MRsRolesResource> rsRolesList;
+        List rolesRsList = rolesResourceGrantService.search("rolesId=" + rolesId);
+        rsRolesList = convertToModels(rolesRsList,new ArrayList<>(rolesRsList.size()),MRsRolesResource.class,"");
+        return (List<MRsRolesResource>)rsRolesList;
+    }
+
+
     @ApiOperation("角色组资源数据元授权查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceRolesResMetadataGrants,method = RequestMethod.GET)
     public Collection<MRsRolesResourceMetadata> getRolesRsMetadatas(

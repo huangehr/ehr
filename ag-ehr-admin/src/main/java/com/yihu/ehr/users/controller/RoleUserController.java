@@ -284,7 +284,7 @@ public class RoleUserController extends BaseController {
         Integer totalCount = getTotalCount(responseEntity);
         return getResult(roleOrgModelList,totalCount,page,size);
     }
-    @RequestMapping(value = ServiceApi.Roles.RoleOrgsNoPaging,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Roles.RoleOrgsNoPage,method = RequestMethod.GET)
     @ApiOperation(value = "查询角色组机构列表---不分页")
     public Envelop searchRoleOrgsNoPaging(
             @ApiParam(name = "filters",value = "过滤条件，为空检索全部",defaultValue = "")

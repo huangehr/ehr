@@ -33,7 +33,7 @@ public interface XUserRepository extends PagingAndSortingRepository<User, String
     @Query("select user from User user where user.loginCode = :loginCode or user.telephone = :loginCode or user.idCardNo = :loginCode")
     List<User> findUserForLogin(@Param("loginCode") String loginCode);
 
-
-
+    @Query("select u.idCardNo from User u where u.id in (:userIds)")
+    List<String> findIdCardNoById(@Param("userIds") List<String> userIds);
 
 }
