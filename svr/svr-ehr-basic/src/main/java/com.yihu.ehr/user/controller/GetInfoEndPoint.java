@@ -213,7 +213,11 @@ public class GetInfoEndPoint extends EnvelopRestEndPoint {
     public String getIdCardNoByOrgCode(
             @ApiParam(name = "orgCode", value = "orgCode", defaultValue = "")
             @RequestParam(value = "orgCode") String orgCode) {
-        String idCardNo = getInfoService.getIdCardNo(orgCode);
-        return idCardNo;
+        try {
+            String idCardNo = getInfoService.getIdCardNo(orgCode);
+            return idCardNo;
+        } catch (Exception e) {
+            return "";
+        }
     }
 }
