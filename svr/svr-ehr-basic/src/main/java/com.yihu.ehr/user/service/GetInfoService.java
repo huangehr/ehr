@@ -2,6 +2,8 @@ package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.org.dao.XOrgMemberRelationRepository;
 import com.yihu.ehr.org.dao.XOrganizationRepository;
+import com.yihu.ehr.org.model.OrgMemberRelation;
+import com.yihu.ehr.org.service.OrgMemberRelationService;
 import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.user.dao.XRoleUserRepository;
 import com.yihu.ehr.user.dao.XRolesRepository;
@@ -33,6 +35,8 @@ public class GetInfoService {
     private XOrganizationRepository organizationRepository;
     @Autowired
     private XUserRepository userRepository;
+    @Autowired
+    private OrgMemberRelationService orgMemberRelationService;
 
     public List<String> getOrgCodes(String userId) {
         List<String> orgIds = getOrgIds(userId);
@@ -72,7 +76,7 @@ public class GetInfoService {
         return appsId;
     }
 
-    public String getIdCardNo(String orgCode) {
+    public String getIdCardNo(String orgCode) throws Exception{
         String idCardNos = "";
         if (!StringUtils.isEmpty(orgCode)) {
             String[] split = orgCode.split(",");
@@ -81,7 +85,11 @@ public class GetInfoService {
             List<String> orgIdList = organizationRepository.getIdByOrgCode(orgCodeList);
             if (null != orgIdList && orgIdList.size() > 0) {
                 //2、根据orgIdList到OrgMemberRelation表获取userId
-                List<String> userIdList = relationRepository.getUserIdListByOrgId(orgIdList);
+                List<OrgMemberRelation> list = orgMemberRelationService.search("orgId=" + StringUtils.join(orgIdList, ","));
+                List<String> userIdList = new ArrayList<>();
+                for (OrgMemberRelation o : list) {
+                    userIdList.add(o.getUserId());
+                }
                 if (null != userIdList && userIdList.size() > 0) {
                     //3、根据userId到users表获取用户idCardNo
                     List<String> idCardNoList = userRepository.findIdCardNoById(userIdList);

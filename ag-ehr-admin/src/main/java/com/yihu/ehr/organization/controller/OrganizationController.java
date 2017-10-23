@@ -752,5 +752,23 @@ public class OrganizationController extends BaseController {
         return mOrganization;
     }
 
+    @RequestMapping(value = "/organizations/batch", method = RequestMethod.POST)
+    @ApiOperation("批量导入机构")
+    public Envelop createOrgBatch(
+            @ApiParam(name = "orgs", value = "JSON", defaultValue = "")
+            @RequestParam(value = "orgs") String orgs) throws Exception {
+
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try{
+            orgClient.createOrgBatch(orgs);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
+        }
+        return envelop;
+    }
+
 
 }

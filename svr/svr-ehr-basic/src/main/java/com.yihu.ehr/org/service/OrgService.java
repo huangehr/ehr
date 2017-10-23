@@ -1,16 +1,24 @@
 package com.yihu.ehr.org.service;
 
+import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.entity.geography.Geography;
+import com.yihu.ehr.geography.service.GeographyService;
 import com.yihu.ehr.org.dao.XOrganizationRepository;
 import com.yihu.ehr.org.feign.GeographyClient;
+import com.yihu.ehr.org.model.OrgDept;
+import com.yihu.ehr.org.model.OrgDeptDetail;
 import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.util.id.ObjectId;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * 组织机构管理器.
@@ -26,7 +34,13 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     private XOrganizationRepository organizationRepository;
     @Autowired
     private GeographyClient geographyClient;
+    @Autowired
+    private GeographyService geographyService;
+    @Autowired
+    private OrgDeptService orgDeptService;
 
+    @Value("${deploy.region}")
+    Short deployRegion = 3502;
 
     public OrgService() {
     }
@@ -151,6 +165,82 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
     public List<String> getOrgListById(List<Long> orgId) {
         List<String> list =  organizationRepository.findOrgListById(orgId);
         return list;
+    }
+
+    protected String getObjectId(BizObject bizObject){
+        return new ObjectId(deployRegion, bizObject).toString();
+    }
+    @Transactional(propagation = Propagation.REQUIRED)
+
+    public boolean addOrgBatch(List<Map<String, Object>> orgDepts) {
+        Map<String, Object> map;
+        Geography geography =null;
+        List<Geography> geographies =null;
+      try{
+        for(int i=1; i <= orgDepts.size(); i++){
+            map = orgDepts.get(i-1);
+            String addressId ="";
+            //保存地址到addresses---start
+            geography = new Geography();
+            if (geography.getCountry() == null) {
+                geography.setCountry("中国");
+            }
+            geography.setProvince(map .get("provinceName").toString());
+            geography.setCity(map .get("cityName").toString());
+            geography.setDistrict(map .get("district").toString());
+            geography.setStreet(map .get("street").toString());
+            geographies=geographyService.isGeographyExist(geography);
+            if(geographies==null || geographies.size()==0){
+                geography.setId(getObjectId(BizObject.Geography));
+                addressId=geographyService.saveAddress(geography);
+            }
+            //保存地址到addresses---end
+            Organization organization=new Organization();
+            organization.setOrgCode(map .get("orgCode").toString());
+            organization.setFullName(map .get("fullName").toString());
+            organization.setHosTypeId(map .get("hosTypeId").toString());///
+
+            // 医院归属  1.部属医院2.省属医院3.市属医院9：未知
+            Integer ascriptionType=0;
+            String str=map .get("ascriptionType").toString();
+            if(str.equals("部属医院")){
+                ascriptionType=1;
+            }else if(str.equals("省属医院")){
+                ascriptionType=2;
+            }else if(str.equals("市属医院")){
+                ascriptionType=3;
+            }else{
+                ascriptionType=9;
+            }
+            organization.setAscriptionType(ascriptionType);
+            organization.setShortName(map .get("shortName").toString());
+            organization.setOrgType(map .get("orgType").toString());
+            organization.setLevelId(map .get("levelId").toString());
+            organization.setLegalPerson(map .get("legalPerson").toString());
+            organization.setAdmin(map .get("admin").toString());
+            organization.setPhone(map .get("phone").toString());
+//            organization.setZxy(map .get("zxy").toString());//中西医标识
+//            organization.setParentHosId(map .get("parentHosId").toString());
+            organization.setLocation(addressId);
+            organization.setTraffic(map .get("traffic").toString());
+            organization.setSettledWay(map .get("settledWay").toString());
+            organization.setIng(map .get("ing").toString());
+            organization.setLat(map .get("lat").toString());
+            organization.setUpdateTime(new Timestamp(new Date().getTime()));
+//            organization.setTags(map .get("tags").toString());
+            organization.setIntroduction(map .get("introduction").toString());
+            Organization org=organizationRepository.save(organization);
+            OrgDept dept=new OrgDept();
+            dept.setOrgId(String.valueOf(org.getId()));
+            dept.setCode(String.valueOf(org.getId())+"1");
+            dept.setName("未分配部门人员");
+            orgDeptService.saveOrgDept(dept);
+            }
+           } catch (Exception e) {
+             e.printStackTrace();
+          return false;
+          }
+        return true;
     }
 
 }

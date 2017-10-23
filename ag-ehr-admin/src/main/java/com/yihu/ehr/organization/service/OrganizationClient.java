@@ -201,4 +201,8 @@ public interface OrganizationClient {
     @RequestMapping(value = "/organizations/getAllOrgsNoPaging", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "查询所有机构列表不分页")
     List<MOrganization> getAllOrgsNoPaging();
+
+    @RequestMapping(value = "/organizations/batch", method = RequestMethod.POST)
+    @ApiOperation("批量导入机构")
+    boolean createOrgBatch(@RequestBody String orgs);
 }
