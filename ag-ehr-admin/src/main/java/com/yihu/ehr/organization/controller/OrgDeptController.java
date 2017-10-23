@@ -1,13 +1,14 @@
 package com.yihu.ehr.organization.controller;
 
-import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.agModel.org.OrgDeptDetailModel;
 import com.yihu.ehr.agModel.org.OrgDeptMemberModel;
 import com.yihu.ehr.agModel.org.OrgDeptModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrgDept;
+import com.yihu.ehr.model.org.MOrgDeptData;
 import com.yihu.ehr.model.org.MOrgDeptDetail;
 import com.yihu.ehr.model.org.MOrgMemberRelation;
 import com.yihu.ehr.model.user.MUser;
@@ -225,8 +226,7 @@ public class OrgDeptController  extends BaseController {
             if (StringUtils.isEmpty(mOrgDept.getOrgId())) {
                 errorMsg+="机构不能为空！";
             }
-            if(StringUtils.isNotEmpty(errorMsg))
-            {
+            if(StringUtils.isNotEmpty(errorMsg)){
                 return failed(errorMsg);
             }
 
@@ -477,8 +477,8 @@ public class OrgDeptController  extends BaseController {
                 detailModel.setUserName(mUser == null ? "" : mUser.getRealName());
             }
             if (StringUtils.isNotEmpty(detailModel.getParentUserId()) ){
-                MUser mUser = userClient.getUser(detailModel.getParentUserId());
-                detailModel.setParentUserName(mUser == null ? "" : mUser.getRealName());
+                MOrgMemberRelation memberUser= orgDeptMemberClient.getOrgMemberRelation(Long.valueOf(detailModel.getParentUserId()));
+                detailModel.setParentUserName(memberUser == null ? "" : memberUser.getUserName());
             }
             if (detailModel.getDeptId()!=null && detailModel.getDeptId()!=0 ){
                 MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(detailModel.getDeptId());
@@ -638,7 +638,42 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
+    @ApiOperation(value = "根据用户ＩＤ获取部门列表")
+    @RequestMapping(value = ServiceApi.Org.getUserOrglistByUserId, method = RequestMethod.GET)
+    public Envelop getUserOrglistByUserId(
+            @ApiParam(name = "userId", value = "用户ID", defaultValue = "")
+            @RequestParam(value = "userId") String userId) {
+        try {
+            Envelop envelop = new Envelop();
+            envelop.setDetailModelList(orgDeptClient.getUserOrglistByUserId(userId));
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
 
-
+    @RequestMapping(value =ServiceApi.Org.GetOrgDeptsDate, method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构id获取机构及部门列表")
+    public Envelop getOrgDeptsDate(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId") String orgId) {
+        try {
+            Envelop envelop = new Envelop();
+            MOrgDeptData orgDeptsDate = orgDeptClient.getOrgDeptsDate(orgId);
+            List<MOrgDeptData> orgDeptDataList = new ArrayList<>();
+            orgDeptDataList.add(orgDeptsDate);
+            envelop.setDetailModelList(orgDeptDataList);
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
     
 }

@@ -21,11 +21,12 @@ import java.io.IOException;
  * @created 2016.04.15 16:50
  */
 @Service
-public class SubResourceRepository {
-    @Autowired
-    HBaseDao hbaseDao;
+public class SubResourceDao {
 
-    public void saveOrUpdate(ResourceBucket resBucket) throws Throwable {
+    @Autowired
+    private HBaseDao hbaseDao;
+
+    public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
         TableBundle bundle = new TableBundle();
 
         // delete legacy data if they are exist

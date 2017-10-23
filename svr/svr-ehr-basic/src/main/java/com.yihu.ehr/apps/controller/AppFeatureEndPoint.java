@@ -1,10 +1,10 @@
 package com.yihu.ehr.apps.controller;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.model.AppFeature;
 import com.yihu.ehr.apps.service.AppFeatureService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MAppFeature;
@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author linz
@@ -33,13 +31,12 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppFeatureService appFeatureService;
 
-    @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "创建AppFeature")
-    public MAppFeature createAppFeature(
-            @ApiParam(name = "AppFeature", value = "对象JSON结构体", allowMultiple = true)
-            @RequestBody String AppFeatureJson) throws Exception {
-        AppFeature appFeature = toEntity(AppFeatureJson, AppFeature.class);
-        appFeature = appFeatureService.createAppFeature(appFeature);
+    @RequestMapping(value = ServiceApi.AppFeature.AppFeature, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppFeature")
+    public MAppFeature getAppFeature(
+            @ApiParam(name = "id", value = "id")
+            @PathVariable(value = "id") int id) throws Exception {
+        AppFeature appFeature = appFeatureService.retrieve(id);
         return convertToModel(appFeature, MAppFeature.class);
     }
 
@@ -58,19 +55,32 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-            List<AppFeature> appFeatureList = appFeatureService.search(fields, filters, sorts, page, size);
-            pagedResponse(request, response, appFeatureService.getCount(filters), page, size);
-            return convertToModels(appFeatureList, new ArrayList<>(appFeatureList.size()), MAppFeature.class, fields);
+        List<AppFeature> appFeatureList = appFeatureService.search(fields, filters, sorts, page, size);
+        pagedResponse(request, response, appFeatureService.getCount(filters), page, size);
+        return convertToModels(appFeatureList, new ArrayList<>(appFeatureList.size()), MAppFeature.class, fields);
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureList, method = RequestMethod.GET)
     @ApiOperation(value = "获取过滤AppFeature列表")
     public Boolean getAppFeaturesFilter(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "filters", required = false) String filters
-           ) throws Exception {
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
         Long count = appFeatureService.getCount(filters);
-        return count>0?true:false;
+        return count > 0 ? true : false;
+    }
+
+    @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "创建AppFeature")
+    public MAppFeature createAppFeature(
+            @ApiParam(name = "AppFeature", value = "对象JSON结构体", allowMultiple = true)
+            @RequestBody String AppFeatureJson) throws Exception {
+        AppFeature appFeature = toEntity(AppFeatureJson, AppFeature.class);
+        appFeature = appFeatureService.createAppFeature(appFeature);
+        // 拼接菜单JSON对象字符串，并保存
+        appFeature = appFeatureService.joinMenuItemJsonStr(appFeature);
+        appFeatureService.save(appFeature);
+
+        return convertToModel(appFeature, MAppFeature.class);
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.AppFeatures, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -79,17 +89,11 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "AppFeature", value = "对象JSON结构体", allowMultiple = true)
             @RequestBody String appJson) throws Exception {
         AppFeature appFeature = toEntity(appJson, AppFeature.class);
-        if (appFeatureService.retrieve(appFeature.getId()) == null) throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        if (appFeatureService.retrieve(appFeature.getId()) == null)
+            throw new ApiException(ErrorCode.InvalidAppId, "应用不存在");
+        // 拼接菜单JSON对象字符串
+        appFeature = appFeatureService.joinMenuItemJsonStr(appFeature);
         appFeatureService.save(appFeature);
-        return convertToModel(appFeature, MAppFeature.class);
-    }
-
-    @RequestMapping(value = ServiceApi.AppFeature.AppFeature, method = RequestMethod.GET)
-    @ApiOperation(value = "获取AppFeature")
-    public MAppFeature getAppFeature(
-            @ApiParam(name = "id", value = "id")
-            @PathVariable(value = "id") int id) throws Exception {
-        AppFeature appFeature = appFeatureService.retrieve(id);
         return convertToModel(appFeature, MAppFeature.class);
     }
 
@@ -103,12 +107,33 @@ public class AppFeatureEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
-    @ApiOperation(value = "获取过滤App列表")
+    @ApiOperation(value = "获取AppFeature列表（不分页）")
     public Collection<MAppFeature> getAppFeatureNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
-            @RequestParam(value = "filters", required = false) String filters
-    ) throws Exception {
-        List<AppFeature> appFeatureList =  appFeatureService.search(filters);
-        return convertToModels(appFeatureList,new ArrayList<>(appFeatureList.size()),MAppFeature.class, "");
+            @RequestParam(value = "filters", required = false) String filters) throws Exception {
+        List<AppFeature> appFeatureList = appFeatureService.search(filters);
+        return convertToModels(appFeatureList, new ArrayList<>(appFeatureList.size()), MAppFeature.class, "");
     }
+
+    @RequestMapping(value = ServiceApi.AppFeature.FilterFeatureNoPageSorts, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppFeature排序后的列表（不分页）")
+    public Collection<MAppFeature> getAppFeatureNoPageSorts(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts) throws Exception {
+        List<AppFeature> appFeatureList = appFeatureService.search(filters, sorts);
+        return convertToModels(appFeatureList, new ArrayList<>(appFeatureList.size()), MAppFeature.class, "");
+    }
+
+    @RequestMapping(value = ServiceApi.AppFeature.FindAppMenus, method = RequestMethod.GET)
+    @ApiOperation(value = "根据权限，获取应用菜单")
+    public List<Map<String, Object>> findAppMenus(
+            @ApiParam(name = "appId", value = "应用ID", required = true)
+            @RequestParam(value = "appId", required = true) String appId,
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId", required = true) String userId) throws Exception {
+        return appFeatureService.findAppMenus(appId, userId, 0);
+    }
+
 }

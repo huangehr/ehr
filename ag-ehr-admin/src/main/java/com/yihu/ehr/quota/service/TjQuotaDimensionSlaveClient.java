@@ -3,6 +3,7 @@ package com.yihu.ehr.quota.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.entity.quota.TjQuotaDimensionSlave;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 /**
  * @author janseny
@@ -52,7 +55,11 @@ public interface TjQuotaDimensionSlaveClient {
     @ApiOperation(value = "删除从维度关联信息")
     Result delete(@RequestParam(value = "id") String id);
 
-    @RequestMapping(value = "/tj/deleteSlaveByQuotaCode", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.TJ.DeleteSlaveByQuotaCode, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除统计指标从维度关联信息")
     Result deleteSlaveByQuotaCode(@RequestParam(value = "quotaCode") String quotaCode);
+
+    @RequestMapping(value = ServiceApi.TJ.GetDimensionSlaveByQuotaCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据指标ID获取从维度列表信息")
+    List<TjQuotaDimensionSlave> getDimensionSlaveByQuotaCode(@RequestParam(value = "quotaCode") String quotaCode);
 }

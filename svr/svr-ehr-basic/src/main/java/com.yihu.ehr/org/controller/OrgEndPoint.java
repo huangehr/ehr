@@ -1,5 +1,6 @@
 package com.yihu.ehr.org.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
@@ -7,6 +8,8 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.org.feign.SecurityClient;
+import com.yihu.ehr.org.model.OrgDept;
+import com.yihu.ehr.org.service.OrgDeptService;
 import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.util.phonics.PinyinUtil;
@@ -46,6 +49,8 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private FastDFSUtil fastDFSUtil;
+    @Autowired
+    private OrgDeptService orgDeptService;
 
 
     @RequestMapping(value = "/organizations/getAllOrgs", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -76,7 +81,7 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
             @RequestBody(required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
@@ -119,7 +124,13 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         org.setCreateDate(new Date());
         org.setActivityFlag(1);
         org.setPyCode(PinyinUtil.getPinYinHeadChar(org.getFullName(), false));
-        orgService.save(org);
+        Organization organization=orgService.save(org);
+        //添加默认部门
+        OrgDept dept=new OrgDept();
+        dept.setOrgId(String.valueOf(organization.getId()));
+        dept.setCode(String.valueOf(organization.getId())+"1");
+        dept.setName("未分配部门人员");
+        orgDeptService.saveOrgDept(dept);
         return convertToModel(org, MOrganization.class);
     }
 
@@ -268,7 +279,11 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "district", value = "县")
             @RequestParam(value = "district", required = false) String district) {
         List<Organization> orgList = orgService.searchByAddress(province, city, district);
-        return (List<MOrganization>) convertToModels(orgList, new ArrayList<MOrganization>(orgList.size()), MOrganization.class, null);
+        if(orgList != null && orgList.size() > 0 ){
+            return (List<MOrganization>) convertToModels(orgList, new ArrayList<MOrganization>(orgList.size()), MOrganization.class, null);
+        }else {
+            return null;
+        }
     }
 
     @RequestMapping(value = "organizations/key", method = RequestMethod.POST)
@@ -376,5 +391,35 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
                 List<Organization> orgs = orgService.getAllSaasOrgs(saasName);
                 return orgs;
             }
+    /**
+     * 根据机构ID获取机构
+     *
+     * @param userOrgCode
+     * @return
+     */
+    @RequestMapping(value = "/organizations/getOrgListById", method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构ID获取机构")
+    public List<String> getOrgListById(
+            @ApiParam(name = "userOrgCode", value = "机构代码", defaultValue = "")
+            @RequestParam(value = "userOrgCode") List<Long> userOrgCode) throws Exception {
+        List<String> organizationList = orgService.getOrgListById(userOrgCode);
+        return organizationList;
+    }
 
+    @RequestMapping(value = "/organizations/getAllOrgsNoPaging", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有机构列表不分页")
+    public List<MOrganization> getAllOrgsNoPaging() throws Exception {
+        List<MOrganization> orgs = orgService.search(null);
+        return orgs;
+    }
+
+    @RequestMapping(value = "/organizations/batch", method = RequestMethod.POST)
+    @ApiOperation("批量导入机构")
+    public boolean createOrgBatch(
+            @ApiParam(name = "orgs", value = "JSON", defaultValue = "")
+            @RequestBody String orgs) throws Exception{
+        List models = objectMapper.readValue(orgs, new TypeReference<List>() {});
+        orgService.addOrgBatch(models);
+        return true;
+    }
 }

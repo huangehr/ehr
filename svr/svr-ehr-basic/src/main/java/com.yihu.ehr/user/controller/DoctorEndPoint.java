@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.model.OrgMemberRelation;
@@ -85,10 +86,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     public MDoctor createDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
             @RequestBody String doctoJsonData,
-            @ApiParam(name = "orgId", value = "", defaultValue = "")
-            @RequestParam(value = "orgId") String orgId,
-            @ApiParam(name = "deptId", value = "", defaultValue = "")
-            @RequestParam(value = "deptId") String deptId) throws Exception {
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam("model") String model) throws Exception {
         Doctors doctor = toEntity(doctoJsonData, Doctors.class);
         doctor.setInsertTime(new Date());
         doctor.setUpdateTime(new Date());
@@ -125,21 +124,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         demographicInfo.setGender(d.getSex());
         demographicService.savePatient(demographicInfo);
         //创建用户与机构关系
-        if (!StringUtils.isEmpty(orgId) && !StringUtils.isEmpty(deptId)) {
-            OrgMemberRelation memberRelation = new OrgMemberRelation();
-            Organization organization = orgService.getOrgById(orgId);
-            OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(deptId));
-            if (null != organization && null != orgDept) {
-                memberRelation.setOrgId(orgId);
-                memberRelation.setOrgName(organization.getFullName());
-                memberRelation.setDeptId(Integer.parseInt(deptId));
-                memberRelation.setDeptName(orgDept.getName());
-                memberRelation.setUserId(user.getId());
-                memberRelation.setUserName(user.getRealName());
-                memberRelation.setStatus(0);
-                relationService.save(memberRelation);
-            }
-        }
+        List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
+        orgMemberRelationInfo(orgDeptJsonList, user);
         return convertToModel(doctor, MDoctor.class);
     }
 
@@ -147,7 +133,9 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "修改医生", notes = "重新绑定医生信息")
     public MDoctor updateDoctor(
             @ApiParam(name = "doctor_json_data", value = "", defaultValue = "")
-            @RequestBody String doctoJsonData) throws Exception {
+            @RequestBody String doctoJsonData,
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam("model") String model) throws Exception {
         Doctors doctors = toEntity(doctoJsonData, Doctors.class);
         doctors.setUpdateTime(new Date());
         doctorService.save(doctors);
@@ -166,6 +154,9 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             demographicInfo.setTelephoneNo("{\"联系电话\":\"" + doctors.getPhone() + "\"}");
             demographicService.save(demographicInfo);
         }
+        //修改用户与机构关系
+        List<MOrgDeptJson> orgDeptJsonList = objectMapper.readValue(model, new TypeReference<List<MOrgDeptJson>>() {});
+        orgMemberRelationInfo(orgDeptJsonList, user);
         return convertToModel(doctors, MDoctor.class);
     }
 
@@ -268,8 +259,8 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                   orgId=objectList[23].toString();
               }
               String deptName="";
-              if(!StringUtils.isEmpty(objectList[26])){
-                  deptName=objectList[26].toString();
+              if(!StringUtils.isEmpty(objectList[27])){
+                  deptName=objectList[27].toString();
               }
               // 根据机构id和部门名称 获取部门id
             int deptId=  orgDeptService.getOrgDeptByOrgIdAndName(orgId, deptName);
@@ -337,5 +328,38 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
         List<Object> statisticsDoctors = doctorService.getStatisticsDoctorsByRoleType(roleType);
         return statisticsDoctors;
+    }
+
+    //创建用户与机构的关联
+    private void orgMemberRelationInfo(List<MOrgDeptJson> orgDeptJsonList, User user) {
+        if (null != orgDeptJsonList && orgDeptJsonList.size() > 0) {
+            String[] orgIds = new String[orgDeptJsonList.size()];
+            for (int i=0; i<orgDeptJsonList.size(); i++) {
+                orgIds[i] = orgDeptJsonList.get(i).getOrgId();
+            }
+            relationService.updateByOrgId(orgIds, user.getId());
+        }
+
+        for (MOrgDeptJson orgDeptJson : orgDeptJsonList) {
+            Organization organization = orgService.getOrgById(orgDeptJson.getOrgId());
+            String deptIds = orgDeptJson.getDeptIds();
+            if (!StringUtils.isEmpty(deptIds)) {
+                String[] deptIdArr = deptIds.split(",");
+                for (String deptId : deptIdArr) {
+                    OrgDept orgDept = orgDeptService.searchBydeptId(Integer.parseInt(deptId));
+                    if (null != organization && null != orgDept) {
+                        OrgMemberRelation memberRelation = new OrgMemberRelation();
+                        memberRelation.setOrgId(orgDeptJson.getOrgId());
+                        memberRelation.setOrgName(organization.getFullName());
+                        memberRelation.setDeptId(Integer.parseInt(deptId));
+                        memberRelation.setDeptName(orgDept.getName());
+                        memberRelation.setUserId(user.getId());
+                        memberRelation.setUserName(user.getRealName());
+                        memberRelation.setStatus(0);
+                        relationService.save(memberRelation);
+                    }
+                }
+            }
+        }
     }
 }

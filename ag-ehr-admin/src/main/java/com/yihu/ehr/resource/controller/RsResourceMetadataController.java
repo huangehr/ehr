@@ -190,10 +190,9 @@ public class RsResourceMetadataController extends BaseController {
         {
             ResponseEntity<List<MRsResourceMetadata>> responseEntity = resourceMetadataClient.queryDimensions(fields,"resourcesId=" + resourcesId,sorts,page,size);
             List<MRsResourceMetadata> rsMetadatas = responseEntity.getBody();
-
             List<RsResourceMetadataModel> rsResourceMetadataModels = getRsMetadata(rsMetadatas,filters,page,size);
-
-            Envelop envelop = getResult(rsResourceMetadataModels, rsResourceMetadataModels.size(), page, size);
+            int  totalSize = Integer.valueOf(responseEntity.getHeaders().get("X-Total-Count").get(0));
+            Envelop envelop = getResult(rsResourceMetadataModels, totalSize, page, size);
             return envelop;
         }
         catch (Exception e)

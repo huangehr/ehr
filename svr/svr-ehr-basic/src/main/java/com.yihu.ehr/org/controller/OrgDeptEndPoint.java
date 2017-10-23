@@ -1,14 +1,18 @@
 package com.yihu.ehr.org.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.org.MOrgDept;
+import com.yihu.ehr.model.org.MOrgDeptData;
 import com.yihu.ehr.model.org.MOrgDeptDetail;
 import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.model.OrgDeptDetail;
+import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.org.service.OrgDeptDetailService;
 import com.yihu.ehr.org.service.OrgDeptService;
 import com.yihu.ehr.org.service.OrgMemberRelationService;
+import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.util.file.ExcelUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +43,8 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
     private OrgMemberRelationService relationService;
     @Autowired
     private OrgDeptDetailService deptDetailService;
+    @Autowired
+    private OrgService orgService;
 
     @RequestMapping(value = "/orgDept/getAllOrgDepts", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "查询所有部门列表")
@@ -203,8 +210,37 @@ public class OrgDeptEndPoint extends EnvelopRestEndPoint {
         System.out.println(list.toString());
         return list;
     }
+    @RequestMapping(value =ServiceApi.Org.getUserOrglistByUserId, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据用户ＩＤ获取部门列表")
+    public List<String> getUserOrglistByUserId(
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId", required = true) String userId) throws Exception {
+        List<String> orgDepts = orgDeptService.searchByUserId(userId);
+        return orgDepts;
+    }
 
-
-
-
+    @RequestMapping(value =ServiceApi.Org.GetOrgDeptsDate, method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构id获取机构及部门列表")
+    public MOrgDeptData getOrgDeptsDate(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId") String orgId) throws Exception {
+        List<MOrgDeptData> orgDeptData = new ArrayList<>();
+        MOrgDeptData mOrgDeptData = new MOrgDeptData();
+        Organization organization = orgService.getOrgById(orgId);
+        if (null != organization) {
+            mOrgDeptData.setId(new Long(organization.getId()).intValue());
+            mOrgDeptData.setName(organization.getFullName());
+            List<OrgDept> orgDepts = orgDeptService.searchByOrgId(orgId);
+            if (null != orgDepts && orgDepts.size() > 0) {
+                for (OrgDept dept : orgDepts) {
+                    MOrgDeptData data = new MOrgDeptData();
+                    data.setId(dept.getId());
+                    data.setName(dept.getName());
+                    orgDeptData.add(data);
+                }
+            }
+        }
+        mOrgDeptData.setChildren(orgDeptData);
+        return mOrgDeptData;
+    }
 }

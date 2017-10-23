@@ -19,7 +19,7 @@ import java.util.Map;
 @ApiIgnore
 @FeignClient(name = MicroServices.Patient)
 @RequestMapping(ApiVersion.Version1_0)
-public interface XArchiveClient {
+public interface ArchiveClient {
 
     @RequestMapping(value = ServiceApi.Patients.ArchiveRelation, method = RequestMethod.POST)
     Result archiveRelation(@RequestBody String data);

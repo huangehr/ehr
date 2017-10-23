@@ -1,18 +1,20 @@
 package com.yihu.ehr.apps.controller;
 
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.apps.model.App;
 import com.yihu.ehr.apps.service.AppService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ErrorCode;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,8 @@ import java.util.List;
 public class AppEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private AppService appService;
+    @Value("${fast-dfs.public-server}")
+    private String fastDfsPublicServers;
 
     @RequestMapping(value = ServiceApi.Apps.Apps, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建App")
@@ -52,8 +56,8 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+name,+createTime")
-            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sort", required = false) String sorts,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
@@ -91,6 +95,10 @@ public class AppEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "app_id", value = "id")
             @PathVariable(value = "app_id") String appId) throws Exception {
         App app = appService.retrieve(appId);
+        if (StringUtils.isNotEmpty(app.getIcon())) {
+            String iconUrl = fastDfsPublicServers + "/" + app.getIcon().replace(":", "/");
+            app.setIcon(iconUrl);
+        }
         return convertToModel(app, MApp.class);
     }
 
@@ -142,14 +150,16 @@ public class AppEndPoint extends EnvelopRestEndPoint {
         return count>0?true:false;
     }
 
-    @RequestMapping(value =  ServiceApi.Apps.getAppTreeByType, method = RequestMethod.GET)
-    @ApiOperation(value = "获取app列表，不分页")
-    public Collection<MApp> getAppsByUserIdAndCatalog(
-            @ApiParam(name = "userId", value = "userId")
+    @RequestMapping(value =  ServiceApi.Apps.getApps, method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件，获取app列表")
+    public Collection<MApp> getApps(
+            @ApiParam(name = "userId", value = "userId", required = true)
             @RequestParam(value = "userId") String userId,
-            @ApiParam(name = "catalog", value = "catalog")
-            @RequestParam(value = "catalog") String catalog) throws Exception {
-        List<App> appList = appService.getAppsByUserIdAndCatalog(userId,catalog);
+            @ApiParam(name = "catalog", value = "catalog", required = true)
+            @RequestParam(value = "catalog") String catalog,
+            @ApiParam(name = "manageType", value = "APP管理类型，backStage：后台管理，client：客户端。", required = true)
+            @RequestParam(value = "manageType", required = false) String manageType) throws Exception {
+        List<App> appList = appService.getApps(userId, catalog, manageType);
         return convertToModels(appList,new ArrayList<MApp>(appList.size()),MApp.class,"");
     }
 }

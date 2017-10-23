@@ -1,6 +1,6 @@
 package com.yihu.ehr.service.resource.stage1;
 
-import com.yihu.ehr.feign.XRedisServiceClient;
+import com.yihu.ehr.feign.RedisServiceClient;
 import com.yihu.ehr.profile.util.DataSetParser;
 import com.yihu.ehr.profile.util.QualifierTranslator;
 import com.yihu.ehr.util.log.LogService;
@@ -17,8 +17,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DataSetParserWithTranslator extends DataSetParser {
+
     @Autowired
-    XRedisServiceClient redisServiceClient;
+    private RedisServiceClient redisServiceClient;
 
     /**
      * 翻译数据元。

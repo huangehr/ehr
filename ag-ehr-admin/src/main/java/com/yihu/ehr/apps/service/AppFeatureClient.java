@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by linz on 2016年7月8日11:30:03.
  */
-@FeignClient(name=MicroServices.Application)
+@FeignClient(name = MicroServices.Application)
 public interface AppFeatureClient {
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.AppFeatures, method = RequestMethod.GET)
@@ -64,9 +65,25 @@ public interface AppFeatureClient {
             @ApiParam(name = "filters", value = "filters", defaultValue = "")
             @RequestParam(value = "filters") String filters);
 
-    @RequestMapping(value =  ApiVersion.Version1_0 +ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
-    @ApiOperation(value = "获取过滤App列表")
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureNoPage, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppFeature列表（不分页）")
     public Collection<MAppFeature> getAppFeatureNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FilterFeatureNoPageSorts, method = RequestMethod.GET)
+    @ApiOperation(value = "获取AppFeature排序后的列表（不分页）")
+    public Collection<MAppFeature> getAppFeatureNoPageSorts(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts);
+
+    @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.AppFeature.FindAppMenus, method = RequestMethod.GET)
+    @ApiOperation(value = "根据权限，获取应用菜单")
+    public List<Map<String, Object>> findAppMenus(
+            @ApiParam(name = "appId", value = "应用ID", required = true)
+            @RequestParam(value = "appId", required = true) String appId,
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId", required = true) String userId);
 }

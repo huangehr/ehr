@@ -17,7 +17,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 @FeignClient(name = MicroServices.Patient)
 @RequestMapping(ApiVersion.Version1_0)
-public interface XPatientEndClient {
+public interface PatientEndClient {
 
     @RequestMapping(value = "/populations",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     void registerPatient(@RequestBody String jsonData);

@@ -44,8 +44,7 @@ public class RedisService {
      *获取地址redis
      * @return
      */
-    public String getAddressRedis(String key)
-    {
+    public String getAddress(String key) {
         return addressDictKeySchema.get(key);
     }
 
@@ -53,7 +52,7 @@ public class RedisService {
      *获取健康问题redis
      * @return
      */
-    public String getHealthProblemRedis(String key) {
+    public String getHealthProblem(String key) {
         return healthProblemDictKeySchema.get(key);
     }
 
@@ -61,23 +60,21 @@ public class RedisService {
      *获取ICD10健康问题 redis
      * @return
      */
-    public String getIcd10HpRelationRedis(String key)
-    {
+    public String getIcd10HpRelation(String key) {
         return icd10HpRelationKeySchema.get(key);
     }
 
     /**
      *获取ICD10名称 redis
      */
-    public String getIcd10NameRedis(String key) {
+    public String getIcd10Name(String key) {
         return icd10KeySchema.get(key);
     }
 
     /**
      *获取ICD10对应健康问题 redis
      */
-    public String getIcd10HpCodeRedis(String key)
-    {
+    public String getHpCodeByIcd10(String key) {
         return icd10KeySchema.getHpCode(key);
     }
 
@@ -85,8 +82,7 @@ public class RedisService {
      * 获取指标 redis
      * @return
      */
-    public String getIndicatorsRedis(String key)
-    {
+    public String getIndicators(String key) {
         return indicatorsDictKeySchema.get(key);
     }
 
@@ -94,8 +90,7 @@ public class RedisService {
      *获取机构名称redis
      * @return
      */
-    public String getOrgRedis(String key)
-    {
+    public String getOrgName(String key) {
        return orgKeySchema.get(key);
     }
 
@@ -103,8 +98,7 @@ public class RedisService {
      *获取机构区域redis
      * @return
      */
-    public String getOrgAreaRedis(String key)
-    {
+    public String getOrgArea(String key) {
         return orgKeySchema.getOrgArea(key);
     }
 
@@ -112,8 +106,7 @@ public class RedisService {
      *获取机构Saas区域权限范围redis
      * @return
      */
-    public String getOrgSaasArea(String key)
-    {
+    public String getOrgSaasArea(String key) {
         return orgKeySchema.getOrgSaasArea(key);
     }
 
@@ -123,21 +116,19 @@ public class RedisService {
      */
     public String getOrgSaasOrg(String key) {
         String saasOrg = orgKeySchema.getOrgSaasOrg(key);
-
         //未设置权限，默认自身机构
         if(StringUtils.isEmpty(saasOrg)) {
             saasOrg = key;
         }
-
         return saasOrg;
     }
 
-    /******************************************* 资源化相关Redis *******************************************************************/
+    //------------------------------------ 资源化相关 START -------------------------------------------------------
     /**
      *获取资源化字典映射 redis
      * @return
      */
-    public String getRsAdaptionDict(String cdaVersion, String dictCode, String srcDictEntryCode) {
+    public String getRsAdapterDict(String cdaVersion, String dictCode, String srcDictEntryCode) {
         return rsAdapterDictKeySchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
     }
 
@@ -145,7 +136,7 @@ public class RedisService {
      *获取资源化数据元映射 redis
      * @return
      */
-    public String getRsAdaptionMetaData(String cdaVersion, String dictCode, String srcDictEntryCode) {
+    public String getRsAdapterMetaData(String cdaVersion, String dictCode, String srcDictEntryCode) {
         return rsAdapterMetaKeySchema.getMetaData(cdaVersion,dictCode,srcDictEntryCode);
     }
 
@@ -156,8 +147,9 @@ public class RedisService {
     public String getRsMetaData(String key) {
         return rsMetadataKeySchema.get(key);
     }
+    //------------------------------------ 资源化相关 END -------------------------------------------------------
 
-    /******************************************* 标准相关Redis *******************************************************************/
+    //------------------------------------ 标准相关 START -------------------------------------------------------
     /**
      *获取标准版本 redis
      */
@@ -216,4 +208,5 @@ public class RedisService {
 
         return stdMetaDataKeySchema.dictEntryValue(version, dictId , entryCode);
     }
+    //------------------------------------ 标准相关 END -------------------------------------------------------
 }

@@ -44,5 +44,10 @@ public interface XSystemDictEntryRepository extends JpaRepository<SystemDictEntr
      */
     @Query("select entry from SystemDictEntry entry where entry.dictId = :dictId and entry.code in (:codes) order by entry.sort asc")
     List<SystemDictEntry> findByDictIdAndCodes(@Param("dictId") long dictId, @Param("codes") String[] codes);
+
+    @Query("select entry from SystemDictEntry entry where entry.dictId = :dictId and entry.value = :value")
+    List<SystemDictEntry> findByDictIdAndValue(@Param("dictId") long dictId, @Param("value") String value);
+
+    List<SystemDictEntry> findByDictIdAndCode(@Param("dictId") long dictId, @Param("code") String code);
 }
 

@@ -10,6 +10,7 @@ public class MRoles {
     private String description;
     private String appId;
     private String type;
+    private String orgCode;
 
     public long getId() {
         return id;
@@ -51,5 +52,13 @@ public class MRoles {
     }
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
     }
 }

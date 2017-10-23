@@ -17,6 +17,7 @@ public class Roles {
     private String description;
     private String appId;
     private String type;
+    private String orgCode;
 
     public Roles(){}
 
@@ -68,5 +69,14 @@ public class Roles {
     }
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Column(name = "org_code",nullable = true)
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
     }
 }

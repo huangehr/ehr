@@ -2,12 +2,15 @@ package com.yihu.ehr.saas.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 /**
  * Created by zdm on 2017/5/26.
@@ -48,5 +51,14 @@ public interface OrgSaasClient {
             @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(name = "type", value = "类别", defaultValue = "")
             @RequestParam(value = "type", required = false) String type);
+
+
+    @ApiOperation(value = "根据用户的机构id，获取Saas化的机构或者区域id")
+    @RequestMapping(value=ServiceApi.Org.getUserOrgSaasByUserOrgCode, method = RequestMethod.GET)
+    List<String> getUserOrgSaasByUserOrgCode(
+            @ApiParam(name = "userOrgCode", value = "用户所在机构", defaultValue = "")
+            @RequestParam(value = "userOrgCode", required = false) List<String> userOrgCode,
+            @ApiParam(name = "type", value = "saas类型", defaultValue = "")
+            @RequestParam(value = "type", required = false) String type) ;
 
 }

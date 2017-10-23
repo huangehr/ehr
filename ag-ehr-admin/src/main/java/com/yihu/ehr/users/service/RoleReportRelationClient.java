@@ -3,11 +3,9 @@ package com.yihu.ehr.users.service;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.user.MRoleReportRelation;
-import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -57,8 +55,14 @@ public interface RoleReportRelationClient {
             @RequestParam(value = "page", required = false) int page);
 
     @RequestMapping(value = ServiceApi.Roles.SearchRoleReportRelationNoPage, method = RequestMethod.GET)
-    @ApiOperation(value = "查询角色与资源报表的授权关系列表---分页")
+    @ApiOperation(value = "查询角色与资源报表的授权关系列表（未分页）")
     List<MRoleReportRelation> searchRoleReportRelationNoPage(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有信息", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value = ServiceApi.Roles.SearchRoleReportRelationIsReportAccredited, method = RequestMethod.GET)
+    @ApiOperation(value = "判断资源报表是否已被授权")
+    boolean isReportAccredited(
+            @ApiParam(name = "rsReportId", value = "资源报表ID", required = true)
+            @RequestParam(value = "rsReportId") Integer rsReportId);
 }

@@ -19,7 +19,7 @@ public class TjDimensionMainService {
 
     public List<TjQuotaDimensionMain> findTjQuotaDimensionMainByQuotaIncudeAddress(String code) {
         String sql = "SELECT  qdm.*, dm.type FROM   tj_dimension_main dm, tj_quota_dimension_main qdm " +
-        "WHERE   dm.`code` = qdm.main_code AND qdm.quota_code = ? order by code desc";
+        "WHERE   dm.`code` = qdm.main_code AND qdm.quota_code = ? order by qdm.id desc";
 
         List<TjQuotaDimensionMain> quotaDataSources = jdbcTemplate.query(sql, new BeanPropertyRowMapper(TjQuotaDimensionMain.class), code);
         return quotaDataSources;

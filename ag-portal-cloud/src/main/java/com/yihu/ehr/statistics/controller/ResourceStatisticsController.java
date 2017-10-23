@@ -70,14 +70,14 @@ public class ResourceStatisticsController extends BaseController {
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsMedicalEventTypeCount, method = RequestMethod.GET)
     @ApiOperation(value = "电子病历 - 今天 门诊住院数统计 - 饼状")
     public Envelop getStatisticsElectronicMedicalEventTypeCount() {
-            Envelop  envelop = resourceStatisticsClient.getStatisticsElectronicMedicalCount();
+            Envelop  envelop = resourceStatisticsClient.getStatisticsElectronicMedicalEventTypeCount();
             return envelop;
     }
 
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsDemographicsAgeCount, method = RequestMethod.GET)
     @ApiOperation(value = "全员人口个案库 - 年龄段人数统计 -柱状")
     public Envelop getStatisticsDemographicsAgeCount() {
-            Envelop envelop = resourceStatisticsClient.getStatisticsElectronicMedicalCount();
+            Envelop envelop = resourceStatisticsClient.getStatisticsDemographicsAgeCount();
             return envelop;
     }
 

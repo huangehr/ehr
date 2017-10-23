@@ -17,11 +17,12 @@ import org.springframework.stereotype.Service;
  * @created 2015.08.27 10:20
  */
 @Service
-public class MasterResourceRepository {
-    @Autowired
-    HBaseDao hbaseDao;
+public class MasterResourceDao {
 
-    public void saveOrUpdate(ResourceBucket resBucket) throws Throwable {
+    @Autowired
+    private HBaseDao hbaseDao;
+
+    public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
         TableBundle bundle = new TableBundle();
 
         // delete legacy data if they are exist

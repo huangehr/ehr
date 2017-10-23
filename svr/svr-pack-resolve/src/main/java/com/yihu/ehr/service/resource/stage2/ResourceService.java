@@ -1,18 +1,14 @@
 package com.yihu.ehr.service.resource.stage2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.feign.XArchiveClient;
-import com.yihu.ehr.entity.patient.ArchiveRelation;
+
 import com.yihu.ehr.service.resource.stage2.index.IndexService;
-import com.yihu.ehr.service.resource.stage2.repo.FileResourceRepository;
-import com.yihu.ehr.service.resource.stage2.repo.MasterResourceRepository;
-import com.yihu.ehr.service.resource.stage2.repo.RelationRepository;
-import com.yihu.ehr.service.resource.stage2.repo.SubResourceRepository;
+import com.yihu.ehr.service.resource.stage2.repo.FileResourceDao;
+import com.yihu.ehr.service.resource.stage2.repo.MasterResourceDao;
+import com.yihu.ehr.service.resource.stage2.repo.RelationDao;
+import com.yihu.ehr.service.resource.stage2.repo.SubResourceDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.util.Date;
 
 /**
  * 资源服务。
@@ -23,22 +19,19 @@ import java.util.Date;
  */
 @Service
 public class ResourceService {
-    @Autowired
-    MasterResourceRepository masterResRepo;
 
     @Autowired
-    SubResourceRepository subResRepo;
-
+    private MasterResourceDao masterResRepo;
     @Autowired
-    FileResourceRepository fileResRepo;
-
+    private SubResourceDao subResRepo;
     @Autowired
-    IndexService indexService;
-
+    private FileResourceDao fileResRepo;
     @Autowired
-    RelationRepository relationRepository;
+    private IndexService indexService;
+    @Autowired
+    private RelationDao relationDao;
 
-    public void save(ResourceBucket resourceBucket) throws Throwable {
+    public void save(ResourceBucket resourceBucket) throws Exception {
         // 资源主表
         masterResRepo.saveOrUpdate(resourceBucket);
 
@@ -51,8 +44,7 @@ public class ResourceService {
         // 保存维度索引
         //indexService.save(resourceBucket);
 
-
         //保存MYSQL关联记录
-        relationRepository.save(resourceBucket);
+        relationDao.save(resourceBucket);
     }
 }

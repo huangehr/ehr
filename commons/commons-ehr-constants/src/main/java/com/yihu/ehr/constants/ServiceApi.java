@@ -48,6 +48,7 @@ public class ServiceApi {
         public static final String ResourceBrowseCategories = "/resources/ResourceBrowses/categories";
         public static final String ResourceBrowseResourceData = "/resources/ResourceBrowses/getResourceData";
         public static final String ResourceBrowseQuotaResourceData = "/resources/ResourceBrowses/getQuotaResourceData";
+        public static final String ResourceBrowseQuotaResourceParam = "/resources/ResourceBrowses/getQuotaResourceParam";
         public static final String ResourceBrowseResourceMetadata = "/resources/ResourceBrowses/getResourceMetadata";
         public static final String ResourceBrowseTree = "/resourceBrowseTree";
         public static final String ResourceBrowseGetRsByCategoryId = "/getResourceByCategoryId";
@@ -147,6 +148,7 @@ public class ServiceApi {
         public static final String IntMetadataData = "/resources/integrated/metadata_data";
         public static final String IntQuotaList = "/resources/integrated/quota_list";
         public static final String IntQuotaData = "/resources/integrated/quota_data";
+        public static final String IntQuotaParam = "/resources/integrated/quota_param";
         public static final String IntResourceUpdate = "/resources/integrated/resource_update";
         public static final String IntResourceQueryUpdate = "/resources/integrated/resource_query_update";
 
@@ -161,6 +163,7 @@ public class ServiceApi {
         public static final String ResourceRolesMetadatasValid = "/resources/relosMetadatas/valid";
         public static final String ResourceRolesMetadataGrants = "/resources/relosMetadatas/grants";
         public static final String RolesGrantResources = "/resources/roles/{rolesId}/grant";
+        public static final String GetRolesGrantResources = "/resources/getRolesGrantResources";
         //public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
         public static final String ResourceRolesMetadataGrant = "/resources/rolesMetadata/grants/{id}";
         public static final String ResourceRolesGrantsNoPage = "/resources/rolesGrants/no_paging";
@@ -210,6 +213,7 @@ public class ServiceApi {
         public static final String RsReportIsUniqueName = "/resources/report/isUniqueName";
         public static final String RsReportNoPage = "/resources/report/getReportNoPage";
         public static final String RsReportTemplateContent = "/resources/report/getTemplateContent";
+        public static final String RsReportIsCategoryApplied = "/resources/report/isCategoryApplied";
 
         /**
          * 资源报表视图配置
@@ -303,7 +307,8 @@ public class ServiceApi {
         public static final String AppStatus = "/apps/{app_id}/status";
         public static final String AppNameExistence = "/app/{app_name}/existence";
         public static final String FilterList = "/apps/filterList";
-        public static final String getAppTreeByType = "/getAppTreeByType";
+        public static final String getAppTypeAndApps = "/getAppTypeAndApps";
+        public static final String getApps = "/getApps";
     }
 
     public static class AppApi {
@@ -319,7 +324,9 @@ public class ServiceApi {
         public static final String AppFeatures = "/appFeature";
         public static final String FilterFeatureList = "/filterFeatureList";
         public static final String FilterFeatureNoPage = "/filterFeatureNoPage";
+        public static final String FilterFeatureNoPageSorts = "/filterFeatureNoPageSorts";
         public static final String AppFeature = "/appFeature/{id}";
+        public static final String FindAppMenus = "/appFeature/findAppMenus";
     }
 
     public static class AppApiParameter {
@@ -604,6 +611,7 @@ public class ServiceApi {
         public static final String UserOnePhoneExistence = "/user/onePhone/existence";
         public static final String UserEmailExistence = "/user/email/existence";
         public static final String UseridCardNoExistence = "/user/idCardNo/existence";
+        public static final String UserByIdCardNo = "/user/idCardNo/userByIdCardNo";
 
     }
 
@@ -611,7 +619,7 @@ public class ServiceApi {
         public static final String Role = "/roles/role";
         public static final String RoleId = "/roles/role/{id}";
         public static final String Roles = "/roles/roles";
-        public static final String RolesNoPage = "/roles/roles/no_paging";
+        public static final String RolesNoPage = "/roles/roles/no_page";
         public static final String RoleNameExistence = "/roles/name/existence";
         public static final String RoleCodeExistence = "/roles/code/existence";
 
@@ -619,15 +627,20 @@ public class ServiceApi {
         public static final String RoleUser = "/roles/role_user";
         public static final String RoleUserByUserId = "/roles/role_user/{user_id}";
         public static final String RoleUsers = "/roles/role_users";
-        public static final String RoleUsersNoPage = "/roles/role_users/no_paging";
+        public static final String RoleUsersNoPage = "/roles/role_users/no_page";
         public static final String NoPageCategoriesAndReport = "/roles/report/getCategoryAndReportNoPage";
+
+        public static final String RoleOrg = "/roles/role_org";
+        public static final String RoleOrgs = "/roles/role_orgs";
+        public static final String RoleOrgsNoPage = "/roles/role_orgs/no_page";
 
         public static final String RoleFeature = "/roles/role_feature";
         public static final String RoleFeatureId = "/roles/role_feature/{id}";
         public static final String RoleFeatureByRoleId = "/roles/role_feature/role_id";
         public static final String RoleFeatures = "/roles/role_features";
-        public static final String RoleFeaturesNoPage = "/roles/role_features/no_paging";
+        public static final String RoleFeaturesNoPage = "/roles/role_features/no_page";
         public static final String RoleFeatureExistence = "/roles/role_feature/existence";
+        public static final String HasPermission = "/roles/role_feature/hasPermission";
 
         public static final String RoleApp = "/roles/role_app";
         public static final String RoleAppId = "/roles/role_app/{id}";
@@ -645,6 +658,7 @@ public class ServiceApi {
         public static final String DeleteRoleReportRelationByRoleId = "/roles/role_report/deleteByRoleId";
         public static final String SearchRoleReportRelation = "/roles/role_report/search";
         public static final String SearchRoleReportRelationNoPage = "/roles/role_report/searchNoPage";
+        public static final String SearchRoleReportRelationIsReportAccredited = "/roles/role_report/isReportAccredited";
 
     }
 
@@ -798,7 +812,7 @@ public class ServiceApi {
         //初始化缓存
         public static final String InitAddress = "/redis/init/address";
         public static final String InitHealthProblem = "/redis/init/healthProblem";
-        public static final String InitIcd10Hp = "/redis/init/icd10Hp";
+        public static final String InitIcd10HpR = "/redis/init/icd10HpR";
         public static final String InitIcd10 = "/redis/init/icd10";
         public static final String InitIndicatorsDict = "/redis/init/indicatorsDict";
         public static final String InitOrgName = "/redis/init/orgName";
@@ -810,41 +824,39 @@ public class ServiceApi {
         public static final String InitRsAdapterMeta = "/redis/init/rsAdapterMeta/{id}";
         public static final String InitRsMetadata = "/redis/init/rsMetadata";
 
+        //清除缓存
+        public static final String Delete = "/redis/delete";
+
         //更新缓存
         public static final String UpdateOrgName = "/redis/update/orgName";
         public static final String UpdateOrgArea = "/redis/update/orgArea";
         public static final String UpdateOrgSaasArea = "/redis/update/orgSaasArea";
         public static final String UpdateOrgSaasOrg = "/redis/update/orgSaasOrg";
 
-        //清除缓存
-        public static final String Delete = "/redis/delete";
-
-        /******************************************* Redis缓存数据 *******************************************************************/
-        public static final String AddressRedis = "/redis/addressRedis";
-        public static final String HealthProblemRedis = "/redis/healthProblemRedis";
-        public static final String Icd10HpRelationRedis = "/redis/icd10HpRelationRedis";
-        public static final String Icd10NameRedis = "/redis/icd10NameRedis";
-        public static final String Icd10HpCodeRedis = "/redis/icd10HpCodeListRedis";
-        public static final String IndicatorsRedis = "/redis/indicatorsRedis";
-        public static final String OrgRedis = "/redis/orgRedis";
-        public static final String OrgAreaRedis = "/redis/orgAreaRedis";
-        public static final String OrgSaasAreaRedis = "/redis/orgSaasAreaRedis";
-        public static final String OrgSaasOrgRedis = "/redis/orgSaasOrgRedis";
-
-        /******************************************* 资源化相关Redis *******************************************************************/
-        public static final String RsAdaptionDict = "/redis/rsAdaptionDict";
-        public static final String RsAdaptionMetaData = "/redis/rsAdaptionMetaData";
-        public static final String RsMetaData = "/redis/rsMetaData";
-
-        /******************************************* 标准相关Redis *******************************************************************/
+        //获取缓存数据
+        public static final String Address = "/redis/address";
+        public static final String HealthProblem = "/redis/healthProblem";
+        public static final String Icd10HpR = "/redis/icd10HpRelation";
+        public static final String Icd10Name = "/redis/icd10Name";
+        public static final String Icd10HpCode = "/redis/icd10HpCode";
+        public static final String IndicatorsDict = "/redis/indicatorsDict";
+        public static final String OrgName = "/redis/orgName";
+        public static final String OrgArea = "/redis/orgArea";
+        public static final String OrgSaasArea = "/redis/orgSaasArea";
+        public static final String OrgSaasOrg = "/redis/orgSaasOrg";
+        //资源化相关Redis
+        public static final String RsAdapterDict = "/redis/rsAdapterDict";
+        public static final String RsAdapterMetadata = "/redis/rsAdapterMetaData";
+        public static final String RsMetadata = "/redis/rsMetadata";
+        //标准相关Redis
         public static final String StdVersion = "/redis/stdVersion";
-        public static final String DataSetCode = "/redis/dataSetCode";
-        public static final String DataSetName = "/redis/dataSetName";
-        public static final String DataSetNameByCode = "/redis/dataSetNameByCode";
-        public static final String DataSetMultiRecord = "/redis/dataSetMultiRecord";
-        public static final String MetaDataType = "/redis/metaDataType";
-        public static final String MetaDataDict = "/redis/metaDataDict";
-        public static final String DictEntryValue = "/redis/dictEntryValue";
+        public static final String StdDataSetCode = "/redis/stdDataSetCode";
+        public static final String StdDataSetName = "/redis/stdDataSetName";
+        public static final String StdDataSetNameByCode = "/redis/stdDataSetNameByCode";
+        public static final String StdDataSetMultiRecord = "/redis/stdDataSetMultiRecord";
+        public static final String StdMetadataType = "/redis/stdMetaDataType";
+        public static final String StdMetadataDict = "/redis/stdMetaDataDict";
+        public static final String StdDictEntryValue = "/redis/stdDictEntryValue";
 
     }
 
@@ -933,6 +945,9 @@ public class ServiceApi {
         public static final String TjDimensionSlaveCode = "/tj/tjDimensionSlaveCode";
         public static final String TjDimensionSlaveName= "/tj/tjDimensionSlaveName";
         public static final String GetTjDimensionSlaveInfoList= "/tj/getTjDimensionSlaveInfoList";
+        public static final String GetTjDimensionSlaveByCode= "/tj/getTjDimensionSlaveByCode";
+
+
 
         public static final String GetTjQuotaDimensionMainList = "/tj/getTjQuotaDimensionMainList";
         public static final String TjQuotaDimensionMain = "/tj/tjQuotaDimensionMain";
@@ -943,6 +958,8 @@ public class ServiceApi {
         public static final String TjQuotaDimensionSlave = "/tj/tjQuotaDimensionSlave";
         public static final String AddTjQuotaDimensionSlave = "/tj/addTjQuotaDimensionSlave";
         public static final String GetTjQuotaDimensionSlaveAll = "/tj/getTjQuotaDimensionSlaveAll";
+        public static final String DeleteSlaveByQuotaCode = "/tj/deleteSlaveByQuotaCode";
+        public static final String GetDimensionSlaveByQuotaCode = "/tj/getDimensionSlaveByQuotaCode";
 
 
         public static final String GetTjQuotaSynthesiseDimension = "/tj/getTjQuotaSynthesiseDimension";
@@ -1017,7 +1034,15 @@ public class ServiceApi {
         public static final String getStatisticsCityDoctorByRoleType = "/tj/getStatisticsCityDoctorByRoleType";
     }
 
+    public static class Org {
+        public static final String getUserOrglistByUserId="/org/getUserOrglistByUserId/";
+        public static final String getUserOrgSaasByUserOrgCode="/org/getUserOrgSaasByUserOrgCode/";
+        public static final String GetOrgDeptsDate="/org/getOrgDeptsDate";
+        public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
+    }
 
-
-
+    public static class GetInfo {
+        public static final String GetAppIdsByUserId = "/BasicInfo/getAppIdsByUserId";
+        public static final String GetIdCardNoByOrgCode = "/BasicInfo/getIdCardNoByOrgCode";
+    }
 }

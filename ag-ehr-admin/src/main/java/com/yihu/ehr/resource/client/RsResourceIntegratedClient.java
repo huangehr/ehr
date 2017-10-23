@@ -6,6 +6,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -42,13 +43,13 @@ public interface RsResourceIntegratedClient {
             @RequestParam(value = "filters", required = false) String filters);
 
     @ApiOperation("综合查询视图保存")
-    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     Envelop updateResource(
-            @RequestParam(value = "dataJson") String dataJson);
+            @RequestBody String dataJson);
 
     @ApiOperation("综合查询搜索条件更新")
-    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     Envelop updateResourceQuery(
-            @RequestParam(value = "dataJson") String dataJson);
+            @RequestBody String dataJson);
 
 }

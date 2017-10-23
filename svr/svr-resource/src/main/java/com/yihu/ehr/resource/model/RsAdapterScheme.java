@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Created by lyr on 2016/5/17.
  */
 @Entity
-@Table(name="rs_adapter_schema")
+@Table(name="rs_adapter_scheme")
 public class RsAdapterScheme {
 
     private String id;

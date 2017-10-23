@@ -3,6 +3,7 @@ package com.yihu.ehr.org.service;
 import com.yihu.ehr.org.dao.XOrgMemberRelationRepository;
 import com.yihu.ehr.org.model.OrgMemberRelation;
 import com.yihu.ehr.query.BaseJpaService;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,5 +85,19 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
 
     public List<String> getUserIdByOrgId(List<String> orgId) {
         return relationRepository.findUserIdByOrgId(orgId);
+    }
+
+    public List<Integer> getDeptIds(String userId) {
+        List<Integer> deptIds = relationRepository.findDeptIdByUserId(userId);
+        return deptIds;
+    }
+
+    public void updateByOrgId(String[] orgId,String userId) {
+        relationRepository.updateByOrgId(orgId, userId);
+    }
+
+    public List<OrgMemberRelation> getByUserId(String userId) {
+        List<OrgMemberRelation> relationList = relationRepository.findByUserId(userId);
+        return relationList;
     }
 }

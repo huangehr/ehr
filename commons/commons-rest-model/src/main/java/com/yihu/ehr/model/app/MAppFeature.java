@@ -13,16 +13,20 @@ import java.io.Serializable;
 public class MAppFeature implements Serializable {
 
     private int id;
-    private String code;
-    private String name;
-    private String description;
-    private String type;
-    private int parentId;
-    private String url;
-    private String iconUrl;
-    private String auditLevel;
-    private String openLevel;
-    private String appId;
+    private String code; // 菜单编码
+    private String name; // 菜单名称
+    private String description; // 菜单描述
+    private String type; // 类型，1：模块，2：菜单，3：功能按钮。
+    private int parentId; // 父菜单
+    private String url; // 菜单访问路径。模块时没有值，菜单时有值，按钮时不一定有值。
+    private String prefixUrl; // 菜单相对访问路径前缀，即JavaWeb上下文路径或站点+上下文路径。
+    private String iconUrl; // 图标访问路径
+    private String auditLevel; // 审计类型，0：不审计，1：审计。
+    private String openLevel; // 开放级别，0：私有（不作为授权对象），1：公开（收费/免费）
+    private String appId; // 应用ID
+    private Integer sort; // 菜单排序
+    private Integer level; // 菜单级别
+    private String content; // 页面菜单拼接对象
 
     public int getId() {
         return id;
@@ -80,6 +84,14 @@ public class MAppFeature implements Serializable {
         this.url = url;
     }
 
+    public String getPrefixUrl() {
+        return prefixUrl;
+    }
+
+    public void setPrefixUrl(String prefixUrl) {
+        this.prefixUrl = prefixUrl;
+    }
+
     public String getIconUrl() {
         return iconUrl;
     }
@@ -112,5 +124,27 @@ public class MAppFeature implements Serializable {
         this.appId = appId;
     }
 
+    public Integer getSort() {
+        return sort;
+    }
 
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }

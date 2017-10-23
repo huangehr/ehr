@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsBrowseModel;
 import com.yihu.ehr.agModel.resource.RsCategoryTypeTreeModel;
@@ -7,12 +8,18 @@ import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.geography.service.AddressClient;
+import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsCategory;
 import com.yihu.ehr.model.resource.MRsResources;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
+import com.yihu.ehr.quota.service.TjQuotaSynthesizeQueryClient;
 import com.yihu.ehr.resource.client.*;
+import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +27,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,11 +47,7 @@ public class ResourceBrowseController extends BaseController {
     @Autowired
     private RsResourceClient resourcesClient;
     @Autowired
-    private RsResourceMetadataClient resourceMetadataClient;
-    @Autowired
     private RsResourceCategoryClient resourcesCategoryClient;
-    @Autowired
-    private RsMetadataClient metadataClient;
     @Autowired
     private ResourceBrowseClient resourceBrowseClient;
     @Autowired
@@ -54,7 +57,15 @@ public class ResourceBrowseController extends BaseController {
     @Autowired
     private TjQuotaJobClient tjQuotaJobClient;
     @Autowired
+    private TjQuotaSynthesizeQueryClient tjQuotaSynthesizeQueryClient;
+    @Autowired
     private RsResourceDefaultQueryClient rsResourceDefaultQueryClient;
+    @Autowired
+    private GetInfoClient getInfoClient;
+    @Autowired
+    private AddressClient addressClient;
+    @Autowired
+    OrganizationClient organizationClient;
 
     @ApiOperation("获取档案资源分类")
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseCategories, method = RequestMethod.GET)
@@ -76,7 +87,7 @@ public class ResourceBrowseController extends BaseController {
                 rsCategoryModel.setName(mRsCategory.getName());
                 rsCategoryTypeTreeModelList.add(rsCategoryModel);
 
-                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999);// TODO: 2016/5/30 测试数据15（无不分页查询）
+                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999, null, null);// TODO: 2016/5/30 测试数据15（无不分页查询）
                 rsResources = categoryResponseEntity.getBody();
                 //rsResources = resourcesClient.queryNoPageResources("categoryId=" + mRsCategory.getId());
                 if (rsResources.size() > 0) {
@@ -155,12 +166,19 @@ public class ResourceBrowseController extends BaseController {
             @ApiParam("机构代码(预留参数)")
             @RequestParam(required = false) String orgCode,
             @ApiParam("查询条件")
-            @RequestParam(required = false) String queryCondition) throws Exception {
+            @RequestParam(required = false) String queryCondition,
+            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
+            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList
+    ) throws Exception {
         Envelop envelop = new Envelop();
         String [] quotaCodeArr = null;
         try {
             //获取资源关联指标
             List<ResourceQuotaModel> rqmList = resourceQuotaClient.getByResourceId(resourcesId);
+            if(rqmList == null || rqmList.size() <= 0) {
+                envelop.setErrorMsg("关联指标为空");
+                return envelop;
+            }
             //获取资源默认查询条件
             String query = rsResourceDefaultQueryClient.getByResourceId(resourcesId);
             //拼接指标code字符串作为维度交集查询参数
@@ -171,19 +189,15 @@ public class ResourceBrowseController extends BaseController {
                 ResourceQuotaModel resourceQuotaModel = rqmList.get(i);
                 MTjQuotaModel tjQuotaModel = tjQuotaClient.getById((long) resourceQuotaModel.getQuotaId());
                 quotaCodeArr[i] = tjQuotaModel.getCode();
-                Map<String, String> objMap = new HashMap<String, String>();
-                objMap.put("key", tjQuotaModel.getCode());
-                objMap.put("name", tjQuotaModel.getName());
-                objList.add(objMap);
                 quotaCodes += tjQuotaModel.getCode() + ",";
             }
             //拼接交集维度字符串作为查询参数
             String dimension = "";
             if(StringUtils.isEmpty(quotaCodes)) {
-                envelop.setErrorMsg("交集维度为空");
+                envelop.setErrorMsg("指标编码有误");
                 return envelop;
             }
-            List<Map<String, String>> qsdList = tjQuotaClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
+            List<Map<String, String>> qsdList = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
             if(qsdList == null || qsdList.size() <= 0) {
                 envelop.setSuccessFlg(true);
                 return envelop;
@@ -202,15 +216,43 @@ public class ResourceBrowseController extends BaseController {
                     }
                 }
             }
+            for (int i = 0; i< rqmList.size(); i ++) {
+                ResourceQuotaModel resourceQuotaModel = rqmList.get(i);
+                MTjQuotaModel tjQuotaModel = tjQuotaClient.getById((long) resourceQuotaModel.getQuotaId());
+                Map<String, String> objMap = new HashMap<String, String>();
+                objMap.put("key", tjQuotaModel.getCode());
+                objMap.put("name", tjQuotaModel.getName());
+                objList.add(objMap);
+            }
             //依次获取指标统计不同维度结果总量
             List<Envelop> envelopList = new ArrayList<Envelop>();
             for (ResourceQuotaModel resourceQuotaModel : rqmList) {
                 Envelop envelop1;
+
+                //-----------------用户数据权限 start
+                String org = "";
+                if( userOrgList != null ){
+                    org = StringUtils.strip(String.join(",", userOrgList), "[]");
+                }
+                //-----------------用户数据权限 end
                 //判断是否启用默认查询条件
-                if (queryCondition == null || queryCondition == "{}") {
+                Map<String, Object> params  = new HashMap<>();
+                if (queryCondition == null || queryCondition.equals("{}")) {
+                    if(org.length()>0){
+                        if( !StringUtils.isEmpty(query)){
+                            params  = objectMapper.readValue(query, new TypeReference<Map>() {});
+                        }
+                        params.put("org",org);
+                        query = objectMapper.writeValueAsString(params);
+                    }
                     envelop1 = tjQuotaJobClient.getQuotaTotalCount(resourceQuotaModel.getQuotaId(), query, dimension.substring(0, dimension.length() - 1));
                     envelopList.add(envelop1);
                 } else {
+                    if(org.length()>0){
+                        params  = objectMapper.readValue(queryCondition, new TypeReference<Map>() {});
+                        params.put("org",org);
+                        queryCondition = objectMapper.writeValueAsString(params);
+                    }
                     envelop1 = tjQuotaJobClient.getQuotaTotalCount(resourceQuotaModel.getQuotaId(), queryCondition, dimension.substring(0, dimension.length() - 1));
                     envelopList.add(envelop1);
                 }
@@ -219,50 +261,53 @@ public class ResourceBrowseController extends BaseController {
             //遍历数据集，拼装结果集
             for(int i = 0; i < envelopList.size(); i ++ ) {
                 Envelop envelop1 = envelopList.get(i);
-                //遍历当前数据
-                for (Map<String, Object> tempMap1 : (List<Map<String, Object>>) envelop1.getDetailModelList()) {
-                    //判断是否已记录数据
-                    boolean isRecode = false;
-                    for (Map<String, Object> resultMap : resultList) {
-                        if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) resultMap.get("cloumns")).toArray())) {
-                            isRecode = true;
-                        }
-                    }
-                    //未记录的数据
-                    if (!isRecode) {
-                        Map<String, Object> newMap = new HashMap<String, Object>();
-                        //初始化基本列名
-                        newMap.put("cloumns", tempMap1.get("cloumns"));
-                        //初始化为空数据
-                        for(int p = 0; p < i; p ++) {
-                            newMap.put(quotaCodeArr[p], 0);
-                        }
-                        //当数据为最后一个数据集中的一个时
-                        if ((envelopList.size() - 1) == i) {
-                            newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                        } else {
-                            //与其他数据集进行对比
-                            for (int j = i + 1; j < envelopList.size(); j++) {
-                                //判断是否匹配
-                                boolean isMatch = false;
-                                Envelop envelop2 = envelopList.get(j);
-                                for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
-                                    if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
-                                        newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                                        newMap.put(quotaCodeArr[j], tempMap2.get("value"));
-                                        isMatch = true;
-                                    }
-                                }
-                                //未匹配到数据
-                                if (!isMatch) {
-                                    newMap.put(quotaCodeArr[i], tempMap1.get("value"));
-                                    newMap.put(quotaCodeArr[j], 0);
-                                }
+                if(envelop1.getDetailModelList() != null) {
+                    //遍历当前数据
+                    for (Map<String, Object> tempMap1 : (List<Map<String, Object>>) envelop1.getDetailModelList()) {
+                        //判断是否已记录数据
+                        boolean isRecode = false;
+                        for (Map<String, Object> resultMap : resultList) {
+                            if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) resultMap.get("cloumns")).toArray())) {
+                                isRecode = true;
                             }
                         }
-                        resultList.add(newMap);
+                        //未记录的数据
+                        if (!isRecode) {
+                            Map<String, Object> newMap = new HashMap<String, Object>();
+                            //初始化基本列名
+                            newMap.put("cloumns", tempMap1.get("cloumns"));
+                            //初始化为空数据
+                            for (int p = 0; p < i; p++) {
+                                newMap.put(quotaCodeArr[p], 0);
+                            }
+                            //当数据为最后一个数据集中的一个时
+                            if ((envelopList.size() - 1) == i) {
+                                newMap.put(quotaCodeArr[i], tempMap1.get("value"));
+                            } else {
+                                //与其他数据集进行对比
+                                for (int j = i + 1; j < envelopList.size(); j++) {
+                                    //判断是否匹配
+                                    boolean isMatch = false;
+                                    Envelop envelop2 = envelopList.get(j);
+                                    for (Map<String, Object> tempMap2 : (List<Map<String, Object>>) envelop2.getDetailModelList()) {
+                                        if (Arrays.equals(((List<String>) tempMap1.get("cloumns")).toArray(), ((List<String>) tempMap2.get("cloumns")).toArray())) {
+                                            newMap.put(quotaCodeArr[i], tempMap1.get("value"));
+                                            newMap.put(quotaCodeArr[j], tempMap2.get("value"));
+                                            isMatch = true;
+                                        }
+                                    }
+                                    //未匹配到数据
+                                    if (!isMatch) {
+                                        newMap.put(quotaCodeArr[i], tempMap1.get("value"));
+                                        newMap.put(quotaCodeArr[j], 0);
+                                    }
+                                }
+                            }
+                            resultList.add(newMap);
+                        }
                     }
                 }
+
             }
             List<Map<String, Object>> finalList = new ArrayList<Map<String, Object>>();
             String [] dimensionArr = dimension.split(";");
@@ -292,6 +337,57 @@ public class ResourceBrowseController extends BaseController {
         return envelop;
     }
 
+    @ApiOperation("指标资源浏览数据检索条件获取")
+    @RequestMapping(value = ServiceApi.Resources.ResourceBrowseQuotaResourceParam, method = RequestMethod.GET)
+    public Envelop getStatisticsParam(
+            @ApiParam("资源Id")
+            @RequestParam String resourcesId){
+        Envelop envelop = new Envelop();
+        String [] quotaCodeArr = null;
+        //获取资源关联指标
+        List<ResourceQuotaModel> rqmList = resourceQuotaClient.getByResourceId(resourcesId);
+        if(rqmList == null || rqmList.size() <= 0) {
+            envelop.setErrorMsg("关联指标为空");
+            return envelop;
+        }
+        //拼接指标code字符串作为维度交集查询参数
+        String quotaCodes = "";
+        quotaCodeArr = new String [rqmList.size()];
+        List<Map<String, String>> objList = new ArrayList<Map<String, String>>();
+        for (int i = 0; i< rqmList.size(); i ++) {
+            ResourceQuotaModel resourceQuotaModel = rqmList.get(i);
+            MTjQuotaModel tjQuotaModel = tjQuotaClient.getById((long) resourceQuotaModel.getQuotaId());
+            quotaCodeArr[i] = tjQuotaModel.getCode();
+            quotaCodes += tjQuotaModel.getCode() + ",";
+        }
+        //拼接交集维度字符串作为查询参数
+        String dimensions = "";
+        if(StringUtils.isEmpty(quotaCodes)) {
+            envelop.setErrorMsg("指标编码有误");
+            return envelop;
+        }
+        List<Map<String, String>> qsdList = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
+        if(qsdList == null || qsdList.size() <= 0) {
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        for(Map<String, String> temp : qsdList) {
+            for(String codeStr : temp.keySet()){
+                if(quotaCodes.contains(codeStr)) {
+                    //交集维度参数
+                    dimensions += temp.get(codeStr) + ",";
+                    break;
+                }
+            }
+        }
+        Map<String, Map<String, Object>> dataMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(quotaCodeArr[0], dimensions);
+        if (dataMap != null) {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(dataMap);
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseTree, method = RequestMethod.GET)
     @ApiOperation(value = "获取视图类别-数据集列表树")
     public Envelop getResourceBrowseTree() {
@@ -315,7 +411,7 @@ public class ResourceBrowseController extends BaseController {
                 rsCategoryModel.setPid(mRsCategory.getPid());
                 rsCategoryModel.setName(mRsCategory.getName());
                 //查询资源-数据集
-                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999);// TODO: 2016/5/30 测试数据15（无不分页查询）
+                ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", "categoryId=" + mRsCategory.getId(), "", 1, 999, null, null);// TODO: 2016/5/30 测试数据15（无不分页查询）
                 rsResources = categoryResponseEntity.getBody();
                 if (rsResources.size() > 0) {
                     List<RsResourcesModel> resourcesModelList = (List<RsResourcesModel>) convertToModels(rsResources, new ArrayList<RsResourcesModel>(rsResources.size()), RsResourcesModel.class, null);
@@ -341,7 +437,7 @@ public class ResourceBrowseController extends BaseController {
              filters="categoryId=" + categoryId;
         }
 
-        ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", filters, "", 1, 999);
+        ResponseEntity<List<MRsResources>> categoryResponseEntity = resourcesClient.queryResources("", filters, "", 1, 999, null, null);
         List<MRsResources>  rsResources = categoryResponseEntity.getBody();
         Integer totalCount = getTotalCount(categoryResponseEntity);
         return getResult(rsResources, totalCount, 1, 999);

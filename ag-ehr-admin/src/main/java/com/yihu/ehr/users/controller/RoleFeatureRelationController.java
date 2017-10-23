@@ -207,4 +207,13 @@ public class RoleFeatureRelationController extends BaseController {
             return success(null);
         return failed("");
     }
+
+    @RequestMapping(value = ServiceApi.Roles.HasPermission, method = RequestMethod.GET)
+    @ApiOperation(value = "判断用户是否有权限查看居民身份证信息")
+    public boolean hasPermission(
+            @ApiParam(name = "userId", value = "用户id")
+            @RequestParam(value = "userId", required = false) String userId) {
+        boolean flag = roleFeatureRelationClient.hasPermission(userId);
+        return flag;
+    }
 }

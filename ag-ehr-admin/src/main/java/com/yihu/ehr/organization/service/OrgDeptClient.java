@@ -2,7 +2,10 @@ package com.yihu.ehr.organization.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.org.MOrgDept;
+import com.yihu.ehr.model.org.MOrgDeptData;
+import com.yihu.ehr.model.org.MOrgMemberRelation;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -114,4 +117,17 @@ public interface OrgDeptClient {
     @RequestMapping(value = "/orgDept/getAllOrgDepts", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "查询所有的部门列表")
     List getAllOrgDepts();
+
+    @RequestMapping(value = ServiceApi.Org.getUserOrglistByUserId, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据用户ＩＤ获取部门列表")
+    List<String> getUserOrglistByUserId(
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId", required = true) String userId);
+
+    @RequestMapping(value =ServiceApi.Org.GetOrgDeptsDate, method = RequestMethod.GET)
+    @ApiOperation(value = "根据机构id获取机构及部门列表")
+    MOrgDeptData getOrgDeptsDate(
+            @ApiParam(name = "orgId", value = "机构ID")
+            @RequestParam(value = "orgId") String orgId);
+
 }

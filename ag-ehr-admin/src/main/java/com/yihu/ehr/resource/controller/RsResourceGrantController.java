@@ -631,11 +631,30 @@ public class RsResourceGrantController extends BaseController {
         return envelop;
     }
 
+    @ApiOperation("单个角色组资源列表查询")
+    @RequestMapping(value= ServiceApi.Resources.GetRolesGrantResources ,method = RequestMethod.GET)
+    public Envelop getRolesGrantResources(
+            @ApiParam(name="rolesId",value="角色组ID",defaultValue = "")
+            @RequestParam(value="rolesId") String rolesId) throws Exception {
+        Envelop envelop = new Envelop();
+        try{
+            List<MRsRolesResource> rsRolesResources = resourcesGrantClient.getRolesGrantResources(rolesId);
+            envelop.setDetailModelList(rsRolesResources);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+        }
+        return envelop;
+    }
+
     @ApiOperation("角色组资源数据元授权查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceRolesResMetadataGrants,method = RequestMethod.GET)
     public Envelop queryRolesRsMetadataGrant(
             @ApiParam(name="roles_res_id",value="授权角色编号",defaultValue = "1")
             @PathVariable(value="roles_res_id")String rolesResId,
+            @ApiParam(name="appId",value="应用编号",defaultValue = "1")
+            @RequestParam(value="appId",required = false)String appId,
             @ApiParam(name="page",value="页码",defaultValue = "1")
             @RequestParam(value="page",required = false)int page,
             @ApiParam(name="size",value="分页大小",defaultValue = "15")
@@ -643,7 +662,7 @@ public class RsResourceGrantController extends BaseController {
     {
         try
         {
-            ResponseEntity<List<MRsRolesResourceMetadata>> responseEntity = resourcesGrantClient.getRolesRsMetadatas(rolesResId);
+            ResponseEntity<List<MRsRolesResourceMetadata>> responseEntity = resourcesGrantClient.getRolesRsMetadatas(rolesResId, appId);
             return getResult(responseEntity.getBody(), responseEntity.getBody().size(), 1, 15);
         }
         catch (Exception e)

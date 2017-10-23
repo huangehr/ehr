@@ -131,3 +131,50 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
+
+---
+spring:
+  profiles: prod_fz
+  datasource:
+    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: sr_healtharchive
+    password: data!@)1
+  data:
+    mongodb:
+      host: 192.168.135.41
+      port: 29000
+      username: sr_ehr
+      password: ehr@#(2^
+      authenticationDatabase: admin
+      database: ehr
+
+fast-dfs:
+  tracker-server: 192.168.135.42:22122
+  public-server: http://192.168.135.42:22122
+
+
+
+---
+spring:
+  profiles: prod_sr
+  datasource:
+    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: healthcloud
+    password: GP8Qz4qU
+  ldap:
+    host: 172.19.103.87
+    port: 389
+    bindDn: cn=admin,dc=ehr,dc=jkzl
+    password: jkzl
+    root: dc=ehr,dc=jkzl
+  data:
+    mongodb:
+      host: 10.176.97.9
+      port: 29000
+      username: jkzlehr
+      password: GMLBq1LG
+      authenticationDatabase: admin
+      database: ehr
+fast-dfs:
+  tracker-server: 10.176.97.5:22122
+  public-server: http://10.176.97.5:22122

@@ -34,6 +34,7 @@ public class OrgSaasService extends BaseJpaService<OrgSaas,OrgSaasRepository>{
         return OrgSaasList;
 	}
 
+
     public List<OrgSaas> isOrgSaasExist(OrgSaas orgSaas) throws Exception {
         List<OrgSaas> OrgSaasList = oOrgSaasRepository.getOrgSaasByorgCode(orgSaas.getOrgCode(),orgSaas.getType(),orgSaas.getSaasCode());
         return OrgSaasList;
@@ -68,4 +69,23 @@ public class OrgSaasService extends BaseJpaService<OrgSaas,OrgSaasRepository>{
         }
         return oOrgSaasRepository.findSaasNameByType(orgCode);
     }
+
+    public List<String> getSaasCode(String orgCode, String type) {
+        if ("1".equals(type)) {
+            return oOrgSaasRepository.findSaasCode(orgCode);
+        }
+        return oOrgSaasRepository.findSaasCodeByType(orgCode);
+    }
+
+    /**
+     * 根据机构获取saas机构数据
+     * @param orgCode
+     * @param type
+     * @return
+     */
+    public List<String> getOrgSaasCodeByorgCode( List<String> orgCode,String type){
+        List<String> OrgSaasList = oOrgSaasRepository.getOrgSaasCodeByorgCode(orgCode,type);
+        return OrgSaasList;
+    }
+
 }

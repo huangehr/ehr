@@ -77,4 +77,10 @@ public interface RoleFeatureRelationClient {
     boolean getAppFeaturesFilter(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value = ServiceApi.Roles.HasPermission, method = RequestMethod.GET)
+    @ApiOperation(value = "判断用户是否有权限查看居民身份证信息")
+    boolean hasPermission(
+            @ApiParam(name = "userId", value = "用户id")
+            @RequestParam(value = "userId", required = false) String userId);
 }

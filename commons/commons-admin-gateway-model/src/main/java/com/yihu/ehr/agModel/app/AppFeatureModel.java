@@ -11,66 +11,27 @@ package com.yihu.ehr.agModel.app;
 public class AppFeatureModel {
 
     private int id;
-    private String code;
-    private String name;
-    private String description;
-    private String type;
+    private String code; // 菜单编码
+    private String name; // 菜单名称
+    private String description; // 菜单描述
+    private String type; // 类型，1：模块，2：菜单，3：功能按钮。
+    private int parentId; // 父菜单
+    private String url; // 菜单访问路径。模块时没有值，菜单时有值，按钮时不一定有值。
+    private String prefixUrl; // 菜单相对访问路径前缀，即JavaWeb上下文路径或站点+上下文路径。
+    private String iconUrl; // 图标访问路径
+    private String auditLevel; // 审计类型，0：不审计，1：审计。
+    private String openLevel; // 开放级别，0：私有（不作为授权对象），1：公开（收费/免费）
+    private String appId; // 应用ID
+    private Integer sort; // 菜单排序
+    private Integer level; // 菜单级别
+    private String content; // 页面菜单拼接对象
+
     private String typeName;
-    private int parentId;
-    private String url;
-    private String iconUrl;
-    private String auditLevel;
     private String auditLevelName;
-    private String openLevel;
     private String openLevelName;
-    private String appId;
-    //temp
     private String roleId;
-
-    /**
-     * 界面上适配选中是否适配用做界面展示，代表是否以及被适配
-     */
+    // 界面上适配选中是否适配用做界面展示，代表是否以及被适配
     private Boolean ischecked;
-
-    public String getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
-    }
-
-    public Boolean getIschecked() {
-        return ischecked;
-    }
-
-    public void setIschecked(Boolean ischecked) {
-        this.ischecked = ischecked;
-    }
-
-    public String getAuditLevelName() {
-        return auditLevelName;
-    }
-
-    public void setAuditLevelName(String auditLevelName) {
-        this.auditLevelName = auditLevelName;
-    }
-
-    public String getOpenLevelName() {
-        return openLevelName;
-    }
-
-    public void setOpenLevelName(String openLevelName) {
-        this.openLevelName = openLevelName;
-    }
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
 
     public int getId() {
         return id;
@@ -78,6 +39,14 @@ public class AppFeatureModel {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getName() {
@@ -94,14 +63,6 @@ public class AppFeatureModel {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getType() {
@@ -126,6 +87,14 @@ public class AppFeatureModel {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getPrefixUrl() {
+        return prefixUrl;
+    }
+
+    public void setPrefixUrl(String prefixUrl) {
+        this.prefixUrl = prefixUrl;
     }
 
     public String getIconUrl() {
@@ -158,5 +127,69 @@ public class AppFeatureModel {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getAuditLevelName() {
+        return auditLevelName;
+    }
+
+    public void setAuditLevelName(String auditLevelName) {
+        this.auditLevelName = auditLevelName;
+    }
+
+    public String getOpenLevelName() {
+        return openLevelName;
+    }
+
+    public void setOpenLevelName(String openLevelName) {
+        this.openLevelName = openLevelName;
+    }
+
+    public String getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
+
+    public Boolean getIschecked() {
+        return ischecked;
+    }
+
+    public void setIschecked(Boolean ischecked) {
+        this.ischecked = ischecked;
     }
 }

@@ -3,13 +3,14 @@ package com.yihu.ehr.saas.controller;
 import com.yihu.ehr.agModel.orgSaas.AreaSaasModel;
 import com.yihu.ehr.agModel.orgSaas.OrgSaasModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.redis.client.RedisUpdateClient;
 import com.yihu.ehr.saas.service.OrgSaasClient;
-import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by zdm on 2017/5/26.
@@ -205,9 +207,25 @@ public class OrgSaasController extends BaseController{
     }
 
 
+    /**
+     * 机构授权检查并保存
+     * @return
+     */
+    @RequestMapping(value=ServiceApi.Org.getUserOrgSaasByUserOrgCode,method=RequestMethod.GET)
+    @ApiOperation(value="根据用户的机构id，获取Saas化的机构或者区域id")
+    public Envelop getUserOrgSaasByUserOrgCode(
+            @ApiParam(name = "orgCodeList", value = "用户所在机构", defaultValue = "")
+            @RequestParam(value = "orgCodeList", required = false) List<String> orgCodeList){
+        Envelop envelop = new Envelop();
+        //授权类型 1区域 2机构
+        List<String> areaResult =orgSaasClient.getUserOrgSaasByUserOrgCode(orgCodeList,"1");
 
-
-
+        List<String> orgResult =orgSaasClient.getUserOrgSaasByUserOrgCode(orgCodeList,"2");
+        envelop.setSuccessFlg(true);
+        envelop.setObj(areaResult);
+        envelop.setDetailModelList(orgResult);
+        return envelop;
+    }
 
 
 }

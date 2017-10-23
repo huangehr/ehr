@@ -82,7 +82,7 @@ public class AppController extends BaseController {
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤器，规则参见说明文档", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "")
+            @ApiParam(name = "sort", value = "排序，规则参见说明文档", defaultValue = "-createTime")
             @RequestParam(value = "sort", required = false) String sort,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
@@ -294,7 +294,7 @@ public class AppController extends BaseController {
         rsIds = rsIds.substring(0,rsIds.length()-1);
         //根据rsIds获取资源对象集合-再获取资源名字字符串
         //TODO 提供查询资源不分页方法替代
-        ResponseEntity<List<MRsResources>> entity = resourcesClient.queryResources("", "id=" + rsIds, "", 1, 999);
+        ResponseEntity<List<MRsResources>> entity = resourcesClient.queryResources("", "id=" + rsIds, "", 1, 999, null, null);
         List<MRsResources> mRsResources = entity.getBody();
         if(mRsResources.size() == 0){
             return appModel;
@@ -412,11 +412,13 @@ public class AppController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/getAppTreeByType", method = RequestMethod.GET)
-    @ApiOperation(value = "获取App tree")
-    public Envelop getAppTreeByType(
-            @ApiParam(name = "userId", value = "返回的字段，为空返回全部字段", defaultValue = "")
-            @RequestParam(value = "userId", required = false) String userId) {
+    @RequestMapping(value = ServiceApi.Apps.getAppTypeAndApps, method = RequestMethod.GET)
+    @ApiOperation(value = "根据条件，获取APP类型及其所拥有的应用")
+    public Envelop getAppTypeAndApps(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "manageType", value = "APP管理类型，backStage：后台管理，client：客户端。")
+            @RequestParam(value = "manageType", required = false) String manageType) {
         Envelop envelop = new Envelop();
         //获取系统字典项（App类型）
         String filters="dictId="+1;
@@ -433,18 +435,17 @@ public class AppController extends BaseController {
         Map<String,String> map=new HashedMap();
         if(null!=systemDictEntryModelList&&systemDictEntryModelList.size()>0){
             for(SystemDictEntryModel dict:systemDictEntryModelList){
-                Collection<MApp> mAppList = appClient.getAppsByUserIdAndCatalog(userId,dict.getCode());
+                Collection<MApp> mAppList = appClient.getApps(userId, dict.getCode(), manageType);
                 appModelList = (List<AppModel>) convertToModels(mAppList, new ArrayList<AppModel>(mAppList.size()), AppModel.class, null);
                 dict.setChildren(appModelList);
                 DictEntryModelList.add(dict);
-                }
             }
+        }
 
         //应用列表
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(DictEntryModelList);
         return envelop;
     }
-
 
 }

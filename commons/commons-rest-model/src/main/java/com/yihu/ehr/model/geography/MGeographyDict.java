@@ -9,7 +9,7 @@ public class MGeographyDict {
 
     private String abbreviation;    //简称
 
-    private int level;  //级别
+    private int level;  //级别 //1 省  2 市 3 区县
 
     private String name;  //名字
 

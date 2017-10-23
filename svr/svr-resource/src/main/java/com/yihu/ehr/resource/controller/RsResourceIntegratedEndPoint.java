@@ -17,8 +17,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +49,8 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     public Envelop getMetadataList(
             @ApiParam(name = "filters", value = "过滤条件(name)", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) {
+            @RequestParam(value = "filters", required = false) String filters,
+            HttpServletRequest request) {
         return resourcesIntegratedService.getMetadataList(filters);
     }
 
@@ -80,10 +83,10 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("综合查询视图保存")
-    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.IntResourceUpdate, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Envelop updateResource(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resource\":\"objStr\",\"(metadatas)(quotas)\":\"[objStr]\",\"queryCondition\":\"([])({})\"})")
-            @RequestParam(value="dataJson") String dataJson) {
+            @RequestBody String dataJson) {
         Envelop envelop = new Envelop();
         RsResource newResources = null;
         try {
@@ -214,10 +217,10 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("综合查询搜索条件更新")
-    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.IntResourceQueryUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Envelop customizeUpdate(
             @ApiParam(name="dataJson",value="JSON对象参数({\"resourceId\":\"resourceId\",\"queryCondition\":\"([])({})\"})")
-            @RequestParam(value="dataJson") String dataJson) throws  Exception {
+            @RequestBody String dataJson) throws  Exception {
         Envelop envelop = new Envelop();
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> paraMap = mapper.readValue(dataJson, Map.class);
@@ -230,11 +233,13 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
             RsResourceDefaultQuery rsResourcesQuery = resourcesDefaultQueryService.findByResourcesId(resourceId);
             String queryCondition = "";
             if(rsResources.getDataSource() == 1) {
-                List<Map<String, String>> queryList = (List<Map<String, String>>)paraMap.get("queryCondition");
-                queryCondition = mapper.writeValueAsString(queryList);
+                //List<Map<String, String>> queryList = (List<Map<String, String>>)paraMap.get("queryCondition");
+                //queryCondition = mapper.writeValueAsString(queryList);
+                queryCondition = (String)paraMap.get("queryCondition");
             }else {
-                Map<String, Object> queryMap = (Map<String, Object>)paraMap.get("queryCondition");
-                queryCondition = mapper.writeValueAsString(queryMap);
+                //Map<String, Object> queryMap = (Map<String, Object>)paraMap.get("queryCondition");
+                //queryCondition = mapper.writeValueAsString(queryMap);
+                queryCondition = (String)paraMap.get("queryCondition");
             }
             if(rsResourcesQuery == null) {
                 rsResourcesQuery = new RsResourceDefaultQuery();

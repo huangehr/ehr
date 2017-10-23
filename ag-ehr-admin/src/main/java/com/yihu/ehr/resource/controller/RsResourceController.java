@@ -1,25 +1,25 @@
 package com.yihu.ehr.resource.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
+import com.yihu.ehr.agModel.resource.RsRolesResourceModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
-import com.yihu.ehr.model.resource.MChartInfoModel;
-import com.yihu.ehr.model.resource.MRsCategory;
-import com.yihu.ehr.model.resource.MRsInterface;
-import com.yihu.ehr.model.resource.MRsResources;
+import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.model.org.MOrganization;
+import com.yihu.ehr.model.resource.*;
 import com.yihu.ehr.model.tj.MQuotaConfigModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
+import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
-import com.yihu.ehr.resource.client.RsResourceQuotaClient;
-import com.yihu.ehr.resource.client.RsResourceCategoryClient;
-import com.yihu.ehr.resource.client.RsResourceClient;
-import com.yihu.ehr.resource.client.RsInterfaceClient;
+import com.yihu.ehr.resource.client.*;
+import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,9 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author linaz
@@ -55,6 +54,12 @@ public class RsResourceController extends BaseController {
     private TjQuotaChartClient tjQuotaChartClient;
     @Autowired
     private TjQuotaJobClient tjQuotaJobClient;
+    @Autowired
+    private GetInfoClient getInfoClient;
+    @Autowired
+    private AddressClient addressClient;
+    @Autowired
+    OrganizationClient organizationClient;
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST)
@@ -166,10 +171,14 @@ public class RsResourceController extends BaseController {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) throws Exception {
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "rolesId", value = "角色组Id", defaultValue = "")
+            @RequestParam(value = "rolesId", required = false) String rolesId,
+            @ApiParam(name = "appId", value = "应用Id", defaultValue = "")
+            @RequestParam(value = "appId", required = false) String appId) throws Exception {
         try
         {
-            ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources(fields,filters,sorts,page,size);
+            ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources(fields,filters,sorts,page,size, rolesId, appId);
             List<MRsResources> mRsResources = responseEntity.getBody();
             List<RsResourcesModel> rsResources = new ArrayList<>(mRsResources.size());
             for(MRsResources m:mRsResources){
@@ -205,7 +214,7 @@ public class RsResourceController extends BaseController {
             @PathVariable(value = "code") String code){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
-        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","code="+code,"",1,999);
+        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","code="+code,"",1,999, null, null);
         List<MRsResources> mRsResources = responseEntity.getBody();
         if(mRsResources.size() != 0){
             envelop.setSuccessFlg(true);
@@ -237,7 +246,7 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "name") String name){
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
-        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","name="+name,"",1,999);
+        ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources("","name="+name,"",1,999, null, null);
         List<MRsResources> mRsResources = responseEntity.getBody();
         if(mRsResources.size() != 0){
             envelop.setSuccessFlg(true);
@@ -321,15 +330,31 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "resourceId") String resourceId,
             @ApiParam(name = "quotaId", value = "上卷下钻的指标ID", defaultValue = "")
             @RequestParam(value = "quotaId", required = false) String quotaId,
+            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
+            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
             @ApiParam(name = "quotaFilter", value = "指标查询过滤条件", defaultValue = "")
             @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension) throws JsonProcessingException {
+            @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
         if(list!=null && list.size() > 0){
             for (ResourceQuotaModel m : list) {
                 if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){
+                    //-----------------用户数据权限 start
+                    String org = "";
+                    if( userOrgList != null ){
+                        org = StringUtils.strip(String.join(",", userOrgList), "[]");
+                    }
+                    //-----------------用户数据权限 end
+                    Map<String, Object> params  = new HashMap<>();
+                    if(org.length()>0){
+                        if(StringUtils.isNotEmpty(quotaFilter)){
+                            params  = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {});
+                        }
+                        params.put("org",org);
+                        quotaFilter = objectMapper.writeValueAsString(params);
+                    }
                     MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
                     chartInfoModels.add(chartInfoModel);
                 }

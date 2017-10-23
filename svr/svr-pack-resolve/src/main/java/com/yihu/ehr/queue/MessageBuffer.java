@@ -1,6 +1,6 @@
 package com.yihu.ehr.queue;
 
-import com.yihu.ehr.feign.XPackageMgrClient;
+import com.yihu.ehr.feign.PackageMgrClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,17 +15,16 @@ import java.util.Queue;
  */
 @Component
 public class MessageBuffer {
-    Queue<Object> messages = new LinkedList<>();
+
+    private Queue<Object> messages = new LinkedList<>();
+    private long timeThreshold = new Date().getTime();
 
     @Autowired
-    XPackageMgrClient packageMgrClient;
-
-    long timeThreshold = new Date().getTime();
+    private PackageMgrClient packageMgrClient;
 
     public synchronized void putMessage(Object message){
         messages.add(message);
     }
-
 
     public synchronized <T> T getMessage() {
         //System.out.println("--------------begin------------------");
@@ -36,7 +35,7 @@ public class MessageBuffer {
             long dateCheck = new Date().getTime();
             //System.out.println("--------------timeThreshold："+timeThreshold+"---------------");
             //System.out.println("--------------current ："+dateCheck+"---------------");
-            if(dateCheck-timeThreshold>10000){
+            if(dateCheck - timeThreshold > 10000){
                 //System.out.println("--------------resolve begin---------------");
                 timeThreshold = new Date().getTime();
                 packageMgrClient.sendResolveMessage(filters,sorts,count);
@@ -44,6 +43,10 @@ public class MessageBuffer {
                 //System.out.println("--------------end---------------");
             }
         }
-        return (T)messages.remove();
+        if(messages.isEmpty()) {
+            return null;
+        }else {
+            return (T)messages.remove();
+        }
     }
 }

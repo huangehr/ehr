@@ -143,14 +143,16 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             //处理下属资源
             if (rsList != null) {
                 List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();
-                for (RsResource RsResource : rsList) {
+                for (RsResource rsResource : rsList) {
                     Map<String, Object> detailMap = new HashMap<String, Object>();
                     detailMap.put("level", level + 1);
-                    detailMap.put("id", RsResource.getId());
-                    detailMap.put("name", RsResource.getName());
-                    detailMap.put("code", RsResource.getCode());
-                    detailMap.put("category_id", RsResource.getCategoryId());
-                    detailMap.put("data_source", RsResource.getDataSource());
+                    detailMap.put("id", rsResource.getId());
+                    detailMap.put("name", rsResource.getName());
+                    detailMap.put("code", rsResource.getCode());
+                    detailMap.put("category_id", rsResource.getCategoryId());
+                    detailMap.put("data_source", rsResource.getDataSource());
+                    detailMap.put("grant_type", rsResource.getGrantType());
+                    detailMap.put("category_name", rsResourceCategory.getName());
                     detailList.add(detailMap);
                 }
                 masterMap.put("detailList", detailList);

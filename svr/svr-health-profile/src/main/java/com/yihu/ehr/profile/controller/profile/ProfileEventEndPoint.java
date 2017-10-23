@@ -117,7 +117,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     public Map<String,Object> profileInfo(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
             @RequestParam(value = "demographic_id", required = true) String demographic_id,
-            @ApiParam(name = "version", value = "版本号",defaultValue="56395d75b854")
+            @ApiParam(name = "version", value = "版本号",defaultValue="59083976eebd")
             @RequestParam(value = "version", required = false) String version) throws Exception {
 
         Map<String,Object> re = patient.getPatientInfo(demographic_id);

@@ -2,6 +2,7 @@ package com.yihu.ehr.org.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.org.MOrgMemberRelation;
 import com.yihu.ehr.org.model.OrgMemberRelation;
 import com.yihu.ehr.org.service.OrgMemberRelationService;
@@ -135,7 +136,33 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         return relationService.getCountByOrgIdAndUserId(orgId.toString(), userId, deptId);
     }
 
+    @RequestMapping(value = "/orgDeptMember/getOrgIds", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取orgId列表")
+    public List<String> getOrgIds(String userId) {
+        List<String> list = relationService.getOrgIds(userId);
+        return list;
+    }
 
+    @RequestMapping(value = "/orgDeptMember/getDeptIds", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取DeptId列表")
+    public List<Integer> getDeptIds(String userId) {
+        List<Integer> list = relationService.getDeptIds(userId);
+        return list;
+    }
 
-
+    @RequestMapping(value = "/orgDeptMember/getByUserId", method = RequestMethod.GET)
+    @ApiOperation(value = "根据userId获取orgDeptJson列表")
+    public List<MOrgDeptJson> getByUserId(
+            @ApiParam(name = "userId", value = "用户id")
+            @RequestParam(value = "userId") String userId) {
+        List<OrgMemberRelation> memberRelationList = relationService.getByUserId(userId);
+        List<MOrgDeptJson> list = new ArrayList<>();
+        for (OrgMemberRelation r : memberRelationList) {
+            MOrgDeptJson orgDeptJson = new MOrgDeptJson();
+            orgDeptJson.setOrgId(r.getOrgId());
+            orgDeptJson.setDeptIds(r.getDeptId() + "");
+            list.add(orgDeptJson);
+        }
+        return list;
+    }
 }

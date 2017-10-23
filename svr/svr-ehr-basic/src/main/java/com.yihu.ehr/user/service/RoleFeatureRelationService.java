@@ -2,6 +2,7 @@ package com.yihu.ehr.user.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.user.dao.XRoleFeatureRelationRepository;
+import com.yihu.ehr.user.dao.XRoleUserRepository;
 import com.yihu.ehr.user.entity.RoleFeatureRelation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ import java.util.List;
 public class RoleFeatureRelationService extends BaseJpaService<RoleFeatureRelation,XRoleFeatureRelationRepository> {
     @Autowired
     private XRoleFeatureRelationRepository roleFeatureRelationRepository;
+
+    @Autowired
+    private XRoleUserRepository roleUserRepository;
 
     public Page<RoleFeatureRelation> getRoleUserList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
@@ -74,4 +78,12 @@ public class RoleFeatureRelationService extends BaseJpaService<RoleFeatureRelati
         return true;
     }
 
+    public boolean hasPermission(String userId) {
+        List<Long> roleIdList = roleUserRepository.findRoleIdByUserId(userId);
+        if (null != roleIdList && roleIdList.size() > 0) {
+            int num = roleFeatureRelationRepository.findNumByRoleIds(roleIdList);
+            return num > 0 ? true : false;
+        }
+        return false;
+    }
 }

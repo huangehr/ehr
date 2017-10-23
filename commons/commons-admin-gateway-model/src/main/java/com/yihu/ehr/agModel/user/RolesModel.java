@@ -12,6 +12,8 @@ public class RolesModel {
     private String appName;
     private String type;
     private String typeName;
+    private String orgCode;
+    private String orgName;
 
     public RolesModel() {
     }
@@ -75,5 +77,21 @@ public class RolesModel {
     }
     public void setTypeName(String typeName) {
         this.typeName = typeName;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 }

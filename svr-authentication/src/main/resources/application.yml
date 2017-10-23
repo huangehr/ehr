@@ -61,3 +61,11 @@ spring:
     url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: sr_healtharchive
     password: data!@)1
+
+---
+spring:
+  profiles: prod_sr
+  datasource:
+    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: healthcloud
+    password: GP8Qz4qU

@@ -3,6 +3,7 @@ package com.yihu.ehr.saas.controller;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.organizations.OrgSaas;
 import com.yihu.ehr.model.common.ListResult;
@@ -79,6 +80,24 @@ public class OrgSaasEndPoint extends EnvelopRestEndPoint {
         }
         return saveFlag;
 
+    }
+
+    /**
+     * 根据用户的机构id，获取Saas化的机构或者区域id
+     * @param userOrgCode
+     * @return
+     */
+    @RequestMapping(value = ServiceApi.Org.getUserOrgSaasByUserOrgCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据用户的机构id，获取Saas化的机构或者区域id")
+    public List<String> getUserOrgSaasByUserOrgCode(
+            @ApiParam(name = "userOrgCode", value = "用户所在机构", defaultValue = "")
+            @RequestParam(value = "userOrgCode", required = false)  List<String> userOrgCode,
+            @ApiParam(name = "type", value = "saas类型", defaultValue = "")
+            @RequestParam(value = "type", required = false) String type,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception  {
+        List<String> OrgSaasList = orgSaasService.getOrgSaasCodeByorgCode(userOrgCode,type);
+        return OrgSaasList;
     }
 
 

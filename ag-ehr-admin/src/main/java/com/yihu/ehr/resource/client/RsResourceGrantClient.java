@@ -166,10 +166,17 @@ public interface RsResourceGrantClient {
             @PathVariable(value = "rolesId") String rolesId,
             @RequestParam(value = "resourceIds") String resourceIds);
 
+    @ApiOperation("单个角色组资源列表查询")
+    @RequestMapping(value = ServiceApi.Resources.GetRolesGrantResources, method = RequestMethod.GET)
+    List<MRsRolesResource> getRolesGrantResources(
+            @RequestParam(value = "rolesId") String rolesId);
+
+
     @ApiOperation("角色组资源数据元授权查询")
     @RequestMapping(value = ServiceApi.Resources.ResourceRolesResMetadataGrants,method = RequestMethod.GET)
     ResponseEntity<List<MRsRolesResourceMetadata>> getRolesRsMetadatas(
-            @PathVariable(value="roles_res_id")String rolesResId);
+            @PathVariable(value="roles_res_id")String rolesResId,
+            @RequestParam(value="appId",required = false)String appId);
 
     @ApiOperation("角色组取消资源授权")
     @RequestMapping(value = ServiceApi.Resources.ResourceRolesGrantsNoPage,method = RequestMethod.GET)

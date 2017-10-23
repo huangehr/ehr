@@ -154,4 +154,8 @@ public interface UserClient {
     List idCardNoExistence(
             @RequestBody String idCardNos);
 
+    @RequestMapping(value = ServiceApi.Users.UserByIdCardNo, method = RequestMethod.GET)
+    @ApiOperation("根据身份证号码获取用户id")
+    String getUserIdByIdCardNo(
+            @RequestParam(value="idCardNo") String idCardNo);
 }

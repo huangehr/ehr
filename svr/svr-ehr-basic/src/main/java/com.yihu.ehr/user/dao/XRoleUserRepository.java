@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 /**
  * Created by yww on 2016/7/7.
  */
@@ -15,4 +17,7 @@ public interface XRoleUserRepository extends PagingAndSortingRepository<RoleUser
 
     @Modifying
     void deleteByUserId(String userId);
+
+    @Query("select roleUser.roleId from RoleUser roleUser where roleUser.userId = :userId")
+    List<Long> findRoleIdByUserId(@Param("userId") String userId);
 }

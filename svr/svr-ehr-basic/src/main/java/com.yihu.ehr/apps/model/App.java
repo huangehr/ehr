@@ -29,6 +29,7 @@ public class App {
     private String name;
     private String secret;
     private String url;
+    private String outUrl;
     private String creator;
     private String auditor;
     private Date createTime;
@@ -40,36 +41,17 @@ public class App {
     private String org;
     private String code;
     private int sourceType;
-
-    @Column(name = "icon", nullable = true)
     private String icon;
-    @Column(name = "release_flag", nullable = true)
     private int releaseFlag;
-
-    @Column(name = "source_type", nullable = true)
-    public int getSourceType() {
-        return sourceType;
-    }
-
-    public void setSourceType(int sourceType) {
-        this.sourceType = sourceType;
-    }
-    @Column(name = "code", nullable = true)
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
+    private String manageType; // 管理类型，dictId=94
 
     public App() {
     }
 
+    @Column(name = "id", nullable = true)
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
@@ -78,7 +60,6 @@ public class App {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -87,7 +68,6 @@ public class App {
     public String getSecret() {
         return secret;
     }
-
     public void setSecret(String secret) {
         this.secret = secret;
     }
@@ -96,16 +76,22 @@ public class App {
     public String getUrl() {
         return url;
     }
-
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @Column(name = "out_url", nullable = true)
+    public String getOutUrl() {
+        return outUrl;
+    }
+    public void setOutUrl(String outUrl) {
+        this.outUrl = outUrl;
     }
 
     @Column(name = "creator", nullable = true)
     public String getCreator() {
         return creator;
     }
-
     public void setCreator(String creator) {
         this.creator = creator;
     }
@@ -114,7 +100,6 @@ public class App {
     public String getAuditor() {
         return auditor;
     }
-
     public void setAuditor(String auditor) {
         this.auditor = auditor;
     }
@@ -123,7 +108,6 @@ public class App {
     public Date getCreateTime() {
         return createTime;
     }
-
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
@@ -132,7 +116,6 @@ public class App {
     public Date getAuditTime() {
         return auditTime;
     }
-
     public void setAuditTime(Date auditTime) {
         this.auditTime = auditTime;
     }
@@ -141,7 +124,6 @@ public class App {
     public String getCatalog() {
         return catalog;
     }
-
     public void setCatalog(String catalog) {
         this.catalog = catalog;
     }
@@ -150,7 +132,6 @@ public class App {
     public String getStatus() {
         return status;
     }
-
     public void setStatus(String status) {
         this.status = status;
     }
@@ -159,7 +140,6 @@ public class App {
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -174,7 +154,6 @@ public class App {
         }
         return list;
     }
-
     public void setTags(List<String> tags) {
         if (tags.size() > 0) {
             this.tags = StringUtils.join(tags.toArray(), ";");
@@ -187,24 +166,48 @@ public class App {
     public String getOrg() {
         return org;
     }
-
     public void setOrg(String org) {
         this.org = org;
     }
 
+
+    @Column(name = "code", nullable = true)
+    public String getCode() {
+        return code;
+    }
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    @Column(name = "source_type", nullable = true)
+    public int getSourceType() {
+        return sourceType;
+    }
+    public void setSourceType(int sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    @Column(name = "icon", nullable = true)
     public String getIcon() {
         return icon;
     }
-
     public void setIcon(String icon) {
         this.icon = icon;
     }
 
+    @Column(name = "release_flag", nullable = true)
     public int getReleaseFlag() {
         return releaseFlag;
     }
-
     public void setReleaseFlag(int releaseFlag) {
         this.releaseFlag = releaseFlag;
+    }
+
+    @Column(name = "manage_type")
+    public String getManageType() {
+        return manageType;
+    }
+    public void setManageType(String manageType) {
+        this.manageType = manageType;
     }
 }

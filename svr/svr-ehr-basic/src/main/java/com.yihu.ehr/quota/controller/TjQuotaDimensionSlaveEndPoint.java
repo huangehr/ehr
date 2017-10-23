@@ -129,4 +129,10 @@ public class TjQuotaDimensionSlaveEndPoint extends EnvelopRestEndPoint {
         tjQuotaDimensionSlaveService.deleteByQuotaCode(quotaCode);
         return Result.success("保存成功！");
     }
+
+    @RequestMapping(value = ServiceApi.TJ.GetDimensionSlaveByQuotaCode, method = RequestMethod.GET)
+    @ApiOperation(value = "根据指标ID获取从维度列表信息")
+    List<TjQuotaDimensionSlave> getDimensionSlaveByQuotaCode(@RequestParam(value = "quotaCode") String quotaCode){
+        return tjQuotaDimensionSlaveService.getTjQuotaDimensionSlaveByCode(quotaCode);
+    }
 }

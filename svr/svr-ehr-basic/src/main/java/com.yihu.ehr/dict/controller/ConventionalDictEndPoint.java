@@ -820,4 +820,13 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
         SystemDictEntry type = dictEntryService.getDictEntry(82, code);
         return getDictModel(type);
     }
+
+    @RequestMapping(value = "/dictionaries/tj_quota_algorithm", method = RequestMethod.GET)
+    @ApiOperation(value = "指标算法", response = MConventionalDict.class)
+    public MConventionalDict getTjQuotaAlgorithm(
+            @ApiParam(name = "code", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "code") String code) {
+        SystemDictEntry type = dictEntryService.getDictEntryByValueAndDictId(code,93);
+        return getDictModel(type);
+    }
 }

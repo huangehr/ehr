@@ -21,14 +21,14 @@ public class RedisController {
     private RedisClient redisClient;
 
     @ApiOperation("获取资源化数据元映射")
-    @RequestMapping(value = ServiceApi.Redis.RsAdaptionMetaData, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Redis.RsAdapterMetadata, method = RequestMethod.GET)
     @ResponseBody
     public String getRsAdaptionMetaData(@ApiParam(value = "cdaVersion", defaultValue = "")
                                         @RequestParam("cdaVersion") String cdaVersion,
-                                        @ApiParam(value = "dictCode", defaultValue = "")
-                                        @RequestParam("dictCode") String dictCode,
-                                        @ApiParam(value = "srcDictEntryCode", defaultValue = "")
-                                        @RequestParam("srcDictEntryCode") String srcDictEntryCode) {
-        return redisClient.getRsAdaptionMetaData(cdaVersion,dictCode,srcDictEntryCode);
+                                        @ApiParam(value = "srcDataSetCode", defaultValue = "")
+                                        @RequestParam("srcDataSetCode") String srcDataSetCode,
+                                        @ApiParam(value = "srcMetadataCode", defaultValue = "")
+                                        @RequestParam("srcMetadataCode") String srcMetadataCode) {
+        return redisClient.getRsAdaptionMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
     }
 }

@@ -39,7 +39,7 @@ public class TjDimensionSlaveService {
                 " WHERE " +
                 "  dm.`code` = qdm.slave_code " +
                 " AND qdm.quota_code = ? order BY" +
-                " qdm.sort asc ";
+                " qdm.id asc ";
         List<TjQuotaDimensionSlave> quotaDataSources = jdbcTemplate.query(sql, new BeanPropertyRowMapper(TjQuotaDimensionSlave.class), code);
         return quotaDataSources;
     }
