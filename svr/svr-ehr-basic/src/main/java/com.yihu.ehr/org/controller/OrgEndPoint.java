@@ -125,10 +125,11 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         org.setActivityFlag(1);
         org.setPyCode(PinyinUtil.getPinYinHeadChar(org.getFullName(), false));
         Organization organization=orgService.save(org);
+        String orgId= orgService.getOrgIdByOrgCode(organization.getOrgCode());
         //添加默认部门
         OrgDept dept=new OrgDept();
-        dept.setOrgId(String.valueOf(organization.getId()));
-        dept.setCode(String.valueOf(organization.getId())+"1");
+        dept.setOrgId(String.valueOf(orgId));
+        dept.setCode(String.valueOf(orgId)+"1");
         dept.setName("未分配部门人员");
         orgDeptService.saveOrgDept(dept);
         return convertToModel(org, MOrganization.class);
