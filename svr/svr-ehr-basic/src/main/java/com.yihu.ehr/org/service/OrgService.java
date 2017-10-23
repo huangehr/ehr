@@ -228,6 +228,7 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
             organization.setLat(map .get("lat").toString());
             organization.setUpdateTime(new Timestamp(new Date().getTime()));
 //            organization.setTags(map .get("tags").toString());
+            organization.setActivityFlag(1);
             organization.setIntroduction(map .get("introduction").toString());
             Organization org=organizationRepository.save(organization);
             List<Long> orgList= organizationRepository.getOrgIdByOrgCode(organization.getOrgCode());
