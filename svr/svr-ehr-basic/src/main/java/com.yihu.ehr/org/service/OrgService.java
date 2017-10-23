@@ -230,9 +230,16 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
 //            organization.setTags(map .get("tags").toString());
             organization.setIntroduction(map .get("introduction").toString());
             Organization org=organizationRepository.save(organization);
+            List<Long> orgList= organizationRepository.getOrgIdByOrgCode(organization.getOrgCode());
+            Long Id=new Long(1);
+            if(orgList.size()>0){
+                for(Long o:orgList){
+                    Id=o;
+                }
+            }
             OrgDept dept=new OrgDept();
-            dept.setOrgId(String.valueOf(org.getId()));
-            dept.setCode(String.valueOf(org.getId())+"1");
+            dept.setOrgId(String.valueOf(Id));
+            dept.setCode(String.valueOf(Id)+"1");
             dept.setName("未分配部门人员");
             orgDeptService.saveOrgDept(dept);
             }
