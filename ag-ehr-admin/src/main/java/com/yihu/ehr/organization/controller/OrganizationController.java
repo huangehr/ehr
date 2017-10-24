@@ -355,6 +355,7 @@ public class OrganizationController extends BaseController {
                 }
             }
             mOrganization.setLocation(locationId);
+            mOrganization.setActivityFlag(1);
             String mOrganizationJson = objectMapper.writeValueAsString(mOrganization);
             MOrganization mOrgNew = orgClient.create(mOrganizationJson);
             if (mOrgNew == null) {
