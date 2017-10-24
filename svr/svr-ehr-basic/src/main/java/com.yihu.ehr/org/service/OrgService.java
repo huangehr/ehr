@@ -188,6 +188,7 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
             geography.setProvince(map .get("provinceName").toString());
             geography.setCity(map .get("cityName").toString());
             geography.setDistrict(map .get("district").toString());
+            geography.setTown(map .get("town").toString());
             geography.setStreet(map .get("street").toString());
             geographies=geographyService.isGeographyExist(geography);
             if(geographies==null || geographies.size()==0){
