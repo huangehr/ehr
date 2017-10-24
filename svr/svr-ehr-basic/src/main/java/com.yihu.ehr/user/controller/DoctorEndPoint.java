@@ -19,6 +19,7 @@ import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.user.service.DoctorService;
 import com.yihu.ehr.user.service.UserManager;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
@@ -244,15 +245,36 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
               stringBuffer.append("telephone=" + d.getPhone()+ ";");
               String filters = stringBuffer.toString();
               List<User> userList = userManager.search("", filters, "", 1, 1);
+              String userId = "";
               //若存在 将用户表与医生表关联
               if(null!=userList&&userList.size()>0){
                   for(User user:userList){
                       user.setDoctorId(String.valueOf(d.getId()));
-                      userManager.saveUser(user);
+                      user = userManager.saveUser(user);
+                      userId = user.getId();
                   }
               }else{
                   //若不存在，为该医生初始化账户。
-                  existPhonesList.add(d);
+//                  existPhonesList.add(d);
+                  User user = new User();
+                  user.setLoginCode(d.getPhone());
+                  user.setTelephone(d.getPhone());
+                  user.setRealName(d.getName());
+                  user.setIdCardNo(d.getIdCardNo());
+                  user.setGender(d.getSex());
+                  user.setTechTitle(d.getSkill());
+                  user.setEmail(d.getEmail());
+                  user.setPassword(HashUtil.hash(default_password));
+                  user.setCreateDate(DateUtil.strToDate(DateUtil.getNowDateTime()));
+                  user.setActivated(true);
+                  user.setUserType("Doctor");
+                  user.setDType("Doctor");
+                  user.setDoctorId(d.getId() + "");
+                  user.setProvinceId(0);
+                  user.setCityId(0);
+                  user.setAreaId(0);
+                  user = userManager.saveUser(user);
+                  userId = user.getId();
               }
               String orgId="";
               if(!StringUtils.isEmpty(objectList[23])){
@@ -272,15 +294,15 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
               }
               memberRelation.setDeptId(deptId);
               memberRelation.setDeptName(deptName);
-              memberRelation.setUserId(String.valueOf(d.getId()));
+              memberRelation.setUserId(String.valueOf(userId));
               memberRelation.setUserName(d.getName());
               memberRelation.setStatus(0);
               relationService.save(memberRelation);
           }
         }
-        if(null!=existPhonesList&&existPhonesList.size()>0){
-            userManager.addUserBatch(existPhonesList);
-        }
+//        if(null!=existPhonesList&&existPhonesList.size()>0){
+//            userManager.addUserBatch(existPhonesList);
+//        }
         return true;
     }
 
