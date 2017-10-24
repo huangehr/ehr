@@ -240,7 +240,9 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         //-----------------用户数据权限 start
         String org = "";
         if( userOrgList != null ){
-            org = StringUtils.strip(String.join(",", userOrgList), "[]");
+            if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ){
+                org = StringUtils.strip(String.join(",", userOrgList), "[]");
+            }
         }
         Map<String, Object> params  = new HashMap<>();
         if(org.length() > 0){
