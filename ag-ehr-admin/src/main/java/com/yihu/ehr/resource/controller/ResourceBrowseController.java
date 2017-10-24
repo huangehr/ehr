@@ -232,7 +232,9 @@ public class ResourceBrowseController extends BaseController {
                 //-----------------用户数据权限 start
                 String org = "";
                 if( userOrgList != null ){
-                    org = StringUtils.strip(String.join(",", userOrgList), "[]");
+                    if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ){
+                        org = StringUtils.strip(String.join(",", userOrgList), "[]");
+                    }
                 }
                 //-----------------用户数据权限 end
                 //判断是否启用默认查询条件
