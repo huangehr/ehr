@@ -254,6 +254,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                       userId = user.getId();
                   }
               }else{
+
                   //若不存在，为该医生初始化账户。
 //                  existPhonesList.add(d);
                   User user = new User();
