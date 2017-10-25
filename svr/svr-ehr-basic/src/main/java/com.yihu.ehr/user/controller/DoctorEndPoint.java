@@ -259,7 +259,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 //                  existPhonesList.add(d);
                   User user = new User();
                   user.setId(getObjectId(BizObject.User));
-                  user.setLoginCode(d.getPhone());
+                  user.setLoginCode(d.getIdCardNo());
                   user.setTelephone(d.getPhone());
                   user.setRealName(d.getName());
                   user.setIdCardNo(d.getIdCardNo());
