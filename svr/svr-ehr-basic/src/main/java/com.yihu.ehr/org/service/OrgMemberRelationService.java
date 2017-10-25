@@ -3,8 +3,16 @@ package com.yihu.ehr.org.service;
 import com.yihu.ehr.org.dao.XOrgMemberRelationRepository;
 import com.yihu.ehr.org.model.OrgMemberRelation;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.user.entity.User;
 import io.swagger.models.auth.In;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +32,8 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
     private XOrgMemberRelationRepository relationRepository;
     @Autowired
     private OrgService orgService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     public List<OrgMemberRelation> searchByDeptId(Integer deptId) {
         return relationRepository.searchByDeptId(deptId);
@@ -99,5 +109,40 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
     public List<OrgMemberRelation> getByUserId(String userId) {
         List<OrgMemberRelation> relationList = relationRepository.findByUserId(userId);
         return relationList;
+    }
+
+    /**
+     *  查询机构人员去重复
+     * @param orgId
+     * @param searchParm
+     * @param size
+     * @param page
+     * @return
+     */
+    public List<OrgMemberRelation> getOrgDeptMembers(String orgId,String searchParm, int size, int page) {
+        Session session = entityManager.unwrap(Session.class);
+        String sql="select r from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm group by r.userId";
+        Query query = session.createQuery(sql);
+        query.setString("orgId", orgId);
+        query.setString("searchParm","%"+searchParm+"%");
+        query.setMaxResults(size);
+        query.setFirstResult((page - 1) * size);
+        List<OrgMemberRelation> list;
+        list = query.list();
+        return list;
+    }
+    /**
+     *  查询机构人员数量去重复
+     * @param orgId
+     * @param searchParm
+     * @return
+     */
+    public Integer getOrgDeptMembersInt(String orgId,String searchParm) {
+        Session session = entityManager.unwrap(Session.class);
+        String sql="select count(*) from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm group by r.userId";
+        Query query = session.createQuery(sql);
+        query.setString("orgId", orgId);
+        query.setString("searchParm","%"+searchParm+"%");
+        return ((Long)query.list().get(0)).intValue();
     }
 }
