@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +65,25 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         return (List<MOrgMemberRelation>) convertToModels(orgMemRelations, new ArrayList<MOrgMemberRelation>(orgMemRelations.size()), MOrgMemberRelation.class, fields);
     }
 
+    @RequestMapping(value = "/orgDeptMember/getOrgDeptMembers", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据条件 查询机构成员列表去重复")
+    public List<MOrgMemberRelation> getOrgDeptMembers(
+            @ApiParam(name = "orgId", value = "机构ID", defaultValue = "")
+            @RequestParam(value = "orgId", required = false) String orgId,
+            @ApiParam(name = "searchParm", value = "关键字查询", defaultValue = "")
+            @RequestParam(value = "searchParm",required = false) String searchParm,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws Exception {
+        List<OrgMemberRelation> orgMemRelations = relationService.getOrgDeptMembers(orgId,searchParm,size,page);
+        Long totalCount = Long.parseLong(relationService.getOrgDeptMembersInt(orgId,searchParm).toString());
+        pagedResponse(request,response,totalCount,page,size);
+        return (List<MOrgMemberRelation>) convertToModels(orgMemRelations, new ArrayList<MOrgMemberRelation>(orgMemRelations.size()), MOrgMemberRelation.class,"userId,userName");
+    }
 
     @RequestMapping(value ="orgDeptMember/admin/{memRelationId}", method = RequestMethod.GET)
     @ApiOperation(value = "获取部门成员信息")

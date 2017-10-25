@@ -395,6 +395,30 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/orgDeptMember/getOrgDeptMembers", method = RequestMethod.POST)
+    @ApiOperation(value = "获取部门下成员列表", notes = "根据查询条件获取机构成员去重复列表在前端表格展示")
+    public Envelop getOrgDeptMembers(
+            @ApiParam(name = "orgId", value = "机构ID", defaultValue = "")
+            @RequestParam(value = "orgId", required = false) String orgId,
+            @ApiParam(name = "searchParm", value = "关键字查询", defaultValue = "")
+            @RequestParam(value = "searchParm",required = false) String searchParm,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) {
+        try {
+            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.getOrgDeptMembers(orgId, searchParm , size, page);
+            List<MOrgMemberRelation> members = responseEntity.getBody();
+            int totalCount = getTotalCount(responseEntity);
+            return getResult(members, totalCount, page, size);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
     @ApiOperation(value = "获取所有成员列表")
     @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMember", method = RequestMethod.GET)
     public Envelop getAllOrgDeptMember(
