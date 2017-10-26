@@ -16,6 +16,6 @@ public interface RsResourceMetadataDao extends PagingAndSortingRepository<RsReso
     List<RsResourceMetadata> findByResourcesId(String resourcesId);
 
     @Query(value="delete from RsResourceMetadata rm where rm.resourcesId in (:resourcesIds)",nativeQuery=true)
-    void deleteByResourcesIds(
-            @Param("resourcesIds") String[] resourcesIds);
+    void deleteByResourcesIds(@Param("resourcesIds") String[] resourcesIds);
+
 }

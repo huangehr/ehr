@@ -6,8 +6,6 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.geography.service.AddressClient;
-import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
@@ -45,19 +43,17 @@ public class RsResourceIntegratedController extends BaseController {
     private TjQuotaJobClient tjQuotaJobClient;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private GetInfoClient getInfoClient;
-    @Autowired
-    private AddressClient addressClient;
-    @Autowired
-    OrganizationClient organizationClient;
 
     @ApiOperation("综合查询档案数据列表树")
     @RequestMapping(value = ServiceApi.Resources.IntMetadataList, method = RequestMethod.GET)
     public Envelop getMetadataList(
-            @ApiParam(name="filters",value="过滤条件(name)",defaultValue = "")
+            @ApiParam(name = "userResource", value = "授权资源")
+            @RequestParam(value = "userResource") String userResource,
+            @ApiParam(name = "roleId", value = "角色id")
+            @RequestParam(value = "roleId") String roleId,
+            @ApiParam(name="filters",value="过滤条件(name)")
             @RequestParam(value="filters",required = false) String filters) {
-        return resourcesIntegratedClient.getMetadataList(filters);
+        return resourcesIntegratedClient.getMetadataList(userResource, roleId, filters);
     }
 
     @ApiOperation("综合查询档案数据检索")
@@ -67,17 +63,17 @@ public class RsResourceIntegratedController extends BaseController {
             @RequestParam(value = "resourcesCode") String resourcesCode,
             @ApiParam(name = "metaData", value = "数据元([\"metadataId\"])")
             @RequestParam(value = "metaData", required = false) String metaData,
-            @ApiParam(name = "orgCode", value = "机构代码(orgCode)")
-            @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(name = "appId", value = "应用ID(appId)")
-            @RequestParam(value = "appId") String appId,
+            @ApiParam(name = "orgCode", value = "机构编码(orgCode)")
+            @RequestParam(value = "orgCode") String orgCode,
+            @ApiParam(name = "areaCode", value = "地区编码(areaCode)")
+            @RequestParam(value = "areaCode") String areaCode,
             @ApiParam(name = "queryCondition", value = "查询条件([{\"andOr\":\"(AND)(OR)\",\"condition\":\"(<)(=)(>)\",\"field\":\"fieldName\",\"value\":\"value\"}])")
             @RequestParam(value = "queryCondition", required = false) String queryCondition,
             @ApiParam(name = "page", value = "第几页(>0)")
             @RequestParam(value = "page", required = false) Integer page,
             @ApiParam(name = "size", value = "每页几行(>0)")
             @RequestParam(value = "size", required = false) Integer size) throws  Exception {
-        return resourcesIntegratedClient.searchMetadataData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
+        return resourcesIntegratedClient.searchMetadataData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
     }
 
     @ApiOperation("综合查询指标统计列表树")
@@ -136,9 +132,7 @@ public class RsResourceIntegratedController extends BaseController {
             //-----------------用户数据权限 start
             String org = "";
             if( userOrgList != null ){
-                if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ){
-                    org = StringUtils.strip(String.join(",", userOrgList), "[]");
-                }
+                org = StringUtils.strip(String.join(",", userOrgList), "[]");
             }
             String filters = queryCondition;
             Map<String, Object> params  = new HashMap<>();

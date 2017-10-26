@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface RsResourceCategoryDao extends PagingAndSortingRepository<RsResourceCategory, String> {
       long countByPid(String pid);
-
       List<RsResourceCategory> findByPid(String pid);
+      List<RsResourceCategory> findByCode(String code);
 }

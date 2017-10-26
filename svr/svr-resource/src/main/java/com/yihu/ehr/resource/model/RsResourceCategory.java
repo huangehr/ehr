@@ -16,6 +16,7 @@ public class RsResourceCategory {
     private String id;
     private String name;
     private String pid;
+    private String code;
     private String description;
 
     @Id
@@ -43,6 +44,14 @@ public class RsResourceCategory {
     }
     public void setPid(String pid) {
         this.pid = pid;
+    }
+
+    @Column(name="code")
+    public String getCode() {
+        return code;
+    }
+    public void setCode(String code) {
+        this.code = code;
     }
 
     @Column(name="description")

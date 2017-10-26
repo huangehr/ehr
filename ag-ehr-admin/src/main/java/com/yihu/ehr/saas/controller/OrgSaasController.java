@@ -214,7 +214,7 @@ public class OrgSaasController extends BaseController{
     @RequestMapping(value=ServiceApi.Org.getUserOrgSaasByUserOrgCode,method=RequestMethod.GET)
     @ApiOperation(value="根据用户的机构id，获取Saas化的机构或者区域id")
     public Envelop getUserOrgSaasByUserOrgCode(
-            @ApiParam(name = "orgCodeList", value = "用户所在机构", defaultValue = "")
+            @ApiParam(name = "orgCodeStr", value = "用户所在机构")
             @RequestParam(value = "orgCodeStr", required = false) String orgCodeStr){
         Envelop envelop = new Envelop();
         List<String> orgCodeList = Arrays.asList(orgCodeStr.split(","));;
