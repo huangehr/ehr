@@ -34,6 +34,15 @@ public interface OrgDeptMemberClient {
             @RequestParam(value = "page", required = false) int page
     ) ;
 
+    @RequestMapping(value = "/orgDeptMember/getOrgDeptMembers", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据条件 查询部门下成员列表")
+    ResponseEntity<List<MOrgMemberRelation>> getOrgDeptMembers(
+            @RequestParam(value = "orgId", required = false) String orgId,
+            @RequestParam(value = "searchParm", required = false) String searchParm,
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "page", required = false) int page
+    ) ;
+
     @RequestMapping(value = "orgDeptMember/admin/{memRelationId}", method = RequestMethod.GET)
     @ApiOperation(value = "获取部门成员信息", notes = "部门成员信息")
     MOrgMemberRelation getOrgMemberRelation(@PathVariable(value = "memRelationId") Long memRelationId);

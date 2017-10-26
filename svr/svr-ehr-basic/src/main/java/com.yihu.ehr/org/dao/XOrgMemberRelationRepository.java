@@ -2,10 +2,13 @@ package com.yihu.ehr.org.dao;
 
 import com.yihu.ehr.org.model.OrgDept;
 import com.yihu.ehr.org.model.OrgMemberRelation;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -47,4 +50,5 @@ public interface XOrgMemberRelationRepository extends PagingAndSortingRepository
     @Query("select r from OrgMemberRelation r where r.status=0 and r.userId=:userId")
     List<OrgMemberRelation> findByUserId(@Param("userId") String userId);
 
+    Page<OrgMemberRelation> findByOrgIdAndUserNameLike( String orgId,String userName,Pageable pageable);
 }

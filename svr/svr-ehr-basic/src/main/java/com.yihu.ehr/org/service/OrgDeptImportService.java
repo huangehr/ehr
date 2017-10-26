@@ -62,7 +62,7 @@ public class OrgDeptImportService extends BaseJpaService<OrgDept,XOrgDeptReposit
             OrgDept save = orgDeptService.save(newOrgDept);
 
             Organization org = orgService.getOrg(map.get("orgCode").toString());
-            if (null != org && "Hospital".equalsIgnoreCase(org.getOrgCode())) {
+            if (null != org && "Hospital".equalsIgnoreCase(org.getOrgType())) {
                 String gloryId = map.get("gloryId").toString();
                 String[] arr = gloryId.split(",");
                 String ids = "";
