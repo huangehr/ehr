@@ -14,6 +14,7 @@ public class AppDetailModel {
     private String name;
     private String secret;
     private String url;
+    private String outUrl;
     private String creator;
     private String auditor;
     private String createTime;
@@ -122,6 +123,14 @@ public class AppDetailModel {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getOutUrl() {
+        return outUrl;
+    }
+
+    public void setOutUrl(String outUrl) {
+        this.outUrl = outUrl;
     }
 
     public String getCreator() {
