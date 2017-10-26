@@ -266,7 +266,14 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                   user.setGender(d.getSex());
                   user.setTechTitle(d.getSkill());
                   user.setEmail(d.getEmail());
-                  user.setPassword(HashUtil.hash(default_password));
+                  String defaultPassword="";
+                  if(!StringUtils.isEmpty(d.getIdCardNo())&&d.getIdCardNo().length()>7){
+                      defaultPassword=d.getIdCardNo().substring(d.getIdCardNo().length()-6,d.getIdCardNo().length());
+                      user.setPassword(HashUtil.hash(defaultPassword));
+                  }else{
+                      user.setPassword(HashUtil.hash(default_password));
+                  }
+
                   user.setCreateDate(DateUtil.strToDate(DateUtil.getNowDateTime()));
                   user.setActivated(true);
                   user.setUserType("Doctor");
