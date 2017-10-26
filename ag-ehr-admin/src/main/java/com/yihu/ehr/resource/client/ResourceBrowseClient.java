@@ -27,14 +27,18 @@ public interface ResourceBrowseClient {
      */
     @ApiOperation("档案资源数据元结构")
     @RequestMapping(value = ServiceApi.Resources.ResourceViewMetadata, method = RequestMethod.GET)
-    String getResourceMetadata(@RequestParam(value = "resourcesCode") String resourcesCode);
+    String getResourceMetadata(
+            @RequestParam(value = "resourcesCode") String resourcesCode,
+            @RequestParam(value = "roleId") String roleId);
 
 
     @ApiOperation("档案资源浏览")
     @RequestMapping(value = ServiceApi.Resources.ResourceViewData, method = RequestMethod.GET)
     Envelop getResourceData(
             @RequestParam(value = "resourcesCode") String resourcesCode,
+            @RequestParam(value = "roleId") String roleId,
             @RequestParam(value = "orgCode") String orgCode,
+            @RequestParam(value = "areaCode") String areaCode,
             @RequestParam(value = "queryCondition",required = false) String queryCondition,
             @RequestParam(value = "page",required = false) Integer page,
             @RequestParam(value = "size",required = false) Integer size);

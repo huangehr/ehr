@@ -54,12 +54,6 @@ public class RsResourceController extends BaseController {
     private TjQuotaChartClient tjQuotaChartClient;
     @Autowired
     private TjQuotaJobClient tjQuotaJobClient;
-    @Autowired
-    private GetInfoClient getInfoClient;
-    @Autowired
-    private AddressClient addressClient;
-    @Autowired
-    OrganizationClient organizationClient;
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST)
@@ -152,11 +146,13 @@ public class RsResourceController extends BaseController {
     @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
     @ApiOperation("获取资源列表树")
     public Envelop getResourceTree(
-            @ApiParam(name = "dataSource", value = "数据源")
+            @ApiParam(name = "dataSource", value = "资源类型")
             @RequestParam(value = "dataSource") Integer dataSource,
+            @ApiParam(name = "userResource", value = "授权资源")
+            @RequestParam(value = "userResource") String userResource,
             @ApiParam(name = "filters", value = "过条件(name)")
             @RequestParam(value = "filters", required = false) String filters) {
-        return resourcesClient.getResourceTree(dataSource, filters);
+        return resourcesClient.getResourceTree(dataSource, userResource, filters);
     }
 
     @ApiOperation("资源查询")
@@ -344,9 +340,7 @@ public class RsResourceController extends BaseController {
                     //-----------------用户数据权限 start
                     String org = "";
                     if( userOrgList != null ){
-                        if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ) {
-                            org = StringUtils.strip(String.join(",", userOrgList), "[]");
-                        }
+                        org = StringUtils.strip(String.join(",", userOrgList), "[]");
                     }
                     //-----------------用户数据权限 end
                     Map<String, Object> params  = new HashMap<>();

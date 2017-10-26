@@ -183,18 +183,18 @@ public class EhrAccessTokenEndpoint implements InitializingBean, ApplicationCont
                     //判断ClientId
                     OAuth2Authentication authentication = tokenServices.loadAuthentication(accessToken);
                     String authenticationClientId = authentication.getOAuth2Request().getClientId();
-                    if(authenticationClientId!=null && authenticationClientId.equals(clientId))
-                    {
+                    if(authenticationClientId!=null && authenticationClientId.equals(clientId)) {
                         String authenticationName = authentication.getName();
-                        String authenticationUserId = authentication.getOAuth2Request().getRequestParameters().get("userId").toString();
                         AccessToken token = new AccessToken();
                         token.setAccessToken(auth2AccessToken.getValue());
                         token.setRefreshToken(auth2AccessToken.getRefreshToken().getValue());
                         token.setTokenType(auth2AccessToken.getTokenType());
                         token.setExpiresIn(auth2AccessToken.getExpiresIn());
                         token.setUser(authenticationName);
-                        token.setUserId(authenticationUserId);
-
+                        if(null != authentication.getOAuth2Request().getRequestParameters().get("userId")) {
+                            String authenticationUserId = authentication.getOAuth2Request().getRequestParameters().get("userId").toString();
+                            token.setUserId(authenticationUserId);
+                        }
                         ObjectResult re = new ObjectResult(true,"accesstoken 可以使用");
                         re.setData(token);
                         return re;

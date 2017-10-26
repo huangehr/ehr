@@ -52,6 +52,7 @@ public interface RsResourceClient {
     @ApiOperation("获取资源列表树")
     Envelop getResourceTree(
             @RequestParam(value = "dataSource") Integer dataSource,
+            @RequestParam(value = "userResource") String userResource,
             @RequestParam(value = "filters", required = false) String filters);
 
     @ApiOperation("资源查询")

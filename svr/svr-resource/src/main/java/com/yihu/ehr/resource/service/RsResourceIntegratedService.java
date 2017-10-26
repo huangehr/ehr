@@ -1,12 +1,13 @@
 package com.yihu.ehr.resource.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.entity.report.QuotaCategory;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.RsResourceDao;
-import com.yihu.ehr.resource.model.RsMetadata;
-import com.yihu.ehr.resource.model.RsResource;
+import com.yihu.ehr.resource.model.*;
+import com.yihu.ehr.resource.service.query.ResourcesMetadataQueryDao;
 import com.yihu.ehr.resource.service.query.ResourcesQueryService;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,37 +30,95 @@ import java.util.regex.Pattern;
 public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsResourceDao> {
 
     @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
+    private ResourcesMetadataQueryDao resourceMetadataQueryDao;
+    @Autowired
     private ResourcesQueryService resourcesQueryService;
+    @Autowired
+    private RsRolesResourceGrantService rsRolesResourceGrantService;
+    @Autowired
+    private RsRolesResourceMetadataGrantService rsRolesResourceMetadataGrantService;
+
 
     /**
      * 获取档案数据主体列表
      * @return
      */
-    public List<RsResource> findFileMasterList(String filters) {
+    public List<RsResource> findFileMasterList(String ids, String filters) {
         String sql = "";
         if (filters != null) {
-            sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resource rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0) AND rr.name like " + "'%" + filters + "%'";
+            if(ids != null) {
+                sql = "SELECT rr.id, rr.code, rr.name, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                        "AND (rr.rs_interface = 'getEhrCenter' AND rr.id IN (" + ids + "))) " +
+                        "OR ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') AND rr.rs_interface = 'getEhrCenter' AND rr.grant_type = '0'))) " +
+                        "AND rr.name like " + "'%" + filters + "%'";
+            }else {
+                sql = "SELECT rr.id, rr.code, rr.name, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                        "AND rr.rs_interface = 'getEhrCenter' " +
+                        "AND rr.name like " + "'%" + filters + "%'";
+            }
         } else {
-            sql = "select rr.id, rr.code, rr.name, rr.rs_interface from rs_resource rr where rr.code in (select code from std_data_set_59083976eebd where multi_record = 0)";
+            if(ids != null) {
+                sql = "SELECT rr.id, rr.code, rr.name, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                        "AND (rr.rs_interface = 'getEhrCenter' AND rr.id IN (" + ids + "))) " +
+                        "OR ((rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') AND rr.rs_interface = 'getEhrCenter' AND rr.grant_type = '0')))";
+            }else {
+                sql = "SELECT rr.id, rr.code, rr.name, rr.rs_interface, rr.grant_type FROM rs_resource rr WHERE rr.category_id IN (SELECT id FROM rs_resource_category WHERE code = 'standard') " +
+                        "AND rr.rs_interface = 'getEhrCenter'";
+            }
         }
-        RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(RsResource.class);
-        return this.jdbcTemplate.query(sql, rowMapper);
+        RowMapper rowMapper = BeanPropertyRowMapper.newInstance(RsResource.class);
+        return jdbcTemplate.query(sql, rowMapper);
     }
 
     /**
      * 根据档案数据主体获取数据元列表
-     * @param rsResources
+     * @param rsResource
+     * @param roleId
      * @return
      */
-    public List<RsMetadata> findFileMetadataList(RsResource rsResources) {
-        String sql = "";
-        RowMapper rowMapper = null;
-        if(rsResources != null) {
-            sql = "select * from rs_metadata rm where rm.id in (select metadata_id from rs_resource_metadata where resources_id = '" + rsResources.getId() + "')";
-            rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(RsMetadata.class);
-            return this.jdbcTemplate.query(sql, rowMapper);
+    public List<RsMetadata> findFileMetadataList(RsResource rsResource, String roleId) throws Exception{
+        List<DtoResourceMetadata> metadataList;
+        Set<String> rsMetadataIdSet = new HashSet<String>();
+        String grantType = rsResource.getGrantType();
+        //获取数据元信息
+        if(grantType.equals("1") && !roleId.equals("*")) {
+            List<String> roleIdList = objectMapper.readValue(roleId, List.class);
+            for(String id : roleIdList) {
+                RsRolesResource rsRolesResource = rsRolesResourceGrantService.findByResourceIdAndRolesId(rsResource.getId(), id);
+                if(rsRolesResource != null) {
+                    List<RsRolesResourceMetadata> rsRolesResourceMetadataList = rsRolesResourceMetadataGrantService.findByRolesResourceIdAndValid(rsRolesResource.getId(), "1");
+                    if(rsRolesResourceMetadataList != null) {
+                        for (RsRolesResourceMetadata rsRolesResourceMetadata : rsRolesResourceMetadataList) {
+                            rsMetadataIdSet.add(rsRolesResourceMetadata.getResourceMetadataId());
+                        }
+                    }
+                }
+            }
+            if(rsMetadataIdSet.size() > 0) {
+                String rsMetadataIds = "";
+                for (String id : rsMetadataIdSet) {
+                    rsMetadataIds += "'" + id + "'" + ",";
+                }
+                metadataList = resourceMetadataQueryDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
+            }else {
+                metadataList = null;
+            }
+        } else{
+            metadataList = resourceMetadataQueryDao.getAllResourceMetadata(rsResource.getCode());
+        }
+        if(metadataList != null && metadataList.size() > 0) {
+            String metadataIds = "";
+            for(DtoResourceMetadata dtoResourceMetadata : metadataList){
+                metadataIds += "'" + dtoResourceMetadata.getId() + "'" + ",";
+            }
+            String sql = "";
+            sql = "select * from rs_metadata rm where rm.id in (" + metadataIds.substring(0, metadataIds.length() - 1) + ")";
+            RowMapper rowMapper = BeanPropertyRowMapper.newInstance(RsMetadata.class);
+            return jdbcTemplate.query(sql, rowMapper);
         }else {
             return null;
         }
@@ -78,8 +135,8 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
         }else {
             sql = "select * from tj_quota_category where parent_id = " + parentId;
         }
-        RowMapper rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(QuotaCategory.class);
-        return this.jdbcTemplate.query(sql, rowMapper);
+        RowMapper rowMapper =  BeanPropertyRowMapper.newInstance(QuotaCategory.class);
+        return jdbcTemplate.query(sql, rowMapper);
     }
 
     /**
@@ -89,11 +146,10 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
      */
     public List<TjQuota> findQuotaMetadataList(QuotaCategory quotaCategory) {
         String sql = "";
-        RowMapper rowMapper = null;
         if(quotaCategory != null) {
             sql = "select * from tj_quota tj where tj.quota_type = " + quotaCategory.getId();
-            rowMapper = (RowMapper) BeanPropertyRowMapper.newInstance(TjQuota.class);
-            return this.jdbcTemplate.query(sql, rowMapper);
+            RowMapper rowMapper = BeanPropertyRowMapper.newInstance(TjQuota.class);
+            return jdbcTemplate.query(sql, rowMapper);
         }else {
             return null;
         }
@@ -156,14 +212,12 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
      * @param filters
      * @return
      */
-    public Envelop getMetadataList(String filters) {
+    public Envelop getMetadataList(String userResource, String roleId, String filters) throws Exception{
         Envelop envelop = new Envelop();
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
         Map<String, Object> baseMap = new HashMap<String, Object>();
         List<Map<String, String>> baseList = new ArrayList<Map<String, String>>();
-        /**
-         * 处理基本数据
-         */
+        //处理基本数据
         Map<String, String> baseMap1 = new HashMap<String, String>();
         baseMap1.put("code", "event_date");
         baseMap1.put("name", "时间");
@@ -191,14 +245,25 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
         baseMap.put("level", "0");
         baseMap.put("baseInfo", baseList);
         resultList.add(baseMap);
-        List<RsResource> rrList = findFileMasterList(filters);
+        List<RsResource> rrList;
+        if(userResource.equals("*")) {
+            rrList = findFileMasterList(null, filters);
+        }else {
+            //授权资源
+            List<String> userResourceList = objectMapper.readValue(userResource, List.class);
+            String ids = "";
+            for(String id : userResourceList) {
+                ids += "'" + id + "'" + ",";
+            }
+            rrList = findFileMasterList(ids.substring(0, ids.length() -1), filters);
+        }
         if(rrList != null) {
             for(RsResource rsResources : rrList) {
                 Map<String, Object> masterMap = new HashMap<String, Object>();
                 masterMap.put("code", rsResources.getCode());
                 masterMap.put("name", rsResources.getName());
                 masterMap.put("level", "1");
-                List<RsMetadata> rmList = findFileMetadataList(rsResources);
+                List<RsMetadata> rmList = findFileMetadataList(rsResources, roleId);
                 if(rmList != null) {
                     List<Map<String, Object>> metadataList = new ArrayList<Map<String, Object>>();
                     for(RsMetadata rsMetadata : rmList) {
@@ -214,10 +279,8 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
                         metadataList.add(metadataMap);
                     }
                     masterMap.put("metaDataList", metadataList);
-                }else {
-                    masterMap.put("metaDataList", null);
+                    resultList.add(masterMap);
                 }
-                resultList.add(masterMap);
             }
         }
         envelop.setSuccessFlg(true);
@@ -229,7 +292,7 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
      * 综合查询档案数据检索
      * @return
      */
-    public Envelop searchMetadataData(String resourcesCode, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception{
+    public Envelop searchMetadataData(String resourcesCode, String metaData, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception{
         Pattern pattern = Pattern.compile("\\[.+?\\]");
         if(resourcesCode != null) {
             Matcher rcMatcher = pattern.matcher(resourcesCode);
@@ -257,7 +320,7 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
                 }
             }
         }
-        return resourcesQueryService.getCustomizeData(resourcesCode, metaData, orgCode, appId, queryCondition, page, size);
+        return resourcesQueryService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
     }
 
     /**

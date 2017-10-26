@@ -113,7 +113,7 @@ public class PatientInfoDetailService {
         }
 
         //西药统计
-        Envelop resultWestern = resource.getResources(BasisConstant.medicationWesternStat, appId,null, xyQueryParams.replace(" ", "+"), null, null);
+        Envelop resultWestern = resource.getResources(BasisConstant.medicationWesternStat, "*", "*", xyQueryParams.replace(" ", "+"), null, null);
         if (resultWestern.getDetailModelList() != null && resultWestern.getDetailModelList().size() > 0) {
             List<Map<String, Object>> list = resultWestern.getDetailModelList();
             for (Map<String, Object> map : list) {
@@ -124,7 +124,7 @@ public class PatientInfoDetailService {
             }
         }
         //中药统计
-        Envelop resultChinese = resource.getResources(BasisConstant.medicationChineseStat, appId,null, zyQueryParams.replace(" ", "+"), null, null);
+        Envelop resultChinese = resource.getResources(BasisConstant.medicationChineseStat, "*", "*", zyQueryParams.replace(" ", "+"), null, null);
         if (resultChinese.getDetailModelList() != null && resultChinese.getDetailModelList().size() > 0) {
             List<Map<String, Object>> list = resultChinese.getDetailModelList();
             for (Map<String, Object> map : list) {
@@ -182,7 +182,7 @@ public class PatientInfoDetailService {
         {
             resourceCode = BasisConstant.medicationChinese;
         }
-        Envelop result = resource.getResources(resourceCode, appId, null,"{\"q\":\"" + queryParams + "\"}", null, null);
+        Envelop result = resource.getResources(resourceCode, "*", "*","{\"q\":\"" + queryParams + "\"}", null, null);
         re = result.getDetailModelList();
         return re;
     }
