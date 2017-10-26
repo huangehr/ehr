@@ -29,67 +29,24 @@ import java.util.Map;
  * @created 2017.06.22
  */
 @RestController
-@RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Api(value = "档案事件接口", description = "档案事件接口")
+@RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ProfileEventEndPoint extends BaseRestEndPoint {
 
     @Autowired
-    ObjectMapper mapper;
-
+    private ObjectMapper mapper;
     @Autowired
-    PatientInfoBaseService patient;
-
+    private PatientInfoBaseService patient;
     @Autowired
-    PatientEventService patientEvent;
-
+    private PatientEventService patientEvent;
     @Autowired
-    PatientInfoDetailService patientDetail;
-
+    private PatientInfoDetailService patientDetail;
     @Autowired
-    ProfileCDAService profileCDAService;
-
+    private ProfileCDAService profileCDAService;
     @Autowired
-    XTransformClient transform;
-
+    private XTransformClient transform;
     @Autowired
-    IndicatorsService indicatorsService;
-
-    /**
-     * 单条记录转适配
-     * @return
-     */
-    private Map<String,Object> adapterOne(String version,Map<String,Object> obj) throws Exception
-    {
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setSource(mapper.writeValueAsString(obj));
-            stdTransformDto.setVersion(version);
-            return transform.stdTransform(mapper.writeValueAsString(stdTransformDto));
-        }
-        else{
-            return obj;
-        }
-    }
-
-    /**
-     * 多条记录转适配
-     * @return
-     */
-    private List<Map<String,Object>> adapterBatch(String version,List<Map<String,Object>> list) throws Exception
-    {
-        if(version!=null)
-        {
-            MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(list));
-            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
-        }
-        else{
-            return list;
-        }
-    }
-
+    private IndicatorsService indicatorsService;
 
     @ApiOperation("全文检索（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.ProfileLucene, method = RequestMethod.GET)
@@ -116,10 +73,9 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Profiles.ProfileInfo, method = RequestMethod.GET)
     public Map<String,Object> profileInfo(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
-            @RequestParam(value = "demographic_id", required = true) String demographic_id,
+            @RequestParam(value = "demographic_id") String demographic_id,
             @ApiParam(name = "version", value = "版本号",defaultValue="59083976eebd")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-
         Map<String,Object> re = patient.getPatientInfo(demographic_id);
         return adapterOne(version,re);
     }
@@ -128,7 +84,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
     public String ProfileHistory(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
-            @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
+            @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
 
         return "[{\"pastHistoryType\":\"家族病史\",\"pastHistoryContents\":\"也就是医学中常常提到的家族史，也指某一种病的患者的家族成员（较大范围的家族成员，不仅限于祖孙等直系亲属）中发病情况。家族病史分为阴性跟阳性。 1)阴性（即没有发现同样病的患者）。临床上无家族史 2)阳性（即发现有同样病的患者）。比如：临床上讲糖尿病家族史、高血压病家族史、遗传型疾病家族史等。\"},\n" +
                 "  {\"pastHistoryType\":\"传染史\",\"pastHistoryContents\":\"传染史..\"},\n" +
@@ -140,7 +96,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Profiles.HealthProblem, method = RequestMethod.GET)
     public List<Map<String,Object>> HealthProblem(
             @ApiParam(name = "demographic_id", value = "身份证号",defaultValue="422724197105101686")
-            @RequestParam(value = "demographic_id", required = true) String demographic_id) throws Exception {
+            @RequestParam(value = "demographic_id") String demographic_id) throws Exception {
         return patient.getHealthProblem(demographic_id);
     }
 		
@@ -272,5 +228,37 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         Envelop re = indicatorsService.getIndicatorsData(demographic_id,indicator_code,date_from,date_end,page,size);
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
+    }
+
+    /**
+     * 单条记录转适配
+     * @return
+     */
+    private Map<String,Object> adapterOne(String version,Map<String,Object> obj) throws Exception {
+        if(version != null) {
+            MStdTransformDto stdTransformDto = new MStdTransformDto();
+            stdTransformDto.setSource(mapper.writeValueAsString(obj));
+            stdTransformDto.setVersion(version);
+            return transform.stdTransform(mapper.writeValueAsString(stdTransformDto));
+        }
+        else{
+            return obj;
+        }
+    }
+
+    /**
+     * 多条记录转适配
+     * @return
+     */
+    private List<Map<String,Object>> adapterBatch(String version,List<Map<String,Object>> list) throws Exception {
+        if(version!=null) {
+            MStdTransformDto stdTransformDto = new MStdTransformDto();
+            stdTransformDto.setVersion(version);
+            stdTransformDto.setSource(mapper.writeValueAsString(list));
+            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
+        }
+        else{
+            return list;
+        }
     }
 }

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -89,16 +90,25 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
     @ApiOperation("获取资源列表树")
     public Envelop getResourceTree(
-            @ApiParam(name = "dataSource", value = "数据元")
+            @ApiParam(name = "dataSource", value = "资源类型")
             @RequestParam(value = "dataSource") Integer dataSource,
+            @ApiParam(name = "userResource", value = "授权资源")
+            @RequestParam(value = "userResource") String userResource,
             @ApiParam(name = "filters", value = "过滤条件(name)")
             @RequestParam(value = "filters", required = false) String filters) {
         Envelop envelop = new Envelop();
-        List<Map<String, Object>> resultList = rsResourceService.getResourceTree(dataSource, filters);
-        envelop.setSuccessFlg(true);
-        envelop.setTotalCount(resultList.size());
-        envelop.setDetailModelList(resultList);
-        return envelop;
+        try{
+            List<Map<String, Object>> resultList = rsResourceService.getResourceTree(dataSource, userResource, filters);
+            envelop.setSuccessFlg(true);
+            envelop.setTotalCount(resultList.size());
+            envelop.setDetailModelList(resultList);
+            return envelop;
+        }catch (IOException e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+            return envelop;
+        }
     }
 
     @ApiOperation("资源查询")

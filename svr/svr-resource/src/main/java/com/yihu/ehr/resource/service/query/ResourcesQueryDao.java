@@ -59,7 +59,7 @@ public class ResourcesQueryDao {
                 if (obj.containsKey("q")) {
                     q = obj.get("q");
                     if (obj.containsKey("saas") && !obj.get("saas").equals("*")) {
-                        q += " AND ("+obj.get("saas")+")";
+                        q += " AND (" + obj.get("saas") + ")";
                     }
                 }
                 else{

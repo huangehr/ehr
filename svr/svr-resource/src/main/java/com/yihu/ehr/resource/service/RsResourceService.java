@@ -1,6 +1,7 @@
 package com.yihu.ehr.resource.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.RsResourceCategoryDao;
 import com.yihu.ehr.resource.dao.RsResourceMetadataDao;
@@ -8,7 +9,6 @@ import com.yihu.ehr.resource.dao.RsResourceDao;
 import com.yihu.ehr.resource.dao.RsResourceDefaultQueryDao;
 import com.yihu.ehr.resource.model.RsResource;
 import com.yihu.ehr.resource.model.RsResourceCategory;
-import javafx.beans.binding.ObjectExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,8 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
     private RsResourceDefaultQueryDao resourcesDefaultQueryDao;
     @Autowired
     private RsResourceCategoryDao rsResourceCategoryDao;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * 资源创建
@@ -105,15 +108,29 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
 
     /**
      * 获取资源列表树
+     * @param dataSource
+     * @param userResource
      * @param filters
      * @return
      */
-    public List<Map<String, Object>> getResourceTree(Integer dataSource, String filters){
+    public List<Map<String, Object>> getResourceTree(Integer dataSource, String userResource, String filters) throws IOException{
+        List<RsResourceCategory> rsCateList;
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-        List<RsResourceCategory> rsCateList = rsResourceCategoryDao.findByPid("");
-        for(RsResourceCategory rsResourceCategory : rsCateList) {
-            Map<String, Object> childMap = getTreeMap(rsResourceCategory, 0, dataSource, filters);
-            resultList.add(childMap);
+        if(userResource.equals("*")){
+            rsCateList = rsResourceCategoryDao.findByPid("");
+            for(RsResourceCategory rsResourceCategory : rsCateList) {
+                Map<String, Object> childMap = getTreeMap(rsResourceCategory, 0, dataSource, null, filters);
+                resultList.add(childMap);
+            }
+        }else {
+            rsCateList = rsResourceCategoryDao.findByCode("derived");
+            List<String> userResourceList = objectMapper.readValue(userResource, List.class);
+            String [] ids = new String[userResourceList.size()];
+            userResourceList.toArray(ids);
+            for(RsResourceCategory rsResourceCategory : rsCateList) {
+                Map<String, Object> childMap = getTreeMap(rsResourceCategory, 0, dataSource, ids, filters);
+                resultList.add(childMap);
+            }
         }
         return resultList;
     }
@@ -124,7 +141,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
      * @param filters
      * @return
      */
-    private Map<String, Object> getTreeMap(RsResourceCategory rsResourceCategory, int level, Integer dataSource, String filters) {
+    private Map<String, Object> getTreeMap(RsResourceCategory rsResourceCategory, int level, Integer dataSource, String [] ids, String filters) {
         Map<String, Object> masterMap = new HashMap<String, Object>();
         if(rsResourceCategory != null) {
             /**
@@ -136,9 +153,17 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             masterMap.put("pid", rsResourceCategory.getId());
             List<RsResource> rsList;
             if(StringUtils.isEmpty(filters)) {
-                rsList = rsResourceDao.findByCategoryIdAndDataSource(rsResourceCategory.getId(), dataSource);
+                if(null == ids) {
+                    rsList = rsResourceDao.findByCategoryIdAndDataSource(rsResourceCategory.getId(), dataSource);
+                }else {
+                    rsList = rsResourceDao.findByCategoryIdAndDataSourceAndIdsOrGrantType(rsResourceCategory.getId(), dataSource, ids, "0");
+                }
             }else {
-                rsList = rsResourceDao.findByCategoryIdAndDataSourceAndName(rsResourceCategory.getId(), dataSource, filters);
+                if(null == ids) {
+                    rsList = rsResourceDao.findByCategoryIdAndDataSourceAndName(rsResourceCategory.getId(), dataSource, filters);
+                }else {
+                    rsList = rsResourceDao.findByCategoryIdAndDataSourceAndIdsOrGrantTypeAndName(rsResourceCategory.getId(), dataSource, ids, "0", filters);
+                }
             }
             //处理下属资源
             if (rsList != null) {
@@ -164,7 +189,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             if(hList != null) {
                 List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
                 for(RsResourceCategory category: hList) {
-                    childList.add(getTreeMap(category, level + 1, dataSource, filters));
+                    childList.add(getTreeMap(category, level + 1, dataSource, ids, filters));
                 }
                 masterMap.put("child", childList);
             }

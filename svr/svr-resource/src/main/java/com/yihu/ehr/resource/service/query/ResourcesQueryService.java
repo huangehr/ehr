@@ -12,8 +12,12 @@ import com.yihu.ehr.resource.dao.*;
 import com.yihu.ehr.resource.feign.AppClient;
 import com.yihu.ehr.resource.feign.RedisClient;
 import com.yihu.ehr.resource.model.*;
+import com.yihu.ehr.resource.service.RsRolesResourceGrantService;
+import com.yihu.ehr.resource.service.RsRolesResourceMetadataGrantService;
 import com.yihu.ehr.util.rest.Envelop;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -41,8 +45,6 @@ public class ResourcesQueryService  {
     @Autowired
     private RsResourceDefaultParamDao resourceDefaultParamDao;
     @Autowired
-    private RsAppResourceDao appResourceDao;
-    @Autowired
     private RedisClient redisServiceClient;
     @Autowired
     private AppClient appClient;
@@ -50,43 +52,114 @@ public class ResourcesQueryService  {
     private ObjectMapper objectMapper;
     @Autowired
     private RsResourceDefaultQueryDao resourcesDefaultQueryDao;
+    @Autowired
+    private RsRolesResourceGrantService rsRolesResourceGrantService;
+    @Autowired
+    private RsRolesResourceMetadataGrantService rsRolesResourceMetadataGrantService;
 
     //忽略字段
     private List<String> ignoreField = new ArrayList<String>(Arrays.asList("rowkey", "event_type", "event_no", "event_date", "demographic_id", "patient_id", "org_code", "org_name", "profile_id", "cda_version", "client_id", "profile_type", "patient_name", "org_area", "diagnosis", "health_problem"));
 
     /**
+     * 资源浏览 -- 资源数据元结构
+     * @param resourcesCode
+     * @param roleId
+     * @return
+     * @throws Exception
+     */
+    public String getResourceMetadata(String resourcesCode, String roleId) throws Exception{
+        Map<String, Object> mapParam = new HashMap<String, Object>();
+        List<DtoResourceMetadata> metadataList;
+        Set<String> rsMetadataIdSet = new HashSet<String>();
+        //获取资源信息
+        RsResource rsResource = resourcesDao.findByCode(resourcesCode);
+        String grantType = rsResource.getGrantType();
+        if(grantType.equals("1") && !roleId.equals("*")) {
+            List<String> roleIdList = objectMapper.readValue(roleId, List.class);
+            for(String id : roleIdList) {
+                RsRolesResource rsRolesResource = rsRolesResourceGrantService.findByResourceIdAndRolesId(rsResource.getId(), id);
+                if(rsRolesResource != null) {
+                    List<RsRolesResourceMetadata> rsRolesResourceMetadataList = rsRolesResourceMetadataGrantService.findByRolesResourceIdAndValid(rsRolesResource.getId(), "1");
+                    if(rsRolesResourceMetadataList != null) {
+                        for (RsRolesResourceMetadata rsRolesResourceMetadata : rsRolesResourceMetadataList) {
+                            rsMetadataIdSet.add(rsRolesResourceMetadata.getResourceMetadataId());
+                        }
+                    }
+                }
+            }
+            if(rsMetadataIdSet.size() > 0) {
+                String rsMetadataIds = "";
+                for (String id : rsMetadataIdSet) {
+                    rsMetadataIds += "'" + id + "'" + ",";
+                }
+                metadataList = resourceMetadataQueryDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
+            }else {
+                metadataList = null;
+            }
+        } else{
+            metadataList = resourceMetadataQueryDao.getAllResourceMetadata(rsResource.getCode());
+        }
+        //资源结构
+        List<String> colunmName = new ArrayList<String>();
+        List<String> colunmCode = new ArrayList<String>();
+        List<String> colunmType = new ArrayList<String>();
+        List<String> colunmDict = new ArrayList<String>();
+        if(metadataList != null) {
+            for (DtoResourceMetadata r : metadataList) {
+                colunmName.add(r.getName());
+                if (!StringUtils.isEmpty(r.getDictCode())) {
+                    colunmCode.add(r.getId() + "_VALUE");
+                } else {
+                    colunmCode.add(r.getId());
+                }
+                colunmType.add(r.getColumnType());
+                colunmDict.add(r.getDictCode());
+            }
+        }
+        //设置动态datagrid值
+        mapParam.put("colunmName", colunmName);
+        mapParam.put("colunmCode", colunmCode);
+        mapParam.put("colunmDict", colunmDict);
+        mapParam.put("colunmType", colunmType);
+        return objectMapper.writeValueAsString(mapParam);
+    }
+
+    /**
      * 获取资源数据
      * @param resourcesCode
-     * @param appId
+     * @param orgCode
+     * @param areaCode
      * @param queryParams Mysql为sql语句，Hbase为solr查询语法
      * @param page
      * @param size
      * @return
      * @throws Exception
      */
-    public Envelop getResources(String resourcesCode, String appId, String orgCode, String queryParams, Integer page, Integer size) throws Exception {
-        return getResultData(resourcesCode, appId, orgCode, queryParams, page, size, false);
+    public Envelop getResources(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
+        return getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size, false);
     }
 
     /**
      * 获取资源数据(档案浏览器主要健康问题诊断详情)
      * @param resourcesCode
-     * @param appId
+     * @param orgCode
+     * @param areaCode
      * @param queryParams Mysql为sql语句，Hbase为solr查询语法
      * @param page
      * @param size
      * @return
      * @throws Exception
      */
-    public Envelop getResourcesSub(String resourcesCode, String appId, String orgCode, String queryParams, Integer page, Integer size) throws Exception {
-        return getResultData(resourcesCode, appId, orgCode, queryParams, page, size, true);
+    public Envelop getResourcesSub(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
+        return getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size, true);
     }
 
     /**
      * 资源浏览
      * @return
      */
-    public Envelop getResourceData(String resourcesCode, String orgCode, String queryCondition, Integer page, Integer size) throws Exception {
+    public Envelop getResourceData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception {
+        Envelop envelop = new Envelop();
         String queryParams = "";
         //获取资源信息
         RsResource rsResources = resourcesDao.findByCode(resourcesCode);
@@ -101,60 +174,54 @@ public class ResourcesQueryService  {
                 ql = parseCondition(defaultQuery);
             }
             queryParams = addParams(queryParams,"q", solr.conditionToString(ql));
+            return resourcesBrowse(resourcesCode, rsResources.getRsInterface(), roleId, orgCode, areaCode, queryParams, page, size);
         }else {
-            throw new Exception("无效资源！");
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("无效资源！");
+            return envelop;
         }
-        return resourcesBrowse(resourcesCode, "JKZL", orgCode, queryParams, page, size);
     }
 
     /**
-     * 资源浏览数据
+     * 资源浏览（细表数据处理）
      * @param resourcesCode
-     * @param appId
+     * @param orgCode
+     * @param areaCode
      * @param queryParams Mysql为sql语句，Hbase为solr查询语法
      * @param page
      * @param size
      * @return
      * @throws Exception
      */
-    public Envelop resourcesBrowse(String resourcesCode, String appId, String orgCode, String queryParams, Integer page, Integer size) throws Exception {
-        Envelop envelop = null;
-        //获取资源信息
-        RsResource rsResources = resourcesDao.findByCode(resourcesCode);
-        if(rsResources != null) {
-            String methodName = rsResources.getRsInterface(); //执行函数
-            //获取结果集
-            envelop = getResultData(resourcesCode, appId, orgCode, queryParams, page, size, false);
-            //如果资源查询为细表则增加主表信息
-            if(methodName.endsWith("Sub") && envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
-                List<Map<String,Object>> oldList = envelop.getDetailModelList();
-                for(Map<String, Object> temp : oldList) {
-                    String masterRowKey = (String)temp.get("profile_id");
-                    if(masterRowKey != null) {
-                        Map<String, Object> matsterMap = hbase.queryByRowKey(ResourceCore.MasterTable, masterRowKey);
-                        temp.put("event_date", matsterMap.get("event_date"));
-                        temp.put("org_name", matsterMap.get("org_name"));
-                        temp.put("org_code", matsterMap.get("org_code"));
-                        temp.put("demographic_id", matsterMap.get("demographic_id"));
-                        temp.put("patient_name", matsterMap.get("patient_name"));
-                        String eventType = (String)matsterMap.get("event_type");
-                        if(null != eventType) {
-                            if ("0".equals(eventType)) {
-                                temp.put("event_type", "门诊");
-                            } else if ("1".equals(eventType)) {
-                                temp.put("event_type", "住院");
-                            } else if ("2".equals(eventType)) {
-                                temp.put("event_type", "体检");
-                            }
-                        }else {
-                            temp.put("event_type", "未知类型");
+    public Envelop resourcesBrowse(String resourcesCode, String methodName, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
+        //获取结果集
+        Envelop envelop = getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size, false);
+        //如果资源查询为细表则增加主表信息
+        if(methodName.endsWith("Sub") && envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
+            List<Map<String,Object>> oldList = envelop.getDetailModelList();
+            for(Map<String, Object> temp : oldList) {
+                String masterRowKey = (String)temp.get("profile_id");
+                if(masterRowKey != null) {
+                    Map<String, Object> masterMap = hbase.queryByRowKey(ResourceCore.MasterTable, masterRowKey);
+                    temp.put("event_date", masterMap.get("event_date"));
+                    temp.put("org_name", masterMap.get("org_name"));
+                    temp.put("org_code", masterMap.get("org_code"));
+                    temp.put("demographic_id", masterMap.get("demographic_id"));
+                    temp.put("patient_name", masterMap.get("patient_name"));
+                    String eventType = (String)masterMap.get("event_type");
+                    if(null != eventType) {
+                        if ("0".equals(eventType)) {
+                            temp.put("event_type", "门诊");
+                        } else if ("1".equals(eventType)) {
+                            temp.put("event_type", "住院");
+                        } else if ("2".equals(eventType)) {
+                            temp.put("event_type", "体检");
                         }
+                    }else {
+                        temp.put("event_type", "未知类型");
                     }
                 }
             }
-        }
-        else{
-            throw new Exception("无效资源！");
         }
         return envelop;
     }
@@ -163,7 +230,7 @@ public class ResourcesQueryService  {
      * 综合查询档案数据检索
      * @return
      */
-    public Envelop getCustomizeData(String resourcesCodes, String metaData, String orgCode, String appId, String queryCondition, Integer page, Integer size) throws Exception {
+    public Envelop getCustomizeData(String resourcesCodes, String metaData, String orgCode, String areaCode, String queryCondition, Integer page, Integer size) throws Exception {
         Envelop envelop = new Envelop();
         ObjectMapper mapper = new ObjectMapper();
         String queryParams = "";
@@ -175,16 +242,40 @@ public class ResourcesQueryService  {
          */
         for(String code : codeList) {
             RsResource rsResources = resourcesDao.findByCode(code);
-            if(rsResources != null) {
-                String grantType = rsResources.getGrantType(); //访问方式 0开放 1授权
-                //获取资源结构，检查APP权限
-                List<DtoResourceMetadata> metadataList = isAccessMetadata(code, grantType, appId);
+            if(rsResources != null && StringUtils.isEmpty(saas)) {
                 //获取Saas权限参数
-                saas = getSaas(appId, orgCode);
-                if(StringUtils.isEmpty(saas)) {
-                    throw new Exception("无SAAS权限访问资源[resourcesCode=" + code + "]");
+                if(orgCode.equals("*") && areaCode.equals("*")) {
+                    saas = "*";
+                }else {
+                    List<String> orgCodeList = objectMapper.readValue(orgCode, List.class);
+                    List<String> areaCodeList = objectMapper.readValue(areaCode, List.class);
+                    if((orgCodeList != null && orgCodeList.size() > 0)) {
+                        for(String code1 : orgCodeList) {
+                            if(StringUtils.isEmpty(saas)) {
+                                saas = "org_code:" + code1;
+                            }
+                            else{
+                                saas += " OR org_code:" + code1;
+                            }
+                        }
+                    }
+                    if(areaCodeList != null && areaCodeList.size() > 0) {
+                        for(String code1 : areaCodeList) {
+                            if(StringUtils.isEmpty(saas)) {
+                                saas = "org_area:" + code1;
+                            }
+                            else{
+                                saas += " OR org_area:" + code1;
+                            }
+                        }
+                    }
                 }
             }
+        }
+        if(StringUtils.isEmpty(saas)) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("无SAAS权限访问资源");
+            return envelop;
         }
         List<QueryCondition> ql = new ArrayList<>();
         if (!StringUtils.isEmpty(queryCondition) && !queryCondition.equals("{}")) {
@@ -235,8 +326,8 @@ public class ResourcesQueryService  {
     /**
      * 获取最终数据
      * @param resourcesCode
-     * @param appId
      * @param orgCode
+     * @param areaCode
      * @param queryParams
      * @param page
      * @param size
@@ -244,25 +335,51 @@ public class ResourcesQueryService  {
      * @return
      * @throws Exception
      */
-    private Envelop getResultData(String resourcesCode, String appId, String orgCode, String queryParams, Integer page, Integer size, boolean isSpecialScan) throws Exception{
+    private Envelop getResultData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size, boolean isSpecialScan) throws Exception{
         Envelop envelop = new Envelop();
         RsResource rsResources = resourcesDao.findByCode(resourcesCode);
         if(rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
             String grantType = rsResources.getGrantType(); //访问方式 0开放 1授权
-            //资源结构
-            List<DtoResourceMetadata> metadataList = isAccessMetadata(resourcesCode, grantType, appId);
-            //获取Saas权限参数
-            String saas = getSaas(appId, orgCode);
+            //获取资源结构权限
+            List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId);
+            //获取Saas权限
+            String saas = "";
+            if (orgCode.equals("*") && areaCode.equals("*")) {
+                saas = "*";
+            } else {
+                List<String> orgCodeList = objectMapper.readValue(orgCode, List.class);
+                List<String> areaCodeList = objectMapper.readValue(areaCode, List.class);
+                if ((orgCodeList != null && orgCodeList.size() > 0)) {
+                    for (String code : orgCodeList) {
+                        if (StringUtils.isEmpty(saas)) {
+                            saas = "org_code:" + code;
+                        } else {
+                            saas += " OR org_code:" + code;
+                        }
+                    }
+                }
+                if (areaCodeList != null && areaCodeList.size() > 0) {
+                    for (String code : areaCodeList) {
+                        if (StringUtils.isEmpty(saas)) {
+                            saas = "org_area:" + code;
+                        } else {
+                            saas += " OR org_area:" + code;
+                        }
+                    }
+                }
+            }
             if(StringUtils.isEmpty(saas)) {
-                throw new Exception("无SAAS权限访问资源[resourcesCode=" + resourcesCode+ "]");
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("无SAAS权限访问资源[resourcesCode=" + resourcesCode+ "]");
+                return envelop;
             }
             else {
-                queryParams = addParams(queryParams,"saas",saas);
+                queryParams = addParams(queryParams,"saas", saas);
             }
             //通过资源代码获取默认参数
             List<RsResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
-            for(RsResourceDefaultParam param:paramsList) {
+            for(RsResourceDefaultParam param : paramsList) {
                 queryParams = addParams(queryParams, param.getParamKey(), param.getParamValue());
             }
             //分组统计数据元
@@ -420,7 +537,6 @@ public class ResourcesQueryService  {
         if(cdaDocumentId!=null && cdaDocumentId.length()>0) {
             queryParams = "{\"q\":\"rowkey:"+profileId+"* AND cda_document_id:"+cdaDocumentId+"\"}";
         }
-
         Page<Map<String,Object>> result = resourcesQueryDao.getRawFiles(queryParams, page, size);
         if (result != null) {
             re.setSuccessFlg(true);
@@ -457,80 +573,41 @@ public class ResourcesQueryService  {
     }
 
     /**
-     * 区域并集
-     */
-    private List<String> containArea(List<String> areaListApp,String[] areaArray) {
-        List<String> areaList = new ArrayList<>();
-
-        for(String area : areaArray) {
-            //省
-            if(area.endsWith("0000")) {
-                //全省
-                if(areaListApp.contains(area)) {
-                    areaList.add(area);
-                }
-                //选定省所属
-                else {
-                    for(String areaApp:areaListApp) {
-                        //截取省代码
-                        if(area.substring(0,area.length()-4).equals(areaApp.substring(0,area.length()-4))) {
-                            areaList.add(areaApp);
-                        }
-                    }
-                }
-            }
-            //市
-            else if(area.endsWith("00")) {
-                //全市
-                if(areaListApp.contains(area) || areaListApp.contains(area.substring(0,area.length()-4)+"0000")) {
-                    areaList.add(area);
-                }
-                //选定市所属
-                else{
-                    for(String areaApp:areaListApp) {
-                        //截取市代码
-                        if(area.substring(0,area.length()-2).equals(areaApp.substring(0,area.length()-2))) {
-                            areaList.add(areaApp);
-                        }
-                    }
-                }
-            }
-            //区
-            else {
-                if(areaListApp.contains(area) || areaListApp.contains(area.substring(0,area.length()-4)+"0000") || areaListApp.contains(area.substring(0,area.length()-2)+"00")) {
-                    areaList.add(area);
-                }
-            }
-        }
-        return areaList;
-    }
-
-    /**
-     * 判断应用是否有资源访问权限，并返回数据元列表
-     * @param resourcesCode
-     * @param grantType
-     * @param appId
+     * 获取资源授权数据元列表
+     * @param rsResource
+     * @param roleId
      * @return
      * @throws Exception
      */
-    private List<DtoResourceMetadata> isAccessMetadata(String resourcesCode, String grantType, String appId) throws Exception{
-        List<DtoResourceMetadata> metadataList = null;
-        if(grantType == "1" && appId != "JKZL") {
-            //判断应用是否有资源权限
-            RsAppResource appResource = appResourceDao.findByAppId(appId);
-            if(appResource != null) {
-                //获取授权数据源
-                metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode, appResource.getId());
+    private List<DtoResourceMetadata> getAccessMetadata(RsResource rsResource, String roleId) throws Exception{
+        Set<String> rsMetadataIdSet = new HashSet<String>();
+        String grantType = rsResource.getGrantType();
+        if(grantType.equals("1") && !roleId.equals("*")) {
+            List<String> roleIdList = objectMapper.readValue(roleId, List.class);
+            for(String id : roleIdList) {
+                RsRolesResource rsRolesResource = rsRolesResourceGrantService.findByResourceIdAndRolesId(rsResource.getId(), id);
+                if(rsRolesResource != null) {
+                    List<RsRolesResourceMetadata> rsRolesResourceMetadataList = rsRolesResourceMetadataGrantService.findByRolesResourceIdAndValid(rsRolesResource.getId(), "1");
+                    if(rsRolesResourceMetadataList != null) {
+                        for (RsRolesResourceMetadata rsRolesResourceMetadata : rsRolesResourceMetadataList) {
+                            rsMetadataIdSet.add(rsRolesResourceMetadata.getResourceMetadataId());
+                        }
+                    }
+                }
             }
-            else {
-                throw new Exception("应用[appId =" + appId + "]无权访问资源[resourcesCode =" + resourcesCode+ "]");
+            if(rsMetadataIdSet.size() > 0) {
+                String rsMetadataIds = "";
+                for (String id : rsMetadataIdSet) {
+                    rsMetadataIds += "'" + id + "'" + ",";
+                }
+                return resourceMetadataQueryDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
+            }else {
+                return null;
             }
+        } else{
+            //返回所有数据元
+            return  resourceMetadataQueryDao.getAllResourceMetadata(rsResource.getCode());
         }
-        else{
-            //所有数据元
-            metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode);
-        }
-        return metadataList;
     }
 
     /**
@@ -583,16 +660,15 @@ public class ResourcesQueryService  {
         }
         //机构权限控制
         else {
-//            String[] orgCodeList = orgCode.split(",");
+            //String[] orgCodeList = orgCode.split(",");
             List<String> areaListApp = new ArrayList<>();
             List<String> orgListApp = new ArrayList<>();
-//            for (String orgCo:orgCodeList) {
+            //for (String orgCo:orgCodeList) {
 
-//            String orgSaasArea = redisServiceClient.getOrgSaasAreaRedis(orgCo);
-//            String orgSaasOrg = redisServiceClient.getOrgSaasOrgRedis(orgCo);
+            //String orgSaasArea = redisServiceClient.getOrgSaasAreaRedis(orgCo);
+            //String orgSaasOrg = redisServiceClient.getOrgSaasOrgRedis(orgCo);
             String orgSaasArea = redisServiceClient.getOrgSaasAreaRedis(orgCode);
             String orgSaasOrg = redisServiceClient.getOrgSaasOrgRedis(orgCode);
-
 
             //************* 单独机构权限控制 *************
             if ("*".equals(appSaasArea) && "*".equals(appSaasOrg)) {
@@ -622,8 +698,6 @@ public class ResourcesQueryService  {
             }
             //************* APP权限和机构权限并集 *************
             else {
-
-
                 //【APP权限】存在区域授权范围
                 if (!StringUtils.isEmpty(appSaasArea) && !appSaasArea.equals("*")) {
                     String[] arrayArea = appSaasArea.split(",");
@@ -642,7 +716,6 @@ public class ResourcesQueryService  {
                         }
                     }
                 }
-
                 //********【机构权限】存在区域授权范围【区域并集】  ***************
                 if (!StringUtils.isEmpty(orgSaasArea)) {
                     if ("*".equals(orgSaasArea)) {
@@ -669,7 +742,6 @@ public class ResourcesQueryService  {
 
             }
         }
-//        }
         if(areaList.size()>0) {
             for(String area : areaList) {
                 if(area.endsWith("0000")) { //省
@@ -699,41 +771,51 @@ public class ResourcesQueryService  {
     }
 
     /**
-     * 资源浏览 -- 资源数据元结构
-     * （该类未调用）
-     * @return
+     * 区域并集
      */
-    public String getResourceMetadata(String resourcesCode) throws Exception{
-        Map<String, Object> mapParam = new HashMap<String, Object>();
-        try {
-            //获取资源信息
-            RsResource rs = resourcesDao.findByCode(resourcesCode);
-            //资源结构
-            List<DtoResourceMetadata> metadataList = resourceMetadataQueryDao.getResourceMetadata(resourcesCode);
-            List<String> colunmName = new ArrayList<String>();
-            List<String> colunmCode = new ArrayList<String>();
-            List<String> colunmType = new ArrayList<String>();
-            List<String> colunmDict = new ArrayList<String>();
-            for (DtoResourceMetadata r : metadataList) {
-                colunmName.add(r.getName());
-                if(!StringUtils.isEmpty(r.getDictCode())) {
-                    colunmCode.add(r.getId()+"_VALUE");
+    private List<String> containArea(List<String> areaListApp,String[] areaArray) {
+        List<String> areaList = new ArrayList<>();
+        for(String area : areaArray) {
+            //省
+            if(area.endsWith("0000")) {
+                //全省
+                if(areaListApp.contains(area)) {
+                    areaList.add(area);
                 }
-                else{
-                    colunmCode.add(r.getId());
+                //选定省所属
+                else {
+                    for(String areaApp:areaListApp) {
+                        //截取省代码
+                        if(area.substring(0,area.length()-4).equals(areaApp.substring(0,area.length()-4))) {
+                            areaList.add(areaApp);
+                        }
+                    }
                 }
-                colunmType.add(r.getColumnType());
-                colunmDict.add(r.getDictCode());
             }
-            //设置动态datagrid值
-            mapParam.put("colunmName", colunmName);
-            mapParam.put("colunmCode", colunmCode);
-            mapParam.put("colunmDict", colunmDict);
-            mapParam.put("colunmType", colunmType);
-        } catch (Exception e) {
-            e.printStackTrace();
+            //市
+            else if(area.endsWith("00")) {
+                //全市
+                if(areaListApp.contains(area) || areaListApp.contains(area.substring(0,area.length()-4)+"0000")) {
+                    areaList.add(area);
+                }
+                //选定市所属
+                else{
+                    for(String areaApp:areaListApp) {
+                        //截取市代码
+                        if(area.substring(0,area.length()-2).equals(areaApp.substring(0,area.length()-2))) {
+                            areaList.add(areaApp);
+                        }
+                    }
+                }
+            }
+            //区
+            else {
+                if(areaListApp.contains(area) || areaListApp.contains(area.substring(0,area.length()-4)+"0000") || areaListApp.contains(area.substring(0,area.length()-2)+"00")) {
+                    areaList.add(area);
+                }
+            }
         }
-        return objectMapper.writeValueAsString(mapParam);
+        return areaList;
     }
 }
 
