@@ -448,6 +448,37 @@ public class OrgDeptController  extends BaseController {
         }
     }
 
+    @ApiOperation(value = "获取所有成员列表去重复")
+    @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMemberDistinct", method = RequestMethod.GET)
+    public Envelop getAllOrgDeptMemberDistinct(
+            @ApiParam(name = "orgId", value = "机构ID", defaultValue = "")
+            @RequestParam(value = "orgId",required = false) String orgId,
+            @ApiParam(name = "searchNm", value = "关键字查询", defaultValue = "")
+            @RequestParam(value = "searchNm",required = false) String searchNm
+            ) {
+        try {
+            Envelop envelop = new Envelop();
+            List<MOrgMemberRelation> memberRelationList = new ArrayList<MOrgMemberRelation>();
+            ResponseEntity<List<MOrgMemberRelation>> responseEntity = orgDeptMemberClient.getAllOrgDeptMemberDistinct(orgId,searchNm);
+            memberRelationList = responseEntity.getBody();
+            if (memberRelationList !=null && memberRelationList.size() > 0 ){
+                for (MOrgMemberRelation  memberRelation : memberRelationList){
+                    if (StringUtils.isNotEmpty(memberRelation.getUserId() ) && StringUtils.isEmpty(memberRelation.getUserName() ) ) {
+                        MUser mUser = userClient.getUser(memberRelation.getUserId());
+                        memberRelation.setUserName(mUser == null ? "" : mUser.getRealName());
+                    }
+                }
+            }
+            envelop.setDetailModelList( memberRelationList );
+            envelop.setSuccessFlg(true);
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
 
     @RequestMapping(value = "/orgDept/checkUser" , method = RequestMethod.PUT)
     @ApiOperation(value = "检查机构下用户是否唯一")
@@ -570,50 +601,22 @@ public class OrgDeptController  extends BaseController {
     }
 
     /**
-     *  TODO 重复接口，视情况删除
-     * 创建部门成员
+     * 修改上级成员
      * @param memberRelationJsonData
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/orgDeptMember" , method = RequestMethod.PUT)
-    @ApiOperation(value = "修改部门成员")
+    @RequestMapping(value = "/updateOrgDeptMemberParent" , method = RequestMethod.POST)
+    @ApiOperation(value = "修改部门成员上级成员")
     public Envelop updateDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = " 部门成员信息Json", defaultValue = "")
             @RequestParam(value = "memberRelationJsonData", required = false) String memberRelationJsonData){
         try {
-            String errorMsg = "";
-            OrgDeptMemberModel deptMemberModel = objectMapper.readValue(memberRelationJsonData, OrgDeptMemberModel.class);
-            MOrgMemberRelation mDeptMember = convertToModel(deptMemberModel, MOrgMemberRelation.class);
-             if (StringUtils.isEmpty(mDeptMember.getOrgId())) {
-                errorMsg+="机构不能为空！";
-            }
-            if (StringUtils.isEmpty(mDeptMember.getUserId())) {
-                errorMsg+="用户不能为空！";
-            }
-            if (mDeptMember.getDeptId() == null){
-                errorMsg+="部门不能为空！";
-            }
-
-            if(StringUtils.isNotEmpty(errorMsg))
-            {
-                return failed(errorMsg);
-            }
-            MUser mUser = userClient.getUser(mDeptMember.getUserId());
-            mDeptMember.setUserName(mUser == null ? "" : mUser.getRealName());
-
-            MUser mUserp = userClient.getUser(mDeptMember.getParentUserId());
-            mDeptMember.setParentUserName(mUserp == null ? "" : mUserp.getRealName());
-
-            MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(mDeptMember.getDeptId());
-            mDeptMember.setDeptName(mOrgDept == null ? "" : mOrgDept.getName());
-
-            String deptMemberJsonStr = objectMapper.writeValueAsString(mDeptMember);
-            MOrgMemberRelation deptMember = orgDeptMemberClient.saveOrgDeptMember(deptMemberJsonStr);
-            if (deptMember == null) {
+            boolean succ = orgDeptMemberClient.updateOrgDeptMemberParent(memberRelationJsonData);
+            if (!succ) {
                 return failed("保存失败!");
             }
-            return success(deptMember);
+            return success(null);
         } catch (Exception ex)
         {
             ex.printStackTrace();
