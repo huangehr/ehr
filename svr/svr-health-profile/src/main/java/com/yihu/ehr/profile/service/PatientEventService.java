@@ -21,21 +21,15 @@ import java.util.*;
 @Service
 public class PatientEventService {
     @Autowired
-    XResourceClient resource; //资源服务
-
+    private XResourceClient resource; //资源服务
     @Autowired
-    XOrganizationClient organization; //机构信息服务
-
+    private XOrganizationClient organization; //机构信息服务
     @Autowired
-    XDictClient dictClient;
-
-
+    private XDictClient dictClient;
     @Autowired
-    XGeographyClient addressClient;
-
+    private XGeographyClient addressClient;
     @Value("${spring.application.id}")
-    String appId;
-
+    private String appId;
     //event_type对应数据集
     Map<String,String[]> eventTypeDataset = new HashMap() {
         {
@@ -48,33 +42,25 @@ public class PatientEventService {
     /**
      * 返回包含event_type对应数据的事件
      */
-    private  List<String> geyProfileByEventType(List<String> rowkeys,String eventType) throws Exception
-    {
+    private  List<String> geyProfileByEventType(List<String> rowkeys,String eventType) throws Exception {
         List<String> re = new ArrayList<>();
-        if(rowkeys!=null && rowkeys.size()>0)
-        {
+        if(rowkeys!=null && rowkeys.size()>0) {
             String rowkeyString = "";
             String datasetString = "";
             //筛选事件
-            for(String rowkey:rowkeys)
-            {
-                if(rowkeyString.length()>0)
-                {
+            for(String rowkey:rowkeys) {
+                if(rowkeyString.length()>0) {
                     rowkeyString += " OR profile_id:"+rowkey;
                 }
-                else
-                {
+                else {
                     rowkeyString = "profile_id:"+rowkey;
                 }
             }
             //筛选对应数据集
             String[] datasets = eventTypeDataset.get(eventType);
-            if(datasets!=null && datasets.length>0)
-            {
-                for(String dataset:datasets)
-                {
-                    if(datasetString.length()>0)
-                    {
+            if(datasets!=null && datasets.length>0) {
+                for(String dataset:datasets) {
+                    if(datasetString.length()>0) {
                         datasetString += " OR rowkey:*"+dataset+"*";
                     }
                     else{
@@ -85,22 +71,17 @@ public class PatientEventService {
             else{
                 return re;
             }
-
             String query = "{\"groupFields\":\"profile_id\",\"q\":\"("+rowkeyString+") AND ("+datasetString+")\"}";
             Envelop result = resource.getSubStat(query.replace(" ","+"), null ,null);
-            if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0)
-            {
+            if(result.getDetailModelList()!=null && result.getDetailModelList().size()>0) {
                 List<Map<String,Object>> list = result.getDetailModelList();
-                for(Map<String,Object> map:list)
-                {
+                for(Map<String,Object> map:list) {
                     re.add(map.get("profile_id").toString());
                 }
             }
         }
-
         return re;
     }
-
 
     /*
      * 通过eventNo获取某次门诊住院记录
@@ -108,9 +89,8 @@ public class PatientEventService {
     public Map<String, Object> getMedicalEvent(String orgCode,String eventNo) throws Exception {
         Map<String, Object> re = new HashMap<>();
         //获取相关门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId,null, "{\"q\":\"org_code:"+orgCode+"+AND+event_no:" + eventNo + "\"}",1,1);
-        if(result.getDetailModelList()!=null&& result.getDetailModelList().size()>0)
-        {
+        Envelop result = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\"org_code:"+orgCode+"+AND+event_no:" + eventNo + "\"}",1,1);
+        if(result.getDetailModelList()!=null&& result.getDetailModelList().size()>0) {
             re = (Map<String, Object>)result.getDetailModelList().get(0);
         }
         else{
@@ -118,8 +98,6 @@ public class PatientEventService {
         }
         return re;
     }
-
-
 
     /**
      * 【机构权限控制】获取病人门诊住院事件
@@ -136,14 +114,11 @@ public class PatientEventService {
         String rowkeys = "";
         //疾病事件纪录rowkey
         List<String> returnRowkey = new ArrayList<String>();
-
         Map<String,String> recordMap=new HashMap<>();
         //事件类型
-        if (!StringUtils.isBlank(eventType))
-        {
+        if (!StringUtils.isBlank(eventType)) {
             //0门诊 1住院 2体检 3处方 4医嘱 5检查检验
-            if(eventType.equals("0") || eventType.equals("1") || eventType.equals("2"))
-            {
+            if(eventType.equals("0") || eventType.equals("1") || eventType.equals("2")) {
                 query += " AND "+BasisConstant.eventType+":" + eventType;
             }
         }
@@ -196,18 +171,14 @@ public class PatientEventService {
                 return returnList;
             }
         }*/
-
         query += "\"}";
-
         //门诊住院事件
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, saasOrg,query.replace(' ','+'), null, null);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, "*", "*", query.replace(' ','+'), null, null);
         //事件集合
         List<Map<String, Object>> eventList = new ArrayList<Map<String, Object>>();
-
         //获取rowkey
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             eventList = (List<Map<String, Object>>) result.getDetailModelList();
-
             for (Map<String, Object> event : eventList) {
                 if (rowkeys.length() > 0) {
                     rowkeys += " OR ";
@@ -218,27 +189,18 @@ public class PatientEventService {
         else{
             return returnList;
         }
-
-
-
-
         //健康问题
         if (!StringUtils.isBlank(hpCode)) {
             //健康问题->疾病ICD10代码
             List<MIcd10Dict> dictCodeList = dictClient.getIcd10ByHpCode(hpCode);
-
-            if (dictCodeList != null && dictCodeList.size() > 0)
-            {
+            if (dictCodeList != null && dictCodeList.size() > 0) {
                 //遍历疾病列表
-                for (MIcd10Dict ICD10 : dictCodeList)
-                {
-                    if (mzQuery.length() > 0)
-                    {
+                for (MIcd10Dict ICD10 : dictCodeList) {
+                    if (mzQuery.length() > 0) {
                         mzQuery += " OR " + BasisConstant.mzzd + ":" + ICD10.getCode();
                         zyQuery += " OR " + BasisConstant.zyzd + ":" + ICD10.getCode();
                     }
-                    else
-                    {
+                    else {
                         mzQuery = BasisConstant.mzzd + ":" + ICD10.getCode();
                         zyQuery = BasisConstant.zyzd + ":" + ICD10.getCode();
                     }
@@ -259,21 +221,16 @@ public class PatientEventService {
                 zyQuery = BasisConstant.zyzd + ":" + diseaseId;
             }
         }*/
-
         List<String> list=new ArrayList<>();
         Map<String,String>peofileMap=new HashMap<>();
         //过滤门诊纪录
-        if (!StringUtils.isBlank(mzQuery))
-        {
+        if (!StringUtils.isBlank(mzQuery)) {
             String queryParams = "{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\"}";
             //门诊诊断纪录
-            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, appId,saasOrg, queryParams.replace(' ', '+'), null, null);
-
+            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, "*", "*", queryParams.replace(' ', '+'), null, null);
             //获取疾病门诊事件纪录rowkey
-            if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
-            {
-                for(Map<String,Object> map : (List<Map<String, Object>>)resultMzzd.getDetailModelList())
-                {
+            if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0) {
+                for(Map<String,Object> map : (List<Map<String, Object>>)resultMzzd.getDetailModelList()) {
                     returnRowkey.add((String)map.get("profile_id"));
                 }
             }
@@ -281,15 +238,11 @@ public class PatientEventService {
         else{
             String queryParams = "{\"q\":\""+ "(" + rowkeys +")\"}";
             //门诊诊断纪录
-            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, appId,saasOrg, queryParams.replace(' ', '+'), null, null);
-
+            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, "*", "*", queryParams.replace(' ', '+'), null, null);
             //获取疾病门诊事件纪录rowkey
-
-            if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
-            {
+            if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0) {
                 List<Map<String, Object>> resultMzzdList = resultMzzd.getDetailModelList();
-                for(Map<String,Object> map :resultMzzdList)
-                {
+                for(Map<String,Object> map :resultMzzdList) {
                     if(map.get(BasisConstant.mzzd)!=null) {
                         if (!list.contains(map.get(BasisConstant.mzzd).toString())) {
                             list.add(map.get(BasisConstant.mzzd).toString());
@@ -301,42 +254,30 @@ public class PatientEventService {
 
         }
         //过滤门诊纪录
-        if (!StringUtils.isBlank(mzQuery))
-        {
+        if (!StringUtils.isBlank(mzQuery)) {
             String queryParams = "{\"q\":\"(" + mzQuery + ") AND (" + rowkeys +")\"";
             //门诊诊断纪录
-            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, appId, saasOrg,queryParams.replace(' ', '+'), null, null);
-
+            Envelop resultMzzd = resource.getResources(BasisConstant.outpatientDiagnosis, "*", "*", queryParams.replace(' ', '+'), null, null);
             //获取疾病门诊事件纪录rowkey
-            if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0)
-            {
-                for(Map<String,Object> map : (List<Map<String, Object>>)resultMzzd.getDetailModelList())
-                {
+            if(resultMzzd.getDetailModelList() != null && resultMzzd.getDetailModelList().size() > 0) {
+                for(Map<String,Object> map : (List<Map<String, Object>>)resultMzzd.getDetailModelList()) {
                     returnRowkey.add((String)map.get("profile_id"));
                 }
             }
         }
         //过滤住院纪录
-        if(!StringUtils.isBlank(zyQuery))
-        {
+        if(!StringUtils.isBlank(zyQuery)) {
             String queryParams = "{\"q\":\"(" + zyQuery + ") AND (" + rowkeys +")\"";
-
             //住院诊断纪录
-            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis,appId,saasOrg,queryParams.replace(' ', '+'), null, null);
-
+            Envelop resultZyzd = resource.getResources(BasisConstant.hospitalizedDiagnosis, "*", "*", queryParams.replace(' ', '+'), null, null);
             //获取疾病住院事件纪录rowkey
-            if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0)
-            {
-                for (Map<String, Object> map : (List<Map<String, Object>>)resultZyzd.getDetailModelList())
-                {
+            if(resultZyzd.getDetailModelList() != null && resultZyzd.getDetailModelList().size() > 0) {
+                for (Map<String, Object> map : (List<Map<String, Object>>)resultZyzd.getDetailModelList()) {
                     returnRowkey.add((String)map.get("profile_id"));
                 }
             }
         }
-
-
-        if(eventList != null)
-        {
+        if(eventList != null) {
             //诊断疾病为空，全部事件
             if(StringUtils.isBlank(hpCode)) {
                 for(Map<String,Object> map : eventList) {
@@ -348,22 +289,17 @@ public class PatientEventService {
             if (!StringUtils.isBlank(eventType) && !eventType.equals("0") && !eventType.equals("1") && !eventType.equals("2")) {
                 returnRowkey = geyProfileByEventType(returnRowkey,eventType);
             }
-
-
             //获取所有client_id->client_type数据来源
             List<MConventionalDict> clientList = dictClient.getRecordDataSourceList();
             //筛选事件
             for(Map<String,Object> map : eventList) {
                 //包含该事件
-                if(returnRowkey.contains(map.get("rowkey")))
-                {
+                if(returnRowkey.contains(map.get("rowkey"))) {
                     //通过client_id获取数据来源
                     map.put("data_from","");
                     String clientId = map.get("client_id").toString();
-                    for(MConventionalDict client:clientList)
-                    {
-                        if(client.getCode().equals(clientId))
-                        {
+                    for(MConventionalDict client:clientList) {
+                        if(client.getCode().equals(clientId)) {
                             map.put("data_from",client.getValue());
                             break;
                         }
@@ -372,8 +308,6 @@ public class PatientEventService {
                 }
             }
         }
-
-
         return returnList;
     }
 

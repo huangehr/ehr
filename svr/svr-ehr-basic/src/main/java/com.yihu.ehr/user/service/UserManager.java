@@ -266,5 +266,19 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         return sqlQuery.list();
     }
 
-
+    /**
+     * 根据医生ID查询账号信息
+     * @param doctorId
+     * @return
+     */
+    public User getUserByDoctorId(String doctorId) {
+        Session session = entityManager.unwrap(Session.class);
+        Query query = session.createQuery("from User where doctorId = :doctorId");
+        List<User> userList = query.setString("doctorId", doctorId).list();
+        if (userList.size() == 0) {
+            return null;
+        } else {
+            return userList.get(0);
+        }
+    }
 }

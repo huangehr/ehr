@@ -78,6 +78,10 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException {
         List<Doctors> doctorsList = doctorService.search(fields, filters, sorts, page, size);
+        for(Doctors doctors : doctorsList){
+            User user = userManager.getUserByDoctorId(doctors.getId().toString());
+            doctors.setUserId(user.getId());
+        }
         pagedResponse(request, response, doctorService.getCount(filters), page, size);
 
         return (List<MDoctor>) convertToModels(doctorsList, new ArrayList<MDoctor>(doctorsList.size()), MDoctor.class, fields);

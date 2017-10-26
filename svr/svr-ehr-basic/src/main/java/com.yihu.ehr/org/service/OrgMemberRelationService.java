@@ -112,7 +112,7 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
     }
 
     /**
-     *  查询机构人员去重复
+     *  查询机构人员去重复  分页
      * @param orgId
      * @param searchParm
      * @param size
@@ -144,5 +144,33 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
         query.setString("orgId", orgId);
         query.setString("searchParm","%"+searchParm+"%");
         return ((Long)query.list().get(0)).intValue();
+    }
+    /**
+     *  查询机构人员去重复
+     * @param orgId
+     * @param searchParm
+     * @return
+     */
+    public List<OrgMemberRelation> getAllOrgDeptMemberDistinct(String orgId,String searchParm) {
+        Session session = entityManager.unwrap(Session.class);
+        String sql="select r from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm group by r.userId";
+        Query query = session.createQuery(sql);
+        query.setString("orgId", orgId);
+        query.setString("searchParm","%"+searchParm+"%");
+        List<OrgMemberRelation> list = query.list();
+        return list;
+    }
+
+    /**
+     * 修改上级成员
+     * @param model
+     */
+    public void updateOrgDeptMemberParent(OrgMemberRelation model){
+        List<OrgMemberRelation> relationList = relationRepository.findByUserId(model.getUserId());
+        for(OrgMemberRelation item : relationList){
+            item.setParentUserId(model.getParentUserId());
+            item.setParentUserName(model.getParentUserName());
+            save(item);
+        }
     }
 }

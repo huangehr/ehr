@@ -21,6 +21,15 @@ import java.util.Collection;
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface RolesClient {
+
+    @RequestMapping(value = ServiceApi.Roles.RoleBatchAdd,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量新增角色组")
+    Boolean roleBatchAdd(
+            @ApiParam(name = "data_json",value = "批量新增角色组Json字符串")
+            @RequestBody String dataJson,
+            @ApiParam(name = "orgCodes", value = "多机构编码拼接字符串")
+            @RequestParam(value = "orgCodes") String orgCodes);
+
     @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增角色组")
     MRoles createRoles(
@@ -72,8 +81,10 @@ public interface RolesClient {
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "name",value = "角色组名称")
             @RequestParam(value = "name") String name,
+            @ApiParam(name = "orgCode",value = "机构Code")
+            @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type") String type);
+            @RequestParam(value = "type",required = false) String type);
 
     @RequestMapping(value = ServiceApi.Roles.RoleCodeExistence,method = RequestMethod.GET)
     @ApiOperation(value = "角色组代码是否已存在" )
@@ -82,7 +93,9 @@ public interface RolesClient {
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "code",value = "角色组代码")
             @RequestParam(value = "code") String code,
+            @ApiParam(name = "orgCode",value = "机构Code")
+            @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type") String type);
+            @RequestParam(value = "type",required = false) String type);
 
 }

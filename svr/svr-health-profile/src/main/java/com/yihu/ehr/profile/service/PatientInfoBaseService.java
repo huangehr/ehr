@@ -123,7 +123,7 @@ public class PatientInfoBaseService {
      */
     public Map<String, Object> getPatientInfo(String demographicId) throws Exception {
         //时间排序
-        Envelop result = resource.getResources(BasisConstant.patientInfo, appId,null, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
+        Envelop result = resource.getResources(BasisConstant.patientInfo, "*","*", "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             List<Map<String, Object>> list = result.getDetailModelList();
             if (list.size() == 1) {
@@ -151,51 +151,37 @@ public class PatientInfoBaseService {
      */
     public List<Map<String, Object>> getHealthProblem(String demographicId) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
-
-
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId, null, "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
-
+        Envelop result = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
         Map<String,List<Map<String, Object>>> hpList = new HashedMap();
-
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
             //进行降序
             Collections.sort(eventList, new EventDateComparatorDesc());
-
-            for(Map<String, Object> event : eventList)
-            {
-                 if(event.containsKey(BasisConstant.healthProblem))
-                 {
+            for(Map<String, Object> event : eventList) {
+                 if(event.containsKey(BasisConstant.healthProblem)) {
                      String healthProblem = event.get(BasisConstant.healthProblem).toString();
-                     if(!StringUtils.isEmpty(healthProblem))
-                     {
+                     if(!StringUtils.isEmpty(healthProblem)) {
                          String[] hps = event.get(BasisConstant.healthProblem).toString().split(";");
-                         for(String hp:hps)
-                         {
+                         for(String hp:hps) {
                              List<Map<String, Object>> profileList = new ArrayList<>();
-                             if(hpList.containsKey(hp))
-                             {
+                             if(hpList.containsKey(hp)) {
                                  profileList = hpList.get(hp);
                              }
-
                              profileList.add(event);
                              hpList.put(hp,profileList);
                          }
                      }
                  }
             }
-
-            for(String healthProblemCode : hpList.keySet())
-            {
+            for(String healthProblemCode : hpList.keySet()) {
                 Map<String, Object> obj = new HashedMap();
                 obj.put("healthProblemCode", healthProblemCode);
                 obj.put("healthProblemName", redisServiceClient.getHealthProblemRedis(healthProblemCode));
                 int visitTimes = 0;
                 int hospitalizationTimes = 0;
                 List<Map<String,Object>> profileList = (List<Map<String,Object>>)hpList.get(healthProblemCode);
-                for(int i=0;i<profileList.size();i++)
-                {
+                for(int i=0;i<profileList.size();i++) {
                     Map<String,Object> profile = profileList.get(i);
                     //事件类型
                     String eventType = (String) profile.get(BasisConstant.eventType);
@@ -257,7 +243,7 @@ public class PatientInfoBaseService {
         }else if(eventType.equals("2")) {
             resourcesCode = BasisConstant.examinationReport;
         }
-        Envelop result = resource.getResourcesSub(resourcesCode, appId, null, "{\"q\":\"profile_id:" + lastVisitRecord + "\"}", null, null);
+        Envelop result = resource.getResourcesSub(resourcesCode, "*", "*", "{\"q\":\"profile_id:" + lastVisitRecord + "\"}", null, null);
         re = result.getDetailModelList();
         return re;
     }
@@ -283,7 +269,7 @@ public class PatientInfoBaseService {
         }
 
         //全文检索
-        Envelop re = resource.getResources(BasisConstant.patientEvent, appId, null, "{\"q\":\""+queryParams.replace(' ','+')+"\"}", page, size);
+        Envelop re = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\""+queryParams.replace(' ','+')+"\"}", page, size);
         return re;
     }
 }
