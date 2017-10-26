@@ -6,6 +6,7 @@ import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.org.MOrgMemberRelation;
 import com.yihu.ehr.org.model.OrgMemberRelation;
 import com.yihu.ehr.org.service.OrgMemberRelationService;
+import com.yihu.ehr.query.URLQueryParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaQuery;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -41,6 +43,18 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
     ) throws Exception {
         filters= filters +";status=0";
         List<OrgMemberRelation> orgMemberRelations = relationService.search(filters);
+        return (List<MOrgMemberRelation>) convertToModels(orgMemberRelations, new ArrayList<MOrgMemberRelation>(orgMemberRelations.size()), MOrgMemberRelation.class, null);
+    }
+
+    @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMemberDistinct", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有成员列表去重复")
+    public List<MOrgMemberRelation> getAllOrgDeptMemberDistinct(
+            @ApiParam(name = "orgId", value = "机构ID", defaultValue = "")
+            @RequestParam(value = "orgId",required = false) String orgId,
+            @ApiParam(name = "searchNm", value = "关键字查询", defaultValue = "")
+            @RequestParam(value = "searchNm",required = false) String searchNm
+    ) throws Exception {
+        List<OrgMemberRelation> orgMemberRelations = relationService.getAllOrgDeptMemberDistinct(orgId,searchNm);
         return (List<MOrgMemberRelation>) convertToModels(orgMemberRelations, new ArrayList<MOrgMemberRelation>(orgMemberRelations.size()), MOrgMemberRelation.class, null);
     }
 
@@ -108,15 +122,15 @@ public class OrgMemberRelationEndPoint extends EnvelopRestEndPoint {
         return convertToModel(memberRelation, MOrgMemberRelation.class);
     }
 
-    @RequestMapping(value = "/orgDeptMember", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "修改部门成员")
-    public MOrgMemberRelation updateOrgDeptMember(
+    @RequestMapping(value = "/updateOrgDeptMemberParent", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改部门成员上级成员")
+    public boolean updateOrgDeptMember(
             @ApiParam(name = "memberRelationJsonData", value = "修改部门成员信息")
             @RequestBody String memberRelationJsonData
     ) throws Exception {
         OrgMemberRelation memberRelation = toEntity(memberRelationJsonData, OrgMemberRelation.class);
-        relationService.save(memberRelation);
-        return convertToModel(memberRelation, MOrgMemberRelation.class);
+        relationService.updateOrgDeptMemberParent(memberRelation);
+        return true;
     }
 
     @RequestMapping(value = "/orgDeptMember/updateStatus", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

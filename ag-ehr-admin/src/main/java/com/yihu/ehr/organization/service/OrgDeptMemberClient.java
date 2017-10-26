@@ -61,6 +61,13 @@ public interface OrgDeptMemberClient {
             @RequestBody String memberRelationJsonData
     ) ;
 
+    @RequestMapping(value = "/updateOrgDeptMemberParent", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "修改部门成员上级成员")
+    boolean updateOrgDeptMemberParent(
+            @ApiParam(name = "memberRelationJsonData", value = "修改部门成员信息")
+            @RequestBody String memberRelationJsonData
+    ) ;
+
     @RequestMapping(value = "/orgDeptMember/updateStatus", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "修改部门成员状态" )
     boolean updateStatusOrgDeptMember(
@@ -81,6 +88,14 @@ public interface OrgDeptMemberClient {
     @ApiOperation(value = "查询所有成员列表")
     ResponseEntity<List<MOrgMemberRelation>> getAllOrgDeptMember(
             @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value = "/orgDeptMember/getAllOrgDeptMemberDistinct", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "查询所有成员列表去重复")
+    ResponseEntity<List<MOrgMemberRelation>> getAllOrgDeptMemberDistinct(
+            @ApiParam(name = "orgId", value = "机构ID", defaultValue = "")
+            @RequestParam(value = "orgId",required = false) String orgId,
+            @ApiParam(name = "searchNm", value = "关键字查询", defaultValue = "")
+            @RequestParam(value = "searchNm",required = false) String searchNm);
 
     @RequestMapping(value = "/orgDeptMember/getOrgIds", method = RequestMethod.GET)
     @ApiOperation(value = "根据userId获取orgId列表")
