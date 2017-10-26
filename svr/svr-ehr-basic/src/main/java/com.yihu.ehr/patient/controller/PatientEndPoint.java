@@ -26,6 +26,7 @@ import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.csource.common.MyException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,7 +170,12 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             @RequestBody String jsonData) throws Exception{
         DemographicInfo demographicInfo = toEntity(jsonData, DemographicInfo.class);
         String pwd = "123456";
-        demographicInfo.setPassword(HashUtil.hash(pwd));
+        if(!StringUtils.isEmpty(demographicInfo.getIdCardNo())&&demographicInfo.getIdCardNo().length()>7){
+            pwd=demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length()-6,demographicInfo.getIdCardNo().length());
+            demographicInfo.setPassword(DigestUtils.md5Hex(pwd));
+        }else{
+            demographicInfo.setPassword(DigestUtils.md5Hex(pwd));
+        }
         demographicInfo.setRegisterTime(new Date());
         demographicService.savePatient(demographicInfo);
         return convertToModel(demographicInfo,MDemographicInfo.class);

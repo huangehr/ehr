@@ -7,6 +7,7 @@ import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.patient.feign.GeographyClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.hash.HashUtil;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -155,7 +156,7 @@ public class DemographicService {
 
         String pwd = "123456";
         DemographicInfo demInfo = getDemographicInfo(id);
-        demInfo.setPassword(HashUtil.hash(pwd));
+        demInfo.setPassword(DigestUtils.md5Hex(pwd));
         demographicInfoRepository.save(demInfo);
     }
     public List<DemographicInfo> searchPatientByParams(Map<String, Object> args) {
