@@ -56,6 +56,30 @@ public class RolesController extends BaseController {
     @Autowired
     private OrganizationClient organizationClient;
 
+    @RequestMapping(value = ServiceApi.Roles.RoleBatchAdd,method = RequestMethod.POST)
+    @ApiOperation(value = "批量新增角色组")
+    public Envelop roleBatchAdd(
+            @ApiParam(name = "data_json",value = "新增角色组Json字符串")
+            @RequestParam(value = "data_json") String dataJson,
+            @ApiParam(name = "orgCodes", value = "多机构编码拼接字符串")
+            @RequestParam(value = "orgCodes") String orgCodes){
+        MRoles model=new MRoles();
+        try {
+            model= objectMapper.readValue(dataJson, MRoles.class);
+            if(null!=model&&model.getDescription().length()>250){
+                return failed("角色组描述不能大于250字");
+            }
+        }catch (Exception e){
+
+        }
+        Boolean flag = rolesClient.roleBatchAdd(dataJson, orgCodes);
+        if(!flag){
+            return failed("新增角色组失败");
+        }else {
+            return  success("新增角色组成功");
+        }
+    }
+
     @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST)
     @ApiOperation(value = "新增角色组")
     public Envelop createRoles(
@@ -197,9 +221,11 @@ public class RolesController extends BaseController {
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "name",value = "角色组名")
             @RequestParam(value = "name") String name,
+            @ApiParam(name = "orgCode",value = "机构Code")
+            @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type") String type){
-        boolean bo = rolesClient.isNameExistence(appId,name,type);
+            @RequestParam(value = "type",required = false) String type){
+        boolean bo = rolesClient.isNameExistence(appId,name,orgCode,type);
         if(bo){
             return success(null);
         }
@@ -212,9 +238,11 @@ public class RolesController extends BaseController {
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "code",value = "角色组代码")
             @RequestParam(value = "code") String code,
+            @ApiParam(name = "orgCode",value = "机构Code")
+            @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type") String type){
-        boolean  bo = rolesClient.isCodeExistence(appId,code,type);
+            @RequestParam(value = "type",required = false) String type){
+        boolean  bo = rolesClient.isCodeExistence(appId,code,orgCode,type);
         if(bo){
             return success(null);
         }

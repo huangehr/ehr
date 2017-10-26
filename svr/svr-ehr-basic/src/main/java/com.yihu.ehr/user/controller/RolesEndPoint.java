@@ -10,6 +10,7 @@ import com.yihu.ehr.user.service.RolesService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +33,35 @@ import java.util.List;
 public class RolesEndPoint extends EnvelopRestEndPoint{
     @Autowired
     private RolesService rolesService;
+
+    @RequestMapping(value = ServiceApi.Roles.RoleBatchAdd,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "批量新增角色组")
+    public boolean roleBatchAdd(
+            @ApiParam(name = "data_json",value = "新增角色组Json字符串")
+            @RequestBody String dataJson,
+            @ApiParam(name = "orgCodes", value = "多机构编码拼接字符串")
+            @RequestParam(value = "orgCodes") String orgCodes){
+        Roles roles = toEntity(dataJson,Roles.class);
+        Roles rolesNew = null;
+        if(StringUtils.isNotEmpty(orgCodes)){
+            String [] orgs = orgCodes.split(";");
+            for(int i=0;i < orgs.length ;i++){
+                rolesNew = new Roles();
+                rolesNew.setAppId(roles.getAppId());
+                rolesNew.setCode(roles.getCode());
+                rolesNew.setName(roles.getName());
+                rolesNew.setDescription(roles.getDescription());
+                rolesNew.setType(roles.getType());
+                rolesNew.setOrgCode(orgs[i]);
+                rolesNew = rolesService.save(rolesNew);
+            }
+        }
+        if(rolesNew != null){
+            return true;
+        }else {
+            return false;
+        }
+    }
 
     @RequestMapping(value = ServiceApi.Roles.Role,method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增角色组")
@@ -104,10 +134,12 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "name",value = "角色组名称")
             @RequestParam(value = "name") String name,
+            @ApiParam(name = "orgCode",value = "机构Code")
+            @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type") String type){
-        String[] fields = {"appId","name","type"};
-        String[] values = {appId,name,type};
+            @RequestParam(value = "type",required = false) String type){
+        String[] fields = {"appId","name","orgCode","type"};
+        String[] values = {appId,name,orgCode,type};
         List<Roles> roles = rolesService.findByFields(fields,values);
         if(roles != null && roles.size() >0){
             return true;
@@ -121,10 +153,12 @@ public class RolesEndPoint extends EnvelopRestEndPoint{
             @RequestParam(value = "app_id") String appId,
             @ApiParam(name = "code",value = "角色组代码")
             @RequestParam(value = "code") String code,
+            @ApiParam(name = "orgCode",value = "机构Code")
+            @RequestParam(value = "orgCode") String orgCode,
             @ApiParam(name = "type",value = "角色组类别")
-            @RequestParam(value = "type") String type){
-        String[] fields = {"appId","code","type"};
-        String[] values = {appId,code,type};
+            @RequestParam(value = "type",required = false) String type){
+        String[] fields = {"appId","code","orgCode","type"};
+        String[] values = {appId,code,orgCode,type};
         List<Roles> roles = rolesService.findByFields(fields, values);
         if(roles != null && roles.size() >0){
             return true;

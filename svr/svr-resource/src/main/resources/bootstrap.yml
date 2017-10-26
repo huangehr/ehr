@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-resource
+    name: svr-resource-zhoujie
 
 ---
 spring:
