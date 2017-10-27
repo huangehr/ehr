@@ -13,12 +13,15 @@ import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.util.hash.HashUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -280,5 +283,42 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
     public int getStatisticsCityDoctorByRoleType(String roleType) {
         return doctorRepository.getStatisticsCityDoctorByRoleType(roleType);
+    }
+
+    public List<Doctors> searchDoctors(String filter, String[] orgCode, int page, int size) {
+        Session s = currentSession();
+        String hql = "SELECT d from Doctors d WHERE d.id IN(SELECT u.doctorId from User u where u.id in(" +
+                "SELECT DISTINCT(omr.userId) from OrgMemberRelation omr where omr.orgId in(" +
+                "SELECT id from Organization o where o.orgCode in(:orgCode))))";
+        if (!StringUtils.isEmpty(filter)) {
+            hql += " AND d.name LIKE :filter";
+        }
+        hql += " order by d.insertTime desc";
+        Query q = s.createQuery(hql);
+        q.setParameterList("orgCode", orgCode);
+        if (!StringUtils.isEmpty(filter)) {
+            q.setParameter("filter", "%" + filter + "%");
+        }
+        q.setMaxResults(size);
+        q.setFirstResult((page - 1) * size);
+        List<Doctors> list = (List<Doctors>)q.list();
+        return list;
+    }
+
+    public Long getDoctorsCount(String filter, String[] orgCode) {
+        Session s = currentSession();
+        String sql = "SELECT count(*) from doctors d WHERE d.id IN(SELECT u.doctor_id from users u where u.id in(" +
+                "SELECT DISTINCT(omr.user_id) from org_member_relation omr where omr.org_id in(" +
+                "SELECT id from organizations where org_code in(:orgCode))))";
+        if (!StringUtils.isEmpty(filter)) {
+            sql += " AND d.name LIKE :filter";
+        }
+        Query q = s.createSQLQuery(sql);
+        q.setParameterList("orgCode", orgCode);
+        if (!StringUtils.isEmpty(filter)) {
+            q.setParameter("filter", "%" + filter + "%");
+        }
+        BigInteger count = (BigInteger ) q.uniqueResult();
+        return count.longValue();
     }
 }
