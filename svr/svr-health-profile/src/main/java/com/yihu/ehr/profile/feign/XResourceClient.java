@@ -46,10 +46,10 @@ public interface XResourceClient {
 
     @RequestMapping(value = ServiceApi.Resources.ResourcesQueryTransform, method = RequestMethod.POST)
     Envelop ResourcesQueryTransform(
-            @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
+            @RequestParam(value = "resourcesCode") String resourcesCode,
             @RequestParam(value = "roleId") String roleId,
-            @RequestParam(value = "orgCode", required = true) String appId,
-            @RequestParam(value = "areaCode", required = false) String orgCode,
+            @RequestParam(value = "orgCode") String orgCode,
+            @RequestParam(value = "areaCode", required = false) String areaCode,
             @RequestParam(value = "queryParams", required = false) String queryParams,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
