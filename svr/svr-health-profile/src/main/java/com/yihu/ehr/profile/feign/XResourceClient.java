@@ -47,8 +47,9 @@ public interface XResourceClient {
     @RequestMapping(value = ServiceApi.Resources.ResourcesQueryTransform, method = RequestMethod.POST)
     Envelop ResourcesQueryTransform(
             @RequestParam(value = "resourcesCode", required = true) String resourcesCode,
-            @RequestParam(value = "appId", required = true) String appId,
-            @RequestParam(value = "orgCode", required = false) String orgCode,
+            @RequestParam(value = "roleId") String roleId,
+            @RequestParam(value = "orgCode", required = true) String appId,
+            @RequestParam(value = "areaCode", required = false) String orgCode,
             @RequestParam(value = "queryParams", required = false) String queryParams,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
@@ -57,8 +58,6 @@ public interface XResourceClient {
     //cda数据
     @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     Map<String,Object> getCDAData(@RequestBody String cdaTransformDtoJson);
-
-
 
 
     //查询主表数据
