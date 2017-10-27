@@ -7,6 +7,7 @@ import com.yihu.ehr.user.entity.User;
 import io.swagger.models.auth.In;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
@@ -121,8 +122,9 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
      */
     public List<OrgMemberRelation> getOrgDeptMembers(String orgId,String searchParm, int size, int page) {
         Session session = entityManager.unwrap(Session.class);
-        String sql="select r from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm group by r.userId";
+        String sql="select distinct r.userId as userId,r.userName as userName from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm";
         Query query = session.createQuery(sql);
+        query.setResultTransformer(Transformers.aliasToBean(OrgMemberRelation.class));
         query.setString("orgId", orgId);
         query.setString("searchParm","%"+searchParm+"%");
         query.setMaxResults(size);
@@ -139,7 +141,7 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
      */
     public Integer getOrgDeptMembersInt(String orgId,String searchParm) {
         Session session = entityManager.unwrap(Session.class);
-        String sql="select count(*) from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm group by r.userId";
+        String sql="select count(distinct r.userId) from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm";
         Query query = session.createQuery(sql);
         query.setString("orgId", orgId);
         query.setString("searchParm","%"+searchParm+"%");
@@ -153,8 +155,9 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
      */
     public List<OrgMemberRelation> getAllOrgDeptMemberDistinct(String orgId,String searchParm) {
         Session session = entityManager.unwrap(Session.class);
-        String sql="select r from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm group by r.userId";
+        String sql="select distinct r.userId as userId,r.userName as userName  from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm";
         Query query = session.createQuery(sql);
+        query.setResultTransformer(Transformers.aliasToBean(OrgMemberRelation.class));
         query.setString("orgId", orgId);
         query.setString("searchParm","%"+searchParm+"%");
         List<OrgMemberRelation> list = query.list();

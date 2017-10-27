@@ -137,7 +137,7 @@ public class RsResourceCategoryController extends BaseController {
         try{
             MRsCategory rsCategory = resourcesCategoryClient.getRsCategoryById(id);
             RsCategoryModel rsCategoryModel = new RsCategoryModel();
-            BeanUtils.copyProperties(rsCategory,rsCategoryModel);
+            BeanUtils.copyProperties(rsCategory, rsCategoryModel);
             if(StringUtils.isNotBlank(rsCategoryModel.getPid())){
                 MRsCategory rsCategoryParent = resourcesCategoryClient.getRsCategoryById(id);
                 if(rsCategoryParent!=null){

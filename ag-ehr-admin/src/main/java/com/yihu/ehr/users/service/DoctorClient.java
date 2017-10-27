@@ -29,7 +29,8 @@ public interface DoctorClient {
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page);
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "orgCode", required = false) String orgCode);
 
     @RequestMapping(value = ServiceApi.Doctors.DoctorsExistence, method = RequestMethod.GET)
     @ApiOperation(value = "判断code是否存在")
