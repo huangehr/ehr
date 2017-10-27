@@ -95,7 +95,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         }
         for(Doctors doctors : doctorsList){
             User user = userManager.getUserByDoctorId(doctors.getId().toString());
-            if (null != user) {
+            if(user != null){
                 doctors.setUserId(user.getId());
             }
         }

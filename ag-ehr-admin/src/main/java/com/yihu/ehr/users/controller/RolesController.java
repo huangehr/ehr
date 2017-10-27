@@ -227,7 +227,8 @@ public class RolesController extends BaseController {
             @RequestParam(value = "type",required = false) String type){
         boolean bo = rolesClient.isNameExistence(appId,name,orgCode,type);
         if(bo){
-            return success(null);
+            MOrganization organization = organizationClient.getOrg(orgCode);
+            return success(name + "在" + organization.getFullName()+"中已存在！"  );
         }
         return failed("");
     }
@@ -244,7 +245,8 @@ public class RolesController extends BaseController {
             @RequestParam(value = "type",required = false) String type){
         boolean  bo = rolesClient.isCodeExistence(appId,code,orgCode,type);
         if(bo){
-            return success(null);
+            MOrganization organization = organizationClient.getOrg(orgCode);
+            return success(code + "在" + organization.getFullName()+"中已存在！"  );
         }
         return failed("");
     }
