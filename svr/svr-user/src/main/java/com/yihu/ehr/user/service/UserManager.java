@@ -82,7 +82,7 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     }
 
     public String hashPassword(String pwd) {
-        return HashUtil.hash(pwd);
+        return DigestUtils.md5Hex(pwd);
     }
 
     public boolean isPasswordRight(User user, String pwd) {

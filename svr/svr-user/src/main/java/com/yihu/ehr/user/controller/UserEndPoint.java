@@ -89,9 +89,9 @@ public class UserEndPoint extends EnvelopRestEndPoint {
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
         if (!StringUtils.isEmpty(user.getPassword())){
-            user.setPassword(HashUtil.hash(user.getPassword()));
+            user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         }else {
-            user.setPassword(HashUtil.hash(default_password));
+            user.setPassword(DigestUtils.md5Hex(default_password));
         }
         String userType = user.getUserType();
         MConventionalDict dict = conventionalDictClient.getUserType(userType);
@@ -173,7 +173,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "user_id") String userId,
             @ApiParam(name = "password", value = "密码", defaultValue = "")
             @RequestParam(value = "password") String password) throws Exception {
-        String hashPassWord = HashUtil.hash(password);
+        String hashPassWord = DigestUtils.md5Hex(password);
         userManager.changePassWord(userId,hashPassWord);
         return true;
     }

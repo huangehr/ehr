@@ -142,7 +142,7 @@ public class DemographicService {
 
         String pwd = "123456";
         DemographicInfo demInfo = getDemographicInfo(id);
-        demInfo.setPassword(HashUtil.hash(pwd));
+        demInfo.setPassword(DigestUtils.md5Hex(pwd));
         demographicInfoRepository.save(demInfo);
     }
 }
