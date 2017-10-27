@@ -12,15 +12,8 @@ public class RsCategoryModel {
     private String name;
     private String pid;
     private String pname;
+    private String code;
     private String description;
-
-    public String getPname() {
-        return pname;
-    }
-
-    public void setPname(String pname) {
-        this.pname = pname;
-    }
 
     public String getId() {
         return id;
@@ -44,6 +37,22 @@ public class RsCategoryModel {
 
     public void setPid(String pid) {
         this.pid = pid;
+    }
+
+    public String getPname() {
+        return pname;
+    }
+
+    public void setPname(String pname) {
+        this.pname = pname;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getDescription() {
