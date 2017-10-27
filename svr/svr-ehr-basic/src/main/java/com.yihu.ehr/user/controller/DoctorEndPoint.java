@@ -80,7 +80,9 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         List<Doctors> doctorsList = doctorService.search(fields, filters, sorts, page, size);
         for(Doctors doctors : doctorsList){
             User user = userManager.getUserByDoctorId(doctors.getId().toString());
-            doctors.setUserId(user.getId());
+            if(user != null){
+                doctors.setUserId(user.getId());
+            }
         }
         pagedResponse(request, response, doctorService.getCount(filters), page, size);
 
