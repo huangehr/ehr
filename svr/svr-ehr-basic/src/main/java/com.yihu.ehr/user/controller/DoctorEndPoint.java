@@ -75,14 +75,30 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException {
-        List<Doctors> doctorsList = doctorService.search(fields, filters, sorts, page, size);
+        List<Doctors> doctorsList = new ArrayList<>();
+        if (!StringUtils.isEmpty(orgCode)) {
+            String[] orgCodes = orgCode.split(",");
+            String filter = "";
+            if (!StringUtils.isEmpty(filters)) {
+                filter = filters.substring(filters.indexOf("?") + 1, filters.indexOf(";"));
+            }
+            doctorsList = doctorService.searchDoctors(filter, orgCodes, page, size);
+            Long totalCount = doctorService.getDoctorsCount(filter, orgCodes);
+            pagedResponse(request, response, totalCount, page, size);
+        } else {
+            doctorsList= doctorService.search(fields, filters, sorts, page, size);
+            pagedResponse(request, response, doctorService.getCount(filters), page, size);
+        }
         for(Doctors doctors : doctorsList){
             User user = userManager.getUserByDoctorId(doctors.getId().toString());
-            doctors.setUserId(user.getId());
+            if(user != null){
+                doctors.setUserId(user.getId());
+            }
         }
-        pagedResponse(request, response, doctorService.getCount(filters), page, size);
 
         return (List<MDoctor>) convertToModels(doctorsList, new ArrayList<MDoctor>(doctorsList.size()), MDoctor.class, fields);
     }
