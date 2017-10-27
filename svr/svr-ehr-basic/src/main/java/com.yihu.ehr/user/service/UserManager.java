@@ -126,8 +126,6 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     }
 
     public boolean isPasswordRight(User user, String pwd) {
-        String password = DigestUtils.md5Hex(pwd);
-       // return hashPassword(pwd).equals(user.getPassword());
         return DigestUtils.md5Hex(pwd).equals(user.getPassword());
     }
 
