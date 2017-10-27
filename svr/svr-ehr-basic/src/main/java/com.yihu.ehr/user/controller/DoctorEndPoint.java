@@ -25,6 +25,7 @@ import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -105,7 +106,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         User user =new User();
         user.setId(getObjectId(BizObject.User));
         user.setCreateDate(new Date());
-        user.setPassword(HashUtil.hash(default_password));
+        user.setPassword(DigestUtils.md5Hex(default_password));
         user.setUserType("Doctor");
         user.setIdCardNo(d.getIdCardNo());
         user.setDoctorId(d.getId().toString());
@@ -123,7 +124,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
 
         //创建居民
         DemographicInfo demographicInfo =new DemographicInfo();
-        demographicInfo.setPassword(HashUtil.hash(default_password));
+        demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
         demographicInfo.setRegisterTime(new Date());
         demographicInfo.setIdCardNo(d.getIdCardNo());
         demographicInfo.setName(d.getName());
@@ -275,9 +276,9 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
                   String defaultPassword="";
                   if(!StringUtils.isEmpty(d.getIdCardNo())&&d.getIdCardNo().length()>7){
                       defaultPassword=d.getIdCardNo().substring(d.getIdCardNo().length()-6,d.getIdCardNo().length());
-                      user.setPassword(HashUtil.hash(defaultPassword));
+                      user.setPassword(DigestUtils.md5Hex(defaultPassword));
                   }else{
-                      user.setPassword(HashUtil.hash(default_password));
+                      user.setPassword(DigestUtils.md5Hex(default_password));
                   }
 
                   user.setCreateDate(DateUtil.strToDate(DateUtil.getNowDateTime()));

@@ -11,6 +11,7 @@ import com.yihu.ehr.user.dao.XUserRepository;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.util.hash.HashUtil;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +79,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
                     {
                         password = number.substring(number.length()-6);
                     }
-                    user.setPassword(HashUtil.hash(password));
+                    user.setPassword(DigestUtils.md5Hex(password));
                     user.setRealName(doctor.getName());
                     user.setCreateDate(new Date());
                     userRepository.save(user);
@@ -179,7 +180,13 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
                 sql.append(",");
             //创建居民
              demographicInfo =new DemographicInfo();
-            demographicInfo.setPassword(HashUtil.hash("123456"));
+            String idCardNo="123456";
+             if(null!=map .get("idCardNo")&&StringUtils.isEmpty(map .get("idCardNo").toString())){
+                 idCardNo=map .get("idCardNo").toString();
+                 demographicInfo.setPassword(DigestUtils.md5Hex(idCardNo));
+             }else{
+                 demographicInfo.setPassword(DigestUtils.md5Hex("123456"));
+             }
             demographicInfo.setRegisterTime(new Date());
             demographicInfo.setIdCardNo(String.valueOf(map .get("idCardNo")));
             demographicInfo.setName(String.valueOf(map .get("name")));

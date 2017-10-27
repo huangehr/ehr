@@ -150,7 +150,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             @RequestBody String jsonData) throws Exception{
         DemographicInfo demographicInfo = toEntity(jsonData, DemographicInfo.class);
         String pwd = "123456";
-        demographicInfo.setPassword(HashUtil.hash(pwd));
+        demographicInfo.setPassword(DigestUtils.md5Hex(pwd));
         demographicInfo.setRegisterTime(new Date());
         demographicService.savePatient(demographicInfo);
         return convertToModel(demographicInfo,MDemographicInfo.class);

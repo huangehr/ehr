@@ -66,7 +66,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
                     {
                         password = number.substring(number.length()-6);
                     }
-                    user.setPassword(HashUtil.hash(password));
+                    user.setPassword(DigestUtils.md5Hex(password));
                     user.setRealName(doctor.getName());
                     user.setCreateDate(new Date());
                     userRepository.save(user);
