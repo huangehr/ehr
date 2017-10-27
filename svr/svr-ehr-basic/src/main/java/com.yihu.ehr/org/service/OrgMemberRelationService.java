@@ -155,7 +155,9 @@ public class OrgMemberRelationService extends BaseJpaService<OrgMemberRelation, 
      */
     public List<OrgMemberRelation> getAllOrgDeptMemberDistinct(String orgId,String searchParm) {
         Session session = entityManager.unwrap(Session.class);
-        String sql="select distinct r.userId as userId,r.userName as userName  from OrgMemberRelation r where r.status=0 and r.orgId=:orgId and r.userName like :searchParm";
+        String sql="select distinct r.orgId as orgId,r.orgName as orgName,coalesce(r.parentUserId,'') as parentUserId,coalesce(r.parentUserName,'') as parentUserName," +
+                " r.userId as userId,r.userName as userName  from OrgMemberRelation r" +
+                " where r.status=0 and r.orgId=:orgId and r.userName like :searchParm";
         Query query = session.createQuery(sql);
         query.setResultTransformer(Transformers.aliasToBean(OrgMemberRelation.class));
         query.setString("orgId", orgId);
