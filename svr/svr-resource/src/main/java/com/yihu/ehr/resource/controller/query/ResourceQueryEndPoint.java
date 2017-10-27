@@ -108,21 +108,24 @@ public class ResourceQueryEndPoint {
      */
     @ApiOperation("获取资源数据(转译)")
     @RequestMapping(value = ServiceApi.Resources.ResourcesQueryTransform, method = RequestMethod.POST)
-    public Envelop getResourcesTransform(@ApiParam("资源代码")
-                                          @RequestParam String resourcesCode,
-                                          @ApiParam(value = "appId应用ID",defaultValue = "JKZL")
-                                          @RequestParam String appId,
-                                          @ApiParam("orgCode机构代码")
-                                          @RequestParam(required = false) String orgCode,
-                                          @ApiParam("json查询条件，{\"q\":\"*:*\"}")
-                                          @RequestParam(required = false) String queryParams,
-                                          @ApiParam("第几页")
-                                          @RequestParam(required = false) Integer page,
-                                          @ApiParam("每页几条")
-                                          @RequestParam(required = false) Integer size,
-                                          @ApiParam("版本号")
-                                          @RequestParam(required = false) String version) throws Exception {
-        Envelop re = resourcesQueryService.getResources(resourcesCode, "",appId, orgCode, queryParams, page, size);
+    public Envelop getResourcesTransform(
+            @ApiParam(name = "resourcesCode", value = "资源代码")
+            @RequestParam(value = "resourcesCode") String resourcesCode,
+            @ApiParam(name = "roleId", value = "角色ID")
+            @RequestParam(value = "roleId") String roleId,
+            @ApiParam(name = "orgCode", value = "机构编码")
+            @RequestParam(value = "orgCode") String orgCode,
+            @ApiParam(name = "areaCode", value = "地区编码")
+            @RequestParam(value = "areaCode") String areaCode,
+            @ApiParam(name = "queryParams", value = "json查询条件，{\"q\":\"*:*\"}")
+            @RequestParam(value = "queryParams", required = false) String queryParams,
+            @ApiParam(name = "page", value = "第几页")
+            @RequestParam(value = "page", required = false) Integer page,
+            @ApiParam(name = "size", value = "每页几条")
+            @RequestParam(value = "size", required = false) Integer size,
+            @ApiParam(name = "version", value = "版本号")
+            @RequestParam(value = "version", required = false) String version) throws Exception {
+        Envelop re = resourcesQueryService.getResources(resourcesCode, roleId , orgCode, areaCode, queryParams, page, size);
         if(version!=null && version.length()>0) {
             List<Map<String,Object>> list = re.getDetailModelList();
             re.setDetailModelList(resourcesTransformService.displayCodeConvert(list,version,null));
