@@ -123,7 +123,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
                 resultList.add(childMap);
             }
         }else {
-            rsCateList = rsResourceCategoryDao.findByCode("derived");
+            rsCateList = rsResourceCategoryDao.findByCodeAndPid("derived", "");
             List<String> userResourceList = objectMapper.readValue(userResource, List.class);
             String [] ids = new String[userResourceList.size()];
             userResourceList.toArray(ids);
