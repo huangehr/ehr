@@ -25,33 +25,21 @@ import java.util.*;
  */
 @Service
 public class ProfileCDAService {
+
     @Autowired
-    XResourceClient resource;
-
-
+    private XResourceClient resource;
     //模板服务
     @Autowired
-    TemplateDao templateRepository;
-
+    private TemplateDao templateRepository;
     @Autowired
-    TemplateService templateService;
-
+    private TemplateService templateService;
     //CDA服务
     @Autowired
-    XCDADocumentClient cdaService;
-
+    private XCDADocumentClient cdaService;
     @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    XTransformClient transform;
-
-    @Autowired
-    CdaDocumentTypeOptions cdaDocumentTypeOptions;
-
+    private ObjectMapper objectMapper;
     @Value("${spring.application.id}")
-    String appId;
-
+    private String appId;
     //event_type对应cda_code
     Map<String,String[]> eventTypeCDA = new HashMap() {
         {
@@ -65,8 +53,7 @@ public class ProfileCDAService {
     /**
      * 获取CDA文档数据片段
      */
-    private Map<String, Object> getCDAPartData(Map<String, Object> obj,boolean isPart,String...cdaDocumentIdList) throws Exception
-    {
+    private Map<String, Object> getCDAPartData(Map<String, Object> obj,boolean isPart,String...cdaDocumentIdList) {
         try {
             String profileId = obj.get("rowkey").toString();
             String cdaVersion = obj.get("cda_version").toString();
@@ -84,7 +71,6 @@ public class ProfileCDAService {
                     for (MCdaDataSet dataset : CDADataset) {
                         String datasetCode = dataset.getDataSetCode();
                         String multiRecord = dataset.getMultiRecord();
-
                         //单条数据
                         if (multiRecord.equals("0")) {
                             SingleDatasetCodeList.add(datasetCode);
@@ -95,7 +81,6 @@ public class ProfileCDAService {
                     }
                     SingleDatasetMap.put(key, SingleDatasetCodeList);
                     multiDatasetMap.put(key, multiDatasetCodeList);
-
                 }
 
             }
@@ -105,7 +90,6 @@ public class ProfileCDAService {
             cdaTransformDto.setMasterDatasetCodeList(SingleDatasetMap);
             cdaTransformDto.setMultiDatasetCodeList(multiDatasetMap);
             datasetList = resource.getCDAData(objectMapper.writeValueAsString(cdaTransformDto));
-
             //获取cda document数据
             Map<String, MCDADocument> cdaMap = cdaService.getCDADocumentsList(cdaVersion, cdaDocumentIdList);
             for (String key : cdaMap.keySet()) {
@@ -128,8 +112,6 @@ public class ProfileCDAService {
                     ((Map<String, Object>) result.get(key)).put("file_list", fileList);
                 }
             }
-
-
             //单独获取CDA片段数据额外信息
             for (int i = 0; i < cdaDocumentIdList.length; i++) {
                 String key = cdaDocumentIdList[i];
@@ -140,53 +122,43 @@ public class ProfileCDAService {
                     ((Map<String, Object>) result.get(key)).put("event_no", obj.get("event_no"));
                 }
             }
-
-
             return result;
         }
-        catch (Exception ex)
-        {
-            System.out.print(ex.getMessage());
-            throw ex;
+        catch (Exception e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     /**
      * 获取某个CDA文档数据
      * @return
      */
-    public Map<String, Object> getCDAData(String profileId, String cdaDocumentId) throws Exception
-    {
+    public Map<String, Object> getCDAData(String profileId, String cdaDocumentId) throws Exception {
         //权限控制******
-
         Map<String, Object> re = new HashMap<>();
         //主表记录
         Envelop profile = resource.getMasterData("{\"q\":\"rowkey:" + profileId + "\"}", 1, 1,null);
-        if(profile.getDetailModelList()!=null && profile.getDetailModelList().size()>0)
-        {
+        if(profile.getDetailModelList()!=null && profile.getDetailModelList().size()>0) {
             Map<String, Object> obj = (Map<String, Object>) profile.getDetailModelList().get(0);
             re = (Map<String, Object>)getCDAPartData(obj,true,cdaDocumentId).get(cdaDocumentId);
         }
         return re;
     }
 
-
     /**
      * 根据ProfileId查询CDA分类
      */
     public List<Map<String, Object>> getCDAClass(String profileId,String eventType) throws Exception {
         List<Map<String, Object>> re = new ArrayList<>();
-
         //根据profileId或者eventNo获取主记录
         String q = "{\"q\":\"rowkey:" + profileId + "\"}";
-
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId,null, q, 1, 1);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, "*", "*", q, 1, 1);
         if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
             Map<String, Object> obj = (Map<String, Object>) result.getDetailModelList().get(0);
             profileId = obj.get("rowkey").toString();
             String profileType = obj.get("profile_type").toString(); //0结构化  1非结构化
             String cdaVersion = obj.get("cda_version").toString();
-
             //非结构化取数据rawfile
             if (profileType.equals("1")) {
                 Envelop data = resource.getRawFiles(profileId, null, null, null);
@@ -212,7 +184,6 @@ public class ProfileCDAService {
                 List<Template> list = templateRepository.findByOrganizationCodeAndCdaVersion(orgCode, cdaVersion);
                 //遍历模板
                 if (list != null && list.size() > 0) {
-
                     //获取档案相关数据
                     List<String> datasetContains = new ArrayList<>();
                     Envelop data = resource.getSubData("{\"q\":\"profile_id:" + profileId + "\"}", null, null, null);
@@ -225,22 +196,16 @@ public class ProfileCDAService {
                             }
                         }
                     }
-
                     for (Template template : list) {
                         String cdaDocumentId = template.getCdaDocumentId();
                         String cdaCode = template.getCdaCode();
-
                         //是否显示
                         boolean isShow = false;
-                        if(eventType!= null)
-                        {
+                        if(eventType!= null) {
                             String[] cdaList = eventTypeCDA.get(eventType);
-                            if(cdaList!=null && cdaList.length>0)
-                            {
-                                for(String cda : cdaList)
-                                {
-                                    if(cda.equals(cdaCode))
-                                    {
+                            if(cdaList!=null && cdaList.length>0) {
+                                for(String cda : cdaList) {
+                                    if(cda.equals(cdaCode)) {
                                         isShow = true;
                                         break;
                                     }
@@ -250,16 +215,13 @@ public class ProfileCDAService {
                         else{
                             isShow = true;
                         }
-
-                        if(isShow)
-                        {
+                        if(isShow) {
                             //获取CDA关联数据集
                             List<MCdaDataSet> datasetList = cdaService.getCDADataSetByCDAId(cdaVersion, cdaDocumentId);
                             if (datasetList != null && datasetList.size() > 0) {
                                 for (MCdaDataSet dataset : datasetList) {
                                     String dsCode = dataset.getDataSetCode();
                                     if (datasetContains.contains(dsCode)) {
-
                                         Map<String, Object> item = new HashMap<>();
                                         item.put("profile_id", profileId);
                                         item.put("profile_type", profileType);
@@ -279,7 +241,6 @@ public class ProfileCDAService {
                 }
             }
         }
-
         return re;
     }
 
@@ -288,7 +249,7 @@ public class ProfileCDAService {
      */
     public Map<String, Object> getCDADocumentId(String orgCode,String eventNo, String cdaCode) throws Exception {
         Map<String, Object> re = new HashMap<>();
-        Envelop result = resource.getResources(BasisConstant.patientEvent, appId,null, "{\"q\":\"org_code:"+orgCode+"+AND+event_no:" + eventNo + "\"}", null, null);
+        Envelop result = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\"org_code:"+orgCode+"+AND+event_no:" + eventNo + "\"}", null, null);
 
         //是否有数据
         if (result.getDetailModelList() != null && result.getTotalCount() > 0) {
