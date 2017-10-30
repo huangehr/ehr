@@ -57,7 +57,7 @@ public class ResourceQueryEndPoint {
             @RequestParam(value = "size", required = false) Integer size) {
         Envelop envelop = new Envelop();
         try {
-            envelop = resourcesQueryService.getResources(resourcesCode, "", orgCode, areaCode, queryParams, page, size);
+            envelop = resourcesQueryService.getResources(resourcesCode, "*", orgCode, areaCode, queryParams, page, size);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -94,7 +94,7 @@ public class ResourceQueryEndPoint {
             @RequestParam(value = "size", required = false) Integer size) {
         Envelop envelop = new Envelop();
         try {
-            envelop = resourcesQueryService.getResourcesSub(resourcesCode, "", orgCode, areaCode, queryParams, page, size);
+            envelop = resourcesQueryService.getResourcesSub(resourcesCode, "*", orgCode, areaCode, queryParams, page, size);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
