@@ -83,7 +83,7 @@ public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
         return convertToModel(rsCategoryService.getRsCategoryById(id), MRsCategory.class);
     }
 
-    @RequestMapping(value = ServiceApi.Resources.CategoriesByPid,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.CategoriesByPid, method = RequestMethod.GET)
     @ApiOperation("根据pid获取资源类别列表")
     public List<MRsCategory> getRsCategoryByPid(
             @ApiParam(name="pid",value="pid",defaultValue = "")
@@ -117,6 +117,8 @@ public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.CategoriesSearch, method = RequestMethod.GET)
     @ApiOperation("获取资源类别")
     public List<MRsCategory> getRsCategories(
+            @ApiParam(name = "roleId", value = "角色编码")
+            @RequestParam(value = "roleId") String roleId,
             @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤", defaultValue = "")
@@ -133,15 +135,28 @@ public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
         Collection<MRsCategory> rsList;
         //过滤条件为空
         if (StringUtils.isEmpty(filters)) {
-            Page<RsResourceCategory> resources = rsCategoryService.getRsCategories(sorts, reducePage(page), size);
-            total = resources.getTotalElements();
-            rsList = convertToModels(resources.getContent(), new ArrayList<>(resources.getNumber()), MRsCategory.class, fields);
+            if(roleId.equals("*")) {
+                Page<RsResourceCategory> rsCatePage = null;
+                rsCatePage = rsCategoryService.getRsCategories(sorts, reducePage(page), size);
+                total = rsCatePage.getTotalElements();
+                rsList = convertToModels(rsCatePage.getContent(), new ArrayList<>(rsCatePage.getNumber()), MRsCategory.class, fields);
+            }else {
+                List<RsResourceCategory> rsCateList = null;
+                rsCateList = rsCategoryService.findByCode("derived");
+                total = rsCateList.size();
+                rsList = convertToModels(rsCateList, new ArrayList<>(rsCateList.size()), MRsCategory.class, fields);
+            }
         } else {
-            List<RsResourceCategory> resources = rsCategoryService.search(fields, filters, sorts, page, size);
-            total = rsCategoryService.getCount(filters);
-            rsList = convertToModels(resources, new ArrayList<>(resources.size()), MRsCategory.class, fields);
+            List<RsResourceCategory> rsCateList = null;
+            if(roleId.equals("*")) {
+                rsCateList = rsCategoryService.search(fields, filters, sorts, page, size);
+            }else {
+                filters += "code=derived;";
+                rsCateList = rsCategoryService.search(fields, filters, sorts, page, size);
+            }
+            total = rsCateList.size();
+            rsList = convertToModels(rsCateList, new ArrayList<>(rsCateList.size()), MRsCategory.class, fields);
         }
-
         pagedResponse(request, response, total, page, size);
         return (List<MRsCategory>) rsList;
     }

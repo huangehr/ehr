@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.patient.feign.GeographyClient;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.hash.HashUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;

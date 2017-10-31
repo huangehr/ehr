@@ -10,7 +10,6 @@ import com.yihu.ehr.user.dao.XDoctorRepository;
 import com.yihu.ehr.user.dao.XUserRepository;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
-import com.yihu.ehr.util.hash.HashUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;

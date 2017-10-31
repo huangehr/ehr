@@ -35,18 +35,13 @@ public class RsResourceCategoryService extends BaseJpaService<RsResourceCategory
      *
      * @param id 资源类别id
      */
-    public void deleteRsCategory(String id) throws Exception
-    {
-        if(rsResourcesCategoryDao.countByPid(id) > 0)
-        {
+    public void deleteRsCategory(String id) throws Exception {
+        if(rsResourcesCategoryDao.countByPid(id) > 0) {
             throw new Exception("此类别包含子类别!");
         }
-
-        if(resourcesDao.countByCategoryId(id) > 0)
-        {
+        if(resourcesDao.countByCategoryId(id) > 0) {
             throw new Exception("此类别包含资源!");
         }
-
         rsResourcesCategoryDao.delete(id);
     }
 
@@ -56,10 +51,8 @@ public class RsResourceCategoryService extends BaseJpaService<RsResourceCategory
      * @param rsCategory 资源类别
      * @return RsCategory 资源类别
      */
-    public RsResourceCategory createOrUpdRsCategory(RsResourceCategory rsCategory)
-    {
+    public RsResourceCategory createOrUpdRsCategory(RsResourceCategory rsCategory) {
         rsResourcesCategoryDao.save(rsCategory);
-
         return rsCategory;
     }
 
@@ -71,10 +64,8 @@ public class RsResourceCategoryService extends BaseJpaService<RsResourceCategory
      * @param size int 分页大小
      * @return Page<RsCategory>
      */
-    public Page<RsResourceCategory> getRsCategories(String sorts, int page, int size)
-    {
-        Pageable pageable = new PageRequest(page,size,parseSorts(sorts));
-
+    public Page<RsResourceCategory> getRsCategories(String sorts, int page, int size) {
+        Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
         return rsResourcesCategoryDao.findAll(pageable);
     }
 
@@ -92,6 +83,7 @@ public class RsResourceCategoryService extends BaseJpaService<RsResourceCategory
     public List<RsResourceCategory> findAll() {
         return (List<RsResourceCategory>) rsResourcesCategoryDao.findAll();
     }
+
     /**
      * 根据父级ID获取下级类别
      */
@@ -125,6 +117,10 @@ public class RsResourceCategoryService extends BaseJpaService<RsResourceCategory
 
     public RsResourceCategory FindById(String id) {
         return rsResourcesCategoryDao.findOne(id);
+    }
+
+    public List<RsResourceCategory> findByCode(String code){
+        return rsResourcesCategoryDao.findByCode(code);
     }
 
 }

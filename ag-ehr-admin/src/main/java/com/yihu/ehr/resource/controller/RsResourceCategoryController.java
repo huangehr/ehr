@@ -251,7 +251,9 @@ public class RsResourceCategoryController extends BaseController {
     @RequestMapping(value = ServiceApi.Resources.CategoriesSearch, method = RequestMethod.GET)
     @ApiOperation("获取资源类别")
     public Envelop getRsCategories(
-            @ApiParam(name = "fields", value = "返回字段", defaultValue = "")
+            @ApiParam(name = "roleId", value = "角色编码")
+            @RequestParam(value = "roleId") String roleId,
+            @ApiParam(name = "fields", value = "返回字段")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "过滤", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
@@ -261,16 +263,16 @@ public class RsResourceCategoryController extends BaseController {
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size) throws Exception {
+        Envelop envelop = new Envelop();
         try {
-            ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories(fields, filters, sorts, page, size);
+            ResponseEntity<List<MRsCategory>> responseEntity = resourcesCategoryClient.getRsCategories(roleId, fields, filters, sorts, page, size);
             List<MRsCategory> rsCategories = responseEntity.getBody();
-            Envelop envelop = getResult(rsCategories, getTotalCount(responseEntity), page, size);
+            envelop = getResult(rsCategories, getTotalCount(responseEntity), page, size);
             return envelop;
-        }
-        catch (Exception e) {
-            Envelop envelop = new Envelop();
+        } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
     }
