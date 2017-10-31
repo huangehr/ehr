@@ -131,8 +131,10 @@ public class RsResourceIntegratedController extends BaseController {
             objList.add(objMap);
             //-----------------用户数据权限 start
             String org = "";
-            if( userOrgList != null ){
-                org = StringUtils.strip(String.join(",", userOrgList), "[]");
+            if( userOrgList != null && userOrgList.size()>0){
+                if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ) {
+                    org = StringUtils.strip(String.join(",", userOrgList), "[]");
+                }
             }
             String filters = queryCondition;
             Map<String, Object> params  = new HashMap<>();
