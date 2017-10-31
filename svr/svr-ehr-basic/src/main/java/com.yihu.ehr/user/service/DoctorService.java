@@ -271,7 +271,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
                         "ON d.id=u.doctor_id " +
                         "JOIN org_member_relation omr " +
                         "ON u.id=omr.user_id " +
-                        "WHERE d.role_type=:roleType " +
+                        "WHERE d.role_type=:roleType and omr.org_id is not null and omr.org_name is not null " +
                         " GROUP BY omr.org_id,omr.org_name";
 
         SQLQuery query = currentSession().createSQLQuery(sql);
