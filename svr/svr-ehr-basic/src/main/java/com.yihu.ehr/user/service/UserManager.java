@@ -5,7 +5,6 @@ import com.yihu.ehr.user.dao.XUserRepository;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.hash.HashUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
