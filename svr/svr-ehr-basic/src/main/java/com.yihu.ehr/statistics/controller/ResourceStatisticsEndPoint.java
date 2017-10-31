@@ -62,15 +62,24 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
             }
             EchartReportModel echartReportModel = setEchartReportModel(list,"total",dateList);
             echartReportModels.add(echartReportModel);
+        }else{
+            EchartReportModel echartReportModel = setEchartReportModel(new ArrayList<>(),"total",new ArrayList<String>());
+            echartReportModels.add(echartReportModel);
         }
         List<Object> list0 = archiveRelationService.getCollectEventTypeCount(0);
         if( list0 != null && list0.size() > 0){
             EchartReportModel echartReportModel = setEchartReportModel(list0,"outpatient",dateList);
             echartReportModels.add(echartReportModel);
+        }else{
+            EchartReportModel echartReportModel = setEchartReportModel(new ArrayList<>(),"outpatient",new ArrayList<String>());
+            echartReportModels.add(echartReportModel);
         }
         List<Object> list1 = archiveRelationService.getCollectEventTypeCount(1);
         if( list1 != null && list1.size() > 0){
             EchartReportModel echartReportModel = setEchartReportModel(list1,"hospital",dateList);
+            echartReportModels.add(echartReportModel);
+        }else{
+            EchartReportModel echartReportModel = setEchartReportModel(new ArrayList<>(),"hospital",new ArrayList<String>());
             echartReportModels.add(echartReportModel);
         }
         envelop.setDetailModelList(echartReportModels);
@@ -242,7 +251,9 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         Map<Integer,Object> map = new HashMap<>();
         Object[] obj = (Object[]) object;
         for (int i = 0; i < obj.length; i++) {
-            map.put(i, obj[i].toString());
+            if(obj[i] != null){
+                map.put(i, obj[i].toString());
+            }
         }
         return map;
     }
