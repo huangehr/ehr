@@ -5,7 +5,6 @@ import com.yihu.ehr.user.dao.XUserRepository;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.hash.HashUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -126,8 +125,6 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
     }
 
     public boolean isPasswordRight(User user, String pwd) {
-        String password = DigestUtils.md5Hex(pwd);
-       // return hashPassword(pwd).equals(user.getPassword());
         return DigestUtils.md5Hex(pwd).equals(user.getPassword());
     }
 

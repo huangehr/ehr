@@ -20,7 +20,6 @@ import com.yihu.ehr.user.service.RoleUserService;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.hash.HashUtil;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.phonics.PinyinUtil;
 import io.swagger.annotations.Api;
