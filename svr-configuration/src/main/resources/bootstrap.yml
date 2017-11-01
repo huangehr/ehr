@@ -5,35 +5,35 @@ spring:
 ---
 spring:
   profiles: dev
-
   cloud:
     config:
       server:
         git:
           #uri: http://192.168.1.220:10080/hill9868/ehr.config.git
           uri: http://192.168.1.220:10080/EHR/ehr.config.git
+          basedir: /usr/local/ehr-config
         default-label: dev
 
 ---
 spring:
   profiles: alpha
-
   cloud:
     config:
       server:
         git:
           uri: http://192.168.1.220:10080/EHR/ehr.config.git
+          basedir: /usr/local/ehr-config
         default-label: dev
 
 ---
 spring:
   profiles: test
-
   cloud:
     config:
       server:
         git:
           uri: http://192.168.1.220:10080/EHR/ehr.config.git
+          basedir: /usr/local/ehr-config
         default-label: dev
 
 ---
@@ -44,6 +44,7 @@ spring:
       server:
         git:
           uri: http://11.1.2.8:3000/ehr_admin/ehr.config.git
+          basedir: /usr/local/ehr-config
         default-label: master
 
 ---
@@ -54,6 +55,7 @@ spring:
       server:
         git:
           uri: http://192.168.135.29:3000/jkzl/ehr.config.git
+          basedir: /usr/local/ehr-config
         default-label: master
 
 ---
@@ -64,4 +66,5 @@ spring:
       server:
         git:
           uri: http://10.176.97.10:3000/jkzl/ehr.config.git
+          basedir: /usr/local/ehr-config
         default-label: master
