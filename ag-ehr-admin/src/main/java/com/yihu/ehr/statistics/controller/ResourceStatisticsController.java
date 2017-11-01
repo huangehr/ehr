@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Created by zdm on 2017/9/12
  */
-@RequestMapping(ApiVersion.Version1_0 +"/portal")
+@RequestMapping(ApiVersion.Version1_0 +"/admin")
 @RestController
 @Api(value = "ResourceStatistics", description = "数据中心首页统计相关", tags = {"数据中心首页-统计相关"})
 public class ResourceStatisticsController extends BaseController {
