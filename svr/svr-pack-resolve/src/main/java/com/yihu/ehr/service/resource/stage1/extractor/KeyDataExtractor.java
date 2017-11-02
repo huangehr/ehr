@@ -15,7 +15,7 @@ public abstract class KeyDataExtractor {
 
     public enum Filter{
         CardInfo,        //就診卡号和就诊卡类型
-        DemographicInfo,   //身份证和姓名
+        Identity,   //身份证和姓名
         EventInfo,     //事件时间和事件类型
         Diagnosis     //门诊/住院诊断
     }

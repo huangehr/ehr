@@ -21,72 +21,59 @@ import java.util.Map;
  */
 @Component
 public class DataSetParser {
+
     /**
      * 结构化档案包数据集处理
-     *
-     * @param root
+     * @param jsonNode
      * @param isOrigin
      * @return
      */
-    public PackageDataSet parseStructuredJsonDataSet(JsonNode root, boolean isOrigin) {
+    public PackageDataSet parseStructuredJsonDataSet(JsonNode jsonNode, boolean isOrigin) {
         PackageDataSet dataSet = new PackageDataSet();
 
-        String version = root.get("inner_version").asText();
-        //if (version.equals("000000000000")) throw new LegacyPackageException("Package is collected via cda version 00000000000, ignored.");
-
-        String dataSetCode = root.get("code") == null? "" : root.get("code").asText();
-        String eventNo = root.get("event_no") == null ? "" : root.get("event_no").asText();
-        String patientId = root.get("patient_id") == null ? "" : root.get("patient_id").asText();
-        String orgCode = root.get("org_code") == null ? "" : root.get("org_code").asText();
-        String createTime = root.get("create_date") == null ? "" : root.get("create_date").asText();
-        String eventTime = root.path("event_time") == null ? "" : root.path("event_time").asText();    // 旧数据集结构可能不存在这个属性*/
+        String code = jsonNode.get("code") == null? "" : jsonNode.get("code").asText();
+        String patientId = jsonNode.get("patient_id") == null ? "" : jsonNode.get("patient_id").asText();
+        String eventNo = jsonNode.get("event_no") == null ? "" : jsonNode.get("event_no").asText();
+        String orgCode = jsonNode.get("org_code") == null ? "" : jsonNode.get("org_code").asText();
+        String version = jsonNode.get("inner_version") == null ? "" : jsonNode.get("inner_version").asText();
+        String createTime = jsonNode.get("create_date") == null ? "" : jsonNode.get("create_date").asText();
+        String eventTime = jsonNode.path("event_time") == null ? "" : jsonNode.path("event_time").asText();
 
         //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
         String errorMsg = "";
-        if(StringUtils.isEmpty(dataSetCode)){
+        if(StringUtils.isEmpty(code)){
             errorMsg = errorMsg + "dataSetCode is null;";
-        }
-        if(StringUtils.isEmpty(eventNo)){
-            errorMsg = errorMsg + "eventNo is null;";
         }
         if(StringUtils.isEmpty(patientId)){
             errorMsg = errorMsg + "patientId is null;";
         }
+        if(StringUtils.isEmpty(eventNo)){
+            errorMsg = errorMsg + "eventNo is null;";
+        }
         if(StringUtils.isEmpty(orgCode)){
             errorMsg = errorMsg + "orgCode is null;";
         }
-
         if(!StringUtils.isEmpty(errorMsg)){
-            throw new RuntimeException("Invalid date time format.");
+            throw new RuntimeException(errorMsg);
         }
-
-       /* String dataSetCode = root.get("code").asText();
-        String eventNo = root.get("event_no").asText();
-        String patientId = root.get("patient_id").asText();
-        String orgCode = root.get("org_code").asText();
-        String createTime = root.get("create_date").isNull() ? "" : root.get("create_date").asText();
-        String eventTime = root.path("event_time").isNull() ? "" : root.path("event_time").asText();    // 旧数据集结构可能不存在这个属性*/
 
         try {
             dataSet.setPatientId(patientId);
             dataSet.setEventNo(eventNo);
             dataSet.setCdaVersion(version);
-            dataSet.setCode(dataSetCode);
+            dataSet.setCode(code);
             dataSet.setOrgCode(orgCode);
             dataSet.setEventTime(DateTimeUtil.simpleDateParse(eventTime));
             dataSet.setCreateTime(DateTimeUtil.simpleDateParse(createTime));
-
-            JsonNode dataNode = root.get("data");
-            for (int i = 0; i < dataNode.size(); ++i) {
+            JsonNode dataNode = jsonNode.get("data");
+            for (int i = 0; i < dataNode.size(); i ++) {
                 MetaDataRecord record = new MetaDataRecord();
-
                 JsonNode recordNode = dataNode.get(i);
                 Iterator<Map.Entry<String, JsonNode>> iterator = recordNode.fields();
                 while (iterator.hasNext()) {
                     Map.Entry<String, JsonNode> item = iterator.next();
-                    String metaData = item.getKey();
-                    if (metaData.equals("EVENT_NO")) continue; //metaData.equals("PATIENT_ID") ||
-
+                    String metaDataKey = item.getKey();
+                    if (metaDataKey.equals("EVENT_NO")) continue; //metaData.equals("PATIENT_ID") ||
                     /*String[] qualifiedMetaData = translateMetaData(
                             version, dataSetCode, metaData,
                             item.getValue().asText().equals("null") ? "" : item.getValue().asText(),
@@ -97,10 +84,9 @@ public class DataSetParser {
                         if (qualifiedMetaData.length > 2)
                             record.putMetaData(qualifiedMetaData[2], qualifiedMetaData[3]);
                     }*/
-                    String value = item.getValue().asText().equals("null") ? "" : item.getValue().asText();
-                    record.putMetaData(metaData, value);
+                    String metaDataValue = item.getValue().asText().equals("null") ? "" : item.getValue().asText();
+                    record.putMetaData(metaDataKey, metaDataValue);
                 }
-
                 dataSet.addRecord(Integer.toString(i), record);
             }
         } catch (NullPointerException e) {

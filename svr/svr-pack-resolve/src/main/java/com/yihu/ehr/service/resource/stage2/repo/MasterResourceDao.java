@@ -24,14 +24,12 @@ public class MasterResourceDao {
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
         TableBundle bundle = new TableBundle();
-
         // delete legacy data if they are exist
         String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, "^" + resBucket.getId());
         if (legacyRowKeys != null && legacyRowKeys.length > 0){
             bundle.addRows(legacyRowKeys);
             hbaseDao.delete(ResourceCore.MasterTable, bundle);
         }
-
         // now save the data to hbase
         bundle.clear();
         bundle.addValues(resBucket.getId(),
@@ -40,7 +38,6 @@ public class MasterResourceDao {
         bundle.addValues(resBucket.getId(),
                 MasterResourceFamily.Data,
                 ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Data, resBucket));
-
         hbaseDao.save(ResourceCore.MasterTable, bundle);
     }
 }

@@ -15,28 +15,45 @@ import java.util.TreeMap;
  * @created 2016.05.16 13:52
  */
 public class ResourceBucket {
-    private String id;                                  // 档案ID
-    private String cardId;                              // 就诊时用的就诊卡ID
-    private String orgCode;                             // 机构代码
-    private String orgName;                             // 机构名称
-    private String orgArea;                             // 机构区域
-    private String clientId;                            // 应用来源
-    private String patientId;                           // 人口学ID
-    private String eventNo;                             // 事件号
-    private Date eventDate;                             // 事件时间，如挂号，出院，体检时间
-    private String demographicId;                       // 身份证号
+
+    //档案ID
+    private String id;
+    //就诊时用的就诊卡ID
+    private String cardId;
+    //机构代码
+    private String orgCode;
+    //机构名称
+    private String orgName;
+    //机构区域
+    private String orgArea;
+    //应用来源
+    private String clientId;
+    //人口学ID
+    private String patientId;
+    //事件号
+    private String eventNo;
+    //事件时间，如挂号，出院，体检时间
+    private Date eventDate;
+    //身份证号
+    private String demographicId;
+    //1结构化档案，2文件档案，3链接档案
     private String cdaVersion;
-    private ProfileType profileType; //1结构化档案，2文件档案，3链接档案
-    private EventType eventType; // 0门诊 1住院 2体检
-
-    //add by hzp
-    private String cardType;                              // 就诊时用的就诊卡类型
-    private String patientName;                           // 患者姓名
-    private String diagnosis;                           // ICD10诊断，分号分隔
-    private String healthProblem;                           // 健康问题，分号分隔
-
-    protected MasterRecord masterRecord;                // 主记录
-    protected SubRecords subRecords;                    // 子记录
+    //档案类型
+    private ProfileType profileType;
+    //0门诊 1住院 2体检
+    private EventType eventType;
+    //就诊时用的就诊卡类型
+    private String cardType;
+    //患者姓名
+    private String patientName;
+    //ICD10诊断，分号分隔
+    private String diagnosis;
+    //健康问题，分号分隔
+    private String healthProblem;
+    // 主记录
+    protected MasterRecord masterRecord;
+    //子记录
+    protected SubRecords subRecords;
 
     // CDA文档列表，Key为HBase rowkey
     private Map<String, CdaDocument> cdaDocuments = new TreeMap<>();

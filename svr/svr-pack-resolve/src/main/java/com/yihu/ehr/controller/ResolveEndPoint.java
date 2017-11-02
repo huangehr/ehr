@@ -12,7 +12,7 @@ import com.yihu.ehr.feign.PackageMgrClient;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.model.patient.MDemographicInfo;
-import com.yihu.ehr.service.resource.stage1.DatasetPackage;
+import com.yihu.ehr.service.resource.stage1.DataSetPackage;
 import com.yihu.ehr.service.resource.stage1.PackageResolveEngine;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage2.PackMill;
@@ -224,7 +224,7 @@ public class ResolveEndPoint {
                 pack.setClientId(clientId);
             }
             String zipFile = downloadTo(pack.getRemotePath());
-            DatasetPackage datasetPackage = packResolveEngine.doResolveDataset(pack, zipFile);
+            DataSetPackage datasetPackage = packResolveEngine.doResolveDataset(pack, zipFile);
             dataSetPackageDao.saveDataset(datasetPackage);
             // 回写入库状态
             Map<String, String> map = new HashMap<>();

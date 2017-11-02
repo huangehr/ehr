@@ -1,6 +1,6 @@
 package com.yihu.ehr.service.resource.stage2.repo;
 
-import com.yihu.ehr.service.resource.stage1.DatasetPackage;
+import com.yihu.ehr.service.resource.stage1.DataSetPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class DataSetPackageDao {
      * @param datasetPackage
      */
     @Transactional(readOnly = false)
-    public void saveDataset(DatasetPackage datasetPackage) {
+    public void saveDataset(DataSetPackage datasetPackage) {
         String[] insertSqlArr = new String[datasetPackage.getSqlList().size()];
         insertSqlArr = datasetPackage.getSqlList().toArray(insertSqlArr);
         jdbcTemplate.batchUpdate(insertSqlArr);

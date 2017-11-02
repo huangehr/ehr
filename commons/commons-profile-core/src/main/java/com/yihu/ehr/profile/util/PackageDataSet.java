@@ -15,6 +15,9 @@ import java.util.*;
  * @created 2015.08.16 11:13
  */
 public class PackageDataSet {
+
+    //非档案类型数据集主键 add by HZY at 2017/07/06
+    protected String pk ;
     protected String code;
     protected String name;
     protected String patientId;
@@ -26,12 +29,10 @@ public class PackageDataSet {
     protected boolean isMultiRecord = false;
     protected Map<String, MetaDataRecord> records = new TreeMap<>();
 
-    protected String pk ; //非档案类型数据集主键 add by HZY at 2017/07/06
 
     public String getPk() {
         return pk;
     }
-
     public void setPk(String pk) {
         this.pk = pk;
     }
@@ -39,39 +40,20 @@ public class PackageDataSet {
     public String getCode() {
         return code;
     }
-
     public void setCode(String dataSetCode) {
         this.code = dataSetCode;
-    }
-
-    public String getCdaVersion() {
-        return cdaVersion;
-    }
-
-    public void setCdaVersion(String cdaVersion) {
-        this.cdaVersion = cdaVersion;
     }
 
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
     }
 
     public String getPatientId() {
         return patientId;
     }
-
     public void setPatientId(String patientId) {
         this.patientId = patientId;
     }
@@ -79,15 +61,27 @@ public class PackageDataSet {
     public String getEventNo() {
         return eventNo;
     }
-
     public void setEventNo(String eventNo) {
         this.eventNo = eventNo;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    public String getCdaVersion() {
+        return cdaVersion;
+    }
+    public void setCdaVersion(String cdaVersion) {
+        this.cdaVersion = cdaVersion;
     }
 
     public Date getEventTime() {
         return eventTime;
     }
-
     public void setEventTime(Date eventTime) {
         this.eventTime = eventTime;
     }
@@ -95,17 +89,23 @@ public class PackageDataSet {
     public Date getCreateTime() {
         return createTime;
     }
-
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public Set<String> getRecordKeys() {
-        return this.records.keySet();
+    public boolean isMultiRecord() {
+        return isMultiRecord;
+    }
+    public void setMultiRecord(boolean multiRecord) {
+        isMultiRecord = multiRecord;
     }
 
     public void addRecord(String recordKey, MetaDataRecord record) {
         this.records.put(recordKey, record);
+    }
+
+    public Set<String> getRecordKeys() {
+        return this.records.keySet();
     }
 
     public MetaDataRecord getRecord(String recordKey) {
@@ -139,7 +139,6 @@ public class PackageDataSet {
         root.put("patient_id", patientId);
         root.put("event_no", eventNo);
         root.put("org_code", orgCode);
-
         return root;
     }
 
@@ -162,11 +161,5 @@ public class PackageDataSet {
         return root;
     }
 
-    public boolean isMultiRecord() {
-        return isMultiRecord;
-    }
 
-    public void setMultiRecord(boolean multiRecord) {
-        isMultiRecord = multiRecord;
-    }
 }

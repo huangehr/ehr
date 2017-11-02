@@ -27,13 +27,22 @@ import static com.yihu.ehr.constants.ProfileType.*;
  */
 @Component
 public class PackageResolveEngine {
-    @Autowired
-    ApplicationContext context;
 
-    Map<ProfileType, PackageResolver> packageResolvers;
+    @Autowired
+    private ApplicationContext context;
+    private Map<ProfileType, PackageResolver> packageResolvers;
 
 
     private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
+
+    @PostConstruct
+    private void init() {
+        packageResolvers = new HashMap<>();
+        packageResolvers.put(Standard, context.getBean(StdPackageResolver.class));
+        packageResolvers.put(File, context.getBean(FilePackageResolver.class));
+        packageResolvers.put(Link, context.getBean(LinkPackageResolver.class));
+        packageResolvers.put(DataSet, context.getBean(DataSetPackageResolver.class));
+    }
 
     /**
      * 执行归档作业。归档作为流程如下：
@@ -51,34 +60,31 @@ public class PackageResolveEngine {
             if (root == null || !root.isDirectory() || root.list().length == 0) {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
-            StandardPackage profile = PackModelFactory.createPackModel(root);
+            //根据压缩包获取标准档案包
+            StandardPackage standardPackage = PackModelFactory.createPackModel(root);
             PackageResolver packageResolver;
-            switch (profile.getProfileType()) {
+            switch (standardPackage.getProfileType()) {
                 case Standard:
                     packageResolver = packageResolvers.get(ProfileType.Standard);
                     break;
-
                 case File:
                     packageResolver = packageResolvers.get(ProfileType.File);
                     break;
-
                 case Link:
                     packageResolver = packageResolvers.get(ProfileType.Link);
                     break;
-
-                case Dataset:
-                    packageResolver = packageResolvers.get(ProfileType.Dataset);
+                case DataSet:
+                    packageResolver = packageResolvers.get(ProfileType.DataSet);
                     break;
-
                 default:
                     packageResolver = null;
                     break;
             }
-            packageResolver.resolve(profile, root);
-            profile.setClientId(pack.getClientId());
-            profile.regularRowKey();
+            packageResolver.resolve(standardPackage, root);
+            standardPackage.setClientId(pack.getClientId());
+            standardPackage.regularRowKey();
             //profile.determineEventType();
-            return profile;
+            return standardPackage;
         } finally {
             houseKeep(zipFile, root);
         }
@@ -101,7 +107,7 @@ public class PackageResolveEngine {
             if (root == null || !root.isDirectory() || root.list().length == 0) {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
-            PackageResolver packageResolver = packageResolvers.get(ProfileType.Dataset);
+            PackageResolver packageResolver = packageResolvers.get(ProfileType.DataSet);
             List<StandardPackage> standardPackages = packageResolver.resolveDataSets(root,pack.getClientId());
             //profile.determineEventType();
             return standardPackages;
@@ -118,7 +124,7 @@ public class PackageResolveEngine {
      * @param zipFile 数据集档案包路径
      * @return
      */
-    public DatasetPackage doResolveDataset(MPackage pack, String zipFile) throws Exception {
+    public DataSetPackage doResolveDataset(MPackage pack, String zipFile) throws Exception {
         File root = null;
         try {
             root = new Zipper().unzipFile(new File(zipFile), TempPath + pack.getId(), pack.getPwd());
@@ -126,8 +132,8 @@ public class PackageResolveEngine {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
 
-            DatasetPackage profile = (DatasetPackage) PackModelFactory.createPackModel(root);
-            PackageResolver packageResolver = packageResolvers.get(ProfileType.Dataset);
+            DataSetPackage profile = (DataSetPackage) PackModelFactory.createPackModel(root);
+            PackageResolver packageResolver = packageResolvers.get(ProfileType.DataSet);
             packageResolver.resolve(profile, root);
             profile.setClientId(pack.getClientId());
 
@@ -146,12 +152,5 @@ public class PackageResolveEngine {
         }
     }
 
-    @PostConstruct
-    private void init() {
-        packageResolvers = new HashMap<>();
-        packageResolvers.put(Standard, context.getBean(StdPackageResolver.class));
-        packageResolvers.put(File, context.getBean(FilePackageResolver.class));
-        packageResolvers.put(Link, context.getBean(LinkPackageResolver.class));
-        packageResolvers.put(Dataset, context.getBean(DatasetPackageResolver.class));
-    }
+
 }

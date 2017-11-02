@@ -14,6 +14,7 @@ import java.util.List;
  * @created 2016.04.13 15:28
  */
 public class PackModelFactory {
+
     public final static String StandardFolder = "standard";
     public final static String OriginFolder = "origin";
     public final static String DocumentFolder = "documents";
@@ -22,13 +23,11 @@ public class PackModelFactory {
 
     /**
      * 读取档案包目录结构判断档案类型。
-     *
      * @param root
      * @return
      */
     public static StandardPackage createPackModel(File root) {
         List<String> directories = CollectionUtils.arrayToList(root.list());
-
         if (directories.contains(StandardFolder) && directories.contains(OriginFolder)) {
             return createPackModel(ProfileType.Standard);
         } else if (directories.contains(DocumentsFile)) {
@@ -36,7 +35,7 @@ public class PackModelFactory {
         } else if (directories.size() == 1 && directories.contains(LinkFile)) {
             return createPackModel(ProfileType.Link);
         } else { // 数据集档案包（zip下只有 .json 数据文件）。
-            return createPackModel(ProfileType.Dataset);
+            return createPackModel(ProfileType.DataSet);
         }
     }
 
@@ -44,16 +43,12 @@ public class PackModelFactory {
         switch(type){
             case Standard:
                 return new StandardPackage();
-
             case File:
                 return new FilePackage();
-
             case Link:
                 return new LinkPackage();
-
-            case Dataset:
-                return new DatasetPackage();
-
+            case DataSet:
+                return new DataSetPackage();
             default:
                 return null;
         }

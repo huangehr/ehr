@@ -19,12 +19,14 @@ import java.util.Map;
 @FeignClient(name = MicroServices.Package)
 public interface PackageMgrClient {
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
-    String acquirePackage(@RequestParam(value = "id") String id);
+    String acquirePackage(
+            @RequestParam(value = "id") String id);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.Package, method = RequestMethod.PUT)
-    void reportStatus(@PathVariable(value = "id") String id,
-                      @RequestParam(value = "status") ArchiveStatus status,
-                      @RequestBody String message);
+    void reportStatus(
+            @PathVariable(value = "id") String id,
+            @RequestParam(value = "status") ArchiveStatus status,
+            @RequestBody String message);
 
     @RequestMapping(value = ApiVersion.Version1_0 + ServiceApi.Packages.ResolveMessage, method = RequestMethod.PUT)
     Map<String, String> sendResolveMessage(

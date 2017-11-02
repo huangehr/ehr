@@ -19,33 +19,32 @@ import java.util.*;
 @Component
 @ConfigurationProperties(prefix = "ehr.pack-extractor.diagnosis")
 public class DiagnosisExtractor extends KeyDataExtractor {
-    private Map<String, String> dataSets = new HashMap<>();       // 界定数据集
-    private List<String> metaData = new ArrayList<>();            // 数据元
+    // 界定数据集
+    private List<String> dataSets = new ArrayList<String>();
+    // 数据元
+    private List<String> metaData = new ArrayList<>();
 
     @Override
     public Map<String,Object> extract(PackageDataSet dataSet) throws Exception {
         Map<String,Object> properties = new HashedMap();
-
         List<String> diagnosisList = new ArrayList<>();
-        if (dataSets.containsValue(dataSet.getCode())) {
+        if (dataSets.contains(dataSet.getCode())) {
             for (String rowKey : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(rowKey);
-
-                //获取门诊/住院诊断
+                //获取门诊或住院诊断
                 for (String metaDataCode : metaData) {
                     String value = record.getMetaData(metaDataCode);
-                    if (!StringUtils.isEmpty(value)&&!diagnosisList.contains(value)) {
+                    if (!StringUtils.isEmpty(value) && !diagnosisList.contains(value)) {
                         diagnosisList.add(value);
                     }
                 }
             }
         }
-        properties.put(MasterResourceFamily.BasicColumns.Diagnosis,diagnosisList);
-
+        properties.put(MasterResourceFamily.BasicColumns.Diagnosis, diagnosisList);
         return properties;
     }
 
-    public Map<String, String> getDataSets() {
+    public List<String> getDataSets() {
         return this.dataSets;
     }
 

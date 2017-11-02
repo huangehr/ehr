@@ -110,13 +110,13 @@ ehr:
     #卡提取参数，从就诊摘要提取
     card:
       data-sets:
-        - HDSD00_85: 门诊-挂号 #v1.3
-        - HDSD00_13: 住院-入院记录 #v1.3
-        - HDSC01_02: 门诊-挂号 #v1.0
-        - HDSC02_09: 住院-入院记录 #v1.0
+        - HDSD00_85 #门诊-挂号 v1.3
+        - HDSD00_13 #住院-入院记录 v1.3
+        - HDSC01_02 #门诊-挂号 v1.0
+        - HDSC02_09 #住院-入院记录 v1.0
       meta-data:
-        - card-no: JDSD00_85_005 #就诊卡号 CARD_NO
-        - card-type: JDSD00_85_006  #就诊卡类型 CARD_TYPE
+        card-no: JDSD00_85_005 #就诊卡号 CARD_NO
+        card-type: JDSD00_85_006  #就诊卡类型 CARD_TYPE
   eventIndex: #病人事件索引信息
     patientId:
       - JDSA00_01_001 #v1.3
