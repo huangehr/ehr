@@ -16,14 +16,14 @@ import java.util.List;
  * @created 2017.06.27 11:34
  */
 @Table(ResourceCore.MasterTable)
-public class DatasetPackage extends StandardPackage {
+public class DataSetPackage extends StandardPackage {
 
     private String pk;                              // 数据集主键（可能是联合主键）
 
     private List<String> sqlList; // 遍历数据集拼接的插入/更新SQL语句
 
-    public DatasetPackage(){
-        setProfileType(ProfileType.Dataset);
+    public DataSetPackage(){
+        setProfileType(ProfileType.DataSet);
     }
 
     public List<String> getSqlList() {

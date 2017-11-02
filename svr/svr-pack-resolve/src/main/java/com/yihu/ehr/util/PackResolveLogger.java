@@ -30,7 +30,6 @@ public class PackResolveLogger {
             log.put("time", DateTimeUtil.simpleDateTimeFormat(new Date()));
             log.put("logType", "3"); // TODO - 2017.7.4 张进军 - 待确定。
             log.set("data", info);
-
             logger.info(log.toString());
         } catch (Exception e) {
             e.printStackTrace();

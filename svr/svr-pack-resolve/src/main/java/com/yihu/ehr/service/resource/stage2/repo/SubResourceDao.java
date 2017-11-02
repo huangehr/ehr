@@ -28,15 +28,13 @@ public class SubResourceDao {
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
         TableBundle bundle = new TableBundle();
-
         // delete legacy data if they are exist
         String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + resBucket.getId());
         if (legacyRowKeys != null && legacyRowKeys.length > 0){
             bundle.addRows(legacyRowKeys);
             hbaseDao.delete(ResourceCore.SubTable, bundle);
         }
-
-        bundle = new TableBundle();
+        bundle.clear();
         // now save the data to hbase
         SubRecords subRecords = resBucket.getSubRecords();
         for (SubRecord record : subRecords.getRecords()){
@@ -44,13 +42,11 @@ public class SubResourceDao {
                     record.getRowkey(),
                     SubResourceFamily.Basic,
                     ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record));
-
             bundle.addValues(
                     record.getRowkey(),
                     SubResourceFamily.Data,
                     ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record));
         }
-
         hbaseDao.save(ResourceCore.SubTable, bundle);
     }
 

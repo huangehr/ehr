@@ -25,19 +25,20 @@ import java.util.*;
 @Component
 @ConfigurationProperties(prefix = "ehr.pack-extractor.event")
 public class EventInfoExtractor extends KeyDataExtractor {
-    private Map<String, String> dataSets = new HashMap<>();       // 事件界定数据集
-    private List<String> metaData = new ArrayList<>();            // 事件时间数据元
+
+    //事件界定数据集
+    private Map<String, String> dataSets = new HashMap<>();
+    // 事件时间数据元
+    private List<String> metaData = new ArrayList<>();
 
     @Override
     public Map<String,Object> extract(PackageDataSet dataSet) throws Exception {
         Map<String,Object> properties = new HashedMap();
-
         Date eventDate = null;
         EventType eventType = null;
         if (dataSets.containsKey(dataSet.getCode())) {
             for (String rowKey : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(rowKey);
-
                 //获取就诊时间
                 if(eventDate == null) {
                     for (String metaDataCode : metaData) {
@@ -45,7 +46,6 @@ public class EventInfoExtractor extends KeyDataExtractor {
                         if (StringUtils.isNotEmpty(value)) {
                             eventDate = DateUtil.strToDate(value);
                         }
-
                         if(eventDate != null) {
                             eventType = EventType.valueOf(dataSets.get(dataSet.getCode()));
                             break;
@@ -53,12 +53,9 @@ public class EventInfoExtractor extends KeyDataExtractor {
                     }
                 }
             }
-
         }
-
-        properties.put(MasterResourceFamily.BasicColumns.EventDate,eventDate);
-        properties.put(MasterResourceFamily.BasicColumns.EventType,eventType);
-
+        properties.put(MasterResourceFamily.BasicColumns.EventDate, eventDate);
+        properties.put(MasterResourceFamily.BasicColumns.EventType, eventType);
         return properties;
     }
 
@@ -67,10 +64,8 @@ public class EventInfoExtractor extends KeyDataExtractor {
         Set<String> keys = new HashSet<>(this.dataSets.keySet());
         for (String key : keys) {
             String value = this.dataSets.remove(key);
-
             key = key.replaceAll("^\\d{1,2}\\.", "");
             this.dataSets.put(key, value);
-
             if (!key.endsWith(DataSetUtil.OriginDataSetFlag)){
                 this.dataSets.put(DataSetUtil.originDataSetCode(key), value);
             }

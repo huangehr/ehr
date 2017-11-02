@@ -17,12 +17,11 @@ import java.util.List;
  * @created 2016.04.13 16:14
  */
 public abstract class PackageResolver {
+
     @Autowired
     protected DataSetParserWithTranslator dataSetResolverWithTranslator;
-
     @Autowired
     protected ObjectMapper objectMapper;
-
     @Autowired
     protected ExtractorChain extractorChain;
 
@@ -31,7 +30,7 @@ public abstract class PackageResolver {
      * @param root
      * @throws Exception
      */
-    public abstract List<StandardPackage> resolveDataSets( File root,String clinetId) throws Exception;
+    public abstract List<StandardPackage> resolveDataSets(File root, String clientId) throws Exception;
     
     public abstract void resolve(StandardPackage profile, File root) throws Exception;
 

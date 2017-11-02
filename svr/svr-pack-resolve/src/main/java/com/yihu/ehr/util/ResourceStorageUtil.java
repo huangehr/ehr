@@ -22,57 +22,47 @@ public class ResourceStorageUtil {
     /**
      * 取得主表的单元格记录。
      *
-     * @param profile
+     * @param resourceBucket
      * @return
      */
-    public static Map<String, String> getMasterResCells(String family, ResourceBucket profile) {
+    public static Map<String, String> getMasterResCells(String family, ResourceBucket resourceBucket) {
         Map<String, String> map = new HashMap<>();
-
         if (family.equals(MasterResourceFamily.Basic)){
-            map.put(MasterResourceFamily.BasicColumns.CardId, profile.getCardId());
-            map.put(MasterResourceFamily.BasicColumns.CardType, profile.getCardType());
-            map.put(MasterResourceFamily.BasicColumns.OrgCode, profile.getOrgCode());
-            map.put(MasterResourceFamily.BasicColumns.OrgName, profile.getOrgName());
-            map.put(MasterResourceFamily.BasicColumns.OrgArea, profile.getOrgArea());
-            map.put(MasterResourceFamily.BasicColumns.PatientId, profile.getPatientId());
-            map.put(MasterResourceFamily.BasicColumns.PatientName, profile.getPatientName());
-            map.put(MasterResourceFamily.BasicColumns.Diagnosis, profile.getDiagnosis());
-            map.put(MasterResourceFamily.BasicColumns.HealthProblem, profile.getHealthProblem());
-            map.put(MasterResourceFamily.BasicColumns.EventNo, profile.getEventNo());
-            map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(profile.getEventDate()));
-            map.put(MasterResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(profile.getEventType())?"":Integer.toString(profile.getEventType().ordinal()));
-            map.put(MasterResourceFamily.BasicColumns.ProfileType, Integer.toString(profile.getProfileType().ordinal()));
-            String demographicId  = profile.getDemographicId();
-            if(StringUtils.isEmpty(demographicId))
-            {
-                demographicId = "";
-            }
-            else if(demographicId == "null"){
+            map.put(MasterResourceFamily.BasicColumns.CardId, resourceBucket.getCardId());
+            map.put(MasterResourceFamily.BasicColumns.CardType, resourceBucket.getCardType());
+            map.put(MasterResourceFamily.BasicColumns.OrgCode, resourceBucket.getOrgCode());
+            map.put(MasterResourceFamily.BasicColumns.OrgName, resourceBucket.getOrgName());
+            map.put(MasterResourceFamily.BasicColumns.OrgArea, resourceBucket.getOrgArea());
+            map.put(MasterResourceFamily.BasicColumns.PatientId, resourceBucket.getPatientId());
+            map.put(MasterResourceFamily.BasicColumns.PatientName, resourceBucket.getPatientName());
+            map.put(MasterResourceFamily.BasicColumns.Diagnosis, resourceBucket.getDiagnosis());
+            map.put(MasterResourceFamily.BasicColumns.HealthProblem, resourceBucket.getHealthProblem());
+            map.put(MasterResourceFamily.BasicColumns.EventNo, resourceBucket.getEventNo());
+            map.put(MasterResourceFamily.BasicColumns.EventDate, DateTimeUtil.utcDateTimeFormat(resourceBucket.getEventDate()));
+            map.put(MasterResourceFamily.BasicColumns.EventType, StringUtils.isEmpty(resourceBucket.getEventType())?"":Integer.toString(resourceBucket.getEventType().ordinal()));
+            map.put(MasterResourceFamily.BasicColumns.ProfileType, Integer.toString(resourceBucket.getProfileType().ordinal()));
+            String demographicId  = resourceBucket.getDemographicId();
+            if(StringUtils.isEmpty(demographicId) || demographicId.equals("null")) {
                 demographicId = "";
             }
             map.put(MasterResourceFamily.BasicColumns.DemographicId, demographicId);
-            map.put(MasterResourceFamily.BasicColumns.ClientId, profile.getClientId());
+            map.put(MasterResourceFamily.BasicColumns.ClientId, resourceBucket.getClientId());
             map.put(MasterResourceFamily.BasicColumns.CreateDate, DateTimeUtil.utcDateTimeFormat(new Date()));
-            map.put(MasterResourceFamily.BasicColumns.CdaVersion, profile.getCdaVersion());
+            map.put(MasterResourceFamily.BasicColumns.CdaVersion, resourceBucket.getCdaVersion());
         } else if (family.equals(MasterResourceFamily.Data)){
-            MasterRecord masterRecord = profile.getMasterRecord();
+            MasterRecord masterRecord = resourceBucket.getMasterRecord();
             map = masterRecord.getDataGroup();
         }
-
         return map;
     }
 
     public static Map<String, String> getSubResCells(String family, SubRecord subRecord){
-        Map<String, String> map = null;
-
+        Map<String, String> map = new HashMap<String, String>();
         if (family.equals(SubResourceFamily.Basic)){
-            map = new HashMap<>();
-
             map.put(SubResourceFamily.BasicColumns.ProfileId, subRecord.getProfileId());
         } else if (family.equals(SubResourceFamily.Data)){
             map = subRecord.getDataGroup();
         }
-
         return map;
     }
 }

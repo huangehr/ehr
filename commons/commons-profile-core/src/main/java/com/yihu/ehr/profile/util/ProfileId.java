@@ -33,8 +33,8 @@ import java.util.regex.Pattern;
  * <p>本类实例不可修改.</p>
  */
 public final class ProfileId implements Comparable<ProfileId>, Serializable {
-    private static final long serialVersionUID = 5121234589654483072L;
 
+    private static final long serialVersionUID = 5121234589654483072L;
     private final static Pattern Pattern = java.util.regex.Pattern.compile("([\\da-zA-Z\\-]+)_([\\da-zA-Z\\-]+)_(\\d+)");
 
     private final String orgCode;
@@ -60,6 +60,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
         return new ProfileId(orgId, patientId, eventNo);
     }
 
+    //档案维度，有时间
     public ProfileId(final String orgCode, final String eventNo, final Date timestamp) {
         this.orgCode = orgCode;
         this.patientId = "";
@@ -67,7 +68,7 @@ public final class ProfileId implements Comparable<ProfileId>, Serializable {
         this.timestamp = timestamp.getTime();
     }
 
-    //非档案维度的，没有时间时间
+    //非档案维度的，没有时间
     public ProfileId(final String orgCode, final String patientId, final String eventNo) {
         this.orgCode = orgCode;
         this.patientId = patientId;

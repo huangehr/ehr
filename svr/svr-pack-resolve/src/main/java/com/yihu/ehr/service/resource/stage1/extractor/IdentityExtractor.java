@@ -20,45 +20,40 @@ import java.util.*;
  * @created 2017.04.23
  */
 @Component
-@ConfigurationProperties(prefix="ehr.pack-extractor.identity")
+@ConfigurationProperties(prefix = "ehr.pack-extractor.identity")
 public class IdentityExtractor extends KeyDataExtractor {
-    private List<String> dataSets = new ArrayList<>();        // 包含身份信息的数据集
 
+    //包含身份信息的数据集
+    private List<String> dataSets = new ArrayList<>();
     @Value("${ehr.pack-extractor.identity.meta-data.id-card-no}")
-    private String IdCardNoMetaData;
-
+    private String IdCardNo;
     @Value("${ehr.pack-extractor.identity.meta-data.id-card-type}")
-    private String IdCardTypeMetaData;
-
+    private String IdCardType;
     @Value("${ehr.pack-extractor.identity.meta-data.patient-name}")
     private String PatientName;
-
     private static final String IdCardNoDictEntry = "01;02";    // 身份字典项代码：身份证号与护照
 
     @Override
     public Map<String,Object> extract(PackageDataSet dataSet) throws Exception {
         Map<String,Object> properties = new HashedMap();
-
         String demographicId = "";
         String patientName = "";
         //获取身份证和姓名
         if (dataSets.contains(dataSet.getCode())) {
             for (String key : dataSet.getRecordKeys()) {
                 MetaDataRecord record = dataSet.getRecord(key);
-
                 //获取身份证号码
                 if(StringUtils.isEmpty(demographicId)) {
-                    String val = record.getMetaData(IdCardTypeMetaData);
-                    if (val != null) {
-                        if (IdCardNoDictEntry.contains(val)) {
-                            demographicId = record.getMetaData(IdCardNoMetaData);
-                        }
-                    } else {
+                    String val = record.getMetaData(IdCardType);
+                    if (StringUtils.isEmpty(val)) {
                         // default as identity card no
-                        demographicId = record.getMetaData(IdCardNoMetaData);
+                        demographicId = record.getMetaData(IdCardNo);
+                    } else {
+                        if (IdCardNoDictEntry.contains(val)) {
+                            demographicId = record.getMetaData(IdCardNo);
+                        }
                     }
                 }
-
                 //获取姓名
                 if(StringUtils.isEmpty(patientName)) {
                     String val = record.getMetaData(PatientName);
@@ -68,10 +63,8 @@ public class IdentityExtractor extends KeyDataExtractor {
                 }
             }
         }
-
-        properties.put(MasterResourceFamily.BasicColumns.DemographicId,demographicId);
-        properties.put(MasterResourceFamily.BasicColumns.PatientName,patientName);
-
+        properties.put(MasterResourceFamily.BasicColumns.DemographicId, demographicId);
+        properties.put(MasterResourceFamily.BasicColumns.PatientName, patientName);
         return properties;
     }
 

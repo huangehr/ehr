@@ -23,26 +23,21 @@ public class ExtractorChain {
 
         Map<String,Object> re = new HashedMap();
         //就診卡号和就诊卡类型
-        if(filter.equals(KeyDataExtractor.Filter.CardInfo))
-        {
+        if(filter.equals(KeyDataExtractor.Filter.CardInfo)) {
             re = context.getBean(CardInfoExtractor.class).extract(dataSet);
         }
         //事件时间和事件类型
-        else if(filter.equals(KeyDataExtractor.Filter.EventInfo))
-        {
+        else if(filter.equals(KeyDataExtractor.Filter.EventInfo)) {
             re = context.getBean(EventInfoExtractor.class).extract(dataSet);
         }
         //身份证和姓名
-        else if(filter.equals(KeyDataExtractor.Filter.DemographicInfo))
-        {
+        else if(filter.equals(KeyDataExtractor.Filter.Identity)) {
             re = context.getBean(IdentityExtractor.class).extract(dataSet);
         }
-        //门诊/住院诊断
-        else if(filter.equals(KeyDataExtractor.Filter.Diagnosis))
-        {
+        //门诊和住院诊断
+        else if(filter.equals(KeyDataExtractor.Filter.Diagnosis)) {
             re = context.getBean(DiagnosisExtractor.class).extract(dataSet);
         }
-
         return re;
     }
 }

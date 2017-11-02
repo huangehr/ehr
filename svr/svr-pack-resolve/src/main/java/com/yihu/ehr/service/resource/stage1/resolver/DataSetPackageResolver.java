@@ -11,15 +11,13 @@ import com.yihu.ehr.profile.family.MasterResourceFamily;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.service.resource.stage1.DatasetPackage;
+import com.yihu.ehr.service.resource.stage1.DataSetPackage;
 import com.yihu.ehr.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.service.resource.stage1.StandardPackage;
 import com.yihu.ehr.service.resource.stage1.extractor.KeyDataExtractor;
 import com.yihu.ehr.util.PackResolveLogger;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -36,9 +34,7 @@ import java.util.*;
  * @created 2017.06.27 11:28
  */
 @Component
-public class DatasetPackageResolver extends PackageResolver {
-
-    Logger logger = LoggerFactory.getLogger(DatasetPackageResolver.class);
+public class DataSetPackageResolver extends PackageResolver {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -55,80 +51,79 @@ public class DatasetPackageResolver extends PackageResolver {
     @Override
     public void resolve(StandardPackage profile, File root) throws Exception {
         File originFolder = new File(root.getAbsolutePath());
-        this.parseFiles((DatasetPackage) profile, originFolder.listFiles());
+        this.parseFiles((DataSetPackage) profile, originFolder.listFiles());
     }
 
     /**
      * 非档案类型--结构化档案包解析JSON文件中的数据。
      */
-    private List<StandardPackage> parseDataSetFiles(String clinetId, File[] files, boolean origin) throws Exception {
-        List<StandardPackage> profiles = new ArrayList<>();
-        StandardPackage profile = null;
+    private List<StandardPackage> parseDataSetFiles(String clientId, File[] files, boolean origin) throws Exception {
+        List<StandardPackage> standardPackageList = new ArrayList<>();
+        StandardPackage standardPackage = null;
         for (File file : files) {
             List<PackageDataSet> packageDataSets = generateDataSet(file, origin);
-            for (PackageDataSet dataSet:packageDataSets) {
-                profile = PackModelFactory.createPackModel(ProfileType.Dataset);
+            for (PackageDataSet dataSet : packageDataSets) {
+                standardPackage = PackModelFactory.createPackModel(ProfileType.DataSet);
                 String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
                 dataSet.setCode(dataSetCode);
 
                 // Extract key data from data set if exists
                 if (!origin) {
                     //就诊卡信息
-                    if (StringUtils.isEmpty(profile.getCardId())) {
+                    if (StringUtils.isEmpty(standardPackage.getCardId()) || StringUtils.isEmpty(standardPackage.getCardType())) {
                         Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.CardInfo);
                         String cardId = (String) properties.get(MasterResourceFamily.BasicColumns.CardId);
-                        if (!StringUtils.isEmpty(cardId)) {
-                            profile.setCardId(cardId);
-                            profile.setCardType((String) properties.get(MasterResourceFamily.BasicColumns.CardType));
+                        String cardType = (String) properties.get(MasterResourceFamily.BasicColumns.CardType);
+                        if(!StringUtils.isEmpty(cardId) && !StringUtils.isEmpty(cardType)) {
+                            standardPackage.setCardId(cardId);
+                            standardPackage.setCardType(cardType);
                         }
                     }
 
                     //身份信息
-                    if (StringUtils.isEmpty(profile.getDemographicId()) || StringUtils.isEmpty(profile.getPatientName())) {
-                        Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.DemographicInfo);
-
+                    if (StringUtils.isEmpty(standardPackage.getDemographicId()) || StringUtils.isEmpty(standardPackage.getPatientName())) {
+                        Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Identity);
                         String demographicId = (String) properties.get(MasterResourceFamily.BasicColumns.DemographicId);
-                        if (!StringUtils.isEmpty(demographicId) && StringUtils.isEmpty(profile.getDemographicId())) {
-                            profile.setDemographicId(demographicId);
-                        }
-
                         String patientName = (String) properties.get(MasterResourceFamily.BasicColumns.PatientName);
-                        if (!StringUtils.isEmpty(patientName) && StringUtils.isEmpty(profile.getPatientName())) {
-                            profile.setPatientName(patientName);
+                        if(!StringUtils.isEmpty(demographicId) && !StringUtils.isEmpty(patientName)) {
+                            standardPackage.setDemographicId(demographicId);
+                            standardPackage.setPatientName(patientName);
                         }
                     }
 
                     //就诊事件信息
-                    if (profile.getEventDate() == null) {
+                    if (standardPackage.getEventDate() == null || standardPackage.getEventType() == null) {
                         Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.EventInfo);
                         Date eventDate = (Date) properties.get(MasterResourceFamily.BasicColumns.EventDate);
-                        if (eventDate != null) {
-                            profile.setEventDate(eventDate);
-                            profile.setEventType((EventType) properties.get(MasterResourceFamily.BasicColumns.EventType));
+                        EventType eventType = (EventType) properties.get(MasterResourceFamily.BasicColumns.EventType);
+                        if(eventDate != null && eventType != null) {
+                            standardPackage.setEventDate(eventDate);
+                            standardPackage.setEventType(eventType);
                         }
                     }
 
-                    //门诊/住院诊断
-                    Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
-                    List<String> diagnosisList = (List<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
-                    if (diagnosisList != null && diagnosisList.size() > 0) {
-                        profile.setDiagnosisList(diagnosisList);
+                    //门诊或住院诊断
+                    if(standardPackage.getDiagnosisList() == null || standardPackage.getDiagnosisList().size() <= 0 ) {
+                        Map<String, Object> properties = extractorChain.doExtract(dataSet, KeyDataExtractor.Filter.Diagnosis);
+                        List<String> diagnosisList = (List<String>) properties.get(MasterResourceFamily.BasicColumns.Diagnosis);
+                        if (diagnosisList != null && diagnosisList.size() > 0) {
+                            standardPackage.setDiagnosisList(diagnosisList);
+                        }
                     }
                 }
 
-                profile.setPatientId(dataSet.getPatientId());
-                profile.setEventNo(dataSet.getEventNo());
-                profile.setOrgCode(dataSet.getOrgCode());
-                profile.setCdaVersion(dataSet.getCdaVersion());
-                profile.setCreateDate(dataSet.getCreateTime());
-                profile.insertDataSet(dataSetCode, dataSet);
-                profile.setClientId(clinetId);
-                profile.regularNonArchiveRowKey();//rowkey设置
-                profiles.add(profile);
+                standardPackage.setPatientId(dataSet.getPatientId());
+                standardPackage.setEventNo(dataSet.getEventNo());
+                standardPackage.setOrgCode(dataSet.getOrgCode());
+                standardPackage.setCdaVersion(dataSet.getCdaVersion());
+                standardPackage.setCreateDate(dataSet.getCreateTime());
+                standardPackage.insertDataSet(dataSetCode, dataSet);
+                standardPackage.setClientId(clientId);
+                standardPackage.regularNonArchiveRowKey();//rowkey设置
+                standardPackageList.add(standardPackage);
             }
         }
-
-        return profiles;
+        return standardPackageList;
     }
 
 
@@ -157,7 +152,7 @@ public class DatasetPackageResolver extends PackageResolver {
      * @throws IOException
      * @throws ParseException
      */
-    private void parseFiles(DatasetPackage profile, File[] files) throws IOException, ParseException {
+    private void parseFiles(DataSetPackage profile, File[] files) throws IOException, ParseException {
         List<String> sqlList = new ArrayList<>();
 
         for (File file : files) {
@@ -323,7 +318,6 @@ public class DatasetPackageResolver extends PackageResolver {
                 dataSet.setEventTime(DateTimeUtil.simpleDateParse(recordNode.path(eventTime[0]).asText()));
                 dataSet.setCreateTime(DateTimeUtil.simpleDateParse(createTime));
                 MetaDataRecord record = new MetaDataRecord();
-
                 Iterator<Map.Entry<String, JsonNode>> iterator = recordNode.fields();
                 while (iterator.hasNext()) {
                     Map.Entry<String, JsonNode> item = iterator.next();
@@ -336,7 +330,6 @@ public class DatasetPackageResolver extends PackageResolver {
                         pkBuffer.append(value).append("_");
                     }
                 }
-
                 dataSet.setPk(pkBuffer.toString());
                 dataSet.addRecord(Integer.toString(i), record);
                 packageDataSetList.add(dataSet);
@@ -346,7 +339,6 @@ public class DatasetPackageResolver extends PackageResolver {
                 throw new RuntimeException("Invalid date time format.");
             }
         }
-
         return packageDataSetList;
     }
 
