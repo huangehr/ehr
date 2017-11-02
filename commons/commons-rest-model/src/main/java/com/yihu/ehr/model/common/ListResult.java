@@ -22,6 +22,8 @@ public class ListResult extends Result implements Serializable {
 
     private List detailModelList;
 
+    private Object obj;
+
     public ListResult() {
 
     }
@@ -98,5 +100,13 @@ public class ListResult extends Result implements Serializable {
 
     public void setDetailModelList(List detailModelList) {
         this.detailModelList = detailModelList;
+    }
+
+    public Object getObj() {
+        return obj;
+    }
+
+    public void setObj(Object obj) {
+        this.obj = obj;
     }
 }
