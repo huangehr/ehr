@@ -10,11 +10,11 @@ import java.util.Date;
 @Table(name = "government_browse_log")
 public class GovernmentBrowseLog {
     private int id;
-    private String resource_id; // 视图id
+    private String resourceId; // 视图id
     private String title;   // 浏览名称
-    private String user_id;
-    private String user_name;
-    private Date create_time;
+    private String userId;
+    private String userName;
+    private Date createTime;
     private String type;
 
     @Id
@@ -29,12 +29,12 @@ public class GovernmentBrowseLog {
     }
 
     @Column(name = "resource_id")
-    public String getResource_id() {
-        return resource_id;
+    public String getResourceId() {
+        return resourceId;
     }
 
-    public void setResource_id(String resource_id) {
-        this.resource_id = resource_id;
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
     }
 
     @Column(name = "title")
@@ -47,30 +47,30 @@ public class GovernmentBrowseLog {
     }
 
     @Column(name = "user_id")
-    public String getUser_id() {
-        return user_id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Column(name = "user_name")
-    public String getUser_name() {
-        return user_name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     @Column(name = "create_time")
-    public Date getCreate_time() {
-        return create_time;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setCreate_time(Date create_time) {
-        this.create_time = create_time;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     @Column(name = "type")

@@ -1055,5 +1055,8 @@ public class ServiceApi {
         public static final String GovernmentMenuById = "/government/detailById";
         public static final String AddGovernmentMenu = "/government/save";
         public static final String UpdateGovernmentMenu = "/government/update";
+
+        public static final String AddGovernmentBrowseLog = "/governmentBrowseLog/save";
+        public static final String searchGovernmentBrowseLog = "/governmentBrowseLog/searchByUserId";
     }
 }
