@@ -89,8 +89,18 @@ public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name="pid",value="pid",defaultValue = "")
             @RequestParam(value="pid",required = false) String pid) throws Exception {
 
-        List<RsResourceCategory> categoryList;
-        categoryList = rsCategoryService.getRsCategoryByPid(pid);
+        List<RsResourceCategory> categoryList = rsCategoryService.getRsCategoryByPid(pid);
+        return (List<MRsCategory>) convertToModels(categoryList, new ArrayList<MRsCategory>(categoryList.size()), MRsCategory.class, null);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.CategoriesByCodeAndPid, method = RequestMethod.GET)
+    @ApiOperation("根据pid和code获取资源类别列表")
+    public List<MRsCategory> getRsCategoryByPidAndCode(
+            @ApiParam(name = "code", value="编码类型", defaultValue = "")
+            @RequestParam(value= "code") String code,
+            @ApiParam(name = "pid", value = "上级id", defaultValue = "")
+            @RequestParam(value="pid",required = false) String pid) throws Exception {
+        List<RsResourceCategory> categoryList = rsCategoryService.findByCodeAndPid(code, pid);
         return (List<MRsCategory>) convertToModels(categoryList, new ArrayList<MRsCategory>(categoryList.size()), MRsCategory.class, null);
     }
 

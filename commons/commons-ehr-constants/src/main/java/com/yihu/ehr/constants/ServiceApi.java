@@ -138,6 +138,7 @@ public class ServiceApi {
         public static final String CategoryUpdate = "/resources/category/update";
         public static final String Category = "/resources/category/{id}";
         public static final String CategoriesByPid = "/resources/categories/pid";
+        public static final String CategoriesByCodeAndPid = "/resources/categories/codeAndPid";
         public static final String CategoryTree = "/resources/categories/tree";
         public static final String CategoryExitSelfAndParent = "/resources/categories/selfAndParent";
         public static final String CategoriesAll = "/resources/categories/all";

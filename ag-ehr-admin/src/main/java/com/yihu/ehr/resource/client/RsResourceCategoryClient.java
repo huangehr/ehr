@@ -49,6 +49,11 @@ public interface RsResourceCategoryClient {
     List<MRsCategory> getRsCategoryByPid(
             @RequestParam(value="pid",required = false) String pid);
 
+    @RequestMapping(value = ServiceApi.Resources.CategoriesByCodeAndPid, method = RequestMethod.GET)
+    @ApiOperation("根据pid获取资源类别列表")
+    List<MRsCategory> getRsCategoryByCodeAndPid(
+            @RequestParam(value="code") String code,
+            @RequestParam(value="pid", required = false) String pid);
 
     @RequestMapping(value = ServiceApi.Resources.CategoryExitSelfAndParent, method = RequestMethod.GET)
     @ApiOperation(value = "根据当前类别获取自己的父级以及同级以及同级所在父级类别列表")
