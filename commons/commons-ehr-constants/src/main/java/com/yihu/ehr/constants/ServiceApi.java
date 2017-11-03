@@ -1047,4 +1047,13 @@ public class ServiceApi {
         public static final String GetAppIdsByUserId = "/BasicInfo/getAppIdsByUserId";
         public static final String GetIdCardNoByOrgCode = "/BasicInfo/getIdCardNoByOrgCode";
     }
+
+    public static class Government {
+        public static final String SearchGovernmentMenu = "/government/searchGovernmentMenu";
+        public static final String GovernmentMenuCheckName = "/government/checkName";
+        public static final String GovernmentMenuCheckCode = "/government/checkCode";
+        public static final String GovernmentMenuById = "/government/detailById";
+        public static final String AddGovernmentMenu = "/government/save";
+        public static final String UpdateGovernmentMenu = "/government/update";
+    }
 }
