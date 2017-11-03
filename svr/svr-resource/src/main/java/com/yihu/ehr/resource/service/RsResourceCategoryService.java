@@ -123,4 +123,8 @@ public class RsResourceCategoryService extends BaseJpaService<RsResourceCategory
         return rsResourcesCategoryDao.findByCode(code);
     }
 
+    public List<RsResourceCategory> findByCodeAndPid(String code, String pid){
+        return rsResourcesCategoryDao.findByCodeAndPid(code, pid);
+    }
+
 }

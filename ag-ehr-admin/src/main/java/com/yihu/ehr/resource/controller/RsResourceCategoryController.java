@@ -178,19 +178,24 @@ public class RsResourceCategoryController extends BaseController {
     @RequestMapping(value = ServiceApi.Resources.CategoryTree, method = RequestMethod.GET)
     @ApiOperation(value = "获取所有资源类别转成的RsCategoryTypeTreeModel列表，初始页面显示")
     public Envelop getRsCategoryTreeModels(
+            @ApiParam(name = "userResource", value = "授权资源")
+            @RequestParam(value = "userResource") String userResource,
             @ApiParam(name = "name", value = "资源类别的名称")
             @RequestParam(value = "name",required = false) String name) throws Exception {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         //获取到的顶级cda类别集合
-        //String pid = null;
-        List<MRsCategory> mRsCategories = resourcesCategoryClient.getRsCategoryByPid("");
+        List<MRsCategory> mRsCategories;
+        if(userResource.equals("*")) {
+            mRsCategories = resourcesCategoryClient.getRsCategoryByPid("");
+        }else {
+            mRsCategories = resourcesCategoryClient.getRsCategoryByCodeAndPid("derived", "");
+        }
         //顶级类别中符合条件的类别集合
         List<MRsCategory> mRsCategoriesSome = new ArrayList<>();
         //顶级类别中不符合条件的类别集合
         List<MRsCategory> mRsCategoriesOthers = new ArrayList<>();
-
-        if (mRsCategories.size() == 0){
+        if (mRsCategories == null || mRsCategories.size() == 0){
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("没有匹配条件的资源类别！");
             return envelop;
@@ -208,7 +213,7 @@ public class RsResourceCategoryController extends BaseController {
             }
             mRsCategoriesOthers.add(mRsCategory);
         }
-        if (mRsCategoriesSome.size()!=0){
+        if (mRsCategoriesSome.size() != 0){
             treeList.addAll(getRsCategoryTreeModelChild(mRsCategoriesSome));
         }
         treeList .addAll(getRsCategoryTreeModelByName(mRsCategoriesOthers, name));
@@ -328,8 +333,7 @@ public class RsResourceCategoryController extends BaseController {
         List<RsCategoryTypeTreeModel> treeInfo = new ArrayList<>();
         for (int i = 0; i < info.size(); i++) {
             MRsCategory typeInfo = info.get(i);
-            RsCategoryTypeTreeModel tree = new RsCategoryTypeTreeModel();
-            tree = convertToModel(typeInfo,RsCategoryTypeTreeModel.class);
+            RsCategoryTypeTreeModel tree = convertToModel(typeInfo, RsCategoryTypeTreeModel.class);
             List<MRsCategory> listChild = resourcesCategoryClient.getRsCategoryByPid(typeInfo.getId());
             List<RsCategoryTypeTreeModel> listChildTree = getRsCategoryTreeModelChild(listChild);
             tree.setChildren(listChildTree);
@@ -344,7 +348,7 @@ public class RsResourceCategoryController extends BaseController {
      * @param name
      * @return
      */
-    public  List<RsCategoryTypeTreeModel> getRsCategoryTreeModelByName(List<MRsCategory> mRsCategories,String name){
+    public  List<RsCategoryTypeTreeModel> getRsCategoryTreeModelByName(List<MRsCategory> mRsCategories, String name){
         //结构：treeList 包含treeModel，treeModel包含listOfParent
         List<RsCategoryTypeTreeModel> treeList = new ArrayList<>();
         for(MRsCategory mRsCategory:mRsCategories){

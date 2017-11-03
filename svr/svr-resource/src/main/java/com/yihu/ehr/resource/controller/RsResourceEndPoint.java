@@ -36,8 +36,6 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RsResourceService rsResourceService;
     @Autowired
-    private RsResourceCategoryService rsResourceCategoryService;
-    @Autowired
     private RsAppResourceService rsAppResourceService;
 
     @ApiOperation("创建资源")
