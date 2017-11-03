@@ -20,7 +20,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
-@Api(value = "government_menu", description = "政府服务平台浏览记录", tags = {"政府服务平台"})
+@Api(value = "government_browse_log", description = "政府服务平台浏览记录", tags = {"政府服务平台"})
 public class GovernmentBrowseLogController extends ExtendController<GovernmentBrowseLogModel> {
     @Autowired
     private GovernmentBrowseLogClient governmentBrowseLogClient;
