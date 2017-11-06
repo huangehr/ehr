@@ -12,6 +12,6 @@ import java.util.List;
  */
 public interface XGovernmentBrowseLogRepository extends PagingAndSortingRepository<GovernmentBrowseLog, Integer> {
 
-    @Query(value = "select gbl.title from Government_Browse_Log gbl where gbl.user_Id = :userId order by gbl.create_Time desc limit 4", nativeQuery = true)
-    List<String> findByUserId(@Param("userId") String userId);
+    @Query(value = "select gbl.* from Government_Browse_Log gbl where gbl.user_Id = :userId order by gbl.create_Time desc limit 4", nativeQuery = true)
+    List<GovernmentBrowseLog> findByUserId(@Param("userId") String userId);
 }

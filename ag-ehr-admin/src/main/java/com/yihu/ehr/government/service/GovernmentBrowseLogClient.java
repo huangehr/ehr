@@ -1,5 +1,6 @@
 package com.yihu.ehr.government.service;
 
+import com.yihu.ehr.agModel.government.GovernmentBrowseLogModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -28,5 +29,5 @@ public interface GovernmentBrowseLogClient {
 
     @RequestMapping(value = ServiceApi.Government.searchGovernmentBrowseLog, method = RequestMethod.GET)
     @ApiOperation(value = "浏览记录")
-    List<String> getBrowseName(@RequestParam(value = "userId", required = false) String userId);
+    List<GovernmentBrowseLogModel> getBrowseName(@RequestParam(value = "userId", required = false) String userId);
 }

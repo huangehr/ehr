@@ -23,8 +23,8 @@ public class GovernmentBrowseLogService extends BaseJpaService<GovernmentBrowseL
         return governmentBrowseLog;
     }
 
-    public List<String> getBrowseName(String userId) {
-        List<String> list = governmentBrowseLogRepository.findByUserId(userId);
+    public List<GovernmentBrowseLog> getBrowseName(String userId) {
+        List<GovernmentBrowseLog> list = governmentBrowseLogRepository.findByUserId(userId);
         return list;
     }
 }

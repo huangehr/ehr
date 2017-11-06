@@ -36,10 +36,10 @@ public class GovernmentBrowseLogEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Government.searchGovernmentBrowseLog, method = RequestMethod.GET)
     @ApiOperation(value = "浏览记录")
-    public List<String> getBrowseName(
+    public List<GovernmentBrowseLog> getBrowseName(
             @ApiParam(name = "userId", value = " 用户Id", defaultValue = "")
             @RequestParam(value = "userId", required = false) String userId) {
-        List<String> browseName = governmentBrowseLogService.getBrowseName(userId);
+        List<GovernmentBrowseLog> browseName = governmentBrowseLogService.getBrowseName(userId);
         return browseName;
     }
 }
