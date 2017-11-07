@@ -9,13 +9,16 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -277,5 +280,59 @@ public class UserManager extends BaseJpaService<User, XUserRepository> {
         } else {
             return userList.get(0);
         }
+    }
+
+    public List<User> searchUsers(String[] orgCode, String realName, String userType, int page, int size) {
+        Session s = currentSession();
+        String hql = "SELECT user.* FROM Users user WHERE user.id IN(SELECT DISTINCT(u.id) from Users u INNER JOIN " +
+                "role_User ru ON u.id = ru.user_Id INNER JOIN Roles r ON ru.role_Id =  r.id " +
+                "WHERE r.org_code IN(:orgCode))";
+
+        if (!StringUtils.isEmpty(realName)) {
+            hql += " AND user.real_Name LIKE :realName";
+        }
+        if (!StringUtils.isEmpty(userType)) {
+            hql += " AND user.user_Type = :userType";
+        }
+        hql += " ORDER BY user.create_Date desc";
+
+        Query query = s.createSQLQuery(hql).addEntity(User.class);
+
+        query.setParameterList("orgCode", orgCode);
+        if (!StringUtils.isEmpty(realName)) {
+            query.setParameter("realName", "%" + realName + "%");
+        }
+        if (!StringUtils.isEmpty(userType)) {
+            query.setParameter("userType", userType);
+        }
+        query.setMaxResults(size);
+        query.setFirstResult((page - 1) * size);
+        return query.list();
+    }
+
+    public Long searchUsersCount(String[] orgCode, String realName, String userType) {
+        Session s = currentSession();
+        String hql = "SELECT COUNT(user.id) FROM Users user WHERE user.id IN(SELECT DISTINCT(u.id) from Users u INNER JOIN " +
+                "role_User ru ON u.id = ru.user_Id INNER JOIN Roles r ON ru.role_Id =  r.id " +
+                "WHERE r.org_code IN(:orgCode))";
+
+        if (!StringUtils.isEmpty(realName)) {
+            hql += " AND user.real_Name LIKE :realName";
+        }
+        if (!StringUtils.isEmpty(userType)) {
+            hql += " AND user.user_Type = :userType";
+        }
+
+        Query query = s.createSQLQuery(hql);
+
+        query.setParameterList("orgCode", orgCode);
+        if (!StringUtils.isEmpty(realName)) {
+            query.setParameter("realName", "%" + realName + "%");
+        }
+        if (!StringUtils.isEmpty(userType)) {
+            query.setParameter("userType", userType);
+        }
+        BigInteger count = (BigInteger) query.uniqueResult();
+        return count.longValue();
     }
 }

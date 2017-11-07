@@ -145,12 +145,14 @@ public class UserController extends BaseController {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page) {
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode) {
         if (null == sorts) {
             sorts = "-createDate,-lastLoginTime";
         }
         filters = resetFilter(filters);
-        ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
+        ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page, orgCode);
         List<MUser> mUsers = responseEntity.getBody();
         List<UsersModel> usersModels = new ArrayList<>();
         for (MUser mUser : mUsers) {

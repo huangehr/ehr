@@ -84,10 +84,35 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "orgCode", value = "机构编码", defaultValue = "")
+            @RequestParam(value = "orgCode", required = false) String orgCode,
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException {
-        List<User> userList = userManager.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, userManager.getCount(filters), page, size);
+        List<User> userList = new ArrayList<>();
+        if (!StringUtils.isEmpty(orgCode)) {
+            String[] orgCodes = orgCode.split(",");
+            String realName = "";
+            String userType = "";
+            if (!StringUtils.isEmpty(filters)) {
+                boolean nameFlag = filters.contains("realName?");
+                boolean typeFlag = filters.contains("userType=");
+                if (nameFlag && typeFlag) {
+                    realName = filters.substring(filters.indexOf("?") + 1, filters.indexOf(";"));
+                    userType = filters.substring(filters.lastIndexOf("=") + 1, filters.lastIndexOf(";"));
+                } else if (nameFlag) {
+                    realName = filters.substring(filters.indexOf("?") + 1, filters.indexOf(";"));
+                } else if (typeFlag) {
+                    userType = filters.substring(filters.lastIndexOf("=") + 1, filters.lastIndexOf(";"));
+                }
+            }
+            userList = userManager.searchUsers(orgCodes, realName, userType, page, size);
+            Long totalCount =userManager.searchUsersCount(orgCodes, realName, userType);
+            pagedResponse(request, response, totalCount, page, size);
+
+        } else {
+            userList = userManager.search(fields, filters, sorts, page, size);
+            pagedResponse(request, response, userManager.getCount(filters), page, size);
+        }
 
         return (List<MUser>) convertToModels(userList, new ArrayList<MUser>(userList.size()), MUser.class, fields);
     }
