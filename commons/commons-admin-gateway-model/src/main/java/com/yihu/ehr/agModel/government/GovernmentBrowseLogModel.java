@@ -11,7 +11,7 @@ public class GovernmentBrowseLogModel {
     private String title;   // 浏览名称
     private String userId;
     private String userName;
-    private Date createTime;
+    private String createTime;
     private String type;
 
     public int getId() {
@@ -54,11 +54,11 @@ public class GovernmentBrowseLogModel {
         this.userName = userName;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
