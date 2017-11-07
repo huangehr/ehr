@@ -140,6 +140,14 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 }
                 String rsMetadatasStr = mapper.writeValueAsString(paraMap.get("metadatas"));
                 RsResourceMetadata[] rsMetadatas = toEntity(rsMetadatasStr, RsResourceMetadata[].class);
+                if(rsMetadatas == null || rsMetadatas.length <= 0) {
+                    /**
+                     * 档案数据元为空，删除资源
+                     */
+                    rsService.delete(newResources);
+                    envelop.setErrorMsg("档案数据元不能为空");
+                    return envelop;
+                }
                 for (RsResourceMetadata rsMetadata : rsMetadatas) {
                     rsMetadata.setResourcesId(reId);
                     rsMetadata.setId(getObjectId(BizObject.ResourceMetadata));
@@ -179,6 +187,14 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 }
                 String rsQuotasStr = mapper.writeValueAsString(paraMap.get("quotas"));
                 RsResourceQuota[] rsQuotas = toEntity(rsQuotasStr, RsResourceQuota[].class);
+                if(rsQuotas == null || rsQuotas.length <= 0 ) {
+                    /**
+                     * 指标数据元关联失败，删除资源
+                     */
+                    rsService.delete(newResources);
+                    envelop.setErrorMsg("指标数据元不能为空");
+                    return envelop;
+                }
                 for(RsResourceQuota resourceQuota : rsQuotas) {
                     resourceQuota.setResourceId(reId);
                     RsResourceQuota newResourceQuota = resourceQuotaService.save(resourceQuota);
