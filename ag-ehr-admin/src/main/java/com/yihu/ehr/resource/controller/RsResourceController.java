@@ -332,31 +332,35 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
+        String ids  = "";
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
         if(list!=null && list.size() > 0){
             for (ResourceQuotaModel m : list) {
-                if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){
-                    //-----------------用户数据权限 start
-                    String org = "";
-                    if( userOrgList != null ){
-                        if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ) {
-                            org = StringUtils.strip(String.join(",", userOrgList), "[]");
-                        }
-                    }
-                    //-----------------用户数据权限 end
-                    Map<String, Object> params  = new HashMap<>();
-                    if(org.length()>0){
-                        if(StringUtils.isNotEmpty(quotaFilter)){
-                            params  = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {});
-                        }
-                        params.put("org",org);
-                        quotaFilter = objectMapper.writeValueAsString(params);
-                    }
-                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
-                    chartInfoModels.add(chartInfoModel);
-                }
+//                if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){
+//                    //-----------------用户数据权限 start
+//                    String org = "";
+//                    if( userOrgList != null ){
+//                        if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ) {
+//                            org = StringUtils.strip(String.join(",", userOrgList), "[]");
+//                        }
+//                    }
+//                    //-----------------用户数据权限 end
+//                    Map<String, Object> params  = new HashMap<>();
+//                    if(org.length()>0){
+//                        if(StringUtils.isNotEmpty(quotaFilter)){
+//                            params  = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {});
+//                        }
+//                        params.put("org",org);
+//                        quotaFilter = objectMapper.writeValueAsString(params);
+//                    }
+//                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
+//                    chartInfoModels.add(chartInfoModel);
+//                }
+                ids = ids + m.getQuotaId() +",";
             }
+            MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReportPreviewsMoreOption(ids,2,null,null);
+            chartInfoModels.add(chartInfoModel);
         }
         return chartInfoModels;
     }
