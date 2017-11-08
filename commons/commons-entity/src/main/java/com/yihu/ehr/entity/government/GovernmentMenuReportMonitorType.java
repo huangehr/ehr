@@ -12,7 +12,11 @@ import java.util.Date;
 @Table(name = "government_menu_report_monitor_type")
 public class GovernmentMenuReportMonitorType {
     private int id;
-    private String rsReoportMonitorTypeId;
+    private int rsReoportMonitorTypeId;
+    private int governmentMenuId;
+
+
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,11 +30,20 @@ public class GovernmentMenuReportMonitorType {
     }
 
     @Column(name = "rs_reoport_monitor_type_id")
-    public String getRsReoportMonitorTypeId() {
+    public int getRsReoportMonitorTypeId() {
         return rsReoportMonitorTypeId;
     }
 
-    public void setRsReoportMonitorTypeId(String rsReoportMonitorTypeId) {
+    public void setRsReoportMonitorTypeId(int rsReoportMonitorTypeId) {
         this.rsReoportMonitorTypeId = rsReoportMonitorTypeId;
+    }
+
+    @Column(name = "government_menu_id")
+    public int getGovernmentMenuId() {
+        return governmentMenuId;
+    }
+
+    public void setGovernmentMenuId(int governmentMenuId) {
+        this.governmentMenuId = governmentMenuId;
     }
 }

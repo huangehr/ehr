@@ -28,10 +28,9 @@ public class GovernmentMenuReportMonitorTypeEndPoint extends EnvelopRestEndPoint
     @ApiOperation("新增政府平台菜单资源报表监测分类")
     @RequestMapping(value = ServiceApi.Government.GovernmentMenuReportMonitorTypeSave, method = RequestMethod.POST)
     public MRsReportMonitorType add(
-            @ApiParam(name = "rsReoportMonitorTypeId", value = "资源报表监测分类ID", required = true)
-            @RequestParam(value = "rsReoportMonitorTypeId") String rsReoportMonitorTypeId) throws Exception {
-        GovernmentMenuReportMonitorType newGovernmentMenuMonitorType = new GovernmentMenuReportMonitorType();
-        newGovernmentMenuMonitorType.setRsReoportMonitorTypeId(rsReoportMonitorTypeId);
+            @ApiParam(name = "rsReportMonitorType", value = "资源报表监测分类JSON", required = true)
+            @RequestBody String rsReportMonitorType) throws Exception {
+        GovernmentMenuReportMonitorType newGovernmentMenuMonitorType = toEntity(rsReportMonitorType, GovernmentMenuReportMonitorType.class);
         newGovernmentMenuMonitorType = governmentMenuReportMonitorTypeService.save(newGovernmentMenuMonitorType);
         return convertToModel(newGovernmentMenuMonitorType, MRsReportMonitorType.class);
     }

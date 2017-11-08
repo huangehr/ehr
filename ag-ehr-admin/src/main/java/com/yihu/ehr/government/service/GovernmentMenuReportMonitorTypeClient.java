@@ -7,6 +7,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,8 +30,8 @@ public interface GovernmentMenuReportMonitorTypeClient {
     @ApiOperation("新增政府菜单资源报表监测分类")
     @RequestMapping(value = ServiceApi.Government.GovernmentMenuReportMonitorTypeSave, method = RequestMethod.POST)
     GovernmentMenuReportMonitorTypeModel add(
-            @ApiParam(name = "rsReoportMonitorTypeId", value = "政府菜单资源报表监测分类ID", required = true)
-            @RequestParam(value = "rsReoportMonitorTypeId") String rsReoportMonitorTypeId);
+            @ApiParam(name = "governmentMenuReportMonitorType", value = "政府菜单资源报表监测分类JSON字符串", required = true)
+            @RequestBody String governmentMenuReportMonitorType);
 
 
     @ApiOperation("删除政府菜单资源报表监测分类")

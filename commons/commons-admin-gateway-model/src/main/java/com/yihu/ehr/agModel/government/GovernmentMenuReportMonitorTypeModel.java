@@ -5,7 +5,8 @@ package com.yihu.ehr.agModel.government;
  */
 public class GovernmentMenuReportMonitorTypeModel {
     private int id;
-    private String rsReoportMonitorTypeId;
+    private int rsReoportMonitorTypeId;
+    private int governmentMenuId;
 
     public int getId() {
         return id;
@@ -15,11 +16,19 @@ public class GovernmentMenuReportMonitorTypeModel {
         this.id = id;
     }
 
-    public String getRsReoportMonitorTypeId() {
+    public int getRsReoportMonitorTypeId() {
         return rsReoportMonitorTypeId;
     }
 
-    public void setRsReoportMonitorTypeId(String rsReoportMonitorTypeId) {
+    public void setRsReoportMonitorTypeId(int rsReoportMonitorTypeId) {
         this.rsReoportMonitorTypeId = rsReoportMonitorTypeId;
+    }
+
+    public int getGovernmentMenuId() {
+        return governmentMenuId;
+    }
+
+    public void setGovernmentMenuId(int governmentMenuId) {
+        this.governmentMenuId = governmentMenuId;
     }
 }
