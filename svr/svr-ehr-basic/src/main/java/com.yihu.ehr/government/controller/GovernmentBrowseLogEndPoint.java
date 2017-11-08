@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,6 +31,7 @@ public class GovernmentBrowseLogEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = " 记录信息Json", defaultValue = "")
             @RequestBody String jsonData) {
         GovernmentBrowseLog governmentBrowseLog = toEntity(jsonData, GovernmentBrowseLog.class);
+        governmentBrowseLog.setCreateTime(new Date());
         governmentBrowseLog = governmentBrowseLogService.saveGovernmentBrowseLog(governmentBrowseLog);
         return governmentBrowseLog;
     }
