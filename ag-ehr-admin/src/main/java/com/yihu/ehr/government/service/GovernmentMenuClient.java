@@ -44,9 +44,9 @@ public interface GovernmentMenuClient {
 
     @RequestMapping(value = ServiceApi.Government.AddGovernmentMenu, method = RequestMethod.POST)
     @ApiOperation(value = "新增菜单")
-    GovernmentMenuModel saveGovernmentMenu(@RequestBody String jsonData);
+    GovernmentMenuModel saveGovernmentMenu(@RequestBody String jsonData, @RequestParam(value = "ids") String ids);
 
     @RequestMapping(value = ServiceApi.Government.UpdateGovernmentMenu, method = RequestMethod.POST)
     @ApiOperation(value = "修改菜单")
-    GovernmentMenuModel updateGovernmentMenu(@RequestBody String jsonData);
+    GovernmentMenuModel updateGovernmentMenu(@RequestBody String jsonData, @RequestParam(value = "ids") String ids);
 }
