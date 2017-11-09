@@ -10,6 +10,9 @@ package com.yihu.ehr.constants;
  */
 public class ServiceApi {
 
+    public static class GateWay {
+        public static final String admin = "/admin";
+    }
 
     public static class Adaptions {
         //public static final String Cache = "/adaptions/{id}/cache";
