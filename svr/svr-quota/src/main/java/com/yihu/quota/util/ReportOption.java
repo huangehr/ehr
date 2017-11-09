@@ -133,7 +133,7 @@ public class ReportOption {
      * @param lineDatas 数据集
      * @param lineNames 折线名称集合
      */
-    public Option getLineEchartOption2(String title, String xName, String yName, Object[] yData,  List<List<Object>> lineDatas, List<String> lineNames) {
+    public Option getLineEchartOptionMoreChart(String title, String xName, String yName, Object[] yData,  List<List<Object>> lineDatas, List<String> lineNames,List<String> types) {
         Option option = new GsonOption();
         //title
         option.title().setText(title);
@@ -163,19 +163,24 @@ public class ReportOption {
         categoryAxis.data(yData);
         option.xAxis(categoryAxis);
 
-        if(lineNames.size() > 0 && lineDatas.size() >0 && lineDatas.size() == lineDatas.size()){
-            for(int i = 0 ; i < lineDatas.size();i++){
+        if(lineNames.size() > 0 && lineDatas.size() >0 && lineNames.size() == lineDatas.size()) {
+            for (int i = 0; i < lineDatas.size(); i++) {
                 String lineName = lineNames.get(i);
+                String type = types.get(i);
                 //series
                 Line line = new Line();
                 line.name(lineName);
-                line.type(SeriesType.line);
+                if (type.equals(String.valueOf(ReportOption.bar))) {
+                    line.type(SeriesType.bar);
+                } else if (type.equals(String.valueOf(ReportOption.line))) {
+                        line.type(SeriesType.line);
+                }
                 line.smooth(true);
                 line.stack("stack");
                 line.itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0.4)");
 
                 List<Object> lineValList = lineDatas.get(i);
-                Object[] lineVal = (Object[])lineValList.toArray(new Object[lineValList.size()]);
+                Object[] lineVal = (Object[]) lineValList.toArray(new Object[lineValList.size()]);
                 line.data(lineVal);
                 option.series().add(line);
             }
