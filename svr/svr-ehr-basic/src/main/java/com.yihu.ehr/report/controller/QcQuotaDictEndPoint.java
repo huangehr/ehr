@@ -46,9 +46,8 @@ public class QcQuotaDictEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page
+            ) throws Exception {
 
         ListResult listResult = new ListResult();
         List<QcQuotaDict> qcQuotaDictList = qcQuotaDictService.search(fields, filters, sorts, page, size);

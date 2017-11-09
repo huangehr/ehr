@@ -1,5 +1,7 @@
 package com.yihu.ehr.entity.government;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -14,6 +16,7 @@ public class GovernmentBrowseLog {
     private String title;   // 浏览名称
     private String userId;
     private String userName;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
     private Date createTime;
     private String type;
 

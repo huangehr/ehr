@@ -240,7 +240,7 @@ public class OrganizationController extends BaseController {
                 return failed("机构代码不能为空！");
             }
             //用户
-            ResponseEntity<List<MUser>> userEntity = userClient.searchUsers("", "organization="+orgCode, "", 1, 1);
+            ResponseEntity<List<MUser>> userEntity = userClient.searchUsers("", "organization="+orgCode, "", 1, 1, null);
             List<MUser> users = userEntity.getBody();
             if(users.size()>0){
                 return failed("删除失败!该组织机构下面存在用户，请先删除用户！");

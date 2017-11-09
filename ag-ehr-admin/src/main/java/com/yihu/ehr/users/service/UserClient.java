@@ -30,7 +30,8 @@ public interface UserClient {
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page);
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "orgCode", required = false) String orgCode);
 
     @RequestMapping(value = ServiceApi.Users.Users, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "创建用户", notes = "重新绑定用户信息")
