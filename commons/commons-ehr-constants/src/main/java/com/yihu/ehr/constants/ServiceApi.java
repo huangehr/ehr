@@ -1076,6 +1076,7 @@ public class ServiceApi {
 
         public static final String GovernmentMenuReportMonitorTypeSave = "/governmentMenuReportMonitorType/save";
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
+        public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
     }
 }

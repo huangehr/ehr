@@ -12,6 +12,8 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * Created by jansny 2017年11月7日15:17:24
@@ -43,5 +45,11 @@ public class GovernmentMenuReportMonitorTypeEndPoint extends EnvelopRestEndPoint
         governmentMenuReportMonitorTypeService.delete(id);
     }
 
-
+    @ApiOperation("获取政府菜单资源报表监测类型Id")
+    @RequestMapping(value = ServiceApi.Government.MonitorTypeList, method = RequestMethod.GET)
+    public List<Integer> getMonitorTypeIdByGovernmentMenuId(
+            @ApiParam(name = "menuId", value = "菜单ID", required = true)
+            @RequestParam(value = "menuId") String menuId) {
+        return governmentMenuReportMonitorTypeService.getMonitorTypeIdByGovernmentMenuId(menuId);
+    }
 }

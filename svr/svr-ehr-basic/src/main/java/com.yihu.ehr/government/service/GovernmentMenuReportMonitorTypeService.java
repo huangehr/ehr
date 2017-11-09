@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 政府平台菜单资源报表监测分类 Service
  *
@@ -41,4 +43,7 @@ public class GovernmentMenuReportMonitorTypeService extends BaseJpaService<Gover
         governmentMenuReportMonitorTypeDao.delete(id);
     }
 
+    public List<Integer> getMonitorTypeIdByGovernmentMenuId(String menuId) {
+        return governmentMenuReportMonitorTypeDao.findMonitorTypeIdByGovernmentMenuId(Integer.parseInt(menuId));
+    }
 }

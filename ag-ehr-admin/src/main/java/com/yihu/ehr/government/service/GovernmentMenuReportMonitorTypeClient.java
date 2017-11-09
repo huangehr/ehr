@@ -21,7 +21,7 @@ import java.util.List;
  * @author janseny
  * @created 2017年11月7日15:05:53
  */
-@FeignClient(name = MicroServices.Resource)
+@FeignClient(name = MicroServices.User)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
 public interface GovernmentMenuReportMonitorTypeClient {
@@ -39,5 +39,11 @@ public interface GovernmentMenuReportMonitorTypeClient {
     void delete(
             @ApiParam(name = "id", value = "政府菜单资源报表监测分类ID", required = true)
             @RequestParam(value = "id") Integer id);
+
+    @ApiOperation("获取政府菜单资源报表监测类型Id")
+    @RequestMapping(value = ServiceApi.Government.MonitorTypeList, method = RequestMethod.GET)
+    List<Integer> getMonitorTypeIdByGovernmentMenuId(
+            @ApiParam(name = "menuId", value = "菜单ID", required = true)
+            @RequestParam(value = "menuId") String menuId);
 
 }

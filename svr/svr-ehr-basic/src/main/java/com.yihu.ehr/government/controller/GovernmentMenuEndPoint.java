@@ -89,9 +89,11 @@ public class GovernmentMenuEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "新增菜单")
     public GovernmentMenu create(
             @ApiParam(name = "jsonData", value = " 菜单信息Json", defaultValue = "")
-            @RequestBody String jsonData){
+            @RequestBody String jsonData,
+            @ApiParam(name = "ids", value = "资源报表监测类型ids", defaultValue = "")
+            @RequestParam(value = "ids", required = false) String ids){
         GovernmentMenu governmentMenu = toEntity(jsonData, GovernmentMenu.class);
-        governmentMenu = governmentMenuService.saveGovernmentMenu(governmentMenu);
+        governmentMenu = governmentMenuService.saveGovernmentMenu(governmentMenu, ids);
         return governmentMenu;
     }
 
@@ -99,9 +101,11 @@ public class GovernmentMenuEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "修改菜单")
     public GovernmentMenu resetInfo(
             @ApiParam(name = "jsonData", value = " 菜单信息Json", defaultValue = "")
-            @RequestBody String jsonData){
+            @RequestBody String jsonData,
+            @ApiParam(name = "ids", value = "资源报表监测类型ids", defaultValue = "")
+            @RequestParam(value = "ids", required = false) String ids){
         GovernmentMenu governmentMenu = toEntity(jsonData, GovernmentMenu.class);
-        governmentMenu = governmentMenuService.updateGovernmentMenu(governmentMenu);
+        governmentMenu = governmentMenuService.updateGovernmentMenu(governmentMenu, ids);
         return governmentMenu;
     }
 }
