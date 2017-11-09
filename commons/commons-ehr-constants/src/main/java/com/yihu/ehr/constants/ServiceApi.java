@@ -210,6 +210,15 @@ public class ServiceApi {
         public static final String RsReportMonitorTypes = "/resources/rsReportMonitorType/getRsReportMonitorTypePage";
         public static final String RsReportMonitorTypesNoPage = "/resources/rsReportMonitorType/getRsReportMonitorTypeNoPage";
 
+
+        /**
+         * 资源报表监测类型配置报表
+         */
+        public static final String RsMonitorTypeReport = "/resources/monitorTypeReport";
+        public static final String RsMonitorTypeReportByUserId = "/resources/monitorTypeReport/{user_id}";
+        public static final String RsMonitorTypeReports = "/resources/monitorTypeReport";
+        public static final String RsMonitorTypeReportsNoPage = "/resources/monitorTypeReport/noPage";
+
         /**
          * 资源报表
          */

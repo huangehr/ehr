@@ -332,35 +332,85 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
-        String ids  = "";
+
+        //-----------------用户数据权限 start
+        String org = "";
+        if (userOrgList != null) {
+            if (!(userOrgList.size() == 1 && userOrgList.get(0).equals("null"))) {
+                org = StringUtils.strip(String.join(",", userOrgList), "[]");
+            }
+        }
+        //-----------------用户数据权限 end
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
-        if(list!=null && list.size() > 0){
+        if(list!=null && list.size() > 0) {
             for (ResourceQuotaModel m : list) {
-//                if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){
-//                    //-----------------用户数据权限 start
-//                    String org = "";
-//                    if( userOrgList != null ){
-//                        if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ) {
-//                            org = StringUtils.strip(String.join(",", userOrgList), "[]");
-//                        }
-//                    }
-//                    //-----------------用户数据权限 end
-//                    Map<String, Object> params  = new HashMap<>();
-//                    if(org.length()>0){
-//                        if(StringUtils.isNotEmpty(quotaFilter)){
-//                            params  = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {});
-//                        }
-//                        params.put("org",org);
-//                        quotaFilter = objectMapper.writeValueAsString(params);
-//                    }
-//                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
-//                    chartInfoModels.add(chartInfoModel);
-//                }
-                ids = ids + m.getQuotaId() +",";
+                if (StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)) {
+                    Map<String, Object> params = new HashMap<>();
+                    if (org.length() > 0) {
+                        if (StringUtils.isNotEmpty(quotaFilter)) {
+                            params = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {
+                            });
+                        }
+                        params.put("org", org);
+                        quotaFilter = objectMapper.writeValueAsString(params);
+                    }
+                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter, dimension);
+                    chartInfoModels.add(chartInfoModel);
+                }
             }
-            MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReportPreviewsMoreOption(ids,2,null,null);
-            chartInfoModels.add(chartInfoModel);
+        }
+        return chartInfoModels;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.POST)
+    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览,多个指标放在一个图形上展示")
+    public List<MChartInfoModel> getRsQuotaPreviewMoreQuota(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId,
+            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
+            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
+        //-----------------用户数据权限 start
+        String org = "";
+        if( userOrgList != null ){
+            if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ) {
+                org = StringUtils.strip(String.join(",", userOrgList), "[]");
+            }
+        }
+        //-----------------用户数据权限 end
+        Map<String, Object> params  = new HashMap<>();
+        String filter = "";
+        if(org.length()>0){
+            params.put("org",org);
+            filter = objectMapper.writeValueAsString(params);
+        }
+        MRsResources rsResources =  resourcesClient.getResourceById(resourceId);
+        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
+        List<MChartInfoModel> chartInfoModels = new ArrayList<>();
+        String title = "";
+        if(rsResources != null ){
+            title = rsResources.getName();
+        }
+        if(list != null && list.size() > 0){
+            String idstr  = "";
+            String charstr = "";
+            if(list.size() == 1){
+                MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(list.get(0).getQuotaId(), list.get(0).getQuotaChart(), filter, dimension);
+                chartInfoModels.add(chartInfoModel);
+            }else{
+                for (ResourceQuotaModel m : list) {
+                    idstr = idstr + m.getQuotaId() +",";
+                    if(m.getQuotaChart()<3){
+                        charstr = charstr + m.getQuotaChart() +",";
+                    }else {
+                        charstr = charstr + "1" +",";
+                    }
+                }
+                MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReportPreviewsMoreOption(idstr,charstr,filter,null,title);
+                chartInfoModels.add(chartInfoModel);
+            }
         }
         return chartInfoModels;
     }
