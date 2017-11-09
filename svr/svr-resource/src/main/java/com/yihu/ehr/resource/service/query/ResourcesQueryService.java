@@ -234,40 +234,41 @@ public class ResourcesQueryService  {
         Envelop envelop = new Envelop();
         ObjectMapper mapper = new ObjectMapper();
         String queryParams = "";
-        String saas = "";
-        //获取资源信息
+        StringBuilder saas = new StringBuilder();
+        //获取资源编码列表
         List<String> codeList = (List<String>) mapper.readValue(resourcesCodes, List.class);
         /**
-         * 权限控制
+         * 资源判空检查
          */
         for(String code : codeList) {
             RsResource rsResources = resourcesDao.findByCode(code);
-            if(rsResources != null && StringUtils.isEmpty(saas)) {
-                //获取Saas权限参数
-                if(orgCode.equals("*") && areaCode.equals("*")) {
-                    saas = "*";
-                }else {
-                    List<String> orgCodeList = objectMapper.readValue(orgCode, List.class);
-                    List<String> areaCodeList = objectMapper.readValue(areaCode, List.class);
-                    if((orgCodeList != null && orgCodeList.size() > 0)) {
-                        for(String code1 : orgCodeList) {
-                            if(StringUtils.isEmpty(saas)) {
-                                saas = "org_code:" + code1;
-                            }
-                            else{
-                                saas += " OR org_code:" + code1;
-                            }
-                        }
+            if(rsResources == null) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("无效的资源编码：" + code);
+                return envelop;
+            }
+        }
+        //获取Saas权限参数
+        if(orgCode.equals("*") && areaCode.equals("*")) {
+            saas.append("*");
+        }else {
+            List<String> orgCodeList = objectMapper.readValue(orgCode, List.class);
+            List<String> areaCodeList = objectMapper.readValue(areaCode, List.class);
+            if((orgCodeList != null && orgCodeList.size() > 0)) {
+                for(String oCode : orgCodeList) {
+                    if(StringUtils.isEmpty(saas.toString())) {
+                        saas.append("org_code:" + oCode);
+                    }else {
+                        saas.append(" OR org_code:" + oCode);
                     }
-                    if(areaCodeList != null && areaCodeList.size() > 0) {
-                        for(String code1 : areaCodeList) {
-                            if(StringUtils.isEmpty(saas)) {
-                                saas = "org_area:" + code1;
-                            }
-                            else{
-                                saas += " OR org_area:" + code1;
-                            }
-                        }
+                }
+            }
+            if(areaCodeList != null && areaCodeList.size() > 0) {
+                for(String aCode : areaCodeList) {
+                    if(StringUtils.isEmpty(saas.toString())) {
+                        saas.append("org_area:" + aCode);
+                    } else {
+                        saas.append(" OR org_area:" + aCode);
                     }
                 }
             }
@@ -278,12 +279,9 @@ public class ResourcesQueryService  {
             return envelop;
         }
         List<QueryCondition> ql = new ArrayList<>();
-        if (!StringUtils.isEmpty(queryCondition) && !queryCondition.equals("{}")) {
+        if (!StringUtils.isEmpty(queryCondition)) {
             ql = parseCondition(queryCondition);
         }
-        /**
-         * 待修改
-         */
         if(ql.size() > 0) {
             if(solr.conditionToString(ql).contains(":")) {
                 queryParams = addParams(queryParams,"q", solr.conditionToString(ql));
@@ -293,8 +291,8 @@ public class ResourcesQueryService  {
         }else {
             queryParams = addParams(queryParams,"q", "*:*");
         }
-        queryParams = addParams(queryParams,"saas", saas);
-        queryParams = addParams(queryParams,"sort", "{\"event_date\":\"desc\"}");
+        queryParams = addParams(queryParams,"saas", saas.toString());
+        queryParams = addParams(queryParams,"sort", "{\"create_date\":\"desc\"}");
         //基础数据字段
         String basicStr = ignoreField.toString();
         String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
@@ -314,9 +312,7 @@ public class ResourcesQueryService  {
             envelop.setCurrPage(result.getNumber());
             envelop.setPageSize(result.getSize());
             envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
-            if(result.getContent() != null) {
-                envelop.setDetailModelList(result.getContent());
-            }
+            envelop.setDetailModelList(result.getContent());
         }else {
             envelop.setErrorMsg("数据库数据检索失败");
         }
@@ -340,31 +336,30 @@ public class ResourcesQueryService  {
         RsResource rsResources = resourcesDao.findByCode(resourcesCode);
         if(rsResources != null) {
             String methodName = rsResources.getRsInterface(); //执行函数
-            String grantType = rsResources.getGrantType(); //访问方式 0开放 1授权
             //获取资源结构权限
             List<DtoResourceMetadata> metadataList = getAccessMetadata(rsResources, roleId);
             //获取Saas权限
-            String saas = "";
+            StringBuilder saas = new StringBuilder();
             if (orgCode.equals("*") && areaCode.equals("*")) {
-                saas = "*";
+                saas.append("*");
             } else {
                 List<String> orgCodeList = objectMapper.readValue(orgCode, List.class);
                 List<String> areaCodeList = objectMapper.readValue(areaCode, List.class);
                 if ((orgCodeList != null && orgCodeList.size() > 0)) {
-                    for (String code : orgCodeList) {
-                        if (StringUtils.isEmpty(saas)) {
-                            saas = "org_code:" + code;
+                    for (String oCode : orgCodeList) {
+                        if (StringUtils.isEmpty(saas.toString())) {
+                            saas.append("org_code:" + oCode);
                         } else {
-                            saas += " OR org_code:" + code;
+                            saas.append(" OR org_code:" + oCode);
                         }
                     }
                 }
                 if (areaCodeList != null && areaCodeList.size() > 0) {
-                    for (String code : areaCodeList) {
-                        if (StringUtils.isEmpty(saas)) {
-                            saas = "org_area:" + code;
+                    for (String aCode : areaCodeList) {
+                        if (StringUtils.isEmpty(saas.toString())) {
+                            saas.append("org_area:" + aCode);
                         } else {
-                            saas += " OR org_area:" + code;
+                            saas.append(" OR org_area:" + aCode);
                         }
                     }
                 }
@@ -375,7 +370,7 @@ public class ResourcesQueryService  {
                 return envelop;
             }
             else {
-                queryParams = addParams(queryParams,"saas", saas);
+                queryParams = addParams(queryParams,"saas", saas.toString());
             }
             //通过资源代码获取默认参数
             List<RsResourceDefaultParam> paramsList = resourceDefaultParamDao.findByResourcesCode(resourcesCode);
@@ -384,6 +379,8 @@ public class ResourcesQueryService  {
             }
             //分组统计数据元
             if(metadataList != null && metadataList.size() > 0) {
+
+                /**
                 String groupFields = "";
                 String statsFields = "";
                 String customGroup = "";
@@ -417,6 +414,8 @@ public class ResourcesQueryService  {
                     customGroup = "[" + customGroup.substring(0, customGroup.length() -1 ) + "]";
                     queryParams = addParams(queryParams,"customGroup", customGroup);
                 }
+                */
+
                 //基础信息字段
                 String basicStr = ignoreField.toString();
                 String dealBasicStr = basicStr.substring(1, basicStr.length() - 1).replaceAll(" ", "");
