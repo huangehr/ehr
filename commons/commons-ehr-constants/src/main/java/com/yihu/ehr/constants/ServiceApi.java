@@ -202,6 +202,17 @@ public class ServiceApi {
         public static final String RsReportCategoryIsUniqueName = "/resources/reportCategory/isUniqueName";
         public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
 
+
+        /**
+         * 资源报表监测分类
+         */
+        public static final String RsReportMonitorType = "/resources/rsReportMonitorType/{id}";
+        public static final String RsReportMonitorTypeSave = "/resources/rsReportMonitorType/save";
+        public static final String RsReportMonitorTypeDelete = "/resources/rsReportMonitorType/delete";
+        public static final String RsReportMonitorTypeIsUniqueName = "/resources/rsReportMonitorType/isUniqueName";
+        public static final String RsReportMonitorTypes = "/resources/rsReportMonitorType/getRsReportMonitorTypePage";
+        public static final String RsReportMonitorTypesNoPage = "/resources/rsReportMonitorType/getRsReportMonitorTypeNoPage";
+
         /**
          * 资源报表
          */
@@ -1011,6 +1022,7 @@ public class ServiceApi {
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
         public static final String GetQuotaReport = "tj/getQuotaReport";
         public static final String GetQuotaGraphicReportPreview = "tj/getQuotaGraphicReportPreview";
+        public static final String GetQuotaGraphicReportPreviewsMoreOption = "tj/getQuotaGraphicReportPreviewsMoreOption";
         public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
 
@@ -1061,5 +1073,9 @@ public class ServiceApi {
 
         public static final String AddGovernmentBrowseLog = "/governmentBrowseLog/save";
         public static final String searchGovernmentBrowseLog = "/governmentBrowseLog/searchByUserId";
+
+        public static final String GovernmentMenuReportMonitorTypeSave = "/governmentMenuReportMonitorType/save";
+        public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
+
     }
 }
