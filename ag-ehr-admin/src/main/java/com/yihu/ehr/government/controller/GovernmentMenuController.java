@@ -154,7 +154,9 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
     @ApiOperation(value = "新增菜单")
     public Envelop create(
             @ApiParam(name = "jsonData", value = " 菜单信息Json", defaultValue = "")
-            @RequestParam(value = "jsonData", required = false) String jsonData){
+            @RequestParam(value = "jsonData", required = false) String jsonData,
+            @ApiParam(name = "ids", value = "资源报表监测类型ids", defaultValue = "")
+            @RequestParam(value = "ids", required = false) String ids){
         try {
             String errorMsg = "";
             GovernmentMenuModel governmentMenuModel = objectMapper.readValue(jsonData, GovernmentMenuModel.class);
@@ -173,7 +175,7 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
             }
 
             String json = objectMapper.writeValueAsString(governmentMenuModel);
-            GovernmentMenuModel mQuotaCategory = governmentMenuClient.saveGovernmentMenu(json);
+            GovernmentMenuModel mQuotaCategory = governmentMenuClient.saveGovernmentMenu(json, ids);
             if (mQuotaCategory == null) {
                 return failed("保存失败!");
             }
@@ -188,7 +190,9 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
     @ApiOperation(value = "修改菜单")
     public Envelop resetInfo(
             @ApiParam(name = "jsonData", value = " 菜单信息Json", defaultValue = "")
-            @RequestParam(value = "jsonData", required = false) String jsonData){
+            @RequestParam(value = "jsonData", required = false) String jsonData,
+            @ApiParam(name = "ids", value = "资源报表监测类型ids", defaultValue = "")
+            @RequestParam(value = "ids", required = false) String ids){
         try {
             String errorMsg = "";
             GovernmentMenuModel governmentMenuModel = objectMapper.readValue(jsonData, GovernmentMenuModel.class);
@@ -208,7 +212,7 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
                 return failed(errorMsg);
             }
             String json = objectMapper.writeValueAsString(governmentMenuModel);
-            GovernmentMenuModel mQuotaCategory = governmentMenuClient.updateGovernmentMenu(json);
+            GovernmentMenuModel mQuotaCategory = governmentMenuClient.updateGovernmentMenu(json, ids);
             if (mQuotaCategory == null) {
                 return failed("修改菜单失败!");
             }

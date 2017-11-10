@@ -23,9 +23,6 @@ import java.util.Map;
 public class RoleOrgService extends BaseJpaService<RoleOrg,XRoleOrgRepository> {
     @Autowired
     private XRoleOrgRepository roleOrgRepository;
-    @Autowired
-    private XRolesRepository rolesRepository;
-
 
     /**
      * 删除

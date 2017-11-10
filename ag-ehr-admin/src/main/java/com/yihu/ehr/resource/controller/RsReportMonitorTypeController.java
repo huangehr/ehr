@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
+import com.yihu.ehr.government.service.GovernmentMenuReportMonitorTypeClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.resource.MRsReportMonitorType;
 import com.yihu.ehr.resource.client.RsReportMonitorTypeClient;
@@ -16,6 +17,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +34,8 @@ public class RsReportMonitorTypeController extends BaseController {
 
     @Autowired
     private RsReportMonitorTypeClient rsReportMonitorTypeClient;
-
+    @Autowired
+    private GovernmentMenuReportMonitorTypeClient governmentMenuReportMonitorTypeClient;
 
     @RequestMapping(value = ServiceApi.Resources.RsReportMonitorTypes, method = RequestMethod.GET)
     @ApiOperation(value = "资源报表监测分类列表分页", notes = "资源报表监测分类列表")
@@ -151,10 +154,30 @@ public class RsReportMonitorTypeController extends BaseController {
 
     @RequestMapping(value = ServiceApi.Resources.RsReportMonitorTypesNoPage, method = RequestMethod.GET)
     @ApiOperation("获取资源报表监测类别")
-    public List<MRsReportMonitorType> getAllCategories(
+    public Envelop getAllCategories(
             @ApiParam(name = "filters", value = "过滤", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters) throws Exception {
-       return  rsReportMonitorTypeClient.getAll(filters);
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "menuId", value = "菜单Id")
+            @RequestParam(value = "menuId", required = false) String menuId) throws Exception {
+        Envelop envelop = new Envelop();
+        List<MRsReportMonitorType> list = rsReportMonitorTypeClient.getAll(filters);
+        List<Integer> monitorTypeList = new ArrayList<>();
+        List<MRsReportMonitorType> rsReportMonitorTypeList = new ArrayList<>();
+        if (!"-1".equals(menuId)) {
+            monitorTypeList = governmentMenuReportMonitorTypeClient.getMonitorTypeIdByGovernmentMenuId(menuId);
+        }
+        if (null != list && list.size() > 0) {
+            if (null != monitorTypeList && monitorTypeList.size() > 0) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (monitorTypeList.contains(list.get(i).getId())) {
+                        list.get(i).setFlag(true);
+                    }
+                }
+            }
+
+            return getResult(list, list.size(), 1, 1);
+        }
+        return envelop;
     }
 
 }

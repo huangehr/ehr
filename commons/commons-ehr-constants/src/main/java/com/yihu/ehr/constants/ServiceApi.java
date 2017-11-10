@@ -10,6 +10,9 @@ package com.yihu.ehr.constants;
  */
 public class ServiceApi {
 
+    public static class GateWay {
+        public static final String admin = "/admin";
+    }
 
     public static class Adaptions {
         //public static final String Cache = "/adaptions/{id}/cache";
@@ -209,6 +212,15 @@ public class ServiceApi {
         public static final String RsReportMonitorTypeIsUniqueName = "/resources/rsReportMonitorType/isUniqueName";
         public static final String RsReportMonitorTypes = "/resources/rsReportMonitorType/getRsReportMonitorTypePage";
         public static final String RsReportMonitorTypesNoPage = "/resources/rsReportMonitorType/getRsReportMonitorTypeNoPage";
+
+
+        /**
+         * 资源报表监测类型配置报表
+         */
+        public static final String RsMonitorTypeReport = "/resources/monitorTypeReport";
+        public static final String RsMonitorTypeReportByUserId = "/resources/monitorTypeReport/{user_id}";
+        public static final String RsMonitorTypeReports = "/resources/monitorTypeReport";
+        public static final String RsMonitorTypeReportsNoPage = "/resources/monitorTypeReport/noPage";
 
         /**
          * 资源报表
@@ -1073,6 +1085,7 @@ public class ServiceApi {
 
         public static final String GovernmentMenuReportMonitorTypeSave = "/governmentMenuReportMonitorType/save";
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
+        public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
     }
 }

@@ -14,6 +14,7 @@ public class MRsReportMonitorType implements Serializable {
     private Integer id; // 主键
     private String name; // 名称
     private String note; // 备注
+    private boolean flag;   // 是否选中
 
     public Integer getId() {
         return id;
@@ -37,5 +38,13 @@ public class MRsReportMonitorType implements Serializable {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 }
