@@ -4,7 +4,6 @@ ehr.iws
 ehr.ids
 *.html
 *.iml
-ehr.iml
 */target/*
 */*/target/*
 .idea/*
