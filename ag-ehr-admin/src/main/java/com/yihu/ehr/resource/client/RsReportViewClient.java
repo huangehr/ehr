@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.resource.MRsReportView;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -42,6 +43,12 @@ public interface RsReportViewClient {
     boolean exist(
             @ApiParam(name = "reportId", value = "资源报表ID", required = true)
             @RequestParam(value = "reportId") Integer reportId,
+            @ApiParam(name = "resourceId", value = "视图ID", required = true)
+            @RequestParam(value = "resourceId") String resourceId);
+
+    @ApiOperation("判断资源报表是否关联相关资源")
+    @RequestMapping(value = ServiceApi.Resources.RsReportViewExistByResourceId, method = RequestMethod.GET)
+    Envelop existByResourceId (
             @ApiParam(name = "resourceId", value = "视图ID", required = true)
             @RequestParam(value = "resourceId") String resourceId);
 
