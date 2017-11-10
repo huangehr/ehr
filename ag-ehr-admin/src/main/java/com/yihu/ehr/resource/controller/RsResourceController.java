@@ -365,13 +365,15 @@ public class RsResourceController extends BaseController {
 
     @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.POST)
     @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览,多个指标放在一个图形上展示")
-    public List<MChartInfoModel> getRsQuotaPreviewMoreQuota(
+    public Envelop getRsQuotaPreview(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
             @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
             @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
+        Envelop envelop = new Envelop();
+        String filter = "";
         //-----------------用户数据权限 start
         String org = "";
         if( userOrgList != null ){
@@ -379,40 +381,53 @@ public class RsResourceController extends BaseController {
                 org = StringUtils.strip(String.join(",", userOrgList), "[]");
             }
         }
-        //-----------------用户数据权限 end
         Map<String, Object> params  = new HashMap<>();
-        String filter = "";
         if(org.length()>0){
             params.put("org",org);
             filter = objectMapper.writeValueAsString(params);
         }
+        //-----------------用户数据权限 end
+
+        MChartInfoModel chartInfoModel = null;
         MRsResources rsResources =  resourcesClient.getResourceById(resourceId);
-        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
-        List<MChartInfoModel> chartInfoModels = new ArrayList<>();
-        String title = "";
-        if(rsResources != null ){
-            title = rsResources.getName();
+        if(rsResources == null ){
+            chartInfoModel = new MChartInfoModel();
+            envelop.setObj(chartInfoModel);
+            envelop.setErrorMsg("视图不存在，请确认！");
+            return envelop;
         }
+        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
         if(list != null && list.size() > 0){
             String idstr  = "";
             String charstr = "";
             if(list.size() == 1){
-                MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(list.get(0).getQuotaId(), list.get(0).getQuotaChart(), filter, dimension);
-                chartInfoModels.add(chartInfoModel);
+                chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(list.get(0).getQuotaId(), list.get(0).getQuotaChart(), filter, dimension);
             }else{
                 for (ResourceQuotaModel m : list) {
                     idstr = idstr + m.getQuotaId() +",";
-                    if(m.getQuotaChart()<3){
-                        charstr = charstr + m.getQuotaChart() +",";
-                    }else {
-                        charstr = charstr + "1" +",";
+                    charstr = charstr + m.getQuotaChart() +",";
+                }
+                List<String> charTypes = Arrays.asList(charstr.split(","));
+                Map<String,String> map = new HashMap<>();
+                for(String key:charTypes){
+                    if(Integer.valueOf(key) == 1 || Integer.valueOf(key) == 2 ){
+                        map.put("LineOrBar","LineOrBar");
+                    }else{
+                        map.put("Pie","Pie");
                     }
                 }
-                MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReportPreviewsMoreOption(idstr,charstr,filter,null,title);
-                chartInfoModels.add(chartInfoModel);
+                if(map.size() >= 2){
+                    chartInfoModel = new MChartInfoModel();
+                    envelop.setObj(chartInfoModel);
+                    envelop.setErrorMsg("视图由多个指标组成时，预览图形支持 多指标都属于同一类型，混合型目前支持‘柱状+柱状’,请确认图表展示类型！");
+                    return envelop;
+                }
+                chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(idstr, charstr, filter, null, rsResources.getName());
             }
         }
-        return chartInfoModels;
+        chartInfoModel.setResourceId(resourceId);
+        envelop.setObj(chartInfoModel);
+        return envelop;
     }
 
 }
