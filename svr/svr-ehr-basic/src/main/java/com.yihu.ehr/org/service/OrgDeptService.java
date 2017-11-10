@@ -253,5 +253,12 @@ public class OrgDeptService extends BaseJpaService<OrgDept, XOrgDeptRepository> 
         return orgMemberRelationRepository.searchByUserId(userId);
     }
 
+    public Integer getParentIdByCode(String code) {
+        List<Integer> list = orgDeptRepository.findIdByCode(code);
+        if (null != list && list.size() > 0) {
+            return list.get(0);
+        }
+        return 0;
+    }
 }
 
