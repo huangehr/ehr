@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ag-admin-xingwang
+    name: ag-admin
 
 ---
 spring:
