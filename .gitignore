@@ -5,7 +5,8 @@ ehr.ids
 *.html
 *.iml
 ehr.iml
-target/*
+*/target/*
+*/*/target/*
 .idea/*
 
 # ---> Java
