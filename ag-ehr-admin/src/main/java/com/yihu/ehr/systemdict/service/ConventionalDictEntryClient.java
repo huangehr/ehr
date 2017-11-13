@@ -2,8 +2,10 @@ package com.yihu.ehr.systemdict.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.dict.MConventionalDict;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -501,4 +503,9 @@ import java.util.List;
             @ApiParam(name = "code", value = "字典代码", defaultValue = "")
             @RequestParam(value = "code") String code);
 
+    @RequestMapping(value = ServiceApi.SystemDict.getDictEntryByDictId,method = RequestMethod.POST)
+    @ApiOperation("根据字典代码获取字典项列表")
+    List<MDictionaryEntry> getDictEntryByDictId(
+            @ApiParam(name = "dictId", value = "字典代码", defaultValue = "")
+            @RequestParam(value = "dictId") String dictId);
 }

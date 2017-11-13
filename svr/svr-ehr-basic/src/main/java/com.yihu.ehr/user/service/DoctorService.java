@@ -10,6 +10,7 @@ import com.yihu.ehr.user.dao.XDoctorRepository;
 import com.yihu.ehr.user.dao.XUserRepository;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
@@ -34,13 +35,11 @@ import java.util.Map;
 public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
     @Autowired
-    XUserRepository userRepository;
-
+    private XUserRepository userRepository;
     @Autowired
-    XDoctorRepository doctorRepository;
-
+    private XDoctorRepository doctorRepository;
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     @Autowired
     private XOrganizationRepository organizationRepository;
     @Autowired
@@ -146,7 +145,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     @Transactional(propagation = Propagation.REQUIRED)
     public String addDoctorBatch(List<Map<String, Object>> doctorLs)
     {
-        String header = "INSERT INTO doctors(code, name, sex,orgCode,orgId,org_full_name,dept_name, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction,id_card_no, office_tel, status) VALUES \n";
+        String header = "INSERT INTO doctors(code, name, sex,orgCode,orgId,org_full_name,dept_name, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction,id_card_no,insert_time, office_tel, status) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
@@ -172,6 +171,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             sql.append(",'"+ map .get("xzzc") +"'");
             sql.append(",'"+ map .get("introduction") +"'");
             sql.append(",'"+ map .get("idCardNo") +"'");
+            sql.append(",'"+ DateUtil.strToDate(DateUtil.getNowDateTime()) +"'");
             sql.append(",'"+ map .get("officeTel") +"','1')\n");
 
             if(i%100==0 || i == doctorLs.size()){
@@ -181,14 +181,14 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             }else
                 sql.append(",");
             //创建居民
-             demographicInfo =new DemographicInfo();
+            demographicInfo =new DemographicInfo();
             String idCardNo="123456";
-             if(null!=map .get("idCardNo")&&StringUtils.isEmpty(map .get("idCardNo").toString())){
-                 idCardNo=map .get("idCardNo").toString();
-                 demographicInfo.setPassword(DigestUtils.md5Hex(idCardNo));
-             }else{
-                 demographicInfo.setPassword(DigestUtils.md5Hex("123456"));
-             }
+            if(null!=map .get("idCardNo")&&StringUtils.isEmpty(map .get("idCardNo").toString())){
+                idCardNo=map .get("idCardNo").toString();
+                demographicInfo.setPassword(DigestUtils.md5Hex(idCardNo));
+            }else{
+                demographicInfo.setPassword(DigestUtils.md5Hex("123456"));
+            }
             demographicInfo.setRegisterTime(new Date());
             demographicInfo.setIdCardNo(String.valueOf(map .get("idCardNo")));
             demographicInfo.setName(String.valueOf(map .get("name")));

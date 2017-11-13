@@ -1,11 +1,13 @@
 package com.yihu.ehr.dict.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.dict.service.SystemDictEntry;
 import com.yihu.ehr.dict.service.SystemDictEntryService;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.dict.MDictionaryEntry;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -828,5 +830,15 @@ public class ConventionalDictEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "code") String code) {
         SystemDictEntry type = dictEntryService.getDictEntryByValueAndDictId(code,93);
         return getDictModel(type);
+    }
+
+    @RequestMapping(value = ServiceApi.SystemDict.getDictEntryByDictId,method = RequestMethod.POST)
+    @ApiOperation("根据字典代码获取字典项列表")
+    public  List<MDictionaryEntry> getDictEntryByDictId(
+            @ApiParam(name="dictId",value="dictId",defaultValue = "")
+            @RequestParam(value ="dictId")  String dictId) throws Exception {
+
+        List<SystemDictEntry> DictEntrys = dictEntryService.getDictEntries(Long.parseLong(dictId),null);
+        return (List<MDictionaryEntry>)convertToModels(DictEntrys,new ArrayList<MDictionaryEntry>(DictEntrys.size()),MDictionaryEntry.class,null);
     }
 }

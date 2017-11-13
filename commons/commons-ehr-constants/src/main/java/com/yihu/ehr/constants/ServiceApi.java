@@ -1059,4 +1059,7 @@ public class ServiceApi {
         public static final String AddGovernmentBrowseLog = "/governmentBrowseLog/save";
         public static final String searchGovernmentBrowseLog = "/governmentBrowseLog/searchByUserId";
     }
+    public static class SystemDict {
+        public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
+    }
 }

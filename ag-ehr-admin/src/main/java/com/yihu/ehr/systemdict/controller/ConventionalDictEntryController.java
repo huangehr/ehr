@@ -1,5 +1,6 @@
 package com.yihu.ehr.systemdict.controller;
 
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
@@ -844,6 +845,19 @@ public class ConventionalDictEntryController extends BaseController{
         ListResult result = dictEntryClient.GetAlldictionariesByDictId();
 //        List<Map<String,Object>> list = result.getDetailModelList();
         return result;
+    }
+
+    @RequestMapping(value = ServiceApi.SystemDict.getDictEntryByDictId,method = RequestMethod.POST)
+    @ApiOperation("根据字典代码获取字典项列表")
+    public Envelop getDictEntryByDictId(
+            @ApiParam(name = "dictId", value = "字典代码", defaultValue = "")
+            @RequestParam(value ="dictId") String dictId) throws Exception {
+        Envelop envelop = new Envelop();
+        List<MDictionaryEntry> DictEntrys = dictEntryClient.getDictEntryByDictId(dictId);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(DictEntrys);
+        return envelop;
+
     }
 
 }

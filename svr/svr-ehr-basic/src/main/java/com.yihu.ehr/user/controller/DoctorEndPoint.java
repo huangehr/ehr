@@ -28,6 +28,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -230,12 +232,12 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         return existPhones;
     }
 
-    @RequestMapping(value = ServiceApi.Doctors.DoctorBatch,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Doctors.DoctorBatch, method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation("批量导入医生")
     public boolean createDoctorsPatch(
             @ApiParam(name="doctors",value="医生JSON",defaultValue = "")
-            @RequestBody String doctors) throws Exception
-    {
+            @RequestBody String doctors) throws Exception {
         List models = objectMapper.readValue(doctors, new TypeReference<List>() {});
         String phones=doctorService.addDoctorBatch(models);
         List list =new ArrayList<>();

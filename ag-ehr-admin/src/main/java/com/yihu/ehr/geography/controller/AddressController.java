@@ -3,6 +3,7 @@ package com.yihu.ehr.geography.controller;
 import com.yihu.ehr.agModel.geogrephy.GeographyDictModel;
 import com.yihu.ehr.agModel.geogrephy.GeographyModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.model.geography.MGeographyDict;
@@ -16,6 +17,7 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -242,6 +244,26 @@ public class AddressController extends BaseController{
 
         Boolean bo = addressClient.isNullAddress(jsonData);
         envelop.setSuccessFlg(bo);
+
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Geography.AddressDictByFields, method = RequestMethod.GET)
+    @ApiOperation(value = "根据名称查询行政区划地址id")
+    public Envelop getAddressDictByName(
+            @ApiParam(name = "fields", value = "fields", defaultValue = "")
+            @RequestParam(value = "fields") String[] fields ,
+            @ApiParam(name = "values", value = "values", defaultValue = "")
+            @RequestParam(value = "values") String[] values) {
+        Envelop envelop = new Envelop();
+        Collection<MGeographyDict> addressDict = addressClient.getAddressDict(fields,values);
+        if(addressDict!=null){
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(new ArrayList<>(addressDict));
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("根据名称查询行政区划地址id失败");
+        }
 
         return envelop;
     }
