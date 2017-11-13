@@ -208,7 +208,7 @@ public class QuotaReportController extends BaseController {
     }
 
 
-    @ApiOperation(value = "获取指标统计结果echart图表，多条线")
+    @ApiOperation(value = "获取指标统计结果echart图表，一条和多条线")
     @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.POST)
     public MChartInfoModel getQuotaGraphicReports(
             @ApiParam(name = "idStr", value = "指标任务ID", required = true)
@@ -238,10 +238,10 @@ public class QuotaReportController extends BaseController {
                 if(tjQuota != null){
                     //查询维度
                     List<TjDimensionMain> mains = tjDimensionMainService.getDimensionMainByQuotaCode(tjQuota.getCode());
-                    QuotaReport quotaReport = quotaService.getQuotaReportGeneral(tjQuota.getId(), filter, mains.get(0).getCode(), 10000);
+                    QuotaReport quotaReport = quotaService.getQuotaReportGeneral(tjQuota.getId(), filter, mains.get(0).getCode()+"Name", 10000);
                     Map<String, Object> datamap = new HashMap<>();
                     for(ResultModel resultModel :quotaReport.getReultModelList()){
-                        datamap.put(resultModel.getCloumns().get(1),resultModel.getValue());
+                        datamap.put(resultModel.getCloumns().get(0),resultModel.getValue());
                     }
                     xName = mains.get(0).getName();
                     lineNames.add(tjQuota.getName());
