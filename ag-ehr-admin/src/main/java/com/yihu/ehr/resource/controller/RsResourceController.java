@@ -427,6 +427,7 @@ public class RsResourceController extends BaseController {
         }
         chartInfoModel.setResourceId(resourceId);
         envelop.setObj(chartInfoModel);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
