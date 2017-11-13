@@ -181,7 +181,7 @@ public class ServiceApi {
         public static final String ResourceOrgMetadatasValid = "/resources/OrgMetadatas/valid";
         public static final String ResourceOrgMetadataGrants = "/resources/OrgMetadatas/grants";
         public static final String OrgGrantResources = "/resources/Org/{orgCode}/grant";
-        //        public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        //public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
         public static final String ResourceOrgMetadataGrant = "/resources/OrgMetadata/grants/{id}";
         public static final String ResourceOrgGrantsNoPage = "/resources/OrgGrants/no_paging";
         public static final String ResourceOrgResMetadataGrants = "/resources/Org_resource/{Org_res_id}/metadata";
@@ -245,6 +245,7 @@ public class ServiceApi {
         public static final String RsReportViews = "/resources/reportViews";
         public static final String RsReportViewSave = "/resources/reportView/save";
         public static final String RsReportViewExist = "/resources/reportView/exist";
+        public static final String RsReportViewExistByResourceId = "/resources/reportView/existByResourceId";
 
     }
 

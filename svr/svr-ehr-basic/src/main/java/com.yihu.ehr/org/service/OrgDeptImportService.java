@@ -50,11 +50,11 @@ public class OrgDeptImportService extends BaseJpaService<OrgDept,XOrgDeptReposit
         Map<String, Object> map;
         for(int i=1; i <= orgDepts.size(); i++){
             map = orgDepts.get(i-1);
-            String parentId = map .get("parentDeptId").toString();
-//            OrgDept orgDept = orgDeptService.searchBydeptId(Integer.valueOf(parentId));
+            String parentDeptId = map .get("parentDeptId").toString();
+            Integer parentId = orgDeptService.getParentIdByCode(parentDeptId);
             String orgId = orgService.getOrgIdByOrgCode(map .get("orgCode").toString());
             OrgDept newOrgDept = new OrgDept();
-            newOrgDept.setParentDeptId(parentId == "" ? 0 : Integer.valueOf(parentId));
+            newOrgDept.setParentDeptId(parentId);
             newOrgDept.setOrgId(orgId);
             newOrgDept.setCode(map .get("code").toString());
             newOrgDept.setName(map .get("name").toString());

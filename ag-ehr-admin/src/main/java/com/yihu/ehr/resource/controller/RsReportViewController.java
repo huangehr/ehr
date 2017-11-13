@@ -86,8 +86,15 @@ public class RsReportViewController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             LogService.getLogger(RsReportViewController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
+            return failed(e.getMessage());
         }
     }
 
+    @ApiOperation("判断资源报表是否关联相关资源")
+    @RequestMapping(value = ServiceApi.Resources.RsReportViewExistByResourceId, method = RequestMethod.GET)
+    public Envelop existByResourceId(
+            @ApiParam(name = "resourceId", value = "视图ID", required = true)
+            @RequestParam(value = "resourceId") String resourceId) throws Exception {
+         return rsReportViewClient.existByResourceId(resourceId);
+    }
 }
