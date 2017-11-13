@@ -35,20 +35,26 @@ public class Attendance {
     private Date endTime;
     // 状态
     private Status status;
-    // 病人姓名
-    private String patientName;
+    //接警电话
+    private String alarmTel;
+    //呼救地点
+    private String callAddr;
+    //主诉
+    private String chiefComplaint;
+    //调派医院
+    private String dispatchHospital;
+    // 患者人数
+    private String patientNum;
     // 病人性别
     private String patientGender;
-    // 病情
+    // 初步诊断
     private String disease;
-    // 操作员
+    // 送达地点
+    private String deliverAddr;
+    // 调度人员
     private String creator;
-    // 医生
-    private String doctor;
-    // 护士
-    private String nurse;
-    // 驾驶员
-    private String driver;
+    //备注
+    private String remark;
 
 
     @Id
@@ -108,13 +114,13 @@ public class Attendance {
         this.status = status;
     }
 
-    @Column(name = "patient_name", nullable = false)
-    public String getPatientName() {
-        return patientName;
+    @Column(name = "patient_num", nullable = false)
+    public String getPatientNum() {
+        return patientNum;
     }
 
-    public void setPatientName(String patientName) {
-        this.patientName = patientName;
+    public void setPatientNum(String patientNum) {
+        this.patientNum = patientNum;
     }
 
     @Column(name = "patient_gender", nullable = false)
@@ -144,30 +150,57 @@ public class Attendance {
         this.creator = creator;
     }
 
-    @Column(name = "doctor", nullable = false)
-    public String getDoctor() {
-        return doctor;
+    @Column(name = "alarm_tel")
+    public String getAlarmTel() {
+        return alarmTel;
     }
 
-    public void setDoctor(String doctor) {
-        this.doctor = doctor;
+    public void setAlarmTel(String alarmTel) {
+        this.alarmTel = alarmTel;
     }
 
-    @Column(name = "nurse", nullable = false)
-    public String getNurse() {
-        return nurse;
+    @Column(name = "call_addr", nullable = false)
+    public String getCallAddr() {
+        return callAddr;
     }
 
-    public void setNurse(String nurse) {
-        this.nurse = nurse;
+    public void setCallAddr(String callAddr) {
+        this.callAddr = callAddr;
     }
 
-    @Column(name = "driver", nullable = false)
-    public String getDriver() {
-        return driver;
+    @Column(name = "chief_complaint")
+    public String getChiefComplaint() {
+        return chiefComplaint;
     }
 
-    public void setDriver(String driver) {
-        this.driver = driver;
+    public void setChiefComplaint(String chiefComplaint) {
+        this.chiefComplaint = chiefComplaint;
+    }
+
+    @Column(name = "dispatch_hospital")
+    public String getDispatchHospital() {
+        return dispatchHospital;
+    }
+
+    public void setDispatchHospital(String dispatchHospital) {
+        this.dispatchHospital = dispatchHospital;
+    }
+
+    @Column(name = "deliver_addr")
+    public String getDeliverAddr() {
+        return deliverAddr;
+    }
+
+    public void setDeliverAddr(String deliverAddr) {
+        this.deliverAddr = deliverAddr;
+    }
+
+    @Column(name = "remark")
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }
