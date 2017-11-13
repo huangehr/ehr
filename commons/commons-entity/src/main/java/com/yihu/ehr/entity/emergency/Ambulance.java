@@ -30,18 +30,20 @@ public class Ambulance {
     private double initLongitude;
     // 初始纬度
     private double initLatitude;
-    // 当前经度
-    private double nowLongitude;
-    // 当前纬度
-    private double nowLatitude;
+    // 归属片区
+    private String district;
+    // 所属医院Id
+    private int orgId;
+    //所属医院名称
+    private String orgName;
     // 司机
     private String driver;
     // 随车手机号码
     private String phone;
     // 状态
     private Status status;
-    // 归属片区
-    private String district;
+    //百度鹰眼设备号
+    private String entityName;
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -73,22 +75,22 @@ public class Ambulance {
         this.initLatitude = initLatitude;
     }
 
-    @Column(name = "now_longitude")
-    public double getNowLongitude() {
-        return nowLongitude;
+    @Column(name = "org_id", nullable = false)
+    public int getOrgId() {
+        return orgId;
     }
 
-    public void setNowLongitude(double nowLongitude) {
-        this.nowLongitude = nowLongitude;
+    public void setOrgId(int orgId) {
+        this.orgId = orgId;
     }
 
-    @Column(name = "now_latitude")
-    public double getNowLatitude() {
-        return nowLatitude;
+    @Column(name = "org_name", nullable = false)
+    public String getOrgName() {
+        return orgName;
     }
 
-    public void setNowLatitude(double nowLatitude) {
-        this.nowLatitude = nowLatitude;
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     @Column(name = "driver", nullable = false)
@@ -118,7 +120,7 @@ public class Ambulance {
         this.status = status;
     }
 
-    @Column(name = "district", nullable = false)
+    @Column(name = "district")
     public String getDistrict() {
         return district;
     }
@@ -126,4 +128,15 @@ public class Ambulance {
     public void setDistrict(String district) {
         this.district = district;
     }
+
+    @Column(name = "entity_name")
+    public String getEntityName() {
+        return entityName;
+    }
+
+    public void setEntityName(String entityName) {
+        this.entityName = entityName;
+    }
+
+
 }

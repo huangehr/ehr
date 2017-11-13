@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "PositionEndPoint", description = "定位数据", tags = {"应急指挥"})
+@Api(value = "PositionEndPoint", description = "定位数据", tags = {"应急指挥-定位数据"})
 public class PositionEndPoint extends BaseRestEndPoint {
 
     @Autowired
