@@ -130,5 +130,9 @@
             <artifactId>commons-entity</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-rest-model</artifactId>
+        </dependency>
     </dependencies>
 </project>
