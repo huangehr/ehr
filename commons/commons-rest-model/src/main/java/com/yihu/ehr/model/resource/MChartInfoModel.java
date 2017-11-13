@@ -9,8 +9,10 @@ import java.util.Map;
  */
 public class MChartInfoModel {
     private String title; //报表标题
-    private String quotaId; //指标ID
-    private String quotaCode; //指标Code
+//    private String quotaId; //指标ID
+//    private String quotaCode; //指标Code
+    private String resourceId; //指标ID
+    private String resourceCode; //指标Code
     private String option;
     private List<MReportDimension> listMap;
     private Map<String,Object> dimensionMap;//维度真实值的 code ,中文说明 对应关系
@@ -23,21 +25,21 @@ public class MChartInfoModel {
         this.title = title;
     }
 
-    public String getQuotaId() {
-        return quotaId;
-    }
-
-    public void setQuotaId(String quotaId) {
-        this.quotaId = quotaId;
-    }
-
-    public String getQuotaCode() {
-        return quotaCode;
-    }
-
-    public void setQuotaCode(String quotaCode) {
-        this.quotaCode = quotaCode;
-    }
+//    public String getQuotaId() {
+//        return quotaId;
+//    }
+//
+//    public void setQuotaId(String quotaId) {
+//        this.quotaId = quotaId;
+//    }
+//
+//    public String getQuotaCode() {
+//        return quotaCode;
+//    }
+//
+//    public void setQuotaCode(String quotaCode) {
+//        this.quotaCode = quotaCode;
+//    }
 
     public String getOption() {
         return option;
@@ -61,5 +63,21 @@ public class MChartInfoModel {
 
     public void setDimensionMap(Map<String, Object> dimensionMap) {
         this.dimensionMap = dimensionMap;
+    }
+
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public String getResourceCode() {
+        return resourceCode;
+    }
+
+    public void setResourceCode(String resourceCode) {
+        this.resourceCode = resourceCode;
     }
 }

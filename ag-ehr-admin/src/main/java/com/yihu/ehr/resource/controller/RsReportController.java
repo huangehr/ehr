@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "metadata", description = "资源报表服务接口", tags = {"资源管理-资源报表服务接口"})
+@Api(value = "RsReportController", description = "资源报表服务接口", tags = {"资源管理-资源报表服务接口"})
 public class RsReportController extends BaseController {
 
     @Autowired

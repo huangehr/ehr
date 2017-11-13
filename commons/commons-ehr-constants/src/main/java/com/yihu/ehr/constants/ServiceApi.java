@@ -181,7 +181,7 @@ public class ServiceApi {
         public static final String ResourceOrgMetadatasValid = "/resources/OrgMetadatas/valid";
         public static final String ResourceOrgMetadataGrants = "/resources/OrgMetadatas/grants";
         public static final String OrgGrantResources = "/resources/Org/{orgCode}/grant";
-        //        public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        //public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
         public static final String ResourceOrgMetadataGrant = "/resources/OrgMetadata/grants/{id}";
         public static final String ResourceOrgGrantsNoPage = "/resources/OrgGrants/no_paging";
         public static final String ResourceOrgResMetadataGrants = "/resources/Org_resource/{Org_res_id}/metadata";
@@ -245,6 +245,7 @@ public class ServiceApi {
         public static final String RsReportViews = "/resources/reportViews";
         public static final String RsReportViewSave = "/resources/reportView/save";
         public static final String RsReportViewExist = "/resources/reportView/exist";
+        public static final String RsReportViewExistByResourceId = "/resources/reportView/existByResourceId";
 
     }
 
@@ -1031,7 +1032,7 @@ public class ServiceApi {
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
         public static final String GetQuotaReport = "tj/getQuotaReport";
         public static final String GetQuotaGraphicReportPreview = "tj/getQuotaGraphicReportPreview";
-        public static final String GetQuotaGraphicReportPreviewsMoreOption = "tj/getQuotaGraphicReportPreviewsMoreOption";
+        public static final String GetMoreQuotaGraphicReportPreviews = "tj/getMoreQuotaGraphicReportPreviews";
         public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
 
