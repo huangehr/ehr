@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "GovernmentMenuReportMonitorType", description = "政府平台菜单资源报表监测监测分类服务接口")
+@Api(value = "GovernmentMenuReportMonitorType", description = "政府平台菜单资源报表监测监测分类服务接口", tags = {"政府服务平台"})
 public class GovernmentMenuReportMonitorTypeEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

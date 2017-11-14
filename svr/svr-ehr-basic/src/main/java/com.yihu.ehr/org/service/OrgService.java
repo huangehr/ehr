@@ -6,7 +6,6 @@ import com.yihu.ehr.geography.service.GeographyService;
 import com.yihu.ehr.org.dao.XOrganizationRepository;
 import com.yihu.ehr.org.feign.GeographyClient;
 import com.yihu.ehr.org.model.OrgDept;
-import com.yihu.ehr.org.model.OrgDeptDetail;
 import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.ObjectId;
@@ -18,7 +17,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 组织机构管理器.
@@ -194,43 +196,50 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
             if(geographies==null || geographies.size()==0){
                 geography.setId(getObjectId(BizObject.Geography));
                 addressId=geographyService.saveAddress(geography);
+            }else{
+                addressId= geographies.get(0).getId();
             }
             //保存地址到addresses---end
             Organization organization=new Organization();
             organization.setOrgCode(map .get("orgCode").toString());
             organization.setFullName(map .get("fullName").toString());
-            organization.setHosTypeId(map .get("hosTypeId").toString());///
-
-            // 医院归属  1.部属医院2.省属医院3.市属医院9：未知
-            Integer ascriptionType=0;
-            String str=map .get("ascriptionType").toString();
-            if(str.equals("部属医院")){
-                ascriptionType=1;
-            }else if(str.equals("省属医院")){
-                ascriptionType=2;
-            }else if(str.equals("市属医院")){
-                ascriptionType=3;
-            }else{
-                ascriptionType=9;
-            }
-            organization.setAscriptionType(ascriptionType);
             organization.setShortName(map .get("shortName").toString());
-            organization.setOrgType(map .get("orgType").toString());
             organization.setLevelId(map .get("levelId").toString());
             organization.setLegalPerson(map .get("legalPerson").toString());
             organization.setAdmin(map .get("admin").toString());
             organization.setPhone(map .get("phone").toString());
-//            organization.setZxy(map .get("zxy").toString());//中西医标识
-//            organization.setParentHosId(map .get("parentHosId").toString());
+            organization.setTel(map .get("phone").toString());
+            if(null!=map .get("zxy")){
+                organization.setZxy(Integer.valueOf(map .get("zxy").toString()));//中西医标识
+            }
+            if(null!=map .get("hosTypeId")){
+                organization.setHosTypeId(map .get("hosTypeId").toString());///
+            }
+            if(null!=map .get("orgType")){
+                organization.setOrgType(map .get("orgType").toString());
+            }
+            if(null!=map .get("settledWay")){
+                organization.setSettledWay(map .get("settledWay").toString());
+            }
+
+            if(null!=map .get("ascriptionType")){
+                organization.setAscriptionType(Integer.valueOf(map .get("ascriptionType").toString()));
+            }
+
             organization.setLocation(addressId);
             organization.setTraffic(map .get("traffic").toString());
-            organization.setSettledWay(map .get("settledWay").toString());
+
             organization.setIng(map .get("ing").toString());
             organization.setLat(map .get("lat").toString());
-            organization.setUpdateTime(new Timestamp(new Date().getTime()));
-//            organization.setTags(map .get("tags").toString());
+            organization.setCreateDate(new Timestamp(new Date().getTime()));
+            organization.setAdministrativeDivision(Integer.valueOf(map .get("administrativeDivision").toString()));
             organization.setActivityFlag(1);
             organization.setIntroduction(map .get("introduction").toString());
+            Integer berth=0;
+            if(null!=map .get("berth")){
+                berth=Integer.valueOf( map .get("berth").toString());
+            }
+            organization.setBerth(berth);
             Organization org=organizationRepository.save(organization);
             List<Long> orgList= organizationRepository.getOrgIdByOrgCode(organization.getOrgCode());
             Long Id=new Long(1);

@@ -74,7 +74,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("新增资源报表")
-    @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST,produces = "application/json")
     public MRsReport add(
             @ApiParam(name = "rsReport", value = "资源报表JSON", required = true)
             @RequestParam(value = "rsReport") String rsReport) throws Exception {
@@ -84,10 +84,10 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("更新资源报表")
-    @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT, produces = "application/json" )
     public MRsReport update(
             @ApiParam(name = "rsReport", value = "资源报表JSON", required = true)
-            @RequestParam(value = "rsReport") String rsReport) throws Exception {
+            @RequestBody String rsReport) throws Exception {
         RsReport newRsReport = toEntity(rsReport, RsReport.class);
         newRsReport = rsReportService.save(newRsReport);
         return convertToModel(newRsReport, MRsReport.class);
@@ -142,7 +142,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
         }
         String[] paths = rsReport.getTemplatePath().split(":");
         byte[] bytes = fastDFSUtil.download(paths[0], paths[1]);
-        String templateContent = new String(bytes);
+        String templateContent = new String(bytes, "UTF-8");
         return templateContent;
     }
 

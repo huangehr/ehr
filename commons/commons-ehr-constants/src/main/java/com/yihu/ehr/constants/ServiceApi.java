@@ -212,7 +212,8 @@ public class ServiceApi {
         public static final String RsReportMonitorTypeIsUniqueName = "/resources/rsReportMonitorType/isUniqueName";
         public static final String RsReportMonitorTypes = "/resources/rsReportMonitorType/getRsReportMonitorTypePage";
         public static final String RsReportMonitorTypesNoPage = "/resources/rsReportMonitorType/getRsReportMonitorTypeNoPage";
-
+        public static final String RsReportMonitorTypesById = "/resources/rsReportMonitorType/getRsReportMonitorTypeById";
+        public static final String RsReportByMonitorTypeId = "/resources/rsReportMonitorType/getRsReportByMonitorTypeId";
 
         /**
          * 资源报表监测类型配置报表
@@ -1107,5 +1108,25 @@ public class ServiceApi {
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
         public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
+        public static final String GetReportByMenuId = "/governmentMenuReportMonitorType/getReportByMenuId";
+    }
+
+    public static class SystemDict {
+        public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
+    }
+
+    /**
+     * 应急指挥中心
+     */
+    public static class Emergency {
+        //救护车
+        public static final String AmbulanceList = "/ambulance/list";
+        public static final String AmbulanceSearch = "/ambulance/search";
+        public static final String AmbulanceUpdate = "/ambulance/update";
+        //出勤记录
+        public static final String AttendanceSave = "/attendance/save";
+        public static final String AttendanceUpdate = "/attendance/update";
+        //排班历史
+        public static final String ScheduleList = "/schedule/list";
     }
 }

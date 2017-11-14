@@ -1,6 +1,9 @@
 package com.yihu.ehr.queue;
 
+import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.feign.PackageMgrClient;
+import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,26 +30,22 @@ public class MessageBuffer {
     }
 
     public synchronized <T> T getMessage() {
-        //System.out.println("--------------begin------------------");
         String filters = "archiveStatus=Received";
         String sorts = "-receiveDate";
         int count = 500;
         if(messages.isEmpty()){
             long dateCheck = new Date().getTime();
-            //System.out.println("--------------timeThreshold："+timeThreshold+"---------------");
-            //System.out.println("--------------current ："+dateCheck+"---------------");
             if(dateCheck - timeThreshold > 10000){
-                //System.out.println("--------------resolve begin---------------");
                 timeThreshold = new Date().getTime();
                 packageMgrClient.sendResolveMessage(filters,sorts,count);
-                //System.out.println("current:"+timeThreshold);
-                //System.out.println("--------------end---------------");
             }
         }
         if(messages.isEmpty()) {
             return null;
         }else {
-            return (T)messages.remove();
+            MPackage pack = (MPackage)messages.remove();
+            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
+            return (T)pack;
         }
     }
 }

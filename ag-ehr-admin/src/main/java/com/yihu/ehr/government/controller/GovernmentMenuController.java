@@ -2,11 +2,16 @@ package com.yihu.ehr.government.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.government.GovernmentMenuModel;
+import com.yihu.ehr.agModel.resource.RsReportModel;
+import com.yihu.ehr.agModel.resource.RsReportMonitorTypeModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.government.service.GovernmentMenuClient;
+import com.yihu.ehr.government.service.GovernmentMenuReportMonitorTypeClient;
 import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.resource.MRsReportMonitorType;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.resource.client.RsReportMonitorTypeClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -34,6 +39,10 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
     private GovernmentMenuClient governmentMenuClient;
     @Autowired
     private UserClient userClient;
+    @Autowired
+    private GovernmentMenuReportMonitorTypeClient reportMonitorTypeClient;
+    @Autowired
+    private RsReportMonitorTypeClient monitorTypeClient;
 
     @RequestMapping(value = ServiceApi.Government.SearchGovernmentMenu, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询政府服务平台菜单")
@@ -54,7 +63,7 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
             List<GovernmentMenuModel> governmentMenus = new ArrayList<>();
             if (governmentMenuList.getTotalCount() != 0) {
                 List<Map<String,Object>> modelList = governmentMenuList.getDetailModelList();
-                for(Map<String,Object> map : modelList){
+                for(Map<String,Object> map : modelList) {
                     GovernmentMenuModel governmentMenuModel = objectMapper.convertValue(map,GovernmentMenuModel.class);
                     if (null != governmentMenuModel && StringUtils.isNotEmpty(governmentMenuModel.getCreateUser())) {
                         MUser user = userClient.getUser(governmentMenuModel.getCreateUser());
@@ -221,5 +230,37 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
             ex.printStackTrace();
             return failedSystem();
         }
+    }
+
+    @RequestMapping(value = ServiceApi.Government.GetReportByMenuId, method = RequestMethod.GET)
+    @ApiOperation(value = "根据菜单id获取报表内容")
+    public Envelop getReportByMenuId(
+            @ApiParam(name = "menuId", value = "菜单Id", defaultValue = "")
+            @RequestParam(value = "menuId", required = false) String menuId) {
+        Envelop envelop = new Envelop();
+        List<RsReportMonitorTypeModel> list = new ArrayList<>();
+        try {
+            List<Integer> monitorTypeIds = reportMonitorTypeClient.getMonitorTypeIdByGovernmentMenuId(menuId);
+            if (null != monitorTypeIds && monitorTypeIds.size() > 0) {
+                List<MRsReportMonitorType> rsReportMonitorType = monitorTypeClient.getInfoById(monitorTypeIds);
+                if (null != rsReportMonitorType && rsReportMonitorType.size() > 0) {
+                    for (MRsReportMonitorType m : rsReportMonitorType) {
+                        RsReportMonitorTypeModel reportMonitorTypeModel = convertToModel(m, RsReportMonitorTypeModel.class);
+                        if (null != reportMonitorTypeModel) {
+                            // 根据monitorTypeId获取报表信息
+                            List<RsReportModel> rsReportModels = monitorTypeClient.getRsReportByMonitorTypeId(reportMonitorTypeModel.getId());
+                            reportMonitorTypeModel.setReportModelList(rsReportModels);
+                        }
+                        list.add(reportMonitorTypeModel);
+                    }
+                }
+            }
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("请求发生异常");
+        }
+        return envelop;
     }
 }
