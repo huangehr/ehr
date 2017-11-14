@@ -30,20 +30,14 @@ public class MessageBuffer {
     }
 
     public synchronized <T> T getMessage() {
-        //System.out.println("--------------begin------------------");
         String filters = "archiveStatus=Received";
         String sorts = "-receiveDate";
         int count = 500;
         if(messages.isEmpty()){
             long dateCheck = new Date().getTime();
-            //System.out.println("--------------timeThreshold："+timeThreshold+"---------------");
-            //System.out.println("--------------current ："+dateCheck+"---------------");
             if(dateCheck - timeThreshold > 10000){
-                //System.out.println("--------------resolve begin---------------");
                 timeThreshold = new Date().getTime();
                 packageMgrClient.sendResolveMessage(filters,sorts,count);
-                //System.out.println("current:"+timeThreshold);
-                //System.out.println("--------------end---------------");
             }
         }
         if(messages.isEmpty()) {
