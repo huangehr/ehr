@@ -6,7 +6,6 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.redis.MRedisMqChannel;
 import com.yihu.ehr.redis.client.RedisMqChannelClient;
-import com.yihu.ehr.resource.controller.RsReportController;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -44,7 +43,7 @@ public class RedisMqChannelController extends BaseController {
             envelop.setObj(mRedisMqChannel);
             return envelop;
         } catch (Exception e) {
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -70,7 +69,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -88,7 +87,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -106,7 +105,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -123,7 +122,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -145,7 +144,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -167,7 +166,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }

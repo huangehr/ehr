@@ -893,6 +893,15 @@ public class ServiceApi {
             public static final String IsUniqueChannel = "/redis/mq/channel/isUniqueChannel";
             public static final String IsUniqueChannelName = "/redis/mq/channel/isUniqueChannelName";
         }
+        // Redis消息订阅者
+        public static class MqSubscriber {
+            public static final String Prefix = "/redis/mq/subscriber/";
+            public static final String GetById = "/redis/mq/subscriber/{id}";
+            public static final String Search = "/redis/mq/subscriber/search";
+            public static final String Save = "/redis/mq/subscriber/save";
+            public static final String Delete = "/redis/mq/subscriber/delete";
+            public static final String IsUniqueSubscribedUrl = "/redis/mq/subscriber/isUniqueSubscribedUrl";
+        }
 
     }
 

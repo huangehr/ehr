@@ -17,6 +17,13 @@ public class RedisMqChannelModel implements Serializable {
     public String authorizedCode; // 授权码
     public String remark; // 备注
 
+    public RedisMqChannelModel() {
+    }
+
+    public RedisMqChannelModel(String channel) {
+        this.channel = channel;
+    }
+
     public Integer getId() {
         return id;
     }
