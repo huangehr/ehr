@@ -212,7 +212,8 @@ public class ServiceApi {
         public static final String RsReportMonitorTypeIsUniqueName = "/resources/rsReportMonitorType/isUniqueName";
         public static final String RsReportMonitorTypes = "/resources/rsReportMonitorType/getRsReportMonitorTypePage";
         public static final String RsReportMonitorTypesNoPage = "/resources/rsReportMonitorType/getRsReportMonitorTypeNoPage";
-
+        public static final String RsReportMonitorTypesById = "/resources/rsReportMonitorType/getRsReportMonitorTypeById";
+        public static final String RsReportByMonitorTypeId = "/resources/rsReportMonitorType/getRsReportByMonitorTypeId";
 
         /**
          * 资源报表监测类型配置报表
@@ -829,9 +830,8 @@ public class ServiceApi {
 
     }
 
-
     /**
-     *Redis服务
+     * Redis服务
      */
     public static class Redis {
 
@@ -883,6 +883,17 @@ public class ServiceApi {
         public static final String StdMetadataType = "/redis/stdMetaDataType";
         public static final String StdMetadataDict = "/redis/stdMetaDataDict";
         public static final String StdDictEntryValue = "/redis/stdDictEntryValue";
+
+        // Redis消息队列
+        public static class MqChannel {
+            public static final String Prefix = "/redis/mq/channel/";
+            public static final String GetById = "/redis/mq/channel/{id}";
+            public static final String Search = "/redis/mq/channel/search";
+            public static final String Save = "/redis/mq/channel/save";
+            public static final String Delete = "/redis/mq/channel/delete";
+            public static final String IsUniqueChannel = "/redis/mq/channel/isUniqueChannel";
+            public static final String IsUniqueChannelName = "/redis/mq/channel/isUniqueChannelName";
+        }
 
     }
 
@@ -1088,6 +1099,11 @@ public class ServiceApi {
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
         public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
+        public static final String GetReportByMenuId = "/governmentMenuReportMonitorType/getReportByMenuId";
+    }
+
+    public static class SystemDict {
+        public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
     }
 
     /**

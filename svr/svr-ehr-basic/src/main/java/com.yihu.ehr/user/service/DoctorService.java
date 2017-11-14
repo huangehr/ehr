@@ -10,6 +10,7 @@ import com.yihu.ehr.user.dao.XDoctorRepository;
 import com.yihu.ehr.user.dao.XUserRepository;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
@@ -146,7 +147,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
     @Transactional(propagation = Propagation.REQUIRED)
     public String addDoctorBatch(List<Map<String, Object>> doctorLs)
     {
-        String header = "INSERT INTO doctors(code, name, sex,orgCode,orgId,org_full_name,dept_name, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction,id_card_no, office_tel, status) VALUES \n";
+        String header = "INSERT INTO doctors(code, name, sex,orgCode,orgId,org_full_name,dept_name, skill, work_portal, email, phone,jxzc,lczc,xlzc,xzzc,introduction,id_card_no,insert_time, office_tel, status) VALUES \n";
         StringBuilder sql = new StringBuilder(header) ;
         Map<String, Object> map;
         SQLQuery query;
@@ -172,6 +173,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             sql.append(",'"+ map .get("xzzc") +"'");
             sql.append(",'"+ map .get("introduction") +"'");
             sql.append(",'"+ map .get("idCardNo") +"'");
+            sql.append(",'"+ DateUtil.strToDate(DateUtil.getNowDateTime()) +"'");
             sql.append(",'"+ map .get("officeTel") +"','1')\n");
 
             if(i%100==0 || i == doctorLs.size()){

@@ -19,4 +19,7 @@ public interface RsReportMonitorTypeDao extends PagingAndSortingRepository<RsRep
     @Query(" FROM RsReportMonitorType rc WHERE rc.id <> :id AND rc.name = :name ")
     RsReportMonitorType isUniqueName(@Param("id") Integer id, @Param("name") String name);
 
+    @Query("from RsReportMonitorType rc WHERE rc.id in (:monitorTypeIds)")
+    List<RsReportMonitorType> findById(@Param("monitorTypeIds") List<Integer> monitorTypeIds);
+
 }
