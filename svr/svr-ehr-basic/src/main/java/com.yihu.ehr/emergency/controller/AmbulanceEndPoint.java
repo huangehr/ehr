@@ -84,6 +84,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
             for (Ambulance ambulance : ambulanceList) {
                 Map<String, Object> resultMap = new HashMap<String, Object>();
                 List<Schedule> scheduleList = scheduleService.findMatch(ambulance.getId(), date);
+                Attendance attendance = attendanceService.findByStartTimeAndCarId(date, ambulance.getId());
                 Map<String, Object> childMap = new HashMap<String, Object>();
                 childMap.put("id", ambulance.getId());
                 childMap.put("initLongitude", ambulance.getInitLongitude());
@@ -96,6 +97,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                 childMap.put("status", ambulance.getStatus());
                 childMap.put("entityName", ambulance.getEntityName());
                 childMap.put("dutyList", scheduleList);
+                childMap.put("attendance", attendance);
                 resultMap.put("car", childMap);
                 resultList.add(resultMap);
             }
