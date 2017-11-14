@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.resource.MRsReportMonitorType;
+import com.yihu.ehr.resource.model.RsReport;
 import com.yihu.ehr.resource.model.RsReportMonitorType;
 import com.yihu.ehr.resource.service.RsReportMonitorTypeService;
 import io.swagger.annotations.Api;
@@ -117,4 +118,21 @@ public class RsResourceMonitorTypeEndPoint extends EnvelopRestEndPoint {
         return (List<MRsReportMonitorType>) convertToModels(list, new ArrayList<>(list.size()), MRsReportMonitorType.class, null);
     }
 
+    @RequestMapping(value = ServiceApi.Resources.RsReportMonitorTypesById, method = RequestMethod.GET)
+    @ApiOperation("获取报表监测分类")
+    public List<MRsReportMonitorType> getInfoById (
+            @ApiParam(name = "monitorTypeIds", value = "类型id", defaultValue = "")
+            @RequestParam(value = "monitorTypeIds", required = false) List<Integer> monitorTypeIds) {
+        List<RsReportMonitorType> monitorTypes = rsReportMonitorTypeService.getInfoById(monitorTypeIds);
+        return (List<MRsReportMonitorType>) convertToModels(monitorTypes, new ArrayList<>(monitorTypes.size()), MRsReportMonitorType.class, null);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportByMonitorTypeId, method = RequestMethod.GET)
+    @ApiOperation("获取报表信息")
+    public List<RsReport> getRsReportByMonitorTypeId(
+            @ApiParam(name = "monitorTypeId", value = "类型id", defaultValue = "")
+            @RequestParam(value = "monitorTypeId")Integer monitorTypeId) throws Exception {
+        List<RsReport> reportList = rsReportMonitorTypeService.getRsReportByMonitorTypeId(monitorTypeId);
+        return reportList;
+    }
 }
