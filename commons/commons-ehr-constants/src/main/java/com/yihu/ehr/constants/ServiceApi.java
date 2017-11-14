@@ -1089,4 +1089,19 @@ public class ServiceApi {
         public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
     }
+
+    /**
+     * 应急指挥中心
+     */
+    public static class Emergency {
+        //救护车
+        public static final String AmbulanceList = "/ambulance/list";
+        public static final String AmbulanceSearch = "/ambulance/search";
+        public static final String AmbulanceUpdate = "/ambulance/update";
+        //出勤记录
+        public static final String AttendanceSave = "/attendance/save";
+        public static final String AttendanceUpdate = "/attendance/update";
+        //排班历史
+        public static final String ScheduleList = "/schedule/list";
+    }
 }

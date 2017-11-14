@@ -18,10 +18,14 @@ public class Attendance {
      * 状态
      */
     public enum Status {
-        // 记录中
-        active,
+        // 开始
+        start,
+        // 到达
+        arrival,
         // 完成
-        complete
+        complete,
+        // 意外中止
+        discontinue
     }
     // id
     private int id;
@@ -32,28 +36,28 @@ public class Attendance {
     // 到达时间
     private Date arrivalTime;
     // 结束时间
-    private Date endTime;
+    private Date completeTime;
     // 状态
     private Status status;
-    //接警电话
+    // 接警电话
     private String alarmTel;
-    //呼救地点
-    private String callAddr;
-    //主诉
+    // 呼救地点
+    private String callAddress;
+    // 主诉
     private String chiefComplaint;
-    //调派医院
+    // 调派医院
     private String dispatchHospital;
     // 患者人数
-    private String patientNum;
+    private int patientNum;
     // 病人性别
     private String patientGender;
     // 初步诊断
     private String disease;
     // 送达地点
-    private String deliverAddr;
+    private String deliverAddress;
     // 调度人员
     private String creator;
-    //备注
+    // 备注
     private String remark;
 
 
@@ -96,15 +100,16 @@ public class Attendance {
         this.arrivalTime = arrivalTime;
     }
 
-    @Column(name = "end_time")
-    public Date getEndTime() {
-        return endTime;
+    @Column(name = "complete_time")
+    public Date getCompleteTime() {
+        return completeTime;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public void setCompleteTime(Date completeTime) {
+        this.completeTime = completeTime;
     }
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "status", nullable = false)
     public Status getStatus() {
         return status;
@@ -115,15 +120,15 @@ public class Attendance {
     }
 
     @Column(name = "patient_num", nullable = false)
-    public String getPatientNum() {
+    public int getPatientNum() {
         return patientNum;
     }
 
-    public void setPatientNum(String patientNum) {
+    public void setPatientNum(int patientNum) {
         this.patientNum = patientNum;
     }
 
-    @Column(name = "patient_gender", nullable = false)
+    @Column(name = "patient_gender")
     public String getPatientGender() {
         return patientGender;
     }
@@ -159,13 +164,13 @@ public class Attendance {
         this.alarmTel = alarmTel;
     }
 
-    @Column(name = "call_addr", nullable = false)
-    public String getCallAddr() {
-        return callAddr;
+    @Column(name = "call_address", nullable = false)
+    public String getCallAddress() {
+        return callAddress;
     }
 
-    public void setCallAddr(String callAddr) {
-        this.callAddr = callAddr;
+    public void setCallAddress(String callAddress) {
+        this.callAddress = callAddress;
     }
 
     @Column(name = "chief_complaint")
@@ -186,13 +191,13 @@ public class Attendance {
         this.dispatchHospital = dispatchHospital;
     }
 
-    @Column(name = "deliver_addr")
-    public String getDeliverAddr() {
-        return deliverAddr;
+    @Column(name = "deliver_address")
+    public String getDeliverAddress() {
+        return deliverAddress;
     }
 
-    public void setDeliverAddr(String deliverAddr) {
-        this.deliverAddr = deliverAddr;
+    public void setDeliverAddress(String deliverAddress) {
+        this.deliverAddress = deliverAddress;
     }
 
     @Column(name = "remark")

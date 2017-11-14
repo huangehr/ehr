@@ -1,5 +1,6 @@
 package com.yihu.ehr.emergency.service;
 
+import com.yihu.ehr.emergency.dao.PositionDao;
 import com.yihu.ehr.entity.emergency.Position;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,6 @@ import javax.transaction.Transactional;
  */
 @Service
 @Transactional
-public class PositionService extends BaseJpaService<Position, String> {
+public class PositionService extends BaseJpaService<Position, PositionDao> {
 
 }
