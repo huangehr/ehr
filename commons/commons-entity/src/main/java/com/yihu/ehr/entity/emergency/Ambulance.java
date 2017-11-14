@@ -24,23 +24,23 @@ public class Ambulance {
         /** 不可用 */
         down
     }
-    // 车牌号码
+    //车牌号码
     private String id;
-    // 初始经度
+    //初始经度
     private double initLongitude;
-    // 初始纬度
+    //初始纬度
     private double initLatitude;
-    // 归属片区
+    //归属片区
     private String district;
-    // 所属医院Id
-    private int orgId;
+    //所属医院编码
+    private int orgCode;
     //所属医院名称
     private String orgName;
-    // 司机
+    //司机
     private String driver;
-    // 随车手机号码
+    //随车手机号码
     private String phone;
-    // 状态
+    //状态
     private Status status;
     //百度鹰眼设备号
     private String entityName;
@@ -75,13 +75,13 @@ public class Ambulance {
         this.initLatitude = initLatitude;
     }
 
-    @Column(name = "org_id", nullable = false)
-    public int getOrgId() {
-        return orgId;
+    @Column(name = "org_code", nullable = false)
+    public int getOrgCode() {
+        return orgCode;
     }
 
-    public void setOrgId(int orgId) {
-        this.orgId = orgId;
+    public void setOrgCode(int orgCode) {
+        this.orgCode = orgCode;
     }
 
     @Column(name = "org_name", nullable = false)
@@ -111,6 +111,7 @@ public class Ambulance {
         this.phone = phone;
     }
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "status", nullable = false)
     public Status getStatus() {
         return status;

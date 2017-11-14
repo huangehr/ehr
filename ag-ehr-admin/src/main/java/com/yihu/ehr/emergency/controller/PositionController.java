@@ -13,14 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * Controller - 定位数据
+ * Controller - 定位数据（暂时不用）
  * Created by progr1mmer on 2017/11/8.
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + ServiceApi.GateWay.admin)
 @Api(value = "PositionController", description = "定位数据", tags = {"应急指挥"})
+@ApiIgnore
 public class PositionController extends BaseController {
 
     @Autowired

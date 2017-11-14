@@ -1105,4 +1105,19 @@ public class ServiceApi {
     public static class SystemDict {
         public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
     }
+
+    /**
+     * 应急指挥中心
+     */
+    public static class Emergency {
+        //救护车
+        public static final String AmbulanceList = "/ambulance/list";
+        public static final String AmbulanceSearch = "/ambulance/search";
+        public static final String AmbulanceUpdate = "/ambulance/update";
+        //出勤记录
+        public static final String AttendanceSave = "/attendance/save";
+        public static final String AttendanceUpdate = "/attendance/update";
+        //排班历史
+        public static final String ScheduleList = "/schedule/list";
+    }
 }
