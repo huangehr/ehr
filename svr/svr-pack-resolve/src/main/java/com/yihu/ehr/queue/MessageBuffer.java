@@ -1,6 +1,9 @@
 package com.yihu.ehr.queue;
 
+import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.feign.PackageMgrClient;
+import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,7 +49,9 @@ public class MessageBuffer {
         if(messages.isEmpty()) {
             return null;
         }else {
-            return (T)messages.remove();
+            MPackage pack = (MPackage)messages.remove();
+            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
+            return (T)pack;
         }
     }
 }
