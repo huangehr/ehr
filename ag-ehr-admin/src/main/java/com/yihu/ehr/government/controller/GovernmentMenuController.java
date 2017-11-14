@@ -250,11 +250,8 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
                             // 根据monitorTypeId获取报表信息
                             List<RsReportModel> rsReportModels = monitorTypeClient.getRsReportByMonitorTypeId(reportMonitorTypeModel.getId());
                             reportMonitorTypeModel.setReportModelList(rsReportModels);
-                            if (null != rsReportModels && rsReportModels.size() > 0) {
-                                list.add(reportMonitorTypeModel);
-                            }
                         }
-
+                        list.add(reportMonitorTypeModel);
                     }
                 }
             }
