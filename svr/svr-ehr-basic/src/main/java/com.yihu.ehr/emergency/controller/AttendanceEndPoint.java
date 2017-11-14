@@ -79,7 +79,7 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
             }
         }else {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("车辆状态有误");
+            envelop.setErrorMsg("当前车辆不处于待命状态");
         }
         return envelop;
     }
