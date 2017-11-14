@@ -239,7 +239,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 resourceQuotaService.deleteByResourceId(newResources.getId());
                 rsService.delete(newResources);
             }
-            envelop.setErrorMsg(ErrorCode.SystemError.toString());
+            envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
     }

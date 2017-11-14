@@ -129,7 +129,9 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             userResourceList.toArray(ids);
             for(RsResourceCategory rsResourceCategory : rsCateList) {
                 Map<String, Object> childMap = getTreeMap(rsResourceCategory, 0, dataSource, ids, filters);
-                resultList.add(childMap);
+                if (childMap != null) {
+                    resultList.add(childMap);
+                }
             }
         }
         return resultList;
@@ -143,6 +145,8 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
      */
     private Map<String, Object> getTreeMap(RsResourceCategory rsResourceCategory, int level, Integer dataSource, String [] ids, String filters) {
         Map<String, Object> masterMap = new HashMap<String, Object>();
+        List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
         if(rsResourceCategory != null) {
             /**
              * 处理自身数据
@@ -167,7 +171,6 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
             }
             //处理下属资源
             if (rsList != null) {
-                List<Map<String, Object>> detailList = new ArrayList<Map<String, Object>>();
                 for (RsResource rsResource : rsList) {
                     Map<String, Object> detailMap = new HashMap<String, Object>();
                     detailMap.put("level", level + 1);
@@ -180,19 +183,19 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
                     detailMap.put("category_name", rsResourceCategory.getName());
                     detailList.add(detailMap);
                 }
-                masterMap.put("detailList", detailList);
-            } else {
-                masterMap.put("detailList", null);
             }
+            masterMap.put("detailList", detailList);
             //处理下级数据
             List<RsResourceCategory> hList = rsResourceCategoryDao.findByPid(rsResourceCategory.getId());
             if(hList != null) {
-                List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
                 for(RsResourceCategory category: hList) {
                     childList.add(getTreeMap(category, level + 1, dataSource, ids, filters));
                 }
                 masterMap.put("child", childList);
             }
+        }
+        if(ids != null && detailList.size() <= 0 && childList.size() <= 0) {
+            return null;
         }
         return masterMap;
     }
