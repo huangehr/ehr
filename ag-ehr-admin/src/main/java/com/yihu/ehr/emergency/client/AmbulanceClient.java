@@ -29,8 +29,8 @@ public interface AmbulanceClient{
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
-            @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page);
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "size", required = false) int size);
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceSearch, method = RequestMethod.GET)
     @ApiOperation(value = "查询救护车信息,包括执勤人员信息")
@@ -38,8 +38,8 @@ public interface AmbulanceClient{
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
-            @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page);
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "size", required = false) int size);
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT)
     @ApiOperation(value = "更新救护车状态信息")

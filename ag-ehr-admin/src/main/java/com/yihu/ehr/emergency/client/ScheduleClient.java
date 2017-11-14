@@ -27,7 +27,7 @@ public interface ScheduleClient {
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
-            @RequestParam(value = "size", required = false) int size,
-            @RequestParam(value = "page", required = false) int page);
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "size", required = false) int size);
 
 }
