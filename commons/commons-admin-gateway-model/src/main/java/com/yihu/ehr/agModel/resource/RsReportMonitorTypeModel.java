@@ -15,6 +15,8 @@ public class RsReportMonitorTypeModel implements Serializable {
     private String name; // 名称
     private String note; // 备注
 
+    private List<RsReportModel> reportModelList;
+
     public Integer getId() {
         return id;
     }
@@ -37,5 +39,13 @@ public class RsReportMonitorTypeModel implements Serializable {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public List<RsReportModel> getReportModelList() {
+        return reportModelList;
+    }
+
+    public void setReportModelList(List<RsReportModel> reportModelList) {
+        this.reportModelList = reportModelList;
     }
 }
