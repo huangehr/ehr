@@ -165,6 +165,12 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                 envelop.setErrorMsg("车辆：" + newAmbulance.getId() + "已存在");
                 return envelop;
             }
+            oldAmbulance = ambulanceService.findByPhone(newAmbulance.getPhone());
+            if(oldAmbulance != null) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("手机号：" + newAmbulance.getPhone() + "已存在");
+                return envelop;
+            }
             Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
             if (organization == null) {
                 envelop.setSuccessFlg(false);
@@ -200,6 +206,13 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("无相关车辆信息");
                 return envelop;
+            }else {
+                Ambulance oldAmbulance1 = ambulanceService.findByPhone(newAmbulance.getPhone());
+                if(oldAmbulance1 != null && !oldAmbulance1.getId().equals(newAmbulance.getId())) {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("手机号码重复");
+                    return envelop;
+                }
             }
             Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
             if (organization == null) {
@@ -207,7 +220,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                 envelop.setErrorMsg("无相关机构");
                 return envelop;
             }
-            if (newAmbulance.getStatus() == Ambulance.Status.active) {
+            if (oldAmbulance.getStatus() == Ambulance.Status.active) {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("当前车辆处于执勤状态，无法更新");
                 return envelop;
