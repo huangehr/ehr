@@ -42,6 +42,10 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
         return dictionaryDao.findOne(id);
     }
 
+    public RsDictionary findByCode(String code){
+        return dictionaryDao.findByCode(code);
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public void batchInsertDictsAndEntry(List<Map<String, Object>> models) throws SQLException {
         Session session = null;
@@ -136,4 +140,7 @@ public class RsDictionaryService extends BaseJpaService<RsDictionary, RsDictiona
         model.setId(keyHolder.getKey().intValue());
         return model;
     }
+
+
+
 }

@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -41,6 +42,8 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
     private RsRolesResourceGrantService rsRolesResourceGrantService;
     @Autowired
     private RsRolesResourceMetadataGrantService rsRolesResourceMetadataGrantService;
+    @Autowired
+    private RsDictionaryService rsDictionaryService;
 
 
     /**
@@ -271,8 +274,19 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
                         metadataMap.put("level", "2");
                         metadataMap.put("code", rsMetadata.getId());
                         metadataMap.put("name", rsMetadata.getName());
-                        metadataMap.put("metaDataStdCode", rsMetadata.getStdCode());
+                        metadataMap.put("stdCode", rsMetadata.getStdCode());
+                        String dictCode = rsMetadata.getDictCode();
                         metadataMap.put("dictCode", rsMetadata.getDictCode());
+                        if(!StringUtils.isEmpty(dictCode)){
+                            if (dictCode.equals("DATECONDITION")) {
+                                metadataMap.put("dictName", "时间");
+                            }else {
+                                RsDictionary rsDictionary = rsDictionaryService.findByCode(rsMetadata.getDictCode());
+                                if(rsDictionary != null) {
+                                    metadataMap.put("dictName", rsDictionary.getName());
+                                }
+                            }
+                        }
                         metadataMap.put("description", rsMetadata.getDescription());
                         metadataMap.put("groupData", "");
                         metadataMap.put("groupType", "");
