@@ -9,11 +9,14 @@ import com.yihu.ehr.emergency.service.ScheduleService;
 import com.yihu.ehr.entity.emergency.Ambulance;
 import com.yihu.ehr.entity.emergency.Attendance;
 import com.yihu.ehr.entity.emergency.Schedule;
+import com.yihu.ehr.org.model.Organization;
+import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +38,8 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
     private ScheduleService scheduleService;
     @Autowired
     private AttendanceService attendanceService;
+    @Autowired
+    private OrgService orgService;
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceList, method = RequestMethod.GET)
     @ApiOperation(value = "获取所有救护车列表")
@@ -92,7 +97,6 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                 childMap.put("district", ambulance.getDistrict());
                 childMap.put("orgCode", ambulance.getOrgCode());
                 childMap.put("orgName", ambulance.getOrgName());
-                childMap.put("driver", ambulance.getDriver());
                 childMap.put("phone", ambulance.getPhone());
                 childMap.put("status", ambulance.getStatus());
                 childMap.put("entityName", ambulance.getEntityName());
@@ -111,10 +115,10 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdateStatus, method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "更新救护车状态信息")
-    public Envelop update(
+    public Envelop updateStatus(
             @ApiParam(name = "carId", value = "车牌号码")
             @RequestParam(value = "carId") String carId,
             @ApiParam(name = "status", value = "车辆状态码(0为统一可用状态码，1为统一不可用状态码)")
@@ -146,5 +150,109 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
         }
         return envelop;
     }
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("保存单条记录")
+    public Envelop save(
+            @ApiParam(name = "ambulance", value = "救护车")
+            @RequestBody String ambulance){
+        Envelop envelop = new Envelop();
+        try {
+            Ambulance newAmbulance = objectMapper.readValue(ambulance, Ambulance.class);
+            Ambulance oldAmbulance = ambulanceService.findById(newAmbulance.getId());
+            if(oldAmbulance != null) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("车辆：" + newAmbulance.getId() + "已存在");
+                return envelop;
+            }
+            Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
+            if (organization == null) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("无相关机构");
+                return envelop;
+            }
+            if (newAmbulance.getStatus() == Ambulance.Status.active) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("车辆状态不能为执勤中");
+                return envelop;
+            }
+            newAmbulance.setCrateDate(new Date());
+            ambulanceService.save(newAmbulance);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("更新单条记录")
+    public Envelop update(
+            @ApiParam(name = "ambulance", value = "救护车")
+            @RequestBody String ambulance){
+        Envelop envelop = new Envelop();
+        try {
+            Ambulance newAmbulance = objectMapper.readValue(ambulance, Ambulance.class);
+            Ambulance oldAmbulance = ambulanceService.findById(newAmbulance.getId());
+            if(oldAmbulance == null) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("无相关车辆信息");
+                return envelop;
+            }
+            Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
+            if (organization == null) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("无相关机构");
+                return envelop;
+            }
+            if (newAmbulance.getStatus() == Ambulance.Status.active) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("当前车辆处于执勤状态，无法更新");
+                return envelop;
+            }
+            newAmbulance.setCrateDate(oldAmbulance.getCrateDate());
+            newAmbulance.setUpdateDate(new Date());
+            ambulanceService.save(newAmbulance);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceDelete, method = RequestMethod.DELETE)
+    @ApiOperation("删除记录")
+    public Envelop delete(
+            @ApiParam(name = "ids", value = "id列表['xxxx','xxxx','xxxx'...] String")
+            @RequestParam(value = "ids") String ids){
+        Envelop envelop = new Envelop();
+        try {
+            List<String> idList = toEntity(ids, List.class);
+            for (String id : idList) {
+                Ambulance ambulance = ambulanceService.findById(id);
+                if (ambulance.getStatus() == Ambulance.Status.active) {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("车辆：" + id + "，处于执勤状态，无法删除");
+                    return envelop;
+                }
+                List<Attendance> attendanceList = attendanceService.search("carId=" + id);
+                if(attendanceList != null && attendanceList.size() > 0) {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("车辆：" + id + "，有执勤记录，无法删除");
+                    return envelop;
+                }
+            }
+            ambulanceService.delete(idList);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return envelop;
+    }
+
 
 }

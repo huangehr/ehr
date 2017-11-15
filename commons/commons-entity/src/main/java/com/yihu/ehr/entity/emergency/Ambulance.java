@@ -1,8 +1,10 @@
 package com.yihu.ehr.entity.emergency;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Entity - 救护车信息表
@@ -26,6 +28,14 @@ public class Ambulance {
     }
     //车牌号码
     private String id;
+    //创建时间
+    private Date crateDate;
+    //创建者
+    private String creator;
+    //更新时间
+    private Date updateDate;
+    //更新者
+    private String updater;
     //初始经度
     private double initLongitude;
     //初始纬度
@@ -33,11 +43,9 @@ public class Ambulance {
     //归属片区
     private String district;
     //所属医院编码
-    private int orgCode;
+    private String orgCode;
     //所属医院名称
     private String orgName;
-    //司机
-    private String driver;
     //随车手机号码
     private String phone;
     //状态
@@ -55,6 +63,44 @@ public class Ambulance {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "crate_date", nullable = false)
+    public Date getCrateDate() {
+        return crateDate;
+    }
+
+    public void setCrateDate(Date crateDate) {
+        this.crateDate = crateDate;
+    }
+
+    @Column(name = "creator")
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "update_date")
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    @Column(name = "updater")
+    public String getUpdater() {
+        return updater;
+    }
+
+    public void setUpdater(String updater) {
+        this.updater = updater;
     }
 
     @Column(name = "init_longitude", nullable = false)
@@ -76,11 +122,11 @@ public class Ambulance {
     }
 
     @Column(name = "org_code", nullable = false)
-    public int getOrgCode() {
+    public String getOrgCode() {
         return orgCode;
     }
 
-    public void setOrgCode(int orgCode) {
+    public void setOrgCode(String orgCode) {
         this.orgCode = orgCode;
     }
 
@@ -91,15 +137,6 @@ public class Ambulance {
 
     public void setOrgName(String orgName) {
         this.orgName = orgName;
-    }
-
-    @Column(name = "driver", nullable = false)
-    public String getDriver() {
-        return driver;
-    }
-
-    public void setDriver(String driver) {
-        this.driver = driver;
     }
 
     @Column(name = "phone", nullable = false)

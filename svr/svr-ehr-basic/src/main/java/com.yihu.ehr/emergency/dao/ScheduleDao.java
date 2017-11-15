@@ -9,4 +9,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 public interface ScheduleDao extends PagingAndSortingRepository<Schedule, Integer> {
 
+    Schedule findById(int id);
+
 }

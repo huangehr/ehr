@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * EndPoint - 出勤记录
@@ -59,16 +56,27 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
         dataMap.put("remark", "赶紧的");
         dataMap.put("creator", "桂花");
         String dataJson = objectMapper.writeValueAsString(dataMap);
-        Attendance enAttendance = toEntity(dataJson, Attendance.class);
-        Ambulance ambulance =  ambulanceService.findById(enAttendance.getCarId());
+        Attendance newAttendance = toEntity(dataJson, Attendance.class);
+        Attendance verification = attendanceService.findByCarIdAndStatus(newAttendance.getCarId(), Attendance.Status.start, Attendance.Status.arrival);
+        if(verification != null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("该车辆有尚未完成的执勤任务");
+            return envelop;
+        }
+        Ambulance ambulance =  ambulanceService.findById(newAttendance.getCarId());
         //如果救护车不为空，并且状态为待命中
         if(ambulance != null && ambulance.getStatus().equals(Ambulance.Status.wait)) {
             List<Schedule> scheduleList = scheduleService.findMatch(ambulance.getId(), new Date());
-            if(scheduleList != null && scheduleList.size() > 3) {
+            if(scheduleList != null && scheduleList.size() >= 3) {
                 //生成出勤记录
-                enAttendance.setStatus(Attendance.Status.start);
-                enAttendance.setStartTime(new Date());
-                attendanceService.save(enAttendance);
+                List<Integer> idList = new ArrayList<Integer>();
+                for(Schedule schedule : scheduleList) {
+                    idList.add(schedule.getId());
+                }
+                newAttendance.setSchedules(objectMapper.writeValueAsString(idList));
+                newAttendance.setStatus(Attendance.Status.start);
+                newAttendance.setStartTime(new Date());
+                attendanceService.save(newAttendance);
                 //更新车辆状态为执勤中
                 ambulance.setStatus(Ambulance.Status.active);
                 ambulanceService.save(ambulance);
@@ -121,6 +129,44 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
             envelop.setErrorMsg("该车辆无可更新的出勤记录");
             envelop.setObj(status);
         }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceList, method = RequestMethod.GET)
+    @ApiOperation("获取出勤列表")
+    public Envelop list(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "页码", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size) {
+        Envelop envelop = new Envelop();
+        try {
+            List<Ambulance> ambulances = attendanceService.search(fields, filters, sorts, page, size);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(ambulances);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceDelete, method = RequestMethod.DELETE)
+    @ApiOperation("删除出勤记录")
+    public Envelop delete(
+            @ApiParam(name = "ids", value = "id列表[1,2,3...] int")
+            @RequestParam(value = "ids") String ids){
+        List<Integer> idList = toEntity(ids, List.class);
+        attendanceService.delete(idList);
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 

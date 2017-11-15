@@ -5,9 +5,9 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.omg.IOP.ENCODING_CDR_ENCAPS;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,7 +43,22 @@ public interface AmbulanceClient{
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT)
     @ApiOperation(value = "更新救护车状态信息")
-    Envelop update(
+    Envelop updateStatus(
             @RequestParam(value = "carId") String carId,
             @RequestParam(value = "status") String status);
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("保存单条记录")
+    Envelop save(
+            @RequestBody String ambulance);
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("更新单条记录")
+    Envelop update(
+            @RequestBody String ambulance);
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceDelete, method = RequestMethod.DELETE)
+    @ApiOperation("删除记录")
+    Envelop delete(
+            @RequestParam(value = "ids") String ids);
 }
