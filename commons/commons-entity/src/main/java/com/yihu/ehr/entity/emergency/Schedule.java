@@ -1,5 +1,6 @@
 package com.yihu.ehr.entity.emergency;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -25,6 +26,14 @@ public class Schedule {
     }
     // id
     private int id;
+    // 创建时间
+    private Date crateDate;
+    // 创建者
+    private String creator;
+    // 更新时间
+    private Date updateDate;
+    // 更新者
+    private String updater;
     // 开始时间
     private Date start;
     // 结束时间
@@ -52,6 +61,45 @@ public class Schedule {
         this.id = id;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "crate_date", nullable = false)
+    public Date getCrateDate() {
+        return crateDate;
+    }
+
+    public void setCrateDate(Date crateDate) {
+        this.crateDate = crateDate;
+    }
+
+    @Column(name = "creator")
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "update_date")
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    @Column(name = "updater")
+    public String getUpdater() {
+        return updater;
+    }
+
+    public void setUpdater(String updater) {
+        this.updater = updater;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "start", nullable = false)
     public Date getStart() {
         return start;
@@ -61,6 +109,7 @@ public class Schedule {
         this.start = start;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "end", nullable = false)
     public Date getEnd() {
         return end;

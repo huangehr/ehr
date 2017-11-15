@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,5 +46,22 @@ public class ScheduleController extends BaseController {
             @RequestParam(value = "size", required = false) int size) {
         return scheduleClient.list(fields, filters, sorts, page, size);
     }
+
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("保存单条记录")
+    public Envelop save(
+            @ApiParam(name = "schedule", value = "排班")
+            @RequestParam(value = "schedule") String schedule){
+        return scheduleClient.save(schedule);
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("更新单条记录，只允许更新时间和状态")
+    public Envelop update(
+            @ApiParam(name = "schedule", value = "排班")
+            @RequestParam(value = "schedule") String schedule){
+        return scheduleClient.update(schedule);
+    }
+
 
 }

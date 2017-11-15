@@ -6,6 +6,7 @@ import com.yihu.ehr.query.BaseJpaService;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,6 +21,9 @@ import java.util.List;
 @Transactional
 public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
 
+    @Autowired
+    private ScheduleDao scheduleDao;
+
     public List<Schedule> findMatch(String carId, Date date) throws Exception{
         String sql = "SELECT schedule FROM Schedule schedule WHERE schedule.carId = :carId AND schedule.status = :status AND schedule.start <= :start AND schedule.end >= :end";
         Session session = currentSession();
@@ -30,6 +34,10 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
         query.setParameter("start", date);
         query.setParameter("end", date);
         return query.list();
+    }
+
+    public Schedule findById(int id){
+        return scheduleDao.findById(id);
     }
 
 }

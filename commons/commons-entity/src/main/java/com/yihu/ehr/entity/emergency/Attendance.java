@@ -1,6 +1,7 @@
 package com.yihu.ehr.entity.emergency;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -59,6 +60,8 @@ public class Attendance {
     private String creator;
     // 备注
     private String remark;
+    // 值班id列表
+    private String schedules;
 
 
     @Id
@@ -82,6 +85,7 @@ public class Attendance {
         this.carId = carId;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "start_time", nullable = false)
     public Date getStartTime() {
         return startTime;
@@ -91,6 +95,7 @@ public class Attendance {
         this.startTime = startTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "arrival_time")
     public Date getArrivalTime() {
         return arrivalTime;
@@ -100,6 +105,7 @@ public class Attendance {
         this.arrivalTime = arrivalTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "complete_time")
     public Date getCompleteTime() {
         return completeTime;
@@ -207,5 +213,14 @@ public class Attendance {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name = "schedules", nullable = false)
+    public String getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(String schedules) {
+        this.schedules = schedules;
     }
 }
