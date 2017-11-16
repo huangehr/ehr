@@ -19,13 +19,15 @@ public class Attendance {
      * 状态
      */
     public enum Status {
-        // 开始
+        /** 开始 */
         start,
-        // 到达
+        /** 到达 */
         arrival,
-        // 完成
+        /** 返回 */
+        back,
+        /** 完成 */
         complete,
-        // 意外中止
+        /** 意外中止 */
         discontinue
     }
     // id
