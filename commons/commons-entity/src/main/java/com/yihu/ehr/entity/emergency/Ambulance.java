@@ -21,9 +21,13 @@ public class Ambulance {
     public enum Status {
         /** 待命中 */
         wait,
-        /** 执勤中 */
-        active,
-        /** 不可用 */
+        /** 前往中 */
+        onWay,
+        /** 抵达 */
+        arrival,
+        /** 返程中 */
+        back,
+        /** 异常 */
         down
     }
     //车牌号码

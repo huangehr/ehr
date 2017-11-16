@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Service - 出勤记录
@@ -20,8 +21,8 @@ public class AttendanceService extends BaseJpaService<Attendance, AttendanceDao>
     @Autowired
     private AttendanceDao attendanceDao;
 
-    public Attendance findByCarIdAndStatus(String carId, Attendance.Status status1, Attendance.Status status2) {
-        return attendanceDao.findByCarIdAndStatus(carId, status1, status2);
+    public Attendance findByCarIdAndStatus(String carId, List<Attendance.Status> statuses) {
+        return attendanceDao.findByCarIdAndStatus(carId, statuses);
     }
 
     public Attendance findByStartTimeAndCarId(Date startTime, String carId) {

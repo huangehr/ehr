@@ -69,7 +69,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceSearch , method = RequestMethod.GET)
-    @ApiOperation(value = "查询救护车信息，包括执勤人员信息，检索条件只针对车辆")
+    @ApiOperation(value = "查询救护车信息，包括执勤人员信息，以及最近一条执勤记录，检索条件只针对车辆")
     public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段")
             @RequestParam(value = "fields", required = false) String fields,
@@ -127,14 +127,23 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
         Ambulance ambulance = ambulanceService.findById(carId);
         if(ambulance != null) {
             if (status.equals("0")) {
-                ambulance.setStatus(Ambulance.Status.wait);
-                ambulanceService.save(ambulance);
-                envelop.setSuccessFlg(true);
+                if(ambulance.getStatus() == Ambulance.Status.down) {
+                    ambulance.setStatus(Ambulance.Status.wait);
+                    ambulanceService.save(ambulance);
+                    envelop.setSuccessFlg(true);
+                }else {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("该车辆不处于异常状态");
+                }
             }else if(status.equals("1")) {
                 ambulance.setStatus(Ambulance.Status.down);
                 ambulanceService.save(ambulance);
-                Attendance attendance = attendanceService.findByCarIdAndStatus(carId, Attendance.Status.start, Attendance.Status.arrival);
                 //如果有正在出勤中的任务，则设置为意外中止
+                List<Attendance.Status> statuses = new ArrayList<Attendance.Status>();
+                statuses.add(Attendance.Status.start);
+                statuses.add(Attendance.Status.arrival);
+                statuses.add(Attendance.Status.back);
+                Attendance attendance = attendanceService.findByCarIdAndStatus(carId, statuses);
                 if(attendance != null) {
                     attendance.setStatus(Attendance.Status.discontinue);
                     attendanceService.save(attendance);
@@ -177,7 +186,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                 envelop.setErrorMsg("无相关机构");
                 return envelop;
             }
-            if (newAmbulance.getStatus() == Ambulance.Status.active) {
+            if (newAmbulance.getStatus() != Ambulance.Status.wait || newAmbulance.getStatus() != Ambulance.Status.down) {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("车辆状态不能为执勤中");
                 return envelop;
@@ -205,7 +214,6 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
             if(oldAmbulance == null) {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("无相关车辆信息");
-                return envelop;
             }else {
                 Ambulance oldAmbulance1 = ambulanceService.findByPhone(newAmbulance.getPhone());
                 if(oldAmbulance1 != null && !oldAmbulance1.getId().equals(newAmbulance.getId())) {
@@ -213,22 +221,22 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                     envelop.setErrorMsg("手机号码重复");
                     return envelop;
                 }
+                Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
+                if (organization == null) {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("无相关机构");
+                    return envelop;
+                }
+                if (oldAmbulance.getStatus() != Ambulance.Status.wait || oldAmbulance.getStatus() != Ambulance.Status.down) {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("当前车辆处于执勤状态，无法更新");
+                    return envelop;
+                }
+                newAmbulance.setCrateDate(oldAmbulance.getCrateDate());
+                newAmbulance.setUpdateDate(new Date());
+                ambulanceService.save(newAmbulance);
+                envelop.setSuccessFlg(true);
             }
-            Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
-            if (organization == null) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("无相关机构");
-                return envelop;
-            }
-            if (oldAmbulance.getStatus() == Ambulance.Status.active) {
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("当前车辆处于执勤状态，无法更新");
-                return envelop;
-            }
-            newAmbulance.setCrateDate(oldAmbulance.getCrateDate());
-            newAmbulance.setUpdateDate(new Date());
-            ambulanceService.save(newAmbulance);
-            envelop.setSuccessFlg(true);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -247,7 +255,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
             List<String> idList = toEntity(ids, List.class);
             for (String id : idList) {
                 Ambulance ambulance = ambulanceService.findById(id);
-                if (ambulance.getStatus() == Ambulance.Status.active) {
+                if (ambulance.getStatus() != Ambulance.Status.wait || ambulance.getStatus() != Ambulance.Status.down) {
                     envelop.setSuccessFlg(false);
                     envelop.setErrorMsg("车辆：" + id + "，处于执勤状态，无法删除");
                     return envelop;
