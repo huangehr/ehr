@@ -455,7 +455,7 @@ public class OrgDeptController  extends BaseController {
             @RequestParam(value = "orgId",required = false) String orgId,
             @ApiParam(name = "searchNm", value = "关键字查询", defaultValue = "")
             @RequestParam(value = "searchNm",required = false) String searchNm
-            ) {
+    ) {
         try {
             Envelop envelop = new Envelop();
             List<MOrgMemberRelation> memberRelationList = new ArrayList<MOrgMemberRelation>();
@@ -532,8 +532,8 @@ public class OrgDeptController  extends BaseController {
                 detailModel.setUserName(mUser == null ? "" : mUser.getRealName());
             }
             if (StringUtils.isNotEmpty(detailModel.getParentUserId()) ){
-                MOrgMemberRelation memberUser= orgDeptMemberClient.getOrgMemberRelation(Long.valueOf(detailModel.getParentUserId()));
-                detailModel.setParentUserName(memberUser == null ? "" : memberUser.getUserName());
+                MUser mUser = userClient.getUser(detailModel.getParentUserId());
+                detailModel.setParentUserName(mUser == null ? "" : mUser.getRealName());
             }
             if (detailModel.getDeptId()!=null && detailModel.getDeptId()!=0 ){
                 MOrgDept mOrgDept = orgDeptClient.searchDeptDetail(detailModel.getDeptId());
@@ -702,5 +702,5 @@ public class OrgDeptController  extends BaseController {
             return failedSystem();
         }
     }
-    
+
 }
