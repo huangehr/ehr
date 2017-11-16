@@ -111,7 +111,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     /**
-     * 注入Bean
+     * 手动装配Bean
      * @param bean
      */
     public static void autowiredBean(Object bean) {
@@ -119,7 +119,7 @@ public class SpringContext implements ApplicationContextAware {
     }
 
     /**
-     * 指定模式，注入Bean
+     * 指定模式，手动装配Bean
      * @param bean
      * @param autowireMode
      */
