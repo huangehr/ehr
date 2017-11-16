@@ -4,7 +4,6 @@ package com.yihu.ehr.redis.pubsub.entity;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
 
 /**
  * redis消息记录 Entity
@@ -21,8 +20,8 @@ public class RedisMqMessageLog {
     public String channel; // 消息队列编码
     public String publisher; // 发布者
     public String status; // 消息状态，0：未消费，1：已消费
-    public Date createTime; // 创建时间
-    public Date updateTime; // 更新时间
+    public String createTime; // 创建时间
+    public String updateTime; // 更新时间
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -73,20 +72,20 @@ public class RedisMqMessageLog {
     }
 
     @Column(name = "create_time")
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
     @Column(name = "update_time")
-    public Date getUpdateTime() {
+    public String getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 }

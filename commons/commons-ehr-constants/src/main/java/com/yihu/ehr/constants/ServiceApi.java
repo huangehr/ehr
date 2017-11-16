@@ -893,6 +893,7 @@ public class ServiceApi {
             public static final String Delete = "/redis/mq/channel/delete";
             public static final String IsUniqueChannel = "/redis/mq/channel/isUniqueChannel";
             public static final String IsUniqueChannelName = "/redis/mq/channel/isUniqueChannelName";
+            public static final String SendMessage = "/redis/mq/channel/sendMessage";
         }
         // Redis消息订阅者
         public static class MqSubscriber {

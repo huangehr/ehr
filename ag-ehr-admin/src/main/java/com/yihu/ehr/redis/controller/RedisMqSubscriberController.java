@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api("Redis消息订阅者接口")
+@Api(description = "消息订阅者接口", tags = {"Redis消息发布订阅--消息订阅者接口"})
 public class RedisMqSubscriberController extends BaseController {
 
     @Autowired

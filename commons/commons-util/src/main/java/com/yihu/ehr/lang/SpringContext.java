@@ -1,9 +1,11 @@
 package com.yihu.ehr.lang;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 
 /**
  * Spring上下文管理器。
@@ -106,5 +108,25 @@ public class SpringContext implements ApplicationContextAware {
      */
     public static boolean isSingleton(String serviceName) {
         return springContext.isSingleton(serviceName);
+    }
+
+    /**
+     * 注入Bean
+     * @param bean
+     */
+    public static void autowiredBean(Object bean) {
+        autowiredBean(bean, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE);
+    }
+
+    /**
+     * 指定模式，注入Bean
+     * @param bean
+     * @param autowireMode
+     */
+    public static void autowiredBean(Object bean, int autowireMode) {
+        String beanName = ClassUtils.getUserClass(bean).getName();
+        AutowireCapableBeanFactory factory = springContext.getAutowireCapableBeanFactory();
+        factory.autowireBeanProperties(bean, autowireMode, false);
+        factory.initializeBean(bean, beanName);
     }
 }

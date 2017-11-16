@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api("Redis消息队列接口")
+@Api(description = "消息队列接口", tags = {"Redis消息发布订阅--消息队列接口"})
 public class RedisMqChannelController extends BaseController {
 
     @Autowired
@@ -164,6 +164,24 @@ public class RedisMqChannelController extends BaseController {
                 envelop.setErrorMsg("该消息队列名称已被使用，请重新填写！");
             }
             return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
+    @ApiOperation("发布消息")
+    @RequestMapping(value = ServiceApi.Redis.MqChannel.SendMessage, method = RequestMethod.POST)
+    public Envelop sendMessage(
+            @ApiParam(name = "publisher", value = "发布者", required = true)
+            @RequestParam(value = "publisher") String publisher,
+            @ApiParam(name = "channel", value = "消息队列编码", required = true)
+            @RequestParam(value = "channel") String channel,
+            @ApiParam(name = "message", value = "消息", required = true)
+            @RequestParam(value = "message") String message) throws Exception {
+        try {
+            return redisMqChannelClient.sendMessage(publisher, channel, message);
         } catch (Exception e) {
             e.printStackTrace();
             LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());

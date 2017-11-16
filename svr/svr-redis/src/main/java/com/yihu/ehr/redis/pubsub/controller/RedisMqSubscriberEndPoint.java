@@ -3,14 +3,21 @@ package com.yihu.ehr.redis.pubsub.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.redis.MRedisMqSubscriber;
+import com.yihu.ehr.redis.pubsub.DefaultMessageDelegate;
+import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
+import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqSubscriberService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,11 +34,15 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RedisMqSubscriber", description = "Redis消息订阅者接口")
+@Api(description = "消息订阅者接口", tags = {"Redis消息发布订阅--消息订阅者接口"})
 public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private RedisMqSubscriberService redisMqSubscriberService;
+    @Autowired
+    private RedisMqChannelService redisMqChannelService;
+    @Autowired
+    private RedisMessageListenerContainer redisMessageListenerContainer;
 
     @ApiOperation("根据ID获取消息订阅者")
     @RequestMapping(value = ServiceApi.Redis.MqSubscriber.GetById, method = RequestMethod.GET)
@@ -69,6 +80,12 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
         RedisMqSubscriber newRedisMqSubscriber = toEntity(entityJson, RedisMqSubscriber.class);
         newRedisMqSubscriber.setCreateTime(DateTimeUtil.iso8601DateTimeFormat(new Date()));
         newRedisMqSubscriber = redisMqSubscriberService.save(newRedisMqSubscriber);
+
+        // 开启该订阅者的消息队列的消息监听
+        RedisMqChannel channel = redisMqChannelService.findByChannel(newRedisMqSubscriber.getChannel());
+        MessageListenerAdapter messageListener = this.getMessageListenerAdapter(newRedisMqSubscriber.getSubscribedUrl());
+        redisMessageListenerContainer.addMessageListener(messageListener, new ChannelTopic(channel.getChannel()));
+
         return convertToModel(newRedisMqSubscriber, MRedisMqSubscriber.class);
     }
 
@@ -87,7 +104,14 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
     public void delete(
             @ApiParam(name = "id", value = "消息订阅者ID", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
+        RedisMqSubscriber redisMqSubscriber = redisMqSubscriberService.getById(id);
+
         redisMqSubscriberService.delete(id);
+
+        // 删除该订阅者对消息队列的消息监听
+        RedisMqChannel channel = redisMqChannelService.findByChannel(redisMqSubscriber.getChannel());
+        MessageListenerAdapter messageListener = this.getMessageListenerAdapter(redisMqSubscriber.getSubscribedUrl());
+        redisMessageListenerContainer.removeMessageListener(messageListener, new ChannelTopic(channel.getChannel()));
     }
 
     @ApiOperation("验证消息订阅者服务地址是否唯一")
@@ -98,6 +122,16 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "subscriberUrl", value = "消息订阅者服务地址", required = true)
             @RequestParam(value = "subscriberUrl") String subscriberUrl) throws Exception {
         return redisMqSubscriberService.isUniqueSubscribedUrl(id, subscriberUrl);
+    }
+
+    // 获取消息队列监听器
+    private MessageListenerAdapter getMessageListenerAdapter(String subscribedUrl) {
+        DefaultMessageDelegate defaultMessageDelegate = new DefaultMessageDelegate(subscribedUrl);
+        SpringContext.autowiredBean(defaultMessageDelegate);
+        MessageListenerAdapter messageListener = new MessageListenerAdapter();
+        messageListener.setDelegate(defaultMessageDelegate);
+        SpringContext.autowiredBean(messageListener);
+        return messageListener;
     }
 
 }
