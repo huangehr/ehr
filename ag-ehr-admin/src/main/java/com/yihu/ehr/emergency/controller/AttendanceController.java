@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * Controller - 出勤记录
@@ -29,7 +31,7 @@ public class AttendanceController extends BaseController {
     @ApiOperation(value = "保存出勤记录")
     public Envelop save(
             @ApiParam(name = "attendance", value = "出勤记录")
-            @RequestParam String attendance) {
+            @RequestParam(value = "attendance") String attendance) {
         return attendanceClient.save(attendance);
     }
 
@@ -41,6 +43,30 @@ public class AttendanceController extends BaseController {
             @ApiParam(name = "status", value = "任务状态")
             @RequestParam(value = "status") String status) {
         return attendanceClient.update(carId, status);
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceList, method = RequestMethod.GET)
+    @ApiOperation("获取出勤列表")
+    public Envelop list(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "页码", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size) {
+        return attendanceClient.list(fields, filters, sorts, page, size);
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceDelete, method = RequestMethod.DELETE)
+    @ApiOperation("删除出勤记录")
+    public Envelop delete(
+            @ApiParam(name = "ids", value = "id列表[1,2,3...] int")
+            @RequestParam(value = "ids") String ids){
+        return attendanceClient.delete(ids);
     }
 
 }

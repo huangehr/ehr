@@ -1123,11 +1123,19 @@ public class ServiceApi {
         //救护车
         public static final String AmbulanceList = "/ambulance/list";
         public static final String AmbulanceSearch = "/ambulance/search";
+        public static final String AmbulanceUpdateStatus = "/ambulance/updateStatus";
+        public static final String AmbulanceSave = "/ambulance/save";
         public static final String AmbulanceUpdate = "/ambulance/update";
+        public static final String AmbulanceDelete = "/ambulance/delete";
         //出勤记录
         public static final String AttendanceSave = "/attendance/save";
         public static final String AttendanceUpdate = "/attendance/update";
-        //排班历史
+        public static final String AttendanceList = "/attendance/list";
+        public static final String AttendanceDelete = "/attendance/delete";
+        //排班
         public static final String ScheduleList = "/schedule/list";
+        public static final String ScheduleSave = "/schedule/save";
+        public static final String ScheduleUpdate = "/schedule/update";
+
     }
 }

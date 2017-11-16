@@ -12,4 +12,5 @@ public interface AmbulanceDao extends PagingAndSortingRepository<Ambulance, Stri
 
     Ambulance findById(String id);
 
+    Ambulance findByPhone(String phone);
 }

@@ -24,4 +24,7 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
         return ambulanceDao.findById(carId);
     }
 
+    public Ambulance findByPhone(String phone) {
+        return ambulanceDao.findByPhone(phone);
+    }
 }
