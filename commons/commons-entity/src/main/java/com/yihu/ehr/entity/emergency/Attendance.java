@@ -2,6 +2,7 @@ package com.yihu.ehr.entity.emergency;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yihu.ehr.entity.BaseIdentityEntity;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -14,7 +15,7 @@ import java.util.Date;
 @Entity
 @Table(name = "eme_attendance")
 @Access(value = AccessType.PROPERTY)
-public class Attendance {
+public class Attendance extends BaseIdentityEntity{
     /**
      * 状态
      */
@@ -30,53 +31,38 @@ public class Attendance {
         /** 意外中止 */
         discontinue
     }
-    // id
-    private int id;
-    // 车牌号码
+    //车牌号码
     private String carId;
-    // 开始时间
-    private Date startTime;
-    // 到达时间
+    //到达时间
     private Date arrivalTime;
-    // 结束时间
+    //结束时间
     private Date completeTime;
-    // 状态
+    //状态
     private Status status;
-    // 接警电话
+    //接警电话
     private String alarmTel;
-    // 呼救地点
+    //呼救地点
     private String callAddress;
-    // 主诉
+    //主诉
     private String chiefComplaint;
-    // 调派医院
+    //调派医院
     private String dispatchHospital;
-    // 患者人数
+    //患者人数
     private int patientNum;
-    // 病人性别
+    //病人性别
     private String patientGender;
-    // 初步诊断
+    //初步诊断
     private String disease;
-    // 送达地点
+    //送达地点
     private String deliverAddress;
-    // 调度人员
-    private String creator;
-    // 备注
+    //呼救地点经度
+    private double longitude;
+    //呼救地点纬度
+    private double latitude;
+    //备注
     private String remark;
-    // 值班id列表
+    //值班id列表
     private String schedules;
-
-
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @Column(name = "car_id", nullable = false)
     public String getCarId() {
@@ -85,16 +71,6 @@ public class Attendance {
 
     public void setCarId(String carId) {
         this.carId = carId;
-    }
-
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @Column(name = "start_time", nullable = false)
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
     }
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -154,15 +130,6 @@ public class Attendance {
         this.disease = disease;
     }
 
-    @Column(name = "creator", nullable = false)
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
     @Column(name = "alarm_tel")
     public String getAlarmTel() {
         return alarmTel;
@@ -206,6 +173,24 @@ public class Attendance {
 
     public void setDeliverAddress(String deliverAddress) {
         this.deliverAddress = deliverAddress;
+    }
+
+    @Column(name = "longitude", nullable = false)
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    @Column(name = "latitude", nullable = false)
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 
     @Column(name = "remark")

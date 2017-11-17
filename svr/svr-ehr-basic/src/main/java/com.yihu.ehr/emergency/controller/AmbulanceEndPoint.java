@@ -89,7 +89,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
             for (Ambulance ambulance : ambulanceList) {
                 Map<String, Object> resultMap = new HashMap<String, Object>();
                 List<Schedule> scheduleList = scheduleService.findMatch(ambulance.getId(), date);
-                Attendance attendance = attendanceService.findByStartTimeAndCarId(date, ambulance.getId());
+                Attendance attendance = attendanceService.findByCreateDateAndCarId(date, ambulance.getId());
                 Map<String, Object> childMap = new HashMap<String, Object>();
                 childMap.put("id", ambulance.getId());
                 childMap.put("initLongitude", ambulance.getInitLongitude());
@@ -186,14 +186,13 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                 envelop.setErrorMsg("无相关机构");
                 return envelop;
             }
-            if (newAmbulance.getStatus() != Ambulance.Status.wait || newAmbulance.getStatus() != Ambulance.Status.down) {
+            if (newAmbulance.getStatus() == Ambulance.Status.wait || newAmbulance.getStatus() == Ambulance.Status.down) {
+                ambulanceService.save(newAmbulance);
+                envelop.setSuccessFlg(true);
+            }else {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("车辆状态不能为执勤中");
-                return envelop;
             }
-            newAmbulance.setCrateDate(new Date());
-            ambulanceService.save(newAmbulance);
-            envelop.setSuccessFlg(true);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -227,15 +226,13 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                     envelop.setErrorMsg("无相关机构");
                     return envelop;
                 }
-                if (oldAmbulance.getStatus() != Ambulance.Status.wait || oldAmbulance.getStatus() != Ambulance.Status.down) {
+                if (oldAmbulance.getStatus() == Ambulance.Status.wait || oldAmbulance.getStatus() == Ambulance.Status.down) {
+                    ambulanceService.save(newAmbulance);
+                    envelop.setSuccessFlg(true);
+                }else {
                     envelop.setSuccessFlg(false);
                     envelop.setErrorMsg("当前车辆处于执勤状态，无法更新");
-                    return envelop;
                 }
-                newAmbulance.setCrateDate(oldAmbulance.getCrateDate());
-                newAmbulance.setUpdateDate(new Date());
-                ambulanceService.save(newAmbulance);
-                envelop.setSuccessFlg(true);
             }
         }catch (Exception e) {
             e.printStackTrace();
