@@ -62,7 +62,7 @@ public interface RedisMqChannelClient {
 
     @ApiOperation("删除消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.Delete, method = RequestMethod.DELETE)
-    public void delete(
+    public Envelop delete(
             @ApiParam(name = "id", value = "消息队列ID", required = true)
             @RequestParam(value = "id") Integer id);
 

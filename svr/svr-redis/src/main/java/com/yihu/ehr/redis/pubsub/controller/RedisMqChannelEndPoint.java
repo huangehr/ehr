@@ -6,8 +6,10 @@ import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.redis.MRedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
+import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
 import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqMessageLogService;
+import com.yihu.ehr.redis.pubsub.service.RedisMqSubscriberService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.id.UuidUtil;
 import com.yihu.ehr.util.rest.Envelop;
@@ -39,6 +41,8 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
     private RedisTemplate redisTemplate;
     @Autowired
     private RedisMqMessageLogService redisMqMessageLogService;
+    @Autowired
+    private RedisMqSubscriberService redisMqSubscriberService;
 
     @ApiOperation("根据ID获取消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.GetById, method = RequestMethod.GET)
@@ -90,10 +94,29 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("删除消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.Delete, method = RequestMethod.DELETE)
-    public void delete(
+    public Envelop delete(
             @ApiParam(name = "id", value = "消息队列ID", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
+        Envelop envelop = new Envelop();
+        RedisMqChannel redisMqChannel = redisMqChannelService.getById(id);
+
+        List<RedisMqMessageLog> messageLogList = redisMqMessageLogService.findByChannelAndStatus(redisMqChannel.getChannel(), "0");
+        if(messageLogList.size() != 0) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("该消息队列存在未消费消息，不能删除。");
+            return envelop;
+        }
+        List<RedisMqSubscriber> subscriberList = redisMqSubscriberService.findByChannel(redisMqChannel.getChannel());
+        if(subscriberList.size() != 0) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("该消息队列存在订阅者，不能删除。");
+            return envelop;
+        }
+
         redisMqChannelService.delete(id);
+
+        envelop.setSuccessFlg(true);
+        return envelop;
     }
 
     @ApiOperation("验证消息队列编码是否唯一")

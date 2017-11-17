@@ -115,11 +115,8 @@ public class RedisMqChannelController extends BaseController {
     public Envelop delete(
             @ApiParam(name = "id", value = "消息队列ID", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
-        Envelop envelop = new Envelop();
         try {
-            redisMqChannelClient.delete(id);
-            envelop.setSuccessFlg(true);
-            return envelop;
+            return redisMqChannelClient.delete(id);
         } catch (Exception e) {
             e.printStackTrace();
             LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());

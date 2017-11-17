@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * redis消息订阅者 Service
  *
@@ -22,6 +24,10 @@ public class RedisMqSubscriberService extends BaseJpaService<RedisMqSubscriber, 
 
     public RedisMqSubscriber getById(Integer id) {
         return redisMqSubscriberDao.findOne(id);
+    }
+
+    public List<RedisMqSubscriber> findByChannel(String channel) {
+        return redisMqSubscriberDao.findByChannel(channel);
     }
 
     @Transactional(readOnly = false)
