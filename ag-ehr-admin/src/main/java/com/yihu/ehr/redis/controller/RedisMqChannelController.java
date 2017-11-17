@@ -155,7 +155,7 @@ public class RedisMqChannelController extends BaseController {
             @RequestParam(value = "channelName") String channelName) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            boolean result = redisMqChannelClient.isUniqueChannel(id, channelName);
+            boolean result = redisMqChannelClient.isUniqueChannelName(id, channelName);
             envelop.setSuccessFlg(result);
             if (!result) {
                 envelop.setErrorMsg("该消息队列名称已被使用，请重新填写！");
