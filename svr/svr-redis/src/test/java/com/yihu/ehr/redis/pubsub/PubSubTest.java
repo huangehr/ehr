@@ -7,6 +7,7 @@ import com.yihu.ehr.lang.SpringContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -44,16 +45,17 @@ public class PubSubTest {
         String channel01 = "zjj.channel.01";
         ChannelTopic c1 = new ChannelTopic(channel01);
 
+        AutowireCapableBeanFactory factory = SpringContext.getApplicationContext().getAutowireCapableBeanFactory();
+
         String subscribedUrl = "http://localhost:10000/api/v1.0/admin/redis/mq/subscriber/receiveMessage";
         DefaultMessageDelegate defaultMessageDelegate = new DefaultMessageDelegate(subscribedUrl);
         SpringContext.autowiredBean(defaultMessageDelegate);
-        MessageListenerAdapter messageListener = new MessageListenerAdapter();
-        messageListener.setDelegate(defaultMessageDelegate);
+        MessageListenerAdapter messageListener = new CustomMessageListenerAdapter(defaultMessageDelegate);
         SpringContext.autowiredBean(messageListener);
         redisMessageListenerContainer.addMessageListener(messageListener, c1);
 
         Map<String, Object> message = new HashMap<>();
-        message.put("messageLogId", "111");
+        message.put("messageLogId", "2efec7cfd8f447f696c27198e9c9d223");
         message.put("messageContent", "a test message.");
         redisTemplate.convertAndSend(channel01, objectMapper.writeValueAsString(message));
     }

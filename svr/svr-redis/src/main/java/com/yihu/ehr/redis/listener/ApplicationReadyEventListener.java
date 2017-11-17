@@ -3,6 +3,7 @@ package com.yihu.ehr.redis.listener;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.lang.SpringContext;
+import com.yihu.ehr.redis.pubsub.CustomMessageListenerAdapter;
 import com.yihu.ehr.redis.pubsub.DefaultMessageDelegate;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
@@ -18,7 +19,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -64,8 +64,7 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
                 for (RedisMqSubscriber subscriber : subscriberList) {
                     DefaultMessageDelegate defaultMessageDelegate = new DefaultMessageDelegate(subscriber.getSubscribedUrl());
                     SpringContext.autowiredBean(defaultMessageDelegate);
-                    MessageListenerAdapter messageListener = new MessageListenerAdapter();
-                    messageListener.setDelegate(defaultMessageDelegate);
+                    CustomMessageListenerAdapter messageListener = new CustomMessageListenerAdapter(defaultMessageDelegate);
                     SpringContext.autowiredBean(messageListener);
                     redisMessageListenerContainer.addMessageListener(messageListener, topic);
                 }

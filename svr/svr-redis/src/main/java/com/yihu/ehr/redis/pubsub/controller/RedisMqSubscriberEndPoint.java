@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.redis.MRedisMqSubscriber;
+import com.yihu.ehr.redis.pubsub.CustomMessageListenerAdapter;
 import com.yihu.ehr.redis.pubsub.DefaultMessageDelegate;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
@@ -17,7 +18,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -83,7 +83,7 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
 
         // 开启该订阅者的消息队列的消息监听
         RedisMqChannel channel = redisMqChannelService.findByChannel(newRedisMqSubscriber.getChannel());
-        MessageListenerAdapter messageListener = this.getMessageListenerAdapter(newRedisMqSubscriber.getSubscribedUrl());
+        CustomMessageListenerAdapter messageListener = this.getMessageListenerAdapter(newRedisMqSubscriber.getSubscribedUrl());
         redisMessageListenerContainer.addMessageListener(messageListener, new ChannelTopic(channel.getChannel()));
 
         return convertToModel(newRedisMqSubscriber, MRedisMqSubscriber.class);
@@ -110,7 +110,7 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
 
         // 删除该订阅者对消息队列的消息监听
         RedisMqChannel channel = redisMqChannelService.findByChannel(redisMqSubscriber.getChannel());
-        MessageListenerAdapter messageListener = this.getMessageListenerAdapter(redisMqSubscriber.getSubscribedUrl());
+        CustomMessageListenerAdapter messageListener = this.getMessageListenerAdapter(redisMqSubscriber.getSubscribedUrl());
         redisMessageListenerContainer.removeMessageListener(messageListener, new ChannelTopic(channel.getChannel()));
     }
 
@@ -125,11 +125,10 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
     }
 
     // 获取消息队列监听器
-    private MessageListenerAdapter getMessageListenerAdapter(String subscribedUrl) {
+    private CustomMessageListenerAdapter getMessageListenerAdapter(String subscribedUrl) {
         DefaultMessageDelegate defaultMessageDelegate = new DefaultMessageDelegate(subscribedUrl);
         SpringContext.autowiredBean(defaultMessageDelegate);
-        MessageListenerAdapter messageListener = new MessageListenerAdapter();
-        messageListener.setDelegate(defaultMessageDelegate);
+        CustomMessageListenerAdapter messageListener = new CustomMessageListenerAdapter(defaultMessageDelegate);
         SpringContext.autowiredBean(messageListener);
         return messageListener;
     }
