@@ -16,6 +16,10 @@ public class MRedisMqChannel implements Serializable{
     public String channelName; // 消息队列名称
     public String authorizedCode; // 授权码
     public String remark; // 备注
+    public String enqueuedNum; // 入列数
+    public String dequeuedNum; // 出列数
+    public String subscriberNum; // 订阅者数
+    public String publisherNum; // 发布者数
 
     public Integer getId() {
         return id;
@@ -55,5 +59,37 @@ public class MRedisMqChannel implements Serializable{
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getEnqueuedNum() {
+        return enqueuedNum;
+    }
+
+    public void setEnqueuedNum(String enqueuedNum) {
+        this.enqueuedNum = enqueuedNum;
+    }
+
+    public String getDequeuedNum() {
+        return dequeuedNum;
+    }
+
+    public void setDequeuedNum(String dequeuedNum) {
+        this.dequeuedNum = dequeuedNum;
+    }
+
+    public String getSubscriberNum() {
+        return subscriberNum;
+    }
+
+    public void setSubscriberNum(String subscriberNum) {
+        this.subscriberNum = subscriberNum;
+    }
+
+    public String getPublisherNum() {
+        return publisherNum;
+    }
+
+    public void setPublisherNum(String publisherNum) {
+        this.publisherNum = publisherNum;
     }
 }
