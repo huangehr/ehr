@@ -13,6 +13,8 @@ import org.springframework.data.repository.query.Param;
  */
 public interface RedisMqChannelDao extends PagingAndSortingRepository<RedisMqChannel, Integer> {
 
+    RedisMqChannel findByChannel(@Param("channel") String channel);
+
     @Query(" FROM RedisMqChannel rmc WHERE rmc.id <> :id AND rmc.channel = :channel ")
     RedisMqChannel isUniqueChannel(@Param("id") Integer id, @Param("channel") String channel);
 
