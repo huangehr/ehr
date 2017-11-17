@@ -101,7 +101,7 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
                 return envelop;
             }
             Ambulance ambulance = ambulanceService.findById(newSchedule.getCarId());
-            if (ambulance == null || ambulance.getStatus() == Ambulance.Status.active) {
+            if (ambulance == null || ambulance.getStatus() != Ambulance.Status.wait || ambulance.getStatus() != Ambulance.Status.down) {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("无相关车辆信息，或者相关车辆处于执勤状态");
                 return envelop;
