@@ -86,7 +86,6 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
             newAttendance.setSchedules(objectMapper.writeValueAsString(idList));
             //开始任务
             newAttendance.setStatus(Attendance.Status.start);
-            newAttendance.setStartTime(new Date());
             attendanceService.save(newAttendance);
             //更新车辆状态为前往中
             ambulance.setStatus(Ambulance.Status.onWay);
@@ -149,6 +148,9 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
                 attendance.setStatus(Attendance.Status.discontinue);
                 attendance.setCompleteTime(new Date());
                 attendanceService.save(attendance);
+                //设置车辆为异常状态
+                ambulance.setStatus(Ambulance.Status.down);
+                ambulanceService.save(ambulance);
                 envelop.setSuccessFlg(true);
                 envelop.setObj(status);
             }else {

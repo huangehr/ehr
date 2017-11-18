@@ -7,6 +7,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * Dao - 定位数据表
  * Created by progr1mmer on 2017/11/8.
  */
-public interface PositionDao extends PagingAndSortingRepository<Position, String> {
+public interface PositionDao extends PagingAndSortingRepository<Position, Long> {
 
 }

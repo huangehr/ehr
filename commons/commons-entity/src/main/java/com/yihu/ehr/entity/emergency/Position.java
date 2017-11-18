@@ -1,9 +1,9 @@
 package com.yihu.ehr.entity.emergency;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yihu.ehr.entity.BaseIdentityEntity;
 
 import javax.persistence.*;
-import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -13,14 +13,12 @@ import java.util.Date;
 @Entity
 @Table(name = "eme_position")
 @Access(value = AccessType.PROPERTY)
-public class Position {
+public class Position extends BaseIdentityEntity {
 
-    // UUID
-    private String id;
     // 经度
-    private BigInteger longitude;
+    private double longitude;
     // 纬度
-    private BigInteger latitude;
+    private double latitude;
     // 车牌号码
     private String carId;
     // 时间
@@ -28,33 +26,21 @@ public class Position {
     // 出勤ID
     private int attendanceId;
 
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @Column(name = "longitude", nullable = false)
-    public BigInteger getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(BigInteger longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
     @Column(name = "latitude", nullable = false)
-    public BigInteger getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(BigInteger latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
@@ -67,6 +53,7 @@ public class Position {
         this.carId = carId;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "date", nullable = false)
     public Date getDate() {
         return date;
