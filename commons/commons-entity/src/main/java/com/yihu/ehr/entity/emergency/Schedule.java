@@ -43,7 +43,7 @@ public class Schedule extends BaseIdentityEntity {
     // 主副班
     private Boolean main;
     //性别：0代表未知、1代表男性，2代表女性
-    private Integer gender;
+    private String gender;
 
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -130,11 +130,11 @@ public class Schedule extends BaseIdentityEntity {
     }
 
     @Column(name = "gender")
-    public Integer getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Integer gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 }
