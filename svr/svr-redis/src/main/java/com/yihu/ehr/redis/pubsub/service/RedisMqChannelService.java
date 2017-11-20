@@ -24,6 +24,10 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
         return redisMqChannelDao.findOne(id);
     }
 
+    public RedisMqChannel findByChannel(String channel) {
+        return redisMqChannelDao.findByChannel(channel);
+    }
+
     @Transactional(readOnly = false)
     public RedisMqChannel save(RedisMqChannel redisMqChannel) {
         return redisMqChannelDao.save(redisMqChannel);

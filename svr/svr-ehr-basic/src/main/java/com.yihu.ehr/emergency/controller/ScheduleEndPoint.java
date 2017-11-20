@@ -75,7 +75,6 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
                 envelop.setErrorMsg("无相关车辆信息");
                 return envelop;
             }
-            newSchedule.setCrateDate(new Date());
             scheduleService.save(newSchedule);
             envelop.setSuccessFlg(true);
         }catch (Exception e) {
@@ -101,15 +100,16 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
                 return envelop;
             }
             Ambulance ambulance = ambulanceService.findById(newSchedule.getCarId());
-            if (ambulance == null || ambulance.getStatus() == Ambulance.Status.active) {
+            if(ambulance == null) {
                 envelop.setSuccessFlg(false);
-                envelop.setErrorMsg("无相关车辆信息，或者相关车辆处于执勤状态");
-                return envelop;
+                envelop.setErrorMsg("无相关车辆信息");
+            }else if(ambulance.getStatus() == Ambulance.Status.wait || ambulance.getStatus() == Ambulance.Status.down) {
+                scheduleService.save(newSchedule);
+                envelop.setSuccessFlg(true);
+            }else {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("相关车辆处于执勤状态");
             }
-            newSchedule.setCrateDate(oldSchedule.getCrateDate());
-            newSchedule.setUpdateDate(new Date());
-            scheduleService.save(newSchedule);
-            envelop.setSuccessFlg(true);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
