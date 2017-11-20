@@ -4,16 +4,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.security.MKey;
 import com.yihu.ehr.org.feign.SecurityClient;
 import com.yihu.ehr.org.model.OrgDept;
+import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.org.service.OrgDeptService;
 import com.yihu.ehr.org.service.OrgService;
-import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.util.phonics.PinyinUtil;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -423,4 +424,20 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         orgService.addOrgBatch(models);
         return true;
     }
+
+    @RequestMapping(value = ServiceApi.Org.getseaOrgsByOrgCode, method = RequestMethod.POST)
+    @ApiOperation("根据机构code获取机构code和name")
+    public Map<String,String> seaOrgsByOrgCode(
+            @ApiParam(name = "org_codes", value = "机构org_codes", defaultValue = "")
+            @RequestBody String org_codes)throws Exception{
+        Map<String, String> map = new HashMap<>();
+        List<Object> list = (List<Object>)orgService.orgExist(toEntity(org_codes, String[].class));
+            for(int i = 0 ;i < list.size() ; i++){
+                Object[] objectList=(Object[])list.get(i);
+                if(null!=objectList[0]&&null!=objectList[1]){
+                    map.put(objectList[0].toString(), objectList[1].toString());
+                }
+            }
+        return  map;
+    };
 }
