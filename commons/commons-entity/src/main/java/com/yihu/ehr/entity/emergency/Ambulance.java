@@ -1,10 +1,12 @@
 package com.yihu.ehr.entity.emergency;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
+import com.yihu.ehr.entity.BaseAssignedEntity;
 import org.hibernate.annotations.GenericGenerator;
 
+
 import javax.persistence.*;
-import java.util.Date;
+
 
 /**
  * Entity - 救护车信息表
@@ -13,7 +15,7 @@ import java.util.Date;
 @Entity
 @Table(name = "eme_ambulance")
 @Access(value = AccessType.PROPERTY)
-public class Ambulance {
+public class Ambulance extends BaseAssignedEntity {
 
     /**
      * 状态
@@ -30,16 +32,7 @@ public class Ambulance {
         /** 异常 */
         down
     }
-    //车牌号码
-    private String id;
-    //创建时间
-    private Date crateDate;
-    //创建者
-    private String creator;
-    //更新时间
-    private Date updateDate;
-    //更新者
-    private String updater;
+
     //初始经度
     private double initLongitude;
     //初始纬度
@@ -56,56 +49,6 @@ public class Ambulance {
     private Status status;
     //百度鹰眼设备号
     private String entityName;
-
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @Column(name = "crate_date", nullable = false)
-    public Date getCrateDate() {
-        return crateDate;
-    }
-
-    public void setCrateDate(Date crateDate) {
-        this.crateDate = crateDate;
-    }
-
-    @Column(name = "creator")
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @Column(name = "update_date")
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
-    }
-
-    @Column(name = "updater")
-    public String getUpdater() {
-        return updater;
-    }
-
-    public void setUpdater(String updater) {
-        this.updater = updater;
-    }
 
     @Column(name = "init_longitude", nullable = false)
     public double getInitLongitude() {
@@ -152,7 +95,6 @@ public class Ambulance {
         this.phone = phone;
     }
 
-    @Enumerated(EnumType.ORDINAL)
     @Column(name = "status", nullable = false)
     public Status getStatus() {
         return status;
