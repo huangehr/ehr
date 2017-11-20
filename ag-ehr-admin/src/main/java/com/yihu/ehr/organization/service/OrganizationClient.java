@@ -2,6 +2,7 @@ package com.yihu.ehr.organization.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.org.MOrganization;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -205,4 +206,10 @@ public interface OrganizationClient {
     @RequestMapping(value = "/organizations/batch", method = RequestMethod.POST)
     @ApiOperation("批量导入机构")
     boolean createOrgBatch(@RequestBody String orgs);
+
+    @RequestMapping(value = ServiceApi.Org.getseaOrgsByOrgCode, method = RequestMethod.POST)
+    @ApiOperation("根据机构code获取机构code和name")
+    Map<String,String> seaOrgsByOrgCode(
+            @ApiParam(name = "org_codes", value = "机构org_codes", defaultValue = "")
+            @RequestBody String org_codes);
 }

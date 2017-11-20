@@ -5,6 +5,7 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 
 /**
@@ -61,4 +64,17 @@ public interface AmbulanceClient{
     @ApiOperation("删除记录")
     Envelop delete(
             @RequestParam(value = "ids") String ids);
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在车牌号、电话号码")
+    List idExistence(
+            @ApiParam(name = "type", value = "字段名", defaultValue = "")
+            @RequestParam(value ="type") String type,
+            @ApiParam(name = "values", value = "", defaultValue = "")
+            @RequestBody String values);
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulancesBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入救护车")
+    boolean createAmbulancesBatch(
+            @RequestBody String ambulances);
 }

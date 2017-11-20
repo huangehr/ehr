@@ -92,4 +92,32 @@ public class AmbulanceController extends BaseController {
             @RequestParam(value = "ids") String ids){
         return ambulanceClient.delete(ids);
     }
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence,method = RequestMethod.POST)
+    @ApiOperation("获取已存在车牌号、电话号码")
+    public List idExistence(
+            @ApiParam(name = "type", value = "字段名", defaultValue = "")
+            @RequestParam(value ="type") String type,
+            @ApiParam(name = "values", value = "", defaultValue = "")
+            @RequestParam(value ="values") String values) throws Exception {
+        List vals = ambulanceClient.idExistence(type,values);
+        return vals;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulancesBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入救护车")
+    public Envelop createAmbulancesBatch(
+            @ApiParam(name = "ambulances", value = "救护车", defaultValue = "")
+            @RequestParam(value = "ambulances") String ambulances) throws Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try{
+            ambulanceClient.createAmbulancesBatch(ambulances);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("导入失败！"+e.getMessage());
+        }
+        return envelop;
+    }
 }
