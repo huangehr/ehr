@@ -9,6 +9,7 @@ import com.yihu.ehr.agModel.org.OrgModel;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.AgAdminConstants;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.fileresource.service.FileResourceClient;
 import com.yihu.ehr.geography.service.AddressClient;
@@ -765,6 +766,24 @@ public class OrganizationController extends BaseController {
         envelop.setSuccessFlg(true);
         try{
             orgClient.createOrgBatch(orgs);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Org.getseaOrgsByOrgCode, method = RequestMethod.POST)
+    @ApiOperation("根据机构code获取机构code和name")
+    public Envelop seaOrgsByOrgCode(
+            @ApiParam(name = "org_codes", value = "机构org_codes", defaultValue = "")
+            @RequestParam(value = "org_codes") String org_codes) throws Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try{
+            Map<String,String> orgMap= orgClient.seaOrgsByOrgCode(org_codes);
+            envelop.setObj(orgMap);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
