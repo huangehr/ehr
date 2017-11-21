@@ -32,12 +32,19 @@ public class Schedule extends BaseIdentityEntity {
     private String carId;
     // 执勤人员
     private String dutyName;
+    // 工号
+    private String dutyNum;
     // 执勤手机号码
     private String dutyPhone;
     // 执勤角色
     private String dutyRole;
     // 状态（只能有一份数据为启用状态）
     private Status status;
+    // 主副班
+    private Boolean main;
+    //性别：0代表未知、1代表男性，2代表女性
+    private String gender;
+
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "start", nullable = false)
@@ -77,6 +84,15 @@ public class Schedule extends BaseIdentityEntity {
         this.dutyName = dutyName;
     }
 
+    @Column(name = "duty_num")
+    public String getDutyNum() {
+        return dutyNum;
+    }
+
+    public void setDutyNum(String dutyNum) {
+        this.dutyNum = dutyNum;
+    }
+
     @Column(name = "duty_phone", nullable = false)
     public String getDutyPhone() {
         return dutyPhone;
@@ -102,5 +118,23 @@ public class Schedule extends BaseIdentityEntity {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    @Column(name = "main")
+    public Boolean getMain() {
+        return main;
+    }
+
+    public void setMain(Boolean main) {
+        this.main = main;
+    }
+
+    @Column(name = "gender")
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }
