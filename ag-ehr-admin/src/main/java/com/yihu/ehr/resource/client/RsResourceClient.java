@@ -43,10 +43,15 @@ public interface RsResourceClient {
     boolean deleteResourcesBatch(
             @RequestParam(value = "ids") String ids);
 
-    @RequestMapping(value = ServiceApi.Resources.Resource,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.Resource, method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源")
     Envelop getResourceById(
             @PathVariable(value="id") String id);
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取资源")
+    Envelop getResourceByCode(
+            @RequestParam(value = "code" ) String code);
 
     @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
     @ApiOperation("获取资源列表树")

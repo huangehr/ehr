@@ -228,6 +228,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 }
             }
             envelop.setSuccessFlg(true);
+            envelop.setObj(newResources.getId());
         }catch (Exception e) {
             e.printStackTrace();
             if(newResources != null) {
