@@ -154,21 +154,21 @@ fast-dfs:
 spring:
   profiles: prod_sr
   datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
-    username: healthcloud
+    url: jdbc:mysql:///171.35.109.39:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: chenweishan
     password: GP8Qz4qU
   redis:
-    host: 10.176.97.5 # Redis server host.
+    host: 171.35.109.35 # Redis server host.
     port: 6390
     password: q4YaQemf
   data:
     solr:
       #zk-host: 11.1.2.51,11.1.2.52,11.1.2.53:2181/solr # ZooKeeper host address in the form HOST:PORT.
-      zk-host: node1.hde.jkzlehr.com,node2.hde.jkzlehr.com,node3.hde.jkzlehr.com:2181/solr
+      zk-host: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com:2181/solr
 hadoop:
   hbase-properties:
     - hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
 fast-dfs:
-  tracker-server: 10.176.97.5:22122
-  public-server: http://10.176.97.5:80
+  tracker-server: 171.35.109.35:22122
+  public-server: http://171.35.109.35:80
 

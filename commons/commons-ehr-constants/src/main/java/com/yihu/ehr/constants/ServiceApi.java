@@ -1140,6 +1140,9 @@ public class ServiceApi {
         public static final String ScheduleList = "/schedule/list";
         public static final String ScheduleSave = "/schedule/save";
         public static final String ScheduleUpdate = "/schedule/update";
+        public static final String ScheduleBatch = "/schedules/batch";
+
+
 
     }
 }
