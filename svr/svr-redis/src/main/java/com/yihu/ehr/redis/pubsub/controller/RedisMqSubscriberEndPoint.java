@@ -84,6 +84,7 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "entityJson", value = "消息订阅者JSON", required = true)
             @RequestParam(value = "entityJson") String entityJson) throws Exception {
         RedisMqSubscriber updateRedisMqSubscriber = toEntity(entityJson, RedisMqSubscriber.class);
+        updateRedisMqSubscriber.setCreateTime(updateRedisMqSubscriber.getCreateTime().replace(" ", "+"));
         updateRedisMqSubscriber = redisMqSubscriberService.save(updateRedisMqSubscriber);
         return convertToModel(updateRedisMqSubscriber, MRedisMqSubscriber.class);
     }
