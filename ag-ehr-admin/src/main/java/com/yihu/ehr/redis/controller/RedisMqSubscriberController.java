@@ -127,19 +127,45 @@ public class RedisMqSubscriberController extends BaseController {
         }
     }
 
-    @ApiOperation("验证消息订阅者服务地址是否唯一")
+    @ApiOperation("验证指定消息队列中订阅者应用ID是否唯一")
+    @RequestMapping(value = ServiceApi.Redis.MqSubscriber.IsUniqueAppId, method = RequestMethod.GET)
+    public Envelop isUniqueAppId(
+            @ApiParam(name = "id", value = "消息订阅者ID", required = true)
+            @RequestParam(value = "id") Integer id,
+            @ApiParam(name = "channel", value = "消息队列编码", required = true)
+            @RequestParam(value = "channel") String channel,
+            @ApiParam(name = "appId", value = "订阅者应用ID", required = true)
+            @RequestParam(value = "appId") String appId) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            boolean result = redisMqSubscriberClient.isUniqueAppId(id, channel, appId);
+            envelop.setSuccessFlg(result);
+            if (!result) {
+                envelop.setErrorMsg("该消息订阅者应用ID已存在，请重新填写！");
+            }
+            return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogService.getLogger(RedisMqSubscriberController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
+    @ApiOperation("验证指定消息队列中订阅者服务地址是否唯一")
     @RequestMapping(value = ServiceApi.Redis.MqSubscriber.IsUniqueSubscribedUrl, method = RequestMethod.GET)
     public Envelop isUniqueSubscribedUrl(
             @ApiParam(name = "id", value = "消息订阅者ID", required = true)
             @RequestParam(value = "id") Integer id,
+            @ApiParam(name = "channel", value = "消息队列编码", required = true)
+            @RequestParam(value = "channel") String channel,
             @ApiParam(name = "subscriberUrl", value = "消息订阅者服务地址", required = true)
             @RequestParam(value = "subscriberUrl") String subscriberUrl) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            boolean result = redisMqSubscriberClient.isUniqueSubscribedUrl(id, subscriberUrl);
+            boolean result = redisMqSubscriberClient.isUniqueSubscribedUrl(id, channel, subscriberUrl);
             envelop.setSuccessFlg(result);
             if (!result) {
-                envelop.setErrorMsg("该消息订阅者服务地址已被使用，请重新填写！");
+                envelop.setErrorMsg("该消息订阅者服务地址已存在，请重新填写！");
             }
             return envelop;
         } catch (Exception e) {

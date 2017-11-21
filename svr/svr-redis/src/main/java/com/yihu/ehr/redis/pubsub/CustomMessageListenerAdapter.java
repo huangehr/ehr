@@ -10,15 +10,16 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
  */
 public class CustomMessageListenerAdapter extends MessageListenerAdapter {
 
-    private String subscribedUrl;
+    // 消息队列编码
+    private String channel;
 
-    public CustomMessageListenerAdapter(MessageDelegate delegate) {
+    public CustomMessageListenerAdapter(DefaultMessageDelegate delegate) {
         super.setDelegate(delegate);
-        this.subscribedUrl = super.getDelegate().toString();
+        this.channel = super.getDelegate().toString();
     }
 
     public int hashCode() {
-        return this.subscribedUrl.hashCode();
+        return this.channel.hashCode();
     }
 
     public boolean equals(Object obj) {
@@ -30,11 +31,11 @@ public class CustomMessageListenerAdapter extends MessageListenerAdapter {
             return false;
         } else {
             CustomMessageListenerAdapter other = (CustomMessageListenerAdapter) obj;
-            if (this.subscribedUrl == null) {
-                if (other.subscribedUrl != null) {
+            if (this.channel == null) {
+                if (other.channel != null) {
                     return false;
                 }
-            } else if (!this.subscribedUrl.equals(other.subscribedUrl)) {
+            } else if (!this.channel.equals(other.channel)) {
                 return false;
             }
 

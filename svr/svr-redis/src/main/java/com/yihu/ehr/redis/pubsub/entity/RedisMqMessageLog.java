@@ -18,10 +18,12 @@ public class RedisMqMessageLog {
     public String id; // 主键
     public String message; // 消息
     public String channel; // 消息队列编码
-    public String publisher; // 发布者
+    public String publisherAppId; // 发布者应用ID
     public String status; // 消息状态，0：未消费，1：已消费
     public String createTime; // 创建时间
     public String updateTime; // 更新时间
+    public String isRealConsumed; // 是否真实被订阅消费，0：否，1：是
+    public Integer consumedNum; // 真实消费的次数
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -53,13 +55,13 @@ public class RedisMqMessageLog {
         this.channel = channel;
     }
 
-    @Column(name = "publisher")
-    public String getPublisher() {
-        return publisher;
+    @Column(name = "publisher_app_id")
+    public String getPublisherAppId() {
+        return publisherAppId;
     }
 
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
+    public void setPublisherAppId(String publisherAppId) {
+        this.publisherAppId = publisherAppId;
     }
 
     @Column(name = "status")
@@ -87,5 +89,23 @@ public class RedisMqMessageLog {
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Column(name = "is_real_consumed")
+    public String getIsRealConsumed() {
+        return isRealConsumed;
+    }
+
+    public void setIsRealConsumed(String isRealConsumed) {
+        this.isRealConsumed = isRealConsumed;
+    }
+
+    @Column(name = "consumed_num")
+    public Integer getConsumedNum() {
+        return consumedNum;
+    }
+
+    public void setConsumedNum(Integer consumedNum) {
+        this.consumedNum = consumedNum;
     }
 }
