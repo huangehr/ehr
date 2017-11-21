@@ -261,4 +261,15 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
         return true;
     }
 
+    /**
+     * 查询机构是否已存在， 返回已存在机构code、name
+     */
+    public List orgExist(String[] org_codes)
+    {
+        String sql = "SELECT org_code, full_name FROM organizations WHERE org_code in(:org_codes)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("org_codes", org_codes);
+        return sqlQuery.list();
+    }
+
 }

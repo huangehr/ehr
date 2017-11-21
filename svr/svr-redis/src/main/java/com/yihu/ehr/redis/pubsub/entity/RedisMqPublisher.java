@@ -4,18 +4,18 @@ package com.yihu.ehr.redis.pubsub.entity;
 import javax.persistence.*;
 
 /**
- * redis消息订阅者 Entity
+ * redis消息发布者 Entity
  *
  * @author 张进军
- * @date 2017/11/10 11:14
+ * @date 2017/11/20 09:35
  */
 @Entity
-@Table(name = "redis_mq_subscriber")
-public class RedisMqSubscriber {
+@Table(name = "redis_mq_publisher")
+public class RedisMqPublisher {
 
     public Integer id; // 主键
     public String appId; // 应用ID
-    public String subscribedUrl; // 订阅者服务地址
+    public String authorizedCode; // 授权码
     public String channel; // 消息队列编码
     public String createTime; // 创建时间
     public String remark; // 备注
@@ -40,13 +40,13 @@ public class RedisMqSubscriber {
         this.appId = appId;
     }
 
-    @Column(name = "subscribed_url")
-    public String getSubscribedUrl() {
-        return subscribedUrl;
+    @Column(name = "authorized_code")
+    public String getAuthorizedCode() {
+        return authorizedCode;
     }
 
-    public void setSubscribedUrl(String subscribedUrl) {
-        this.subscribedUrl = subscribedUrl;
+    public void setAuthorizedCode(String authorizedCode) {
+        this.authorizedCode = authorizedCode;
     }
 
     @Column(name = "channel")

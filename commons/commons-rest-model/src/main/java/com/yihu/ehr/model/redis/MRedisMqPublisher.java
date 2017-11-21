@@ -1,28 +1,23 @@
-package com.yihu.ehr.redis.pubsub.entity;
+package com.yihu.ehr.model.redis;
 
 
-import javax.persistence.*;
+import java.io.Serializable;
 
 /**
- * redis消息订阅者 Entity
+ * redis消息发布者
  *
  * @author 张进军
- * @date 2017/11/10 11:14
+ * @date 2017/11/20 09:35
  */
-@Entity
-@Table(name = "redis_mq_subscriber")
-public class RedisMqSubscriber {
+public class MRedisMqPublisher implements Serializable {
 
     public Integer id; // 主键
     public String appId; // 应用ID
-    public String subscribedUrl; // 订阅者服务地址
+    public String authorizedCode; // 授权码
     public String channel; // 消息队列编码
     public String createTime; // 创建时间
     public String remark; // 备注
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
     public Integer getId() {
         return id;
     }
@@ -31,7 +26,6 @@ public class RedisMqSubscriber {
         this.id = id;
     }
 
-    @Column(name = "app_id")
     public String getAppId() {
         return appId;
     }
@@ -40,16 +34,14 @@ public class RedisMqSubscriber {
         this.appId = appId;
     }
 
-    @Column(name = "subscribed_url")
-    public String getSubscribedUrl() {
-        return subscribedUrl;
+    public String getAuthorizedCode() {
+        return authorizedCode;
     }
 
-    public void setSubscribedUrl(String subscribedUrl) {
-        this.subscribedUrl = subscribedUrl;
+    public void setAuthorizedCode(String authorizedCode) {
+        this.authorizedCode = authorizedCode;
     }
 
-    @Column(name = "channel")
     public String getChannel() {
         return channel;
     }
@@ -58,7 +50,6 @@ public class RedisMqSubscriber {
         this.channel = channel;
     }
 
-    @Column(name = "create_time")
     public String getCreateTime() {
         return createTime;
     }
@@ -67,7 +58,6 @@ public class RedisMqSubscriber {
         this.createTime = createTime;
     }
 
-    @Column(name = "remark")
     public String getRemark() {
         return remark;
     }

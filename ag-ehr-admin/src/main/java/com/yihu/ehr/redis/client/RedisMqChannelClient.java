@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.redis.MRedisMqChannel;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -61,7 +62,7 @@ public interface RedisMqChannelClient {
 
     @ApiOperation("删除消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.Delete, method = RequestMethod.DELETE)
-    public void delete(
+    public Envelop delete(
             @ApiParam(name = "id", value = "消息队列ID", required = true)
             @RequestParam(value = "id") Integer id);
 
@@ -80,5 +81,15 @@ public interface RedisMqChannelClient {
             @RequestParam(value = "id") Integer id,
             @ApiParam(name = "channelName", value = "消息队列名称", required = true)
             @RequestParam(value = "channelName") String channelName);
+
+    @ApiOperation("发布消息")
+    @RequestMapping(value = ServiceApi.Redis.MqChannel.SendMessage, method = RequestMethod.POST)
+    public Envelop sendMessage(
+            @ApiParam(name = "publisherAppId", value = "发布者应用ID", required = true)
+            @RequestParam(value = "publisherAppId") String publisherAppId,
+            @ApiParam(name = "channel", value = "消息队列编码", required = true)
+            @RequestParam(value = "channel") String channel,
+            @ApiParam(name = "message", value = "消息", required = true)
+            @RequestParam(value = "message") String message);
 
 }

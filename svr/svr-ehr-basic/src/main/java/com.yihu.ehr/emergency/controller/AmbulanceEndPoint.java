@@ -1,5 +1,6 @@
 package com.yihu.ehr.emergency.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
@@ -270,6 +271,27 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
             e.printStackTrace();
         }
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence, method = RequestMethod.POST)
+    @ApiOperation("获取已存在车牌号、电话号码")
+    public List idExistence(
+            @ApiParam(name = "type", value = "字段名", defaultValue = "")
+            @RequestParam(value ="type") String type,
+            @ApiParam(name = "values", value = "车牌号、电话号码", defaultValue = "")
+            @RequestBody String values) throws Exception {
+        List existPhones = ambulanceService.idExist(type,toEntity(values, String[].class));
+        return existPhones;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AmbulancesBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入救护车")
+    public boolean createAmbulancesBatch(
+            @ApiParam(name = "ambulances", value = "救护车", defaultValue = "")
+            @RequestBody String ambulances) throws Exception{
+        List models = objectMapper.readValue(ambulances, new TypeReference<List>() {});
+        ambulanceService.addAmbulancesBatch(models);
+        return true;
     }
 
 

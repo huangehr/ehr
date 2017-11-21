@@ -6,7 +6,6 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.redis.MRedisMqChannel;
 import com.yihu.ehr.redis.client.RedisMqChannelClient;
-import com.yihu.ehr.resource.controller.RsReportController;
 import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -26,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api("Redis消息队列接口")
+@Api(description = "消息队列接口", tags = {"Redis消息发布订阅--消息队列接口"})
 public class RedisMqChannelController extends BaseController {
 
     @Autowired
@@ -44,7 +43,7 @@ public class RedisMqChannelController extends BaseController {
             envelop.setObj(mRedisMqChannel);
             return envelop;
         } catch (Exception e) {
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -70,7 +69,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -88,7 +87,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -106,7 +105,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -116,14 +115,11 @@ public class RedisMqChannelController extends BaseController {
     public Envelop delete(
             @ApiParam(name = "id", value = "消息队列ID", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
-        Envelop envelop = new Envelop();
         try {
-            redisMqChannelClient.delete(id);
-            envelop.setSuccessFlg(true);
-            return envelop;
+            return redisMqChannelClient.delete(id);
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -145,7 +141,7 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }
@@ -159,7 +155,7 @@ public class RedisMqChannelController extends BaseController {
             @RequestParam(value = "channelName") String channelName) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            boolean result = redisMqChannelClient.isUniqueChannel(id, channelName);
+            boolean result = redisMqChannelClient.isUniqueChannelName(id, channelName);
             envelop.setSuccessFlg(result);
             if (!result) {
                 envelop.setErrorMsg("该消息队列名称已被使用，请重新填写！");
@@ -167,7 +163,25 @@ public class RedisMqChannelController extends BaseController {
             return envelop;
         } catch (Exception e) {
             e.printStackTrace();
-            LogService.getLogger(RsReportController.class).error(e.getMessage());
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
+    @ApiOperation("发布消息")
+    @RequestMapping(value = ServiceApi.Redis.MqChannel.SendMessage, method = RequestMethod.POST)
+    public Envelop sendMessage(
+            @ApiParam(name = "publisherAppId", value = "发布者应用ID", required = true)
+            @RequestParam(value = "publisherAppId") String publisherAppId,
+            @ApiParam(name = "channel", value = "消息队列编码", required = true)
+            @RequestParam(value = "channel") String channel,
+            @ApiParam(name = "message", value = "消息", required = true)
+            @RequestParam(value = "message") String message) throws Exception {
+        try {
+            return redisMqChannelClient.sendMessage(publisherAppId, channel, message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());
             return failed(ErrorCode.SystemError.toString());
         }
     }

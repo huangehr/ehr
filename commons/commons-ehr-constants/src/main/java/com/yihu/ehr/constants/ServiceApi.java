@@ -893,6 +893,26 @@ public class ServiceApi {
             public static final String Delete = "/redis/mq/channel/delete";
             public static final String IsUniqueChannel = "/redis/mq/channel/isUniqueChannel";
             public static final String IsUniqueChannelName = "/redis/mq/channel/isUniqueChannelName";
+            public static final String SendMessage = "/redis/mq/channel/sendMessage";
+        }
+        // Redis消息订阅者
+        public static class MqSubscriber {
+            public static final String Prefix = "/redis/mq/subscriber/";
+            public static final String GetById = "/redis/mq/subscriber/{id}";
+            public static final String Search = "/redis/mq/subscriber/search";
+            public static final String Save = "/redis/mq/subscriber/save";
+            public static final String Delete = "/redis/mq/subscriber/delete";
+            public static final String IsUniqueAppId = "/redis/mq/subscriber/isUniqueAppId";
+            public static final String IsUniqueSubscribedUrl = "/redis/mq/subscriber/isUniqueSubscribedUrl";
+        }
+        // Redis消息发布者
+        public static class MqPublisher {
+            public static final String Prefix = "/redis/mq/publisher/";
+            public static final String GetById = "/redis/mq/publisher/{id}";
+            public static final String Search = "/redis/mq/publisher/search";
+            public static final String Save = "/redis/mq/publisher/save";
+            public static final String Delete = "/redis/mq/publisher/delete";
+            public static final String IsUniqueAppId = "/redis/mq/publisher/isUniqueAppId";
         }
 
     }
@@ -1077,6 +1097,7 @@ public class ServiceApi {
         public static final String getUserOrgSaasByUserOrgCode="/org/getUserOrgSaasByUserOrgCode/";
         public static final String GetOrgDeptsDate="/org/getOrgDeptsDate";
         public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
+        public static final String getseaOrgsByOrgCode="/organizations/seaOrgsByOrgCode";
     }
 
     public static class GetInfo {
@@ -1117,6 +1138,9 @@ public class ServiceApi {
         public static final String AmbulanceSave = "/ambulance/save";
         public static final String AmbulanceUpdate = "/ambulance/update";
         public static final String AmbulanceDelete = "/ambulance/delete";
+        public static final String AmbulanceIdOrPhoneExistence = "/ambulance/IdOrPhoneExistence";
+        public static final String AmbulancesBatch = "/ambulances/batch";
+
         //出勤记录
         public static final String AttendanceSave = "/attendance/save";
         public static final String AttendanceUpdate = "/attendance/update";
@@ -1126,6 +1150,9 @@ public class ServiceApi {
         public static final String ScheduleList = "/schedule/list";
         public static final String ScheduleSave = "/schedule/save";
         public static final String ScheduleUpdate = "/schedule/update";
+        public static final String ScheduleBatch = "/schedules/batch";
+
+
 
     }
 }
