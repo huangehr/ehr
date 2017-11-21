@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +47,7 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
     }
 
     /**
-     * 批量导入机构
+     * 批量导入救护车
      */
     public boolean addAmbulancesBatch(List<Map<String, Object>> ambulances) {
         Map<String, Object> map;
@@ -75,7 +73,6 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
                 ambulance.setStatus(Ambulance.Status.wait);
                 ambulance.setEntityName(map .get("entityName").toString());
                 ambulance.setCreator(map .get("creator").toString());
-                ambulance.setCrateDate(new Timestamp(new Date().getTime()));
                 ambulanceDao.save(ambulance);
             }
         } catch (Exception e) {
