@@ -4,6 +4,7 @@ package com.yihu.ehr.redis.pubsub.entity;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * redis消息记录 Entity
@@ -20,10 +21,10 @@ public class RedisMqMessageLog {
     public String channel; // 消息队列编码
     public String publisherAppId; // 发布者应用ID
     public String status; // 消息状态，0：未消费，1：已消费
-    public String createTime; // 创建时间
-    public String updateTime; // 更新时间
     public String isRealConsumed; // 是否真实被订阅消费，0：否，1：是
     public Integer consumedNum; // 真实消费的次数
+    public Date createTime; // 创建时间
+    public Date updateTime; // 更新时间
 
     @Id
     @GeneratedValue(generator = "Generator")
@@ -73,24 +74,6 @@ public class RedisMqMessageLog {
         this.status = status;
     }
 
-    @Column(name = "create_time")
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
-
-    @Column(name = "update_time")
-    public String getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(String updateTime) {
-        this.updateTime = updateTime;
-    }
-
     @Column(name = "is_real_consumed")
     public String getIsRealConsumed() {
         return isRealConsumed;
@@ -107,5 +90,23 @@ public class RedisMqMessageLog {
 
     public void setConsumedNum(Integer consumedNum) {
         this.consumedNum = consumedNum;
+    }
+
+    @Column(name = "create_time")
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    @Column(name = "update_time")
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }
