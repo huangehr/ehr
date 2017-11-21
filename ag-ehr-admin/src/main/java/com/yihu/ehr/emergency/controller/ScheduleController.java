@@ -3,9 +3,7 @@ package com.yihu.ehr.emergency.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.emergency.client.ScheduleClient;
-import com.yihu.ehr.entity.emergency.Schedule;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * Controller - 排班历史
@@ -61,6 +57,23 @@ public class ScheduleController extends BaseController {
             @ApiParam(name = "schedule", value = "排班")
             @RequestParam(value = "schedule") String schedule){
         return scheduleClient.update(schedule);
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入排班信息")
+    public Envelop createSchedulesBatch(
+            @ApiParam(name = "schedules", value = "排班信息", defaultValue = "")
+            @RequestParam(value = "schedules") String schedules) throws Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try{
+            scheduleClient.createSchedulesBatch(schedules);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("导入失败！"+e.getMessage());
+        }
+        return envelop;
     }
 
 

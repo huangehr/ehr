@@ -3,7 +3,6 @@ package com.yihu.ehr.emergency.client;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.entity.emergency.Schedule;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.List;
 
 
 /**
@@ -48,5 +45,9 @@ public interface ScheduleClient {
             @ApiParam(name = "schedule", value = "排班")
             @RequestBody String schedule);
 
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入排班信息")
+    boolean createSchedulesBatch(
+            @RequestBody String schedules);
 
 }
