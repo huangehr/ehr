@@ -59,6 +59,7 @@ public class ServiceApi {
         //资源视图
         public static final String Resources = "/resources";
         public static final String Resource = "/resources/{id}";
+        public static final String ResourceByCode = "/resources/byCode";
         public static final String ResourceTree = "/resources/tree";
         public static final String NoPageResources = "/NoPageResources";
         public static final String IsExistName = "/resources/isExistName";

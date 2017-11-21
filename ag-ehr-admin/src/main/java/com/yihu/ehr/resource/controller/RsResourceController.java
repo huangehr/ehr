@@ -96,6 +96,14 @@ public class RsResourceController extends BaseController {
         return resourcesClient.getResourceById(id);
     }
 
+    @RequestMapping(value = ServiceApi.Resources.ResourceByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取资源")
+    public Envelop getResourceByCode(
+            @ApiParam(name = "code", value = "编码" )
+            @RequestParam(value = "code" ) String code) {
+        return resourcesClient.getResourceByCode(code);
+    }
+
     @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
     @ApiOperation("获取资源列表树")
     public Envelop getResourceTree(

@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -86,10 +87,27 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.Resource, method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源")
     public Envelop getResourceById(
-            @ApiParam(name="id",value="id",defaultValue = "")
-            @PathVariable(value="id") String id) throws Exception {
+            @ApiParam(name = "id",value = "id")
+            @PathVariable(value = "id") String id) {
         Envelop envelop = new Envelop();
         RsResource rsResource = rsResourceService.getResourceById(id);
+        if(rsResource != null) {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(rsResource);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("无相关资源");
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取资源")
+    public Envelop getResourceByCode(
+            @ApiParam(name = "code", value = "编码" )
+            @RequestParam(value = "code" ) String code) {
+        Envelop envelop = new Envelop();
+        RsResource rsResource = rsResourceService.getResourceByCode(code);
         if(rsResource != null) {
             envelop.setSuccessFlg(true);
             envelop.setObj(rsResource);
