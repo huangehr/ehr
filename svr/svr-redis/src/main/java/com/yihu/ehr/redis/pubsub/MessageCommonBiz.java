@@ -2,7 +2,6 @@ package com.yihu.ehr.redis.pubsub;
 
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.id.UuidUtil;
 
 import java.util.Date;
@@ -29,8 +28,9 @@ public class MessageCommonBiz {
         redisMqMessageLog.setPublisherAppId(publisherAppId);
         redisMqMessageLog.setMessage(message);
         redisMqMessageLog.setStatus("0");
+        redisMqMessageLog.setIsRealConsumed("0");
         redisMqMessageLog.setConsumedNum(0);
-        redisMqMessageLog.setCreateTime(DateTimeUtil.iso8601DateTimeFormat(new Date()));
+        redisMqMessageLog.setCreateTime(new Date());
         return redisMqMessageLog;
     }
 
