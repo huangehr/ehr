@@ -171,14 +171,14 @@ public class RedisMqChannelController extends BaseController {
     @ApiOperation("发布消息")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.SendMessage, method = RequestMethod.POST)
     public Envelop sendMessage(
-            @ApiParam(name = "publisher", value = "发布者", required = true)
-            @RequestParam(value = "publisher") String publisher,
+            @ApiParam(name = "publisherAppId", value = "发布者应用ID", required = true)
+            @RequestParam(value = "publisherAppId") String publisherAppId,
             @ApiParam(name = "channel", value = "消息队列编码", required = true)
             @RequestParam(value = "channel") String channel,
             @ApiParam(name = "message", value = "消息", required = true)
             @RequestParam(value = "message") String message) throws Exception {
         try {
-            return redisMqChannelClient.sendMessage(publisher, channel, message);
+            return redisMqChannelClient.sendMessage(publisherAppId, channel, message);
         } catch (Exception e) {
             e.printStackTrace();
             LogService.getLogger(RedisMqChannelController.class).error(e.getMessage());

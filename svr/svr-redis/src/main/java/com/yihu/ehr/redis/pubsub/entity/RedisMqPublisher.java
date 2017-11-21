@@ -1,30 +1,28 @@
-package com.yihu.ehr.agModel.redis;
+package com.yihu.ehr.redis.pubsub.entity;
 
 
-import java.io.Serializable;
+import javax.persistence.*;
 
 /**
- * redis消息订阅者 model
+ * redis消息发布者 Entity
  *
  * @author 张进军
- * @date 2017/11/13 15:14
+ * @date 2017/11/20 09:35
  */
-public class RedisMqSubscriberModel implements Serializable {
+@Entity
+@Table(name = "redis_mq_publisher")
+public class RedisMqPublisher {
 
     public Integer id; // 主键
     public String appId; // 应用ID
-    public String subscribedUrl; // 订阅者服务地址
+    public String authorizedCode; // 授权码
     public String channel; // 消息队列编码
     public String createTime; // 创建时间
     public String remark; // 备注
 
-    public RedisMqSubscriberModel() {
-    }
-
-    public RedisMqSubscriberModel(String channel) {
-        this.channel = channel;
-    }
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", unique = true, nullable = false)
     public Integer getId() {
         return id;
     }
@@ -33,6 +31,7 @@ public class RedisMqSubscriberModel implements Serializable {
         this.id = id;
     }
 
+    @Column(name = "app_id")
     public String getAppId() {
         return appId;
     }
@@ -41,14 +40,16 @@ public class RedisMqSubscriberModel implements Serializable {
         this.appId = appId;
     }
 
-    public String getSubscribedUrl() {
-        return subscribedUrl;
+    @Column(name = "authorized_code")
+    public String getAuthorizedCode() {
+        return authorizedCode;
     }
 
-    public void setSubscribedUrl(String subscribedUrl) {
-        this.subscribedUrl = subscribedUrl;
+    public void setAuthorizedCode(String authorizedCode) {
+        this.authorizedCode = authorizedCode;
     }
 
+    @Column(name = "channel")
     public String getChannel() {
         return channel;
     }
@@ -57,6 +58,7 @@ public class RedisMqSubscriberModel implements Serializable {
         this.channel = channel;
     }
 
+    @Column(name = "create_time")
     public String getCreateTime() {
         return createTime;
     }
@@ -65,6 +67,7 @@ public class RedisMqSubscriberModel implements Serializable {
         this.createTime = createTime;
     }
 
+    @Column(name = "remark")
     public String getRemark() {
         return remark;
     }

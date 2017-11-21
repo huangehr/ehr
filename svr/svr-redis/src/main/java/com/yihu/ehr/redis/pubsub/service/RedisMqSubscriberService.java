@@ -40,8 +40,17 @@ public class RedisMqSubscriberService extends BaseJpaService<RedisMqSubscriber, 
         redisMqSubscriberDao.delete(id);
     }
 
-    public Boolean isUniqueSubscribedUrl(Integer id, String subscriberUrl) {
-        RedisMqSubscriber redisMqSubscriber = redisMqSubscriberDao.isUniqueSubscribedUrl(id, subscriberUrl);
+    public Boolean isUniqueAppId(Integer id, String channel, String appId) {
+        RedisMqSubscriber redisMqSubscriber = redisMqSubscriberDao.isUniqueAppId(id, channel, appId);
+        if (redisMqSubscriber == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Boolean isUniqueSubscribedUrl(Integer id, String channel, String subscriberUrl) {
+        RedisMqSubscriber redisMqSubscriber = redisMqSubscriberDao.isUniqueSubscribedUrl(id, channel, subscriberUrl);
         if (redisMqSubscriber == null) {
             return true;
         } else {

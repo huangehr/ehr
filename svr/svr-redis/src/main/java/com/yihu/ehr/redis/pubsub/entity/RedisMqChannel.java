@@ -18,7 +18,8 @@ public class RedisMqChannel {
     public Integer id; // 主键
     public String channel; // 消息队列编码
     public String channelName; // 消息队列名称
-    public String authorizedCode; // 授权码
+    public String createTime; // 创建时间
+    public String messageTemplate; // 消息模版
     public String remark; // 备注
 
     // 临时属性
@@ -56,13 +57,22 @@ public class RedisMqChannel {
         this.channelName = channelName;
     }
 
-    @Column(name = "authorized_code")
-    public String getAuthorizedCode() {
-        return authorizedCode;
+    @Column(name = "create_time")
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setAuthorizedCode(String authorizedCode) {
-        this.authorizedCode = authorizedCode;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    @Column(name = "message_template")
+    public String getMessageTemplate() {
+        return messageTemplate;
+    }
+
+    public void setMessageTemplate(String messageTemplate) {
+        this.messageTemplate = messageTemplate;
     }
 
     @Column(name = "remark")
@@ -101,7 +111,7 @@ public class RedisMqChannel {
         this.subscriberNum = subscriberNum;
     }
 
-    @Formula("( SELECT COUNT(1) FROM redis_mq_message_log ml WHERE ml.channel = channel )")
+    @Formula("( SELECT COUNT(1) FROM redis_mq_publisher mp WHERE mp.channel = channel )")
     public String getPublisherNum() {
         return publisherNum;
     }
