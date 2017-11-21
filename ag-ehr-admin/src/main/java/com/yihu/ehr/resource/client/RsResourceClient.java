@@ -25,12 +25,12 @@ public interface RsResourceClient {
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    MRsResources createResource(
+    Envelop createResource(
             @RequestBody String resource);
 
     @ApiOperation("更新资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    MRsResources updateResources(
+    Envelop updateResources(
             @RequestBody String resource);
 
     @ApiOperation("资源删除")
@@ -45,7 +45,7 @@ public interface RsResourceClient {
 
     @RequestMapping(value = ServiceApi.Resources.Resource,method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源")
-    MRsResources getResourceById(
+    Envelop getResourceById(
             @PathVariable(value="id") String id);
 
     @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
