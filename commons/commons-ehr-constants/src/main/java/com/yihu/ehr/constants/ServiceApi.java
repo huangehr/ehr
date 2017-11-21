@@ -902,7 +902,17 @@ public class ServiceApi {
             public static final String Search = "/redis/mq/subscriber/search";
             public static final String Save = "/redis/mq/subscriber/save";
             public static final String Delete = "/redis/mq/subscriber/delete";
+            public static final String IsUniqueAppId = "/redis/mq/subscriber/isUniqueAppId";
             public static final String IsUniqueSubscribedUrl = "/redis/mq/subscriber/isUniqueSubscribedUrl";
+        }
+        // Redis消息发布者
+        public static class MqPublisher {
+            public static final String Prefix = "/redis/mq/publisher/";
+            public static final String GetById = "/redis/mq/publisher/{id}";
+            public static final String Search = "/redis/mq/publisher/search";
+            public static final String Save = "/redis/mq/publisher/save";
+            public static final String Delete = "/redis/mq/publisher/delete";
+            public static final String IsUniqueAppId = "/redis/mq/publisher/isUniqueAppId";
         }
 
     }

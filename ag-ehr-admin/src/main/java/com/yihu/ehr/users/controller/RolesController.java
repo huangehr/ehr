@@ -280,8 +280,13 @@ public class RolesController extends BaseController {
             List<PlatformAppRolesTreeModel> roleTreeModelList = new ArrayList<>();
             for(MRoles m : mRoles){
                 PlatformAppRolesTreeModel modelTree = new PlatformAppRolesTreeModel();
+                MOrganization org = null;
+                if (!StringUtils.isEmpty(m.getOrgCode())) {
+                    org = organizationClient.getOrg(m.getOrgCode());
+                }
+                String orgName = org != null ? "--" + org.getFullName() : "";
                 modelTree.setId(m.getId()+"");
-                modelTree.setName(m.getName());
+                modelTree.setName(m.getName() + orgName);
                 modelTree.setType("1");
                 modelTree.setPid(mApp.getId());
                 modelTree.setChildren(null);
