@@ -6,6 +6,9 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.*;
 import com.yihu.ehr.resource.model.RsResource;
 import com.yihu.ehr.resource.model.RsResourceCategory;
+import org.hibernate.FlushMode;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -125,6 +128,9 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
         }else {
             rsCateList = rsResourceCategoryDao.findByCodeAndPid("derived", "");
             List<String> userResourceList = objectMapper.readValue(userResource, List.class);
+            if(userResourceList.size() <= 0) {
+                userResourceList.add("NO_AUTH_RS");
+            }
             String [] ids = new String[userResourceList.size()];
             userResourceList.toArray(ids);
             for(RsResourceCategory rsResourceCategory : rsCateList) {
@@ -199,4 +205,25 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
         }
         return masterMap;
     }
+
+    public List<RsResource> getResourcePage(String userResource, String userId, int page, int size) throws IOException{
+        Session session = currentSession();
+        if(page <= 0 ) {
+            page = 1;
+        }
+        List<String> rsList = objectMapper.readValue(userResource, List.class);
+        if(rsList.size() <= 0) {
+            rsList.add("NO_AUTH_RS");
+        }
+        String hql = "SELECT rsResource FROM RsResource rsResource WHERE rsResource.categoryId IN (SELECT id FROM RsResourceCategory rsResourceCategory WHERE rsResourceCategory.code = 'derived') AND (rsResource.grantType = '0' OR rsResource.creator = :creator OR rsResource.id IN (:ids)) " +
+                "ORDER BY rsResource.createDate DESC";
+        Query query = session.createQuery(hql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setParameter("creator", userId);
+        query.setParameterList("ids", rsList);
+        query.setFirstResult((page - 1) * size);
+        query.setMaxResults(size);
+        return query.list();
+    }
+
 }

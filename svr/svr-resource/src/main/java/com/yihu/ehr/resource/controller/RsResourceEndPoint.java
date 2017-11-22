@@ -142,6 +142,32 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
         }
     }
 
+    @RequestMapping(value = ServiceApi.Resources.ResourcePage, method = RequestMethod.GET)
+    @ApiOperation("获取资源列表分页（政府服务平台）")
+    public Envelop getResourcePage(
+            @ApiParam(name = "userResource", value = "授权资源")
+            @RequestParam(value = "userResource") String userResource,
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size") int size) {
+        Envelop envelop = new Envelop();
+        try{
+            List<RsResource> resultList = rsResourceService.getResourcePage(userResource, userId, page, size);
+            envelop.setSuccessFlg(true);
+            envelop.setCurrPage(page);
+            //envelop.setTotalCount(resultList.size());
+            envelop.setDetailModelList(resultList);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
     @ApiOperation("资源查询")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.GET)
     public List<MRsResources> queryResources(

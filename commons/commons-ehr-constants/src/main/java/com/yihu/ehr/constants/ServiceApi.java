@@ -61,6 +61,7 @@ public class ServiceApi {
         public static final String Resource = "/resources/{id}";
         public static final String ResourceByCode = "/resources/byCode";
         public static final String ResourceTree = "/resources/tree";
+        public static final String ResourcePage = "/resources/page";
         public static final String NoPageResources = "/NoPageResources";
         public static final String IsExistName = "/resources/isExistName";
         public static final String IsExistCode = "/resources/isExistCode/{code}";
