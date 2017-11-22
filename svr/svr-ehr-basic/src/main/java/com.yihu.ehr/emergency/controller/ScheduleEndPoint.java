@@ -1,12 +1,12 @@
 package com.yihu.ehr.emergency.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.emergency.service.AmbulanceService;
 import com.yihu.ehr.emergency.service.ScheduleService;
 import com.yihu.ehr.entity.emergency.Ambulance;
-import com.yihu.ehr.entity.emergency.Attendance;
 import com.yihu.ehr.entity.emergency.Schedule;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -138,6 +137,16 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
             envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入排班信息")
+    public boolean createSchedulesBatch(
+            @ApiParam(name = "schedules", value = "排班信息", defaultValue = "")
+            @RequestBody String schedules) throws Exception{
+        List models = objectMapper.readValue(schedules, new TypeReference<List>() {});
+        scheduleService.addSchedulesBatch(models);
+        return true;
     }
 
 }
