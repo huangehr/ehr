@@ -60,6 +60,28 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleLevel, method = RequestMethod.GET)
+    @ApiOperation("获取排班层级列表（年-月-日）")
+    public Envelop level(
+            @ApiParam(name = "date", value = "年-月")
+            @RequestParam(value = "date", required = false) String date,
+            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "页码", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size) {
+        Envelop envelop = new Envelop();
+        try {
+            List<Object> resultList =  scheduleService.getLevel(date, page, size);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(resultList);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
     @RequestMapping(value = ServiceApi.Emergency.ScheduleSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("保存单条记录")
     public Envelop save(

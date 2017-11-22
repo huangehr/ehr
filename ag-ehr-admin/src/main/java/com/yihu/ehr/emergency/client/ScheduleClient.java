@@ -33,6 +33,13 @@ public interface ScheduleClient {
             @RequestParam(value = "page", required = false) int page,
             @RequestParam(value = "size", required = false) int size);
 
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleLevel, method = RequestMethod.GET)
+    @ApiOperation("获取排班层级列表（年-月-日）")
+    Envelop level(
+            @RequestParam(value = "date", required = false) String date,
+            @RequestParam(value = "page", required = false) int page,
+            @RequestParam(value = "size", required = false) int size);
+
     @RequestMapping(value = ServiceApi.Emergency.ScheduleSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("保存单条记录")
     Envelop save(

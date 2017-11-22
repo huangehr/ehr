@@ -43,6 +43,18 @@ public class ScheduleController extends BaseController {
         return scheduleClient.list(fields, filters, sorts, page, size);
     }
 
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleLevel, method = RequestMethod.GET)
+    @ApiOperation("获取排班层级列表（年-月-日）")
+    public Envelop level(
+            @ApiParam(name = "date", value = "年-月")
+            @RequestParam(value = "date", required = false) String date,
+            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "页码", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size) {
+        return scheduleClient.level(date, page, size);
+    }
+
     @RequestMapping(value = ServiceApi.Emergency.ScheduleSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("保存单条记录")
     public Envelop save(
