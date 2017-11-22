@@ -30,6 +30,10 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
     @Autowired
     private ScheduleDao scheduleDao;
 
+    public Schedule findById(int id){
+        return scheduleDao.findById(id);
+    }
+
     public List<Schedule> findMatch(String carId, Date date) throws Exception{
         String sql = "SELECT schedule FROM Schedule schedule WHERE schedule.carId = :carId AND schedule.status = :status AND schedule.start <= :start AND schedule.end >= :end";
         Session session = currentSession();
@@ -67,13 +71,10 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
         return query.list();
     }
 
-    public Schedule findById(int id){
-        return scheduleDao.findById(id);
-    }
-
-
     /**
      * 批量导入排班信息
+     * @param schedules
+     * @return
      */
     public boolean addSchedulesBatch(List<Map<String, Object>> schedules) {
         Map<String, Object> map;
