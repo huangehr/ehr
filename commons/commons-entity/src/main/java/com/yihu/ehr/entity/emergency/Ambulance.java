@@ -2,7 +2,6 @@ package com.yihu.ehr.entity.emergency;
 
 
 import com.yihu.ehr.entity.BaseAssignedEntity;
-import org.hibernate.annotations.GenericGenerator;
 
 
 import javax.persistence.*;
@@ -33,39 +32,27 @@ public class Ambulance extends BaseAssignedEntity {
         down
     }
 
-    //初始经度
-    private double initLongitude;
-    //初始纬度
-    private double initLatitude;
-    //归属片区
-    private String district;
-    //所属医院编码
+    private Integer location;
+    // 所属医院编码
     private String orgCode;
-    //所属医院名称
+    // 所属医院名称
     private String orgName;
-    //随车手机号码
+    // 随车手机号码
     private String phone;
-    //状态
+    // 状态
     private Status status;
-    //百度鹰眼设备号
+    // 图片
+    private String img;
+    // 百度鹰眼设备号
     private String entityName;
 
-    @Column(name = "init_longitude", nullable = false)
-    public double getInitLongitude() {
-        return initLongitude;
+    @Column(name = "location", nullable = false)
+    public Integer getLocation() {
+        return location;
     }
 
-    public void setInitLongitude(double initLongitude) {
-        this.initLongitude = initLongitude;
-    }
-
-    @Column(name = "init_latitude", nullable = false)
-    public double getInitLatitude() {
-        return initLatitude;
-    }
-
-    public void setInitLatitude(double initLatitude) {
-        this.initLatitude = initLatitude;
+    public void setLocation(Integer location) {
+        this.location = location;
     }
 
     @Column(name = "org_code", nullable = false)
@@ -104,13 +91,13 @@ public class Ambulance extends BaseAssignedEntity {
         this.status = status;
     }
 
-    @Column(name = "district")
-    public String getDistrict() {
-        return district;
+    @Column(name = "img")
+    public String getImg() {
+        return img;
     }
 
-    public void setDistrict(String district) {
-        this.district = district;
+    public void setImg(String img) {
+        this.img = img;
     }
 
     @Column(name = "entity_name")
