@@ -113,6 +113,8 @@ public class ResolveEndPoint {
                     if (!isSucceed) {
                         LogService.getLogger().info("idCardNo:" + idCardNo + " registration failed !");
                     }
+                }else {
+                    LogService.getLogger().info("idCardNo:" + idCardNo + " has registrationed !");
                 }
             }else {
                 LogService.getLogger().info("idCardNo is empty !");
