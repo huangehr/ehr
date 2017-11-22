@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -40,23 +41,29 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public MRsResources createResource(
+    public Envelop createResource(
             @ApiParam(name="resource",value="资源",defaultValue = "")
             @RequestBody String resource) throws Exception {
-        RsResource rs = toEntity(resource,RsResource.class);
+        Envelop envelop = new Envelop();
+        RsResource rs = toEntity(resource, RsResource.class);
         rs.setId(getObjectId(BizObject.Resources));
-        rsResourceService.saveResource(rs);
-        return convertToModel(rs,MRsResources.class);
+        RsResource newRsResource =  rsResourceService.saveResource(rs);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(newRsResource);
+        return envelop;
     }
 
     @ApiOperation("更新资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public MRsResources updateResources(
-            @ApiParam(name="resource",value="资源",defaultValue="")
-            @RequestBody String resource) throws Exception {
+    public Envelop updateResources(
+            @ApiParam(name="resource",value="资源")
+            @RequestBody String resource) {
+        Envelop envelop = new Envelop();
         RsResource rs = toEntity(resource,RsResource.class);
-        rsResourceService.saveResource(rs);
-        return convertToModel(rs,MRsResources.class);
+        RsResource newRsResource =  rsResourceService.saveResource(rs);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(newRsResource);
+        return envelop;
     }
 
     @ApiOperation("资源删除")
@@ -79,10 +86,36 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Resources.Resource, method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源")
-    public MRsResources getResourceById(
-            @ApiParam(name="id",value="id",defaultValue = "")
-            @PathVariable(value="id") String id) throws Exception {
-        return convertToModel(rsResourceService.getResourceById(id),MRsResources.class);
+    public Envelop getResourceById(
+            @ApiParam(name = "id",value = "id")
+            @PathVariable(value = "id") String id) {
+        Envelop envelop = new Envelop();
+        RsResource rsResource = rsResourceService.getResourceById(id);
+        if(rsResource != null) {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(rsResource);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("无相关资源");
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取资源")
+    public Envelop getResourceByCode(
+            @ApiParam(name = "code", value = "编码" )
+            @RequestParam(value = "code" ) String code) {
+        Envelop envelop = new Envelop();
+        RsResource rsResource = rsResourceService.getResourceByCode(code);
+        if(rsResource != null) {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(rsResource);
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("无相关资源");
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)

@@ -17,7 +17,10 @@ public interface RedisMqSubscriberDao extends PagingAndSortingRepository<RedisMq
 
     List<RedisMqSubscriber> findByChannel(@Param("channel") String channel);
 
-    @Query(" FROM RedisMqSubscriber rmc WHERE rmc.id <> :id AND rmc.subscribedUrl = :subscribedUrl ")
-    RedisMqSubscriber isUniqueSubscribedUrl(@Param("id") Integer id, @Param("subscribedUrl") String subscribedUrl);
+    @Query(" FROM RedisMqSubscriber rms WHERE rms.id <> :id AND rms.channel = :channel AND rms.appId = :appId ")
+    RedisMqSubscriber isUniqueAppId(@Param("id") Integer id, @Param("channel") String channel, @Param("appId") String appId);
+
+    @Query(" FROM RedisMqSubscriber rms WHERE rms.id <> :id AND rms.channel = :channel AND rms.subscribedUrl = :subscribedUrl ")
+    RedisMqSubscriber isUniqueSubscribedUrl(@Param("id") Integer id, @Param("channel") String channel, @Param("subscribedUrl") String subscribedUrl);
 
 }

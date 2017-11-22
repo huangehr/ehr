@@ -4,20 +4,25 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.redis.MRedisMqChannel;
+import com.yihu.ehr.redis.pubsub.CustomMessageListenerAdapter;
+import com.yihu.ehr.redis.pubsub.MessageCommonBiz;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
+import com.yihu.ehr.redis.pubsub.entity.RedisMqPublisher;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
 import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqMessageLogService;
+import com.yihu.ehr.redis.pubsub.service.RedisMqPublisherService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqSubscriberService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
-import com.yihu.ehr.util.id.UuidUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,11 +43,15 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RedisMqChannelService redisMqChannelService;
     @Autowired
-    private RedisTemplate redisTemplate;
-    @Autowired
     private RedisMqMessageLogService redisMqMessageLogService;
     @Autowired
     private RedisMqSubscriberService redisMqSubscriberService;
+    @Autowired
+    private RedisMqPublisherService redisMqPublisherService;
+    @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
+    private RedisMessageListenerContainer redisMessageListenerContainer;
 
     @ApiOperation("根据ID获取消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.GetById, method = RequestMethod.GET)
@@ -78,7 +87,14 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "entityJson", value = "消息队列JSON", required = true)
             @RequestParam(value = "entityJson") String entityJson) throws Exception {
         RedisMqChannel newRedisMqChannel = toEntity(entityJson, RedisMqChannel.class);
+        newRedisMqChannel.setCreateTime(DateTimeUtil.iso8601DateTimeFormat(new Date()));
         newRedisMqChannel = redisMqChannelService.save(newRedisMqChannel);
+
+        // 开启该订阅者的消息队列的消息监听
+        String channel = newRedisMqChannel.getChannel();
+        CustomMessageListenerAdapter messageListener = MessageCommonBiz.newCustomMessageListenerAdapter(channel);
+        redisMessageListenerContainer.addMessageListener(messageListener, new ChannelTopic(channel));
+
         return convertToModel(newRedisMqChannel, MRedisMqChannel.class);
     }
 
@@ -88,6 +104,7 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "entityJson", value = "消息队列JSON", required = true)
             @RequestParam(value = "entityJson") String entityJson) throws Exception {
         RedisMqChannel updateRedisMqChannel = toEntity(entityJson, RedisMqChannel.class);
+        updateRedisMqChannel.setCreateTime(updateRedisMqChannel.getCreateTime().replace(" ", "+"));
         updateRedisMqChannel = redisMqChannelService.save(updateRedisMqChannel);
         return convertToModel(updateRedisMqChannel, MRedisMqChannel.class);
     }
@@ -99,21 +116,26 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "id") Integer id) throws Exception {
         Envelop envelop = new Envelop();
         RedisMqChannel redisMqChannel = redisMqChannelService.getById(id);
+        String channel = redisMqChannel.getChannel();
 
-        List<RedisMqMessageLog> messageLogList = redisMqMessageLogService.findByChannelAndStatus(redisMqChannel.getChannel(), "0");
-        if(messageLogList.size() != 0) {
+        List<RedisMqMessageLog> messageLogList = redisMqMessageLogService.findByChannelAndStatus(channel, "0");
+        if (messageLogList.size() != 0) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("该消息队列存在未消费消息，不能删除。");
             return envelop;
         }
-        List<RedisMqSubscriber> subscriberList = redisMqSubscriberService.findByChannel(redisMqChannel.getChannel());
-        if(subscriberList.size() != 0) {
+        List<RedisMqSubscriber> subscriberList = redisMqSubscriberService.findByChannel(channel);
+        if (subscriberList.size() != 0) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("该消息队列存在订阅者，不能删除。");
             return envelop;
         }
 
         redisMqChannelService.delete(id);
+
+        // 删除该消息队列的消息监听
+        CustomMessageListenerAdapter messageListener = MessageCommonBiz.newCustomMessageListenerAdapter(channel);
+        redisMessageListenerContainer.removeMessageListener(messageListener, new ChannelTopic(channel));
 
         envelop.setSuccessFlg(true);
         return envelop;
@@ -142,8 +164,8 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("发布消息")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.SendMessage, method = RequestMethod.POST)
     public Envelop sendMessage(
-            @ApiParam(name = "publisher", value = "发布者", required = true)
-            @RequestParam(value = "publisher") String publisher,
+            @ApiParam(name = "publisherAppId", value = "发布者应用ID", required = true)
+            @RequestParam(value = "publisherAppId") String publisherAppId,
             @ApiParam(name = "channel", value = "消息队列编码", required = true)
             @RequestParam(value = "channel") String channel,
             @ApiParam(name = "message", value = "消息", required = true)
@@ -157,21 +179,21 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("消息队列 " + channel + " 还未注册，需要先注册才能往队列发布消息。");
             return envelop;
         }
+        // 判断队列是否绑定发布者
+        RedisMqPublisher redisMqPublisher = redisMqPublisherService.findByChannelAndAppId(channel, publisherAppId);
+        if (redisMqPublisher == null) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("消息队列 " + channel + " 中没绑定过应用ID为 " + publisherAppId + " 的发布者，需要先绑定才能发布消息。");
+            return envelop;
+        }
 
         // 记录消息
-        String messageLogId = UuidUtil.randomUUID();
-        RedisMqMessageLog redisMqMessageLog = new RedisMqMessageLog();
-        redisMqMessageLog.setId(messageLogId);
-        redisMqMessageLog.setChannel(channel);
-        redisMqMessageLog.setMessage(message);
-        redisMqMessageLog.setPublisher(publisher);
-        redisMqMessageLog.setStatus("0");
-        redisMqMessageLog.setCreateTime(DateTimeUtil.iso8601DateTimeFormat(new Date()));
+        RedisMqMessageLog redisMqMessageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, message);
         redisMqMessageLogService.save(redisMqMessageLog);
 
         // 发布消息
         Map<String, Object> messageMap = new HashMap<>();
-        messageMap.put("messageLogId", messageLogId);
+        messageMap.put("messageLogId", redisMqMessageLog.getId());
         messageMap.put("messageContent", message);
         redisTemplate.convertAndSend(channel, toJson(messageMap));
 

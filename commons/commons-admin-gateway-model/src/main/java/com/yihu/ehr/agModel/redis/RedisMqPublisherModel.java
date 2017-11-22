@@ -4,24 +4,24 @@ package com.yihu.ehr.agModel.redis;
 import java.io.Serializable;
 
 /**
- * redis消息订阅者 model
+ * redis消息发布者 model
  *
  * @author 张进军
- * @date 2017/11/13 15:14
+ * @date 2017/11/20 09:35
  */
-public class RedisMqSubscriberModel implements Serializable {
+public class RedisMqPublisherModel implements Serializable {
 
     public Integer id; // 主键
     public String appId; // 应用ID
-    public String subscribedUrl; // 订阅者服务地址
+    public String authorizedCode; // 授权码
     public String channel; // 消息队列编码
     public String createTime; // 创建时间
     public String remark; // 备注
 
-    public RedisMqSubscriberModel() {
+    public RedisMqPublisherModel() {
     }
 
-    public RedisMqSubscriberModel(String channel) {
+    public RedisMqPublisherModel(String channel) {
         this.channel = channel;
     }
 
@@ -41,12 +41,12 @@ public class RedisMqSubscriberModel implements Serializable {
         this.appId = appId;
     }
 
-    public String getSubscribedUrl() {
-        return subscribedUrl;
+    public String getAuthorizedCode() {
+        return authorizedCode;
     }
 
-    public void setSubscribedUrl(String subscribedUrl) {
-        this.subscribedUrl = subscribedUrl;
+    public void setAuthorizedCode(String authorizedCode) {
+        this.authorizedCode = authorizedCode;
     }
 
     public String getChannel() {

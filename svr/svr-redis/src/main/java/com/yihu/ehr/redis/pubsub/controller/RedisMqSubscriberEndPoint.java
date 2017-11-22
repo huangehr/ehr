@@ -3,11 +3,7 @@ package com.yihu.ehr.redis.pubsub.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.redis.MRedisMqSubscriber;
-import com.yihu.ehr.redis.pubsub.CustomMessageListenerAdapter;
-import com.yihu.ehr.redis.pubsub.DefaultMessageDelegate;
-import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
 import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqSubscriberService;
@@ -16,7 +12,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,12 +75,6 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
         RedisMqSubscriber newRedisMqSubscriber = toEntity(entityJson, RedisMqSubscriber.class);
         newRedisMqSubscriber.setCreateTime(DateTimeUtil.iso8601DateTimeFormat(new Date()));
         newRedisMqSubscriber = redisMqSubscriberService.save(newRedisMqSubscriber);
-
-        // 开启该订阅者的消息队列的消息监听
-        RedisMqChannel channel = redisMqChannelService.findByChannel(newRedisMqSubscriber.getChannel());
-        CustomMessageListenerAdapter messageListener = this.getMessageListenerAdapter(newRedisMqSubscriber.getSubscribedUrl());
-        redisMessageListenerContainer.addMessageListener(messageListener, new ChannelTopic(channel.getChannel()));
-
         return convertToModel(newRedisMqSubscriber, MRedisMqSubscriber.class);
     }
 
@@ -95,6 +84,7 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "entityJson", value = "消息订阅者JSON", required = true)
             @RequestParam(value = "entityJson") String entityJson) throws Exception {
         RedisMqSubscriber updateRedisMqSubscriber = toEntity(entityJson, RedisMqSubscriber.class);
+        updateRedisMqSubscriber.setCreateTime(updateRedisMqSubscriber.getCreateTime().replace(" ", "+"));
         updateRedisMqSubscriber = redisMqSubscriberService.save(updateRedisMqSubscriber);
         return convertToModel(updateRedisMqSubscriber, MRedisMqSubscriber.class);
     }
@@ -104,33 +94,31 @@ public class RedisMqSubscriberEndPoint extends EnvelopRestEndPoint {
     public void delete(
             @ApiParam(name = "id", value = "消息订阅者ID", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
-        RedisMqSubscriber redisMqSubscriber = redisMqSubscriberService.getById(id);
-
         redisMqSubscriberService.delete(id);
-
-        // 删除该订阅者对消息队列的消息监听
-        RedisMqChannel channel = redisMqChannelService.findByChannel(redisMqSubscriber.getChannel());
-        CustomMessageListenerAdapter messageListener = this.getMessageListenerAdapter(redisMqSubscriber.getSubscribedUrl());
-        redisMessageListenerContainer.removeMessageListener(messageListener, new ChannelTopic(channel.getChannel()));
     }
 
-    @ApiOperation("验证消息订阅者服务地址是否唯一")
+    @ApiOperation("验证指定消息队列中订阅者应用ID是否唯一")
+    @RequestMapping(value = ServiceApi.Redis.MqSubscriber.IsUniqueAppId, method = RequestMethod.GET)
+    public boolean isUniqueAppId(
+            @ApiParam(name = "id", value = "消息订阅者ID", required = true)
+            @RequestParam(value = "id") Integer id,
+            @ApiParam(name = "channel", value = "消息队列编码", required = true)
+            @RequestParam(value = "channel") String channel,
+            @ApiParam(name = "appId", value = "消息订阅者应用ID", required = true)
+            @RequestParam(value = "appId") String appId) throws Exception {
+        return redisMqSubscriberService.isUniqueAppId(id, channel, appId);
+    }
+
+    @ApiOperation("验证指定消息队列中订阅者服务地址是否唯一")
     @RequestMapping(value = ServiceApi.Redis.MqSubscriber.IsUniqueSubscribedUrl, method = RequestMethod.GET)
     public boolean isUniqueSubscribedUrl(
             @ApiParam(name = "id", value = "消息订阅者ID", required = true)
             @RequestParam(value = "id") Integer id,
+            @ApiParam(name = "channel", value = "消息队列编码", required = true)
+            @RequestParam(value = "channel") String channel,
             @ApiParam(name = "subscriberUrl", value = "消息订阅者服务地址", required = true)
             @RequestParam(value = "subscriberUrl") String subscriberUrl) throws Exception {
-        return redisMqSubscriberService.isUniqueSubscribedUrl(id, subscriberUrl);
-    }
-
-    // 获取消息队列监听器
-    private CustomMessageListenerAdapter getMessageListenerAdapter(String subscribedUrl) {
-        DefaultMessageDelegate defaultMessageDelegate = new DefaultMessageDelegate(subscribedUrl);
-        SpringContext.autowiredBean(defaultMessageDelegate);
-        CustomMessageListenerAdapter messageListener = new CustomMessageListenerAdapter(defaultMessageDelegate);
-        SpringContext.autowiredBean(messageListener);
-        return messageListener;
+        return redisMqSubscriberService.isUniqueSubscribedUrl(id, channel, subscriberUrl);
     }
 
 }

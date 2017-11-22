@@ -3,10 +3,7 @@ package com.yihu.ehr.resource.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.RsResourceCategoryDao;
-import com.yihu.ehr.resource.dao.RsResourceMetadataDao;
-import com.yihu.ehr.resource.dao.RsResourceDao;
-import com.yihu.ehr.resource.dao.RsResourceDefaultQueryDao;
+import com.yihu.ehr.resource.dao.*;
 import com.yihu.ehr.resource.model.RsResource;
 import com.yihu.ehr.resource.model.RsResourceCategory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +31,13 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
     @Autowired
     private RsResourceDao rsResourceDao;
     @Autowired
-    private RsResourceMetadataDao rsMetadataDao;
-    @Autowired
-    private RsResourceDefaultQueryDao resourcesDefaultQueryDao;
+    private RsResourceMetadataDao rsResourceMetadataDao;
     @Autowired
     private RsResourceCategoryDao rsResourceCategoryDao;
+    @Autowired
+    private RsResourceDefaultQueryDao rsResourceDefaultQueryDao;
+    @Autowired
+    private RsResourceDefaultParamDao rsResourceDefaultParamDao;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -59,8 +58,9 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
     public void deleteResource(String id) {
         String[] ids = id.split(",");
         for(String id_ : ids) {
-            resourcesDefaultQueryDao.deleteByResourcesId(id_);
-            rsMetadataDao.deleteByResourcesId(id_);
+            rsResourceDefaultQueryDao.deleteByResourcesId(id_);
+            rsResourceDefaultParamDao.deleteByResourcesId(id_);
+            rsResourceMetadataDao.deleteByResourcesId(id_);
             rsResourceDao.delete(id_);
         }
     }
