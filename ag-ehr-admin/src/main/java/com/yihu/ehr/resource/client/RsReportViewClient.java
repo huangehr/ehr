@@ -45,4 +45,10 @@ public interface RsReportViewClient {
             @ApiParam(name = "resourceId", value = "视图ID", required = true)
             @RequestParam(value = "resourceId") String resourceId);
 
+    @ApiOperation("判断资源视图是否存在于报表中")
+    @RequestMapping(value = ServiceApi.Resources.RsReportViewExistReport, method = RequestMethod.GET)
+    boolean existReport(
+            @ApiParam(name = "resourceId", value = "视图ID", required = true)
+            @RequestParam(value = "resourceId") String resourceId);
+
 }

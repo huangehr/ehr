@@ -2,6 +2,7 @@ package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.RsReportDao;
+import com.yihu.ehr.resource.dao.RsReportViewDao;
 import com.yihu.ehr.resource.model.RsReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public class RsReportService extends BaseJpaService<RsReport, RsReportDao> {
 
     @Autowired
     private RsReportDao rsReportDao;
+    @Autowired
+    private RsReportViewDao rsReportViewDao;
 
     /**
      * 根据ID，获取资源报表
@@ -71,6 +74,9 @@ public class RsReportService extends BaseJpaService<RsReport, RsReportDao> {
     @Transactional(readOnly = false)
     public void delete(Integer id) {
         rsReportDao.delete(id);
+        //删除报表对应的视图配置
+        rsReportViewDao.deleteByReportId(id);
+
     }
 
     /**

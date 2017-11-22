@@ -222,6 +222,8 @@ public class ServiceApi {
         public static final String RsReportViews = "/resources/reportViews";
         public static final String RsReportViewSave = "/resources/reportView/save";
         public static final String RsReportViewExist = "/resources/reportView/exist";
+        public static final String RsReportViewExistReport = "/resources/reportView/existReport";
+
 
     }
 

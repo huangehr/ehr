@@ -60,7 +60,7 @@ public interface RsReportClient {
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
     MRsReport update(
             @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
-            @RequestParam(value = "rsReport") String rsReport);
+            @RequestBody String rsReport);
 
     @ApiOperation("删除资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportDelete, method = RequestMethod.DELETE)

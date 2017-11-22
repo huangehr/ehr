@@ -87,7 +87,7 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
     public MRsReport update(
             @ApiParam(name = "rsReport", value = "资源报表JSON", required = true)
-            @RequestParam(value = "rsReport") String rsReport) throws Exception {
+            @RequestBody String rsReport) throws Exception {
         RsReport newRsReport = toEntity(rsReport, RsReport.class);
         newRsReport = rsReportService.save(newRsReport);
         return convertToModel(newRsReport, MRsReport.class);

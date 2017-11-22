@@ -192,7 +192,7 @@ public class PatientController extends BaseController {
         String sorts = "+demographicId,+realName";
         int size = 20;
         int page = 1;
-        ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page);
+        ResponseEntity<List<MUser>> responseEntity = userClient.searchUsers(fields, filters, sorts, size, page, null);
         List<MUser> mUsers = responseEntity.getBody();
 
         if (demographicInfo == null) {
@@ -674,7 +674,7 @@ public class PatientController extends BaseController {
                 String fields= "id,demographicId,realName";
                 String filters="demographicId="+patientInfo.getIdCardNo();
                 String sorts="+demographicId,+realName";
-                ResponseEntity<List<MUser>> userEntity = userClient.searchUsers(fields, filters, sorts, 20, 1);
+                ResponseEntity<List<MUser>> userEntity = userClient.searchUsers(fields, filters, sorts, 20, 1, null);
                 List<MUser> mUsers = userEntity.getBody();
                 if(null!=mUsers&&mUsers.size()>0){
                     for(MUser u:mUsers){
@@ -754,7 +754,7 @@ public class PatientController extends BaseController {
                 String fields= "id,demographicId,realName";
                 String filters="demographicId="+patientInfo.getIdCardNo();
                 String sorts="+demographicId,+realName";
-                ResponseEntity<List<MUser>> userEntity = userClient.searchUsers(fields, filters, sorts, 20, 1);
+                ResponseEntity<List<MUser>> userEntity = userClient.searchUsers(fields, filters, sorts, 20, 1, null);
                 List<MUser> mUsers = userEntity.getBody();
                 if(null!=mUsers&&mUsers.size()>0){
                     for(MUser u:mUsers){

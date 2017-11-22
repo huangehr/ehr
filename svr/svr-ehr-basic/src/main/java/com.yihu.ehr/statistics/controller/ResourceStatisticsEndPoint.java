@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -51,37 +52,31 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.StasticReport.GetStatisticsElectronicMedicalCount, method = RequestMethod.GET)
     @ApiOperation(value = "电子病历-最近七天采集总数统计，门诊住院数 - 柱状")
     public Envelop getStatisticsElectronicMedicalCount( ) throws Exception {
+        List<String> dateList = new ArrayList<>();
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+        Calendar lastDate = Calendar.getInstance();
+        dateList.add(sdf.format(lastDate.getTime()));
+        for(int i=0;i<6;i++){
+            lastDate.roll(Calendar.DATE, -1);//日期回滚7天
+            String dateStr=sdf.format(lastDate.getTime());
+            dateList.add(dateStr);
+        }
+        Collections.reverse(dateList); // 倒序排列
+
         Envelop envelop = new Envelop();
         List<EchartReportModel> echartReportModels = new ArrayList<>();
-        List<String> dateList = new ArrayList<>();
         List<Object> list = archiveRelationService.getCollectTocalCount();
-        if( list != null && list.size() > 0){
-            for(int i=0 ; i < list.size(); i++){
-                Map<Integer,Object> mapVal  = converMapObject(list.get(i));
-                dateList.add(mapVal.get(1).toString());
-            }
-            EchartReportModel echartReportModel = setEchartReportModel(list,"total",dateList);
-            echartReportModels.add(echartReportModel);
-        }else{
-            EchartReportModel echartReportModel = setEchartReportModel(new ArrayList<>(),"total",new ArrayList<String>());
-            echartReportModels.add(echartReportModel);
-        }
+        EchartReportModel echartReportModel = setEchartReportModel(list,"total",dateList);
+        echartReportModels.add(echartReportModel);
+
         List<Object> list0 = archiveRelationService.getCollectEventTypeCount(0);
-        if( list0 != null && list0.size() > 0){
-            EchartReportModel echartReportModel = setEchartReportModel(list0,"outpatient",dateList);
-            echartReportModels.add(echartReportModel);
-        }else{
-            EchartReportModel echartReportModel = setEchartReportModel(new ArrayList<>(),"outpatient",new ArrayList<String>());
-            echartReportModels.add(echartReportModel);
-        }
+        EchartReportModel echartReportMode2 = setEchartReportModel(list0,"outpatient",dateList);
+        echartReportModels.add(echartReportMode2);
+
         List<Object> list1 = archiveRelationService.getCollectEventTypeCount(1);
-        if( list1 != null && list1.size() > 0){
-            EchartReportModel echartReportModel = setEchartReportModel(list1,"hospital",dateList);
-            echartReportModels.add(echartReportModel);
-        }else{
-            EchartReportModel echartReportModel = setEchartReportModel(new ArrayList<>(),"hospital",new ArrayList<String>());
-            echartReportModels.add(echartReportModel);
-        }
+        EchartReportModel echartReportMode3 = setEchartReportModel(list1,"hospital",dateList);
+        echartReportModels.add(echartReportMode3);
+
         envelop.setDetailModelList(echartReportModels);
         envelop.setSuccessFlg(true);
         return envelop;
@@ -222,15 +217,14 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
 
     public EchartReportModel setEchartReportModel(List<Object> objectList,String name,List<String> dateList){
         EchartReportModel echartReportModel = new EchartReportModel();
-        if( objectList != null && objectList.size() > 0){
-            echartReportModel.setName(name);
-            if(dateList != null){
-                int num = dateList.size();
-                int[] ydata = new int[num];
-                String[] xdata = new String[num];
-                echartReportModel.setxData(xdata);
-                for(int k=0 ; k < dateList.size() ; k++){
-                    int val = 0;
+        echartReportModel.setName(name);
+        if(dateList != null){
+            int num = dateList.size();
+            int[] ydata = new int[num];
+            String[] xdata = new String[num];
+            for(int k=0 ; k < dateList.size() ; k++){
+                int val = 0;
+                if( objectList != null && objectList.size() > 0) {
                     for(int i=0 ; i < objectList.size() ; i++){
                         Map<Integer,Object> mapVal  = converMapObject(objectList.get(i));
                         if(mapVal.get(1).toString().equals(dateList.get(k))){
@@ -238,11 +232,12 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
                             break;
                         }
                     }
-                    ydata[k] = val;
-                    xdata[k] = dateList.get(k).toString().substring(5);
                 }
-                echartReportModel.setyData(ydata);
+                ydata[k] = val;
+                xdata[k] = dateList.get(k);
             }
+            echartReportModel.setxData(xdata);
+            echartReportModel.setyData(ydata);
         }
         return echartReportModel;
     }
