@@ -44,19 +44,7 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "attendance", value = "出勤记录")
             @RequestBody String attendance) throws Exception{
         Envelop envelop = new Envelop();
-        Map<String, Object> dataMap = new HashMap<String, Object>();
-        dataMap.put("carId", "赣ESD2322");
-        dataMap.put("alarmTel", "120");
-        dataMap.put("callAddress", "五三大道");
-        dataMap.put("chiefComplaint", "救命");
-        dataMap.put("dispatchHospital", "人民医院");
-        dataMap.put("patientNum", 2);
-        dataMap.put("patientGender", "一男一女");
-        dataMap.put("disease", "车祸");
-        dataMap.put("remark", "赶紧的");
-        dataMap.put("creator", "桂花");
-        String dataJson = objectMapper.writeValueAsString(dataMap);
-        Attendance newAttendance = toEntity(dataJson, Attendance.class);
+        Attendance newAttendance = toEntity(attendance, Attendance.class);
         //验证车辆
         Ambulance ambulance =  ambulanceService.findById(newAttendance.getCarId());
         if(ambulance == null || ambulance.getStatus() != Ambulance.Status.wait){
