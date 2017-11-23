@@ -33,8 +33,7 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
     /**
      * 查询电话号码是否已存在， 返回已存在电话号码
      */
-    public List idExist(String type,String[] values)
-    {
+    public List idExist(String type, String[] values) {
         String sql ="";
         if(type.equals("id")){
            sql= "SELECT id FROM eme_ambulance WHERE id in(:values)";
@@ -56,6 +55,7 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
                 map = ambulances.get(i-1);
                 Ambulance ambulance=new Ambulance();
                 ambulance.setId(map .get("id").toString());
+                /**
                 if(null!=map .get("initLongitude")){
                     ambulance.setInitLongitude(Double.valueOf(map .get("initLongitude").toString()));
                 }else{
@@ -67,6 +67,7 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
                     ambulance.setInitLatitude(0.0);
                 }
                 ambulance.setDistrict(map .get("district").toString());
+                */
                 ambulance.setOrgCode(map .get("orgCode").toString());
                 ambulance.setOrgName(map .get("orgName").toString());
                 ambulance.setPhone(map .get("phone").toString());

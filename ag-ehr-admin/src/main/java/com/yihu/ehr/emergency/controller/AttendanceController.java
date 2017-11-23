@@ -1,5 +1,6 @@
 package com.yihu.ehr.emergency.controller;
 
+import com.netflix.eureka.V1AwareInstanceInfoConverter;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
@@ -43,6 +44,14 @@ public class AttendanceController extends BaseController {
             @ApiParam(name = "status", value = "任务状态")
             @RequestParam(value = "status") String status) {
         return attendanceClient.update(carId, status);
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceEdit, method = RequestMethod.PUT)
+    @ApiOperation("编辑出勤记录")
+    public Envelop edit(
+            @ApiParam(name = "attendance", value = "出勤记录")
+            @RequestParam(value = "attendance") String attendance) {
+        return attendanceClient.edit(attendance);
     }
 
     @RequestMapping(value = ServiceApi.Emergency.AttendanceList, method = RequestMethod.GET)

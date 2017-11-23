@@ -6,9 +6,11 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.emergency.service.AmbulanceService;
 import com.yihu.ehr.emergency.service.AttendanceService;
+import com.yihu.ehr.emergency.service.LocationService;
 import com.yihu.ehr.emergency.service.ScheduleService;
 import com.yihu.ehr.entity.emergency.Ambulance;
 import com.yihu.ehr.entity.emergency.Attendance;
+import com.yihu.ehr.entity.emergency.Location;
 import com.yihu.ehr.entity.emergency.Schedule;
 import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.org.service.OrgService;
@@ -39,6 +41,8 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
     private ScheduleService scheduleService;
     @Autowired
     private AttendanceService attendanceService;
+    @Autowired
+    private LocationService locationService;
     @Autowired
     private OrgService orgService;
 
@@ -91,11 +95,14 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                 Map<String, Object> resultMap = new HashMap<String, Object>();
                 List<Schedule> scheduleList = scheduleService.findMatch(ambulance.getId(), date);
                 Attendance attendance = attendanceService.findByCreateDateAndCarId(date, ambulance.getId());
+                Location location = locationService.findById(ambulance.getLocation());
                 Map<String, Object> childMap = new HashMap<String, Object>();
                 childMap.put("id", ambulance.getId());
-                childMap.put("initLongitude", ambulance.getInitLongitude());
-                childMap.put("initLatitude", ambulance.getInitLatitude());
-                childMap.put("district", ambulance.getDistrict());
+                childMap.put("location", location.getId());
+                childMap.put("initLongitude", location.getInitLongitude());
+                childMap.put("initLatitude", location.getInitLatitude());
+                childMap.put("initAddress", location.getInitAddress());
+                childMap.put("district", location.getDistrict());
                 childMap.put("orgCode", ambulance.getOrgCode());
                 childMap.put("orgName", ambulance.getOrgName());
                 childMap.put("phone", ambulance.getPhone());
@@ -221,12 +228,14 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                     envelop.setErrorMsg("手机号码重复");
                     return envelop;
                 }
+                /**
                 Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
                 if (organization == null) {
                     envelop.setSuccessFlg(false);
                     envelop.setErrorMsg("无相关机构");
                     return envelop;
                 }
+                */
                 if (oldAmbulance.getStatus() == Ambulance.Status.wait || oldAmbulance.getStatus() == Ambulance.Status.down) {
                     ambulanceService.save(newAmbulance);
                     envelop.setSuccessFlg(true);
@@ -273,26 +282,27 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
         return envelop;
     }
 
+
+
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在车牌号、电话号码")
     public List idExistence(
-            @ApiParam(name = "type", value = "字段名", defaultValue = "")
+            @ApiParam(name = "type", value = "字段名")
             @RequestParam(value ="type") String type,
-            @ApiParam(name = "values", value = "车牌号、电话号码", defaultValue = "")
+            @ApiParam(name = "values", value = "车牌号、电话号码")
             @RequestBody String values) throws Exception {
-        List existPhones = ambulanceService.idExist(type,toEntity(values, String[].class));
+        List existPhones = ambulanceService.idExist(type, toEntity(values, String[].class));
         return existPhones;
     }
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulancesBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入救护车")
     public boolean createAmbulancesBatch(
-            @ApiParam(name = "ambulances", value = "救护车", defaultValue = "")
+            @ApiParam(name = "ambulances", value = "救护车")
             @RequestBody String ambulances) throws Exception{
-        List models = objectMapper.readValue(ambulances, new TypeReference<List>() {});
+        List models = objectMapper.readValue(ambulances, List.class);
         ambulanceService.addAmbulancesBatch(models);
         return true;
     }
-
 
 }

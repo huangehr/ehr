@@ -29,4 +29,7 @@ public class AttendanceService extends BaseJpaService<Attendance, AttendanceDao>
         return attendanceDao.findByCreateDateAndCarId(startTime, carId);
     }
 
+    public Attendance findById(int id) {
+        return attendanceDao.findById(id);
+    }
 }

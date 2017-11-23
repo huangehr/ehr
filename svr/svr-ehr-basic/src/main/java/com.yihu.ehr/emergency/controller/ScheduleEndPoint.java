@@ -1,12 +1,12 @@
 package com.yihu.ehr.emergency.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.emergency.service.AmbulanceService;
 import com.yihu.ehr.emergency.service.ScheduleService;
 import com.yihu.ehr.entity.emergency.Ambulance;
-import com.yihu.ehr.entity.emergency.Attendance;
 import com.yihu.ehr.entity.emergency.Schedule;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -53,6 +52,28 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
             List<Schedule> schedules = scheduleService.search(fields, filters, sorts, page, size);
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(schedules);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleLevel, method = RequestMethod.GET)
+    @ApiOperation("获取排班层级列表（年-月-日）")
+    public Envelop level(
+            @ApiParam(name = "date", value = "年-月")
+            @RequestParam(value = "date", required = false) String date,
+            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page,
+            @ApiParam(name = "size", value = "页码", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size) {
+        Envelop envelop = new Envelop();
+        try {
+            List<Object> resultList =  scheduleService.getLevel(date, page, size);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(resultList);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -116,6 +137,16 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
             envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入排班信息")
+    public boolean createSchedulesBatch(
+            @ApiParam(name = "schedules", value = "排班信息", defaultValue = "")
+            @RequestBody String schedules) throws Exception{
+        List models = objectMapper.readValue(schedules, new TypeReference<List>() {});
+        scheduleService.addSchedulesBatch(models);
+        return true;
     }
 
 }

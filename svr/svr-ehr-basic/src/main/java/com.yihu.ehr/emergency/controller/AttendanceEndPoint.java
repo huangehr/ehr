@@ -44,19 +44,7 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "attendance", value = "出勤记录")
             @RequestBody String attendance) throws Exception{
         Envelop envelop = new Envelop();
-        Map<String, Object> dataMap = new HashMap<String, Object>();
-        dataMap.put("carId", "赣ESD2322");
-        dataMap.put("alarmTel", "120");
-        dataMap.put("callAddress", "五三大道");
-        dataMap.put("chiefComplaint", "救命");
-        dataMap.put("dispatchHospital", "人民医院");
-        dataMap.put("patientNum", 2);
-        dataMap.put("patientGender", "一男一女");
-        dataMap.put("disease", "车祸");
-        dataMap.put("remark", "赶紧的");
-        dataMap.put("creator", "桂花");
-        String dataJson = objectMapper.writeValueAsString(dataMap);
-        Attendance newAttendance = toEntity(dataJson, Attendance.class);
+        Attendance newAttendance = toEntity(attendance, Attendance.class);
         //验证车辆
         Ambulance ambulance =  ambulanceService.findById(newAttendance.getCarId());
         if(ambulance == null || ambulance.getStatus() != Ambulance.Status.wait){
@@ -162,6 +150,30 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("该车辆无可更新的出勤记录");
             envelop.setObj(-1);
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceEdit, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("编辑出勤记录")
+    public Envelop edit(
+            @ApiParam(name = "attendance", value = "出勤记录")
+            @RequestBody String attendance) {
+        Envelop envelop = new Envelop();
+        try {
+            Attendance newAttendance = objectMapper.readValue(attendance, Attendance.class);
+            Attendance oldAttendance = attendanceService.findById(newAttendance.getId());
+            if(!oldAttendance.getCarId().equals(newAttendance.getCarId())) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("车牌号码有误");
+                return envelop;
+            }
+            attendanceService.save(newAttendance);
+            envelop.setSuccessFlg(true);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
     }

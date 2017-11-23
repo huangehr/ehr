@@ -93,7 +93,7 @@ public class AmbulanceController extends BaseController {
         return ambulanceClient.delete(ids);
     }
 
-    @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在车牌号、电话号码")
     public List idExistence(
             @ApiParam(name = "type", value = "字段名", defaultValue = "")
@@ -110,13 +110,13 @@ public class AmbulanceController extends BaseController {
             @ApiParam(name = "ambulances", value = "救护车", defaultValue = "")
             @RequestParam(value = "ambulances") String ambulances) throws Exception {
         Envelop envelop = new Envelop();
-        envelop.setSuccessFlg(true);
         try{
             ambulanceClient.createAmbulancesBatch(ambulances);
+            envelop.setSuccessFlg(true);
         }catch (Exception e){
             e.printStackTrace();
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("导入失败！"+e.getMessage());
+            envelop.setErrorMsg("导入失败！" + e.getMessage());
         }
         return envelop;
     }

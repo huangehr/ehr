@@ -60,6 +60,14 @@ public interface RsResourceClient {
             @RequestParam(value = "userResource") String userResource,
             @RequestParam(value = "filters", required = false) String filters);
 
+    @RequestMapping(value = ServiceApi.Resources.ResourcePage, method = RequestMethod.GET)
+    @ApiOperation("获取资源列表分页")
+    Envelop getResourcePage(
+            @RequestParam(value = "userResource") String userResource,
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size);
+
     @ApiOperation("资源查询")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.GET)
     ResponseEntity<List<MRsResources>> queryResources(

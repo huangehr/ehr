@@ -116,6 +116,20 @@ public class RsResourceController extends BaseController {
         return resourcesClient.getResourceTree(dataSource, userResource, filters);
     }
 
+    @RequestMapping(value = ServiceApi.Resources.ResourcePage, method = RequestMethod.GET)
+    @ApiOperation("获取资源列表分页（政府服务平台）")
+    public Envelop getResourcePage(
+            @ApiParam(name = "userResource", value = "授权资源")
+            @RequestParam(value = "userResource") String userResource,
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size") int size) {
+        return resourcesClient.getResourcePage(userResource, userId, page, size);
+    }
+
     @ApiOperation("资源查询")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.GET)
     public Envelop queryResources(
@@ -133,8 +147,7 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "rolesId", required = false) String rolesId,
             @ApiParam(name = "appId", value = "应用Id", defaultValue = "")
             @RequestParam(value = "appId", required = false) String appId) throws Exception {
-        try
-        {
+        try {
             ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources(fields,filters,sorts,page,size, rolesId, appId);
             List<MRsResources> mRsResources = responseEntity.getBody();
             List<RsResourcesModel> rsResources = new ArrayList<>(mRsResources.size());
