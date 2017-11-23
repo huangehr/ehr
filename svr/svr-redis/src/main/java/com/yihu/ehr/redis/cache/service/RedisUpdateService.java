@@ -1,4 +1,4 @@
-package com.yihu.ehr.redis.service;
+package com.yihu.ehr.redis.cache.service;
 
 import com.yihu.ehr.redis.schema.OrgKeySchema;
 import org.springframework.beans.factory.annotation.Autowired;
