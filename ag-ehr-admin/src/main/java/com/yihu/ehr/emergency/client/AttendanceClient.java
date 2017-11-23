@@ -3,7 +3,6 @@ package com.yihu.ehr.emergency.client;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.entity.emergency.Ambulance;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,6 +36,11 @@ public interface AttendanceClient {
     Envelop update(
             @RequestParam(value = "carId") String carId,
             @RequestParam(value = "status") String status);
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceEdit, method = RequestMethod.PUT)
+    @ApiOperation("编辑出勤记录")
+    Envelop edit(
+            @RequestBody String attendance);
 
     @RequestMapping(value = ServiceApi.Emergency.AttendanceList, method = RequestMethod.GET)
     @ApiOperation("获取出勤列表")
