@@ -1,5 +1,6 @@
 package com.yihu.ehr.redis.schema;
 
+import com.yihu.ehr.constants.SessionAttributeKeys;
 import com.yihu.ehr.redis.KeySchema;
 import org.springframework.stereotype.Component;
 
@@ -9,10 +10,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppKeySchema extends KeySchema {
 
+    private  static long seconds = 3600*4;//默认设置4小时
+    private  static long current_user_seconds = 1800;//默认设置半小时
+
+
     public AppKeySchema(){
         super.table="FrontAppSession";
         super.column="code";
     }
+
+
 
     /**
      * 前端app 保存单条缓存
@@ -22,7 +29,10 @@ public class AppKeySchema extends KeySchema {
         if(key.contains("-")){
             String keyVal = key.substring(0,key.indexOf("-"));
             String code =  key.substring(key.indexOf("-")+1, key.length());
-            redisClient.set(makeKey(table,keyVal,code),val);
+            if(code.equals(SessionAttributeKeys.CurrentUser)){
+                seconds = current_user_seconds;
+            }
+            redisClient.set(makeKey(table,keyVal,code),val,seconds);
         }else {
             set(key,val);
         }
@@ -36,9 +46,9 @@ public class AppKeySchema extends KeySchema {
         if(key.contains("-")){
             String keyVal = key.substring(0,key.indexOf("-"));
             String code =  key.substring(key.indexOf("-")+1, key.length());
-           return redisClient.get(makeKey(table, keyVal, code));
+            return redisClient.get(makeKey(table, keyVal, code));
         }else {
-          return   get(key);
+            return   get(key);
         }
     }
 
