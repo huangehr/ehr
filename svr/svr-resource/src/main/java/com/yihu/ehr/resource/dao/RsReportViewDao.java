@@ -16,8 +16,6 @@ import java.util.List;
  */
 public interface RsReportViewDao extends PagingAndSortingRepository<RsReportView, Integer> {
 
-    List<RsReportView> findByResourceId(String resourceId);
-
     List<RsReportView> findByReportId(Integer reportId);
 
     RsReportView findByReportIdAndResourceId(Integer reportId, String resourceId);
