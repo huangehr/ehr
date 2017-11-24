@@ -916,6 +916,41 @@ public class ServiceApi {
             public static final String Delete = "/redis/mq/publisher/delete";
             public static final String IsUniqueAppId = "/redis/mq/publisher/isUniqueAppId";
         }
+        // 缓存分类
+        public static class CacheCategory {
+            public static final String Prefix = "/redis/cache/category/";
+            public static final String GetById = "/redis/cache/category/{id}";
+            public static final String Search = "/redis/cache/category/search";
+            public static final String Save = "/redis/cache/category/save";
+            public static final String Delete = "/redis/cache/category/delete";
+            public static final String IsUniqueName = "/redis/cache/category/isUniqueName";
+            public static final String IsUniqueCode = "/redis/cache/category/isUniqueCode";
+        }
+        // 缓存授权
+        public static class CacheAuthorization {
+            public static final String Prefix = "/redis/cache/authorization/";
+            public static final String GetById = "/redis/cache/authorization/{id}";
+            public static final String Search = "/redis/cache/authorization/search";
+            public static final String Save = "/redis/cache/authorization/save";
+            public static final String Delete = "/redis/cache/authorization/delete";
+            public static final String IsUniqueAppId = "/redis/cache/authorization/isUniqueAppId";
+        }
+        // 缓存Key规则
+        public static class CacheKeyRule {
+            public static final String Prefix = "/redis/cache/keyRule/";
+            public static final String GetById = "/redis/cache/keyRule/{id}";
+            public static final String Search = "/redis/cache/keyRule/search";
+            public static final String Save = "/redis/cache/keyRule/save";
+            public static final String Delete = "/redis/cache/keyRule/delete";
+            public static final String IsUniqueName = "/redis/cache/keyRule/isUniqueName";
+            public static final String IsUniqueCode = "/redis/cache/keyRule/isUniqueCode";
+        }
+        // 缓存操作
+        public static class CacheOperation {
+            public static final String Get = "/redis/cache/operation/get";
+            public static final String Set = "/redis/cache/operation/set";
+            public static final String Remove = "/redis/cache/operation/remove";
+        }
 
     }
 
