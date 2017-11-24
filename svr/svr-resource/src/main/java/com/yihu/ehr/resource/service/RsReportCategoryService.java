@@ -199,4 +199,9 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
         List<RsReportCategory> list = query.list();
         return list;
     }
+
+    public List<RsReportCategory> getCategoryByIds(List<Integer> ids) {
+        List<RsReportCategory> categoryList = rsReportCategoryDao.findCategoryByIds(ids);
+        return categoryList;
+    }
 }

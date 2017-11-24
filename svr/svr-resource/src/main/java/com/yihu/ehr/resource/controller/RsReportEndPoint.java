@@ -155,4 +155,12 @@ public class RsReportEndPoint extends EnvelopRestEndPoint {
         return list.size() == 0 ? false : true;
     }
 
+    @ApiOperation("根据资源分类编码获取资源报表分")
+    @RequestMapping(value = ServiceApi.Resources.RsReportByCategoryId, method = RequestMethod.GET)
+    public List<RsReport> getByCategoryId(
+            @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "reportCategoryId") Integer reportCategoryId) throws Exception {
+        List<RsReport> list = rsReportService.getByReportCategoryId(reportCategoryId);
+        return list;
+    }
 }
