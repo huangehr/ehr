@@ -43,72 +43,25 @@ public class PackageResourceJob implements InterruptableJob {
     }
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(JobExecutionContext context) {
+        PackageMgrClient packageMgrClient = SpringContext.getService(PackageMgrClient.class);
         MessageBuffer messageBuffer = SpringContext.getService(MessageBuffer.class);
-        MPackage pack = messageBuffer.getMessage();
+        MPackage pack =  messageBuffer.getMessage();
         JobDetail jobDetail = context.getJobDetail();
         JobKey jobKey = jobDetail.getKey();
         Scheduler scheduler = context.getScheduler();
-        if (null == pack) {
-            try {
-                scheduler.deleteJob(jobKey);
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-        }else {
-            doResolve(pack, scheduler, jobKey);
-        }
-    }
-
-    private void doResolve(MPackage pack, Scheduler scheduler, JobKey jobKey) {
-        PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
-        PackageMgrClient packageMgrClient = SpringContext.getService(PackageMgrClient.class);
-        PatientInfoDao patientInfoDao = SpringContext.getService(PatientInfoDao.class);
-        PackMill packMill = SpringContext.getService(PackMill.class);
-        ResourceService resourceService = SpringContext.getService(ResourceService.class);
-        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
-        System.out.println("正在入库中:" + pack.getId() + ", Timestamp:" + new Date());
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            long start = System.currentTimeMillis();
-            StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
-            ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
-            resourceService.save(resourceBucket);
-            //获取注册信息
-            String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString();
-            if(!idCardNo.equals("")) {
-                boolean isRegistered = patientInfoDao.isRegistered(idCardNo);
-                if (!isRegistered) {
-                    MDemographicInfo demoInfo = new MDemographicInfo();
-                    demoInfo.setIdCardNo(resourceBucket.getDemographicId() == null ? "" : resourceBucket.getDemographicId().toString());
-                    demoInfo.setName(resourceBucket.getPatientName() == null ? "" : resourceBucket.getPatientName().toString());
-                    demoInfo.setBirthday(resourceBucket.getMasterRecord().getResourceValue("EHR_000320") == null ? null : DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000320")));
-                    demoInfo.setNativePlace(resourceBucket.getMasterRecord().getResourceValue("EHR_000015") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000015").toString());
-                    demoInfo.setGender(resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString());
-                    demoInfo.setMartialStatus(resourceBucket.getMasterRecord().getResourceValue("EHR_000014") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000014").toString());
-                    demoInfo.setNation(resourceBucket.getMasterRecord().getResourceValue("EHR_000016") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000016").toString());
-                    demoInfo.setTelephoneNo(resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString());
-                    demoInfo.setEmail(resourceBucket.getMasterRecord().getResourceValue("EHR_000008") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000008").toString());
-                    //注册
-                    boolean isSucceed = patientInfoDao.save(demoInfo);
-                    if (!isSucceed) {
-                        LogService.getLogger().info("idCardNo:" + idCardNo + " registration failed !");
-                    }
+            if (null == pack) {
+                try {
+                    scheduler.deleteJob(jobKey);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }else {
-                LogService.getLogger().info("idCardNo is empty !");
+            } else {
+                System.out.println("正在入库中:" + pack.getId() + ", Timestamp:" + new Date());
+                doResolve(pack, packageMgrClient);
             }
-            //回填入库状态
-            Map<String,String> map = new HashMap();
-            map.put("profileId",standardPackage.getId());
-            map.put("demographicId",standardPackage.getDemographicId());
-            map.put("eventType",String.valueOf(standardPackage.getEventType().getType()));
-            map.put("eventNo",standardPackage.getEventNo());
-            map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-            map.put("patientId",standardPackage.getPatientId());
-            packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
-            getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
             if (StringUtils.isBlank(e.getMessage())) {
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal Server Error");
@@ -121,6 +74,52 @@ public class PackageResourceJob implements InterruptableJob {
                 se.printStackTrace();
             }
         }
+    }
+
+    private void doResolve(MPackage pack, PackageMgrClient packageMgrClient) throws Exception {
+        PackageResolveEngine resolveEngine = SpringContext.getService(PackageResolveEngine.class);
+        PatientInfoDao patientInfoDao = SpringContext.getService(PatientInfoDao.class);
+        PackMill packMill = SpringContext.getService(PackMill.class);
+        ResourceService resourceService = SpringContext.getService(ResourceService.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        long start = System.currentTimeMillis();
+        StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
+        ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
+        resourceService.save(resourceBucket);
+        //获取注册信息
+        String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString();
+        if(!idCardNo.equals("")) {
+            boolean isRegistered = patientInfoDao.isRegistered(idCardNo);
+            if (!isRegistered) {
+                MDemographicInfo demoInfo = new MDemographicInfo();
+                demoInfo.setIdCardNo(resourceBucket.getDemographicId() == null ? "" : resourceBucket.getDemographicId().toString());
+                demoInfo.setName(resourceBucket.getPatientName() == null ? "" : resourceBucket.getPatientName().toString());
+                demoInfo.setBirthday(resourceBucket.getMasterRecord().getResourceValue("EHR_000320") == null ? null : DateTimeUtil.simpleDateParse(resourceBucket.getMasterRecord().getResourceValue("EHR_000320")));
+                demoInfo.setNativePlace(resourceBucket.getMasterRecord().getResourceValue("EHR_000015") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000015").toString());
+                demoInfo.setGender(resourceBucket.getMasterRecord().getResourceValue("EHR_000019") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000019").toString());
+                demoInfo.setMartialStatus(resourceBucket.getMasterRecord().getResourceValue("EHR_000014") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000014").toString());
+                demoInfo.setNation(resourceBucket.getMasterRecord().getResourceValue("EHR_000016") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000016").toString());
+                demoInfo.setTelephoneNo(resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString());
+                demoInfo.setEmail(resourceBucket.getMasterRecord().getResourceValue("EHR_000008") == null ? "" : resourceBucket.getMasterRecord().getResourceValue("EHR_000008").toString());
+                //注册
+                boolean isSucceed = patientInfoDao.save(demoInfo);
+                if (!isSucceed) {
+                    LogService.getLogger().info("idCardNo:" + idCardNo + " registration failed !");
+                }
+            }
+        }else {
+            LogService.getLogger().info("idCardNo is empty !");
+        }
+        //回填入库状态
+        Map<String,String> map = new HashMap();
+        map.put("profileId",standardPackage.getId());
+        map.put("demographicId",standardPackage.getDemographicId());
+        map.put("eventType",String.valueOf(standardPackage.getEventType().getType()));
+        map.put("eventNo",standardPackage.getEventNo());
+        map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
+        map.put("patientId",standardPackage.getPatientId());
+        packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
+        getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
     }
 
     private String downloadTo(String filePath) throws Exception {

@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -41,6 +42,8 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
     private RsRolesResourceGrantService rsRolesResourceGrantService;
     @Autowired
     private RsRolesResourceMetadataGrantService rsRolesResourceMetadataGrantService;
+    @Autowired
+    private RsDictionaryService rsDictionaryService;
 
 
     /**
@@ -99,10 +102,13 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
                 }
             }
             if(rsMetadataIdSet.size() > 0) {
-                String rsMetadataIds = "";
+                StringBuilder builder = new StringBuilder();
                 for (String id : rsMetadataIdSet) {
-                    rsMetadataIds += "'" + id + "'" + ",";
+                    builder.append("'");
+                    builder.append(id);
+                    builder.append("',");
                 }
+                String rsMetadataIds = builder.toString();
                 metadataList = resourceMetadataQueryDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
             }else {
                 metadataList = null;
@@ -251,11 +257,18 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
         }else {
             //授权资源
             List<String> userResourceList = objectMapper.readValue(userResource, List.class);
-            String ids = "";
+            StringBuilder builder = new StringBuilder();
             for(String id : userResourceList) {
-                ids += "'" + id + "'" + ",";
+                builder.append("'");
+                builder.append(id);
+                builder.append("',");
             }
-            rrList = findFileMasterList(ids.substring(0, ids.length() -1), filters);
+            String ids = builder.toString();
+            if(StringUtils.isEmpty(ids)) {
+                rrList = findFileMasterList("''", filters);
+            }else {
+                rrList = findFileMasterList(ids.substring(0, ids.length() -1), filters);
+            }
         }
         if(rrList != null) {
             for(RsResource rsResources : rrList) {
@@ -271,8 +284,19 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
                         metadataMap.put("level", "2");
                         metadataMap.put("code", rsMetadata.getId());
                         metadataMap.put("name", rsMetadata.getName());
-                        metadataMap.put("metaDataStdCode", rsMetadata.getStdCode());
+                        metadataMap.put("stdCode", rsMetadata.getStdCode());
+                        String dictCode = rsMetadata.getDictCode();
                         metadataMap.put("dictCode", rsMetadata.getDictCode());
+                        if(!StringUtils.isEmpty(dictCode)){
+                            if (dictCode.equals("DATECONDITION")) {
+                                metadataMap.put("dictName", "时间");
+                            }else {
+                                RsDictionary rsDictionary = rsDictionaryService.findByCode(rsMetadata.getDictCode());
+                                if(rsDictionary != null) {
+                                    metadataMap.put("dictName", rsDictionary.getName());
+                                }
+                            }
+                        }
                         metadataMap.put("description", rsMetadata.getDescription());
                         metadataMap.put("groupData", "");
                         metadataMap.put("groupType", "");

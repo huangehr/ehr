@@ -10,6 +10,9 @@ package com.yihu.ehr.constants;
  */
 public class ServiceApi {
 
+    public static class GateWay {
+        public static final String admin = "/admin";
+    }
 
     public static class Adaptions {
         //public static final String Cache = "/adaptions/{id}/cache";
@@ -56,7 +59,9 @@ public class ServiceApi {
         //资源视图
         public static final String Resources = "/resources";
         public static final String Resource = "/resources/{id}";
+        public static final String ResourceByCode = "/resources/byCode";
         public static final String ResourceTree = "/resources/tree";
+        public static final String ResourcePage = "/resources/page";
         public static final String NoPageResources = "/NoPageResources";
         public static final String IsExistName = "/resources/isExistName";
         public static final String IsExistCode = "/resources/isExistCode/{code}";
@@ -178,7 +183,7 @@ public class ServiceApi {
         public static final String ResourceOrgMetadatasValid = "/resources/OrgMetadatas/valid";
         public static final String ResourceOrgMetadataGrants = "/resources/OrgMetadatas/grants";
         public static final String OrgGrantResources = "/resources/Org/{orgCode}/grant";
-        //        public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
+        //public static final String ResourceGrantApps = "/resources/{resourceId}/grant";
         public static final String ResourceOrgMetadataGrant = "/resources/OrgMetadata/grants/{id}";
         public static final String ResourceOrgGrantsNoPage = "/resources/OrgGrants/no_paging";
         public static final String ResourceOrgResMetadataGrants = "/resources/Org_resource/{Org_res_id}/metadata";
@@ -198,6 +203,27 @@ public class ServiceApi {
         public static final String RsReportCategoryIsUniqueCode = "/resources/reportCategory/isUniqueCode";
         public static final String RsReportCategoryIsUniqueName = "/resources/reportCategory/isUniqueName";
         public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
+
+
+        /**
+         * 资源报表监测分类
+         */
+        public static final String RsReportMonitorType = "/resources/rsReportMonitorType/{id}";
+        public static final String RsReportMonitorTypeSave = "/resources/rsReportMonitorType/save";
+        public static final String RsReportMonitorTypeDelete = "/resources/rsReportMonitorType/delete";
+        public static final String RsReportMonitorTypeIsUniqueName = "/resources/rsReportMonitorType/isUniqueName";
+        public static final String RsReportMonitorTypes = "/resources/rsReportMonitorType/getRsReportMonitorTypePage";
+        public static final String RsReportMonitorTypesNoPage = "/resources/rsReportMonitorType/getRsReportMonitorTypeNoPage";
+        public static final String RsReportMonitorTypesById = "/resources/rsReportMonitorType/getRsReportMonitorTypeById";
+        public static final String RsReportByMonitorTypeId = "/resources/rsReportMonitorType/getRsReportByMonitorTypeId";
+
+        /**
+         * 资源报表监测类型配置报表
+         */
+        public static final String RsMonitorTypeReport = "/resources/monitorTypeReport";
+        public static final String RsMonitorTypeReportByUserId = "/resources/monitorTypeReport/{user_id}";
+        public static final String RsMonitorTypeReports = "/resources/monitorTypeReport";
+        public static final String RsMonitorTypeReportsNoPage = "/resources/monitorTypeReport/noPage";
 
         /**
          * 资源报表
@@ -222,6 +248,7 @@ public class ServiceApi {
         public static final String RsReportViews = "/resources/reportViews";
         public static final String RsReportViewSave = "/resources/reportView/save";
         public static final String RsReportViewExist = "/resources/reportView/exist";
+        public static final String RsReportViewExistByResourceId = "/resources/reportView/existByResourceId";
         public static final String RsReportViewExistReport = "/resources/reportView/existReport";
 
 
@@ -807,9 +834,8 @@ public class ServiceApi {
 
     }
 
-
     /**
-     *Redis服务
+     * Redis服务
      */
     public static class Redis {
 
@@ -861,6 +887,37 @@ public class ServiceApi {
         public static final String StdMetadataType = "/redis/stdMetaDataType";
         public static final String StdMetadataDict = "/redis/stdMetaDataDict";
         public static final String StdDictEntryValue = "/redis/stdDictEntryValue";
+
+        // Redis消息队列
+        public static class MqChannel {
+            public static final String Prefix = "/redis/mq/channel/";
+            public static final String GetById = "/redis/mq/channel/{id}";
+            public static final String Search = "/redis/mq/channel/search";
+            public static final String Save = "/redis/mq/channel/save";
+            public static final String Delete = "/redis/mq/channel/delete";
+            public static final String IsUniqueChannel = "/redis/mq/channel/isUniqueChannel";
+            public static final String IsUniqueChannelName = "/redis/mq/channel/isUniqueChannelName";
+            public static final String SendMessage = "/redis/mq/channel/sendMessage";
+        }
+        // Redis消息订阅者
+        public static class MqSubscriber {
+            public static final String Prefix = "/redis/mq/subscriber/";
+            public static final String GetById = "/redis/mq/subscriber/{id}";
+            public static final String Search = "/redis/mq/subscriber/search";
+            public static final String Save = "/redis/mq/subscriber/save";
+            public static final String Delete = "/redis/mq/subscriber/delete";
+            public static final String IsUniqueAppId = "/redis/mq/subscriber/isUniqueAppId";
+            public static final String IsUniqueSubscribedUrl = "/redis/mq/subscriber/isUniqueSubscribedUrl";
+        }
+        // Redis消息发布者
+        public static class MqPublisher {
+            public static final String Prefix = "/redis/mq/publisher/";
+            public static final String GetById = "/redis/mq/publisher/{id}";
+            public static final String Search = "/redis/mq/publisher/search";
+            public static final String Save = "/redis/mq/publisher/save";
+            public static final String Delete = "/redis/mq/publisher/delete";
+            public static final String IsUniqueAppId = "/redis/mq/publisher/isUniqueAppId";
+        }
 
     }
 
@@ -1010,6 +1067,7 @@ public class ServiceApi {
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
         public static final String GetQuotaReport = "tj/getQuotaReport";
         public static final String GetQuotaGraphicReportPreview = "tj/getQuotaGraphicReportPreview";
+        public static final String GetMoreQuotaGraphicReportPreviews = "tj/getMoreQuotaGraphicReportPreviews";
         public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
 
@@ -1043,6 +1101,7 @@ public class ServiceApi {
         public static final String getUserOrgSaasByUserOrgCode="/org/getUserOrgSaasByUserOrgCode/";
         public static final String GetOrgDeptsDate="/org/getOrgDeptsDate";
         public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
+        public static final String getseaOrgsByOrgCode="/organizations/seaOrgsByOrgCode";
     }
 
     public static class GetInfo {
@@ -1060,6 +1119,51 @@ public class ServiceApi {
 
         public static final String AddGovernmentBrowseLog = "/governmentBrowseLog/save";
         public static final String searchGovernmentBrowseLog = "/governmentBrowseLog/searchByUserId";
+
+        public static final String GovernmentMenuReportMonitorTypeSave = "/governmentMenuReportMonitorType/save";
+        public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
+        public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
+
+        public static final String GetReportByMenuId = "/governmentMenuReportMonitorType/getReportByMenuId";
+    }
+
+    public static class SystemDict {
+        public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
+    }
+
+    /**
+     * 应急指挥中心
+     */
+    public static class Emergency {
+        // 救护车
+        public static final String AmbulanceList = "/ambulance/list";
+        public static final String AmbulanceSearch = "/ambulance/search";
+        public static final String AmbulanceUpdateStatus = "/ambulance/updateStatus";
+        public static final String AmbulanceSave = "/ambulance/save";
+        public static final String AmbulanceUpdate = "/ambulance/update";
+        public static final String AmbulanceDelete = "/ambulance/delete";
+        public static final String AmbulanceIdOrPhoneExistence = "/ambulance/IdOrPhoneExistence";
+        public static final String AmbulancesBatch = "/ambulances/batch";
+
+        // 出勤记录
+        public static final String AttendanceSave = "/attendance/save";
+        public static final String AttendanceUpdate = "/attendance/update";
+        public static final String AttendanceEdit = "/attendance/edit";
+        public static final String AttendanceList = "/attendance/list";
+        public static final String AttendanceDelete = "/attendance/delete";
+
+        // 排班
+        public static final String ScheduleList = "/schedule/list";
+        public static final String ScheduleLevel = "/schedule/level";
+        public static final String ScheduleSave = "/schedule/save";
+        public static final String ScheduleUpdate = "/schedule/update";
+        public static final String ScheduleBatch = "/schedules/batch";
+
+        // 待命地点
+        public static final String LocationList = "/location/list";
+        public static final String LocationSave = "/location/save";
+        public static final String LocationUpdate = "/location/update";
+        public static final String LocationDelete = "/location/delete";
     }
     public static class SystemDict {
         public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";

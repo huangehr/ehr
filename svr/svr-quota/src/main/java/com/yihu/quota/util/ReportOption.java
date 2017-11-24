@@ -126,6 +126,69 @@ public class ReportOption {
     }
 
     /**
+     * 折线图
+     * @param title  标题
+     * @param xName x轴名称
+     * @param yName yz轴名称
+     * @param lineDatas 数据集
+     * @param lineNames 折线名称集合
+     */
+    public Option getLineEchartOptionMoreChart(String title, String xName, String yName, Object[] yData,  List<List<Object>> lineDatas, List<String> lineNames,List<String> types) {
+        Option option = new GsonOption();
+        //title
+        option.title().setText(title);
+//        option.title().setSubtext(title);//小标题
+        option.title().x("center");
+        //tooltip
+        option.tooltip().trigger(Trigger.axis);
+        //toolbox
+        //grid
+        option.grid().left("3%");
+        option.grid().right("9%");
+        option.grid().top("22%");
+        option.grid().bottom("3%");
+        option.grid().containLabel(true);
+        //yAxis
+        ValueAxis valueAxis = new ValueAxis();
+        valueAxis.name(yName);
+        valueAxis.type(AxisType.value);
+//        valueAxis.axisLabel().formatter("℃");//单位
+        option.yAxis(valueAxis);
+
+        //xAxis
+        CategoryAxis categoryAxis = new CategoryAxis();
+        categoryAxis.name(xName);
+        categoryAxis.type(AxisType.category);
+//        categoryAxis.axisLabel().formatter("千米");//单位
+        categoryAxis.data(yData);
+        option.xAxis(categoryAxis);
+
+        if(lineNames.size() > 0 && lineDatas.size() >0 && lineNames.size() == lineDatas.size()) {
+            for (int i = 0; i < lineDatas.size(); i++) {
+                String lineName = lineNames.get(i);
+                String type = types.get(i);
+                //series
+                Line line = new Line();
+                line.name(lineName);
+                if (type.equals(String.valueOf(ReportOption.bar))) {
+                    line.type(SeriesType.bar);
+                } else if (type.equals(String.valueOf(ReportOption.line))) {
+                        line.type(SeriesType.line);
+                }
+                line.smooth(true);
+                line.stack("stack");
+                line.itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0.4)");
+
+                List<Object> lineValList = lineDatas.get(i);
+                Object[] lineVal = (Object[]) lineValList.toArray(new Object[lineValList.size()]);
+                line.data(lineVal);
+                option.series().add(line);
+            }
+        }
+        return option;
+    }
+
+    /**
      * 柱状图
      * @param title 标题
      * @param legend 副标题

@@ -29,10 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -112,7 +109,7 @@ public class QuotaReportController extends BaseController {
         return envelop;
     }
 
-    @ApiOperation(value = "获取指标统计结果echart图表")
+    @ApiOperation(value = "获取指标统计结果echart图表，单条线")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaGraphicReportPreview, method = RequestMethod.GET)
     public MChartInfoModel getQuotaGraphicReport(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
@@ -136,7 +133,7 @@ public class QuotaReportController extends BaseController {
             List<MReportDimension> dimesionList = new ArrayList<>();
             for(int i=0 ;i < mains.size();i++){
                 String choose = "false";
-                if(StringUtils.isEmpty(dimension) || dimension.equals("null") || dimension.equals("")){
+                if(StringUtils.isEmpty(dimension) || dimension.equals("null")){
                     dimension = mains.get(i).getCode();
                     if(i==0){
                         choose = "true";
@@ -198,9 +195,98 @@ public class QuotaReportController extends BaseController {
             }
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
-            chartInfoModel.setQuotaId(tjQuota.getId().toString());
-            chartInfoModel.setQuotaCode(tjQuota.getCode());
+//            chartInfoModel.setQuotaId(tjQuota.getId().toString());
+//            chartInfoModel.setQuotaCode(tjQuota.getCode());
             chartInfoModel.setDimensionMap(dimensionMap);
+            return chartInfoModel;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+            envelop.setSuccessFlg(false);
+            return null;
+        }
+    }
+
+
+    @ApiOperation(value = "获取指标统计结果echart图表，一条和多条线")
+    @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.POST)
+    public MChartInfoModel getQuotaGraphicReports(
+            @ApiParam(name = "idStr", value = "指标任务ID", required = true)
+            @RequestParam(value = "idStr" , required = true) String idStr,
+            @ApiParam(name = "charstr", value = "图表类型", defaultValue = "1")
+            @RequestParam(value = "charstr" , required = true) String charstr,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "title", value = "视图名称", defaultValue = "")
+            @RequestParam(value = "title", required = false) String title
+    ) {
+        Envelop envelop = new Envelop();
+        try {
+            List<String> ids = Arrays.asList(idStr.split(","));
+            List<String> charTypes = Arrays.asList(charstr.split(","));
+            Option option = null;
+            String xName = "";
+            String yName = "数量";
+            List<List<Object>> optionData = new ArrayList<>();
+            List<String> lineNames = new ArrayList<>();
+            Map<String,Map<String, Object>> lineData = new HashMap<>();
+
+            for(String id:ids){
+                TjQuota tjQuota = quotaService.findOne(Integer.valueOf(id));
+                if(tjQuota != null){
+                    //查询维度
+                    List<TjDimensionMain> mains = tjDimensionMainService.getDimensionMainByQuotaCode(tjQuota.getCode());
+                    QuotaReport quotaReport = quotaService.getQuotaReportGeneral(tjQuota.getId(), filter, mains.get(0).getCode()+"Name", 10000);
+                    Map<String, Object> datamap = new HashMap<>();
+                    for(ResultModel resultModel :quotaReport.getReultModelList()){
+                        datamap.put(resultModel.getCloumns().get(0),resultModel.getValue());
+                    }
+                    xName = mains.get(0).getName();
+                    lineNames.add(tjQuota.getName());
+                    lineData.put(tjQuota.getCode(), datamap);
+                }
+            }
+            Map<String, Object> quotaMap = new HashMap<>();
+            ReportOption reportOption = new ReportOption();
+
+            int size = 0;
+            String quota = "";
+            if(lineData != null && lineData.size() > 0){
+                for(String key : lineData.keySet()){
+                    int tempSize = lineData.get(key).size();
+                    if (tempSize > size){
+                        size = tempSize;
+                        quota = key;
+                        quotaMap = lineData.get(key);
+                    }
+                }
+
+                for(String key : lineData.keySet()){
+                    List<Object> dataList = new ArrayList<>();
+                    Map<String,Object> valMap = lineData.get(key);
+                    if(key != quota){
+                        for(String name :quotaMap .keySet()){
+                            if(valMap.containsKey(name)){
+                                dataList.add(valMap.get(name));
+                            }else {
+                                dataList.add(0);
+                            }
+                        }
+                    }else{
+                        for(String name :valMap .keySet()){
+                            dataList.add(valMap.get(name));
+                        }
+                    }
+                    optionData.add(dataList);
+                }
+            }
+            Object[] yData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
+            option = reportOption.getLineEchartOptionMoreChart(title, xName, yName, yData, optionData, lineNames,charTypes);
+            MChartInfoModel chartInfoModel = new MChartInfoModel();
+            chartInfoModel.setOption(option.toString());
+            chartInfoModel.setTitle(title);
             return chartInfoModel;
         } catch (Exception e) {
             error(e);

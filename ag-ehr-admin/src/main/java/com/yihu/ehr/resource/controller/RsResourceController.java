@@ -3,23 +3,17 @@ package com.yihu.ehr.resource.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
-import com.yihu.ehr.agModel.resource.RsRolesResourceModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
-import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.*;
 import com.yihu.ehr.model.tj.MQuotaConfigModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
-import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.resource.client.*;
-import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,6 +34,7 @@ import java.util.*;
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
 @Api(value = "resources", description = "资源服务接口", tags = {"资源管理-资源服务接口"})
 public class RsResourceController extends BaseController {
+
     @Autowired
     private RsResourceClient resourcesClient;
     @Autowired
@@ -58,89 +53,55 @@ public class RsResourceController extends BaseController {
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST)
     public Envelop createResource(
-            @ApiParam(name = "resource", value = "资源", defaultValue = "")
-            @RequestParam(value = "resource") String resource) throws Exception {
-        Envelop envelop = new Envelop();
-        try{
-            RsResourcesModel rsResourcesModel = objectMapper.readValue(resource,RsResourcesModel.class);
-            MRsResources mRsResources = convertToMModel(rsResourcesModel,MRsResources.class);
-            MRsResources rsResources = resourcesClient.createResource(objectMapper.writeValueAsString(mRsResources));
-            envelop.setObj(rsResources);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-        }
-        return envelop;
+            @ApiParam(name = "resource", value = "资源")
+            @RequestParam(value = "resource") String resource){
+        return resourcesClient.createResource(resource);
     }
 
     @ApiOperation("更新资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT)
     public Envelop updateResources(
-            @ApiParam(name = "resource", value = "资源", defaultValue = "")
+            @ApiParam(name = "resource", value = "资源")
             @RequestParam(value = "resource") String resource) throws Exception {
-        Envelop envelop = new Envelop();
-        try{
-            RsResourcesModel rsResourcesModel = objectMapper.readValue(resource,RsResourcesModel.class);
-            MRsResources mRsResources = convertToMModel(rsResourcesModel,MRsResources.class);
-            MRsResources rsResources = resourcesClient.updateResources(objectMapper.writeValueAsString(mRsResources));
-            envelop.setObj(rsResources);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-        }
-        return envelop;
+        return resourcesClient.updateResources(resource);
     }
 
     @ApiOperation("资源删除")
     @RequestMapping(value = ServiceApi.Resources.Resource, method = RequestMethod.DELETE)
     public Envelop deleteResources(
-            @ApiParam(name = "id", value = "资源ID", defaultValue = "")
-            @PathVariable(value = "id") String id) throws Exception {
+            @ApiParam(name = "id", value = "资源ID")
+            @PathVariable(value = "id") String id) {
         Envelop envelop = new Envelop();
-        try{
-            resourcesClient.deleteResources(id);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-        }
+        resourcesClient.deleteResources(id);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
     @ApiOperation("批量资源删除")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.DELETE)
     public Envelop deleteResourcesBatch(
-            @ApiParam(name = "ids", value = "资源ID", defaultValue = "")
-            @RequestParam(value = "ids") String ids) throws Exception {
+            @ApiParam(name = "ids", value = "资源ID")
+            @RequestParam(value = "ids") String ids) {
         Envelop envelop = new Envelop();
-        try{
-            resourcesClient.deleteResourcesBatch(ids);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-        }
+        resourcesClient.deleteResourcesBatch(ids);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.Resource,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.Resource, method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源")
     public Envelop getResourceById(
-            @ApiParam(name="id",value="id",defaultValue = "")
-            @PathVariable(value="id") String id) throws Exception
-    {
-        Envelop envelop = new Envelop();
-        try{
-            MRsResources rsResources = resourcesClient.getResourceById(id);
-            envelop.setObj(rsResources);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-        }
-        return envelop;
+            @ApiParam(name = "id", value = "id")
+            @PathVariable(value = "id") String id) throws Exception {
+        return resourcesClient.getResourceById(id);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取资源")
+    public Envelop getResourceByCode(
+            @ApiParam(name = "code", value = "编码" )
+            @RequestParam(value = "code" ) String code) {
+        return resourcesClient.getResourceByCode(code);
     }
 
     @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
@@ -153,6 +114,20 @@ public class RsResourceController extends BaseController {
             @ApiParam(name = "filters", value = "过条件(name)")
             @RequestParam(value = "filters", required = false) String filters) {
         return resourcesClient.getResourceTree(dataSource, userResource, filters);
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.ResourcePage, method = RequestMethod.GET)
+    @ApiOperation("获取资源列表分页（政府服务平台）")
+    public Envelop getResourcePage(
+            @ApiParam(name = "userResource", value = "授权资源")
+            @RequestParam(value = "userResource") String userResource,
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size") int size) {
+        return resourcesClient.getResourcePage(userResource, userId, page, size);
     }
 
     @ApiOperation("资源查询")
@@ -172,8 +147,7 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "rolesId", required = false) String rolesId,
             @ApiParam(name = "appId", value = "应用Id", defaultValue = "")
             @RequestParam(value = "appId", required = false) String appId) throws Exception {
-        try
-        {
+        try {
             ResponseEntity<List<MRsResources>> responseEntity = resourcesClient.queryResources(fields,filters,sorts,page,size, rolesId, appId);
             List<MRsResources> mRsResources = responseEntity.getBody();
             List<RsResourcesModel> rsResources = new ArrayList<>(mRsResources.size());
@@ -332,33 +306,103 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
+
+        //-----------------用户数据权限 start
+        String org = "";
+        if (userOrgList != null) {
+            if (!(userOrgList.size() == 1 && userOrgList.get(0).equals("null"))) {
+                org = StringUtils.strip(String.join(",", userOrgList), "[]");
+            }
+        }
+        //-----------------用户数据权限 end
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
         List<MChartInfoModel> chartInfoModels = new ArrayList<>();
-        if(list!=null && list.size() > 0){
+        if(list!=null && list.size() > 0) {
             for (ResourceQuotaModel m : list) {
-                if(StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)){
-                    //-----------------用户数据权限 start
-                    String org = "";
-                    if( userOrgList != null ){
-                        if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ) {
-                            org = StringUtils.strip(String.join(",", userOrgList), "[]");
+                if (StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)) {
+                    Map<String, Object> params = new HashMap<>();
+                    if (org.length() > 0) {
+                        if (StringUtils.isNotEmpty(quotaFilter)) {
+                            params = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {
+                            });
                         }
-                    }
-                    //-----------------用户数据权限 end
-                    Map<String, Object> params  = new HashMap<>();
-                    if(org.length()>0){
-                        if(StringUtils.isNotEmpty(quotaFilter)){
-                            params  = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {});
-                        }
-                        params.put("org",org);
+                        params.put("org", org);
                         quotaFilter = objectMapper.writeValueAsString(params);
                     }
-                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter,dimension);
+                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter, dimension);
                     chartInfoModels.add(chartInfoModel);
                 }
             }
         }
         return chartInfoModels;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.POST)
+    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览,多个指标放在一个图形上展示")
+    public Envelop getRsQuotaPreview(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId,
+            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
+            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
+        Envelop envelop = new Envelop();
+        String filter = "";
+        //-----------------用户数据权限 start
+        String org = "";
+        if( userOrgList != null ){
+            if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ) {
+                org = StringUtils.strip(String.join(",", userOrgList), "[]");
+            }
+        }
+        Map<String, Object> params  = new HashMap<>();
+        if(org.length()>0){
+            params.put("org",org);
+            filter = objectMapper.writeValueAsString(params);
+        }
+        //-----------------用户数据权限 end
+        MChartInfoModel chartInfoModel = null;
+        Envelop envelop1 =  resourcesClient.getResourceById(resourceId);
+        if(!envelop1.isSuccessFlg()){
+            chartInfoModel = new MChartInfoModel();
+            envelop.setObj(chartInfoModel);
+            envelop.setErrorMsg("视图不存在，请确认！");
+            return envelop;
+        }
+        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
+        if(list != null && list.size() > 0){
+            String idstr  = "";
+            String charstr = "";
+            if(list.size() == 1){
+                chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(list.get(0).getQuotaId(), list.get(0).getQuotaChart(), filter, dimension);
+            }else{
+                for (ResourceQuotaModel m : list) {
+                    idstr = idstr + m.getQuotaId() +",";
+                    charstr = charstr + m.getQuotaChart() +",";
+                }
+                List<String> charTypes = Arrays.asList(charstr.split(","));
+                Map<String,String> map = new HashMap<>();
+                for(String key:charTypes){
+                    if(Integer.valueOf(key) == 1 || Integer.valueOf(key) == 2 ){
+                        map.put("LineOrBar","LineOrBar");
+                    }else{
+                        map.put("Pie","Pie");
+                    }
+                }
+                if(map.size() >= 2){
+                    chartInfoModel = new MChartInfoModel();
+                    envelop.setObj(chartInfoModel);
+                    envelop.setErrorMsg("视图由多个指标组成时，预览图形支持 多指标都属于同一类型，混合型目前支持‘柱状+柱状’,请确认图表展示类型！");
+                    return envelop;
+                }
+                MRsResources mRsResources = (MRsResources) envelop1.getObj();
+                chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(idstr, charstr, filter, null, mRsResources.getName());
+            }
+        }
+        chartInfoModel.setResourceId(resourceId);
+        envelop.setObj(chartInfoModel);
+        envelop.setSuccessFlg(true);
+        return envelop;
     }
 
 }

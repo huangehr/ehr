@@ -178,87 +178,98 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
         Map<String, Object> map;
         Geography geography =null;
         List<Geography> geographies =null;
-        try{
-            for(int i=1; i <= orgDepts.size(); i++){
-                map = orgDepts.get(i-1);
-                String addressId ="";
-                //保存地址到addresses---start
-                geography = new Geography();
-                if (geography.getCountry() == null) {
-                    geography.setCountry("中国");
-                }
-                geography.setProvince(map .get("provinceName").toString());
-                geography.setCity(map .get("cityName").toString());
-                geography.setDistrict(map .get("district").toString());
-                geography.setTown(map .get("town").toString());
-                geography.setStreet(map .get("street").toString());
-                geographies=geographyService.isGeographyExist(geography);
-                if(geographies==null || geographies.size()==0){
-                    geography.setId(getObjectId(BizObject.Geography));
-                    addressId=geographyService.saveAddress(geography);
-                }else{
-                    addressId= geographies.get(0).getId();
-                }
-                //保存地址到addresses---end
-                Organization organization=new Organization();
-                organization.setOrgCode(map .get("orgCode").toString());
-                organization.setFullName(map .get("fullName").toString());
-                organization.setShortName(map .get("shortName").toString());
-                organization.setLevelId(map .get("levelId").toString());
-                organization.setLegalPerson(map .get("legalPerson").toString());
-                organization.setAdmin(map .get("admin").toString());
-                organization.setPhone(map .get("phone").toString());
-                organization.setTel(map .get("phone").toString());
-                if(null!=map .get("zxy")){
-                    organization.setZxy(Integer.valueOf(map .get("zxy").toString()));//中西医标识
-                }
-                if(null!=map .get("hosTypeId")){
-                    organization.setHosTypeId(map .get("hosTypeId").toString());///
-                }
-                if(null!=map .get("orgType")){
-                    organization.setOrgType(map .get("orgType").toString());
-                }
-                if(null!=map .get("settledWay")){
-                    organization.setSettledWay(map .get("settledWay").toString());
-                }
-
-                if(null!=map .get("ascriptionType")){
-                    organization.setAscriptionType(Integer.valueOf(map .get("ascriptionType").toString()));
-                }
-
-                organization.setLocation(addressId);
-                organization.setTraffic(map .get("traffic").toString());
-
-                organization.setIng(map .get("ing").toString());
-                organization.setLat(map .get("lat").toString());
-                organization.setCreateDate(new Timestamp(new Date().getTime()));
-                organization.setAdministrativeDivision(Integer.valueOf(map .get("administrativeDivision").toString()));
-                organization.setActivityFlag(1);
-                organization.setIntroduction(map .get("introduction").toString());
-                Integer berth=0;
-                if(null!=map .get("berth")){
-                    berth=Integer.valueOf( map .get("berth").toString());
-                }
-                organization.setBerth(berth);
-                Organization org=organizationRepository.save(organization);
-                List<Long> orgList= organizationRepository.getOrgIdByOrgCode(organization.getOrgCode());
-                Long Id=new Long(1);
-                if(orgList.size()>0){
-                    for(Long o:orgList){
-                        Id=o;
-                    }
-                }
-                OrgDept dept=new OrgDept();
-                dept.setOrgId(String.valueOf(Id));
-                dept.setCode(String.valueOf(Id)+"1");
-                dept.setName("未分配部门人员");
-                orgDeptService.saveOrgDept(dept);
+      try{
+        for(int i=1; i <= orgDepts.size(); i++){
+            map = orgDepts.get(i-1);
+            String addressId ="";
+            //保存地址到addresses---start
+            geography = new Geography();
+            if (geography.getCountry() == null) {
+                geography.setCountry("中国");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+            geography.setProvince(map .get("provinceName").toString());
+            geography.setCity(map .get("cityName").toString());
+            geography.setDistrict(map .get("district").toString());
+            geography.setTown(map .get("town").toString());
+            geography.setStreet(map .get("street").toString());
+            geographies=geographyService.isGeographyExist(geography);
+            if(geographies==null || geographies.size()==0){
+                geography.setId(getObjectId(BizObject.Geography));
+                addressId=geographyService.saveAddress(geography);
+            }else{
+                addressId= geographies.get(0).getId();
+            }
+            //保存地址到addresses---end
+            Organization organization=new Organization();
+            organization.setOrgCode(map .get("orgCode").toString());
+            organization.setFullName(map .get("fullName").toString());
+            organization.setShortName(map .get("shortName").toString());
+            organization.setLevelId(map .get("levelId").toString());
+            organization.setLegalPerson(map .get("legalPerson").toString());
+            organization.setAdmin(map .get("admin").toString());
+            organization.setPhone(map .get("phone").toString());
+            organization.setTel(map .get("phone").toString());
+            if(null!=map .get("zxy")){
+                organization.setZxy(Integer.valueOf(map .get("zxy").toString()));//中西医标识
+            }
+            if(null!=map .get("hosTypeId")){
+                organization.setHosTypeId(map .get("hosTypeId").toString());///
+            }
+            if(null!=map .get("orgType")){
+                organization.setOrgType(map .get("orgType").toString());
+            }
+            if(null!=map .get("settledWay")){
+                organization.setSettledWay(map .get("settledWay").toString());
+            }
+
+            if(null!=map .get("ascriptionType")){
+                organization.setAscriptionType(Integer.valueOf(map .get("ascriptionType").toString()));
+            }
+
+            organization.setLocation(addressId);
+            organization.setTraffic(map .get("traffic").toString());
+
+            organization.setIng(map .get("ing").toString());
+            organization.setLat(map .get("lat").toString());
+            organization.setCreateDate(new Timestamp(new Date().getTime()));
+            organization.setAdministrativeDivision(Integer.valueOf(map .get("administrativeDivision").toString()));
+            organization.setActivityFlag(1);
+            organization.setIntroduction(map .get("introduction").toString());
+            Integer berth=0;
+            if(null!=map .get("berth")){
+                berth=Integer.valueOf( map .get("berth").toString());
+            }
+            organization.setBerth(berth);
+            Organization org=organizationRepository.save(organization);
+            List<Long> orgList= organizationRepository.getOrgIdByOrgCode(organization.getOrgCode());
+            Long Id=new Long(1);
+            if(orgList.size()>0){
+                for(Long o:orgList){
+                    Id=o;
+                }
+            }
+            OrgDept dept=new OrgDept();
+            dept.setOrgId(String.valueOf(Id));
+            dept.setCode(String.valueOf(Id)+"1");
+            dept.setName("未分配部门人员");
+            orgDeptService.saveOrgDept(dept);
+            }
+           } catch (Exception e) {
+             e.printStackTrace();
+          return false;
+          }
         return true;
+    }
+
+    /**
+     * 查询机构是否已存在， 返回已存在机构code、name
+     */
+    public List orgExist(String[] org_codes)
+    {
+        String sql = "SELECT org_code, full_name FROM organizations WHERE org_code in(:org_codes)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("org_codes", org_codes);
+        return sqlQuery.list();
     }
 
 }

@@ -1,36 +1,33 @@
 package com.yihu.ehr.resource.model;
 
-import org.hibernate.annotations.GenericGenerator;
+import com.yihu.ehr.entity.BaseAssignedEntity;
 
 import javax.persistence.*;
 
 /**
+ * Entity - 资源
  * Created by hzp on 2016/4/21.
- * 资源列表
+ * Modify by Progr1mmer 2017/11/20
  */
 @Entity
 @Table(name = "rs_resource")
 @Access(value = AccessType.PROPERTY)
-public class RsResource {
-    private String id;
-    private String code;
-    private String name;
-    private String categoryId;
-    private String rsInterface;
-    private String grantType;
-    private String description;
-    private Integer dataSource;
+public class RsResource extends BaseAssignedEntity {
 
-    @Id
-    @GeneratedValue(generator = "Generator")
-    @GenericGenerator(name = "Generator", strategy = "assigned")
-    @Column(name = "id", unique = true, nullable = false)
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
+    // 编码
+    private String code;
+    // 名称
+    private String name;
+    // 分类ID
+    private String categoryId;
+    // 数据接口
+    private String rsInterface;
+    // 授权类型 （0 开放 1 授权）
+    private String grantType;
+    // 描述
+    private String description;
+    // 资源类型
+    private Integer dataSource;
 
     @Column(name="code",nullable = false)
     public String getCode() {

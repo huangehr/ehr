@@ -4,11 +4,9 @@ ehr.iws
 ehr.ids
 *.html
 *.iml
-ehr.iml
-*/target
+*/target/*
+*/*/target/*
 .idea/*
-app-admin/.idea/*
-
 
 # ---> Java
 *.class

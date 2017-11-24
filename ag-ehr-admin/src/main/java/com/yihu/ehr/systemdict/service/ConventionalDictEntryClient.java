@@ -508,4 +508,5 @@ import java.util.List;
     List<MDictionaryEntry> getDictEntryByDictId(
             @ApiParam(name = "dictId", value = "字典代码", defaultValue = "")
             @RequestParam(value = "dictId") String dictId);
+
 }
