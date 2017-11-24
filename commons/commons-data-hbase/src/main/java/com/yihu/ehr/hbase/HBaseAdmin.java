@@ -2,96 +2,129 @@ package com.yihu.ehr.hbase;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.yihu.ehr.hbase.AbstractHBaseClient;
-import com.yihu.ehr.lang.SpringContext;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.springframework.data.hadoop.hbase.TableCallback;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author hzp
+ * Service - HBase DDL
+ * @author hzp && Progr1mmer
  * @created 2017.05.03
+ * @modifey 2017/11/23
  */
 @Service
 public class HBaseAdmin extends AbstractHBaseClient {
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     /**
      * 判断表是否存在
+     * @param tableName
+     * @return
+     * @throws Exception
      */
     public boolean isTableExists(String tableName) throws Exception {
-        Connection connection = getConnection();
-        Admin admin = connection.getAdmin();
-        boolean ex = admin.tableExists(TableName.valueOf(tableName));
+        Connection connection = null;
+        Admin admin = null;
+        try {
+            connection = getConnection();
+            admin = connection.getAdmin();
+            return admin.tableExists(TableName.valueOf(tableName));
+        }finally {
+            if(admin != null) {
+                admin.close();
+            }
+            if(connection != null) {
+                connection.close();
+            }
+        }
 
-        admin.close();
-        connection.close();
-        return ex;
     }
 
     /**
-     * 创建表
+     * 新建表
+     * @param tableName
+     * @param columnFamilies
+     * @throws Exception
      */
     public void createTable(String tableName, String... columnFamilies) throws Exception {
-        Connection connection = getConnection();
-        Admin admin = connection.getAdmin();
-
-        if (!admin.tableExists(TableName.valueOf(tableName))) {
-            HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));
-            for (String fc : columnFamilies) {
-                tableDescriptor.addFamily(new HColumnDescriptor(fc));
+        Connection connection = null;
+        Admin admin = null;
+        try {
+            connection = getConnection();
+            admin = connection.getAdmin();
+            if (!admin.tableExists(TableName.valueOf(tableName))) {
+                HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));
+                for (String fc : columnFamilies) {
+                    tableDescriptor.addFamily(new HColumnDescriptor(fc));
+                }
+                admin.createTable(tableDescriptor);
             }
-
-            admin.createTable(tableDescriptor);
+        }finally {
+            if(admin != null) {
+                admin.close();
+            }
+            if(connection != null) {
+                connection.close();
+            }
         }
-
-        admin.close();
-        connection.close();
     }
 
     /**
      * 模糊匹配表名
+     * @param regex 表达式
+     * @param includeSysTables 是否包含系统表
+     * @return
+     * @throws Exception
      */
     public List<String> getTableList(String regex, boolean includeSysTables) throws Exception {
-        Connection connection = getConnection();
-        Admin admin = connection.getAdmin();
-
-        TableName[] tableNames;
-        if (regex == null || regex.length() == 0) {
-            tableNames = admin.listTableNames();
-        } else {
-            tableNames = admin.listTableNames(regex, includeSysTables);
-        }
-
+        Connection connection = null;
+        Admin admin = null;
         List<String> tables = new ArrayList<>();
-        for (TableName tableName : tableNames) {
-            tables.add(tableName.getNameAsString());
+        try {
+            connection = getConnection();
+            admin = connection.getAdmin();
+            TableName[] tableNames;
+            if (regex == null || regex.length() == 0) {
+                tableNames = admin.listTableNames();
+            } else {
+                tableNames = admin.listTableNames(regex, includeSysTables);
+            }
+            for (TableName tableName : tableNames) {
+                tables.add(tableName.getNameAsString());
+            }
+            return tables;
+        }finally {
+            if(admin != null) {
+                admin.close();
+            }
+            if(connection != null) {
+                connection.close();
+            }
         }
 
-        admin.close();
-        connection.close();
-
-        return tables;
     }
 
     /**
-     * 批量清空表数据
+     * 批量清空表数据 （直接删除相关表，再新建）
+     * @param tables
+     * @throws Exception
      */
-    public void truncate(List<String> tables) throws Exception {
-        Connection connection = getConnection();
-        Admin admin = connection.getAdmin();
-
+    public void cleanTable(List<String> tables) throws Exception {
+        Connection connection = null;
+        Admin admin = null;
         try {
+            connection = getConnection();
+            admin = connection.getAdmin();
             for (String tableName : tables) {
                 TableName tn = TableName.valueOf(tableName);
                 if (admin.tableExists(TableName.valueOf(tableName))) {
@@ -111,46 +144,70 @@ public class HBaseAdmin extends AbstractHBaseClient {
                 }*/
             }
         } finally {
-            admin.close();
-            connection.close();
+            if(admin != null) {
+                admin.close();
+            }
+            if(connection != null) {
+                connection.close();
+            }
         }
     }
 
     /**
-     * 删除表结构
+     * 删除表
+     * @param tableName
+     * @throws Exception
      */
     public void dropTable(String tableName) throws Exception {
-        Connection connection = getConnection();
-        Admin admin = connection.getAdmin();
-
+        Connection connection = null;
+        Admin admin = null;
         try {
+            connection = getConnection();
+            admin = connection.getAdmin();
             admin.disableTable(TableName.valueOf(tableName));
             admin.deleteTable(TableName.valueOf(tableName));
         } finally {
-            admin.close();
-            connection.close();
+            if(admin != null) {
+                admin.close();
+            }
+            if(connection != null) {
+                connection.close();
+            }
         }
     }
 
-
-
-    public ObjectNode getTableMetaData(String tableName) {
-        return hbaseTemplate.execute(tableName, new TableCallback<ObjectNode>() {
-
-            public ObjectNode doInTable(HTableInterface table) throws Throwable {
-                ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
-                ObjectNode root = objectMapper.createObjectNode();
-
-                HTableDescriptor tableDescriptor = table.getTableDescriptor();
+    /**
+     * 获取表结构
+     * @param tableName
+     * @return
+     * @throws Exception
+     */
+    public ObjectNode getTableMetaData(String tableName) throws Exception{
+        Connection connection = null;
+        Admin admin = null;
+        try {
+            connection = getConnection();
+            admin = connection.getAdmin();
+            TableName tn = TableName.valueOf(tableName);
+            if (admin.tableExists(tn)) {
+                ObjectNode objectNode = objectMapper.createObjectNode();
+                HTableDescriptor tableDescriptor = admin.getTableDescriptor(tn);
                 HColumnDescriptor[] columnDescriptors = tableDescriptor.getColumnFamilies();
                 for (int i = 0; i < columnDescriptors.length; ++i) {
                     HColumnDescriptor columnDescriptor = columnDescriptors[i];
-                    root.put(Integer.toString(i), Bytes.toString(columnDescriptor.getName()));
+                    objectNode.put(Integer.toString(i), Bytes.toString(columnDescriptor.getName()));
                 }
-
-                return root;
+                return objectNode;
             }
-        });
+            return null;
+        }finally {
+            if(admin != null) {
+                admin.close();
+            }
+            if(connection != null) {
+                connection.close();
+            }
+        }
     }
 
 }

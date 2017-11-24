@@ -24,26 +24,36 @@ import java.util.stream.Collectors;
  * @created 2016.04.27 14:38
  */
 public class TableBundle {
+
     Map<String, Row> rows = new HashMap<>();
 
-    public void addRows(String... rowkeys) {
-        for (String rowkey : rowkeys) {
-            rows.put(rowkey, null);
+    public void addRows(String... rowKeys) {
+        for (String rowKey : rowKeys) {
+            rows.put(rowKey, null);
         }
     }
 
-    public void addFamily(String rowkey, Object family) {
-        Row row = getRow(rowkey);
+    private Row getRow(String rowKey) {
+        Row row = rows.get(rowKey);
+        if (row == null) {
+            row = new Row();
+            rows.put(rowKey, row);
+        }
+        return row;
+    }
+
+    public void addFamily(String rowKey, Object family) {
+        Row row = getRow(rowKey);
         row.addFamily(family.toString());
     }
 
-    public void addColumns(String rowkey, Object family, String[] columns) {
-        Row row = getRow(rowkey);
+    public void addColumns(String rowKey, Object family, String[] columns) {
+        Row row = getRow(rowKey);
         row.addColumns(family.toString(), columns);
     }
 
-    public void addValues(String rowkey, Object family, Map<String, String> values) {
-        Row row = getRow(rowkey);
+    public void addValues(String rowKey, Object family, Map<String, String> values) {
+        Row row = getRow(rowKey);
         row.addValues(family.toString(), values);
     }
 
@@ -53,39 +63,32 @@ public class TableBundle {
 
     public List<Get> getOperations() {
         List<Get> gets = new ArrayList<>(rows.size());
-        for (String rowkey : rows.keySet()) {
-            Get get = new Get(Bytes.toBytes(rowkey));
-
-            Row row = rows.get(rowkey);
+        for (String rowKey : rows.keySet()) {
+            Get get = new Get(Bytes.toBytes(rowKey));
+            Row row = rows.get(rowKey);
             if (row != null) {
                 for (String family : row.getFamilies()) {
                     Set<Object> columns = row.getCells(family);
-
                     if (CollectionUtils.isEmpty(columns)) {
                         get.addFamily(Bytes.toBytes(family));
                     }
-
                     for (Object column : columns) {
                         get.addColumn(Bytes.toBytes(family), Bytes.toBytes((String) column));
                     }
                 }
             }
-
             gets.add(get);
         }
-
         return gets;
     }
 
     public List<Put> putOperations() {
         List<Put> puts = new ArrayList<>(rows.values().size());
-        for (String rowkey : rows.keySet()) {
-            Put put = new Put(Bytes.toBytes(rowkey));
-
-            Row row = rows.get(rowkey);
+        for (String rowKey : rows.keySet()) {
+            Put put = new Put(Bytes.toBytes(rowKey));
+            Row row = rows.get(rowKey);
             for (String family : row.getFamilies()) {
                 Set<Object> columns = row.getCells(family);
-
                 for (Object column : columns) {
                     Pair<String, String> pair = (Pair<String, String>) column;
                     if (StringUtils.isNotEmpty(pair.getRight())) {
@@ -95,10 +98,8 @@ public class TableBundle {
                     }
                 }
             }
-
             puts.add(put);
         }
-
         return puts;
     }
 
@@ -106,27 +107,18 @@ public class TableBundle {
         List<Delete> deletes = new ArrayList<>(rows.values().size());
         for (String rowkey : rows.keySet()) {
             Delete delete = new Delete(Bytes.toBytes(rowkey));
-
             deletes.add(delete);
         }
-
         return deletes;
     }
 
-    private Row getRow(String rowkey) {
-        Row row = rows.get(rowkey);
-        if (row == null) {
-            row = new Row();
-            rows.put(rowkey, row);
-        }
 
-        return row;
-    }
 
     /**
      * HBase中的一行
      */
     public static class Row {
+
         private Map<String, Set<Object>> cells = new HashMap<>();   // key为family，value为columns
 
         public void addFamily(String family) {
