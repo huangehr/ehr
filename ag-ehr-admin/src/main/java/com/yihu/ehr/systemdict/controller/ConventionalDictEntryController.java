@@ -847,17 +847,4 @@ public class ConventionalDictEntryController extends BaseController{
         return result;
     }
 
-    @RequestMapping(value = ServiceApi.SystemDict.getDictEntryByDictId,method = RequestMethod.POST)
-    @ApiOperation("根据字典代码获取字典项列表")
-    public Envelop getDictEntryByDictId(
-            @ApiParam(name = "dictId", value = "字典代码", defaultValue = "")
-            @RequestParam(value ="dictId") String dictId) throws Exception {
-        Envelop envelop = new Envelop();
-        List<MDictionaryEntry> DictEntrys = dictEntryClient.getDictEntryByDictId(dictId);
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(DictEntrys);
-        return envelop;
-
-    }
-
 }

@@ -249,6 +249,8 @@ public class ServiceApi {
         public static final String RsReportViewSave = "/resources/reportView/save";
         public static final String RsReportViewExist = "/resources/reportView/exist";
         public static final String RsReportViewExistByResourceId = "/resources/reportView/existByResourceId";
+        public static final String RsReportViewExistReport = "/resources/reportView/existReport";
+
 
     }
 
@@ -1197,5 +1199,8 @@ public class ServiceApi {
         public static final String LocationSave = "/location/save";
         public static final String LocationUpdate = "/location/update";
         public static final String LocationDelete = "/location/delete";
+    }
+    public static class SystemDict {
+        public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
     }
 }

@@ -84,4 +84,16 @@ public class RsReportViewEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @ApiOperation("判断资源视图是否存在于报表中")
+    @RequestMapping(value = ServiceApi.Resources.RsReportViewExistReport, method = RequestMethod.GET)
+    public boolean existReport(
+            @ApiParam(name = "resourceId", value = "视图ID", required = true)
+            @RequestParam(value = "resourceId") String resourceId) throws Exception {
+        List<RsReportView> list = rsReportViewService.findByResourceId(resourceId);
+        if (list != null && list.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
 }

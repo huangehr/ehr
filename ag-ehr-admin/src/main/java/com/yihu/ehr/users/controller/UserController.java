@@ -329,11 +329,11 @@ public class UserController extends BaseController {
             }
             //新增时先新增用户再保存所属角色组-人员关系表，用户新增失败（新增失败）、角色组关系表新增失败（删除新增用户-提示新增失败）
 
-                boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
-                if (!bo) {
-                    userClient.deleteUser(mUser.getId());
-                    return failed("保存失败!");
-                }
+            boolean bo = roleUserClient.batchCreateRolUsersRelation(mUser.getId(), roles);
+            if (!bo) {
+                userClient.deleteUser(mUser.getId());
+                return failed("保存失败!");
+            }
 
             detailModel = convertToUserDetailModel(mUser);
             return success(detailModel);
@@ -435,9 +435,9 @@ public class UserController extends BaseController {
                     roleUserClient.batchDeleteRoleUserRelation(mUser.getDemographicId(), oldRoleIds);
                 }
             } else {*/
-                if (buffer.length() > 0) {
-                    roleUserClient.batchDeleteRoleUserRelation(mUser.getId(), oldRoleIds);
-                }
+            if (buffer.length() > 0) {
+                roleUserClient.batchDeleteRoleUserRelation(mUser.getId(), oldRoleIds);
+            }
 //            }
             return failed("保存失败!");
         } catch (Exception ex) {
@@ -842,8 +842,8 @@ public class UserController extends BaseController {
             @RequestParam(value = "id_card_no") String idCardNo) {
         PatientDetailModel detailModel =new PatientDetailModel();
         try{
-         MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
-         detailModel = patientController.convertToPatientDetailModel(demographicInfo);
+            MDemographicInfo demographicInfo = patientClient.getPatient(idCardNo);
+            detailModel = patientController.convertToPatientDetailModel(demographicInfo);
 
         } catch (Exception ex) {
             ex.printStackTrace();

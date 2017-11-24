@@ -455,7 +455,7 @@ public class OrgDeptController  extends BaseController {
             @RequestParam(value = "orgId",required = false) String orgId,
             @ApiParam(name = "searchNm", value = "关键字查询", defaultValue = "")
             @RequestParam(value = "searchNm",required = false) String searchNm
-            ) {
+    ) {
         try {
             Envelop envelop = new Envelop();
             List<MOrgMemberRelation> memberRelationList = new ArrayList<MOrgMemberRelation>();
@@ -702,5 +702,5 @@ public class OrgDeptController  extends BaseController {
             return failedSystem();
         }
     }
-    
+
 }
