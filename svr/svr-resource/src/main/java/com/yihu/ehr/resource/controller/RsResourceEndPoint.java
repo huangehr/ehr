@@ -158,7 +158,8 @@ public class RsResourceEndPoint extends EnvelopRestEndPoint {
             List<RsResource> resultList = rsResourceService.getResourcePage(userResource, userId, page, size);
             envelop.setSuccessFlg(true);
             envelop.setCurrPage(page);
-            //envelop.setTotalCount(resultList.size());
+            envelop.setPageSize(size);
+            envelop.setTotalCount(rsResourceService.getResourceCount(userResource, userId));
             envelop.setDetailModelList(resultList);
         }catch (Exception e) {
             e.printStackTrace();
