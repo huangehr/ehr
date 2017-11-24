@@ -56,6 +56,10 @@ public class RedisCacheOperationEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             RedisCacheKeyRule redisCacheKeyRule = redisCacheKeyRuleService.findByCode(keyRuleCode);
+            if (redisCacheKeyRule == null) {
+                envelop.setErrorMsg("Key规则 " + keyRuleCode + " 不存在。");
+                return envelop;
+            }
             String categoryCode = redisCacheKeyRule.getCategoryCode();
             String keyRuleExpression = redisCacheKeyRule.getExpression();
 
@@ -89,6 +93,10 @@ public class RedisCacheOperationEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             RedisCacheKeyRule redisCacheKeyRule = redisCacheKeyRuleService.findByCode(keyRuleCode);
+            if (redisCacheKeyRule == null) {
+                envelop.setErrorMsg("Key规则 " + keyRuleCode + " 不存在。");
+                return envelop;
+            }
             String categoryCode = redisCacheKeyRule.getCategoryCode();
             String keyRuleExpression = redisCacheKeyRule.getExpression();
             RedisCacheAuthorization redisCacheAuthorization = redisCacheAuthorizationService.findByCategoryCodeAndAppId(categoryCode, appId);
@@ -124,6 +132,10 @@ public class RedisCacheOperationEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             RedisCacheKeyRule redisCacheKeyRule = redisCacheKeyRuleService.findByCode(keyRuleCode);
+            if (redisCacheKeyRule == null) {
+                envelop.setErrorMsg("Key规则 " + keyRuleCode + " 不存在。");
+                return envelop;
+            }
             String categoryCode = redisCacheKeyRule.getCategoryCode();
             String keyRuleExpression = redisCacheKeyRule.getExpression();
 
