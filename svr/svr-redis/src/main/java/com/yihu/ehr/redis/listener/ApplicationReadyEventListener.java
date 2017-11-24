@@ -47,7 +47,7 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
         try {
-            // 开启消息队列，并添加队列的订阅者
+            // 开启消息队列，并添加队列的消息监听器
             List<RedisMqChannel> channelList = redisMqChannelService.search("");
             for (RedisMqChannel channel : channelList) {
                 ChannelTopic topic = new ChannelTopic(channel.getChannel());

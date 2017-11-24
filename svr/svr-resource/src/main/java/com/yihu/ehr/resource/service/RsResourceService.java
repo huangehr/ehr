@@ -226,4 +226,17 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
         return query.list();
     }
 
+    public Integer getResourceCount(String userResource, String userId) throws IOException{
+        Session session = currentSession();
+        List<String> rsList = objectMapper.readValue(userResource, List.class);
+        if(rsList.size() <= 0) {
+            rsList.add("NO_AUTH_RS");
+        }
+        String hql = "SELECT count(rsResource.id) FROM RsResource rsResource WHERE rsResource.categoryId IN (SELECT id FROM RsResourceCategory rsResourceCategory WHERE rsResourceCategory.code = 'derived') AND (rsResource.grantType = '0' OR rsResource.creator = :creator OR rsResource.id IN (:ids)) ";
+        Query query = session.createQuery(hql);
+        query.setParameter("creator", userId);
+        query.setParameterList("ids", rsList);
+        return ((Long)query.list().get(0)).intValue();
+    }
+
 }

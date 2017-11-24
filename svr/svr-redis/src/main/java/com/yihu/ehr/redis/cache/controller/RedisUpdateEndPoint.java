@@ -1,9 +1,9 @@
-package com.yihu.ehr.redis.controller;
+package com.yihu.ehr.redis.cache.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.redis.service.RedisUpdateService;
+import com.yihu.ehr.redis.cache.service.RedisUpdateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
