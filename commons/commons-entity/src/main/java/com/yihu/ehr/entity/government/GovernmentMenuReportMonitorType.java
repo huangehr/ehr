@@ -12,7 +12,7 @@ import java.util.Date;
 @Table(name = "government_menu_report_monitor_type")
 public class GovernmentMenuReportMonitorType {
     private int id;
-    private int rsReoportMonitorTypeId;
+    private int reportCategoryId;   // 报表分类id
     private int governmentMenuId;
 
 
@@ -29,13 +29,13 @@ public class GovernmentMenuReportMonitorType {
         this.id = id;
     }
 
-    @Column(name = "rs_reoport_monitor_type_id")
-    public int getRsReoportMonitorTypeId() {
-        return rsReoportMonitorTypeId;
+    @Column(name = "report_category_id")
+    public int getReportCategoryId() {
+        return reportCategoryId;
     }
 
-    public void setRsReoportMonitorTypeId(int rsReoportMonitorTypeId) {
-        this.rsReoportMonitorTypeId = rsReoportMonitorTypeId;
+    public void setReportCategoryId(int reportCategoryId) {
+        this.reportCategoryId = reportCategoryId;
     }
 
     @Column(name = "government_menu_id")

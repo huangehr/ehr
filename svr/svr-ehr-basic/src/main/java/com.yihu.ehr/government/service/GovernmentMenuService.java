@@ -73,7 +73,7 @@ public class GovernmentMenuService extends BaseJpaService<GovernmentMenu,XGovern
         for (int i = 0; i < array.length; i++) {
             GovernmentMenuReportMonitorType monitorType = new GovernmentMenuReportMonitorType();
             monitorType.setGovernmentMenuId(governmentMenu.getId());
-            monitorType.setRsReoportMonitorTypeId(Integer.parseInt(array[i]));
+            monitorType.setReportCategoryId(Integer.parseInt(array[i]));
             governmentMenuReportMonitorTypeDao.save(monitorType);
         }
     }

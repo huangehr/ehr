@@ -203,7 +203,14 @@ public class ServiceApi {
         public static final String RsReportCategoryIsUniqueCode = "/resources/reportCategory/isUniqueCode";
         public static final String RsReportCategoryIsUniqueName = "/resources/reportCategory/isUniqueName";
         public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
+        public static final String RsReportCategoryByApp = "/resources/reportCategory/getAllCategoryByApp";
 
+        /**
+         * 资源报表分类和应用
+         */
+        public static final String RsReportCategoryAppDelete = "/resources/reportCategory/deleteCategoryApp";
+        public static final String RsReportCategoryAppSave = "/resources/reportCategory/saveCategoryApp";
+        public static final String GetRsReportCategoryApps = "/resources/reportCategory/getRsReportCategoryApps";
 
         /**
          * 资源报表监测分类
