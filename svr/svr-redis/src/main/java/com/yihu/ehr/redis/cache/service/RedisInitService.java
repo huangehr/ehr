@@ -1,4 +1,4 @@
-package com.yihu.ehr.redis.service;
+package com.yihu.ehr.redis.cache.service;
 
 import com.yihu.ehr.redis.schema.*;
 import com.yihu.ehr.util.id.ObjectVersion;
