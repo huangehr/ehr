@@ -102,8 +102,8 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         if (tjQuotaModel.getId() != null) {
             tjQuota.setUpdateTime(new Date());
             tjQuota.setCreateTime(DateUtil.strToDate(tjQuotaModel.getCreateTime()));
-            tjQuota.setStatus(1);
         } else{
+            tjQuota.setStatus(1);
             tjQuota.setCreateTime(new Date());
         }
         tjQuota = tjQuotaService.saves(tjQuota, tjquotaDataSource, tjQuotaDataSave);

@@ -631,21 +631,14 @@ public class RsResourceGrantController extends BaseController {
         return envelop;
     }
 
-    @ApiOperation("单个角色组资源列表查询")
+    @ApiOperation("角色组资源列表查询")
     @RequestMapping(value= ServiceApi.Resources.GetRolesGrantResources ,method = RequestMethod.GET)
     public Envelop getRolesGrantResources(
-            @ApiParam(name="rolesId",value="角色组ID",defaultValue = "")
-            @RequestParam(value="rolesId") String rolesId) throws Exception {
-        Envelop envelop = new Envelop();
-        try{
-            List<MRsRolesResource> rsRolesResources = resourcesGrantClient.getRolesGrantResources(rolesId);
-            envelop.setDetailModelList(rsRolesResources);
-            envelop.setSuccessFlg(true);
-        }catch (Exception e){
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-        }
-        return envelop;
+            @ApiParam(name = "rolesId", value = "角色组ID")
+            @RequestParam(value = "rolesId") String rolesId,
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId") String userId) throws Exception {
+        return resourcesGrantClient.getRolesGrantResources(rolesId, userId);
     }
 
     @ApiOperation("角色组资源数据元授权查询")

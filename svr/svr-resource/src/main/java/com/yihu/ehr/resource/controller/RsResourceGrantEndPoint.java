@@ -12,6 +12,7 @@ import com.yihu.ehr.model.resource.MRsRolesResourceMetadata;
 import com.yihu.ehr.resource.model.*;
 import com.yihu.ehr.resource.service.*;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,10 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lyr on 2016/4/26.
@@ -37,6 +35,8 @@ import java.util.Map;
 @Api(value = "RsResourceGrant", description = "资源授权服务接口")
 public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
 
+    @Autowired
+    private RsResourceService rsResourceService;
     @Autowired
     private RsResourceGrantService rsGrantService;
     @Autowired
@@ -468,34 +468,41 @@ public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name="rolesId",value="角色组ID",defaultValue = "")
             @PathVariable(value="rolesId") String rolesId,
             @ApiParam(name="resourceIds",value="资源ID",defaultValue = "")
-            @RequestParam(value="resourceIds") String resourceIds) throws Exception
-    {
+            @RequestParam(value="resourceIds") String resourceIds) throws Exception {
         String[] resourceIdArray = resourceIds.split(",");
         List<RsRolesResource> rolesRsList = new ArrayList<RsRolesResource>();
-
-        for(String resoruceId : resourceIdArray)
-        {
+        for(String resoruceId : resourceIdArray) {
             RsRolesResource rolesRs = new RsRolesResource();
-
             rolesRs.setId(getObjectId(BizObject.RolesResource));
             rolesRs.setRolesId(rolesId);
             rolesRs.setResourceId(resoruceId);
-
             rolesRsList.add(rolesRs);
         }
-
         return convertToModels(rolesResourceGrantService.grantResourceBatch(rolesRsList),new ArrayList<>(rolesRsList.size()),MRsRolesResource.class,"");
     }
 
-    @ApiOperation("单个角色组授权资源查询")
-    @RequestMapping(value= ServiceApi.Resources.GetRolesGrantResources ,method = RequestMethod.GET)
-    public List<MRsRolesResource> getRolesGrantResources(
-            @ApiParam(name="rolesId",value="角色组ID",defaultValue = "")
-            @RequestParam(value="rolesId") String rolesId) throws Exception {
-        Collection<MRsRolesResource> rsRolesList;
-        List rolesRsList = rolesResourceGrantService.search("rolesId=" + rolesId);
-        rsRolesList = convertToModels(rolesRsList,new ArrayList<>(rolesRsList.size()),MRsRolesResource.class,"");
-        return (List<MRsRolesResource>)rsRolesList;
+    @ApiOperation("角色组授权资源查询")
+    @RequestMapping(value= ServiceApi.Resources.GetRolesGrantResources, method = RequestMethod.GET)
+    public Envelop getRolesGrantResources(
+            @ApiParam(name = "rolesId", value = "角色组ID")
+            @RequestParam(value = "rolesId") String rolesId,
+            @ApiParam(name = "userId", value = "用户ID")
+            @RequestParam(value = "userId") String userId) throws Exception {
+        Envelop envelop = new Envelop();
+        Set<String> idSet = new HashSet<String>();
+        List<RsRolesResource> rolesRsList = rolesResourceGrantService.search("rolesId=" + rolesId);
+        for(RsRolesResource rsRolesResource : rolesRsList) {
+            idSet.add(rsRolesResource.getResourceId());
+        }
+        List<RsResource> rsResourceList = rsResourceService.search("creator=" + userId);
+        for(RsResource rsResource : rsResourceList) {
+            idSet.add(rsResource.getId());
+        }
+        List<String> idList = new ArrayList<String>();
+        idList.addAll(idSet);
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(idList);
+        return envelop;
     }
 
 

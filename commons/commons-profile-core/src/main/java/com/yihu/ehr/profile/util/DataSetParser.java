@@ -47,7 +47,7 @@ public class DataSetParser {
         if(StringUtils.isEmpty(patientId)){
             errorMsg = errorMsg + "patientId is null;";
         }
-        if(StringUtils.isEmpty(eventNo) && !"HDSA00_01".equals(code)){
+        if(StringUtils.isEmpty(eventNo)  && !"HDSA00_01".equals(code)){
             errorMsg = errorMsg + "eventNo is null;";
         }
         if(StringUtils.isEmpty(orgCode)){

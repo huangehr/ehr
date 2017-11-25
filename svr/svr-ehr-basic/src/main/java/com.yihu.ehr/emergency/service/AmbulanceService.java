@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -35,8 +33,7 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
     /**
      * 查询电话号码是否已存在， 返回已存在电话号码
      */
-    public List idExist(String type,String[] values)
-    {
+    public List idExist(String type, String[] values) {
         String sql ="";
         if(type.equals("id")){
            sql= "SELECT id FROM eme_ambulance WHERE id in(:values)";
@@ -49,7 +46,7 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
     }
 
     /**
-     * 批量导入机构
+     * 批量导入救护车
      */
     public boolean addAmbulancesBatch(List<Map<String, Object>> ambulances) {
         Map<String, Object> map;
@@ -58,6 +55,7 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
                 map = ambulances.get(i-1);
                 Ambulance ambulance=new Ambulance();
                 ambulance.setId(map .get("id").toString());
+                /**
                 if(null!=map .get("initLongitude")){
                     ambulance.setInitLongitude(Double.valueOf(map .get("initLongitude").toString()));
                 }else{
@@ -69,13 +67,13 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
                     ambulance.setInitLatitude(0.0);
                 }
                 ambulance.setDistrict(map .get("district").toString());
+                */
                 ambulance.setOrgCode(map .get("orgCode").toString());
                 ambulance.setOrgName(map .get("orgName").toString());
                 ambulance.setPhone(map .get("phone").toString());
                 ambulance.setStatus(Ambulance.Status.wait);
                 ambulance.setEntityName(map .get("entityName").toString());
                 ambulance.setCreator(map .get("creator").toString());
-                ambulance.setCrateDate(new Timestamp(new Date().getTime()));
                 ambulanceDao.save(ambulance);
             }
         } catch (Exception e) {

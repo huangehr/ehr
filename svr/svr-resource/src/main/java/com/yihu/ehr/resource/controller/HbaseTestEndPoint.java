@@ -156,7 +156,7 @@ public class HbaseTestEndPoint extends EnvelopRestEndPoint {
         try {
             List<String> list = new ArrayList<>();
             list.add(tableName);
-            hbaseAdmin.truncate(list);
+            hbaseAdmin.cleanTable(list);
 
             //清空索引
             solrAdmin.delete(tableName,"rowkey:*");

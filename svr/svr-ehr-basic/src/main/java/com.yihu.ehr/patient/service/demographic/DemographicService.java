@@ -414,10 +414,12 @@ public class DemographicService {
     //统计年龄段人口数
     public List<Object> getStatisticsDemographicsAgeCount() {
         Session session = session = entityManager.unwrap(Session.class);;
-        String sql = "SELECT count(1), tt.age  from( SELECT id , " +
-                " ELT( CEIL( FLOOR(TIMESTAMPDIFF(MONTH, STR_TO_DATE(substr(id ,7,8),'%Y%m%d'), CURDATE())/12)/10-1 ), " +
-                "       '0-1','1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','> 90') as age " +
-                " from demographics t where id is not null and length(id) =18 )tt WHERE tt.age is not null  GROUP BY tt.age ";
+        String sql = "SELECT count(1), tt.age  from(  " +
+                " SELECT t1.id ,  " +
+                "  ELT(   CEIL(  FLOOR( TIMESTAMPDIFF(MONTH, STR_TO_DATE(t1.id ,'%Y%m%d'), CURDATE())/12) /10+1 ), " +
+                " '0-1','1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','> 90') as age from ( "+
+                " SELECT CASE when length(id)=15  then CONCAT('19',substr(id ,7,6)) ELSE substr(id ,7,8) end  id  from demographics t )t1 "+
+                " )tt WHERE tt.age is not null  GROUP BY tt.age";
         SQLQuery query = session.createSQLQuery(sql);
         return query.list();
     }

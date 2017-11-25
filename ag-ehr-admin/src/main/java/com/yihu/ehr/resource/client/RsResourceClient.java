@@ -25,12 +25,12 @@ public interface RsResourceClient {
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    MRsResources createResource(
+    Envelop createResource(
             @RequestBody String resource);
 
     @ApiOperation("更新资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.PUT,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    MRsResources updateResources(
+    Envelop updateResources(
             @RequestBody String resource);
 
     @ApiOperation("资源删除")
@@ -43,10 +43,15 @@ public interface RsResourceClient {
     boolean deleteResourcesBatch(
             @RequestParam(value = "ids") String ids);
 
-    @RequestMapping(value = ServiceApi.Resources.Resource,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Resources.Resource, method = RequestMethod.GET)
     @ApiOperation("根据ID获取资源")
-    MRsResources getResourceById(
+    Envelop getResourceById(
             @PathVariable(value="id") String id);
+
+    @RequestMapping(value = ServiceApi.Resources.ResourceByCode, method = RequestMethod.GET)
+    @ApiOperation("根据code获取资源")
+    Envelop getResourceByCode(
+            @RequestParam(value = "code" ) String code);
 
     @RequestMapping(value = ServiceApi.Resources.ResourceTree, method = RequestMethod.GET)
     @ApiOperation("获取资源列表树")
@@ -54,6 +59,14 @@ public interface RsResourceClient {
             @RequestParam(value = "dataSource") Integer dataSource,
             @RequestParam(value = "userResource") String userResource,
             @RequestParam(value = "filters", required = false) String filters);
+
+    @RequestMapping(value = ServiceApi.Resources.ResourcePage, method = RequestMethod.GET)
+    @ApiOperation("获取资源列表分页")
+    Envelop getResourcePage(
+            @RequestParam(value = "userResource") String userResource,
+            @RequestParam(value = "userId") String userId,
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size);
 
     @ApiOperation("资源查询")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.GET)

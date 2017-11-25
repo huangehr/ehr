@@ -90,6 +90,23 @@ public class RsReportViewController extends BaseController {
         }
     }
 
+    @ApiOperation("判断资源视图是否存在于报表中")
+    @RequestMapping(value = ServiceApi.Resources.RsReportViewExistReport, method = RequestMethod.GET)
+    public Envelop resourceViewExitReport(
+            @ApiParam(name = "resourceId", value = "视图ID", required = true)
+            @RequestParam(value = "resourceId") String resourceId) throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            boolean isExist = rsReportViewClient.existReport(resourceId);
+            envelop.setSuccessFlg(isExist);
+            return envelop;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogService.getLogger(RsReportViewController.class).error(e.getMessage());
+            return failed(ErrorCode.SystemError.toString());
+        }
+    }
+
     @ApiOperation("判断资源报表是否关联相关资源")
     @RequestMapping(value = ServiceApi.Resources.RsReportViewExistByResourceId, method = RequestMethod.GET)
     public Envelop existByResourceId(

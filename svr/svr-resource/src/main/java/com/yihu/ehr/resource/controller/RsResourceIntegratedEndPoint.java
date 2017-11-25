@@ -148,7 +148,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                     envelop.setErrorMsg("档案数据元不能为空");
                     return envelop;
                 }
-                for (RsResourceMetadata rsMetadata : rsMetadatas) {
+              	for (RsResourceMetadata rsMetadata : rsMetadatas) {
                     rsMetadata.setResourcesId(reId);
                     rsMetadata.setId(getObjectId(BizObject.ResourceMetadata));
                 }
@@ -195,7 +195,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                     envelop.setErrorMsg("指标数据元不能为空");
                     return envelop;
                 }
-                for(RsResourceQuota resourceQuota : rsQuotas) {
+              	for(RsResourceQuota resourceQuota : rsQuotas) {
                     resourceQuota.setResourceId(reId);
                     RsResourceQuota newResourceQuota = resourceQuotaService.save(resourceQuota);
                     if(newResourceQuota == null) {
@@ -228,6 +228,7 @@ public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
                 }
             }
             envelop.setSuccessFlg(true);
+            envelop.setObj(newResources.getId());
         }catch (Exception e) {
             e.printStackTrace();
             if(newResources != null) {

@@ -35,13 +35,11 @@ import java.util.Map;
 public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
 
     @Autowired
-    XUserRepository userRepository;
-
+    private XUserRepository userRepository;
     @Autowired
-    XDoctorRepository doctorRepository;
-
+    private XDoctorRepository doctorRepository;
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     @Autowired
     private XOrganizationRepository organizationRepository;
     @Autowired
@@ -183,14 +181,14 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             }else
                 sql.append(",");
             //创建居民
-             demographicInfo =new DemographicInfo();
+            demographicInfo =new DemographicInfo();
             String idCardNo="123456";
-             if(null!=map .get("idCardNo")&&StringUtils.isEmpty(map .get("idCardNo").toString())){
-                 idCardNo=map .get("idCardNo").toString();
-                 demographicInfo.setPassword(DigestUtils.md5Hex(idCardNo));
-             }else{
-                 demographicInfo.setPassword(DigestUtils.md5Hex("123456"));
-             }
+            if(null!=map .get("idCardNo")&&StringUtils.isEmpty(map .get("idCardNo").toString())){
+                idCardNo=map .get("idCardNo").toString();
+                demographicInfo.setPassword(DigestUtils.md5Hex(idCardNo));
+            }else{
+                demographicInfo.setPassword(DigestUtils.md5Hex("123456"));
+            }
             demographicInfo.setRegisterTime(new Date());
             demographicInfo.setIdCardNo(String.valueOf(map .get("idCardNo")));
             demographicInfo.setName(String.valueOf(map .get("name")));
