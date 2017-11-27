@@ -193,7 +193,8 @@ public class RsReportCategoryService extends BaseJpaService<RsReportCategory, Rs
     public List<RsReportCategory> getCategoryByApp(String appId) {
         Session session = currentSession();
         String hql = "select category from RsReportCategory category where category.id in(" +
-                "select relation.reportCategoryId from ReportCategoryAppRelation relation where relation.appId = :appId)";
+                "select relation.reportCategoryId from ReportCategoryAppRelation relation where relation.appId = :appId)" +
+                " and category.pid is not null";
         Query query = session.createQuery(hql);
         query.setParameter("appId", appId);
         List<RsReportCategory> list = query.list();
