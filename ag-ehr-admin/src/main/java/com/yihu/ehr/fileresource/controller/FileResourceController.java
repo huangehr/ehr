@@ -91,6 +91,7 @@ public class FileResourceController {
         List<String> filesStr = fileResourceClient.filesDownload(objectId, mime);
         Envelop envelop = new Envelop();
         envelop.setDetailModelList(filesStr);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 
@@ -109,6 +110,7 @@ public class FileResourceController {
         List<String> filesStr = fileResourceClient.filesPath(objectId);
         Envelop envelop = new Envelop();
         envelop.setDetailModelList(filesStr);
+        envelop.setSuccessFlg(true);
         return envelop;
     }
 

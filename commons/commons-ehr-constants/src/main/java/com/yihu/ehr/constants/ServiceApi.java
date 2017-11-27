@@ -883,6 +883,13 @@ public class ServiceApi {
         public static final String OrgArea = "/redis/orgArea";
         public static final String OrgSaasArea = "/redis/orgSaasArea";
         public static final String OrgSaasOrg = "/redis/orgSaasOrg";
+
+        //App前端Redis
+        public static final String AppGetRedisValue = "/redis/getAppClientValue";
+        public static final String AppSetRedisValue = "/redis/setAppClientValue";
+        public static final String AppSetRedisJsonValue = "/redis/setAppClientJsonValue";
+        public static final String AppDeleteRedisValue = "/redis/deleteAppClientValue";
+
         //资源化相关Redis
         public static final String RsAdapterDict = "/redis/rsAdapterDict";
         public static final String RsAdapterMetadata = "/redis/rsAdapterMetaData";
