@@ -395,7 +395,7 @@ public class RsResourceController extends BaseController {
                     envelop.setErrorMsg("视图由多个指标组成时，预览图形支持 多指标都属于同一类型，混合型目前支持‘柱状+柱状’,请确认图表展示类型！");
                     return envelop;
                 }
-                MRsResources mRsResources = (MRsResources) envelop1.getObj();
+                MRsResources mRsResources = objectMapper.convertValue(envelop1.getObj(), MRsResources.class);
                 chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(idstr, charstr, filter, null, mRsResources.getName());
             }
         }
