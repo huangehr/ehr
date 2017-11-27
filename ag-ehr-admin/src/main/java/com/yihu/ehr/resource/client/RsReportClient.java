@@ -55,7 +55,7 @@ public interface RsReportClient {
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.POST)
     MRsReport add(
             @ApiParam(name = "rsReport", value = "资源报表JSON字符串", required = true)
-            @RequestParam(value = "rsReport") String rsReport);
+            @RequestBody String rsReport);
 
     @ApiOperation("更新资源报表")
     @RequestMapping(value = ServiceApi.Resources.RsReportSave, method = RequestMethod.PUT)
