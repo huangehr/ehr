@@ -17,6 +17,7 @@ public class RsReportCategoryModel implements Serializable {
     private String name; // 名称
     private String remark; // 备注
     private List<RsReportCategoryModel> children;
+    private boolean flag;
 
     public Integer getId() {
         return id;
@@ -64,5 +65,13 @@ public class RsReportCategoryModel implements Serializable {
 
     public void setChildren(List<RsReportCategoryModel> children) {
         this.children = children;
+    }
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
     }
 }
