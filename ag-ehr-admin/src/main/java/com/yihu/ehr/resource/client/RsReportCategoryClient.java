@@ -1,5 +1,7 @@
 package com.yihu.ehr.resource.client;
 
+import com.yihu.ehr.agModel.resource.RsReportCategoryInfoModel;
+import com.yihu.ehr.agModel.resource.RsReportCategoryModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -78,4 +80,14 @@ public interface RsReportCategoryClient {
     @ApiOperation("获取资源报表类别")
     List<MRsReportCategory> getAllCategories(
             @RequestParam(value="filters",required = false)String filters);
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryByApp, method = RequestMethod.GET)
+    @ApiOperation("获取平台应用对应的报表分类")
+    List<RsReportCategoryModel> getCategoryByApp(@RequestParam(value = "appId") String appId);
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryByIds, method = RequestMethod.GET)
+    @ApiOperation("根据Id获取平台应用对应的报表分类")
+    List<RsReportCategoryInfoModel> getCategoryByIds(
+            @ApiParam(name = "ids", value = "id")
+            @RequestParam(value = "ids") List<Integer> ids);
 }

@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.controller;
 
+import com.yihu.ehr.agModel.resource.RsReportCategoryModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
@@ -7,6 +8,7 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.government.service.GovernmentMenuReportMonitorTypeClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.resource.MRsReportMonitorType;
+import com.yihu.ehr.resource.client.RsReportCategoryClient;
 import com.yihu.ehr.resource.client.RsReportMonitorTypeClient;
 import com.yihu.ehr.resource.client.RsReportClient;
 import com.yihu.ehr.util.log.LogService;
@@ -36,6 +38,8 @@ public class RsReportMonitorTypeController extends BaseController {
     private RsReportMonitorTypeClient rsReportMonitorTypeClient;
     @Autowired
     private GovernmentMenuReportMonitorTypeClient governmentMenuReportMonitorTypeClient;
+    @Autowired
+    private RsReportCategoryClient rsReportCategoryClient;
 
     @RequestMapping(value = ServiceApi.Resources.RsReportMonitorTypes, method = RequestMethod.GET)
     @ApiOperation(value = "资源报表监测分类列表分页", notes = "资源报表监测分类列表")
@@ -160,9 +164,10 @@ public class RsReportMonitorTypeController extends BaseController {
             @ApiParam(name = "menuId", value = "菜单Id")
             @RequestParam(value = "menuId", required = false) String menuId) throws Exception {
         Envelop envelop = new Envelop();
-        List<MRsReportMonitorType> list = rsReportMonitorTypeClient.getAll(filters);
+        // 方案修改  先注释
+//        List<MRsReportMonitorType> list = rsReportMonitorTypeClient.getAll(filters);
+        List<RsReportCategoryModel> list = rsReportCategoryClient.getCategoryByApp("P1C7SOQe6n");
         List<Integer> monitorTypeList = new ArrayList<>();
-        List<MRsReportMonitorType> rsReportMonitorTypeList = new ArrayList<>();
         if (!"-1".equals(menuId)) {
             monitorTypeList = governmentMenuReportMonitorTypeClient.getMonitorTypeIdByGovernmentMenuId(menuId);
         }
@@ -174,7 +179,6 @@ public class RsReportMonitorTypeController extends BaseController {
                     }
                 }
             }
-
             return getResult(list, list.size(), 1, 1);
         }
         return envelop;

@@ -27,4 +27,6 @@ public interface RsReportCategoryDao extends CrudRepository<RsReportCategory, In
     @Query(" FROM RsReportCategory rc WHERE rc.id <> :id AND rc.name = :name ")
     RsReportCategory isUniqueName(@Param("id") Integer id, @Param("name") String name);
 
+    @Query("from RsReportCategory rc where rc.id in(:ids)")
+    List<RsReportCategory> findCategoryByIds(@Param("ids") List<Integer> ids);
 }
