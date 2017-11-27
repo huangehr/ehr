@@ -203,7 +203,15 @@ public class ServiceApi {
         public static final String RsReportCategoryIsUniqueCode = "/resources/reportCategory/isUniqueCode";
         public static final String RsReportCategoryIsUniqueName = "/resources/reportCategory/isUniqueName";
         public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
+        public static final String RsReportCategoryByApp = "/resources/reportCategory/getAllCategoryByApp";
+        public static final String RsReportCategoryByIds = "/resources/reportCategory/getAllCategoryByIds";
 
+        /**
+         * 资源报表分类和应用
+         */
+        public static final String RsReportCategoryAppDelete = "/resources/reportCategory/deleteCategoryApp";
+        public static final String RsReportCategoryAppSave = "/resources/reportCategory/saveCategoryApp";
+        public static final String GetRsReportCategoryApps = "/resources/reportCategory/getRsReportCategoryApps";
 
         /**
          * 资源报表监测分类
@@ -241,6 +249,7 @@ public class ServiceApi {
         public static final String RsReportNoPage = "/resources/report/getReportNoPage";
         public static final String RsReportTemplateContent = "/resources/report/getTemplateContent";
         public static final String RsReportIsCategoryApplied = "/resources/report/isCategoryApplied";
+        public static final String RsReportByCategoryId = "/resources/report/getByCategoryId";
 
         /**
          * 资源报表视图配置
@@ -874,6 +883,13 @@ public class ServiceApi {
         public static final String OrgArea = "/redis/orgArea";
         public static final String OrgSaasArea = "/redis/orgSaasArea";
         public static final String OrgSaasOrg = "/redis/orgSaasOrg";
+
+        //App前端Redis
+        public static final String AppGetRedisValue = "/redis/getAppClientValue";
+        public static final String AppSetRedisValue = "/redis/setAppClientValue";
+        public static final String AppSetRedisJsonValue = "/redis/setAppClientJsonValue";
+        public static final String AppDeleteRedisValue = "/redis/deleteAppClientValue";
+
         //资源化相关Redis
         public static final String RsAdapterDict = "/redis/rsAdapterDict";
         public static final String RsAdapterMetadata = "/redis/rsAdapterMetaData";
@@ -1200,7 +1216,5 @@ public class ServiceApi {
         public static final String LocationUpdate = "/location/update";
         public static final String LocationDelete = "/location/delete";
     }
-    public static class SystemDict {
-        public static final String getDictEntryByDictId = "/systemDict/getDictEntryByDictId/{dictId}";
-    }
+
 }

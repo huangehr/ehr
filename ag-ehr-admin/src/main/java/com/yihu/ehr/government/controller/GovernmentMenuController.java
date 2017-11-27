@@ -2,6 +2,7 @@ package com.yihu.ehr.government.controller;
 
 import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.government.GovernmentMenuModel;
+import com.yihu.ehr.agModel.resource.RsReportCategoryInfoModel;
 import com.yihu.ehr.agModel.resource.RsReportModel;
 import com.yihu.ehr.agModel.resource.RsReportMonitorTypeModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -11,6 +12,8 @@ import com.yihu.ehr.government.service.GovernmentMenuReportMonitorTypeClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.resource.MRsReportMonitorType;
 import com.yihu.ehr.model.user.MUser;
+import com.yihu.ehr.resource.client.RsReportCategoryClient;
+import com.yihu.ehr.resource.client.RsReportClient;
 import com.yihu.ehr.resource.client.RsReportMonitorTypeClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.rest.Envelop;
@@ -43,6 +46,10 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
     private GovernmentMenuReportMonitorTypeClient reportMonitorTypeClient;
     @Autowired
     private RsReportMonitorTypeClient monitorTypeClient;
+    @Autowired
+    private RsReportCategoryClient rsReportCategoryClient;
+    @Autowired
+    private RsReportClient rsReportClient;
 
     @RequestMapping(value = ServiceApi.Government.SearchGovernmentMenu, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询政府服务平台菜单")
@@ -238,20 +245,19 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
             @ApiParam(name = "menuId", value = "菜单Id", defaultValue = "")
             @RequestParam(value = "menuId", required = false) String menuId) {
         Envelop envelop = new Envelop();
-        List<RsReportMonitorTypeModel> list = new ArrayList<>();
+        List<RsReportCategoryInfoModel> list = new ArrayList<>();
         try {
-            List<Integer> monitorTypeIds = reportMonitorTypeClient.getMonitorTypeIdByGovernmentMenuId(menuId);
-            if (null != monitorTypeIds && monitorTypeIds.size() > 0) {
-                List<MRsReportMonitorType> rsReportMonitorType = monitorTypeClient.getInfoById(monitorTypeIds);
-                if (null != rsReportMonitorType && rsReportMonitorType.size() > 0) {
-                    for (MRsReportMonitorType m : rsReportMonitorType) {
-                        RsReportMonitorTypeModel reportMonitorTypeModel = convertToModel(m, RsReportMonitorTypeModel.class);
-                        if (null != reportMonitorTypeModel) {
-                            // 根据monitorTypeId获取报表信息
-                            List<RsReportModel> rsReportModels = monitorTypeClient.getRsReportByMonitorTypeId(reportMonitorTypeModel.getId());
-                            reportMonitorTypeModel.setReportModelList(rsReportModels);
+            List<Integer> CategoryIds = reportMonitorTypeClient.getMonitorTypeIdByGovernmentMenuId(menuId);
+            if (null != CategoryIds && CategoryIds.size() > 0) {
+                List<RsReportCategoryInfoModel> categoryInfoModelList = rsReportCategoryClient.getCategoryByIds(CategoryIds);
+                if (null != categoryInfoModelList && categoryInfoModelList.size() > 0) {
+                    for (RsReportCategoryInfoModel m : categoryInfoModelList) {
+                        if (null != m) {
+                            // 根据categoryId获取报表信息
+                            List<RsReportModel> rsReportModels = rsReportClient.getByCategoryId(m.getId());
+                            m.setReportList(rsReportModels);
                         }
-                        list.add(reportMonitorTypeModel);
+                        list.add(m);
                     }
                 }
             }

@@ -18,6 +18,6 @@ public interface GovernmentMenuReportMonitorTypeDao extends CrudRepository<Gover
 
     void deleteByGovernmentMenuId(@Param("governmentMenuId") Integer governmentMenuId);
 
-    @Query("select MonitorType.rsReoportMonitorTypeId from GovernmentMenuReportMonitorType MonitorType where MonitorType.governmentMenuId = :menuId")
+    @Query("select MonitorType.reportCategoryId from GovernmentMenuReportMonitorType MonitorType where MonitorType.governmentMenuId = :menuId")
     List<Integer> findMonitorTypeIdByGovernmentMenuId(@Param("menuId") Integer menuId);
 }

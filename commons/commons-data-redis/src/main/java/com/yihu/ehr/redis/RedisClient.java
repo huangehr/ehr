@@ -42,6 +42,24 @@ public class RedisClient {
     }
 
     /**
+     * 添加数据,含失效时间。
+     *
+     * @param key
+     * @param value
+     */
+    public void set(final String key, final Serializable value,long seconds) {
+        redisTemplate.execute((RedisCallback<Object>) connection -> {
+            byte[] key_ = key.getBytes();
+            byte[] value_ = SerializationUtils.serialize(value);
+            connection.setEx(key_,seconds, value_);
+            return true;
+        });
+    }
+
+
+
+
+    /**
      * 批量设置key-value值。
      *
      * @param data

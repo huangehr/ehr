@@ -142,4 +142,22 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
         List<RsReportCategory> list = rsReportCategoryService.search(filters);
         return (List<MRsReportCategory>) convertToModels(list, new ArrayList<>(list.size()), MRsReportCategory.class, null);
     }
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryByApp, method = RequestMethod.GET)
+    @ApiOperation("获取平台应用对应的报表分类")
+    public List<RsReportCategory> getCategoryByApp(
+            @ApiParam(name = "appId", value = "应用Id")
+            @RequestParam(value = "appId") String appId) {
+        List<RsReportCategory> reportCategoryList = rsReportCategoryService.getCategoryByApp(appId);
+        return reportCategoryList;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.RsReportCategoryByIds, method = RequestMethod.GET)
+    @ApiOperation("根据Id获取平台应用对应的报表分类")
+    public List<RsReportCategory> getCategoryByIds(
+            @ApiParam(name = "ids", value = "id")
+            @RequestParam(value = "ids") List<Integer> ids) {
+        List<RsReportCategory> categoryList = rsReportCategoryService.getCategoryByIds(ids);
+        return categoryList;
+    }
 }

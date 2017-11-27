@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.client;
 
+import com.yihu.ehr.agModel.resource.RsReportModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
@@ -101,4 +102,9 @@ public interface RsReportClient {
             @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
             @RequestParam(value = "reportCategoryId") Integer reportCategoryId);
 
+    @ApiOperation("根据资源分类编码获取资源报表分")
+    @RequestMapping(value = ServiceApi.Resources.RsReportByCategoryId, method = RequestMethod.GET)
+    List<RsReportModel> getByCategoryId(
+            @ApiParam(name = "reportCategoryId", value = "资源报表分类ID", required = true)
+            @RequestParam(value = "reportCategoryId") Integer reportCategoryId);
 }
