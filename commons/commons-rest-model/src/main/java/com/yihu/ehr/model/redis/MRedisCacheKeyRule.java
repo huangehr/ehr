@@ -25,6 +25,7 @@ public class MRedisCacheKeyRule implements Serializable{
     private String creator; // 创建者
     private Date modifyDate; // 修改时间
     private String modifier; // 修改者
+    private String categoryName; // 缓存分类名称
 
     public Integer getId() {
         return id;
@@ -114,5 +115,13 @@ public class MRedisCacheKeyRule implements Serializable{
 
     public void setModifier(String modifier) {
         this.modifier = modifier;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }
