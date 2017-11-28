@@ -90,7 +90,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.POST)
     public MRsReportCategory add(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON", required = true)
-            @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
+            @RequestBody String rsReportCategory) throws Exception {
         RsReportCategory newRsReportCategory = toEntity(rsReportCategory, RsReportCategory.class);
         newRsReportCategory = rsReportCategoryService.save(newRsReportCategory);
         return convertToModel(newRsReportCategory, MRsReportCategory.class);
@@ -100,7 +100,7 @@ public class RsReportCategoryEndPoint extends EnvelopRestEndPoint {
     @RequestMapping(value = ServiceApi.Resources.RsReportCategorySave, method = RequestMethod.PUT)
     public MRsReportCategory update(
             @ApiParam(name = "rsReportCategory", value = "资源报表分类JSON", required = true)
-            @RequestParam(value = "rsReportCategory") String rsReportCategory) throws Exception {
+            @RequestBody String rsReportCategory) throws Exception {
         RsReportCategory newRsReportCategory = toEntity(rsReportCategory, RsReportCategory.class);
         newRsReportCategory = rsReportCategoryService.save(newRsReportCategory);
         return convertToModel(newRsReportCategory, MRsReportCategory.class);
