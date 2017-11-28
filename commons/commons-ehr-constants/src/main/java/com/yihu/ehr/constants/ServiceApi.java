@@ -939,6 +939,7 @@ public class ServiceApi {
             public static final String Prefix = "/redis/cache/category/";
             public static final String GetById = "/redis/cache/category/{id}";
             public static final String Search = "/redis/cache/category/search";
+            public static final String SearchNoPage = "/redis/cache/category/searchNoPage";
             public static final String Save = "/redis/cache/category/save";
             public static final String Delete = "/redis/cache/category/delete";
             public static final String IsUniqueName = "/redis/cache/category/isUniqueName";

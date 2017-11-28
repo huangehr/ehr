@@ -78,11 +78,32 @@ public class RedisCacheCategoryEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @ApiOperation(value = "根据条件获取缓存分类（不分页）")
+    @RequestMapping(value = ServiceApi.Redis.CacheCategory.SearchNoPage, method = RequestMethod.GET)
+    public Envelop searchNoPage(
+            @ApiParam(name = "filters", value = "筛选条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            List<RedisCacheCategory> redisCacheCategoryList = redisCacheCategoryService.search(filters, sorts);
+            envelop.setDetailModelList(redisCacheCategoryList);
+            envelop.setSuccessFlg(true);
+            envelop.setErrorMsg("成功获取缓存分类列表。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("获取缓存分类发生异常：" + e.getMessage());
+        }
+        return envelop;
+    }
+
     @ApiOperation("新增缓存分类")
     @RequestMapping(value = ServiceApi.Redis.CacheCategory.Save, method = RequestMethod.POST)
     public Envelop add(
-            @ApiParam(name = "entityJson", value = "缓存分类JSON", required = true)
-            @RequestParam(value = "entityJson") String entityJson) {
+            @ApiParam(value = "缓存分类JSON", required = true)
+            @RequestBody String entityJson) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
@@ -103,7 +124,7 @@ public class RedisCacheCategoryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("更新缓存分类")
     @RequestMapping(value = ServiceApi.Redis.CacheCategory.Save, method = RequestMethod.PUT)
     public Envelop update(
-            @ApiParam(name = "entityJson", value = "缓存分类JSON", required = true)
+            @ApiParam(value = "缓存分类JSON", required = true)
             @RequestBody String entityJson) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
@@ -158,7 +179,7 @@ public class RedisCacheCategoryEndPoint extends EnvelopRestEndPoint {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            envelop.setErrorMsg("删除缓存分类发生异常：" + e.getMessage());
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
         }
         return envelop;
     }
@@ -180,7 +201,7 @@ public class RedisCacheCategoryEndPoint extends EnvelopRestEndPoint {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            envelop.setErrorMsg("删除缓存分类发生异常：" + e.getMessage());
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
         }
         return envelop;
     }
