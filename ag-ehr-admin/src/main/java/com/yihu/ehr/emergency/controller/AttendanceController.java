@@ -78,4 +78,11 @@ public class AttendanceController extends BaseController {
         return attendanceClient.delete(ids);
     }
 
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceDetail, method = RequestMethod.GET)
+    @ApiOperation("出勤记录详情")
+    public Envelop detail(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") String id){
+        return attendanceClient.detail(id);
+    }
 }
