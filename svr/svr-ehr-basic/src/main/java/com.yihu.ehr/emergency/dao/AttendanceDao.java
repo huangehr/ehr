@@ -17,8 +17,8 @@ public interface AttendanceDao extends PagingAndSortingRepository<Attendance, In
     @Query("SELECT attendance FROM Attendance attendance WHERE attendance.carId = :carId AND attendance.status IN (:statuses)")
     Attendance findByCarIdAndStatus(@Param("carId") String carId, @Param("statuses") List<Attendance.Status> statuses);
 
-    @Query("SELECT max(attendance) FROM Attendance attendance WHERE attendance.createDate <= :createDate AND attendance.carId = :carId ORDER BY attendance.createDate DESC")
-    Attendance findByCreateDateAndCarId(@Param("createDate") Date createDate, @Param("carId") String carId);
+    @Query("SELECT attendance FROM Attendance attendance WHERE attendance.createDate <= :createDate AND attendance.carId = :carId ORDER BY attendance.createDate DESC")
+    List<Attendance> findByCreateDateAndCarId(@Param("createDate") Date createDate, @Param("carId") String carId);
 
     Attendance findById(int id);
 }
