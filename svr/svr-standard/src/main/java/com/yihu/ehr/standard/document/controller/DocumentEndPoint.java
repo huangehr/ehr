@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.net.URLDecoder;
 import java.util.*;
 
 @RestController
@@ -254,8 +255,10 @@ public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version") String versionCode,
             @ApiParam(name = "xml_info", value = "xml_info")
-            @RequestParam(value = "xml_info") String xmlInfo) throws Exception {
-        return cdaDatasetRelationshipManager.SaveDataSetRelationship(dataSetIds, cdaId, versionCode, xmlInfo);
+            @RequestBody String xmlInfo) throws Exception {
+        String replaceFileStr = URLDecoder.decode(xmlInfo, "UTF-8");
+        String xmlInfos = replaceFileStr.substring(replaceFileStr.indexOf("=") + 1, replaceFileStr.indexOf("&cdaId"));
+        return cdaDatasetRelationshipManager.SaveDataSetRelationship(dataSetIds, cdaId, versionCode, xmlInfos);
     }
 
     @ApiOperation(value = "根基id删除CDADataSetRelationship")
