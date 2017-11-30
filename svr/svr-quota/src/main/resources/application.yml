@@ -38,7 +38,6 @@ spring:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: chenweishan
     password: chenweishan
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
@@ -46,12 +45,10 @@ spring:
 ---
 spring:
   profiles: test
-
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: weifuwu
     password: weifuwu
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
@@ -60,12 +57,10 @@ spring:
 ---
 spring:
   profiles: prod
-
   datasource:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: ha
     password: jkzlxm
-
   data:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
@@ -77,7 +72,6 @@ spring:
     url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: sr_healtharchive
     password: data!@)1
-
   data:
     solr:
       zk-host: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
@@ -85,13 +79,11 @@ spring:
 ---
 spring:
   profiles: prod_sr
-
   datasource:
     url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: healthcloud
     password: GP8Qz4qU
-
   data:
     solr:
-      zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      zk-host: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
 
