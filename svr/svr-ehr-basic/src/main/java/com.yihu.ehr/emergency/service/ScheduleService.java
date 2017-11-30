@@ -121,4 +121,11 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
         return true;
     }
 
+    public List<Schedule> findByIds(String ids) throws Exception{
+        String sql = "SELECT schedule FROM Schedule schedule WHERE schedule.id in ("+ids+")";
+        Session session = currentSession();
+        Query query = session.createQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return query.list();
+    }
 }

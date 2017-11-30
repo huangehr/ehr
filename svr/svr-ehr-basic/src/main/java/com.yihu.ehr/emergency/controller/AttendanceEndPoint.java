@@ -9,6 +9,7 @@ import com.yihu.ehr.emergency.service.ScheduleService;
 import com.yihu.ehr.entity.emergency.Ambulance;
 import com.yihu.ehr.entity.emergency.Attendance;
 import com.yihu.ehr.entity.emergency.Schedule;
+import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +37,8 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
     private AmbulanceService ambulanceService;
     @Autowired
     private ScheduleService scheduleService;
+    @Autowired
+    private UserManager userManager;
 
     @RequestMapping(value = ServiceApi.Emergency.AttendanceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -193,9 +196,10 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "size", required = false) int size) {
         Envelop envelop = new Envelop();
         try {
-            List<Ambulance> ambulances = attendanceService.search(fields, filters, sorts, page, size);
+            List<Attendance> attendance = attendanceService.search(fields, filters, sorts, page, size);
             envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(ambulances);
+            envelop.setDetailModelList(attendance);
+            envelop.setTotalCount((int)(attendanceService.getCount(filters)));
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -216,4 +220,33 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceDetail, method = RequestMethod.GET)
+    @ApiOperation("出勤详情")
+    public Envelop detail(
+            @ApiParam(name = "id", value = "出勤任务Id")
+            @RequestParam(value = "id", required = false) int id) {
+        Envelop envelop = new Envelop();
+        try {
+            Map<String,Object> map = new HashMap<String,Object>();
+            Attendance attendance = attendanceService.findById(id);
+            if(attendance!=null){
+                if(attendance.getSchedules().length()>2){
+                    map.put("schedule",scheduleService.findByIds(attendance.getSchedules().substring(1,attendance.getSchedules().length()-1)));
+                }
+                map.put("attendance",attendance);
+                map.put("user",userManager.getUser(attendance.getCreator()));
+                map.put("car",ambulanceService.findById(attendance.getCarId()));
+                envelop.setSuccessFlg(true);
+                envelop.setObj(map);
+            }else{
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("出勤任务Id不存在");
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 }
