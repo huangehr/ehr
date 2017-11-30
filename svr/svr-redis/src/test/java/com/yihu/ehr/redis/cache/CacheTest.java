@@ -5,7 +5,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.BoundListOperations;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -56,6 +59,19 @@ public class CacheTest {
     @Test
     public void deleteCacheTest() {
         redisTemplate.delete("name");
+    }
+
+    @Test
+    public void redisCallbackTest() {
+        String usedMemory = (String) redisTemplate.execute(new RedisCallback() {
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+//                connection.bgSave(); // 生成快照
+                return connection.info("memory").get("used_memory");
+            }
+        });
+
+        System.out.println("Redis 内存大小： " + usedMemory);
     }
 
 }
