@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * IndexController - FastDFS索引
+ * FastDFSIndexEndPoint - FastDFS索引
  * Created by progr1mmer on 2017/11/25.
  */
 @RestController
