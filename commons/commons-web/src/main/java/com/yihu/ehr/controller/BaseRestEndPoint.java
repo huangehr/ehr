@@ -63,6 +63,7 @@ public class BaseRestEndPoint extends AbstractController {
             T entity = objectMapper.readValue(json, entityCls);
             return entity;
         } catch (IOException ex) {
+            ex.printStackTrace();
             throw new ApiException(ErrorCode.SystemError, "Unable to parse json, " + ex.getMessage());
         }
     }
@@ -71,6 +72,7 @@ public class BaseRestEndPoint extends AbstractController {
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
             return null;
         }
     }

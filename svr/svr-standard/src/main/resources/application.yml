@@ -173,6 +173,6 @@ spring:
     password: q4YaQemf
 fast-dfs:
   tracker-server: 10.176.97.5:22122
-  public-server: http://10.176.97.5:22122
+  public-server: http://10.176.97.5:8888
 
 

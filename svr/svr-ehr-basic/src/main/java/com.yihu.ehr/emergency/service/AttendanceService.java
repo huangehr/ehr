@@ -26,7 +26,12 @@ public class AttendanceService extends BaseJpaService<Attendance, AttendanceDao>
     }
 
     public Attendance findByCreateDateAndCarId(Date startTime, String carId) {
-        return attendanceDao.findByCreateDateAndCarId(startTime, carId);
+        List<Attendance> attendanceList = attendanceDao.findByCreateDateAndCarId(startTime, carId);
+        if (attendanceList != null && attendanceList.size() > 0) {
+            return attendanceList.get(0);
+        }else {
+            return null;
+        }
     }
 
     public Attendance findById(int id) {

@@ -74,10 +74,4 @@ public interface RsReportMonitorTypeClient {
     List<MRsReportMonitorType> getInfoById (
             @ApiParam(name = "monitorTypeIds", value = "类型id", defaultValue = "")
             @RequestParam(value = "monitorTypeIds", required = false) List<Integer> monitorTypeIds);
-
-    @RequestMapping(value = ServiceApi.Resources.RsReportByMonitorTypeId, method = RequestMethod.GET)
-    @ApiOperation("获取报表信息")
-    List<RsReportModel> getRsReportByMonitorTypeId(
-            @ApiParam(name = "monitorTypeId", value = "类型id", defaultValue = "")
-            @RequestParam(value = "monitorTypeId")Integer monitorTypeId);
 }

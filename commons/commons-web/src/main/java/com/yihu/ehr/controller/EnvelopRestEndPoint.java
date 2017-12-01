@@ -5,7 +5,6 @@ import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +19,7 @@ import java.util.List;
  * @author Sand
  */
 public class EnvelopRestEndPoint extends BaseRestEndPoint {
+
     @Value("${deploy.region}")
     Short deployRegion = 3502;
 
@@ -37,6 +37,22 @@ public class EnvelopRestEndPoint extends BaseRestEndPoint {
         envelop.setTotalCount(totalCount);
 
         return envelop;
+    }
+
+    public Envelop getPageResult(List detaiModelList, int totalCount, int currPage, int rows) {
+        Envelop result = new Envelop();
+        result.setSuccessFlg(true);
+        result.setDetailModelList(detaiModelList);
+        result.setTotalCount(totalCount);
+        result.setCurrPage(currPage);
+        result.setPageSize(rows);
+        if (result.getTotalCount() % result.getPageSize() > 0) {
+            result.setTotalPage((result.getTotalCount() / result.getPageSize()) + 1);
+        } else {
+            result.setTotalPage(result.getTotalCount() / result.getPageSize());
+        }
+
+        return result;
     }
 
     public Envelop failed(String errMsg){
