@@ -35,9 +35,9 @@ public class JobService {
             params.put("quota", quotaVo);
            //往quartz框架添加任务
            if (!StringUtils.isEmpty(tjQuota.getJobClazz()) && tjQuota.getExecType().equals("1")) {
-               quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()),  UUID.randomUUID().toString().replace("-", ""), params);
+               quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()),  quotaVo.getCode().replace("-", "") + "immediately", params);
            }else {
-               quartzHelper.addJob(Class.forName(quotaVo.getJobClazz()), quotaVo.getCron(), UUID.randomUUID().toString().replace("-", ""), params);
+               quartzHelper.addJob(Class.forName(quotaVo.getJobClazz()), quotaVo.getCron(), quotaVo.getCode().replace("-", ""), params);
            }
         }
     }

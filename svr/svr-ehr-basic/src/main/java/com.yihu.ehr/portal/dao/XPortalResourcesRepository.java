@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface XPortalResourcesRepository extends PagingAndSortingRepository<PortalResources, Long> {
 
-    @Query(value = "select p.* from it_resource_download p ",nativeQuery = true)
+    @Query(value = "select p.* from it_resource_download p order by p.upload_time desc",nativeQuery = true)
     List<PortalResources> getAllPortalResources();
 }

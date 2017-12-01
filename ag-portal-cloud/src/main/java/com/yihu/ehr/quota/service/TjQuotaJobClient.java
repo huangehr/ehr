@@ -36,14 +36,5 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "filters", required = false) String filters
     );
 
-    @RequestMapping(value = ServiceApi.TJ.GetQuotaBreadReport, method = RequestMethod.GET)
-    @ApiOperation(value = "getQuotaBreadReport")
-    Envelop getQuotaBreadReport(
-            @RequestParam(value = "id", required = true) int id,
-            @RequestParam(value = "filters", required = false) String filters
-    );
-
-
-
 
 }
