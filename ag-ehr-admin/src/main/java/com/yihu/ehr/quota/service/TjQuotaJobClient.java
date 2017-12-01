@@ -44,18 +44,6 @@ public interface TjQuotaJobClient {
             @ApiParam(name = "dimension", value = "维度字段")
             @RequestParam(value = "dimension", required = false) String dimension);
 
-    @ApiOperation(value = "获取指标统计结果曲线性或柱状报表")
-    @RequestMapping(value = ServiceApi.TJ.GetQuotaGraphicReportPreview, method = RequestMethod.GET)
-    public MChartInfoModel getQuotaGraphicReport(
-        @ApiParam(name = "id", value = "指标任务ID", required = true)
-        @RequestParam(value = "id" , required = true) int id,
-        @ApiParam(name = "type", value = "图表类型", defaultValue = "1")
-        @RequestParam(value = "type" , required = true) int type,
-        @ApiParam(name = "filter", value = "过滤条件", defaultValue = "")
-        @RequestParam(value = "filter", required = false) String filter,
-        @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-        @RequestParam(value = "dimension", required = false) String dimension);
-
     @ApiOperation(value = "获取指标统计结果曲线性或柱状报表，多条线")
     @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.POST)
     public MChartInfoModel getMoreQuotaGraphicReportPreviews(
