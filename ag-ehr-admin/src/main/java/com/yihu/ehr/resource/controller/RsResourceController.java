@@ -293,52 +293,52 @@ public class RsResourceController extends BaseController {
         }
     }
 
-    @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.GET)
-    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览")
-    public List<MChartInfoModel> getRsQuotaPreview(
-            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
-            @RequestParam(value = "resourceId") String resourceId,
-            @ApiParam(name = "quotaId", value = "上卷下钻的指标ID", defaultValue = "")
-            @RequestParam(value = "quotaId", required = false) String quotaId,
-            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
-            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
-            @ApiParam(name = "quotaFilter", value = "指标查询过滤条件", defaultValue = "")
-            @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
-            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
-
-        //-----------------用户数据权限 start
-        String org = "";
-        if (userOrgList != null) {
-            if (!(userOrgList.size() == 1 && userOrgList.get(0).equals("null"))) {
-                org = StringUtils.strip(String.join(",", userOrgList), "[]");
-            }
-        }
-        //-----------------用户数据权限 end
-        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
-        List<MChartInfoModel> chartInfoModels = new ArrayList<>();
-        if(list!=null && list.size() > 0) {
-            for (ResourceQuotaModel m : list) {
-                if (StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)) {
-                    Map<String, Object> params = new HashMap<>();
-                    if (org.length() > 0) {
-                        if (StringUtils.isNotEmpty(quotaFilter)) {
-                            params = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {
-                            });
-                        }
-                        params.put("org", org);
-                        quotaFilter = objectMapper.writeValueAsString(params);
-                    }
-                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter, dimension);
-                    chartInfoModels.add(chartInfoModel);
-                }
-            }
-        }
-        return chartInfoModels;
-    }
+//    @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.GET)
+//    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览")
+//    public List<MChartInfoModel> getRsQuotaPreview(
+//            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+//            @RequestParam(value = "resourceId") String resourceId,
+//            @ApiParam(name = "quotaId", value = "上卷下钻的指标ID", defaultValue = "")
+//            @RequestParam(value = "quotaId", required = false) String quotaId,
+//            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
+//            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
+//            @ApiParam(name = "quotaFilter", value = "指标查询过滤条件", defaultValue = "")
+//            @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
+//            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
+//            @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
+//
+//        //-----------------用户数据权限 start
+//        String org = "";
+//        if (userOrgList != null) {
+//            if (!(userOrgList.size() == 1 && userOrgList.get(0).equals("null"))) {
+//                org = StringUtils.strip(String.join(",", userOrgList), "[]");
+//            }
+//        }
+//        //-----------------用户数据权限 end
+//        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
+//        List<MChartInfoModel> chartInfoModels = new ArrayList<>();
+//        if(list!=null && list.size() > 0) {
+//            for (ResourceQuotaModel m : list) {
+//                if (StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)) {
+//                    Map<String, Object> params = new HashMap<>();
+//                    if (org.length() > 0) {
+//                        if (StringUtils.isNotEmpty(quotaFilter)) {
+//                            params = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {
+//                            });
+//                        }
+//                        params.put("org", org);
+//                        quotaFilter = objectMapper.writeValueAsString(params);
+//                    }
+//                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter, dimension);
+//                    chartInfoModels.add(chartInfoModel);
+//                }
+//            }
+//        }
+//        return chartInfoModels;
+//    }
 
     @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.POST)
-    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览,多个指标放在一个图形上展示")
+    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览,支持多个指标放在一个图形上展示")
     public Envelop getRsQuotaPreview(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
@@ -373,9 +373,9 @@ public class RsResourceController extends BaseController {
         if(list != null && list.size() > 0){
             String idstr  = "";
             String charstr = "";
-            if(list.size() == 1){
-                chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(list.get(0).getQuotaId(), list.get(0).getQuotaChart(), filter, dimension);
-            }else{
+//            if(list.size() == 1){
+//                chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(list.get(0).getQuotaId(), list.get(0).getQuotaChart(), filter, dimension);
+//            }else{
                 for (ResourceQuotaModel m : list) {
                     idstr = idstr + m.getQuotaId() +",";
                     charstr = charstr + m.getQuotaChart() +",";
@@ -397,7 +397,7 @@ public class RsResourceController extends BaseController {
                 }
                 MRsResources mRsResources = objectMapper.convertValue(envelop1.getObj(), MRsResources.class);
                 chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(idstr, charstr, filter, null, mRsResources.getName());
-            }
+//            }
         }
         chartInfoModel.setResourceId(resourceId);
         envelop.setObj(chartInfoModel);
