@@ -234,7 +234,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             }else {
                 count ++;
             }
-            if(count > 6){
+            if(count > 3){
                 flag = false;
             }
          }
