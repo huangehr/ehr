@@ -15,11 +15,13 @@ import com.yihu.ehr.model.geography.MGeographyDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.tj.MQuotaCategory;
+import com.yihu.ehr.model.tj.MTjQuotaLog;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.quota.service.QuotaCategoryClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
+import com.yihu.ehr.quota.service.TjQuotaLogClient;
 import com.yihu.ehr.resource.client.RsMetadataClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.GetInfoClient;
@@ -57,9 +59,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private GetInfoClient getInfoClient;
-    @Autowired
-    private AddressClient addressClient;
+    TjQuotaLogClient tjQuotaLogClient;
     @Autowired
     OrganizationClient organizationClient;
 
@@ -217,10 +217,39 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
     @ApiOperation(value = "指标执行")
-    public boolean execuJob(
+    public Envelop execuJob(
             @ApiParam(name = "id")
             @RequestParam(value = "id") int id) throws Exception {
-        return tjQuotaJobClient.tjQuotaExecute(id);
+         tjQuotaJobClient.tjQuotaExecute(id);
+         MTjQuotaModel quotaModel = tjQuotaClient.getById(Long.valueOf(String.valueOf(id)));
+        Envelop envelop = new Envelop();
+        MTjQuotaLog mTjQuotaLog = null;
+        boolean flag = true;
+        int count = 1;
+        while (flag) {
+            Thread.sleep(5 * 1000L);
+            mTjQuotaLog = tjQuotaLogClient.getRecentRecord(quotaModel.getCode(),new Date());
+            if(mTjQuotaLog != null ){
+                flag = false;
+            }else {
+                count ++;
+            }
+            if(count > 6){
+                flag = false;
+            }
+         }
+        if(mTjQuotaLog != null ){
+            if(mTjQuotaLog.getStatus().equals("1")){
+                envelop.setSuccessFlg(true);
+            }else {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(mTjQuotaLog.getContent());
+            }
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统错误");
+        }
+        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.TJ.TjGetQuotaResult, method = RequestMethod.GET)

@@ -81,8 +81,8 @@ public class EsQuotaJob implements Job {
      * 统计过程
      */
     private void quota() {
-        TjQuotaLog tjQuotaLog = new TjQuotaLog();
         String message = "";
+        TjQuotaLog tjQuotaLog = new TjQuotaLog();
         tjQuotaLog.setQuotaCode(quotaVo.getCode());
         tjQuotaLog.setSaasId(saasid);
         tjQuotaLog.setStartTime(new Date());
@@ -122,7 +122,7 @@ public class EsQuotaJob implements Job {
                     tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据保存失败");
                 }else {
                     tjQuotaLog.setStatus(Contant.save_status.success);
-                    tjQuotaLog.setContent("统计结果大于0的数据为0条");
+                    tjQuotaLog.setContent("统计成功,统计结果大于0的数据为0条");
                 }
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
