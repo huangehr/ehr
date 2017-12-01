@@ -126,13 +126,4 @@ public class RsResourceMonitorTypeEndPoint extends EnvelopRestEndPoint {
         List<RsReportMonitorType> monitorTypes = rsReportMonitorTypeService.getInfoById(monitorTypeIds);
         return (List<MRsReportMonitorType>) convertToModels(monitorTypes, new ArrayList<>(monitorTypes.size()), MRsReportMonitorType.class, null);
     }
-
-    @RequestMapping(value = ServiceApi.Resources.RsReportByMonitorTypeId, method = RequestMethod.GET)
-    @ApiOperation("获取报表信息")
-    public List<RsReport> getRsReportByMonitorTypeId(
-            @ApiParam(name = "monitorTypeId", value = "类型id", defaultValue = "")
-            @RequestParam(value = "monitorTypeId")Integer monitorTypeId) throws Exception {
-        List<RsReport> reportList = rsReportMonitorTypeService.getRsReportByMonitorTypeId(monitorTypeId);
-        return reportList;
-    }
 }
