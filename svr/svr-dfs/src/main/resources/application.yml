@@ -8,15 +8,20 @@ logging:
       hibernate: ERROR
 
 server:
-  port: ${svr-workflow.server.port}
+  port: 7777
 
-management:
-  port: ${server.port}
+#management:
+#  port: ${server.port}
+# -- 后续删除的配置 start
+deploy:
+  region: 3502
+
+# -- 后续删除的配置 end
 
 info:
   app:
-    name: PictureService
-    description: EHR platform picture service.
+    name: svr-dfs
+    description: Ehr Platform Distributed File System service.
     version: 1.0.0
 
 spring:
@@ -44,56 +49,94 @@ fast-dfs:
 ---
 spring:
   profiles: dev
-
   datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: ha
-    password: ha
+    url: jdbc:mysql://localhost:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: tiger
+  data:
+    elasticsearch:
+      cluster-name: elasticsearch
+      cluster-nodes: 172.17.110.17:9300
+      local: false
+      repositories:
+        enable: true
 
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
-
-
 
 ---
 spring:
   profiles: alpha
-
   datasource:
     url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: ha
     password: ha
+  data:
+      elasticsearch:
+        cluster-name: elasticsearch
+        cluster-nodes: 172.17.110.17:9300
+        local: false
+        repositories:
+          enable: true
 
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
 
-  
 ---
 spring:
   profiles: test
-
   datasource:
     url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: weifuwu
     password: weifuwu
+  data:
+      elasticsearch:
+        cluster-name: elasticsearch
+        cluster-nodes: 172.17.110.17:9300
+        local: false
+        repositories:
+          enable: true
 
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
 
-
 ---
 spring:
   profiles: prod
-
   datasource:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: ha
     password: jkzlxm
+  data:
+      elasticsearch:
+        cluster-name: elasticsearch
+        cluster-nodes: 172.17.110.17:9300
+        local: false
+        repositories:
+          enable: true
 
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
 
+---
+spring:
+  profiles: prod_sr
+  datasource:
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    username: ha
+    password: jkzlxm
+  data:
+      elasticsearch:
+        cluster-name: elasticsearch
+        cluster-nodes: 172.17.110.17:9300
+        local: false
+        repositories:
+          enable: true
+
+fast-dfs:
+  tracker-server: 11.1.2.9:22122
+  public-server: http://ds.ehr.yihu.com:22122

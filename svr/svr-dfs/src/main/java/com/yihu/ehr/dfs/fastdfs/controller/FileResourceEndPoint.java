@@ -1,11 +1,12 @@
-package com.yihu.ehr.controller;
+package com.yihu.ehr.dfs.fastdfs.controller;
 
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.service.FileResource;
-import com.yihu.ehr.service.FileResourceManager;
+import com.yihu.ehr.dfs.fastdfs.service.FileResource;
+import com.yihu.ehr.dfs.fastdfs.service.FileResourceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -31,7 +32,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     private FastDFSUtil fastDFSUtil;
 
     @Autowired
-    private FileResourceManager fileResourceManager;
+    private FileResourceService fileResourceService;
 
 
     /**
@@ -54,7 +55,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "json_data") String jsonData) throws Exception {
         FileResource fileResource = toEntity(jsonData, FileResource.class);
         fileResource.setId(getObjectId(BizObject.FileResource));
-        return fileResourceManager.saveFileResource(fileStr, fileName, fileResource);
+        return fileResourceService.saveFileResource(fileStr, fileName, fileResource);
 
     }
 
@@ -79,7 +80,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "json_data") String jsonData) throws Exception {
         FileResource fileResource = toEntity(jsonData, FileResource.class);
         fileResource.setId(getObjectId(BizObject.FileResource));
-        return fileResourceManager.saveFileResourceReturnUrl(fileStr, fileName, fileResource);
+        return fileResourceService.saveFileResourceReturnUrl(fileStr, fileName, fileResource);
     }
 
     /**
@@ -102,7 +103,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "json_data") String jsonData) throws Exception {
         FileResource fileResource = toEntity(jsonData, FileResource.class);
         fileResource.setId(getObjectId(BizObject.FileResource));
-        return fileResourceManager.saveFileResourceReturnHttpUrl(fileStr, fileName, fileResource);
+        return fileResourceService.saveFileResourceReturnHttpUrl(fileStr, fileName, fileResource);
     }
 
     /**
@@ -117,8 +118,8 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     public boolean filesDelete(
             @ApiParam(name = "object_id", value = "文件字符串")
             @RequestParam(value = "object_id") String objectId) throws Exception {
-        List<FileResource> fileResources = fileResourceManager.findByObjectId(objectId);
-        return fileResourceManager.deleteFileResource(fileResources);
+        List<FileResource> fileResources = fileResourceService.findByObjectId(objectId);
+        return fileResourceService.deleteFileResource(fileResources);
     }
 
     /**
@@ -134,8 +135,8 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "storagePath", value = "文件路径")
             @RequestParam(value = "storagePath") String storagePath) throws Exception {
         String s = java.net.URLDecoder.decode(storagePath, "UTF-8");
-        List<FileResource> fileResources = fileResourceManager.findByStoragePath(s);
-        return fileResourceManager.deleteFileResource(fileResources);
+        List<FileResource> fileResources = fileResourceService.findByStoragePath(s);
+        return fileResourceService.deleteFileResource(fileResources);
     }
 
 
@@ -154,9 +155,9 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "mime", required = false) String mime) throws Exception {
         List<FileResource> fileResources;
         if(StringUtils.isEmpty(mime))
-            fileResources = fileResourceManager.findByObjectId(objectId);
+            fileResources = fileResourceService.findByObjectId(objectId);
         else
-            fileResources = fileResourceManager.findByObjectIdAndMime(objectId, mime);
+            fileResources = fileResourceService.findByObjectIdAndMime(objectId, mime);
 
         List<String> filesStrs = new ArrayList<>();
         for (FileResource fileResource : fileResources) {
@@ -182,7 +183,7 @@ public class FileResourceEndPoint extends EnvelopRestEndPoint {
     public List<String> getFilePath(
             @ApiParam(name = "object_id", value = "文件字符串")
             @RequestParam(value = "object_id") String objectId) throws Exception {
-        List<FileResource> fileResources = fileResourceManager.findByObjectId(objectId);
+        List<FileResource> fileResources = fileResourceService.findByObjectId(objectId);
         List<String> filesStrs = new ArrayList<>();
         for (FileResource fileResource : fileResources) {
             String storagePath = fileResource.getStoragePath();

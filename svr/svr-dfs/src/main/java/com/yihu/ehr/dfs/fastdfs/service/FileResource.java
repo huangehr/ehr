@@ -1,4 +1,4 @@
-package com.yihu.ehr.service;
+package com.yihu.ehr.dfs.fastdfs.service;
 
 import javax.persistence.*;
 import java.util.Date;
