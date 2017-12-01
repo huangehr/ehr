@@ -2,6 +2,7 @@ package com.yihu.quota.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.service.job.JobService;
 import com.yihu.quota.vo.SaveModel;
@@ -37,7 +38,7 @@ public class JobController extends BaseController {
      * @return
      */
     @ApiOperation(value = "根据ID执行任务")
-    @RequestMapping(value = "/job/execuJob", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
     public boolean execuJob(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
             @RequestParam(value = "id", required = true) Integer id) {
