@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * IndexEntity - FastDFS索引
+ * FastDFSIndexEntity - FastDFS索引
  * Created by progr1mmer on 2017/11/25.
  */
 @Document(indexName = "dfs", type = "info")

@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
 /**
- * IndexService - FastDFS索引
+ * FastDFSIndexService - FastDFS索引
  * Created by progr1mmer on 2017/11/25.
  */
 @Service

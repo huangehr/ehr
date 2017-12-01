@@ -21,7 +21,7 @@ deploy:
 info:
   app:
     name: svr-dfs
-    description: Ehr Platform Distributed File System service.
+    description: Ehr Platform Distributed File System Service.
     version: 1.0.0
 
 spring:

@@ -5,7 +5,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import org.springframework.stereotype.Repository;
 
 /**
- * IndexDao - FastDFS索引
+ * FastDFSIndexDao - FastDFS索引
  * Created by progr1mmer on 2017/11/25.
  */
 @Repository
