@@ -45,11 +45,11 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "dimension", required = false) String dimension);
 
     @ApiOperation(value = "获取指标统计结果echart图表，支持多条组合")
-    @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getMoreQuotaGraphicReportPreviews(
-            @ApiParam(name = "idStr", value = "指标任务ID", required = true)
+            @ApiParam(name = "idStr", value = "指标任务ID,多个用,拼接", required = true)
             @RequestParam(value = "idStr" , required = true) String idStr,
-            @ApiParam(name = "charstr", value = "多图表类型用,拼接，混合类型只支持柱状和线性", defaultValue = "1")
+            @ApiParam(name = "charstr", value = "多图表类型用,拼接,混合类型只支持柱状和线性", defaultValue = "1")
             @RequestParam(value = "charstr" , required = true) String charstr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
