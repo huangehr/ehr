@@ -115,7 +115,7 @@ public class QuotaService {
             dimensions = new String[]{"quotaDate"};
         }
         TjQuota tjQuota= quotaDao.findOne(id);
-        List<Map<String, Object>> resultListMap = esResultExtract.getQuotaReport(tjQuota, filters,10000);
+        List<Map<String, Object>> resultListMap = esResultExtract.getQuotaReport(tjQuota, filters,1000);
 
         Map<String,Map<String, Object>> cloumnMap = new HashMap<>();
 

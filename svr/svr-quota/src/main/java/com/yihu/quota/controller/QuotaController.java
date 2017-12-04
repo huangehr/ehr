@@ -102,7 +102,7 @@ public class QuotaController extends BaseController {
         Envelop envelop = new Envelop();
         try {
             TjQuota tjQuota = quotaService.findOne(id);
-            QuotaReport  quotaReport = quotaService.getQuotaReport(tjQuota, filters, dimension,99999);
+            QuotaReport  quotaReport = quotaService.getQuotaReport(tjQuota, filters, dimension,1000);
             envelop.setDetailModelList(quotaReport.getReultModelList());
             envelop.setSuccessFlg(true);
             return envelop;
