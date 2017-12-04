@@ -61,4 +61,10 @@ public interface AttendanceClient {
     Envelop delete(
             @ApiParam(name = "ids", value = "id列表[1,2,3...] int")
             @RequestParam(value = "ids") String ids);
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceDetail, method = RequestMethod.GET)
+    @ApiOperation("出勤记录详情")
+    Envelop detail(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") String id);
 }

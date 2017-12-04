@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,14 +76,27 @@ public class TjQuotaLogEndPoint extends EnvelopRestEndPoint {
         }
         conditionMap.put("startDate", startDate);
         conditionMap.put("endDate", endDate);
-        //        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
-        //        Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
-        //        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
-        //        return getResult(mDemographicInfos,totalCount);
-        List<TjQuotaLog> demographicInfos = tjQuotaLogService.searchQuotaLogByParams(conditionMap);
+        List<TjQuotaLog> tjQuotaLogs = tjQuotaLogService.searchQuotaLogByParams(conditionMap);
         Long totalCount =Long.parseLong(tjQuotaLogService.searchQuotaLogByParamsTotalCount(conditionMap).toString());
         pagedResponse(request, response, totalCount, page, size);
-        return (List<MTjQuotaLog>)convertToModels(demographicInfos,new ArrayList<MTjQuotaLog>(demographicInfos.size()), MTjQuotaLog.class, null);
+        return (List<MTjQuotaLog>)convertToModels(tjQuotaLogs,new ArrayList<MTjQuotaLog>(tjQuotaLogs.size()), MTjQuotaLog.class, null);
+    }
+
+
+    @RequestMapping(value = ServiceApi.TJ.GetTjQuotaLogRecentRecord, method = RequestMethod.GET)
+    @ApiOperation(value = "获取最近日志列表")
+    MTjQuotaLog getRecentRecord(
+            @ApiParam(name = "quotaCode", value = "指标code", defaultValue = "")
+            @RequestParam(value = "quotaCode", required = false) String quotaCode,
+            @ApiParam(name = "endTime", value = "完成时间", defaultValue = "")
+            @RequestParam(value = "endTime", required = false) Date endTime
+    ){
+        MTjQuotaLog mTjQuotaLog = null;
+        List<TjQuotaLog> tjQuotaLogs =  tjQuotaLogService.getRecentRecord(quotaCode,endTime);
+        if(tjQuotaLogs != null && tjQuotaLogs.size() > 0){
+            mTjQuotaLog = objectMapper.convertValue(tjQuotaLogs.get(0),MTjQuotaLog.class);
+        }
+        return mTjQuotaLog;
     }
 
 }
