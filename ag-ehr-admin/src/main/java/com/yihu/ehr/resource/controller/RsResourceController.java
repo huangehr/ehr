@@ -357,20 +357,20 @@ public class RsResourceController extends BaseController {
                 chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, null, mRsResources.getName());
             }
             List<Map<String, String>> synthesiseDimensionMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodestr);
-            if(synthesiseDimensionMap != null && synthesiseDimensionMap.size() > 0){
-                String dimensions = "";
-                for(Map<String, String> map : synthesiseDimensionMap){
-                    for(String key :map.keySet()){
-                        if(key.equals("name")){
-                            String name = map.get("name");
-                        }else {
-                            dimensions = map.get(key);
-                        }
+            Map<String, String> dimensionMap = new HashMap<>();
+            for(Map<String, String> map :synthesiseDimensionMap){
+                String name = "";
+                String code = "";
+                for(String key :map.keySet()){
+                    if(key.equals("name")){
+                        name = map.get(key);
+                    }else{
+                        code = map.get(key);
                     }
                 }
-                Map<String, Map<String, Object>> dimensionKeyValMap= tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimensionKeyVal(list.get(0).getQuotaCode(), dimensions);
-                chartInfoModel.setDimensionMap(dimensionKeyValMap);
+                dimensionMap.put(code,name);
             }
+            chartInfoModel.setDimensionMap(dimensionMap);
         }
         chartInfoModel.setResourceId(resourceId);
         envelop.setObj(chartInfoModel);

@@ -36,5 +36,4 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "filters", required = false) String filters
     );
 
-
 }

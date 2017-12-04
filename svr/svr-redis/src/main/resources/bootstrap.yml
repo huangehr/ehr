@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-redis
+    name: svr-redis-xingwang
 
 ---
 spring:

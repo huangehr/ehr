@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-quota
+    name: svr-quota-xingwang
 
 ---
 spring:
