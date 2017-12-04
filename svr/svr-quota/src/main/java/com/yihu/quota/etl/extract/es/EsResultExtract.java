@@ -292,7 +292,7 @@ public class EsResultExtract {
 
 
 
-    //指标分组统计数量
+    //指标分组统计数量 - 只支持一个字段
     public List<Map<String, Object>> searcherByGroup(TjQuota tjQuota, String filters,String aggsField ) throws Exception {
         initialize(tjQuota,filters);
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
@@ -309,7 +309,7 @@ public class EsResultExtract {
         return  list;
     }
 
-    //根据mysql 指标分组求和
+    //根据mysql 指标分组求和 支持一个和多个字段
     public Map<String, Integer> searcherByGroupBySql(TjQuota tjQuota , String aggsFields ,String filter) throws Exception {
         initialize(tjQuota,null);
         if(StringUtils.isEmpty(filter)){

@@ -304,7 +304,7 @@ public class RsResourceController extends BaseController {
             @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
-        Envelop envelop = new Envelop();
+
         String filter = "";
         //-----------------用户数据权限 start
         String org = "";
@@ -319,62 +319,75 @@ public class RsResourceController extends BaseController {
             filter = objectMapper.writeValueAsString(params);
         }
         //-----------------用户数据权限 end
-        MChartInfoModel chartInfoModel = null;
+        Envelop envelop = new Envelop();
+        MChartInfoModel chartInfoModel = new MChartInfoModel();;
+        envelop.setObj(chartInfoModel);
+        envelop.setSuccessFlg(false);
+        chartInfoModel.setResourceId(resourceId);
         Envelop resourceResult =  resourcesClient.getResourceById(resourceId);
         if(!resourceResult.isSuccessFlg()){
-            chartInfoModel = new MChartInfoModel();
-            envelop.setObj(chartInfoModel);
             envelop.setErrorMsg("视图不存在，请确认！");
             return envelop;
-        }
-        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
-        if(list != null && list.size() > 0){
-            String quotaCodestr  = "";
-            String quotaIdstr  = "";
-            String charstr = "";
-            int charTypeNum = 0;
-            boolean lineOrBarFlag = true;
-            boolean pieFlag = true;
-            for (ResourceQuotaModel m : list) {
-                quotaCodestr = quotaCodestr + m.getQuotaCode() +",";
-                quotaIdstr = quotaIdstr + m.getQuotaId() +",";
-                charstr = charstr + m.getQuotaChart() +",";
-                if(lineOrBarFlag && (m.getQuotaChart() == 1 || m.getQuotaChart() == 2)){
-                    charTypeNum ++;
-                    lineOrBarFlag = false;
-                }else if(pieFlag && m.getQuotaChart() == 3) {
-                    charTypeNum ++;
-                    pieFlag = false;
-                }
-            }
-            if(charTypeNum > 1){
-                chartInfoModel = new MChartInfoModel();
-                envelop.setObj(chartInfoModel);
-                envelop.setErrorMsg("视图由多个指标组成时，预览图形支持 多指标都属于同一类型，混合型目前支持‘柱状+柱状’,请确认图表展示类型！");
-                return envelop;
-            }else {
-                MRsResources mRsResources = objectMapper.convertValue(resourceResult.getObj(), MRsResources.class);
-                chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, null, mRsResources.getName());
-            }
-            List<Map<String, String>> synthesiseDimensionMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodestr);
-            Map<String, String> dimensionMap = new HashMap<>();
-            for(Map<String, String> map :synthesiseDimensionMap){
-                String name = "";
-                String code = "";
-                for(String key :map.keySet()){
-                    if(key.equals("name")){
-                        name = map.get(key);
-                    }else{
-                        code = map.get(key);
+        }else {
+            List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
+            if(list != null && list.size() > 0){
+                String quotaCodestr  = "";
+                String quotaIdstr  = "";
+                String charstr = "";
+                int charTypeNum = 0;
+                boolean lineOrBarFlag = true;
+                boolean pieFlag = true;
+                for (ResourceQuotaModel m : list) {
+                    quotaCodestr = quotaCodestr + m.getQuotaCode() +",";
+                    quotaIdstr = quotaIdstr + m.getQuotaId() +",";
+                    charstr = charstr + m.getQuotaChart() +",";
+                    if(lineOrBarFlag && (m.getQuotaChart() == 1 || m.getQuotaChart() == 2)){
+                        charTypeNum ++;
+                        lineOrBarFlag = false;
+                    }else if(pieFlag && m.getQuotaChart() == 3) {
+                        charTypeNum ++;
+                        pieFlag = false;
                     }
                 }
-                dimensionMap.put(code,name);
+
+                List<Map<String, String>> synthesiseDimensionMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodestr);
+                Map<String, String> dimensionMap = new LinkedHashMap<>();
+                String firstDimension = "";
+                boolean firstFlag = true;
+                for(Map<String, String> map :synthesiseDimensionMap){
+                    String name = "";
+                    String code = "";
+                    for(String key :map.keySet()){
+                        if(key.equals("name")){
+                            name = map.get(key);
+                        }else{
+                            code = map.get(key);
+                        }
+                    }
+                    dimensionMap.put(code,name);
+                    if(firstFlag){
+                        firstDimension = code;
+                        firstFlag =  false;
+                    }
+                }
+                if(StringUtils.isEmpty(dimension)){
+                    dimension = firstDimension;
+                }
+
+                if(charTypeNum > 1){
+                    envelop.setObj(chartInfoModel);
+                    envelop.setErrorMsg("视图由多个指标组成时，预览图形支持 多指标都属于同一类型，混合型目前支持‘柱状+柱状’,请确认图表展示类型！");
+                }else {
+                    MRsResources mRsResources = objectMapper.convertValue(resourceResult.getObj(), MRsResources.class);
+                    chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
+                    chartInfoModel.setDimensionMap(dimensionMap);
+                    envelop.setObj(chartInfoModel);
+                    envelop.setSuccessFlg(true);
+                }
+            }else{
+                envelop.setErrorMsg("视图中无指标，请确认！");
             }
-            chartInfoModel.setDimensionMap(dimensionMap);
         }
-        chartInfoModel.setResourceId(resourceId);
-        envelop.setObj(chartInfoModel);
-        envelop.setSuccessFlg(true);
         return envelop;
     }
 

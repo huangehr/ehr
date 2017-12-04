@@ -24,11 +24,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 
@@ -49,6 +52,8 @@ public class QuotaReportController extends BaseController {
     private TjDimensionSlaveService tjDimensionSlaveService;
     @Autowired
     private QuotaService quotaService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
 
     /**
@@ -79,110 +84,11 @@ public class QuotaReportController extends BaseController {
         return envelop;
     }
 
-//    @ApiOperation(value = "获取指标统计结果echart图表，单条线")
-//    @RequestMapping(value = ServiceApi.TJ.GetQuotaGraphicReportPreview, method = RequestMethod.GET)
-//    public MChartInfoModel getQuotaGraphicReport(
-//            @ApiParam(name = "id", value = "指标任务ID", required = true)
-//            @RequestParam(value = "id" , required = true) int id,
-//            @ApiParam(name = "type", value = "图表类型", defaultValue = "1")
-//            @RequestParam(value = "type" , required = true) int type,
-//            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
-//            @RequestParam(value = "filter", required = false) String filter,
-//            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-//            @RequestParam(value = "dimension", required = false) String dimension
-//    ) {
-//        Envelop envelop = new Envelop();
-//        MChartInfoModel chartInfoModel = new MChartInfoModel();
-//        try {
-//            ReportOption reportOption = new ReportOption();
-//            TjQuota tjQuota = quotaService.findOne(id);
-//
-//            //查询维度
-//            List<TjDimensionMain> mains = tjDimensionMainService.getDimensionMainByQuotaCode(tjQuota.getCode());
-//            List<TjDimensionSlave> slaves = tjDimensionSlaveService.getDimensionSlaveByQuotaCode(tjQuota.getCode());
-//            List<MReportDimension> dimesionList = new ArrayList<>();
-//            for(int i=0 ;i < mains.size();i++){
-//                String choose = "false";
-//                if(StringUtils.isEmpty(dimension) || dimension.equals("null")){
-//                    dimension = mains.get(i).getCode();
-//                    if(i==0){
-//                        choose = "true";
-//                    }
-//                }else {
-//                   if( dimension.equals(mains.get(i).getCode())){
-//                       choose = "true";
-//                    }
-//                }
-//                MReportDimension mReportDimension = new MReportDimension();
-//                mReportDimension.setIsCheck(choose);
-//                mReportDimension.setName(mains.get(i).getName());
-//                mReportDimension.setCode(mains.get(i).getCode());
-//                mReportDimension.setIsMain("true");
-//                dimesionList.add(mReportDimension);
-//            }
-//            for(int i=0 ;i < slaves.size();i++){
-//                String choose = "false";
-//                String key = "slaveKey" + (i+1);
-//                if( dimension.equals(key)){
-//                    choose = "true";
-//                }
-//                MReportDimension mReportDimension = new MReportDimension();
-//                mReportDimension.setIsCheck(choose);
-//                mReportDimension.setName(slaves.get(i).getName());
-//                mReportDimension.setCode(key);
-//                mReportDimension.setIsMain("false");
-//                dimesionList.add(mReportDimension);
-//            }
-//            chartInfoModel.setListMap(dimesionList);
-//
-//            List<Map<String, Object>> data2list = null;
-//            List<Map<String, Object>> datalist = new ArrayList<>();
-//            String dimensions = dimension + ";" + dimension + "Name";
-//            QuotaReport quotaReport = quotaService.getQuotaReportGeneral(tjQuota.getId(), filter, dimensions, 10000);
-//            Map<String,Object> dimensionMap = new HashMap<>();
-//            for(ResultModel resultModel :quotaReport.getReultModelList()){
-//                dimensionMap.put(resultModel.getCloumns().get(1),resultModel.getCloumns().get(0));
-//                Map<String, Object> map = new HashMap<>();
-//                map.put("NAME",resultModel.getCloumns().get(1));
-//                map.put("TOTAL",resultModel.getValue());
-//                datalist.add(map);
-//            }
-//            String title = "指标标题";
-//            String legend = "";
-//            title = tjQuota.getName();
-//            legend = tjQuota.getName();
-//            String xName = "";
-//            String yName = "数量";
-//            String barName = "";
-//            String bar2Name = "";
-//            Option option = null;
-//            if (type == ReportOption.bar) {
-//                option = reportOption.getBarEchartOption(title, legend ,xName,yName, barName, datalist, bar2Name, data2list);
-//            } else if (type == ReportOption.line) {
-//                option = reportOption.getLineEchartOption(title, legend,xName,yName, barName, datalist, bar2Name, data2list);
-//            } else if (type == ReportOption.pie) {
-//                option = reportOption.getPieEchartOption(title, legend, barName, datalist, bar2Name, data2list);
-//            }
-//            chartInfoModel.setOption(option.toString());
-//            chartInfoModel.setTitle(title);
-////            chartInfoModel.setQuotaId(tjQuota.getId().toString());
-////            chartInfoModel.setQuotaCode(tjQuota.getCode());
-//            chartInfoModel.setDimensionMap(dimensionMap);
-//            return chartInfoModel;
-//        } catch (Exception e) {
-//            error(e);
-//            invalidUserException(e, -1, "查询失败:" + e.getMessage());
-//            envelop.setSuccessFlg(false);
-//            return null;
-//        }
-//    }
-
-
     @ApiOperation(value = "获取指标统计结果echart图表，支持多条组合")
     @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getQuotaGraphicReports(
-            @ApiParam(name = "idStr", value = "指标任务ID,多个用,拼接", required = true)
-            @RequestParam(value = "idStr" , required = true) String idStr,
+            @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
+            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
             @ApiParam(name = "charstr", value = "多图表类型用,拼接,混合类型只支持柱状和线性", defaultValue = "1")
             @RequestParam(value = "charstr" , required = true) String charstr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
@@ -193,37 +99,40 @@ public class QuotaReportController extends BaseController {
             @RequestParam(value = "title", required = false) String title
     ) {
         Envelop envelop = new Envelop();
-        List<String> ids = Arrays.asList(idStr.split(","));
+        List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         List<String> charTypes = Arrays.asList(charstr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
         try {
             Option option = null;
-            String xName = "";
-            String yName = "数量";
             List<List<Object>> optionData = new ArrayList<>();
             List<String> lineNames = new ArrayList<>();
             Map<String,Map<String, Object>> lineData = new HashMap<>();
-            Map<String,Map<String, Object>> dimensionDataMap = new HashMap<>();
-
-            for(String id:ids){
-                TjQuota tjQuota = quotaService.findOne(Integer.valueOf(id));
+            Map<String, String> xAxisMap = new HashMap<>();
+            for(String quotaId:quotaIds){
+                Map<String, Object> dataMap = new HashMap<>();
+                TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if(tjQuota != null){
-                    //查询维度
-                    List<TjDimensionMain> mains = tjDimensionMainService.getDimensionMainByQuotaCode(tjQuota.getCode());
-                    if(mains != null && mains.size() > 0){
-                        QuotaReport quotaReport = quotaService.getQuotaReportGeneral(tjQuota.getId(), filter, mains.get(0).getCode()+"Name", 10000);
-                        Map<String, Object> datamap = new HashMap<>();
-                        for(ResultModel resultModel :quotaReport.getReultModelList()){
-                            datamap.put(resultModel.getCloumns().get(0),resultModel.getValue());
+                    String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(),dimension);
+                    Map<String,String> dimensionDicMap = new HashMap<>();
+                    if(StringUtils.isNotEmpty(dictSql)){
+                        //查询字典数据
+                        List<SaveModel> dictData = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
+                        if(dictData != null ) {
+                            for (SaveModel saveModel : dictData) {
+                                String name = getFieldValueByName(dimension + "Name", saveModel).toString();
+                                String val = getFieldValueByName(dimension,saveModel).toString();
+                                dimensionDicMap.put(val,name);
+                            }
                         }
-                        xName = mains.get(0).getName();
-                        lineNames.add(tjQuota.getName());
-                        lineData.put(tjQuota.getCode(), datamap);
-                    }else {
-                        chartInfoModel.setOption("");
-                        chartInfoModel.setTitle(title);
-                        return chartInfoModel;
                     }
+                    //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
+                    Map<String, Integer> groupDataMap =  quotaService.searcherByGroupBySql(tjQuota, dimension, filter);
+                    for(String key : groupDataMap.keySet()){
+                        dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
+                        xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
+                    }
+                    lineNames.add(tjQuota.getName());
+                    lineData.put(tjQuota.getCode(), dataMap);
                 }
             }
             Map<String, Object> quotaMap = new HashMap<>();
@@ -240,7 +149,6 @@ public class QuotaReportController extends BaseController {
                         quotaMap = lineData.get(key);
                     }
                 }
-
                 for(String key : lineData.keySet()){
                     List<Object> dataList = new ArrayList<>();
                     Map<String,Object> valMap = lineData.get(key);
@@ -260,16 +168,15 @@ public class QuotaReportController extends BaseController {
                     optionData.add(dataList);
                 }
             }
-            Object[] yData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
-            option = reportOption.getLineEchartOptionMoreChart(title, xName, yName, yData, optionData, lineNames,charTypes);
-
+            Object[] xData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
+            option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames,charTypes);
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
+            chartInfoModel.setxAxisMap(xAxisMap);
             return chartInfoModel;
         } catch (Exception e) {
             error(e);
             invalidUserException(e, -1, "查询失败:" + e.getMessage());
-            envelop.setSuccessFlg(false);
             return null;
         }
     }
@@ -287,7 +194,8 @@ public class QuotaReportController extends BaseController {
     ) {
         Envelop envelop = new Envelop();
         try {
-            Map<String, Integer>  resultMap = quotaService.searcherByGroupBySql(id,dimension, filters);
+            TjQuota tjQuota = quotaService.findOne(id);
+            Map<String, Integer>  resultMap = quotaService.searcherByGroupBySql(tjQuota,dimension, filters);
             envelop.setSuccessFlg(true);
             envelop.setObj(resultMap);
             return envelop;
@@ -297,6 +205,46 @@ public class QuotaReportController extends BaseController {
         }
         envelop.setSuccessFlg(false);
         return envelop;
+    }
+
+
+    private String getQuotaDimensionDictSql(String quotaCode, String dimension) {
+        String dictSql = "";
+        //查询维度
+        List<TjQuotaDimensionMain>  dimensionMains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaCode);
+        if(dimensionMains != null && dimensionMains.size() > 0){
+            for(TjQuotaDimensionMain main:dimensionMains){
+                if(main.getMainCode().equals(dimension)){
+                    dictSql = main.getDictSql();
+                }
+            }
+        }
+        if(StringUtils.isEmpty(dictSql)) {
+            List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
+            if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
+                for (TjQuotaDimensionSlave slave : dimensionSlaves) {
+                    if (slave.getSlaveCode().equals(dimension)) {
+                        dictSql = slave.getDictSql();
+                    }
+                }
+            }
+        }
+        return dictSql;
+    }
+
+    /**
+     * 根据属性名获取属性值
+     * */
+    private Object getFieldValueByName(String fieldName, Object o) {
+        try {
+            String firstLetter = fieldName.substring(0, 1).toUpperCase();
+            String getter = "get" + firstLetter + fieldName.substring(1);
+            Method method = o.getClass().getMethod(getter, new Class[] {});
+            Object value = method.invoke(o, new Object[] {});
+            return value;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }
