@@ -970,6 +970,14 @@ public class ServiceApi {
             public static final String Set = "/redis/cache/operation/set";
             public static final String Remove = "/redis/cache/operation/remove";
         }
+        // 缓存操作
+        public static class CacheStatistics {
+            public static final String GetCategoryKeys = "/redis/cache/statistics/getCategoryKeys";
+        }
+        // 接收订阅消息
+        public static class SubscribeMessage {
+            public static final String ReceiveResponseTime = "/redis/subscribeMessage/receiveResponseTime";
+        }
 
     }
 
