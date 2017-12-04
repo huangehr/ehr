@@ -16,16 +16,16 @@ import org.springframework.context.annotation.Configuration;
         SecurityAutoConfiguration.class,
         ManagementWebSecurityAutoConfiguration.class})
 @ComponentScan
-@EnableFeignClients
-@EnableDiscoveryClient
-public class SvrFileResourceApplication extends SpringBootServletInitializer {
+//@EnableFeignClients
+//@EnableDiscoveryClient
+public class SvrDfsApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        SpringApplication.run(SvrFileResourceApplication.class, args);
+        SpringApplication.run(SvrDfsApplication.class, args);
     }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(SvrFileResourceApplication.class);
+        return application.sources(SvrDfsApplication.class);
     }
 }

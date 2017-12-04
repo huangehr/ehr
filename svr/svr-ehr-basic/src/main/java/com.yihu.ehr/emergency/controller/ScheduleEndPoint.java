@@ -43,10 +43,10 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "页码", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) {
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         try {
             List<Schedule> schedules = scheduleService.search(fields, filters, sorts, page, size);
@@ -65,10 +65,10 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
     public Envelop level(
             @ApiParam(name = "date", value = "年-月")
             @RequestParam(value = "date", required = false) String date,
-            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "页码", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) {
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         try {
             List<Object> resultList =  scheduleService.getLevel(date, page, size);

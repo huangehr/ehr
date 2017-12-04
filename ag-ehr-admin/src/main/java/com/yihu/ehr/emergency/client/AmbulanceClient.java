@@ -8,10 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -32,8 +29,8 @@ public interface AmbulanceClient{
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
-            @RequestParam(value = "page", required = false) int page,
-            @RequestParam(value = "size", required = false) int size);
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size);
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceSearch, method = RequestMethod.GET)
     @ApiOperation(value = "查询救护车信息,包括执勤人员信息")
@@ -41,8 +38,8 @@ public interface AmbulanceClient{
             @RequestParam(value = "fields", required = false) String fields,
             @RequestParam(value = "filters", required = false) String filters,
             @RequestParam(value = "sorts", required = false) String sorts,
-            @RequestParam(value = "page", required = false) int page,
-            @RequestParam(value = "size", required = false) int size);
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size);
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT)
     @ApiOperation(value = "更新救护车状态信息")
@@ -64,6 +61,11 @@ public interface AmbulanceClient{
     @ApiOperation("删除记录")
     Envelop delete(
             @RequestParam(value = "ids") String ids);
+
+    @RequestMapping(value = ServiceApi.Emergency.Ambulance, method = RequestMethod.GET)
+    @ApiOperation("获取单条记录")
+    Envelop findById(
+            @PathVariable(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence,method = RequestMethod.POST)
     @ApiOperation("获取已存在车牌号、电话号码")
