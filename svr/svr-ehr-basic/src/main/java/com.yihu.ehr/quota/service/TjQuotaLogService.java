@@ -5,6 +5,7 @@ import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.quota.dao.XTjQuotaLogRepository;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -21,6 +22,10 @@ import java.util.Map;
 @Service
 @Transactional
 public class TjQuotaLogService extends BaseJpaService<TjQuotaLog, XTjQuotaLogRepository> {
+
+    @Autowired
+    XTjQuotaLogRepository tjQuotaLogRepository;
+
 
     public List<TjQuotaLog> searchQuotaLogByParams(Map<String, Object> args) {
         Session session = entityManager.unwrap(org.hibernate.Session.class);
@@ -87,5 +92,13 @@ public class TjQuotaLogService extends BaseJpaService<TjQuotaLog, XTjQuotaLogRep
             query.setDate("endTime", endTime);
         }
         return ((Long)query.list().get(0)).intValue();
+    }
+
+    public List<TjQuotaLog> getRecentRecord(String quotaCode,Date endTime) {
+        List<TjQuotaLog> tjQuotaLogs = tjQuotaLogRepository.getRecentRecord(quotaCode, endTime);
+        if (tjQuotaLogs != null && tjQuotaLogs.size() > 0) {
+            return tjQuotaLogs;
+        }
+        return null;
     }
 }

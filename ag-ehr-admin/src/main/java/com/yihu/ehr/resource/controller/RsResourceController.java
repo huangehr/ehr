@@ -1,6 +1,5 @@
 package com.yihu.ehr.resource.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.agModel.resource.RsResourcesModel;
 import com.yihu.ehr.constants.ApiVersion;
@@ -13,6 +12,7 @@ import com.yihu.ehr.model.tj.MTjQuotaModel;
 import com.yihu.ehr.quota.service.TjQuotaChartClient;
 import com.yihu.ehr.quota.service.TjQuotaClient;
 import com.yihu.ehr.quota.service.TjQuotaJobClient;
+import com.yihu.ehr.quota.service.TjQuotaSynthesizeQueryClient;
 import com.yihu.ehr.resource.client.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -49,6 +49,8 @@ public class RsResourceController extends BaseController {
     private TjQuotaChartClient tjQuotaChartClient;
     @Autowired
     private TjQuotaJobClient tjQuotaJobClient;
+    @Autowired
+    private TjQuotaSynthesizeQueryClient tjQuotaSynthesizeQueryClient;
 
     @ApiOperation("创建资源")
     @RequestMapping(value = ServiceApi.Resources.Resources, method = RequestMethod.POST)
@@ -294,51 +296,7 @@ public class RsResourceController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.GET)
-    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览")
-    public List<MChartInfoModel> getRsQuotaPreview(
-            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
-            @RequestParam(value = "resourceId") String resourceId,
-            @ApiParam(name = "quotaId", value = "上卷下钻的指标ID", defaultValue = "")
-            @RequestParam(value = "quotaId", required = false) String quotaId,
-            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
-            @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
-            @ApiParam(name = "quotaFilter", value = "指标查询过滤条件", defaultValue = "")
-            @RequestParam(value = "quotaFilter", required = false) String quotaFilter,
-            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
-
-        //-----------------用户数据权限 start
-        String org = "";
-        if (userOrgList != null) {
-            if (!(userOrgList.size() == 1 && userOrgList.get(0).equals("null"))) {
-                org = StringUtils.strip(String.join(",", userOrgList), "[]");
-            }
-        }
-        //-----------------用户数据权限 end
-        List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
-        List<MChartInfoModel> chartInfoModels = new ArrayList<>();
-        if(list!=null && list.size() > 0) {
-            for (ResourceQuotaModel m : list) {
-                if (StringUtils.isEmpty(quotaId) || m.getQuotaId() == Integer.valueOf(quotaId)) {
-                    Map<String, Object> params = new HashMap<>();
-                    if (org.length() > 0) {
-                        if (StringUtils.isNotEmpty(quotaFilter)) {
-                            params = objectMapper.readValue(quotaFilter, new TypeReference<Map>() {
-                            });
-                        }
-                        params.put("org", org);
-                        quotaFilter = objectMapper.writeValueAsString(params);
-                    }
-                    MChartInfoModel chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(m.getQuotaId(), m.getQuotaChart(), quotaFilter, dimension);
-                    chartInfoModels.add(chartInfoModel);
-                }
-            }
-        }
-        return chartInfoModels;
-    }
-
-    @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.POST)
-    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览,多个指标放在一个图形上展示")
+    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览,支持多个指标放在一个图形上展示")
     public Envelop getRsQuotaPreview(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
@@ -362,8 +320,8 @@ public class RsResourceController extends BaseController {
         }
         //-----------------用户数据权限 end
         MChartInfoModel chartInfoModel = null;
-        Envelop envelop1 =  resourcesClient.getResourceById(resourceId);
-        if(!envelop1.isSuccessFlg()){
+        Envelop resourceResult =  resourcesClient.getResourceById(resourceId);
+        if(!resourceResult.isSuccessFlg()){
             chartInfoModel = new MChartInfoModel();
             envelop.setObj(chartInfoModel);
             envelop.setErrorMsg("视图不存在，请确认！");
@@ -371,33 +329,48 @@ public class RsResourceController extends BaseController {
         }
         List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
         if(list != null && list.size() > 0){
-            String idstr  = "";
+            String quotaCodestr  = "";
+            String quotaIdstr  = "";
             String charstr = "";
-            if(list.size() == 1){
-                chartInfoModel = tjQuotaJobClient.getQuotaGraphicReport(list.get(0).getQuotaId(), list.get(0).getQuotaChart(), filter, dimension);
-            }else{
-                for (ResourceQuotaModel m : list) {
-                    idstr = idstr + m.getQuotaId() +",";
-                    charstr = charstr + m.getQuotaChart() +",";
+            int charTypeNum = 0;
+            boolean lineOrBarFlag = true;
+            boolean pieFlag = true;
+            for (ResourceQuotaModel m : list) {
+                quotaCodestr = quotaCodestr + m.getQuotaCode() +",";
+                quotaIdstr = quotaIdstr + m.getQuotaId() +",";
+                charstr = charstr + m.getQuotaChart() +",";
+                if(lineOrBarFlag && (m.getQuotaChart() == 1 || m.getQuotaChart() == 2)){
+                    charTypeNum ++;
+                    lineOrBarFlag = false;
+                }else if(pieFlag && m.getQuotaChart() == 3) {
+                    charTypeNum ++;
+                    pieFlag = false;
                 }
-                List<String> charTypes = Arrays.asList(charstr.split(","));
-                Map<String,String> map = new HashMap<>();
-                for(String key:charTypes){
-                    if(Integer.valueOf(key) == 1 || Integer.valueOf(key) == 2 ){
-                        map.put("LineOrBar","LineOrBar");
+            }
+            if(charTypeNum > 1){
+                chartInfoModel = new MChartInfoModel();
+                envelop.setObj(chartInfoModel);
+                envelop.setErrorMsg("视图由多个指标组成时，预览图形支持 多指标都属于同一类型，混合型目前支持‘柱状+柱状’,请确认图表展示类型！");
+                return envelop;
+            }else {
+                MRsResources mRsResources = objectMapper.convertValue(resourceResult.getObj(), MRsResources.class);
+                chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, null, mRsResources.getName());
+            }
+            List<Map<String, String>> synthesiseDimensionMap = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodestr);
+            Map<String, String> dimensionMap = new HashMap<>();
+            for(Map<String, String> map :synthesiseDimensionMap){
+                String name = "";
+                String code = "";
+                for(String key :map.keySet()){
+                    if(key.equals("name")){
+                        name = map.get(key);
                     }else{
-                        map.put("Pie","Pie");
+                        code = map.get(key);
                     }
                 }
-                if(map.size() >= 2){
-                    chartInfoModel = new MChartInfoModel();
-                    envelop.setObj(chartInfoModel);
-                    envelop.setErrorMsg("视图由多个指标组成时，预览图形支持 多指标都属于同一类型，混合型目前支持‘柱状+柱状’,请确认图表展示类型！");
-                    return envelop;
-                }
-                MRsResources mRsResources = objectMapper.convertValue(envelop1.getObj(), MRsResources.class);
-                chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(idstr, charstr, filter, null, mRsResources.getName());
+                dimensionMap.put(code,name);
             }
+            chartInfoModel.setDimensionMap(dimensionMap);
         }
         chartInfoModel.setResourceId(resourceId);
         envelop.setObj(chartInfoModel);

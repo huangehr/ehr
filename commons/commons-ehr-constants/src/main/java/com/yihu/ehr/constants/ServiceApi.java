@@ -1079,6 +1079,9 @@ public class ServiceApi {
         public static final String GetTjQuotaChartList = "/tj/getTjQuotaChartList";
 
         public static final String GetTjQuotaLogList = "/tj/getTjQuotaLogList";
+        public static final String GetTjQuotaLogRecentRecord = "/tj/getTjQuotaLogRecentRecord";
+
+
         public static final String GetTjDataSaveList = "/tj/getTjDataSaveList";
         public static final String AddTjDataSave = "/tj/addTjDataSave";
         public static final String DeleteTjDataSave = "/tj/deleteTjDataSave";
@@ -1119,8 +1122,10 @@ public class ServiceApi {
         public static final String GetQuotaReport = "tj/getQuotaReport";
         public static final String GetQuotaGraphicReportPreview = "tj/getQuotaGraphicReportPreview";
         public static final String GetMoreQuotaGraphicReportPreviews = "tj/getMoreQuotaGraphicReportPreviews";
-        public static final String GetQuotaBreadReport = "tj/getQuotaBreadReport";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
+        public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
+
+
 
         public static final String TjQuotaChart = "/tj/tjQuotaChart";
         public static final String BatchTjQuotaChart = "/tj/batchTjQuotaChart";

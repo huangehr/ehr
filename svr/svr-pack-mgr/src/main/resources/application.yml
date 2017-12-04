@@ -36,7 +36,6 @@ spring:
     #sentinel:
     #  master: # Name of Redis server.
     #  nodes: # Comma-separated list of host:port pairs.
-
     pool:
       max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
@@ -49,6 +48,7 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
+
 ---
 spring:
   profiles: dev
@@ -68,6 +68,7 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+
 ---
 spring:
   profiles: alpha
@@ -85,6 +86,7 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
+
 ---
 spring:
   profiles: test
@@ -102,6 +104,7 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+
 ---
 spring:
   profiles: prod
@@ -114,7 +117,6 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
-
 
 ---
 spring:

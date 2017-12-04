@@ -52,7 +52,7 @@ fast-dfs:
 spring:
   profiles: dev
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: chenweishan
     password: chenweishan
   redis:
@@ -73,7 +73,7 @@ fast-dfs:
 spring:
   profiles: alpha
   datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: ha
     password: ha
   redis:
@@ -92,7 +92,7 @@ fast-dfs:
 spring:
   profiles: test
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: weifuwu
     password: weifuwu
   redis:
@@ -111,7 +111,7 @@ fast-dfs:
 spring:
   profiles: prod
   datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: ha
     password: jkzlxm
   redis:
@@ -131,7 +131,7 @@ fast-dfs:
 spring:
   profiles: prod_fz
   datasource:
-    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: sr_healtharchive
     password: data!@)1
   redis:
@@ -154,7 +154,7 @@ fast-dfs:
 spring:
   profiles: prod_sr
   datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
     username: healthcloud
     password: GP8Qz4qU
   redis:
@@ -163,11 +163,10 @@ spring:
     password: q4YaQemf
   data:
     solr:
-      #zk-host: 11.1.2.51,11.1.2.52,11.1.2.53:2181/solr # ZooKeeper host address in the form HOST:PORT.
-      zk-host: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com:2181/solr
+      zk-host: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com:2181/solr
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
+    - hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888

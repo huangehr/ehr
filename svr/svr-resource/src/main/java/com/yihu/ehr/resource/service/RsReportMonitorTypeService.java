@@ -1,20 +1,14 @@
 package com.yihu.ehr.resource.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.resource.dao.RsMonitorTypeReportDao;
 import com.yihu.ehr.resource.dao.RsReportDao;
 import com.yihu.ehr.resource.dao.RsReportMonitorTypeDao;
-import com.yihu.ehr.resource.model.RsMonitorTypeReport;
 import com.yihu.ehr.resource.model.RsReport;
 import com.yihu.ehr.resource.model.RsReportMonitorType;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +24,6 @@ public class RsReportMonitorTypeService extends BaseJpaService<RsReportMonitorTy
 
     @Autowired
     private RsReportMonitorTypeDao rsReportMonitorTypeDao;
-    @Autowired
-    private RsMonitorTypeReportDao rsMonitorTypeReportDao;
     @Autowired
     private RsReportDao rsReportDao;
 
@@ -84,14 +76,5 @@ public class RsReportMonitorTypeService extends BaseJpaService<RsReportMonitorTy
 
     public List<RsReportMonitorType> getInfoById(List<Integer> monitorTypeIds) {
         return rsReportMonitorTypeDao.findById(monitorTypeIds);
-    }
-
-    public List<RsReport> getRsReportByMonitorTypeId(Integer monitorTypeId) throws Exception {
-        List<RsReport> rsReports = new ArrayList<>();
-        List<Integer> reportIds = rsMonitorTypeReportDao.findReportIdByMonitorTypeId(monitorTypeId);
-        if (null != reportIds && reportIds.size() > 0) {
-            rsReports = rsReportDao.findByIds(reportIds);
-        }
-        return rsReports;
     }
 }

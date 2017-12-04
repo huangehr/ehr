@@ -13,7 +13,6 @@ server:
 management:
   port: ${server.port}
 
-
 fast-dfs:
   pool:
     init-size: 5
@@ -147,12 +146,9 @@ spring:
       password: ehr@#(2^
       authenticationDatabase: admin
       database: ehr
-
 fast-dfs:
   tracker-server: 192.168.135.42:22122
   public-server: http://192.168.135.42:22122
-
-
 
 ---
 spring:
