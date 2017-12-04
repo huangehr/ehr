@@ -56,7 +56,7 @@ public class AmbulanceController extends BaseController {
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "页码", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size) {
-        return ambulanceClient.search(fields, filters, sorts, size, page);
+        return ambulanceClient.search(fields, filters, sorts, page, size);
     }
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdateStatus, method = RequestMethod.PUT)

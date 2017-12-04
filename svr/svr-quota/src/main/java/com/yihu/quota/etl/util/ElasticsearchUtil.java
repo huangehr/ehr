@@ -124,7 +124,7 @@ public class ElasticsearchUtil {
 
 
     /**
-     * 执行搜索（带分组求和）
+     * 执行搜索（带分组求和sum）
      * @param queryBuilder 查询内容
      * @param aggsField 要分组的字段
      * @param sumField 要求和的字段  只支持一个字段
@@ -142,8 +142,6 @@ public class ElasticsearchUtil {
         TermsBuilder termsBuilder = AggregationBuilders.terms(aggsField+"_val").field(aggsField);
         SumBuilder ageAgg = AggregationBuilders.sum(sumField+"_count").field(sumField);
         searchRequestBuilder.addAggregation(termsBuilder.subAggregation(ageAgg));
-
-
         Map<String, Object> dataMap = new HashMap<String, Object>();
         //执行搜索
         SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();

@@ -44,24 +44,12 @@ public interface TjQuotaJobClient {
             @ApiParam(name = "dimension", value = "维度字段")
             @RequestParam(value = "dimension", required = false) String dimension);
 
-    @ApiOperation(value = "获取指标统计结果曲线性或柱状报表")
-    @RequestMapping(value = ServiceApi.TJ.GetQuotaGraphicReportPreview, method = RequestMethod.GET)
-    public MChartInfoModel getQuotaGraphicReport(
-        @ApiParam(name = "id", value = "指标任务ID", required = true)
-        @RequestParam(value = "id" , required = true) int id,
-        @ApiParam(name = "type", value = "图表类型", defaultValue = "1")
-        @RequestParam(value = "type" , required = true) int type,
-        @ApiParam(name = "filter", value = "过滤条件", defaultValue = "")
-        @RequestParam(value = "filter", required = false) String filter,
-        @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
-        @RequestParam(value = "dimension", required = false) String dimension);
-
-    @ApiOperation(value = "获取指标统计结果曲线性或柱状报表，多条线")
-    @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.POST)
+    @ApiOperation(value = "获取指标统计结果echart图表，支持多条组合")
+    @RequestMapping(value = ServiceApi.TJ.GetMoreQuotaGraphicReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getMoreQuotaGraphicReportPreviews(
-            @ApiParam(name = "idStr", value = "指标任务ID", required = true)
+            @ApiParam(name = "idStr", value = "指标任务ID,多个用,拼接", required = true)
             @RequestParam(value = "idStr" , required = true) String idStr,
-            @ApiParam(name = "charstr", value = "多图表类型，只支持柱状和线性", defaultValue = "1")
+            @ApiParam(name = "charstr", value = "多图表类型用,拼接,混合类型只支持柱状和线性", defaultValue = "1")
             @RequestParam(value = "charstr" , required = true) String charstr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
             @RequestParam(value = "filter", required = false) String filter,
