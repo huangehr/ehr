@@ -62,5 +62,5 @@ spring:
     config:
       username: user
       password: configuration
-      uri: http://171.35.109.40:1221
-      label: dev
+      uri: http://10.176.97.10:1221
+      label: master
