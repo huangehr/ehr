@@ -211,10 +211,15 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Emergency.AttendanceDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除出勤记录")
     public Envelop delete(
-            @ApiParam(name = "ids", value = "id列表[1,2,3...] int")
+            @ApiParam(name = "ids", value = "id列表(int)1,2,3,...")
             @RequestParam(value = "ids") String ids){
-        List<Integer> idList = toEntity(ids, List.class);
-        attendanceService.delete(idList);
+        //List<Integer> idList = toEntity(ids, List.class);
+        String [] idArr = ids.split(",");
+        Integer [] idArr1 = new Integer[idArr.length];
+        for(int i = 0; i < idArr.length; i++) {
+            idArr1[i] = new Integer(idArr[i]);
+        }
+        attendanceService.delete(idArr1);
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(true);
         return envelop;

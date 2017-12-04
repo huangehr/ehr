@@ -103,10 +103,15 @@ public class LocationEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Emergency.LocationDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除待命地点")
     public Envelop delete(
-            @ApiParam(name = "ids", value = "id列表[1,2,3...] int")
+            @ApiParam(name = "ids", value = "id列表(int)1,2,3,...")
             @RequestParam(value = "ids") String ids){
         Envelop envelop = new Envelop();
-        List<Integer> idList = toEntity(ids, List.class);
+        String [] idArr = ids.split(",");
+        Integer [] idArr1 = new Integer[idArr.length];
+        for(int i = 0; i < idArr.length; i++) {
+            idArr1[i] = new Integer(idArr[i]);
+        }
+        //List<Integer> idList = toEntity(ids, List.class);
         try {
             List<Ambulance> ambulanceList = ambulanceService.search("id=" + ids.substring(1, ids.length() - 1));
             if(ambulanceList == null || ambulanceList.size() > 0) {
@@ -120,7 +125,7 @@ public class LocationEndPoint extends BaseRestEndPoint {
             envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
-        locationService.delete(idList);
+        locationService.delete(idArr1);
         envelop.setSuccessFlg(true);
         return envelop;
     }

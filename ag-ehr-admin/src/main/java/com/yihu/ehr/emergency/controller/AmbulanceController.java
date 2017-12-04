@@ -88,7 +88,7 @@ public class AmbulanceController extends BaseController {
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除记录")
     public Envelop delete(
-            @ApiParam(name = "ids", value = "id列表['xxxx','xxxx','xxxx'...] String")
+            @ApiParam(name = "ids", value = "id列表xxxx,xxxx,xxxx,...")
             @RequestParam(value = "ids") String ids){
         return ambulanceClient.delete(ids);
     }

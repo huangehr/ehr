@@ -73,7 +73,7 @@ public class AttendanceController extends BaseController {
     @RequestMapping(value = ServiceApi.Emergency.AttendanceDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除出勤记录")
     public Envelop delete(
-            @ApiParam(name = "ids", value = "id列表[1,2,3...] int")
+            @ApiParam(name = "ids", value = "id列表(int)1,2,3,...")
             @RequestParam(value = "ids") String ids){
         return attendanceClient.delete(ids);
     }
