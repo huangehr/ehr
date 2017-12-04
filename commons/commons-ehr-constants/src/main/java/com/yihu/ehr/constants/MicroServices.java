@@ -12,24 +12,24 @@ public class MicroServices {
     public static final String Configuration = "svr-configuration";
 
     //以下几个微服务聚合svr-ehr-basic
-    public static final String Basic = "svr-ehr-basic-xingwang";
-    public static final String Application = "svr-ehr-basic-xingwang";
-    public static final String Geography = "svr-ehr-basic-xingwang";
-    public static final String Patient = "svr-ehr-basic-xingwang";
-    public static final String Portal = "svr-ehr-basic-xingwang";
-    public static final String Security = "svr-ehr-basic-xingwang";
-    public static final String User = "svr-ehr-basic-xingwang";
-    public static final String Family = "svr-ehr-basic-xingwang";
-    public static final String FileResource = "svr-ehr-basic-xingwang";
-    public static final String Dictionary = "svr-ehr-basic-xingwang";
-    public static final String Organization = "svr-ehr-basic-xingwang";
+    public static final String Basic = "svr-ehr-basic";
+    public static final String Application = "svr-ehr-basic";
+    public static final String Geography = "svr-ehr-basic";
+    public static final String Patient = "svr-ehr-basic";
+    public static final String Portal = "svr-ehr-basic";
+    public static final String Security = "svr-ehr-basic";
+    public static final String User = "svr-ehr-basic";
+    public static final String Family = "svr-ehr-basic";
+    public static final String FileResource = "svr-ehr-basic";
+    public static final String Dictionary = "svr-ehr-basic";
+    public static final String Organization = "svr-ehr-basic";
 
     //以下几个微服务聚合svr-standard
     public static final String Adaption = "svr-standard";
     public static final String Standard = "svr-standard";
     public static final String SpecialDict = "svr-standard";
 
-    public static final String Resource = "svr-resource-xingwang";
+    public static final String Resource = "svr-resource";
     public static final String ESB = "svr-esb";
 
     public static final String HealthProfile = "svr-health-profile";
@@ -39,9 +39,9 @@ public class MicroServices {
     public static final String ArchiveSecurity = "svr-archive-security";
 
     public static final String Authentication = "svr-authentication";
-    public static final String Redis = "svr-redis-xingwang";
+    public static final String Redis = "svr-redis";
     public static final String Statistics = "svr-protal-statistics";
-    public static final String Quota = "svr-quota-xingwang";
+    public static final String Quota = "svr-quota";
 
     public static final String LogCollection = "svr-logCollection";
 }

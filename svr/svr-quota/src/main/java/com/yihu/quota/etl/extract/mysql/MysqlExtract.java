@@ -116,12 +116,15 @@ public class MysqlExtract {
         }
         //拼凑where语句
         StringBuffer whereSql = new StringBuffer();
+        if (!StringUtils.isEmpty(esConfig.getConfig())) {
+            whereSql.append(" where " + esConfig.getConfig());
+        }
         if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
             if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
-                whereSql.append(" where " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+                whereSql.append(" and " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
                 whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }else{
-                whereSql.append( " where " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
+                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }
         }
         StringBuffer sql = new StringBuffer();
