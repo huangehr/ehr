@@ -45,16 +45,11 @@ public interface AttendanceClient {
     @RequestMapping(value = ServiceApi.Emergency.AttendanceList, method = RequestMethod.GET)
     @ApiOperation("获取出勤列表")
     Envelop list(
-            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段")
             @RequestParam(value = "fields", required = false) String fields,
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件")
             @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "页码", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size);
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size);
 
     @RequestMapping(value = ServiceApi.Emergency.AttendanceDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除出勤记录")

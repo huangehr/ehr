@@ -190,10 +190,10 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "页码", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) {
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         try {
             List<Attendance> attendance = attendanceService.search(fields, filters, sorts, page, size);

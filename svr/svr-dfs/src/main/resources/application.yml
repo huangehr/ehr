@@ -53,17 +53,21 @@ spring:
     url: jdbc:mysql://localhost:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
     username: root
     password: tiger
-  data:
-    elasticsearch:
-      cluster-name: elasticsearch
-      cluster-nodes: 172.17.110.17:9300
-      local: false
-      repositories:
-        enable: true
+  #data:
+    #elasticsearch:
+      #cluster-name: elasticsearch
+      #cluster-nodes: 172.17.110.17:9300
+      #local: false
+      #repositories:
+        #enable: true
+
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 
 fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
+  tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
 
 ---
 spring:

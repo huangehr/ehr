@@ -1,4 +1,4 @@
-package com.yihu.ehr.dfs.fastdfs.service;
+package com.yihu.ehr.dfs.fastdfs.entity;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -10,7 +10,7 @@ import java.util.Date;
 @Entity
 @Table(name = "file_resource")
 @Access(value = AccessType.PROPERTY)
-public class FileResource {
+public class FastDFS {
 
     private String id;                   // objectId
     private String storagePath;          // FDS path
