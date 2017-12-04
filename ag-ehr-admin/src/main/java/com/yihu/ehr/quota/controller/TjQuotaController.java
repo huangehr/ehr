@@ -221,6 +221,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             @ApiParam(name = "id")
             @RequestParam(value = "id") int id) throws Exception {
          tjQuotaJobClient.tjQuotaExecute(id);
+         Date date = new Date();
          MTjQuotaModel quotaModel = tjQuotaClient.getById(Long.valueOf(String.valueOf(id)));
         Envelop envelop = new Envelop();
         MTjQuotaLog mTjQuotaLog = null;
@@ -228,7 +229,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         int count = 1;
         while (flag) {
             Thread.sleep(5 * 1000L);
-            mTjQuotaLog = tjQuotaLogClient.getRecentRecord(quotaModel.getCode(),new Date());
+            mTjQuotaLog = tjQuotaLogClient.getRecentRecord(quotaModel.getCode(),date);
             if(mTjQuotaLog != null ){
                 flag = false;
             }else {

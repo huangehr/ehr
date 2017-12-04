@@ -107,8 +107,9 @@ public class QuotaReportController extends BaseController {
             List<List<Object>> optionData = new ArrayList<>();
             List<String> lineNames = new ArrayList<>();
             Map<String,Map<String, Object>> lineData = new HashMap<>();
+            Map<String, String> xAxisMap = new HashMap<>();
             for(String quotaId:quotaIds){
-                Map<String, Object> datamap = new HashMap<>();
+                Map<String, Object> dataMap = new HashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if(tjQuota != null){
                     String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(),dimension);
@@ -127,10 +128,11 @@ public class QuotaReportController extends BaseController {
                     //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
                     Map<String, Integer> groupDataMap =  quotaService.searcherByGroupBySql(tjQuota, dimension, filter);
                     for(String key : groupDataMap.keySet()){
-                        datamap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
+                        dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
+                        xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
                     }
                     lineNames.add(tjQuota.getName());
-                    lineData.put(tjQuota.getCode(), datamap);
+                    lineData.put(tjQuota.getCode(), dataMap);
                 }
             }
             Map<String, Object> quotaMap = new HashMap<>();
@@ -166,10 +168,11 @@ public class QuotaReportController extends BaseController {
                     optionData.add(dataList);
                 }
             }
-            Object[] yData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
-            option = reportOption.getLineEchartOptionMoreChart(title, "", "", yData, optionData, lineNames,charTypes);
+            Object[] xData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
+            option = reportOption.getLineEchartOptionMoreChart(title, "", "", xData, optionData, lineNames,charTypes);
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
+            chartInfoModel.setxAxisMap(xAxisMap);
             return chartInfoModel;
         } catch (Exception e) {
             error(e);

@@ -370,7 +370,6 @@ public class RsResourceController extends BaseController {
                         firstFlag =  false;
                     }
                 }
-                chartInfoModel.setDimensionMap(dimensionMap);
                 if(StringUtils.isEmpty(dimension)){
                     dimension = firstDimension;
                 }
@@ -381,6 +380,7 @@ public class RsResourceController extends BaseController {
                 }else {
                     MRsResources mRsResources = objectMapper.convertValue(resourceResult.getObj(), MRsResources.class);
                     chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
+                    chartInfoModel.setDimensionMap(dimensionMap);
                     envelop.setObj(chartInfoModel);
                     envelop.setSuccessFlg(true);
                 }

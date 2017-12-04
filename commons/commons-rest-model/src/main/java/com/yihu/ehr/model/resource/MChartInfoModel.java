@@ -13,6 +13,7 @@ public class MChartInfoModel {
     private String resourceCode; //指标Code
     private String option;
     private Map<String,String> dimensionMap;//key: 维度code，value :维度名称
+    private Map<String,String> xAxisMap;//key:X轴名称，value : X轴数据的code
 
     public String getTitle() {
         return title;
@@ -52,5 +53,13 @@ public class MChartInfoModel {
 
     public void setDimensionMap(Map<String, String> dimensionMap) {
         this.dimensionMap = dimensionMap;
+    }
+
+    public Map<String, String> getxAxisMap() {
+        return xAxisMap;
+    }
+
+    public void setxAxisMap(Map<String, String> xAxisMap) {
+        this.xAxisMap = xAxisMap;
     }
 }
