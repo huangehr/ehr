@@ -17,7 +17,7 @@ zookeeper:
 spring:
   profiles: test
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
 
@@ -42,7 +42,7 @@ kafka:
 spring:
   profiles: dev
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
 
@@ -67,7 +67,7 @@ kafka:
 spring:
   profiles: prod
   datasource:
-    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true
+    url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
     username: root
     password: 123456
 
@@ -92,7 +92,7 @@ kafka:
 spring:
   profiles: prod_fz
   datasource:
-    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: sr_healtharchive
     password: data!@)1
 
@@ -119,7 +119,7 @@ kafka:
 spring:
   profiles: prod_sr
   datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
 
