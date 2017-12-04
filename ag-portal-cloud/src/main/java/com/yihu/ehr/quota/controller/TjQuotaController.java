@@ -133,21 +133,4 @@ public class TjQuotaController extends BaseController {
         }
     }
 
-
-
-    @ApiOperation(value = "获取指标单天统计结果")
-    @RequestMapping(value = ServiceApi.TJ.GetQuotaReport, method = RequestMethod.GET)
-    public Envelop getQuotaReport(
-            @ApiParam(name = "id", value = "指标任务ID", required = true)
-            @RequestParam(value = "id" , required = true) int id,
-            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters
-    ) {
-        if(filters !=null && filters.equals("bread")){
-            return tjQuotaJobClient.getQuotaBreadReport(id,filters);
-        }
-        return tjQuotaJobClient.getQuotaReport(id,filters);
-    }
-
-
 }
