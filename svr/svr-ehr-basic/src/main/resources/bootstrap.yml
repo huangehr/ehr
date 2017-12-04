@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-ehr-basic-xingwang
+    name: svr-ehr-basic
 
 ---
 spring:

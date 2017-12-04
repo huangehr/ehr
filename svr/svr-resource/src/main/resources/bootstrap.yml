@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-resource-xingwang
+    name: svr-resource
 
 ---
 spring:
