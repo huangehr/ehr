@@ -59,7 +59,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         Calendar lastDate = Calendar.getInstance();
         dateList.add(sdf.format(lastDate.getTime()));
         for (int i = 0; i < 6; i++) {
-            lastDate.roll(Calendar.DATE, -1);//日期回滚7天
+            lastDate.add(Calendar.DATE, -1);//日期回滚7天
             String dateStr = sdf.format(lastDate.getTime());
             dateList.add(dateStr);
         }
