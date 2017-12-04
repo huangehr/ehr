@@ -164,7 +164,7 @@ public class ElasticsearchUtil {
      * 根据mysql 语句进行分组求和查询
      * @param client
      * @param index 索引名称
-     * @param aggsFields 分组字段
+     * @param aggsFields 分组字段 支持多个
      * @param filter 条件
      * @param sumField  求和字段
      * @return
@@ -172,7 +172,7 @@ public class ElasticsearchUtil {
     public Map<String, Integer> searcherByGroupBySql(Client client,String index, String aggsFields ,String filter , String sumField) {
         Map<String,Integer> map = new HashMap<>();
 
-//       String mysql1 = "select org ,sum(result) from quota where quotaCode='depart_treat_count' group by org  ";
+//       String mysql1 = "select org ,sum(result) from quota where quotaCode='depart_treat_count' group by org  ";id=16
         StringBuffer mysql = new StringBuffer("select ");
         mysql.append(aggsFields)
              .append(" ,sum(").append(sumField).append(") ")

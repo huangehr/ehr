@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.rest.QuotaReport;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.vo.SaveModel;
@@ -100,7 +101,8 @@ public class QuotaController extends BaseController {
     ) {
         Envelop envelop = new Envelop();
         try {
-            QuotaReport  quotaReport = quotaService.getQuotaReport(id, filters, dimension,10000);
+            TjQuota tjQuota = quotaService.findOne(id);
+            QuotaReport  quotaReport = quotaService.getQuotaReport(tjQuota, filters, dimension,99999);
             envelop.setDetailModelList(quotaReport.getReultModelList());
             envelop.setSuccessFlg(true);
             return envelop;

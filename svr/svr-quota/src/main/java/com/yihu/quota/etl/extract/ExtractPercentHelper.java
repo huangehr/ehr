@@ -136,7 +136,7 @@ public class ExtractPercentHelper {
     //获取指标维度
     public Map<String,DictModel> getQuotaDimension(String quotaCode){
         // 指标 主维度
-        List<TjQuotaDimensionMain> dimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaIncudeAddress(quotaCode);
+        List<TjQuotaDimensionMain> dimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaCode);
         // 指标 细维度
         List<TjQuotaDimensionSlave> dimensionSlaves = dimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
         Map<String,DictModel> map = new HashMap<>();

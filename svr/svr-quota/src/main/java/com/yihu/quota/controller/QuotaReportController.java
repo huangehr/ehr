@@ -24,11 +24,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 
@@ -49,6 +52,8 @@ public class QuotaReportController extends BaseController {
     private TjDimensionSlaveService tjDimensionSlaveService;
     @Autowired
     private QuotaService quotaService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
 
     /**
@@ -107,9 +112,43 @@ public class QuotaReportController extends BaseController {
                 Map<String, Object> datamap = new HashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if(tjQuota != null){
-                    QuotaReport quotaReport = quotaService.getQuotaReportGeneral(tjQuota.getId(), filter, dimension+"Name", 10000);
-                    for(ResultModel resultModel :quotaReport.getReultModelList()){
-                        datamap.put(resultModel.getCloumns().get(0),resultModel.getValue());
+                    //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
+                    String dictSql = "";
+                    //查询维度
+                    List<TjQuotaDimensionMain>  dimensionMains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaCode(tjQuota.getCode());
+                    if(dimensionMains != null && dimensionMains.size() > 0){
+                        for(TjQuotaDimensionMain main:dimensionMains){
+                            if(main.getMainCode().equals(dimension)){
+                                dictSql = main.getDictSql();
+                            }
+                        }
+                    }
+                    if(StringUtils.isEmpty(dictSql)) {
+                        List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(tjQuota.getCode());
+                        if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
+                            for (TjQuotaDimensionSlave slave : dimensionSlaves) {
+                                if (slave.getSlaveCode().equals(dimension)) {
+                                    dictSql = slave.getDictSql();
+                                }
+                            }
+                        }
+                    }
+                    Map<String,String> dimensionDicMap = new HashMap<>();
+                    if(StringUtils.isNotEmpty(dictSql)){
+                        //查询字典数据
+                        List<SaveModel> dictData = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
+                        if(dictData != null ) {
+                            for (SaveModel saveModel : dictData) {
+                                String name = getFieldValueByName(dimension + "Name", saveModel).toString();
+                                String val = getFieldValueByName(dimension,saveModel).toString();
+                                dimensionDicMap.put(val,name);
+                            }
+                        }
+                    }
+
+                    Map<String, Integer> groupDataMap =  quotaService.searcherByGroupBySql(tjQuota, dimension, filter);
+                    for(String key : groupDataMap.keySet()){
+                        datamap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
                     }
                     lineNames.add(tjQuota.getName());
                     lineData.put(tjQuota.getCode(), datamap);
@@ -176,7 +215,8 @@ public class QuotaReportController extends BaseController {
     ) {
         Envelop envelop = new Envelop();
         try {
-            Map<String, Integer>  resultMap = quotaService.searcherByGroupBySql(id,dimension, filters);
+            TjQuota tjQuota = quotaService.findOne(id);
+            Map<String, Integer>  resultMap = quotaService.searcherByGroupBySql(tjQuota,dimension, filters);
             envelop.setSuccessFlg(true);
             envelop.setObj(resultMap);
             return envelop;
@@ -186,6 +226,21 @@ public class QuotaReportController extends BaseController {
         }
         envelop.setSuccessFlg(false);
         return envelop;
+    }
+
+    /**
+     * 根据属性名获取属性值
+     * */
+    private Object getFieldValueByName(String fieldName, Object o) {
+        try {
+            String firstLetter = fieldName.substring(0, 1).toUpperCase();
+            String getter = "get" + firstLetter + fieldName.substring(1);
+            Method method = o.getClass().getMethod(getter, new Class[] {});
+            Object value = method.invoke(o, new Object[] {});
+            return value;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

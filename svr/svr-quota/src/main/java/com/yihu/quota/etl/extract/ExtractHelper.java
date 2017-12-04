@@ -80,7 +80,7 @@ public class ExtractHelper {
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             //得到主维度
-            List<TjQuotaDimensionMain> tjQuotaDimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaIncudeAddress(quotaDataSource.getQuotaCode());
+            List<TjQuotaDimensionMain> tjQuotaDimensionMains = dimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaDataSource.getQuotaCode());
             //得到细维度
             List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves = dimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaDataSource.getQuotaCode());
 

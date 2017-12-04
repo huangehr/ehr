@@ -41,26 +41,23 @@ public class QuotaService {
         return count;
     }
 
-    public List<Map<String, Object>> searcherByGroup(Integer id,String filters,String aggsField ) throws Exception {
-        TjQuota tjQuota= quotaDao.findOne(id);
+    public List<Map<String, Object>> searcherByGroup(TjQuota tjQuota,String filters,String aggsField ) throws Exception {
         return  esResultExtract.searcherByGroup(tjQuota, filters,aggsField );
     }
 
 
-    public Map<String, Integer> searcherByGroupBySql(Integer id,String aggsField ,String filters ) throws Exception {
-        TjQuota tjQuota= quotaDao.findOne(id);
+    public Map<String, Integer> searcherByGroupBySql(TjQuota tjQuota,String aggsField ,String filters ) throws Exception {
         return  esResultExtract.searcherByGroupBySql(tjQuota,aggsField,filters);
     }
 
     //多维度 数据的总和
-    public QuotaReport getQuotaReport(Integer id, String filters,String dimension,int size) throws Exception {
+    public QuotaReport getQuotaReport(TjQuota tjQuota, String filters,String dimension,int size) throws Exception {
         String[] dimensions = null;
         if(StringUtils.isNotEmpty(dimension)){
           dimensions = dimension.split(";");
         }else{
             dimensions = new String[]{"quotaDate"};
         }
-        TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
         List<ResultModel> reultModelList = new ArrayList<>();
         List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters,size);
@@ -161,14 +158,13 @@ public class QuotaService {
     }
 
     //多维度 数据的总和
-    public QuotaReport getQuotaReportGeneral(Integer id, String filters,String dimension,int size) throws Exception {
+    public QuotaReport getQuotaReportGeneral( TjQuota tjQuota,String filters,String dimension,int size) throws Exception {
         String[] dimensions = null;
         if(StringUtils.isNotEmpty(dimension)){
             dimensions = dimension.split(";");
         }else{
             dimensions = new String[]{"quotaDate"};
         }
-        TjQuota tjQuota= quotaDao.findOne(id);
         QuotaReport quotaReport = new QuotaReport();
         List<Map<String, Object>> listMap = esResultExtract.getQuotaReport(tjQuota, filters,size);
         List<ResultModel> reultModelList = new ArrayList<>();
