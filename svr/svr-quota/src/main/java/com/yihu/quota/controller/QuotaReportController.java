@@ -107,32 +107,11 @@ public class QuotaReportController extends BaseController {
             List<List<Object>> optionData = new ArrayList<>();
             List<String> lineNames = new ArrayList<>();
             Map<String,Map<String, Object>> lineData = new HashMap<>();
-
             for(String quotaId:quotaIds){
                 Map<String, Object> datamap = new HashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if(tjQuota != null){
-                    //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                    String dictSql = "";
-                    //查询维度
-                    List<TjQuotaDimensionMain>  dimensionMains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaCode(tjQuota.getCode());
-                    if(dimensionMains != null && dimensionMains.size() > 0){
-                        for(TjQuotaDimensionMain main:dimensionMains){
-                            if(main.getMainCode().equals(dimension)){
-                                dictSql = main.getDictSql();
-                            }
-                        }
-                    }
-                    if(StringUtils.isEmpty(dictSql)) {
-                        List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(tjQuota.getCode());
-                        if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
-                            for (TjQuotaDimensionSlave slave : dimensionSlaves) {
-                                if (slave.getSlaveCode().equals(dimension)) {
-                                    dictSql = slave.getDictSql();
-                                }
-                            }
-                        }
-                    }
+                    String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(),dimension);
                     Map<String,String> dimensionDicMap = new HashMap<>();
                     if(StringUtils.isNotEmpty(dictSql)){
                         //查询字典数据
@@ -145,7 +124,7 @@ public class QuotaReportController extends BaseController {
                             }
                         }
                     }
-
+                    //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
                     Map<String, Integer> groupDataMap =  quotaService.searcherByGroupBySql(tjQuota, dimension, filter);
                     for(String key : groupDataMap.keySet()){
                         datamap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
@@ -168,7 +147,6 @@ public class QuotaReportController extends BaseController {
                         quotaMap = lineData.get(key);
                     }
                 }
-
                 for(String key : lineData.keySet()){
                     List<Object> dataList = new ArrayList<>();
                     Map<String,Object> valMap = lineData.get(key);
@@ -190,14 +168,12 @@ public class QuotaReportController extends BaseController {
             }
             Object[] yData = (Object[])quotaMap.keySet().toArray(new Object[quotaMap.size()]);
             option = reportOption.getLineEchartOptionMoreChart(title, "", "", yData, optionData, lineNames,charTypes);
-
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
             return chartInfoModel;
         } catch (Exception e) {
             error(e);
             invalidUserException(e, -1, "查询失败:" + e.getMessage());
-            envelop.setSuccessFlg(false);
             return null;
         }
     }
@@ -226,6 +202,31 @@ public class QuotaReportController extends BaseController {
         }
         envelop.setSuccessFlg(false);
         return envelop;
+    }
+
+
+    private String getQuotaDimensionDictSql(String quotaCode, String dimension) {
+        String dictSql = "";
+        //查询维度
+        List<TjQuotaDimensionMain>  dimensionMains = tjDimensionMainService.findTjQuotaDimensionMainByQuotaCode(quotaCode);
+        if(dimensionMains != null && dimensionMains.size() > 0){
+            for(TjQuotaDimensionMain main:dimensionMains){
+                if(main.getMainCode().equals(dimension)){
+                    dictSql = main.getDictSql();
+                }
+            }
+        }
+        if(StringUtils.isEmpty(dictSql)) {
+            List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
+            if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
+                for (TjQuotaDimensionSlave slave : dimensionSlaves) {
+                    if (slave.getSlaveCode().equals(dimension)) {
+                        dictSql = slave.getDictSql();
+                    }
+                }
+            }
+        }
+        return dictSql;
     }
 
     /**
