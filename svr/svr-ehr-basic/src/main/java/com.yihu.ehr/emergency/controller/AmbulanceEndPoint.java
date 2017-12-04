@@ -255,12 +255,13 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除记录")
     public Envelop delete(
-            @ApiParam(name = "ids", value = "id列表['xxxx','xxxx','xxxx'...] String")
+            @ApiParam(name = "ids", value = "id列表xxxx,xxxx,xxxx,...", required = true)
             @RequestParam(value = "ids") String ids){
         Envelop envelop = new Envelop();
         try {
-            List<String> idList = toEntity(ids, List.class);
-            for (String id : idList) {
+            //List<String> idList = toEntity(ids, List.class);
+            String [] idArr = ids.split(",");
+            for (String id : idArr) {
                 Ambulance ambulance = ambulanceService.findById(id);
                 if (ambulance.getStatus() != Ambulance.Status.wait || ambulance.getStatus() != Ambulance.Status.down) {
                     envelop.setSuccessFlg(false);
@@ -274,7 +275,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                     return envelop;
                 }
             }
-            ambulanceService.delete(idList);
+            ambulanceService.delete(idArr);
             envelop.setSuccessFlg(true);
         }catch (Exception e) {
             e.printStackTrace();

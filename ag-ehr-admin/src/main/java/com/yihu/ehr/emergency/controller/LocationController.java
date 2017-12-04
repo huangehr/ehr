@@ -60,7 +60,7 @@ public class LocationController extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Emergency.LocationDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除待命地点")
     public Envelop delete(
-            @ApiParam(name = "ids", value = "id列表[1,2,3...] int")
+            @ApiParam(name = "ids", value = "id列表(int)1,2,3,...")
             @RequestParam(value = "ids") String ids){
         return locationClient.delete(ids);
     }
