@@ -3,7 +3,7 @@ package com.yihu.ehr.redis.cache.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.redis.cache.CacheBizCommon;
+import com.yihu.ehr.redis.cache.CacheCommonBiz;
 import com.yihu.ehr.redis.cache.entity.RedisCacheAuthorization;
 import com.yihu.ehr.redis.cache.entity.RedisCacheKeyRule;
 import com.yihu.ehr.redis.cache.service.RedisCacheAuthorizationService;
@@ -58,7 +58,7 @@ public class RedisCacheOperationEndPoint extends EnvelopRestEndPoint {
 
             // 获取缓存值
             ValueOperations<String, Object> valOps = redisTemplate.opsForValue();
-            String key = CacheBizCommon.generateKey(keyRuleExpression, ruleParams, categoryCode);
+            String key = CacheCommonBiz.generateKey(keyRuleExpression, ruleParams, categoryCode);
             Object value = valOps.get(key);
 
             envelop.setSuccessFlg(true);
@@ -102,7 +102,7 @@ public class RedisCacheOperationEndPoint extends EnvelopRestEndPoint {
 
             // 设置缓存值
             ValueOperations<String, Object> valOps = redisTemplate.opsForValue();
-            String key = CacheBizCommon.generateKey(keyRuleExpression, ruleParams, categoryCode);
+            String key = CacheCommonBiz.generateKey(keyRuleExpression, ruleParams, categoryCode);
             valOps.set(key, value);
 
             envelop.setSuccessFlg(true);
@@ -133,7 +133,7 @@ public class RedisCacheOperationEndPoint extends EnvelopRestEndPoint {
             String keyRuleExpression = redisCacheKeyRule.getExpression();
 
             // 移除缓存值
-            String key = CacheBizCommon.generateKey(keyRuleExpression, ruleParams, categoryCode);
+            String key = CacheCommonBiz.generateKey(keyRuleExpression, ruleParams, categoryCode);
             redisTemplate.delete(key);
 
             envelop.setSuccessFlg(true);

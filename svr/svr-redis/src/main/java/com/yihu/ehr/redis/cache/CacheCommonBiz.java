@@ -15,11 +15,21 @@ import java.util.Map;
  * @author 张进军
  * @date 2017/12/1 14:00
  */
-public class CacheBizCommon {
+public class CacheCommonBiz {
+
+    /**
+     * 制造缓存Key前缀：categoryCode + :
+     *
+     * @param categoryCode 缓存分类编码
+     * @return 缓存Key前缀
+     */
+    public static String makeKeyPrefix(String categoryCode) {
+        return categoryCode + ":";
+    }
 
     /**
      * 生成缓存的 key
-     * 最终生成的key为：categoryCode + : + 填充值的keyRuleExpression
+     * 最终生成的key为：前缀 + 填充值的keyRuleExpression
      *
      * @param keyRuleExpression Key规则表达式
      * @param ruleParams        Key规则参数
@@ -49,13 +59,13 @@ public class CacheBizCommon {
                 }
             }
         }
-        key = categoryCode + ":" + key;
+        key = makeKeyPrefix(categoryCode) + key;
         return key;
     }
 
     /**
-     * 解析Key规则中的占位参数名。
-     *
+     * 解析Key规则中的占位参数名
+     * <p>
      * 例：规则 xxx{a}xx{b}{c},包含三个占位命名参数 a、b、c，
      * 命名参数用“{}”裹着。
      *

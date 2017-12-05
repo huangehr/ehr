@@ -3,7 +3,7 @@ package com.yihu.ehr.redis;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.redis.cache.CacheBizCommon;
+import com.yihu.ehr.redis.cache.CacheCommonBiz;
 import com.yihu.ehr.redis.cache.entity.RedisCacheKeyRule;
 import com.yihu.ehr.redis.cache.entity.RedisCacheResponseTimeLog;
 import com.yihu.ehr.redis.cache.service.RedisCacheKeyRuleService;
@@ -49,7 +49,7 @@ public class RedisSubscribeMessageEndPoint extends EnvelopRestEndPoint {
             if (redisCacheKeyRule != null) {
                 String categoryCode = redisCacheKeyRule.getCategoryCode();
                 String keyRuleExpression = redisCacheKeyRule.getExpression();
-                String key = CacheBizCommon.generateKey(keyRuleExpression, ruleParams, categoryCode);
+                String key = CacheCommonBiz.generateKey(keyRuleExpression, ruleParams, categoryCode);
 
                 RedisCacheResponseTimeLog responseTimeLog = new RedisCacheResponseTimeLog();
                 responseTimeLog.setId(UuidUtil.randomUUID());

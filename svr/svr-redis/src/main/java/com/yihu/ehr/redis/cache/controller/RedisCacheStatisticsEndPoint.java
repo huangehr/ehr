@@ -3,6 +3,7 @@ package com.yihu.ehr.redis.cache.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.redis.cache.CacheCommonBiz;
 import com.yihu.ehr.redis.cache.entity.RedisCacheCategory;
 import com.yihu.ehr.redis.cache.service.RedisCacheCategoryService;
 import com.yihu.ehr.util.rest.Envelop;
@@ -47,7 +48,7 @@ public class RedisCacheStatisticsEndPoint extends EnvelopRestEndPoint {
             List<RedisCacheCategory> categoryList = redisCacheCategoryService.search("");
             for(RedisCacheCategory category : categoryList) {
                 categoryNameList.add(category.getName());
-                String keysPattern = category.getCode() + ":*";
+                String keysPattern = CacheCommonBiz.makeKeyPrefix(category.getCode());
                 categoryNumList.add(redisTemplate.keys(keysPattern).size());
             }
             result.put("categoryNameList", categoryNameList);
