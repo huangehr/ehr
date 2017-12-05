@@ -1192,7 +1192,7 @@ public class ServiceApi {
      */
     public static class Emergency {
         // 救护车
-        public static final String Ambulance = "/ambulance/{id}";
+        public static final String Ambulance = "/ambulance/findById";
         public static final String AmbulanceList = "/ambulance/list";
         public static final String AmbulanceSearch = "/ambulance/search";
         public static final String AmbulanceUpdateStatus = "/ambulance/updateStatus";
