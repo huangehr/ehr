@@ -94,8 +94,8 @@ public class TjQuotaLogService extends BaseJpaService<TjQuotaLog, XTjQuotaLogRep
         return ((Long)query.list().get(0)).intValue();
     }
 
-    public List<TjQuotaLog> getRecentRecord(String quotaCode,Date endTime) {
-        List<TjQuotaLog> tjQuotaLogs = tjQuotaLogRepository.getRecentRecord(quotaCode, endTime);
+    public List<TjQuotaLog> getRecentRecord(String quotaCode,String endTime) {
+        List<TjQuotaLog> tjQuotaLogs = tjQuotaLogRepository.getRecentRecord(quotaCode, new Date(endTime));
         if (tjQuotaLogs != null && tjQuotaLogs.size() > 0) {
             return tjQuotaLogs;
         }
