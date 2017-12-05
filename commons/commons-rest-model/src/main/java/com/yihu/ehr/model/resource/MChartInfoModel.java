@@ -12,7 +12,8 @@ public class MChartInfoModel {
     private String resourceId; //指标ID
     private String resourceCode; //指标Code
     private String option;
-    private Map<String,Map<String,Object>> dimensionMap;//维度名称 ,维度对应的字典项key,value
+    private Map<String,String> dimensionMap;//key: 维度code，value :维度名称
+    private Map<String,String> xAxisMap;//key:X轴名称，value : X轴数据的code
 
     public String getTitle() {
         return title;
@@ -46,11 +47,19 @@ public class MChartInfoModel {
         this.resourceCode = resourceCode;
     }
 
-    public Map<String, Map<String, Object>> getDimensionMap() {
+    public Map<String, String> getDimensionMap() {
         return dimensionMap;
     }
 
-    public void setDimensionMap(Map<String, Map<String, Object>> dimensionMap) {
+    public void setDimensionMap(Map<String, String> dimensionMap) {
         this.dimensionMap = dimensionMap;
+    }
+
+    public Map<String, String> getxAxisMap() {
+        return xAxisMap;
+    }
+
+    public void setxAxisMap(Map<String, String> xAxisMap) {
+        this.xAxisMap = xAxisMap;
     }
 }

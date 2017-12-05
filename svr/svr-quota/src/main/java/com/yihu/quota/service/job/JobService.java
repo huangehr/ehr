@@ -33,11 +33,21 @@ public class JobService {
             BeanUtils.copyProperties(tjQuota, quotaVo);
             Map<String, Object> params = new HashMap<String, Object>();
             params.put("quota", quotaVo);
-           //往quartz框架添加任务
+            String quotaCode = quotaVo.getCode().replace("_", "");
+            String quotaCodeImmediately = quotaCode + "immediately";
+            boolean existJob = quartzHelper.isExistJob(quotaCode);
+            boolean existJobImmediately = quartzHelper.isExistJob(quotaCodeImmediately);
+            if (existJob) {
+                quartzHelper.removeJob(quotaCode);
+            }
+            if (existJobImmediately) {
+                quartzHelper.removeJob(quotaCodeImmediately);
+            }
+            //往quartz框架添加任务
            if (!StringUtils.isEmpty(tjQuota.getJobClazz()) && tjQuota.getExecType().equals("1")) {
-               quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()),  UUID.randomUUID().toString().replace("-", ""), params);
+               quartzHelper.startNow(Class.forName(quotaVo.getJobClazz()),  quotaCodeImmediately, params);
            }else {
-               quartzHelper.addJob(Class.forName(quotaVo.getJobClazz()), quotaVo.getCron(), UUID.randomUUID().toString().replace("-", ""), params);
+               quartzHelper.addJob(Class.forName(quotaVo.getJobClazz()), quotaVo.getCron(), quotaCode, params);
            }
         }
     }

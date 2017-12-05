@@ -2,6 +2,7 @@ package com.yihu.quota.util;
 
 
 import com.github.abel533.echarts.Option;
+import com.github.abel533.echarts.axis.AxisTick;
 import com.github.abel533.echarts.axis.CategoryAxis;
 import com.github.abel533.echarts.axis.ValueAxis;
 import com.github.abel533.echarts.code.*;
@@ -130,10 +131,11 @@ public class ReportOption {
      * @param title  标题
      * @param xName x轴名称
      * @param yName yz轴名称
+     * @param xData x轴数据集
      * @param lineDatas 数据集
      * @param lineNames 折线名称集合
      */
-    public Option getLineEchartOptionMoreChart(String title, String xName, String yName, Object[] yData,  List<List<Object>> lineDatas, List<String> lineNames,List<String> types) {
+    public Option getLineEchartOptionMoreChart(String title, String xName, String yName, Object[] xData,  List<List<Object>> lineDatas, List<String> lineNames,List<String> types) {
         Option option = new GsonOption();
         //title
         option.title().setText(title);
@@ -159,9 +161,16 @@ public class ReportOption {
         CategoryAxis categoryAxis = new CategoryAxis();
         categoryAxis.name(xName);
         categoryAxis.type(AxisType.category);
+
+//        AxisTick axisTick = new AxisTick();
+//        axisTick.setType
+//        categoryAxis.axisTick(axisTick);
+
+
 //        categoryAxis.axisLabel().formatter("千米");//单位
-        categoryAxis.data(yData);
+        categoryAxis.data(xData);
         option.xAxis(categoryAxis);
+
 
         if(lineNames.size() > 0 && lineDatas.size() >0 && lineNames.size() == lineDatas.size()) {
             for (int i = 0; i < lineDatas.size(); i++) {

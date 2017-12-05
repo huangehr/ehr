@@ -36,10 +36,10 @@ public class AmbulanceController extends BaseController {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "页码", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) {
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) {
         return ambulanceClient.list(fields, filters, sorts, page, size);
     }
 
@@ -52,10 +52,10 @@ public class AmbulanceController extends BaseController {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "页码", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) {
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) {
         return ambulanceClient.search(fields, filters, sorts, page, size);
     }
 
@@ -69,7 +69,7 @@ public class AmbulanceController extends BaseController {
         return ambulanceClient.updateStatus(carId, status);
     }
 
-    @RequestMapping(value = ServiceApi.Emergency.AmbulanceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceSave, method = RequestMethod.POST)
     @ApiOperation("保存单条记录")
     public Envelop save(
             @ApiParam(name = "ambulance", value = "救护车")
@@ -77,7 +77,7 @@ public class AmbulanceController extends BaseController {
         return ambulanceClient.save(ambulance);
     }
 
-    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT)
     @ApiOperation("更新单条记录")
     public Envelop update(
             @ApiParam(name = "ambulance", value = "救护车")
@@ -88,9 +88,17 @@ public class AmbulanceController extends BaseController {
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除记录")
     public Envelop delete(
-            @ApiParam(name = "ids", value = "id列表['xxxx','xxxx','xxxx'...] String")
+            @ApiParam(name = "ids", value = "id列表xxxx,xxxx,xxxx,...")
             @RequestParam(value = "ids") String ids){
         return ambulanceClient.delete(ids);
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.Ambulance, method = RequestMethod.GET)
+    @ApiOperation("获取单条记录")
+    public Envelop findById(
+            @ApiParam(name = "id", value = "id")
+            @PathVariable(value = "id") String id){
+        return ambulanceClient.findById(id);
     }
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence, method = RequestMethod.POST)
