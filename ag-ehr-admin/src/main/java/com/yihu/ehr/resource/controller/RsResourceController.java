@@ -381,6 +381,7 @@ public class RsResourceController extends BaseController {
                     MRsResources mRsResources = objectMapper.convertValue(resourceResult.getObj(), MRsResources.class);
                     chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
                     chartInfoModel.setDimensionMap(dimensionMap);
+                    chartInfoModel.setFirstDimension(firstDimension);
                     envelop.setObj(chartInfoModel);
                     envelop.setSuccessFlg(true);
                 }

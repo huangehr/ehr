@@ -12,6 +12,7 @@ public class MChartInfoModel {
     private String resourceId; //指标ID
     private String resourceCode; //指标Code
     private String option;
+    private String firstDimension;//第一次查询的维度
     private Map<String,String> dimensionMap;//key: 维度code，value :维度名称
     private Map<String,String> xAxisMap;//key:X轴名称，value : X轴数据的code
 
@@ -61,5 +62,13 @@ public class MChartInfoModel {
 
     public void setxAxisMap(Map<String, String> xAxisMap) {
         this.xAxisMap = xAxisMap;
+    }
+
+    public String getFirstDimension() {
+        return firstDimension;
+    }
+
+    public void setFirstDimension(String firstDimension) {
+        this.firstDimension = firstDimension;
     }
 }
