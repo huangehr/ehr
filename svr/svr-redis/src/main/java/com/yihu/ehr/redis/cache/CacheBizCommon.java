@@ -19,7 +19,7 @@ public class CacheBizCommon {
 
     /**
      * 生成缓存的 key
-     * 最终生成的key为：[ + categoryCode + ] + 填充值的keyRuleExpression
+     * 最终生成的key为：categoryCode + : + 填充值的keyRuleExpression
      *
      * @param keyRuleExpression Key规则表达式
      * @param ruleParams        Key规则参数
@@ -49,7 +49,7 @@ public class CacheBizCommon {
                 }
             }
         }
-        key = "[" + categoryCode + "]" + key;
+        key = categoryCode + ":" + key;
         return key;
     }
 

@@ -47,7 +47,7 @@ public class RedisCacheStatisticsEndPoint extends EnvelopRestEndPoint {
             List<RedisCacheCategory> categoryList = redisCacheCategoryService.search("");
             for(RedisCacheCategory category : categoryList) {
                 categoryNameList.add(category.getName());
-                String keysPattern = "[" + category.getCode() + "]*";
+                String keysPattern = category.getCode() + ":*";
                 categoryNumList.add(redisTemplate.keys(keysPattern).size());
             }
             result.put("categoryNameList", categoryNameList);
