@@ -55,7 +55,7 @@ public class ScheduleController extends BaseController {
         return scheduleClient.level(date, page, size);
     }
 
-    @RequestMapping(value = ServiceApi.Emergency.ScheduleSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleSave, method = RequestMethod.POST)
     @ApiOperation("保存单条记录")
     public Envelop save(
             @ApiParam(name = "schedule", value = "排班")
@@ -63,7 +63,7 @@ public class ScheduleController extends BaseController {
         return scheduleClient.save(schedule);
     }
 
-    @RequestMapping(value = ServiceApi.Emergency.ScheduleUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleUpdate, method = RequestMethod.PUT)
     @ApiOperation("更新单条记录，只允许更新时间和状态")
     public Envelop update(
             @ApiParam(name = "schedule", value = "排班")

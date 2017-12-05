@@ -28,7 +28,7 @@ public class AttendanceController extends BaseController {
     @Autowired
     private AttendanceClient attendanceClient;
 
-    @RequestMapping(value = ServiceApi.Emergency.AttendanceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceSave, method = RequestMethod.POST)
     @ApiOperation(value = "保存出勤记录")
     public Envelop save(
             @ApiParam(name = "attendance", value = "出勤记录")

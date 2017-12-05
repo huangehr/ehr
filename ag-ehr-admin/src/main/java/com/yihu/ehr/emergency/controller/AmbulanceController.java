@@ -69,7 +69,7 @@ public class AmbulanceController extends BaseController {
         return ambulanceClient.updateStatus(carId, status);
     }
 
-    @RequestMapping(value = ServiceApi.Emergency.AmbulanceSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceSave, method = RequestMethod.POST)
     @ApiOperation("保存单条记录")
     public Envelop save(
             @ApiParam(name = "ambulance", value = "救护车")
@@ -77,7 +77,7 @@ public class AmbulanceController extends BaseController {
         return ambulanceClient.save(ambulance);
     }
 
-    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT)
     @ApiOperation("更新单条记录")
     public Envelop update(
             @ApiParam(name = "ambulance", value = "救护车")
