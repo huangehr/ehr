@@ -98,7 +98,6 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "title", value = "视图名称", defaultValue = "")
             @RequestParam(value = "title", required = false) String title
     ) {
-        Envelop envelop = new Envelop();
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         List<String> charTypes = Arrays.asList(charstr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
