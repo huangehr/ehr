@@ -23,9 +23,9 @@ import java.util.Map;
 @Component
 public class CacheResponseTimeAspect {
 
-    @Value("${ehr-mq.pubsub.publisherAppId}")
+    @Value("${ehr-redis.mq.pubsub.publisherAppId}")
     private String publisherAppId;
-    @Value("${ehr-mq.pubsub.channel}")
+    @Value("${ehr-redis.mq.pubsub.channel}")
     private String channel;
     @Autowired
     private RedisMqChannelService redisMqChannelService;
