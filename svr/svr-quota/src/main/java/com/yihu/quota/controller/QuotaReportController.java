@@ -5,19 +5,15 @@ import com.github.abel533.echarts.Option;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.resource.MChartInfoModel;
-import com.yihu.ehr.model.resource.MReportDimension;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.model.jpa.TjQuota;
-import com.yihu.quota.model.jpa.dimension.TjDimensionMain;
-import com.yihu.quota.model.jpa.dimension.TjDimensionSlave;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
-import com.yihu.quota.model.rest.QuotaReport;
-import com.yihu.quota.model.rest.ResultModel;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
 import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.util.ReportOption;
+import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.SaveModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -114,15 +110,26 @@ public class QuotaReportController extends BaseController {
                     String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(),dimension);
                     Map<String,String> dimensionDicMap = new HashMap<>();
                     if(StringUtils.isNotEmpty(dictSql)){
-                        //查询字典数据
-                        List<SaveModel> dictData = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
-                        if(dictData != null ) {
-                            for (SaveModel saveModel : dictData) {
-                                String name = getFieldValueByName(dimension + "Name", saveModel).toString();
-                                String val = getFieldValueByName(dimension,saveModel).toString();
+
+                        if(dimension.contains("slaveKey")){
+                            //查询字典数据
+                            List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
+                            for (DictModel dictModel : dictDatas) {
+                                String name = getFieldValueByName("name", dictModel).toString();
+                                String val = getFieldValueByName("code",dictModel).toString();
                                 dimensionDicMap.put(val,name);
                             }
+                        } else{
+                            List<SaveModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
+                            if(dictDatas != null ) {
+                                for (SaveModel saveModel : dictDatas) {
+                                    String name = getFieldValueByName(dimension + "Name", saveModel).toString();
+                                    String val = getFieldValueByName(dimension,saveModel).toString();
+                                    dimensionDicMap.put(val,name);
+                                }
+                            }
                         }
+
                     }
                     //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
                     Map<String, Integer> groupDataMap =  quotaService.searcherByGroupBySql(tjQuota, dimension, filter);
@@ -223,7 +230,7 @@ public class QuotaReportController extends BaseController {
             if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
                int slave = Integer.valueOf(dimension.substring(dimension.length()-1,dimension.length()));
                 if(dimensionSlaves.size() >= slave){
-                    dictSql = dimensionSlaves.get(slave).getDictSql();
+                    dictSql = dimensionSlaves.get(slave-1).getDictSql();
                 }
             }
         }
