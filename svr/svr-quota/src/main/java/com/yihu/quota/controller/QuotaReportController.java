@@ -221,10 +221,9 @@ public class QuotaReportController extends BaseController {
         if(StringUtils.isEmpty(dictSql)) {
             List<TjQuotaDimensionSlave> dimensionSlaves = tjDimensionSlaveService.findTjQuotaDimensionSlaveByQuotaCode(quotaCode);
             if (dimensionSlaves != null && dimensionSlaves.size() > 0) {
-                for (TjQuotaDimensionSlave slave : dimensionSlaves) {
-                    if (slave.getSlaveCode().equals(dimension)) {
-                        dictSql = slave.getDictSql();
-                    }
+               int slave = Integer.valueOf(dimension.substring(dimension.length()-1,dimension.length()));
+                if(dimensionSlaves.size() >= slave){
+                    dictSql = dimensionSlaves.get(slave).getDictSql();
                 }
             }
         }
