@@ -27,7 +27,6 @@ public class RedisAppController {
     public String getRedisValue(@ApiParam(value = "key", defaultValue = "")
                                  @RequestParam("key") String key ) {
         String result =  redisAppClient.getRedisValue(key);
-        System.out.println("get --- key=" + key + "--- val= " +result);
         return result;
     }
 
