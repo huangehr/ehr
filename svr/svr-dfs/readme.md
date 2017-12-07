@@ -1,6 +1,6 @@
-备注：<> 指变量：
+备注：<> 指变量
 
-ElasticSearch：
+ElasticSearch
     a.服务说明：
         1.该服务是对ElasticSearch搜索引擎的集成，提供了一些相对常用的操作接口
     b.配置说明：
@@ -82,7 +82,7 @@ ElasticSearch：
                 size 
                     - 参数说明：分页大小
 				
-FastDFS：
+FastDFS
     a.服务说明：
         此服务在FastDFS的文件服务中加入了建立在ElasticSearch基础上的文件检索功能，以解决FastDFS在文件管理中的缺陷
         索引
