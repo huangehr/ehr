@@ -107,8 +107,8 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
             @RequestParam(value = "index") String index,
             @ApiParam(name = "type", value = "索引类型", required = true)
             @RequestParam(value = "type") String type,
-            @ApiParam(name = "filter", value = "过滤条件", required = true)
-            @RequestParam(value = "filter") String filter,
+            @ApiParam(name = "filter", value = "过滤条件")
+            @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "page", value = "页码", required = true)
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true)

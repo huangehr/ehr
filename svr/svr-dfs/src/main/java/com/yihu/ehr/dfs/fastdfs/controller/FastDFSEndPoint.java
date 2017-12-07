@@ -582,20 +582,24 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取结果集")
     public Envelop page(
             @ApiParam(name = "filter", value = "过滤条件")
-            @RequestParam(value = "filter") String filter,
+            @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "page", value = "页码", required = true)
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true)
             @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         List<Map<String, String>> filterMap;
-        try {
-            filterMap = objectMapper.readValue(filter, List.class);
-        }catch (IOException e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
+        if(!StringUtils.isEmpty(filter)) {
+            try {
+                filterMap = objectMapper.readValue(filter, List.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(e.getMessage());
+                return envelop;
+            }
+        }else {
+            filterMap = new ArrayList<Map<String, String>>(0);
         }
         envelop.setDetailModelList(elasticSearchService.page(indexName, indexType, filterMap, page, size));
         envelop.setSuccessFlg(true);

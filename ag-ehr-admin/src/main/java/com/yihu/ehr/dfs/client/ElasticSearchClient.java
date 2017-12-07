@@ -67,7 +67,7 @@ public interface ElasticSearchClient {
     Envelop page(
             @RequestParam(value = "index") String index,
             @RequestParam(value = "type") String type,
-            @RequestParam(value = "filter") String filter,
+            @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "page") int page,
             @RequestParam(value = "size") int size);
 
