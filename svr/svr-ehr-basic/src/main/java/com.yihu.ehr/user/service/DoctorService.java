@@ -1,5 +1,6 @@
 package com.yihu.ehr.user.service;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.org.dao.XOrganizationRepository;
 import com.yihu.ehr.org.model.Organization;
@@ -10,6 +11,7 @@ import com.yihu.ehr.user.dao.XDoctorRepository;
 import com.yihu.ehr.user.dao.XUserRepository;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Column;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -171,7 +174,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             sql.append(",'"+ map .get("xzzc") +"'");
             sql.append(",'"+ map .get("introduction") +"'");
             sql.append(",'"+ map .get("idCardNo") +"'");
-            sql.append(",'"+ DateUtil.strToDate(DateUtil.getNowDateTime()) +"'");
+            sql.append(",'"+ DateUtil.getNowDateTime()+"'");
             sql.append(",'"+ map .get("officeTel") +"','1')\n");
 
             if(i%100==0 || i == doctorLs.size()){

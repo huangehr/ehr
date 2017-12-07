@@ -71,7 +71,9 @@ public class QuotaService {
                     if(dimensions[k].equals("quotaDate")){
                         nameVal = listMap.get(i).get(dimensions[k]).toString();
                     }else{
-                        nameVal = listMap.get(i).get(dimensions[k]+"Name").toString();
+                        if(null != listMap.get(i).get(dimensions[k]+"Name")){
+                            nameVal = listMap.get(i).get(dimensions[k]+"Name").toString();
+                        }
                     }
                     cloumns.add(nameVal);
                 }

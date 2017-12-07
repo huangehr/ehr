@@ -216,9 +216,9 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     public Envelop execuJob(
             @ApiParam(name = "id")
             @RequestParam(value = "id") int id) throws Exception {
-         tjQuotaJobClient.tjQuotaExecute(id);
-         Date date = new Date();
-         MTjQuotaModel quotaModel = tjQuotaClient.getById(Long.valueOf(String.valueOf(id)));
+        tjQuotaJobClient.tjQuotaExecute(id);
+        Date date = new Date();
+        MTjQuotaModel quotaModel = tjQuotaClient.getById(Long.valueOf(String.valueOf(id)));
         Envelop envelop = new Envelop();
         MTjQuotaLog mTjQuotaLog = null;
         boolean flag = true;
@@ -244,7 +244,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             }
         }else {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(mTjQuotaLog.getContent());
+            envelop.setErrorMsg("无log返回！");
         }
         return envelop;
     }
