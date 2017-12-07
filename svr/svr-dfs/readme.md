@@ -43,7 +43,7 @@ ElasticSearch
                     - 同上
                 id
                     - 参数格式："id1,id2,..."
-                    - 参数说明：多个数值以逗号(,)符号
+                    - 参数说明：多个数值以逗号(,)分隔
         4.更新索引（相当于更新数据）
             1).请求update接口
             2).参数
@@ -51,10 +51,22 @@ ElasticSearch
                     - 同上
                 type
                     - 同上
+                id
+                    - 参数格式："<id>"
+                    - 参数说明：原文档ID
                 source
                     - 参数格式：同index接口
-                    - 参数说明：数据中务必包含_id
-        5.简单数据检索（findByFiled）
+                    - 参数说明：数据中请勿包含原文档ID(_id)
+        5.获取单条数据
+            1).请求findById接口
+            2).参数
+                index
+                    - 同上
+                type
+                    - 同上
+                id
+                    - 同上
+        6.简单数据检索（findByFiled）
             1).请求findByField接口
             2).参数
                 index
@@ -67,7 +79,7 @@ ElasticSearch
                 value
                     - 参数格式：初始化索引时，该字段对应的类型
                     - 参数说明：字段值
-        6.组合数据检索（page）
+        7.组合数据检索（page）
             1).请求page接口，支持模糊查询，完全匹配，范围查询
             2).参数
                 index
@@ -84,8 +96,8 @@ ElasticSearch
 				
 FastDFS
     a.服务说明：
-        此服务在FastDFS的文件服务中加入了建立在ElasticSearch基础上的文件检索功能，以解决FastDFS在文件管理中的缺陷
-        索引
+        1.此服务在FastDFS的文件服务中加入了建立在ElasticSearch基础上的文件检索功能，以解决FastDFS在文件管理中的缺陷
+        --- 索引信息 Start ---
         ["sn":{"type":"string","index":"not_analyzed"},"name":{"type":"string","analyzer":"ik","search_analyzer":"ik"},"path":{"type":"string","index":"not_analyzed"},"objectId":{"type":"string","index":"not_analyzed"},"size":{"type":"integer"},"type":{"type":"string","index":"not_analyzed"},"createDate":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"creator":{"type":"string","index":"not_analyzed"},"modifyDate":{"type":"date","format":"yyyy-MM-dd HH:mm:ss"},"modifier":{"type":"string","index":"not_analyzed"}]
         [
             "sn": {
@@ -129,6 +141,7 @@ FastDFS
                 "index": "not_analyzed"
             }
         ]
+        --- 索引信息 End ---
     b.配置说明：
         1.详见application.yml文件，其中如果有多个tracker-server，请用逗号（,）分隔
         2.新增部署服务的时候请确保基础信息管理的系统字典里面有名称为"FastDFS外链地址"的字典项，并添加值为可用的http外链地址的字典值，可添加多个
