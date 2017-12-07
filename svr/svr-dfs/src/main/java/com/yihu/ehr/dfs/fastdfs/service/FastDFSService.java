@@ -8,6 +8,7 @@ import org.csource.common.NameValuePair;
 import org.csource.fastdfs.FileInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,8 +29,6 @@ public class FastDFSService {
     private ObjectMapper objectMapper;
 
     public ObjectNode upload(Map<String, String> paramMap) throws Exception{
-        //String creator = paramMap.get("creator");
-        //String objectId = paramMap.get("objectId");
         String fileStr = paramMap.get("fileStr");
         String fileName = paramMap.get("fileName");
         String description = paramMap.get("description");
@@ -43,6 +42,18 @@ public class FastDFSService {
         InputStream inputStream = new ByteArrayInputStream(bytes);
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         return fastDFSDao.upload(inputStream, fileExtension, newDescription);
+    }
+
+    public ObjectNode upload(MultipartFile file, String description) throws Exception{
+        byte [] descriptions = description.getBytes();
+        List<Byte> list = new ArrayList<Byte>(descriptions.length);
+        for(byte temp : descriptions) {
+            list.add(temp);
+        }
+        String newDescription = objectMapper.writeValueAsString(list);
+        String fileName = file.getOriginalFilename();
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        return fastDFSDao.upload(file.getInputStream(), fileExtension, newDescription);
     }
 
     /**
