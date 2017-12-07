@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -58,6 +59,72 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     private SystemDictEntryClient systemDictEntryClient;
 
     /**
+     * 上传文件返回HttpUrl
+     * @param file
+     * @param creator
+     * @param objectId
+     * @param description
+     * @return
+     */
+    @RequestMapping(value = "/fastDfs/localUpload", method = RequestMethod.POST)
+    @ApiOperation(value = "本地上传文件", notes = "返回HttpUrl")
+    public Envelop fileUploadReturnId(
+            @ApiParam(name = "file", value = "文件", required = true)
+            @RequestPart() MultipartFile file,
+            @ApiParam(name = "creator", value = "创建者", required = true)
+            @RequestParam(value = "creator") String creator,
+            @ApiParam(name = "objectId", value = "创建者标识", required = true, defaultValue = "EHR")
+            @RequestParam(value = "objectId") String objectId,
+            @ApiParam(name = "description", value = "文件描述", required = true)
+            @RequestParam(value = "description") String description) {
+        Envelop envelop = new Envelop();
+        ObjectNode objectNode;
+        //上传
+        try {
+            objectNode = fastDFSService.upload(file, description);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+            return envelop;
+        }
+        String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
+        String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
+        String path = groupName.substring(1, groupName.length() - 1) + ":" + remoteFileName.substring(1, remoteFileName.length() - 1);
+        //保存索引到ES库中
+        Map<String, String> paramMap = new HashMap<String, String>();
+        paramMap.put("fileName", file.getOriginalFilename());
+        paramMap.put("creator", creator);
+        paramMap.put("objectId", objectId);
+        Map<String, Object> source = getIndexSource(objectNode, paramMap);
+        try {
+            elasticSearchService.index(indexName, indexType, source);
+        }catch (Exception e) {
+            e.printStackTrace();
+            try {
+                fastDFSService.delete(groupName, remoteFileName);
+            }catch (Exception e1) {
+                e1.printStackTrace();
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(e1.getMessage());
+                envelop.setObj("groupName:" + groupName + "-remoteFileName" + remoteFileName);
+                return envelop;
+            }
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+            return envelop;
+        }
+        if(null == publicServer || publicServer.isEmpty()) {
+            publicServer = getPublicUrl().getDetailModelList();
+        }
+        path = path.replace(":","/");
+        String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
+        envelop.setSuccessFlg(true);
+        envelop.setObj(publicUrl + "/" + path);
+        return envelop;
+    }
+
+    /**
      * 上传文件，返回索引ID
      * @param jsonData
      * @return
@@ -82,7 +149,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
         String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
         //String path = groupName.substring(1, groupName.length() - 1) + ":" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        //保存到ES库中
+        //保存索引到ES库中
         Map<String, Object> source = getIndexSource(objectNode, paramMap);
         Map<String, Object> newSource;
         try {
@@ -133,7 +200,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
         String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
         String path = groupName.substring(1, groupName.length() - 1) + ":" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        //保存到ES库中
+        //保存索引到ES库中
         Map<String, Object> source = getIndexSource(objectNode, paramMap);
         try {
             elasticSearchService.index(indexName, indexType, source);
@@ -164,7 +231,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      * @throws Exception
      */
     @RequestMapping(value = "/fastDfs/uploadReturnHttpUrl", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation(value = "上传文件", notes = "返回httpUrl")
+    @ApiOperation(value = "上传文件", notes = "返回HttpUrl")
     public Envelop fileUploadReturnHttpUrl(
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) {
@@ -182,7 +249,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
         String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
         String path = groupName.substring(1, groupName.length() - 1) + ":" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        //保存到ES库中
+        //保存索引到ES库中
         Map<String, Object> source = getIndexSource(objectNode, paramMap);
         try {
             elasticSearchService.index(indexName, indexType, source);
@@ -692,7 +759,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         if(!fileType.equals(fileName)) {
             source.put("type", fileType);
         }else {
-            source.put("type", "unknown");
+            source.put("type", "file");
         }
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date now = new Date();

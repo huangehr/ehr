@@ -120,7 +120,7 @@ public class FastDFSUtil {
     /**
      * 上传文件，从文件
      */
-    public ObjectNode upload(String group_name, String master_filename, String prefix_name, byte[] file_buff, String file_ext_name,NameValuePair[] meta_list) throws IOException, MyException, NoSuchAlgorithmException{
+    public ObjectNode upload(String group_name, String master_filename, String prefix_name, byte[] file_buff, String file_ext_name, NameValuePair[] meta_list) throws IOException, MyException, NoSuchAlgorithmException{
         StorageClient client = clientPool.getStorageClient();
         ObjectNode message = new ObjectMapper().createObjectNode();
         try {
@@ -239,7 +239,6 @@ public class FastDFSUtil {
         return size;
     }
     */
-
     public int modify(String groupName, String remoteFilename, NameValuePair[] metaList, byte opFlag) throws IOException , MyException{
         StorageClient client = clientPool.getStorageClient();
         try {
