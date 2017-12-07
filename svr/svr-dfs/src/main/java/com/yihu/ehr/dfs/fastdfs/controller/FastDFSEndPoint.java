@@ -35,7 +35,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "FastDFSEndPoint", description = "文件管理服务", tags = {"FastDFS-Service"})
+@Api(value = "FastDFSEndPoint", description = "FastDFS服务", tags = {"分布式综合服务-FastDFS服务"})
 public class FastDFSEndPoint extends EnvelopRestEndPoint {
 
     private static String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -69,7 +69,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) {
         Envelop envelop = new Envelop();
-        Map<String, String> paramMap = toEntity(jsonData.substring(9), Map.class);
+        Map<String, String> paramMap = toEntity(jsonData, Map.class);
         ObjectNode objectNode;
         try {
             objectNode = fastDFSService.upload(paramMap);
@@ -120,7 +120,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) {
         Envelop envelop = new Envelop();
-        Map<String, String> paramMap = toEntity(jsonData.substring(9), Map.class);
+        Map<String, String> paramMap = toEntity(jsonData, Map.class);
         ObjectNode objectNode;
         try {
             objectNode = fastDFSService.upload(paramMap);
@@ -169,7 +169,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) {
         Envelop envelop = new Envelop();
-        Map<String, String> paramMap = toEntity(jsonData.substring(9), Map.class);
+        Map<String, String> paramMap = toEntity(jsonData, Map.class);
         ObjectNode objectNode;
         try {
             objectNode = fastDFSService.upload(paramMap);
@@ -260,26 +260,23 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "path") String path) {
         Envelop envelop = new Envelop();
         //String path = java.net.URLDecoder.decode(storagePath, "UTF-8");
+        // 删除文件
+        try {
+            fastDFSService.delete(path.split(":")[0], path.split(":")[1]);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+            return envelop;
+        }
         List<Map<String, Object>> resultList = elasticSearchService.findByField(indexName, indexType,"path", path);
         StringBuilder ids = new StringBuilder();
         for(Map<String, Object> resultMap : resultList) {
             String id = resultMap.get("_id").toString();
             ids.append(id + ",");
-            String storagePath = resultMap.get("path").toString();
-            String groupName = storagePath.split(":")[0];
-            String remoteFileName = storagePath.split(":")[1];
-            // 删除文件
-            try {
-                fastDFSService.delete(groupName, remoteFileName);
-            }catch (Exception e) {
-                e.printStackTrace();
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg(e.getMessage());
-                return envelop;
-            }
+            // 删除索引
+            elasticSearchService.delete(indexName, indexType, ids.toString().split(","));
         }
-        // 删除索引
-        elasticSearchService.delete(indexName, indexType, ids.toString().split(","));
         envelop.setSuccessFlg(true);
         return envelop;
     }
@@ -353,7 +350,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) {
         Envelop envelop = new Envelop();
-        Map<String, String> paramMap = toEntity(jsonData.substring(9), Map.class);
+        Map<String, String> paramMap = toEntity(jsonData, Map.class);
         String _id = paramMap.get("_id");
         Map<String, Object> source = elasticSearchService.findById(indexName, indexType, _id);
         if (null == source) {
@@ -688,7 +685,11 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         source.put("path", path);
         source.put("objectId", objectId);
         source.put("size", fileSize);
-        source.put("type", fileType);
+        if(!fileType.equals(fileName)) {
+            source.put("type", fileType);
+        }else {
+            source.put("type", "unknown");
+        }
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date now = new Date();
         String nowStr = dateFormat.format(now);
