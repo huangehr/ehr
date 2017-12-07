@@ -16,8 +16,8 @@ import org.springframework.context.annotation.Configuration;
         SecurityAutoConfiguration.class,
         ManagementWebSecurityAutoConfiguration.class})
 @ComponentScan
-//@EnableFeignClients
-//@EnableDiscoveryClient
+@EnableFeignClients
+@EnableDiscoveryClient
 public class SvrDfsApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

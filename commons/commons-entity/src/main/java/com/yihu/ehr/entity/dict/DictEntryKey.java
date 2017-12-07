@@ -1,4 +1,4 @@
-package com.yihu.ehr.dict.service;
+package com.yihu.ehr.entity.dict;
 
 import java.io.Serializable;
 import java.util.Objects;

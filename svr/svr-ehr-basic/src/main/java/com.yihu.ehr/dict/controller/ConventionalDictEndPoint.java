@@ -2,8 +2,8 @@ package com.yihu.ehr.dict.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.dict.service.SystemDictEntry;
 import com.yihu.ehr.dict.service.SystemDictEntryService;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;

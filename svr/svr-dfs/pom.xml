@@ -59,11 +59,13 @@
         </dependency>
 
         <!-- jpa -->
+        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
+        -->
         <!-- jpa -->
 
         <dependency>
@@ -142,6 +144,10 @@
             <artifactId>commons-data-fastdfs</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-rest-model</artifactId>
+        </dependency>
 
         <!--
         <dependency>
@@ -160,13 +166,13 @@
             <scope>compile</scope>
         </dependency>
         -->
-
+        <!--
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-entity</artifactId>
             <scope>compile</scope>
         </dependency>
-
+        -->
         <!-- Hibernate
         <dependency>
             <groupId>org.hibernate</groupId>
