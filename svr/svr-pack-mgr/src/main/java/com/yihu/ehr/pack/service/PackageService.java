@@ -97,8 +97,8 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
 
         try {
             ObjectNode msg = fastDFSUtil.upload(is, "zip", "健康档案JSON临时文件");
-            String group = msg.get(FastDFSUtil.GroupField).asText();
-            String remoteFile = msg.get(FastDFSUtil.RemoteFileField).asText();
+            String group = msg.get(FastDFSUtil.GROUP_NAME).asText();
+            String remoteFile = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
 
             // 将组与文件ID使用英文分号隔开, 提取的时候, 只需要将它们这个串拆开, 就可以得到组与文件ID
             String remoteFilePath = String.join(Package.pathSeparator, new String[]{group, remoteFile});

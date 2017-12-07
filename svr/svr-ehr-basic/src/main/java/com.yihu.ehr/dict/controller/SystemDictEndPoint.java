@@ -2,8 +2,8 @@ package com.yihu.ehr.dict.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
-import com.yihu.ehr.dict.service.SystemDict;
 import com.yihu.ehr.dict.service.SystemDictService;
+import com.yihu.ehr.entity.dict.SystemDict;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.dict.MSystemDict;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -29,8 +29,9 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "Dictionary", description = "系统全局字典管理", tags = {"系统字典-系统全局字典管理"})
 public class SystemDictEndPoint extends EnvelopRestEndPoint {
+
     @Autowired
-    SystemDictService dictService;
+    private SystemDictService dictService;
 
     @ApiOperation(value = "获取字典列表", response = MSystemDict.class, responseContainer = "List")
     @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
@@ -76,6 +77,16 @@ public class SystemDictEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "id", value = "字典ID", defaultValue = "")
             @PathVariable(value = "id") long id) {
         SystemDict dict = dictService.retrieve(id);
+        if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
+        return convertToModel(dict, MSystemDict.class);
+    }
+
+    @ApiOperation(value = "获取字典", response = MSystemDict.class)
+    @RequestMapping(value = "/dictionary/{phoneticCode}", method = RequestMethod.GET)
+    public MSystemDict getDictionaryByPhoneticCode(
+            @ApiParam(name = "phoneticCode", value = "拼音编码", required = true)
+            @PathVariable(value = "phoneticCode") String phoneticCode) {
+        SystemDict dict = dictService.findByPhoneticCode(phoneticCode);
         if (dict == null) throw new ApiException(ErrorCode.GetDictFaild, "字典不存在");
         return convertToModel(dict, MSystemDict.class);
     }

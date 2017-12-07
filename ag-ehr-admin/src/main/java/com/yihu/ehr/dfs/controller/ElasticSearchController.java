@@ -1,57 +1,39 @@
-package com.yihu.ehr.dfs.es.controller;
+package com.yihu.ehr.dfs.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.dfs.es.service.ElasticSearchService;
+import com.yihu.ehr.dfs.client.ElasticSearchClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.index.engine.DocumentMissingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * EndPoint - Es搜索服务
  * Created by progr1mmer on 2017/12/2.
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0)
-@Api(value = "ElasticSearchEndPoint", description = "Es搜索服务", tags = {"分布式综合服务-Es搜索服务"})
-public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
+@RequestMapping(ApiVersion.Version1_0 + ServiceApi.GateWay.admin)
+@Api(value = "ElasticSearchController", description = "Es搜索服务", tags = {"分布式综合服务-Es搜索服务"})
+public class ElasticSearchController extends EnvelopRestEndPoint {
 
     @Autowired
-    private ElasticSearchService elasticSearchService;
+    private ElasticSearchClient elasticSearchClient;
 
     @RequestMapping(value = "/elasticSearch/mapping", method = RequestMethod.POST)
-    @ApiOperation(value = "建立映射")
-    public Envelop mapping(
+    @ApiOperation(value = "建立索引")
+    public Envelop mapper(
             @ApiParam(name = "index", value = "索引名称", required = true)
             @RequestParam(value = "index") String index,
             @ApiParam(name = "type", value = "索引类型", required = true)
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source", value = "Json串值", required = true)
             @RequestParam(value = "source") String source) {
-        Envelop envelop = new Envelop();
-        try {
-            String mapper = source.replaceAll("\\[","{").replaceAll("\\]","}");
-            Map<String, Map<String, String>> Mapping = objectMapper.readValue(mapper, Map.class);
-            elasticSearchService.mapping(index, type, Mapping);
-        }catch (IOException e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
-        }
-        envelop.setSuccessFlg(true);
-        return envelop;
+        return elasticSearchClient.mapping(index, type, source);
     }
 
     @RequestMapping(value = "/elasticSearch/index", method = RequestMethod.POST)
@@ -63,25 +45,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source", value = "值", required = true)
             @RequestParam(value = "source") String source) {
-        Envelop envelop = new Envelop();
-        Map<String, Object> result;
-        try {
-            Map<String, Object> sourceMap = objectMapper.readValue(source, Map.class);
-            result = elasticSearchService.index(index, type, sourceMap);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
-        }
-        if (result != null) {
-            envelop.setSuccessFlg(true);
-            envelop.setObj(result);
-            return envelop;
-        }
-        envelop.setSuccessFlg(false);
-        envelop.setErrorMsg("插入数据前请先建立索引");
-        return envelop;
+        return elasticSearchClient.index(index, type, source);
     }
 
     @RequestMapping(value = "/elasticSearch/delete", method = RequestMethod.DELETE)
@@ -93,10 +57,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "id", value = "id(多个id值以,分隔)", required = true)
             @RequestParam(value = "id") String id) {
-        Envelop envelop = new Envelop();
-        elasticSearchService.delete(index, type, id.split(","));
-        envelop.setSuccessFlg(true);
-        return envelop;
+        return elasticSearchClient.delete(index, type, id);
     }
 
     @RequestMapping(value = "/elasticSearch/update", method = RequestMethod.PUT)
@@ -110,31 +71,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "id") String id,
             @ApiParam(name = "source", value = "值", required = true)
             @RequestParam(value = "source") String source) {
-        Envelop envelop = new Envelop();
-        Map<String, Object> sourceMap;
-        try {
-            sourceMap = objectMapper.readValue(source, Map.class);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
-        }
-        Map<String, Object> result;
-        try {
-            result = elasticSearchService.update(index, type, id, sourceMap);
-        }catch (DocumentMissingException e) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
-            return envelop;
-        }
-        if (result != null) {
-            envelop.setSuccessFlg(true);
-            envelop.setObj(result);
-            return envelop;
-        }
-        envelop.setSuccessFlg(false);
-        return envelop;
+        return elasticSearchClient.update(index, type, id, source);
     }
 
     @RequestMapping(value = "/elasticSearch/{id}", method = RequestMethod.GET)
@@ -146,16 +83,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "id", value = "id", required = true)
             @PathVariable(value = "id") String id) {
-        Envelop envelop = new Envelop();
-        Map<String, Object> result = elasticSearchService.findById(index, type, id);
-        if(result != null) {
-            envelop.setSuccessFlg(true);
-            envelop.setObj(result);
-            return envelop;
-        }
-        envelop.setSuccessFlg(false);
-        envelop.setErrorMsg("无相关数据");
-        return envelop;
+        return elasticSearchClient.index(index, type, id);
     }
 
     @RequestMapping(value = "/elasticSearch/findByField", method = RequestMethod.GET)
@@ -169,11 +97,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "field") String field,
             @ApiParam(name = "value", value = "字段值", required = true)
             @RequestParam(value = "value") String value) {
-        Envelop envelop = new Envelop();
-        List<Map<String, Object>> resultList = elasticSearchService.findByField(index, type, field, value);
-        envelop.setDetailModelList(resultList);
-        envelop.setSuccessFlg(true);
-        return envelop;
+        return elasticSearchClient.findByField(index, type, field, value);
     }
 
     @RequestMapping(value = "/elasticSearch/page", method = RequestMethod.GET)
@@ -184,29 +108,12 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "type", value = "索引类型", required = true)
             @RequestParam(value = "type") String type,
             @ApiParam(name = "filter", value = "过滤条件")
-            @RequestParam(value = "filter" , required = false) String filter,
+            @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "page", value = "页码", required = true)
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true)
             @RequestParam(value = "size") int size) {
-        Envelop envelop = new Envelop();
-        List<Map<String, String>> filterMap;
-        if(!StringUtils.isEmpty(filter)) {
-            try {
-                filterMap = objectMapper.readValue(filter, List.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-                envelop.setSuccessFlg(false);
-                envelop.setErrorMsg(e.getMessage());
-                return envelop;
-            }
-        }else {
-            filterMap = new ArrayList<Map<String, String>>(0);
-        }
-        List<Map<String, Object>> resultList = elasticSearchService.page(index, type, filterMap, page, size);
-        envelop.setDetailModelList(resultList);
-        envelop.setSuccessFlg(true);
-        return envelop;
+        return elasticSearchClient.page(index, type, filter, page, size);
     }
 
 }

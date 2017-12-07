@@ -1,5 +1,8 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.dao.SystemDictEntryRepository;
+import com.yihu.ehr.dict.dao.SystemDictRepository;
+import com.yihu.ehr.entity.dict.SystemDict;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,12 +22,12 @@ import java.util.Date;
  */
 @Service
 @Transactional
-public class SystemDictService extends BaseJpaService<SystemDict, XSystemDictRepository> {
-    @Autowired
-    private XSystemDictRepository dictRepo;
+public class SystemDictService extends BaseJpaService<SystemDict, SystemDictRepository> {
 
     @Autowired
-    private XSystemDictEntryRepository entryRepo;
+    private SystemDictRepository dictRepo;
+    @Autowired
+    private SystemDictEntryRepository entryRepo;
 
     public Page<SystemDict> getDictList(String sorts, int page, int size) {
         Pageable pageable = new PageRequest(page, size, parseSorts(sorts));
@@ -62,4 +65,9 @@ public class SystemDictService extends BaseJpaService<SystemDict, XSystemDictRep
         long id = dictRepo.getNextId()+1;
         return id;
     }
+
+    public SystemDict findByPhoneticCode(String code) {
+        return dictRepo.findByPhoneticCode(code);
+    }
+
 }
