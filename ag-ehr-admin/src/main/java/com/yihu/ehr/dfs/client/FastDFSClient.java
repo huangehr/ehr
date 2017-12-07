@@ -116,7 +116,7 @@ public interface FastDFSClient {
     @RequestMapping(value = "/fastDfs/page", method = RequestMethod.GET)
     @ApiOperation(value = "获取结果集")
     Envelop page(
-            @RequestParam(value = "filter") String filter,
+            @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "page") int page,
             @RequestParam(value = "size") int size);
 

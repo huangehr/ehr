@@ -226,7 +226,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取结果集")
     public Envelop page(
             @ApiParam(name = "filter", value = "过滤条件")
-            @RequestParam(value = "filter") String filter,
+            @RequestParam(value = "filter", required = false) String filter,
             @ApiParam(name = "page", value = "页码", required = true)
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "分页大小", required = true)
