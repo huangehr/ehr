@@ -23,8 +23,8 @@
         <!--<module>../svr/svr-dict</module>-->
         <!--<module>../svr/svr-esb</module>-->
         <!--<module>../svr/svr-family</module>
-        <module>../svr/svr-file-resource</module>
         <module>../svr/svr-geography</module>-->
+        <module>../svr/svr-dfs</module>
         <module>../svr/svr-health-profile</module>
         <!--<module>../svr/svr-organization</module>-->
         <module>../svr/svr-pack-mgr</module>

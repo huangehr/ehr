@@ -41,10 +41,10 @@ public class LocationEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "页码", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) {
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         try {
             List<Schedule> schedules = locationService.search(fields, filters, sorts, page, size);
@@ -103,10 +103,15 @@ public class LocationEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Emergency.LocationDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除待命地点")
     public Envelop delete(
-            @ApiParam(name = "ids", value = "id列表[1,2,3...] int")
+            @ApiParam(name = "ids", value = "id列表(int)1,2,3,...")
             @RequestParam(value = "ids") String ids){
         Envelop envelop = new Envelop();
-        List<Integer> idList = toEntity(ids, List.class);
+        String [] idArr = ids.split(",");
+        Integer [] idArr1 = new Integer[idArr.length];
+        for(int i = 0; i < idArr.length; i++) {
+            idArr1[i] = new Integer(idArr[i]);
+        }
+        //List<Integer> idList = toEntity(ids, List.class);
         try {
             List<Ambulance> ambulanceList = ambulanceService.search("id=" + ids.substring(1, ids.length() - 1));
             if(ambulanceList == null || ambulanceList.size() > 0) {
@@ -120,7 +125,7 @@ public class LocationEndPoint extends BaseRestEndPoint {
             envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
-        locationService.delete(idList);
+        locationService.delete(idArr1);
         envelop.setSuccessFlg(true);
         return envelop;
     }

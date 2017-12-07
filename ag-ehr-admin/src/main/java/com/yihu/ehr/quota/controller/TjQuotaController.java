@@ -6,13 +6,10 @@ import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.entity.quota.TjQuota;
-import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
-import com.yihu.ehr.model.geography.MGeographyDict;
-import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.resource.MRsMetadata;
 import com.yihu.ehr.model.tj.MQuotaCategory;
 import com.yihu.ehr.model.tj.MTjQuotaLog;
@@ -24,7 +21,6 @@ import com.yihu.ehr.quota.service.TjQuotaJobClient;
 import com.yihu.ehr.quota.service.TjQuotaLogClient;
 import com.yihu.ehr.resource.client.RsMetadataClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
-import com.yihu.ehr.users.service.GetInfoClient;
 import com.yihu.ehr.util.FeignExceptionUtils;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
@@ -229,7 +225,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         int count = 1;
         while (flag) {
             Thread.sleep(5 * 1000L);
-            mTjQuotaLog = tjQuotaLogClient.getRecentRecord(quotaModel.getCode(),date);
+            mTjQuotaLog = tjQuotaLogClient.getRecentRecord(quotaModel.getCode(),date.toString());
             if(mTjQuotaLog != null ){
                 flag = false;
             }else {
@@ -248,7 +244,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             }
         }else {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("系统错误");
+            envelop.setErrorMsg(mTjQuotaLog.getContent());
         }
         return envelop;
     }

@@ -14,6 +14,7 @@ public class EsConfig {
     private String molecular;  // 统计百分比时的分子  指标code
     private String denominator;// 统计百分比时的分母  指标code
     private String timekey;//根据sql去查询的key
+    private String config;  // where条件
 
     public String getHost() {
         return host;
@@ -86,5 +87,13 @@ public class EsConfig {
 
     public void setDenominator(String denominator) {
         this.denominator = denominator;
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
     }
 }

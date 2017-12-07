@@ -55,10 +55,10 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "页码", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) {
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         try {
             List<Ambulance> ambulanceList = ambulanceService.search(fields, filters, sorts, page, size);
@@ -82,10 +82,10 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "sorts", value = "排序，规则参见说明文档")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "分页大小", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            @ApiParam(name = "size", value = "页码", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size) {
+            @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
+            @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         try {
             List<Object> resultList = new ArrayList<Object>();
@@ -255,12 +255,13 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceDelete, method = RequestMethod.DELETE)
     @ApiOperation("删除记录")
     public Envelop delete(
-            @ApiParam(name = "ids", value = "id列表['xxxx','xxxx','xxxx'...] String")
+            @ApiParam(name = "ids", value = "id列表xxxx,xxxx,xxxx,...", required = true)
             @RequestParam(value = "ids") String ids){
         Envelop envelop = new Envelop();
         try {
-            List<String> idList = toEntity(ids, List.class);
-            for (String id : idList) {
+            //List<String> idList = toEntity(ids, List.class);
+            String [] idArr = ids.split(",");
+            for (String id : idArr) {
                 Ambulance ambulance = ambulanceService.findById(id);
                 if (ambulance.getStatus() != Ambulance.Status.wait || ambulance.getStatus() != Ambulance.Status.down) {
                     envelop.setSuccessFlg(false);
@@ -274,7 +275,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
                     return envelop;
                 }
             }
-            ambulanceService.delete(idList);
+            ambulanceService.delete(idArr);
             envelop.setSuccessFlg(true);
         }catch (Exception e) {
             e.printStackTrace();
@@ -282,7 +283,19 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
         return envelop;
     }
 
-
+    @RequestMapping(value = ServiceApi.Emergency.Ambulance, method = RequestMethod.GET)
+    @ApiOperation("获取单条记录")
+    public Envelop findById(
+            @ApiParam(name = "id", value = "id")
+            @RequestParam(value = "id") String id){
+        Envelop envelop = new Envelop();
+        Ambulance ambulance = ambulanceService.findById(id);
+        if(null != ambulance) {
+            envelop.setSuccessFlg(true);
+            envelop.setObj(ambulance);
+        }
+        return envelop;
+    }
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在车牌号、电话号码")
