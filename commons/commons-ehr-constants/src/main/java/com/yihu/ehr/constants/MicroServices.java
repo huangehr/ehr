@@ -44,4 +44,6 @@ public class MicroServices {
     public static final String Quota = "svr-quota";
 
     public static final String LogCollection = "svr-logCollection";
+
+    public static final String Dfs = "svr-dfs";
 }

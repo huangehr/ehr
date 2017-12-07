@@ -95,7 +95,7 @@ public class ElasticSearchDao {
         }
     }
 
-    public void create(String index, String type, XContentBuilder xContentBuilder) {
+    public void mapping(String index, String type, XContentBuilder xContentBuilder) {
         TransportClient transportClient = getClient();
         try {
             CreateIndexRequestBuilder createIndexRequestBuilder = transportClient.admin().indices().prepareCreate(index);

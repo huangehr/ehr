@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Service - Es搜索服务
@@ -23,22 +24,18 @@ public class ElasticSearchService {
     @Autowired
     private ElasticSearchDao elasticSearchDao;
 
-    public void create(String index, String type, List<Map<String, String>> source) throws IOException{
+    public void mapping(String index, String type, Map<String, Map<String, String>> source) throws IOException{
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject().startObject("properties");
-        for(Map<String , String> map : source) {
-            String field = map.get("field");
-            String fType = map.get("type");
+        for(String field : source.keySet()) {
             xContentBuilder.startObject(field);
-            if(fType.equals("date")){
-                xContentBuilder.field("type", fType);
-                xContentBuilder.field("format", "yyyy-MM-dd HH:mm:ss");
-            }else {
-                xContentBuilder.field("type", fType);
+            Map<String, String> propsMap = source.get(field);
+            for(String prop : propsMap.keySet()) {
+                xContentBuilder.field(prop, propsMap.get(prop));
             }
             xContentBuilder.endObject();
         }
         xContentBuilder.endObject().endObject();
-        elasticSearchDao.create(index, type, xContentBuilder);
+        elasticSearchDao.mapping(index, type, xContentBuilder);
     }
 
     public void remove(String index){
@@ -66,9 +63,9 @@ public class ElasticSearchService {
 
     public List<Map<String, Object>> findByField(String index, String type, String field, Object value) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        //MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-        QueryStringQueryBuilder queryStringQueryBuilder = QueryBuilders.queryStringQuery(field + ":" + value);
-        boolQueryBuilder.must(queryStringQueryBuilder);
+        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
+        //QueryStringQueryBuilder queryStringQueryBuilder = QueryBuilders.queryStringQuery(field + ":" + value);
+        boolQueryBuilder.must(matchQueryBuilder);
         return elasticSearchDao.findByField(index, type, boolQueryBuilder);
     }
 
