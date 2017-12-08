@@ -1,8 +1,7 @@
-package com.yihu.ehr.resource.service.query;
+package com.yihu.ehr.resource.dao;
 
 
 import com.yihu.ehr.resource.model.DtoResourceMetadata;
-import com.yihu.ehr.resource.model.RsAppResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +15,7 @@ import java.util.List;
  * Created by hzp on 2016/5/14.
  */
 @Service
-public class ResourcesMetadataQueryDao {
+public class ResourceBrowseMetadataDao {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

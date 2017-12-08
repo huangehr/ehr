@@ -30,7 +30,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsResourceCategory", description = "资源分类服务接口")
+@Api(value = "RsResourceCategoryEndPoint", description = "资源分类", tags = {"资源服务-资源分类"})
 public class RsResourceCategoryEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

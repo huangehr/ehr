@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsInterface", description = "资源服务接口")
+@Api(value = "RsInterfaceEndPoint", description = "资源接口", tags = {"资源服务-资源接口"})
 public class RsInterfaceEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

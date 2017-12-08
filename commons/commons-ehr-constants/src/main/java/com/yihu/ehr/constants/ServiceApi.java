@@ -35,17 +35,17 @@ public class ServiceApi {
         //资源查询接口(命名先按原有路径，不规范)
         public static final String ResourceViewMetadata = "/resources/query/getResourceMetadata"; //资源浏览获取结构
         public static final String ResourceViewData = "/resources/query/getResourceData"; //资源浏览获取数据
-        public static final String ResourcesQuery = "/resources/query"; //资源查询接口
-        public static final String ResourcesSubQuery = "/resources/sub_query"; //详细资源查询接口
-        public static final String ResourcesQueryTransform = "/resources/query/transform"; //资源查询接口+转译
-        public static final String ResourcesRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
-        public static final String ResourcesRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
-        public static final String ResourcesMasterData = "/resources/query/master_data"; //主表资源查询接口
-        public static final String ResourcesSubData = "/resources/query/sub_data"; //细表资源查询接口
+        public static final String ResourceQuery = "/resources/query"; //资源查询接口
+        public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
+        public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译
+        public static final String ResourceRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
+        public static final String ResourceRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
+        public static final String ResourceMasterData = "/resources/query/master_data"; //主表资源查询接口
+        public static final String ResourceSubData = "/resources/query/sub_data"; //细表资源查询接口
         public static final String getCDAData = "/resources/query/getCDAData";//获取cda data
-        public static final String ResourcesMasterStat = "/resources/query/master_stat"; //主表资源统计接口
-        public static final String ResourcesSubStat = "/resources/query/sub_stat"; //细表资源查询接口
-        public static final String ResourcesMysql = "/resources/query/mysql"; //mysql资源查询接口
+        public static final String ResourceMasterStat = "/resources/query/master_stat"; //主表资源统计接口
+        public static final String ResourceSubStat = "/resources/query/sub_stat"; //细表资源查询接口
+        public static final String ResourceMysql = "/resources/query/mysql"; //mysql资源查询接口
 
         //资源浏览
         public static final String ResourceBrowseCategories = "/resources/ResourceBrowses/categories";
@@ -894,6 +894,7 @@ public class ServiceApi {
         public static final String RsAdapterDict = "/redis/rsAdapterDict";
         public static final String RsAdapterMetadata = "/redis/rsAdapterMetaData";
         public static final String RsMetadata = "/redis/rsMetadata";
+
         //标准相关Redis
         public static final String StdVersion = "/redis/stdVersion";
         public static final String StdDataSetCode = "/redis/stdDataSetCode";
