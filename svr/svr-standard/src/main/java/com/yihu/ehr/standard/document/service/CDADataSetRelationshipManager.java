@@ -189,8 +189,8 @@ public class CDADataSetRelationshipManager extends BaseHbmService<BaseCDADataSet
 
         //将文件上传到服务器中
         ObjectNode msg = fastDFSUtil.upload(strFilePath, "");
-        String strFileGroup = msg.get(FastDFSUtil.GroupField).asText();
-        String strSchemePath = msg.get(FastDFSUtil.RemoteFileField).asText();
+        String strFileGroup = msg.get(FastDFSUtil.GROUP_NAME).asText();
+        String strSchemePath = msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
         File file = new File(strFilePath);
 
         // 路径为文件且不为空则进行删除

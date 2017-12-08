@@ -1,7 +1,5 @@
 logging:
   level:
-    com:
-      netflix: INFO
     org:
       springframework:
         web: INFO
@@ -41,6 +39,11 @@ fast-dfs:
   index:
     name: dfs #ES索引名称
     type: info #ES索引类型
+
+elasticsearch:
+  pool:
+    init-size: 5
+    max-size: 10
 
 ---
 spring:
