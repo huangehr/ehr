@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,40 +78,45 @@ public class RedisCacheStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(false);
         try {
             Map<String, Object> result = new HashMap<>();
-            List<Map<String, Object>> categoryMemoryRateList = new ArrayList<>();
+            List<String> categoryNameList = new ArrayList<>();
+            List<Map<String, Object>> categoryMemoryList = new ArrayList<>();
 
             // Redis使用的总内存
-            double redisUsedMemory = (double) redisTemplate.execute(new RedisCallback() {
+            long redisUsedMemory = (long) redisTemplate.execute(new RedisCallback() {
                 @Override
                 public Object doInRedis(RedisConnection connection) throws DataAccessException {
-                    return Double.parseDouble(connection.info("memory").get("used_memory").toString());
+                    return Long.parseLong(connection.info("memory").get("used_memory").toString());
                 }
             });
 
-            DecimalFormat df = new DecimalFormat("#.####%");
             List<RedisCacheCategory> categoryList = redisCacheCategoryService.search("");
-            double categoryMemoryTotal = 0;
+            long categoryMemoryTotal = 0;
             for (RedisCacheCategory category : categoryList) {
+                categoryNameList.add(category.getName());
                 String keyPrefix = CacheCommonBiz.makeKeyPrefix(category.getCode());
-                Long categoryMemoryObj = redisCacheKeyMemoryService.sumCategoryMemory(keyPrefix);
-                double categoryMemory = categoryMemoryObj == null ? 0 : (double) categoryMemoryObj;
-                String categoryMemoryRate = df.format(categoryMemory / redisUsedMemory);
+                Long categoryMemory = redisCacheKeyMemoryService.sumCategoryMemory(keyPrefix);
                 Map<String, Object> rateMap = new HashMap<>();
-                rateMap.put("value", categoryMemoryRate);
                 rateMap.put("name", category.getName());
-                categoryMemoryRateList.add(rateMap);
+                rateMap.put("value", categoryMemory);
+                categoryMemoryList.add(rateMap);
                 categoryMemoryTotal += categoryMemory;
             }
-            Map<String, Object> rateMap = new HashMap<>();
-            String otherRate = df.format((redisUsedMemory - categoryMemoryTotal) / redisUsedMemory);
-            rateMap.put("value", otherRate);
-            rateMap.put("name", "未分类");
-//            Map<String, Object> idleRateMap = new HashMap<>();
-//            idleRateMap.put("name", "闲置内存");
-//            idleRateMap.put("value", );
-            categoryMemoryRateList.add(rateMap);
+            String noCategoryName = "未分类";
+            categoryNameList.add(noCategoryName);
+            Map<String, Object> noCategoryMemMap = new HashMap<>();
+            Long noCategoryMemory = redisCacheKeyMemoryService.sumNotCategoryMemory();
+            noCategoryMemMap.put("name", noCategoryName);
+            noCategoryMemMap.put("value", noCategoryMemory);
+            categoryMemoryList.add(noCategoryMemMap);
+            String idleMemoryName = "闲置内存";
+            categoryNameList.add(idleMemoryName);
+            Map<String, Object> idleMemoryMap = new HashMap<>();
+            idleMemoryMap.put("name", idleMemoryName);
+            idleMemoryMap.put("value", redisUsedMemory - categoryMemoryTotal - noCategoryMemory);
+            categoryMemoryList.add(idleMemoryMap);
 
-            result.put("categoryMemoryRateList", categoryMemoryRateList);
+            result.put("categoryNameList", categoryNameList);
+            result.put("categoryMemoryList", categoryMemoryList);
 
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
