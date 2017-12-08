@@ -120,11 +120,16 @@ public class MysqlExtract {
             whereSql.append(" where " + esConfig.getConfig());
         }
         if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
+            String condition = " and ";
+            if (StringUtils.isEmpty(whereSql.toString())) {
+                condition = " where ";
+            }
+
             if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
-                whereSql.append(" and " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+                whereSql.append(condition + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
                 whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }else{
-                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
+                whereSql.append( condition + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }
         }
         StringBuffer sql = new StringBuffer();
