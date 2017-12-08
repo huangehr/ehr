@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/resourcesQuota")
-@Api(value = "RsResourceQuota", description = "资源视图指标")
+@Api(value = "RsResourceQuotaEndPoint", description = "资源视图指标", tags = {"资源服务-资源视图指标"})
 public class RsResourceQuotaEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private RsResourceQuotaService resourceQuotaService;

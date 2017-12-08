@@ -1,4 +1,4 @@
-package com.yihu.ehr.resource.service.query;
+package com.yihu.ehr.resource.dao;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +26,7 @@ import java.util.Map;
  * 资源查询底层接口
  */
 @Service
-public class ResourcesQueryDao {
+public class ResourceBrowseDao {
 
     private Integer defaultPage = 1;
     private Integer defaultSize = 1000;

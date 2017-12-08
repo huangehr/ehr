@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsReportCategoryApp", description = "资源报表分类与应用服务接口")
+@Api(value = "RsReportCategoryAppEndPoint", description = "资源报表分类与应用", tags = {"资源服务-资源报表分类与应用"})
 public class RsReportCategoryAppEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

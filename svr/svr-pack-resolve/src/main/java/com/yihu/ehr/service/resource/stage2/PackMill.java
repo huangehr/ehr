@@ -196,7 +196,7 @@ public class PackMill {
      * @param srcDictEntryCode STD字典项代码
      * @return
      */
-    public String[] getDict(String version,String dictCode,String srcDictEntryCode) {
+    public String[] getDict(String version, String dictCode, String srcDictEntryCode) {
         String dict = redisServiceClient.getRsAdaptionDict(version, dictCode, srcDictEntryCode);
         if(dict != null) {
             return dict.split("&");
