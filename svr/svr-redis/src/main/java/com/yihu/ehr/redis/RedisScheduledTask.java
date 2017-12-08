@@ -51,7 +51,6 @@ public class RedisScheduledTask {
 //    @RequestMapping(value = "/redis/cache/statistics/backupRedis", method = RequestMethod.GET)
     @Scheduled(cron = "0 30 0 15 * ?")
     public void backupRedis() {
-        long start = System.currentTimeMillis();
         redisTemplate.execute(new RedisCallback() {
             @Override
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
@@ -59,8 +58,7 @@ public class RedisScheduledTask {
                 return null;
             }
         });
-        long end = System.currentTimeMillis();
-        logger.info("成功生成Redis快照。" + (end - start));
+        logger.info("已执行Redis快照命令。");
     }
 
     /**
