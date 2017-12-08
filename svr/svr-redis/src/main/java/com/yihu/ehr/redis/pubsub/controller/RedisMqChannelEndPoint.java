@@ -8,7 +8,6 @@ import com.yihu.ehr.redis.pubsub.CustomMessageListenerAdapter;
 import com.yihu.ehr.redis.pubsub.MessageCommonBiz;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqChannel;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
-import com.yihu.ehr.redis.pubsub.entity.RedisMqPublisher;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqSubscriber;
 import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqMessageLogService;
@@ -25,9 +24,12 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Redis消息队列 接口
@@ -48,8 +50,8 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
     private RedisMqSubscriberService redisMqSubscriberService;
     @Autowired
     private RedisMqPublisherService redisMqPublisherService;
-    @Autowired
-    private RedisTemplate redisTemplate;
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
     @Autowired
     private RedisMessageListenerContainer redisMessageListenerContainer;
 
@@ -170,35 +172,7 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "channel") String channel,
             @ApiParam(name = "message", value = "消息", required = true)
             @RequestParam(value = "message") String message) throws Exception {
-        Envelop envelop = new Envelop();
-
-        // 判断消息队列是否注册
-        RedisMqChannel redisMqChannel = redisMqChannelService.findByChannel(channel);
-        if (redisMqChannel == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("消息队列 " + channel + " 还未注册，需要先注册才能往队列发布消息。");
-            return envelop;
-        }
-        // 判断队列是否绑定发布者
-        RedisMqPublisher redisMqPublisher = redisMqPublisherService.findByChannelAndAppId(channel, publisherAppId);
-        if (redisMqPublisher == null) {
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("消息队列 " + channel + " 中没绑定过应用ID为 " + publisherAppId + " 的发布者，需要先绑定才能发布消息。");
-            return envelop;
-        }
-
-        // 记录消息
-        RedisMqMessageLog redisMqMessageLog = MessageCommonBiz.newMessageLog(channel, publisherAppId, message);
-        redisMqMessageLogService.save(redisMqMessageLog);
-
-        // 发布消息
-        Map<String, Object> messageMap = new HashMap<>();
-        messageMap.put("messageLogId", redisMqMessageLog.getId());
-        messageMap.put("messageContent", message);
-        redisTemplate.convertAndSend(channel, toJson(messageMap));
-
-        envelop.setSuccessFlg(true);
-        return envelop;
+        return redisMqChannelService.sendMessage(publisherAppId, channel, message);
     }
 
 }

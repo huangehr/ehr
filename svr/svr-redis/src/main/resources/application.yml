@@ -49,6 +49,7 @@ fast-dfs:
     anti-steal-token: no
     secret-key: FastDFS1234567890
 
+
 ---
 spring:
   profiles: dev
@@ -63,6 +64,16 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: E:\临时文件\memory.csv
+
 
 ---
 spring:
@@ -76,7 +87,15 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.54:22122
   public-server: http://172.19.103.54:22122
-
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: E:\临时文件\memory.csv
 
 
 ---
@@ -91,7 +110,15 @@ spring:
 fast-dfs:
   tracker-server: 172.19.103.13:22122
   public-server: http://172.19.103.52:80
-
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: E:\临时文件\memory.csv
 
 
 ---
@@ -106,6 +133,16 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://ds.ehr.yihu.com:22122
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: E:\临时文件\memory.csv
+
 
 ---
 spring:
@@ -122,6 +159,16 @@ spring:
 fast-dfs:
   tracker-server: 192.168.135.42:22122
   public-server: http://192.168.135.42:22122
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: E:\临时文件\memory.csv
+
 
 ---
 spring:
@@ -137,3 +184,12 @@ spring:
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888
+ehr-redis:
+  mq:
+    pubsub:
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: E:\临时文件\memory.csv

@@ -1,6 +1,7 @@
 package com.yihu.ehr.redis.cache.entity;
 
 import com.yihu.ehr.entity.BaseIdentityEntity;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,6 +23,9 @@ public class RedisCacheKeyRule extends BaseIdentityEntity {
     private String expression; // 规则表达式
     private String expireTime; // 过期时间，单位秒
     private String remark; // 备注
+
+    // 临时字段
+    private String categoryName; // 缓存分类名称
 
     @Column(name = "name", nullable = false)
     public String getName() {
@@ -77,4 +81,12 @@ public class RedisCacheKeyRule extends BaseIdentityEntity {
         this.remark = remark;
     }
 
+    @Formula("( SELECT c.name FROM redis_cache_category c WHERE c.code = category_code )")
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }

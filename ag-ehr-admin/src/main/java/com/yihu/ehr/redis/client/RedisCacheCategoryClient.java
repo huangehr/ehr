@@ -41,11 +41,19 @@ public interface RedisCacheCategoryClient {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size);
 
+    @ApiOperation(value = "根据条件获取缓存分类（不分页）")
+    @RequestMapping(value = ServiceApi.Redis.CacheCategory.SearchNoPage, method = RequestMethod.GET)
+    public Envelop searchNoPage(
+            @ApiParam(name = "filters", value = "筛选条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts);
+
     @ApiOperation("新增缓存分类")
     @RequestMapping(value = ServiceApi.Redis.CacheCategory.Save, method = RequestMethod.POST)
     public Envelop add(
-            @ApiParam(name = "entityJson", value = "缓存分类JSON", required = true)
-            @RequestParam(value = "entityJson") String entityJson);
+            @ApiParam(value = "缓存分类JSON", required = true)
+            @RequestBody String entityJson);
 
     @ApiOperation("更新缓存分类")
     @RequestMapping(value = ServiceApi.Redis.CacheCategory.Save, method = RequestMethod.PUT)

@@ -1,6 +1,8 @@
 package com.yihu.ehr.model.redis;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -21,6 +23,13 @@ public class MRedisCacheAuthorization implements Serializable{
     private String creator; // 创建者
     private Date modifyDate; // 修改时间
     private String modifier; // 修改者
+
+    public MRedisCacheAuthorization() {
+    }
+
+    public MRedisCacheAuthorization(String categoryCode) {
+        this.categoryCode = categoryCode;
+    }
 
     public Integer getId() {
         return id;
@@ -62,6 +71,7 @@ public class MRedisCacheAuthorization implements Serializable{
         this.remark = remark;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDate() {
         return createDate;
     }
@@ -78,6 +88,7 @@ public class MRedisCacheAuthorization implements Serializable{
         this.creator = creator;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getModifyDate() {
         return modifyDate;
     }

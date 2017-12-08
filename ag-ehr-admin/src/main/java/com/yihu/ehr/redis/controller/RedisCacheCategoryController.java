@@ -49,6 +49,16 @@ public class RedisCacheCategoryController extends BaseController {
         return redisCacheCategoryClient.search(fields, filters, sorts, page, size);
     }
 
+    @ApiOperation(value = "根据条件获取缓存分类（不分页）")
+    @RequestMapping(value = ServiceApi.Redis.CacheCategory.SearchNoPage, method = RequestMethod.GET)
+    public Envelop searchNoPage(
+            @ApiParam(name = "filters", value = "筛选条件")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序")
+            @RequestParam(value = "sorts", required = false) String sorts) {
+        return redisCacheCategoryClient.searchNoPage(filters, sorts);
+    }
+
     @ApiOperation("新增缓存分类")
     @RequestMapping(value = ServiceApi.Redis.CacheCategory.Save, method = RequestMethod.POST)
     public Envelop add(

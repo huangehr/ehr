@@ -940,6 +940,7 @@ public class ServiceApi {
             public static final String Prefix = "/redis/cache/category/";
             public static final String GetById = "/redis/cache/category/{id}";
             public static final String Search = "/redis/cache/category/search";
+            public static final String SearchNoPage = "/redis/cache/category/searchNoPage";
             public static final String Save = "/redis/cache/category/save";
             public static final String Delete = "/redis/cache/category/delete";
             public static final String IsUniqueName = "/redis/cache/category/isUniqueName";
@@ -969,6 +970,15 @@ public class ServiceApi {
             public static final String Get = "/redis/cache/operation/get";
             public static final String Set = "/redis/cache/operation/set";
             public static final String Remove = "/redis/cache/operation/remove";
+        }
+        // 缓存操作
+        public static class CacheStatistics {
+            public static final String GetCategoryKeys = "/redis/cache/statistics/getCategoryKeys";
+            public static final String GetCategoryMemory = "/redis/cache/statistics/getCategoryMemory";
+        }
+        // 接收订阅消息
+        public static class SubscribeMessage {
+            public static final String ReceiveResponseTime = "/redis/subscribeMessage/receiveResponseTime";
         }
 
     }

@@ -17,6 +17,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +40,8 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
     RedisMqSubscriberService redisMqSubscriberService;
     @Autowired
     RedisMqMessageLogService redisMqMessageLogService;
-    @Autowired
-    RedisTemplate redisTemplate;
+    @Resource
+    RedisTemplate<String, Object> redisTemplate;
     @Autowired
     ObjectMapper objectMapper;
 

@@ -9,15 +9,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,8 +35,8 @@ public class PubSubTest {
     JedisConnectionFactory jedisConnectionFactory;
     @Autowired
     RedisMessageListenerContainer redisMessageListenerContainer;
-    @Autowired
-    RedisTemplate redisTemplate;
+    @Resource
+    RedisTemplate<String, Object> redisTemplate;
     @Autowired
     ObjectMapper objectMapper;
 
@@ -56,24 +55,6 @@ public class PubSubTest {
         message.put("messageLogId", "2efec7cfd8f447f696c27198e9c9d223");
         message.put("messageContent", "a test message.");
         redisTemplate.convertAndSend(channel_01, objectMapper.writeValueAsString(message));
-    }
-
-    @Test
-    public void redisKeyValueTest() {
-        ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
-        valueOps.set("name", "James");
-        System.out.println("字符串类型Key为name的值: " + valueOps.get("name"));
-
-//        redisTemplate.delete("name");
-
-        ListOperations<String, Object> listOps = redisTemplate.opsForList();
-        listOps.leftPush("country", "China");
-        listOps.leftPush("country", "USA");
-        listOps.leftPush("country", "UK");
-        System.out.println("List类型Key为country的值： ");
-        for (int i = 0; i < listOps.size("country"); i++) {
-            System.out.println("  -" + listOps.leftPop("country"));
-        }
     }
 
 }
