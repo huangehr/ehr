@@ -25,8 +25,8 @@ public class CacheResponseTimeAspect {
 
     @Value("${ehr-redis.mq.pubsub.publisherAppId}")
     private String publisherAppId;
-    @Value("${ehr-redis.mq.pubsub.channel}")
-    private String channel;
+    @Value("${ehr-redis.mq.pubsub.responseTimeChannel}")
+    private String responseTimeChannel;
     @Autowired
     private RedisMqChannelService redisMqChannelService;
     @Autowired
@@ -54,7 +54,7 @@ public class CacheResponseTimeAspect {
             messageMap.put("responseTime", endTime - startTime);
             String message = objectMapper.writeValueAsString(messageMap);
 
-            redisMqChannelService.sendMessage(publisherAppId, channel, message);
+            redisMqChannelService.sendMessage(publisherAppId, responseTimeChannel, message);
         } catch (Exception e) {
             e.printStackTrace();
         }

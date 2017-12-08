@@ -67,12 +67,11 @@ fast-dfs:
 ehr-redis:
   mq:
     pubsub:
-      publisherAppId: zjj
-      channel: zjj.test.01
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
   cache:
     memory:
-      rdbToolPath: C:\Zjj_Programs\redis-rdb-tools-rdbtools-0.1.11\rdbtools\cli\rdb.py
-      rdbFilePath: C:\Zjj_Programs\Redis-x64-3.2.100\dump.rdb
+      rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: E:\临时文件\memory.csv
 
 
@@ -91,12 +90,11 @@ fast-dfs:
 ehr-redis:
   mq:
     pubsub:
-      publisherAppId: zjj
-      channel: zjj.test.01
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
   cache:
     memory:
-      rdbToolPath: C:\Zjj_Programs\redis-rdb-tools-rdbtools-0.1.11\rdbtools\cli\rdb.py
-      rdbFilePath: C:\Zjj_Programs\Redis-x64-3.2.100\dump.rdb
+      rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: E:\临时文件\memory.csv
 
 
@@ -115,12 +113,11 @@ fast-dfs:
 ehr-redis:
   mq:
     pubsub:
-      publisherAppId: zjj
-      channel: zjj.test.01
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
   cache:
     memory:
-      rdbToolPath: C:\Zjj_Programs\redis-rdb-tools-rdbtools-0.1.11\rdbtools\cli\rdb.py
-      rdbFilePath: C:\Zjj_Programs\Redis-x64-3.2.100\dump.rdb
+      rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: E:\临时文件\memory.csv
 
 
@@ -139,12 +136,11 @@ fast-dfs:
 ehr-redis:
   mq:
     pubsub:
-      publisherAppId: zjj
-      channel: zjj.test.01
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
   cache:
     memory:
-      rdbToolPath: C:\Zjj_Programs\redis-rdb-tools-rdbtools-0.1.11\rdbtools\cli\rdb.py
-      rdbFilePath: C:\Zjj_Programs\Redis-x64-3.2.100\dump.rdb
+      rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: E:\临时文件\memory.csv
 
 
@@ -166,12 +162,11 @@ fast-dfs:
 ehr-redis:
   mq:
     pubsub:
-      publisherAppId: zjj
-      channel: zjj.test.01
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
   cache:
     memory:
-      rdbToolPath: C:\Zjj_Programs\redis-rdb-tools-rdbtools-0.1.11\rdbtools\cli\rdb.py
-      rdbFilePath: C:\Zjj_Programs\Redis-x64-3.2.100\dump.rdb
+      rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: E:\临时文件\memory.csv
 
 
@@ -192,10 +187,9 @@ fast-dfs:
 ehr-redis:
   mq:
     pubsub:
-      publisherAppId: zjj
-      channel: zjj.test.01
+      publisherAppId: svr-redis
+      responseTimeChannel: redis.cache.reponse-time
   cache:
     memory:
-      rdbToolPath: C:\Zjj_Programs\redis-rdb-tools-rdbtools-0.1.11\rdbtools\cli\rdb.py
-      rdbFilePath: C:\Zjj_Programs\Redis-x64-3.2.100\dump.rdb
+      rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: E:\临时文件\memory.csv
