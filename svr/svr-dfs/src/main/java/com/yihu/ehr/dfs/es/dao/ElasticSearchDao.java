@@ -18,6 +18,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -35,8 +36,11 @@ import java.util.Map;
 @Repository
 public class ElasticSearchDao {
 
+    @Value("${elasticsearch.pool.init-size}")
+    private int initSize;
+    @Value("${elasticsearch.pool.max-size}")
+    private int maxSize;
     private List<TransportClient> clientPool;
-    //private static String TYPE = "info";
 
     @Autowired
     private ElasticSearchConfig elasticSearchConfig;
@@ -47,7 +51,7 @@ public class ElasticSearchDao {
             clientPool = new ArrayList<TransportClient>();
         }
         synchronized (ElasticSearchDao.class) {
-            while (clientPool.size() < 5) {
+            while (clientPool.size() < initSize) {
                 Settings settings = Settings.builder()
                         .put("cluster.name", elasticSearchConfig.getClusterName())
                         .put("client.transport.sniff", true)
@@ -86,7 +90,7 @@ public class ElasticSearchDao {
     }
 
     public synchronized void releaseClient(TransportClient transportClient) {
-        if(clientPool.size() > 10 ) {
+        if(clientPool.size() > maxSize) {
             if (null != transportClient) {
                 transportClient.close();
             }

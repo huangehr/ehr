@@ -110,8 +110,8 @@ public class DispatchService {
 
         if (fileInfo != null) {
             map = new HashMap<>();
-            map.put(FastDFSUtil.GroupField, fileInfo.getFilePath());//setFilePath
-            map.put(FastDFSUtil.RemoteFileField, fileInfo.getFileName());//setFileName
+            map.put(FastDFSUtil.GROUP_NAME, fileInfo.getFilePath());//setFilePath
+            map.put(FastDFSUtil.REMOTE_FILE_NAME, fileInfo.getFileName());//setFileName
             map.put("password", fileInfo.getFile_pwd());
 
         } else {
@@ -499,16 +499,16 @@ public class DispatchService {
         //将文件上传到服务器中
         ObjectNode msg = fastDFSUtil.upload(strZIPFilePath + strFileName, "");
 
-        resultMap.put(FastDFSUtil.GroupField, msg.get(FastDFSUtil.GroupField).asText());//setFilePath
-        resultMap.put(FastDFSUtil.RemoteFileField, msg.get(FastDFSUtil.RemoteFileField).asText());//setFileName
+        resultMap.put(FastDFSUtil.GROUP_NAME, msg.get(FastDFSUtil.GROUP_NAME).asText());//setFilePath
+        resultMap.put(FastDFSUtil.REMOTE_FILE_NAME, msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText());//setFileName
         resultMap.put("password", strPwd);
 
         if(!versionFileService.delete(sourceVersionId,"")) {
             return null;
         }
         VersionFileInfo fileInfo = new VersionFileInfo();
-        fileInfo.setFileName(msg.get(FastDFSUtil.RemoteFileField).asText());
-        fileInfo.setFilePath(msg.get(FastDFSUtil.GroupField).asText());
+        fileInfo.setFileName(msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText());
+        fileInfo.setFilePath(msg.get(FastDFSUtil.GROUP_NAME).asText());
         fileInfo.setFile_pwd(strPwd);
         fileInfo.setSourceVersionId(sourceVersionId);
         fileInfo.setTargetVersionId("");

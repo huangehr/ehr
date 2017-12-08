@@ -65,8 +65,8 @@ public class DispatchEndPoint extends ExtendEndPoint {
             if (schema == null)
                 return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 标准化数据生成失败");
 
-            String group = (String) schema.get(FastDFSUtil.GroupField);
-            String remoteFile = (String) schema.get(FastDFSUtil.RemoteFileField);
+            String group = (String) schema.get(FastDFSUtil.GROUP_NAME);
+            String remoteFile = (String) schema.get(FastDFSUtil.REMOTE_FILE_NAME);
 
             if (group == null || remoteFile == null)
                 return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 标准化数据生成失败");
