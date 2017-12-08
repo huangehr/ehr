@@ -1,7 +1,5 @@
 logging:
   level:
-    com:
-      netflix: INFO
     org:
       springframework:
         web: INFO
@@ -24,123 +22,79 @@ info:
     description: Ehr Platform Distributed File System Service.
     version: 1.0.0
 
-spring:
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    max-active: 20
-    max-idle: 8
-    min-idle: 8
-    validation-query: SELECT 1
-    test-on-borrow: true
-
 fast-dfs:
+  connect-timeout: 2
+  network-timeout: 30
+  charset: ISO8859-1
   pool:
     init-size: 5
     max-size: 20
     wait-time: 500
-  connect-timeout: 2
-  network-timeout: 30
-  charset: ISO8859-1
   http:
     tracker-http-port: 80
     anti-steal-token: no
     secret-key: FastDFS1234567890
+  server:
+    dict-code: FASTDFSWLDZ #外链地址系统字典拼音编码
+  index:
+    name: dfs #ES索引名称
+    type: info #ES索引类型
+
+elasticsearch:
+  pool:
+    init-size: 5
+    max-size: 10
 
 ---
 spring:
   profiles: dev
-  datasource:
-    url: jdbc:mysql://localhost:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: root
-    password: tiger
-  #data:
-    #elasticsearch:
-      #cluster-name: elasticsearch
-      #cluster-nodes: 172.17.110.17:9300
-      #local: false
-      #repositories:
-        #enable: true
-
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.17.110.17:9300
-
 fast-dfs:
   tracker-server: 172.19.103.13:22122
-  public-server: http://172.19.103.52:80
 
 ---
 spring:
   profiles: alpha
-  datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: ha
-    password: ha
-  data:
-      elasticsearch:
-        cluster-name: elasticsearch
-        cluster-nodes: 172.17.110.17:9300
-        local: false
-        repositories:
-          enable: true
-
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
 
 ---
 spring:
   profiles: test
-  datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
-    username: weifuwu
-    password: weifuwu
-  data:
-      elasticsearch:
-        cluster-name: elasticsearch
-        cluster-nodes: 172.17.110.17:9300
-        local: false
-        repositories:
-          enable: true
-
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 172.19.103.13:22122
-  public-server: http://172.19.103.52:80
 
 ---
 spring:
   profiles: prod
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
-    username: ha
-    password: jkzlxm
-  data:
-      elasticsearch:
-        cluster-name: elasticsearch
-        cluster-nodes: 172.17.110.17:9300
-        local: false
-        repositories:
-          enable: true
-
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 11.1.2.9:22122
-  public-server: http://ds.ehr.yihu.com:22122
+
+---
+spring:
+  profiles: prod_fz
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
+fast-dfs:
+  tracker-server: 11.1.2.9:22122
 
 ---
 spring:
   profiles: prod_sr
-  datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
-    username: ha
-    password: jkzlxm
-  data:
-      elasticsearch:
-        cluster-name: elasticsearch
-        cluster-nodes: 172.17.110.17:9300
-        local: false
-        repositories:
-          enable: true
-
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 11.1.2.9:22122
-  public-server: http://ds.ehr.yihu.com:22122

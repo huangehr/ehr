@@ -356,7 +356,7 @@ public class RedisInitService {
      * @return
      */
     public boolean cacheMetadata() {
-        String sql = "SELECT id, dict_code FROM rs_metadata WHERE dict_code != NULL and dict_code != ''";
+        String sql = "SELECT id, dict_code FROM rs_metadata WHERE dict_code != NULL OR dict_code != ''";
         //String sql1 = "SELECT a FROM RsMetadata a WHERE a.dictCode <> NULL AND a.dictCode <> ''";
         List<Map<String, Object>> metaList = jdbc.queryForList(sql);
         //清空相关Redis

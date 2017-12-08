@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value= ApiVersion.Version1_0)
-@Api(value = "ResourceDefaultParams", description = "资源默认参数")
+@Api(value = "RsResourceDefaultParamsEndPoint", description = "资源默认参数", tags = {"资源服务-资源默认参数"})
 public class RsResourceDefaultParamsEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

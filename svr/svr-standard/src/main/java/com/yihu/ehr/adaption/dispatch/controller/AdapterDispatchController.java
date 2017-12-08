@@ -63,8 +63,8 @@ public class AdapterDispatchController {
             if ((mapResult = adapterInfoSendService.getStandardAndMappingInfo(versionCode, orgcode)) == null)
                 return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 标准化数据下载失败!");
 
-            String group = (String) mapResult.get(FastDFSUtil.GroupField);
-            String remoteFile = (String) mapResult.get(FastDFSUtil.RemoteFileField);
+            String group = (String) mapResult.get(FastDFSUtil.GROUP_NAME);
+            String remoteFile = (String) mapResult.get(FastDFSUtil.REMOTE_FILE_NAME);
 
             if (StringUtils.isEmpty(group) || StringUtils.isEmpty(remoteFile))
                 return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 标准化数据生成失败");
@@ -112,8 +112,8 @@ public class AdapterDispatchController {
             if ((mapResult=adapterInfoSendService.getAdapterFileInfo(versionCode, orgcode)) == null)
                 return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 机构标准数据包生成失败");
 
-            String group = (String) mapResult.get(FastDFSUtil.GroupField);
-            String remoteFile = (String) mapResult.get(FastDFSUtil.RemoteFileField);
+            String group = (String) mapResult.get(FastDFSUtil.GROUP_NAME);
+            String remoteFile = (String) mapResult.get(FastDFSUtil.REMOTE_FILE_NAME);
 
             if (group == null || remoteFile == null)
                 return new RestEcho().failed(ErrorCode.GenerateArchiveFailed, " 机构标准数据包生成失败");
@@ -185,8 +185,8 @@ public class AdapterDispatchController {
         } catch (Exception e) {
             throw new Exception("获取远程文件路径出错！", e);
         }
-        String group = (String) mapResult.get(FastDFSUtil.GroupField);
-        String remoteFile = (String) mapResult.get(FastDFSUtil.RemoteFileField);
+        String group = (String) mapResult.get(FastDFSUtil.GROUP_NAME);
+        String remoteFile = (String) mapResult.get(FastDFSUtil.REMOTE_FILE_NAME);
 
         if (StringUtils.isEmpty(group) || StringUtils.isEmpty(remoteFile))
             return null;

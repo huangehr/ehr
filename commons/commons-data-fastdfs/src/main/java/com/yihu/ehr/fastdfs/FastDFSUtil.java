@@ -3,12 +3,19 @@ package com.yihu.ehr.fastdfs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.util.log.LogService;
+import org.csource.common.MyException;
 import org.csource.common.NameValuePair;
 import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * FastDFS 客户端工具.
@@ -19,13 +26,16 @@ import java.net.InetSocketAddress;
  * @author Sand
  */
 public class FastDFSUtil {
-    public final static String GroupField = "groupName";
-    public final static String RemoteFileField = "remoteFileName";
-    public final static String FileIdField = "fid";
-    public final static String FileUrlField = "fileUrl";
+
+    public final static String GROUP_NAME = "groupName";
+    public final static String REMOTE_FILE_NAME = "remoteFileName";
+    public final static String FILE_ID = "fileId";
+    public final static String FILE_URL = "fileUrl";
+    public final static String FILE_SIZE = "fileSize";
     
     @Autowired
-    FastDFSClientPool clientPool;
+    private FastDFSClientPool clientPool;
+
     /**
      * 以输入流的方式上传文件
      * InputStream in = new FileInputStream("C://Desert.jpg");
@@ -51,16 +61,16 @@ public class FastDFSUtil {
      * http://host/healthArchiveGroup/M00/00/00/rBFuH1XdIseAUTZZAA1rIuRd3Es062.jpg?attname=a.jpg
      * @throws Exception
      */
-    public ObjectNode upload(InputStream in, String fileExtension,String description) throws Exception {
+    public ObjectNode upload(InputStream in, String fileExtension, String description) throws IOException, MyException, NoSuchAlgorithmException{
         NameValuePair[] fileMetaData = new NameValuePair[1];
         fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
-        return upload(in,fileExtension,fileMetaData);
+        return upload(in, fileExtension, fileMetaData);
     }
 
     /**
      * 以输入流的方式上传文件
      */
-    public ObjectNode upload(InputStream in, String fileExtension,NameValuePair[] fileMetaData) throws Exception {
+    public ObjectNode upload(InputStream in, String fileExtension, NameValuePair[] fileMetaData) throws IOException, MyException, NoSuchAlgorithmException{
         StorageClient client = clientPool.getStorageClient();
         ObjectNode message = new ObjectMapper().createObjectNode();
         try {
@@ -72,9 +82,8 @@ public class FastDFSUtil {
                 len++;
             }
             in.close();
-
+            message.put(FILE_SIZE, fileBuffer.length);
             TrackerServer trackerServer = clientPool.getTrackerServer();
-
             String[] results = client.upload_file(fileBuffer, fileExtension, fileMetaData);
             if (results != null) {
                 String fileId;
@@ -82,31 +91,25 @@ public class FastDFSUtil {
                 String token;
                 String fileURl;
                 InetSocketAddress socketAddress;
-
                 String groupName = results[0];
                 String remoteFile = results[1];
-                message.put(GroupField, groupName);
-                message.put(RemoteFileField, remoteFile);
-
+                message.put(GROUP_NAME, groupName);
+                message.put(REMOTE_FILE_NAME, remoteFile);
                 fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
-                message.put(FileIdField, fileId);
-
+                message.put(FILE_ID, fileId);
                 socketAddress = trackerServer.getInetSocketAddress();
                 fileURl = "http://" + socketAddress.getAddress().getHostAddress();
                 if (ClientGlobal.g_tracker_http_port != 80) {
                     fileURl += ":" + ClientGlobal.g_tracker_http_port;
                 }
-
                 fileURl += "/" + fileId;
                 if (ClientGlobal.g_anti_steal_token) {
                     ts = (int) (System.currentTimeMillis() / 1000);
                     token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
                     fileURl += "?token=" + token + "&ts=" + ts;
                 }
-
-                message.put(FileUrlField, fileURl);
+                message.put(FILE_URL, fileURl);
                 LogService.getLogger(FastDFSUtil.class).info(client.get_file_info(groupName, remoteFile).toString());
-
             }
         } finally {
             clientPool.releaseStorageClient(client);
@@ -114,47 +117,40 @@ public class FastDFSUtil {
         return message;
     }
 
-
-
     /**
      * 上传文件，从文件
      */
-    public ObjectNode upload(String group_name, String master_filename, String prefix_name, byte[] file_buff, String file_ext_name,NameValuePair[] meta_list) throws Exception{
+    public ObjectNode upload(String group_name, String master_filename, String prefix_name, byte[] file_buff, String file_ext_name, NameValuePair[] meta_list) throws IOException, MyException, NoSuchAlgorithmException{
         StorageClient client = clientPool.getStorageClient();
         ObjectNode message = new ObjectMapper().createObjectNode();
         try {
             TrackerServer trackerServer = clientPool.getTrackerServer();
-
-            String[] results = client.upload_file(group_name,master_filename,prefix_name,file_buff, file_ext_name, meta_list);
+            String[] results = client.upload_file(group_name, master_filename, prefix_name, file_buff, file_ext_name, meta_list);
+            message.put(FILE_SIZE, file_buff.length);
             if (results != null) {
                 String fileId;
                 int ts;
                 String token;
                 String fileURl;
                 InetSocketAddress socketAddress;
-
                 String groupName = results[0];
                 String remoteFile = results[1];
-                message.put(GroupField, groupName);
-                message.put(RemoteFileField, remoteFile);
-
+                message.put(GROUP_NAME, groupName);
+                message.put(REMOTE_FILE_NAME, remoteFile);
                 fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFile;
-                message.put(FileIdField, fileId);
-
+                message.put(FILE_ID, fileId);
                 socketAddress = trackerServer.getInetSocketAddress();
                 fileURl = "http://" + socketAddress.getAddress().getHostAddress();
                 if (ClientGlobal.g_tracker_http_port != 80) {
                     fileURl += ":" + ClientGlobal.g_tracker_http_port;
                 }
-
                 fileURl += "/" + fileId;
                 if (ClientGlobal.g_anti_steal_token) {
                     ts = (int) (System.currentTimeMillis() / 1000);
                     token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
                     fileURl += "?token=" + token + "&ts=" + ts;
                 }
-
-                message.put(FileUrlField, fileURl);
+                message.put(FILE_URL, fileURl);
                 System.out.print(client.get_file_info(groupName, remoteFile).toString());
             }
         } finally {
@@ -186,14 +182,13 @@ public class FastDFSUtil {
      * http://host/healthArchiveGroup/M00/00/00/rBFuH1XdIseAUTZZAA1rIuRd3Es062.jpg?attname=a.jpg
      * @throws Exception
      */
-    public ObjectNode upload(String fileName, String description) throws Exception {
+    public ObjectNode upload(String fileName, String description) throws IOException, MyException, NoSuchAlgorithmException {
         StorageClient client = clientPool.getStorageClient();
         try {
             NameValuePair[] fileMetaData;
             fileMetaData = new NameValuePair[1];
             fileMetaData[0] = new NameValuePair("description", description == null ? "" : description);
-
-//            ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
+            // ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
             ObjectNode message = new ObjectMapper().createObjectNode();
             String fileExtension = "";
             if (fileName.contains(".")) {
@@ -201,7 +196,6 @@ public class FastDFSUtil {
             } else {
                 throw new RuntimeException("上传失败, 文件缺失扩展名.");
             }
-
             TrackerServer trackerServer = clientPool.getTrackerServer();
             String[] results = client.upload_file(fileName, fileExtension, fileMetaData);
             if (results != null) {
@@ -210,15 +204,12 @@ public class FastDFSUtil {
                 String token;
                 String fileUrl;
                 InetSocketAddress inetSockAddr;
-
                 String groupName = results[0];
                 String remoteFileName = results[1];
-                message.put(GroupField, groupName);
-                message.put(RemoteFileField, remoteFileName);
-
+                message.put(GROUP_NAME, groupName);
+                message.put(REMOTE_FILE_NAME, remoteFileName);
                 fileId = groupName + StorageClient1.SPLIT_GROUP_NAME_AND_FILENAME_SEPERATOR + remoteFileName;
-                message.put(FileIdField, fileId);
-
+                message.put(FILE_ID, fileId);
                 inetSockAddr = trackerServer.getInetSocketAddress();
                 fileUrl = "http://" + inetSockAddr.getAddress().getHostAddress();
                 if (ClientGlobal.g_tracker_http_port != 80) {
@@ -230,15 +221,47 @@ public class FastDFSUtil {
                     token = ProtoCommon.getToken(fileId, ts, ClientGlobal.g_secret_key);
                     fileUrl += "?token=" + token + "&ts=" + ts;
                 }
-
-                message.put(FileUrlField, fileUrl);
+                message.put(FILE_URL, fileUrl);
                 LogService.getLogger(FastDFSUtil.class).info(client.get_file_info(groupName, remoteFileName).toString());
-
                 return message;
             } else {
                 return null;
             }
         } finally {
+            clientPool.releaseStorageClient(client);
+        }
+    }
+
+    /**
+    public int modify(String groupName, String appendFileName, long offset, byte [] fileBuff) throws IOException , MyException{
+        StorageClient client = clientPool.getStorageClient();
+        int size = client.modify_file(groupName, appendFileName, offset, fileBuff);
+        return size;
+    }
+    */
+    public int modify(String groupName, String remoteFilename, NameValuePair[] metaList, byte opFlag) throws IOException , MyException{
+        StorageClient client = clientPool.getStorageClient();
+        try {
+            return client.set_metadata(groupName, remoteFilename, metaList, opFlag);
+        }finally {
+            clientPool.releaseStorageClient(client);
+        }
+    }
+
+    public FileInfo getFileInfo(String groupName, String remoteFileName) throws IOException, MyException{
+        StorageClient client = clientPool.getStorageClient();
+        try {
+            return client.get_file_info(groupName, remoteFileName);
+        }finally {
+            clientPool.releaseStorageClient(client);
+        }
+    }
+
+    public NameValuePair[] getMetadata(String groupName, String remoteFileName) throws IOException, MyException{
+        StorageClient client = clientPool.getStorageClient();
+        try {
+            return client.get_metadata(groupName, remoteFileName);
+        }finally {
             clientPool.releaseStorageClient(client);
         }
     }
@@ -251,11 +274,10 @@ public class FastDFSUtil {
      * @return 文件的字节码
      * @throws Exception
      */
-    public byte[] download(String groupName, String remoteFileName) throws Exception {
+    public byte[] download(String groupName, String remoteFileName) throws IOException, MyException {
         StorageClient client = clientPool.getStorageClient();
         try {
             byte[] b = client.download_file(groupName, remoteFileName);
-
             return b;
         } finally {
             clientPool.releaseStorageClient(client);
@@ -270,12 +292,11 @@ public class FastDFSUtil {
      * @param localPath      本地路径
      * @return 是否下载成功
      */
-    public String download(String groupName, String remoteFileName, String localPath) throws Exception {
+    public String download(String groupName, String remoteFileName, String localPath) throws IOException, MyException {
         StorageClient client = clientPool.getStorageClient();
         try {
             String localFileName = localPath + remoteFileName.replaceAll("/", "_");
             client.download_file(groupName, remoteFileName, 0, 0, localFileName);
-
             return localFileName;
         } finally {
             clientPool.releaseStorageClient(client);
@@ -288,7 +309,7 @@ public class FastDFSUtil {
      * @param groupName
      * @param remoteFileName
      */
-    public void delete(String groupName, String remoteFileName) throws Exception {
+    public void delete(String groupName, String remoteFileName) throws IOException, MyException {
         StorageClient client = clientPool.getStorageClient();
         try {
             client.delete_file(groupName, remoteFileName);
@@ -296,4 +317,53 @@ public class FastDFSUtil {
             clientPool.releaseStorageClient(client);
         }
     }
+
+    /**
+     * 获取服务器信息
+     * @return
+     * @throws IOException
+     */
+    public List<Map<String, Object>> status() throws IOException {
+        TrackerGroup trackerGroup = ClientGlobal.getG_tracker_group();
+        int totalServer = trackerGroup.tracker_servers.length;
+        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>(totalServer + 1);
+        long totalMb  = 0;
+        long freeMb = 0;
+        TrackerClient trackerClient = new TrackerClient();
+        for (int i = 0; i < trackerGroup.tracker_servers.length; i++) {
+            TrackerServer trackerServer = null;
+            try {
+                trackerServer = trackerGroup.getConnection(i);
+                StructGroupStat[] structGroupStats = trackerClient.listGroups(trackerServer);
+                Map<String, Object> resultMap = new HashMap<String, Object>();
+                long singleTotalMb = 0;
+                long singleFreeMb = 0;
+                resultMap.put("server", trackerServer.getInetSocketAddress());
+                for (StructGroupStat structGroupStat : structGroupStats) {
+                    long singleTotalMb1 = structGroupStat.getTotalMB();
+                    singleTotalMb += singleTotalMb1;
+                    long singleFreeMb1 = structGroupStat.getFreeMB();
+                    singleFreeMb += singleFreeMb1;
+                }
+                trackerServer.close();
+                resultMap.put("total", singleTotalMb / 1024);
+                resultMap.put("free", singleFreeMb / 1024);
+                resultList.add(resultMap);
+                totalMb += singleTotalMb;
+                freeMb += singleFreeMb;
+            }finally {
+                if(null != trackerServer) {
+                    trackerServer.close();
+                }
+            }
+        }
+        trackerClient = null;
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        resultMap.put("server", "all");
+        resultMap.put("total", totalMb/1024);
+        resultMap.put("free", freeMb/1024);
+        resultList.add(resultMap);
+        return resultList;
+    }
+
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,7 +39,7 @@ public interface TjQuotaLogClient {
     @ApiOperation(value = "获取最近日志列表")
     MTjQuotaLog getRecentRecord(
             @RequestParam(value = "quotaCode", required = false) String quotaCode,
-            @RequestParam(value = "endTime", required = false) Date endTime
+            @RequestParam(value = "endTime", required = false) String endTime
     );
 
 

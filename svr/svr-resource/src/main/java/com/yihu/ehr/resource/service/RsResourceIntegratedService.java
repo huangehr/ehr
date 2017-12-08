@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.entity.report.QuotaCategory;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.resource.dao.ResourceBrowseMetadataDao;
 import com.yihu.ehr.resource.dao.RsResourceDao;
 import com.yihu.ehr.resource.model.*;
-import com.yihu.ehr.resource.service.query.ResourcesMetadataQueryDao;
-import com.yihu.ehr.resource.service.query.ResourcesQueryService;
 import com.yihu.ehr.util.rest.Envelop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,9 +33,9 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private ResourcesMetadataQueryDao resourceMetadataQueryDao;
+    private ResourceBrowseMetadataDao resourceBrowseMetadataDao;
     @Autowired
-    private ResourcesQueryService resourcesQueryService;
+    private ResourceBrowseService resourceBrowseService;
     @Autowired
     private RsRolesResourceGrantService rsRolesResourceGrantService;
     @Autowired
@@ -109,12 +107,12 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
                     builder.append("',");
                 }
                 String rsMetadataIds = builder.toString();
-                metadataList = resourceMetadataQueryDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
+                metadataList = resourceBrowseMetadataDao.getAuthResourceMetadata(rsMetadataIds.substring(0, rsMetadataIds.length() - 1));
             }else {
                 metadataList = null;
             }
         } else{
-            metadataList = resourceMetadataQueryDao.getAllResourceMetadata(rsResource.getCode());
+            metadataList = resourceBrowseMetadataDao.getAllResourceMetadata(rsResource.getCode());
         }
         if(metadataList != null && metadataList.size() > 0) {
             String metadataIds = "";
@@ -135,7 +133,7 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
      * @return
      */
     public List<QuotaCategory> findQuotaCategoryList(int parentId, String filters) {
-        String sql = "";
+        String sql;
         if(parentId != 0 && filters != null) {
             sql = "select * from tj_quota_category where parent_id = " + parentId + " AND name like " + "'%" + filters + "%'";
         }else {
@@ -344,7 +342,7 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
                 }
             }
         }
-        return resourcesQueryService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
+        return resourceBrowseService.getCustomizeData(resourcesCode, metaData, orgCode, areaCode, queryCondition, page, size);
     }
 
     /**

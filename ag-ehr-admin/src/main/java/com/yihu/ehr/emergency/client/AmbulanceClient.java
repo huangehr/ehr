@@ -65,7 +65,7 @@ public interface AmbulanceClient{
     @RequestMapping(value = ServiceApi.Emergency.Ambulance, method = RequestMethod.GET)
     @ApiOperation("获取单条记录")
     Envelop findById(
-            @PathVariable(value = "id") String id);
+            @RequestParam(value = "id") String id);
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence,method = RequestMethod.POST)
     @ApiOperation("获取已存在车牌号、电话号码")

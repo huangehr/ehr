@@ -25,8 +25,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "HbaseTest", description = "habse测试接口")
-public class HbaseTestEndPoint extends EnvelopRestEndPoint {
+@Api(value = "HbaseDataEndPoint", description = "Hbase数据", tags = {"资源服务-Hbase数据"})
+public class HbaseDataEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private HBaseAdmin hbaseAdmin;

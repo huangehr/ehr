@@ -194,6 +194,6 @@ public class FilePackageResolver extends PackageResolver {
     protected String saveFile(String fileName) throws Exception {
         ObjectNode objectNode = fastDFSUtil.upload(fileName, "File from unstructured profile package.");
 
-        return objectNode.get(FastDFSUtil.GroupField).asText() + "/" + objectNode.get(FastDFSUtil.RemoteFileField).asText();
+        return objectNode.get(FastDFSUtil.GROUP_NAME).asText() + "/" + objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).asText();
     }
 }

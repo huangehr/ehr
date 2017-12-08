@@ -32,7 +32,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsResourceIntegrated", description = "资源综合查询数据服务接口")
+@Api(value = "RsResourceIntegratedEndPoint", description = "资源综合查询", tags = {"资源服务-资源综合查询"})
 public class RsResourceIntegratedEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

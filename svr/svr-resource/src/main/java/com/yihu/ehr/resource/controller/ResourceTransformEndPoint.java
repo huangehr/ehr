@@ -20,8 +20,8 @@ import java.util.*;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 )
-@Api(value = "Transform", description = "转换格式接口")
-public class ResourcesTransformEndPoint {
+@Api(value = "ResourceTransformEndPoint", description = "格式转换", tags = {"资源服务-格式转换"})
+public class ResourceTransformEndPoint {
 
     @Autowired
     private ResourcesTransformService resourcesTransformService;

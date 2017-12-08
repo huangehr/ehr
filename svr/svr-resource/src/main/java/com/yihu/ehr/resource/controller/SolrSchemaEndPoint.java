@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "SolrSchema", description = "资源数据元与SolrSchema同步服务")
+@Api(value = "SolrSchemaEndPoint", description = "资源数据元与SolrSchema同步", tags = {"资源服务-资源数据元与SolrSchema同步"})
 public class SolrSchemaEndPoint {
 
     @Autowired

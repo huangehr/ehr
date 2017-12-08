@@ -28,7 +28,7 @@ import java.util.List;
  * Created by lyr on 2016/4/25.
  */
 @RestController
-@Api(value="RsDimensionCategory",description = "维度分类")
+@Api(value="RsDimensionCategoryEndPoint", description = "维度分类", tags = {"资源服务-维度分类"})
 @RequestMapping(value= ApiVersion.Version1_0)
 public class RsDimensionCategoryEndPoint extends EnvelopRestEndPoint {
 

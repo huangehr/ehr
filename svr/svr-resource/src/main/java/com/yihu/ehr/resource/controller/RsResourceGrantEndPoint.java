@@ -32,7 +32,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RsResourceGrant", description = "资源授权服务接口")
+@Api(value = "RsResourceGrantEndPoint", description = "资源授权", tags = {"资源服务-资源授权"})
 public class RsResourceGrantEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

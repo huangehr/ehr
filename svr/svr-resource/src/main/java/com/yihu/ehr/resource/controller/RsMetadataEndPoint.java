@@ -30,7 +30,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value= ApiVersion.Version1_0)
-@Api(value = "RsMetadata", description = "数据元服务接口")
+@Api(value = "RsMetadataEndPoint", description = "数据元", tags = {"资源服务-数据元"})
 public class RsMetadataEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

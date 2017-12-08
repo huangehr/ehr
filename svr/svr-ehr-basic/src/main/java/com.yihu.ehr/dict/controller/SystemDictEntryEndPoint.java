@@ -3,10 +3,14 @@ package com.yihu.ehr.dict.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.dict.service.*;
+import com.yihu.ehr.entity.dict.DictEntryKey;
+import com.yihu.ehr.entity.dict.SystemDict;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,11 +33,11 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "DictionaryEntry", description = "系统全局字典项管理", tags = {"系统字典-系统全局字典项管理"})
 public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
-    @Autowired
-    SystemDictService dictService;
 
     @Autowired
-    SystemDictEntryService systemDictEntryService;
+    private SystemDictService dictService;
+    @Autowired
+    private SystemDictEntryService systemDictEntryService;
 
     @ApiOperation(value = "获取字典项列表")
     @RequestMapping(value = "/dictionaries/entries", method = RequestMethod.GET)
@@ -50,15 +54,6 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) Integer page,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-//        page = reducePage(page);
-
-//        Page<SystemDictEntry> p = null;
-//        if (StringUtils.isEmpty(value)) {
-//            p = systemDictEntryService.findByDictIdAndValueLike(dictId, "%" + value + "%", page, size);
-//        } else {
-//            p = systemDictEntryService.findByDictId(dictId, page, size);
-//        }
-
         List<SystemDictEntry> systemDictEntryList = systemDictEntryService.search(fields,filters,sorts,page,size);
         pagedResponse(request, response,systemDictEntryService.getCount(filters), page, size);
         return (List<MDictionaryEntry>)convertToModels(systemDictEntryList,new ArrayList<MDictionaryEntry>(systemDictEntryList.size()),MDictionaryEntry.class,null);
@@ -82,9 +77,9 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取字典项")
     @RequestMapping(value = "/dictionaries/{dict_id}/entries/{code}", method = RequestMethod.GET)
     public MDictionaryEntry getDictEntry(
-            @ApiParam(name = "dict_id", value = "字典ID", defaultValue = "")
+            @ApiParam(name = "dict_id", value = "字典ID", required = true)
             @PathVariable(value = "dict_id") long dictId,
-            @ApiParam(name = "code", value = "字典项代码", defaultValue = "")
+            @ApiParam(name = "code", value = "字典项代码", required = true)
             @PathVariable(value = "code") String code) {
         SystemDictEntry systemDictEntry = systemDictEntryService.getDictEntry(dictId, code);
 
@@ -133,8 +128,7 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "根据dictId获取所有字典项")
     public ListResult GetSystemDictEntryListByDictId(
             @ApiParam(name = "dict_id", value = "dict_id", defaultValue = "")
-            @PathVariable(value = "dict_id") long dictId
-    ) throws Exception{
+            @PathVariable(value = "dict_id") long dictId) throws Exception{
         int page=0;
         int size=1000;
         ListResult re = new ListResult(page,size);
@@ -145,4 +139,22 @@ public class SystemDictEntryEndPoint extends EnvelopRestEndPoint {
         }
         return re;
     }
+
+    @RequestMapping(value ="/dictionary/entryList/{dictId}", method = RequestMethod.GET)
+    @ApiOperation(value = "根据dictId获取所有字典项")
+    public Envelop listByDictId(
+            @ApiParam(name = "dictId", value = "dictId", required =  true)
+            @PathVariable(value = "dictId") long dictId) {
+        Envelop envelop = new Envelop();
+        int page = 0;
+        int size = 1000;
+        //ListResult re = new ListResult(page, size);
+        Page<SystemDictEntry> page1 = systemDictEntryService.findByDictId(dictId, page,size);
+        if(page1 != null) {
+            envelop.setDetailModelList(page1.getContent());
+            envelop.setSuccessFlg(true);
+        }
+        return envelop;
+    }
+
 }

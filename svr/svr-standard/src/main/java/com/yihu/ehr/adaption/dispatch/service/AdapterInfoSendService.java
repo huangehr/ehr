@@ -606,8 +606,8 @@ public class AdapterInfoSendService {
             //将文件上传到服务器中
             ObjectNode msg = fastDFSUtil.upload(strZIPFilePath + strFileName, "");
 
-            resultMap.put(FastDFSUtil.GroupField, msg.get(FastDFSUtil.GroupField).asText());//setFilePath
-            resultMap.put(FastDFSUtil.RemoteFileField, msg.get(FastDFSUtil.RemoteFileField).asText());//setFileName
+            resultMap.put(FastDFSUtil.GROUP_NAME, msg.get(FastDFSUtil.GROUP_NAME).asText());//setFilePath
+            resultMap.put(FastDFSUtil.REMOTE_FILE_NAME, msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText());//setFileName
             resultMap.put("password", strPwd);
             resultMap.put("ErrorMsg", "");
             resultMap.put("IsSuccess", "true");
@@ -627,8 +627,8 @@ public class AdapterInfoSendService {
         Map<String, Object> resultMap = new HashMap<>();
         MDispatchLog dispatchLog = dispatchLogClient.getLog(versionCode, strOrgCode);
         if(dispatchLog!=null) {
-            resultMap.put(FastDFSUtil.GroupField,dispatchLog.getFileGroup());//setFilePath
-            resultMap.put(FastDFSUtil.RemoteFileField, dispatchLog.getFilePath());//setFileName
+            resultMap.put(FastDFSUtil.GROUP_NAME,dispatchLog.getFileGroup());//setFilePath
+            resultMap.put(FastDFSUtil.REMOTE_FILE_NAME, dispatchLog.getFilePath());//setFileName
             resultMap.put("password", dispatchLog.getPassword());
             resultMap.put("ErrorMsg", "");
             resultMap.put("IsSuccess", "true");
@@ -678,8 +678,8 @@ public class AdapterInfoSendService {
             return standardMap;
         }
 
-        String group = (String) standardMap.get(FastDFSUtil.GroupField);
-        String remoteFile = (String) standardMap.get(FastDFSUtil.RemoteFileField);
+        String group = (String) standardMap.get(FastDFSUtil.GROUP_NAME);
+        String remoteFile = (String) standardMap.get(FastDFSUtil.REMOTE_FILE_NAME);
         String password = (String) standardMap.get("password");
 
         String strLocalFileName = fastDFSUtil.download(group, remoteFile, strFilePath + splitMark + "standardadapter" + splitMark + "xml" + splitMark);
@@ -708,8 +708,8 @@ public class AdapterInfoSendService {
         //将文件上传到服务器中
         ObjectNode msg = fastDFSUtil.upload(strZIPFilePath + strFileName, "");
 
-        resultMap.put(FastDFSUtil.GroupField, msg.get(FastDFSUtil.GroupField).asText());//setFilePath
-        resultMap.put(FastDFSUtil.RemoteFileField, msg.get(FastDFSUtil.RemoteFileField).asText());//setFileName
+        resultMap.put(FastDFSUtil.GROUP_NAME, msg.get(FastDFSUtil.GROUP_NAME).asText());//setFilePath
+        resultMap.put(FastDFSUtil.REMOTE_FILE_NAME, msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText());//setFileName
         resultMap.put("password", strPwd);
         resultMap.put("ErrorMsg", "");
         resultMap.put("IsSuccess", "true");
@@ -720,8 +720,8 @@ public class AdapterInfoSendService {
         logInfo.setOrgId(strOrgCode);
         logInfo.setStdVersionId(versionCode);
         logInfo.setDispatchTime(new Date());
-        logInfo.setFileGroup(msg.get(FastDFSUtil.GroupField).asText());
-        logInfo.setFilePath(msg.get(FastDFSUtil.RemoteFileField).asText());
+        logInfo.setFileGroup(msg.get(FastDFSUtil.GROUP_NAME).asText());
+        logInfo.setFilePath(msg.get(FastDFSUtil.REMOTE_FILE_NAME).asText());
         logInfo.setPassword(strPwd);
         ObjectMapper objectMapper = new ObjectMapper();
         String model = objectMapper.writeValueAsString(logInfo);

@@ -1,5 +1,7 @@
-package com.yihu.ehr.dict.service;
+package com.yihu.ehr.dict.dao;
 
+import com.yihu.ehr.entity.dict.DictEntryKey;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +18,8 @@ import java.util.List;
  * @version 1.0
  * @created 2017.01.30 14:43
  */
-public interface XSystemDictEntryRepository extends JpaRepository<SystemDictEntry, DictEntryKey> {
+public interface SystemDictEntryRepository extends JpaRepository<SystemDictEntry, DictEntryKey> {
+
     List<SystemDictEntry> findByDictId(long dictId);
 
     Page<SystemDictEntry> findByDictId(long dictId, Pageable pageable);

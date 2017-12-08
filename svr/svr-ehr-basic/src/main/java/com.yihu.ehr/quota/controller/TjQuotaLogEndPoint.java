@@ -12,9 +12,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -89,7 +91,7 @@ public class TjQuotaLogEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "quotaCode", value = "指标code", defaultValue = "")
             @RequestParam(value = "quotaCode", required = false) String quotaCode,
             @ApiParam(name = "endTime", value = "完成时间", defaultValue = "")
-            @RequestParam(value = "endTime", required = false) Date endTime
+            @RequestParam(value = "endTime", required = false) String endTime
     ){
         MTjQuotaLog mTjQuotaLog = null;
         List<TjQuotaLog> tjQuotaLogs =  tjQuotaLogService.getRecentRecord(quotaCode,endTime);

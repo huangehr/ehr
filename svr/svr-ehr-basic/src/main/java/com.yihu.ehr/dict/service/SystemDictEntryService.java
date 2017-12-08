@@ -1,5 +1,8 @@
 package com.yihu.ehr.dict.service;
 
+import com.yihu.ehr.dict.dao.SystemDictEntryRepository;
+import com.yihu.ehr.entity.dict.DictEntryKey;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,10 +21,11 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSystemDictEntryRepository> {
+public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, SystemDictEntryRepository> {
 
     @Autowired
-    private XSystemDictEntryRepository systemDictEntryRepository;
+    private SystemDictEntryRepository systemDictEntryRepository;
+
     /**
      * 下一字典项排序号。
      *
@@ -29,8 +33,7 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
      * @return
      */
     public int getNextSN(long dictId) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
-
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
         Integer nextSort = repo.getNextEntrySN(dictId);
         return null == nextSort ? 1 : nextSort + 1;
     }
@@ -44,7 +47,7 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
      * @return
      */
     public Page<SystemDictEntry> getDictEntries(long dictId, int page, int size) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
 
         return repo.findByDictId(dictId, page == -1 ? null : new PageRequest(page, size));
     }
@@ -57,7 +60,7 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
      * @return
      */
     public List<SystemDictEntry> getDictEntries(long dictId, String[] codes) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
 
         if (codes == null) {
             return repo.findByDictId(dictId);
@@ -74,7 +77,7 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
      * @return
      */
     public SystemDictEntry getDictEntry(long dictId, String code) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
 
         return repo.findOne(new DictEntryKey(code, dictId));
     }
@@ -97,7 +100,7 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
      * @return
      */
     public Page<SystemDictEntry> findByDictIdAndValueLike(long dictId, String value, int page, int size) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
 
         return repo.findByDictIdAndValueLike(dictId, value, new PageRequest(page, size));
     }
@@ -111,13 +114,13 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
      * @return
      */
     public Page<SystemDictEntry> findByDictId(long dictId, int page, int size) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
 
         return repo.findByDictId(dictId, new PageRequest(page, size));
     }
 
     public boolean isDictContainEntry(long dictId, String code) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
 
         SystemDictEntry systemDictEntry = repo.findOne(new DictEntryKey(code, dictId));
 
@@ -125,19 +128,19 @@ public class SystemDictEntryService extends BaseJpaService<SystemDictEntry, XSys
     }
 
     public SystemDictEntry saveDictEntry(SystemDictEntry systemDictEntry) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
 
         return repo.save(systemDictEntry);
     }
 
     public void createDictEntry(SystemDictEntry systemDictEntry) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
 
         repo.save(systemDictEntry);
     }
 
     public void deleteDictEntry(long dictId, String code) {
-        XSystemDictEntryRepository repo = (XSystemDictEntryRepository) getJpaRepository();
+        SystemDictEntryRepository repo = (SystemDictEntryRepository) getJpaRepository();
         repo.delete(new DictEntryKey(code, dictId));
     }
 }

@@ -287,7 +287,7 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
     @ApiOperation("获取单条记录")
     public Envelop findById(
             @ApiParam(name = "id", value = "id")
-            @PathVariable(value = "id") String id){
+            @RequestParam(value = "id") String id){
         Envelop envelop = new Envelop();
         Ambulance ambulance = ambulanceService.findById(id);
         if(null != ambulance) {
