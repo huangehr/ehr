@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
+
 /**
  * 缓存操作
  *
@@ -35,8 +37,8 @@ public class RedisCacheOperationEndPoint extends EnvelopRestEndPoint {
     private RedisCacheKeyRuleService redisCacheKeyRuleService;
     @Autowired
     private RedisCacheAuthorizationService redisCacheAuthorizationService;
-    @Autowired
-    private RedisTemplate redisTemplate;
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     @ApiOperation("根据Key规则，获取指定key的缓存值")
     @RequestMapping(value = ServiceApi.Redis.CacheOperation.Get, method = RequestMethod.GET)

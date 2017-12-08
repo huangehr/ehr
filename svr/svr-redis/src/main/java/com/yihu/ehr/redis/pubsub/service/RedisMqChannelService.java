@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,8 +35,8 @@ public class RedisMqChannelService extends BaseJpaService<RedisMqChannel, RedisM
     RedisMqPublisherDao redisMqPublisherDao;
     @Autowired
     RedisMqMessageLogDao redisMqMessageLogDao;
-    @Autowired
-    RedisTemplate redisTemplate;
+    @Resource
+    RedisTemplate<String, Object> redisTemplate;
     @Autowired
     ObjectMapper objectMapper;
 

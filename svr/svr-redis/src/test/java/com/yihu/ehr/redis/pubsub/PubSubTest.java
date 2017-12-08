@@ -16,6 +16,7 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,8 +35,8 @@ public class PubSubTest {
     JedisConnectionFactory jedisConnectionFactory;
     @Autowired
     RedisMessageListenerContainer redisMessageListenerContainer;
-    @Autowired
-    RedisTemplate redisTemplate;
+    @Resource
+    RedisTemplate<String, Object> redisTemplate;
     @Autowired
     ObjectMapper objectMapper;
 

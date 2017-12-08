@@ -24,6 +24,10 @@ public class RedisCacheKeyMemoryService extends BaseJpaService<RedisCacheKeyMemo
         return redisCacheKeyMemoryDao.findByCacheKey(cacheKey);
     }
 
+    public Long sumCategoryMemory(String keyPrefix) {
+        return redisCacheKeyMemoryDao.sumCategoryMemory(keyPrefix);
+    }
+
     @Transactional(readOnly = false)
     public RedisCacheKeyMemory save(RedisCacheKeyMemory redisCacheKeyMemory) {
         return redisCacheKeyMemoryDao.save(redisCacheKeyMemory);

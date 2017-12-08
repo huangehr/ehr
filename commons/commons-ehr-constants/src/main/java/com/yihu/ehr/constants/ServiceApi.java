@@ -973,6 +973,7 @@ public class ServiceApi {
         // 缓存操作
         public static class CacheStatistics {
             public static final String GetCategoryKeys = "/redis/cache/statistics/getCategoryKeys";
+            public static final String GetCategoryMemory = "/redis/cache/statistics/getCategoryMemory";
         }
         // 接收订阅消息
         public static class SubscribeMessage {

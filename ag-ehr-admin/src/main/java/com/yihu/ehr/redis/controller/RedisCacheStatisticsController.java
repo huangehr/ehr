@@ -32,4 +32,10 @@ public class RedisCacheStatisticsController extends BaseController {
         return redisCacheStatisticsClient.getCategoryKeys();
     }
 
+    @ApiOperation("统计缓存分类的缓存内存比率（近似值，比实际略小）")
+    @RequestMapping(value = ServiceApi.Redis.CacheStatistics.GetCategoryMemory, method = RequestMethod.GET)
+    public Envelop getCategoryMemory() {
+        return redisCacheStatisticsClient.getCategoryMemory();
+    }
+
 }

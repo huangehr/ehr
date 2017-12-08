@@ -3,7 +3,6 @@ package com.yihu.ehr.redis.cache;
 import com.yihu.ehr.RedisServiceApp;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -13,6 +12,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+
+import javax.annotation.Resource;
 
 /**
  * Redis缓存测试
@@ -25,8 +26,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @WebAppConfiguration
 public class CacheTest {
 
-    @Autowired
-    RedisTemplate redisTemplate;
+    @Resource
+    RedisTemplate<String, Object> redisTemplate;
 
     @Test
     public void cacheStringTest() {
@@ -63,11 +64,11 @@ public class CacheTest {
 
     @Test
     public void redisCallbackTest() {
-        String usedMemory = (String) redisTemplate.execute(new RedisCallback() {
+        long usedMemory = (long) redisTemplate.execute(new RedisCallback() {
             @Override
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
 //                connection.bgSave(); // 生成快照
-                return connection.info("memory").get("used_memory");
+                return Long.parseLong(connection.info("memory").get("used_memory").toString());
             }
         });
 

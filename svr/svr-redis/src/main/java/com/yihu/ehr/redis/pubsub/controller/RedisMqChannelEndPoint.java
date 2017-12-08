@@ -24,6 +24,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -49,8 +50,8 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
     private RedisMqSubscriberService redisMqSubscriberService;
     @Autowired
     private RedisMqPublisherService redisMqPublisherService;
-    @Autowired
-    private RedisTemplate redisTemplate;
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
     @Autowired
     private RedisMessageListenerContainer redisMessageListenerContainer;
 
