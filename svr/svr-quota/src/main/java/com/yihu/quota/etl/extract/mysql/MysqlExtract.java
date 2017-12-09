@@ -65,15 +65,16 @@ public class MysqlExtract {
         this.esConfig = esConfig;
 
         List<SaveModel> returnList = new ArrayList<>();
-       //获取mysql
+        //获取mysql
         String mysql = getSql(qdm,qds);
         logger.debug(mysql);
+        System.out.println("统计mysql :" + mysql);
         if( !StringUtils.isEmpty(mysql)){
             Map<String,Long> resultMap = new HashMap<>();
             //执行MySQL
             List<Map<String, Object>> mapList = null;
             try {
-                 mapList =  jdbcTemplate.queryForList(mysql);
+                mapList =  jdbcTemplate.queryForList(mysql);
             }catch (Exception e){
                 throw new Exception("mysql查询数据出错" + e.getMessage());
             }
@@ -122,15 +123,11 @@ public class MysqlExtract {
             whereSql.append(" where " + esConfig.getFilter());
         }
         if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
-            String condition = " and ";
-            if (StringUtils.isEmpty(whereSql.toString())) {
-                condition = " where ";
-            }
             if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {//全量，增量
-                whereSql.append(condition + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+                whereSql.append(" and " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
                 whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }else{
-                whereSql.append( condition + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
+                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }
         }
         StringBuffer sql = new StringBuffer();
@@ -154,37 +151,37 @@ public class MysqlExtract {
 
 
     private void compute(List<TjQuotaDimensionMain> qdm,List<TjQuotaDimensionSlave> qds,
-            List<SaveModel> returnList, Map<String, Long> map) throws Exception {
+                         List<SaveModel> returnList, Map<String, Long> map) throws Exception {
         Map<String, SaveModel> allData = new HashMap<>();
-       if(qdm.size() + qds.size() == 0){
-           SaveModel saveModel = new SaveModel();
-           Long num = map.get("result");
-           saveModel = setSaveModel(saveModel);
-           saveModel.setResult(num.toString());
-           returnList.add(saveModel);
-       }else {
-           //初始化主细维度
-           if(qdm!=null && qdm.size()>0){
-               if(qdm.size() == 1){
-                   allData= initDimension(qds, qdm.get(0), allData);
-               }else {
-                   allData= initDimensionMoreMain(qds, qdm, allData);
-               }
-           }else{
-               allData= initDimension(qds, null, allData);
-           }
-           for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
-               String key = oneMap.getKey();
-               SaveModel saveModel = oneMap.getValue();
-               Long num = map.get(key);
-               if(saveModel != null && num != null){
-                   saveModel.setResult(num.toString());
-               }else{
-                   saveModel.setResult("0");
-               }
-               returnList.add(saveModel);
-           }
-       }
+        if(qdm.size() + qds.size() == 0){
+            SaveModel saveModel = new SaveModel();
+            Long num = map.get("result");
+            saveModel = setSaveModel(saveModel);
+            saveModel.setResult(num.toString());
+            returnList.add(saveModel);
+        }else {
+            //初始化主细维度
+            if(qdm!=null && qdm.size()>0){
+                if(qdm.size() == 1){
+                    allData= initDimension(qds, qdm.get(0), allData);
+                }else {
+                    allData= initDimensionMoreMain(qds, qdm, allData);
+                }
+            }else{
+                allData= initDimension(qds, null, allData);
+            }
+            for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
+                String key = oneMap.getKey();
+                SaveModel saveModel = oneMap.getValue();
+                Long num = map.get(key);
+                if(saveModel != null && num != null){
+                    saveModel.setResult(num.toString());
+                }else{
+                    saveModel.setResult("0");
+                }
+                returnList.add(saveModel);
+            }
+        }
     }
 
     /**
@@ -205,8 +202,8 @@ public class MysqlExtract {
 
             for (int i=0 ;i<dimensionMains.size();i++) {
                 if(i != 0){
-                    List<DictModel> dictDataMain = jdbcTemplate.query(dimensionMains.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-                    allData = setOtherMainData(allData, dictDataMain, dimensionMains.get(i).getMainCode());
+                    List<SaveModel> saveDataMain = jdbcTemplate.query(dimensionMains.get(i).getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+                    allData = setOtherMainData(allData, saveDataMain, dimensionMains.get(i).getMainCode(),dimensionMains.get(i).getType());
                 }
             }
 
@@ -254,14 +251,16 @@ public class MysqlExtract {
     }
 
     //如果选择多个维度，除了第一个维度外其他维度组合
-    private Map<String, SaveModel> setOtherMainData(Map<String, SaveModel> allData, List<DictModel> dictDataMain,String code) {
+    private Map<String, SaveModel> setOtherMainData(Map<String, SaveModel> allData, List<SaveModel> saveDataMain,String code,String dimensionType) {
         try {
             Map<String, SaveModel> returnAllData = new HashMap<>();
             for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
-                for (int i = 0; i < dictDataMain.size(); i++) {
-                    DictModel dictOne = dictDataMain.get(i);
+                for (int i = 0; i < saveDataMain.size(); i++) {
+                    SaveModel mainOne = saveDataMain.get(i);
                     //设置新key
-                    StringBuffer newKey = new StringBuffer(one.getKey() + "-" + dictOne.getCode());
+                    String codeVal = getMainCode(mainOne,dimensionType,"code");
+                    String nameVal = getMainCode(mainOne,dimensionType,"name");;
+                    StringBuffer newKey = new StringBuffer(one.getKey() + "-" + codeVal);
                     //设置新的value
                     SaveModel saveModelTemp = new SaveModel();
                     BeanUtils.copyProperties(one.getValue(), saveModelTemp);
@@ -269,8 +268,8 @@ public class MysqlExtract {
                     StringBuffer keyMethodName = new StringBuffer("set"+code);
                     StringBuffer nameMethodName = new StringBuffer("set"+code + "Name");
 
-                    SaveModel.class.getMethod(keyMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getCode());
-                    SaveModel.class.getMethod(nameMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getName());
+                    SaveModel.class.getMethod(keyMethodName.toString(), String.class).invoke(saveModelTemp, codeVal);
+                    SaveModel.class.getMethod(nameMethodName.toString(), String.class).invoke(saveModelTemp, nameVal);
                     returnAllData.put(newKey.toString(), saveModelTemp);
                 }
             }
@@ -365,6 +364,50 @@ public class MysqlExtract {
                 break;
             }
         }
+    }
+
+    public String getMainCode(SaveModel mainOne,String dimensionType,String returnType) {
+        String code = "";
+        String name = "";
+        switch (dimensionType) {
+            case Contant.main_dimension.area_province: {
+                code = mainOne.getProvince();
+                name = mainOne.getProvinceName();
+                break;
+            }
+            case Contant.main_dimension.area_city: {
+                code = mainOne.getCity();
+                name = mainOne.getCityName();
+                break;
+            }
+            case Contant.main_dimension.area_town: {
+                code = mainOne.getCity();
+                name = mainOne.getCityName();
+                break;
+            }
+            case Contant.main_dimension.area_org: {
+                code = mainOne.getOrg();
+                name = mainOne.getOrgName();
+                break;
+            }
+            case Contant.main_dimension.area_team: {
+                code = mainOne.getTeam();
+                name = mainOne.getTeamName();
+                break;
+            }
+            case Contant.main_dimension.time_year: {
+                code = mainOne.getYear();
+                name = mainOne.getYearName();
+                break;
+            }
+        }
+        if(returnType.equals("code")){
+            return code;
+        }
+        if(returnType.equals("name")){
+            return name;
+        }
+        return "";
     }
 
     private void setOneData(Map<String, SaveModel> allData, String key, SaveModel one, String areaLevel) {

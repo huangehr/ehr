@@ -193,7 +193,7 @@ public class EsResultExtract {
         }
         if( !StringUtils.isEmpty(quotaCode)){
 //            TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaCode);
-            QueryStringQueryBuilder termQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaCode);
+            QueryStringQueryBuilder termQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaCode.replaceAll("_",""));
             boolQueryBuilder.must(termQuotaCode);
         }
 
