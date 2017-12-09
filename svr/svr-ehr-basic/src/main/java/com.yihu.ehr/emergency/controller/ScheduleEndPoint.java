@@ -21,10 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -102,8 +99,8 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
                 middleMap1.put("date", date1.toString());
                 //数据节点
                 List<Schedule> scheduleList = scheduleService.getDateMatch(date1);
-                Map<String, Map<String, String>> carMap = new HashMap<String, Map<String, String>>();
-                String carId = "";
+                Map<String, Map<String, Object>> carMap = new HashMap<String, Map<String, Object>>();
+                String carId;
                 for(Schedule schedule : scheduleList) {
                     carId = schedule.getCarId();
                     Ambulance ambulance = ambulanceService.findById(carId);
@@ -112,58 +109,92 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
                         String dutyName = schedule.getDutyName();
                         String scheduleId = schedule.getId().toString();
                         if (carMap.containsKey(carId)) {
-                            Map<String, String> dataMap = carMap.get(carId);
-                            String scheduleIds = dataMap.get("scheduleIds");
-                            dataMap.put("scheduleIds", scheduleIds + "," + scheduleId);
-                            if ("医生".equals(dutyRole)) {
-                                String doctors;
-                                if(StringUtils.isEmpty(dataMap.get("doctor"))) {
-                                    doctors = dutyName;
-                                }else {
-                                    doctors = dataMap.get("doctor") + "," + dutyName;
+                            Map<String, Object> dataMap = carMap.get(carId);
+                            String time = schedule.getStart().toString();
+                            if(dataMap.containsKey(time)) {
+                                for(String timeKey : dataMap.keySet()) {
+                                    if(time.equals(timeKey)) {
+                                        Map<String, String> detailMap = (Map<String, String>)dataMap.get(time);
+                                        String scheduleIds = detailMap.get("scheduleIds");
+                                        detailMap.put("scheduleIds", scheduleIds + "," + scheduleId);
+                                        if ("医生".equals(dutyRole)) {
+                                            String doctors;
+                                            if (StringUtils.isEmpty(dataMap.get("doctor"))) {
+                                                doctors = dutyName;
+                                            } else {
+                                                doctors = dataMap.get("doctor") + "," + dutyName;
+                                            }
+                                            detailMap.put("doctor", doctors);
+                                        } else if ("护士".equals(dutyRole)) {
+                                            String nurses;
+                                            if (StringUtils.isEmpty(dataMap.get("nurse"))) {
+                                                nurses = dutyName;
+                                            } else {
+                                                nurses = dataMap.get("nurse") + "," + dutyName;
+                                            }
+                                            detailMap.put("nurse", nurses);
+                                        } else if ("司机".equals(dutyRole)) {
+                                            String drivers;
+                                            if (StringUtils.isEmpty(dataMap.get("driver"))) {
+                                                drivers = dutyName;
+                                            } else {
+                                                drivers = dataMap.get("driver") + "," + dutyName;
+                                            }
+                                            detailMap.put("driver", drivers);
+                                        }
+                                    }
                                 }
-                                dataMap.put("doctor", doctors);
-                            } else if ("护士".equals(dutyRole)) {
-                                String nurses;
-                                if(StringUtils.isEmpty(dataMap.get("nurse"))) {
-                                    nurses = dutyName;
-                                }else {
-                                    nurses = dataMap.get("nurse") + "," + dutyName;
+                            }else {
+                                //Map<String, Object> newDataMap = new HashMap<String, Object>();
+                                Map<String, String> detailMap = new HashMap<String, String>();
+                                detailMap.put("start", schedule.getStart().toString());
+                                detailMap.put("end", schedule.getEnd().toString());
+                                detailMap.put("carId", carId);
+                                detailMap.put("main", schedule.getMain().toString());
+                                detailMap.put("location", ambulance.getOrgName());
+                                detailMap.put("scheduleIds", scheduleId);
+                                if ("医生".equals(dutyRole)) {
+                                    detailMap.put("doctor", dutyName);
+                                } else if ("护士".equals(dutyRole)) {
+                                    detailMap.put("nurse", dutyName);
+                                } else if ("司机".equals(dutyRole)) {
+                                    detailMap.put("driver", dutyName);
                                 }
-                                dataMap.put("nurse", nurses);
-                            } else if ("司机".equals(dutyRole)) {
-                                String drivers;
-                                if(StringUtils.isEmpty(dataMap.get("driver"))) {
-                                    drivers = dutyName;
-                                }else {
-                                    drivers = dataMap.get("driver") + "," + dutyName;
-                                }
-                                dataMap.put("driver", drivers);
+                                //dataMap.put("time", schedule.getStart().toString());
+                                dataMap.put(schedule.getStart().toString(), detailMap);
+                                //carMap.put(carId, newDataMap);
                             }
                         } else {
-                            Map<String, String> dataMap = new HashMap<String, String>();
-                            dataMap.put("carId", carId);
-                            dataMap.put("main", schedule.getMain().toString());
-                            dataMap.put("location", ambulance.getOrgName());
-                            dataMap.put("scheduleIds", scheduleId);
+                            Map<String, Object> dataMap = new LinkedHashMap<String, Object>();
+                            Map<String, String> detailMap = new HashMap<String, String>();
+                            detailMap.put("start", schedule.getStart().toString());
+                            detailMap.put("end", schedule.getEnd().toString());
+                            detailMap.put("carId", carId);
+                            detailMap.put("main", schedule.getMain().toString());
+                            detailMap.put("location", ambulance.getOrgName());
+                            detailMap.put("scheduleIds", scheduleId);
                             if ("医生".equals(dutyRole)) {
-                                dataMap.put("doctor", dutyName);
+                                detailMap.put("doctor", dutyName);
                             } else if ("护士".equals(dutyRole)) {
-                                dataMap.put("nurse", dutyName);
+                                detailMap.put("nurse", dutyName);
                             } else if ("司机".equals(dutyRole)) {
-                                dataMap.put("driver", dutyName);
+                                detailMap.put("driver", dutyName);
                             }
+                            //dataMap.put("time", schedule.getStart().toString());
+                            dataMap.put(schedule.getStart().toString(), detailMap);
                             carMap.put(carId, dataMap);
                         }
                     }else {
-                        Map<String, String> errorMap = new HashMap<String, String>(1);
+                        Map<String, Object> errorMap = new HashMap<String, Object>(1);
                         errorMap.put("error", "无相关车辆");
                         carMap.put(carId, errorMap);
                     }
                 }
-                List<Map<String, String>> middleList = new ArrayList<Map<String, String>>(carMap.size());
+                List<Object> middleList = new ArrayList<Object>(carMap.size());
                 for(String car : carMap.keySet()) {
-                    middleList.add(carMap.get(car));
+                    for(String timeKey : carMap.get(car).keySet()) {
+                        middleList.add(carMap.get(car).get(timeKey));
+                    }
                 }
                 middleMap1.put("data", middleList);
                 resultList.add(middleMap1);
