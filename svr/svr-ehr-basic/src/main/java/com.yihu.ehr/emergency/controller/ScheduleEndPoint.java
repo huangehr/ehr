@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.emergency.service.AmbulanceService;
 import com.yihu.ehr.emergency.service.ScheduleService;
 import com.yihu.ehr.entity.emergency.Ambulance;
@@ -12,11 +13,18 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import javafx.beans.binding.ObjectExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -26,7 +34,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "ScheduleEndPoint", description = "排班历史", tags = {"应急指挥-排班历史"})
-public class ScheduleEndPoint extends BaseRestEndPoint {
+public class ScheduleEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private ScheduleService scheduleService;
@@ -50,6 +58,8 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
         Envelop envelop = new Envelop();
         try {
             List<Schedule> schedules = scheduleService.search(fields, filters, sorts, page, size);
+            int count = (int)scheduleService.getCount(filters);
+            envelop = getPageResult(schedules, count, page, size);
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(schedules);
         }catch (Exception e) {
@@ -68,18 +78,100 @@ public class ScheduleEndPoint extends BaseRestEndPoint {
             @ApiParam(name = "page", value = "分页大小", required = true, defaultValue = "1")
             @RequestParam(value = "page") int page,
             @ApiParam(name = "size", value = "页码", required = true, defaultValue = "15")
-            @RequestParam(value = "size") int size) {
+            @RequestParam(value = "size") int size) throws ParseException {
         Envelop envelop = new Envelop();
-        try {
-            List<Object> resultList =  scheduleService.getLevel(date, page, size);
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(resultList);
-        }catch (Exception e) {
-            e.printStackTrace();
-            envelop.setSuccessFlg(false);
-            envelop.setErrorMsg(e.getMessage());
+        if (StringUtils.isEmpty(date)) {
+            try {
+                List<Object> resultList = scheduleService.getLevel(page, size);
+                Integer count = scheduleService.getLevelCount();
+                envelop = getPageResult(resultList, count, page, size);
+                return envelop;
+            } catch (ParseException e) {
+                e.printStackTrace();
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(e.getMessage());
+                return envelop;
+            }
+        }else {
+            List<Object> resultList = new ArrayList<Object>();
+            List<java.sql.Date> dateGroup = scheduleService.getDateGroup(date, page, size);
+            for(int i = 0; i < dateGroup.size(); i ++) {
+                Map<String, Object> middleMap1 = new HashMap<String, Object>();
+                java.sql.Date date1 = dateGroup.get(i);
+                //时间节点
+                middleMap1.put("date", date1.toString());
+                //数据节点
+                List<Schedule> scheduleList = scheduleService.getDateMatch(date1);
+                Map<String, Map<String, String>> carMap = new HashMap<String, Map<String, String>>();
+                String carId = "";
+                for(Schedule schedule : scheduleList) {
+                    carId = schedule.getCarId();
+                    Ambulance ambulance = ambulanceService.findById(carId);
+                    if (null != ambulance) {
+                        String dutyRole = schedule.getDutyRole();
+                        String dutyName = schedule.getDutyName();
+                        String scheduleId = schedule.getId().toString();
+                        if (carMap.containsKey(carId)) {
+                            Map<String, String> dataMap = carMap.get(carId);
+                            String scheduleIds = dataMap.get("scheduleIds");
+                            dataMap.put("scheduleIds", scheduleIds + "," + scheduleId);
+                            if ("医生".equals(dutyRole)) {
+                                String doctors;
+                                if(StringUtils.isEmpty(dataMap.get("doctor"))) {
+                                    doctors = dutyName;
+                                }else {
+                                    doctors = dataMap.get("doctor") + "," + dutyName;
+                                }
+                                dataMap.put("doctor", doctors);
+                            } else if ("护士".equals(dutyRole)) {
+                                String nurses;
+                                if(StringUtils.isEmpty(dataMap.get("nurse"))) {
+                                    nurses = dutyName;
+                                }else {
+                                    nurses = dataMap.get("nurse") + "," + dutyName;
+                                }
+                                dataMap.put("nurse", nurses);
+                            } else if ("司机".equals(dutyRole)) {
+                                String drivers;
+                                if(StringUtils.isEmpty(dataMap.get("driver"))) {
+                                    drivers = dutyName;
+                                }else {
+                                    drivers = dataMap.get("driver") + "," + dutyName;
+                                }
+                                dataMap.put("driver", drivers);
+                            }
+                        } else {
+                            Map<String, String> dataMap = new HashMap<String, String>();
+                            dataMap.put("carId", carId);
+                            dataMap.put("main", schedule.getMain().toString());
+                            dataMap.put("location", ambulance.getOrgName());
+                            dataMap.put("scheduleIds", scheduleId);
+                            if ("医生".equals(dutyRole)) {
+                                dataMap.put("doctor", dutyName);
+                            } else if ("护士".equals(dutyRole)) {
+                                dataMap.put("nurse", dutyName);
+                            } else if ("司机".equals(dutyRole)) {
+                                dataMap.put("driver", dutyName);
+                            }
+                            carMap.put(carId, dataMap);
+                        }
+                    }else {
+                        Map<String, String> errorMap = new HashMap<String, String>(1);
+                        errorMap.put("error", "无相关车辆");
+                        carMap.put(carId, errorMap);
+                    }
+                }
+                List<Map<String, String>> middleList = new ArrayList<Map<String, String>>(carMap.size());
+                for(String car : carMap.keySet()) {
+                    middleList.add(carMap.get(car));
+                }
+                middleMap1.put("data", middleList);
+                resultList.add(middleMap1);
+            }
+            int count = scheduleService.getDateGroupCount(date);
+            envelop = getPageResult(resultList, count, page, size);
+            return envelop;
         }
-        return envelop;
     }
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleSave, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

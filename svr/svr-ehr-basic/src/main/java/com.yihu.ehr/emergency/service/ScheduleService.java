@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -46,28 +47,63 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
         return query.list();
     }
 
-    public List<Object> getLevel(String date, int page, int size) throws Exception{
+    public List<Object> getLevel(int page, int size) throws ParseException{
         Session session = currentSession();
-        Query query = null;
-        if(StringUtils.isEmpty(date)) {
-            String hql = "SELECT DATE_FORMAT(start, '%Y-%m') FROM Schedule schedule GROUP BY DATE_FORMAT(start, '%Y-%m')";
-            query = session.createQuery(hql);
-            query.setFlushMode(FlushMode.COMMIT);
-            query.setFirstResult(page - 1);
-            query.setMaxResults(size);
-        }else {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
-            Date date1 = dateFormat.parse(date);
-            Date date2 = new Date(DateUtils.addMonths(date1, 1).getTime() - 1);
-            String hql = "SELECT schedule FROM Schedule schedule WHERE schedule.start BETWEEN :date1 AND :date2 ORDER BY schedule.start ASC";
-            query = session.createQuery(hql);
-            query.setFlushMode(FlushMode.COMMIT);
-            query.setDate("date1", date1);
-            query.setDate("date2", date2);
-            //query.setParameter("date", "%" + date + "%");
-            query.setFirstResult(page - 1);
-            query.setMaxResults(size);
-        }
+        String hql = "SELECT DATE_FORMAT(date, '%Y-%m') FROM Schedule schedule GROUP BY DATE_FORMAT(date, '%Y-%m')";
+        Query query = session.createQuery(hql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setFirstResult((page - 1) * size);
+        query.setMaxResults(size);
+        return query.list();
+    }
+
+    public Integer getLevelCount() throws ParseException{
+        Session session = currentSession();
+        String hql = "SELECT DATE_FORMAT(date, '%Y-%m') FROM Schedule schedule GROUP BY DATE_FORMAT(date, '%Y-%m')";
+        Query query = session.createQuery(hql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return query.list().size();
+    }
+
+    public List<java.sql.Date> getDateGroup(String date, int page, int size) throws ParseException {
+        Session session = currentSession();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+        Date date1 = dateFormat.parse(date);
+        java.sql.Date date11 = new java.sql.Date(date1.getTime());
+        Date date2 = new Date(DateUtils.addMonths(date1, 1).getTime() - 1);
+        java.sql.Date date22 = new java.sql.Date(date2.getTime());
+        String hql =  "SELECT schedule.date FROM Schedule schedule WHERE schedule.date BETWEEN :date1 AND :date2 GROUP BY schedule.date ORDER BY schedule.date ASC";
+        Query query = session.createQuery(hql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setDate("date1", date11);
+        query.setDate("date2", date22);
+        //query.setParameter("date", "%" + date + "%");
+        query.setFirstResult((page - 1) * size);
+        query.setMaxResults(size);
+        return query.list();
+    }
+
+    public Integer getDateGroupCount(String date) throws ParseException {
+        Session session = currentSession();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+        Date date1 = dateFormat.parse(date);
+        java.sql.Date date11 = new java.sql.Date(date1.getTime());
+        Date date2 = new Date(DateUtils.addMonths(date1, 1).getTime() - 1);
+        java.sql.Date date22 = new java.sql.Date(date2.getTime());
+        String hql =  "SELECT schedule.date FROM Schedule schedule WHERE schedule.date BETWEEN :date1 AND :date2 GROUP BY schedule.date ORDER BY schedule.date ASC";
+        Query query = session.createQuery(hql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setDate("date1", date11);
+        query.setDate("date2", date22);
+        return query.list().size();
+    }
+
+    public List<Schedule> getDateMatch(java.sql.Date date) {
+        Session session = currentSession();
+        String hql = "SELECT schedule FROM Schedule schedule WHERE schedule.date = :date1 ORDER BY schedule.date ASC";
+        Query query = session.createQuery(hql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setDate("date1", date);
         return query.list();
     }
 
@@ -95,7 +131,7 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
                 }else{
                     schedule.setGender("0");
                 }
-                if(null!=map .get("main")){
+                if(null != map .get("main")){
                     if("主班".equals(map .get("main").toString())){
                         schedule.setMain(true);
                     }else if("副班".equals(map .get("main").toString())){
@@ -108,8 +144,8 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
                 schedule.setDutyRole(map .get("dutyRole").toString());
                 schedule.setDutyPhone(map .get("dutyPhone").toString());
                 schedule.setCarId(map .get("carId").toString());
-                schedule.setStart(DateUtil.strToDate(map.get("start").toString()));
-                schedule.setEnd(DateUtil.strToDate(map .get("end").toString()));
+                //schedule.setStart(DateUtil.strToDate(map.get("start").toString()));
+                //schedule.setEnd(DateUtil.strToDate(map .get("end").toString()));
                 schedule.setCreator(map .get("creator").toString());
                 schedule.setStatus(Schedule.Status.on);
                 scheduleDao.save(schedule);
