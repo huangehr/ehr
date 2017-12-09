@@ -14,7 +14,7 @@ public class EsConfig {
     private String molecular;  // 统计百分比时的分子  指标code
     private String denominator;// 统计百分比时的分母  指标code
     private String timekey;//根据sql去查询的key
-    private String config;  // where条件
+    private String filter;  // where条件
     private String aggregation;//聚合方式  默认count，另有sum
     private String aggregationKey;//聚合字段
 
@@ -91,12 +91,12 @@ public class EsConfig {
         this.denominator = denominator;
     }
 
-    public String getConfig() {
-        return config;
+    public String getFilter() {
+        return filter;
     }
 
-    public void setConfig(String config) {
-        this.config = config;
+    public void setFilter(String filter) {
+        this.filter = filter;
     }
 
     public String getAggregation() {
