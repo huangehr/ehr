@@ -2,7 +2,7 @@ package com.yihu.ehr.emergency.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.emergency.service.AmbulanceService;
 import com.yihu.ehr.emergency.service.LocationService;
 import com.yihu.ehr.entity.emergency.Ambulance;
@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "LocationEndPoint", description = "待命地点", tags = {"应急指挥-待命地点"})
-public class LocationEndPoint extends BaseRestEndPoint {
+public class LocationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private LocationService locationService;
@@ -47,9 +47,9 @@ public class LocationEndPoint extends BaseRestEndPoint {
             @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         try {
-            List<Schedule> schedules = locationService.search(fields, filters, sorts, page, size);
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(schedules);
+            List<Location> locations = locationService.search(fields, filters, sorts, page, size);
+            int count = (int)locationService.getCount(filters);
+            envelop = getPageResult(locations, count, page, size);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);

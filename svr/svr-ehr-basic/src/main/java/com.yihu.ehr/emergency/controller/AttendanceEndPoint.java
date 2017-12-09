@@ -2,7 +2,7 @@ package com.yihu.ehr.emergency.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.emergency.service.AmbulanceService;
 import com.yihu.ehr.emergency.service.AttendanceService;
 import com.yihu.ehr.emergency.service.ScheduleService;
@@ -29,7 +29,7 @@ import java.util.*;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "AttendanceEndPoint", description = "出勤记录", tags = {"应急指挥-出勤记录"})
-public class AttendanceEndPoint extends BaseRestEndPoint {
+public class AttendanceEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private AttendanceService attendanceService;
@@ -197,9 +197,8 @@ public class AttendanceEndPoint extends BaseRestEndPoint {
         Envelop envelop = new Envelop();
         try {
             List<Attendance> attendance = attendanceService.search(fields, filters, sorts, page, size);
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(attendance);
-            envelop.setTotalCount((int)(attendanceService.getCount(filters)));
+            int count = (int)attendanceService.getCount(filters);
+            envelop = getPageResult(attendance, count, page, size);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
