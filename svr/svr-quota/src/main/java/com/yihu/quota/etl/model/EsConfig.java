@@ -15,6 +15,8 @@ public class EsConfig {
     private String denominator;// 统计百分比时的分母  指标code
     private String timekey;//根据sql去查询的key
     private String config;  // where条件
+    private String aggregation;//聚合方式  默认count，另有sum
+    private String aggregationKey;//聚合字段
 
     public String getHost() {
         return host;
@@ -95,5 +97,21 @@ public class EsConfig {
 
     public void setConfig(String config) {
         this.config = config;
+    }
+
+    public String getAggregation() {
+        return aggregation;
+    }
+
+    public void setAggregation(String aggregation) {
+        this.aggregation = aggregation;
+    }
+
+    public String getAggregationKey() {
+        return aggregationKey;
+    }
+
+    public void setAggregationKey(String aggregationKey) {
+        this.aggregationKey = aggregationKey;
     }
 }
