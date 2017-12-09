@@ -85,7 +85,9 @@ public class MysqlExtract {
                             keyVal = keyVal + map.get(key) +  "-";
                         }
                     }
-                    resultMap.put(keyVal.substring(0, keyVal.length() - 1), (long) map.get("result"));
+                    Object ob = map.get("result");
+                    int result = Integer.parseInt(ob.toString());
+                    resultMap.put(keyVal.substring(0, keyVal.length() - 1), (long)result);
                 }
                 compute(qdm, qds, returnList, resultMap);
             }
@@ -120,24 +122,28 @@ public class MysqlExtract {
             whereSql.append(" where " + esConfig.getConfig());
         }
         if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
-            String condition = " and ";
-            if (StringUtils.isEmpty(whereSql.toString())) {
-                condition = " where ";
-            }
-
-            if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
-                whereSql.append(condition + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+            if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {//全量，增量
+                whereSql.append(" and " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
                 whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }else{
-                whereSql.append( condition + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
+                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }
         }
         StringBuffer sql = new StringBuffer();
-        if(StringUtils.isEmpty(allField)|| allField.length()==0){
-            sql.append("select count(*)  result  from " + tableName + whereSql);
-        }else {
-            String groupByField = allField.substring(0,allField.length() - 1);
-            sql.append("select " + allField + "  count(*) result from " + tableName + whereSql + " group by " + groupByField);
+        if(StringUtils.isEmpty(esConfig.getAggregation())){
+            if(StringUtils.isEmpty(allField)|| allField.length()==0){
+                sql.append("select count(*)  result  from " + tableName + whereSql);
+            }else {
+                String groupByField = allField.substring(0,allField.length() - 1);
+                sql.append("select " + allField + "  count(*) result from " + tableName + whereSql + " group by " + groupByField);
+            }
+        }else if(esConfig.getAggregation().equals(Contant.quota.aggregation_sum)){
+            if(StringUtils.isEmpty(allField)|| allField.length()==0){
+                sql.append("select sum(" ).append(esConfig.getAggregationKey()).append(" ) result  from " + tableName + whereSql);
+            }else {
+                String groupByField = allField.substring(0,allField.length() - 1);
+                sql.append("select ").append(allField ).append("  sum(").append(esConfig.getAggregationKey()).append(" ) result from " + tableName + whereSql + " group by " + groupByField);
+            }
         }
         return sql.toString();
     }
@@ -155,8 +161,10 @@ public class MysqlExtract {
        }else {
            //初始化主细维度
            if(qdm!=null && qdm.size()>0){
-               for(TjQuotaDimensionMain qmain:qdm){
-                   allData= initDimension(qds, qmain, allData);
+               if(qdm.size() == 1){
+                   allData= initDimension(qds, qdm.get(0), allData);
+               }else {
+                   allData= initDimensionMoreMain(qds, qdm, allData);
                }
            }else{
                allData= initDimension(qds, null, allData);
@@ -173,6 +181,43 @@ public class MysqlExtract {
                returnList.add(saveModel);
            }
        }
+    }
+
+    /**
+     * 初始化主细维度
+     */
+    private  Map<String, SaveModel>  initDimensionMoreMain(List<TjQuotaDimensionSlave> dimensionSlaves, List<TjQuotaDimensionMain> dimensionMains, Map<String, SaveModel> allData) throws Exception {
+        try{
+            if(dimensionMains !=null){
+                //查询字典数据
+                List<SaveModel> dictData = jdbcTemplate.query(dimensionMains.get(0).getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+                if (dictData == null) {
+                    throw new Exception("主纬度配置有误");
+                }else {
+                    //设置到map里面
+                    setAllData(allData, dictData, dimensionMains.get(0).getType());
+                }
+            }
+
+            for (int i=0 ;i<dimensionMains.size();i++) {
+                if(i != 0){
+                    List<DictModel> dictDataMain = jdbcTemplate.query(dimensionMains.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                    allData = setOtherMainData(allData, dictDataMain, dimensionMains.get(i).getMainCode());
+                }
+            }
+
+            for (int i=0 ;i<dimensionSlaves.size();i++) {
+                List<DictModel> dictDataSlave = jdbcTemplate.query(dimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                if (dictDataSlave == null) {
+                    throw new Exception("细纬度配置有误");
+                }else {
+                    allData = setAllSlaveData(allData, dictDataSlave,i);
+                }
+            }
+        }catch (Exception e){
+            throw new Exception("纬度配置有误");
+        }
+        return allData;
     }
 
     /**
@@ -204,6 +249,35 @@ public class MysqlExtract {
         return allData;
     }
 
+    //如果选择多个维度，除了第一个维度外其他维度组合
+    private Map<String, SaveModel> setOtherMainData(Map<String, SaveModel> allData, List<DictModel> dictDataMain,String code) {
+        try {
+            Map<String, SaveModel> returnAllData = new HashMap<>();
+            for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
+                for (int i = 0; i < dictDataMain.size(); i++) {
+                    DictModel dictOne = dictDataMain.get(i);
+                    //设置新key
+                    StringBuffer newKey = new StringBuffer(one.getKey() + "-" + dictOne.getCode());
+                    //设置新的value
+                    SaveModel saveModelTemp = new SaveModel();
+                    BeanUtils.copyProperties(one.getValue(), saveModelTemp);
+                    code = code.substring(0, 1).toUpperCase() + code.substring(1);
+                    StringBuffer keyMethodName = new StringBuffer("set"+code);
+                    StringBuffer nameMethodName = new StringBuffer("set"+code + "Name");
+
+                    SaveModel.class.getMethod(keyMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getCode());
+                    SaveModel.class.getMethod(nameMethodName.toString(), String.class).invoke(saveModelTemp, dictOne.getName());
+                    returnAllData.put(newKey.toString(), saveModelTemp);
+                }
+            }
+            return returnAllData;
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        return null;
+    }
+
+
     private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData,Integer key) {
         try {
             Map<String, SaveModel> returnAllData = new HashMap<>();
@@ -226,7 +300,7 @@ public class MysqlExtract {
             }
             return returnAllData;
         } catch (Exception e) {
-
+            e.getMessage();
         }
         return null;
     }
@@ -275,6 +349,14 @@ public class MysqlExtract {
                 dictData.stream().forEach(one -> {
                     // StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown() + "-" + one.getHospital() + "-" + one.getTeam());
                     setOneData(allData, one.getTeam(), one, Contant.main_dimension_areaLevel.area_team);
+                });
+                break;
+            }
+            case Contant.main_dimension.time_year: {
+                //设置省的全部的值
+                dictData.stream().forEach(one -> {
+                    //StringBuffer key = new StringBuffer(one.getProvince());
+                    setOneData(allData, one.getYear(), one, Contant.main_dimension_timeLevel.year);
                 });
                 break;
             }

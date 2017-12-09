@@ -80,7 +80,7 @@ public class ExtractPercentHelper {
 
                 Map<String,DictModel> dimensionMap = getQuotaDimension(quotaDataSource.getQuotaCode());
                 Map<String,DictModel> moleDimensionMap = getQuotaDimension(esConfig.getMolecular());
-                Map<String,DictModel> denoDimensionMap = getQuotaDimension(esConfig.getMolecular());
+                Map<String,DictModel> denoDimensionMap = getQuotaDimension(esConfig.getDenominator());
 
                 List<String> quotaDimension = new ArrayList<>();
                 String moleDimension = "";
