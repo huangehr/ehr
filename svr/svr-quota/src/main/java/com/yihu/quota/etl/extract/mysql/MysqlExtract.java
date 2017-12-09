@@ -118,15 +118,19 @@ public class MysqlExtract {
         }
         //拼凑where语句
         StringBuffer whereSql = new StringBuffer();
-        if (!StringUtils.isEmpty(esConfig.getConfig())) {
-            whereSql.append(" where " + esConfig.getConfig());
+        if (!StringUtils.isEmpty(esConfig.getFilter())) {
+            whereSql.append(" where " + esConfig.getFilter());
         }
         if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
+            String condition = " and ";
+            if (StringUtils.isEmpty(whereSql.toString())) {
+                condition = " where ";
+            }
             if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {//全量，增量
-                whereSql.append(" and " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
+                whereSql.append(condition + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
                 whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }else{
-                whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
+                whereSql.append( condition + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }
         }
         StringBuffer sql = new StringBuffer();
