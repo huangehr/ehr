@@ -15,12 +15,6 @@
     <packaging>war</packaging>
 
     <dependencies>
-        <!--
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-        </dependency>
-        -->
         <!-- 测试 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -28,14 +22,6 @@
             <scope>test</scope>
         </dependency>
         <!-- 测试 -->
-
-        <!-- Actuator
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-actuator</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        -->
         <!-- Base -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -43,31 +29,11 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <!-- Base -->
-
-        <!--
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        -->
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
-
-        <!-- jpa -->
-        <!--
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        -->
-        <!-- jpa -->
-
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter</artifactId>
@@ -148,52 +114,5 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-rest-model</artifactId>
         </dependency>
-
-        <!--
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-util</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-mysql</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-rest-model</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        -->
-        <!--
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-entity</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        -->
-        <!-- Hibernate
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        -->
-
-        <!-- Org
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.4</version>
-        </dependency>
-        -->
-
     </dependencies>
-
-
 </project>

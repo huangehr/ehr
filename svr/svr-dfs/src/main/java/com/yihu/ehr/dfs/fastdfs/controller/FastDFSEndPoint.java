@@ -25,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -603,6 +604,41 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     }
 
     /**
+     * 下载文件至本地路径
+     * @param remotePath
+     * @param localPath
+     * @return
+     */
+    @RequestMapping(value = "/fastDfs/downloadToLocal", method = RequestMethod.GET)
+    @ApiOperation(value = "下载文件(byPath)")
+    public Envelop downLoadToLocal(
+            @ApiParam(name = "remotePath", value = "远程文件路径", required = true)
+            @RequestParam(value = "remotePath") String remotePath,
+            @ApiParam(name = "localPath", value = "本地文件路径", required = true)
+            @RequestParam(value = "localPath") String localPath) {
+        Envelop envelop = new Envelop();
+        //String s = java.net.URLDecoder.decode(storagePath, "UTF-8");
+        String groupName = remotePath.split(":")[0];
+        String remoteFileName = remotePath.split(":")[1];
+        String localFileName = localPath + remoteFileName.replaceAll("/", "_");
+        byte[] bytes;
+        try {
+            bytes = fastDFSService.download(groupName, remoteFileName);
+            FileOutputStream fileOutputStream = new FileOutputStream(localFileName);
+            fileOutputStream.write(bytes);
+            fileOutputStream.close();
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+            return envelop;
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setObj("文件已下载至:" + localFileName);
+        return envelop;
+    }
+
+    /**
      * 获取文件下载路径
      * @param objectId
      * @return
@@ -650,9 +686,9 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     public Envelop page(
             @ApiParam(name = "filter", value = "过滤条件")
             @RequestParam(value = "filter", required = false) String filter,
-            @ApiParam(name = "page", value = "页码", required = true)
+            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
             @RequestParam(value = "page") int page,
-            @ApiParam(name = "size", value = "分页大小", required = true)
+            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         List<Map<String, String>> filterMap;
