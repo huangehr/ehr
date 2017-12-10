@@ -1,5 +1,7 @@
 package com.yihu.ehr.emergency.controller;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
@@ -45,7 +47,7 @@ public class AttendanceEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "保存出勤记录")
     public Envelop save(
             @ApiParam(name = "attendance", value = "出勤记录")
-            @RequestBody String attendance) throws Exception{
+            @RequestBody String attendance) throws JsonProcessingException {
         Envelop envelop = new Envelop();
         Attendance newAttendance = toEntity(attendance, Attendance.class);
         //验证车辆

@@ -10,7 +10,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.text.DateFormat;
@@ -35,15 +34,18 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
         return scheduleDao.findById(id);
     }
 
-    public List<Schedule> findMatch(String carId, Date date) throws Exception{
-        String sql = "SELECT schedule FROM Schedule schedule WHERE schedule.carId = :carId AND schedule.status = :status AND schedule.start <= :start AND schedule.end >= :end";
+    public List<Schedule> findMatch(String carId, Date date){
+        java.sql.Date date1 = new java.sql.Date(date.getTime());
+        java.sql.Time time = new java.sql.Time(date.getTime());
+        String sql = "SELECT schedule FROM Schedule schedule WHERE schedule.carId = :carId AND schedule.status = :status AND schedule.date = :date AND schedule.start <= :start AND schedule.end >= :end";
         Session session = currentSession();
         Query query = session.createQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setParameter("carId", carId);
         query.setParameter("status", Schedule.Status.on);
-        query.setParameter("start", date);
-        query.setParameter("end", date);
+        query.setParameter("date", date1);
+        query.setParameter("start", time);
+        query.setParameter("end", time);
         return query.list();
     }
 
@@ -115,40 +117,74 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
     public boolean addSchedulesBatch(List<Map<String, Object>> schedules) {
         Map<String, Object> map;
         try{
-            for(int i=1; i <= schedules.size(); i++){
-                map = schedules.get(i-1);
-                Schedule schedule=new Schedule();
-                schedule.setDutyName(map .get("dutyName").toString());
+            for(int i = 1; i <= schedules.size(); i++){
+                map = schedules.get(i - 1);
+                String dutyName = map.get("dutyName").toString();
+                String gender;
                 //性别：0未知，1为男，2为女
-                if(null!=map .get("gender")){
-                    if("男".equals(map .get("gender").toString())){
-                        schedule.setGender("1");
-                    }else if("女".equals(map .get("gender").toString())){
-                        schedule.setGender("2");
+                if(null != map.get("gender")) {
+                    if("男".equals(map.get("gender").toString())){
+                        gender = "1";
+                    }else if("女".equals(map.get("gender").toString())){
+                        gender = "2";
                     }else{
-                        schedule.setGender("0");
+                        gender = "0";
                     }
-                }else{
-                    schedule.setGender("0");
+                }else {
+                    gender = "0";
                 }
-                if(null != map .get("main")){
+                boolean main;
+                if(null != map.get("main")){
                     if("主班".equals(map .get("main").toString())){
-                        schedule.setMain(true);
-                    }else if("副班".equals(map .get("main").toString())){
-                        schedule.setMain(false);
+                        main = true;
+                    }else if("副班".equals(map.get("main").toString())){
+                        main = false;
+                    }else {
+                        main = true;
                     }
                 }else{
-                    schedule.setMain(false);
+                    main = true;
                 }
-                schedule.setDutyNum(map .get("dutyNum").toString());
-                schedule.setDutyRole(map .get("dutyRole").toString());
-                schedule.setDutyPhone(map .get("dutyPhone").toString());
-                schedule.setCarId(map .get("carId").toString());
-                //schedule.setStart(DateUtil.strToDate(map.get("start").toString()));
-                //schedule.setEnd(DateUtil.strToDate(map .get("end").toString()));
-                schedule.setCreator(map .get("creator").toString());
-                schedule.setStatus(Schedule.Status.on);
-                scheduleDao.save(schedule);
+                String dutyNum = map .get("dutyNum").toString();
+                String dutyRole = map .get("dutyRole").toString();
+                String dutyPhone = map .get("dutyPhone").toString();
+                String carId = map .get("carId").toString();
+                String creator = map .get("creator").toString();
+                Date start = DateUtil.strToDate(map.get("start").toString());
+                Date end = DateUtil.strToDate(map.get("end").toString());
+                int diff = DateUtil.getDifferenceOfDays(start, end);
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                for(int j = 0; j <= diff; j ++) {
+                    Schedule schedule = new Schedule();
+                    java.sql.Date today = new java.sql.Date(DateUtils.addDays(start, j).getTime());
+                    java.sql.Time startTime;
+                    java.sql.Time endTime;
+                    if(0 == j) {
+                        startTime = new java.sql.Time(start.getTime());
+                        Date tomorrow = DateUtils.addDays(dateFormat.parse(today.toString()), 1);
+                        endTime = new java.sql.Time(tomorrow.getTime() - 1);
+                    }else if(diff == j) {
+                        startTime = new java.sql.Time(dateFormat.parse(today.toString()).getTime());
+                        endTime = new java.sql.Time(end.getTime());
+                    }else {
+                        startTime = new java.sql.Time(dateFormat.parse(today.toString()).getTime());
+                        Date tomorrow = DateUtils.addDays(dateFormat.parse(today.toString()), 1);
+                        endTime = new java.sql.Time(tomorrow.getTime() - 1);
+                    }
+                    schedule.setDate(today);
+                    schedule.setStart(startTime);
+                    schedule.setEnd(endTime);
+                    schedule.setDutyName(dutyName);
+                    schedule.setGender(gender);
+                    schedule.setMain(main);
+                    schedule.setDutyNum(dutyNum);
+                    schedule.setDutyRole(dutyRole);
+                    schedule.setDutyPhone(dutyPhone);
+                    schedule.setCarId(carId);
+                    schedule.setCreator(creator);
+                    schedule.setStatus(Schedule.Status.on);
+                    scheduleDao.save(schedule);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

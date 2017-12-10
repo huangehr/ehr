@@ -90,7 +90,6 @@ public class EsQuotaJob implements Job {
             //抽取数据 如果是累加就是 List<DataModel>  如果是相除 Map<String,List<DataModel>>
             List<SaveModel> dataModels = extract();
             if(dataModels != null && dataModels.size() > 0){
-//                String quoataDate = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
                 String quoataDate =  new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd");
 
                 //查询是否已经统计过,如果已统计 先删除后保存
@@ -111,6 +110,7 @@ public class EsQuotaJob implements Job {
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for(SaveModel saveModel :dataModels){
                     if(saveModel.getResult() != null && Double.valueOf(saveModel.getResult())>0 ){
+                        saveModel.setQuotaCode(saveModel.getQuotaCode().replaceAll("_",""));
                         saveModel.setQuotaDate(quoataDate);
                         dataSaveModels.add(saveModel);
                     }
