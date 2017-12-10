@@ -171,8 +171,8 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "value") String value) {
         Envelop envelop = new Envelop();
         List<Map<String, Object>> resultList = elasticSearchService.findByField(index, type, field, value);
-        envelop.setDetailModelList(resultList);
         envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(resultList);
         return envelop;
     }
 
@@ -185,9 +185,9 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "type") String type,
             @ApiParam(name = "filter", value = "过滤条件")
             @RequestParam(value = "filter" , required = false) String filter,
-            @ApiParam(name = "page", value = "页码", required = true)
+            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
             @RequestParam(value = "page") int page,
-            @ApiParam(name = "size", value = "分页大小", required = true)
+            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
         List<Map<String, String>> filterMap;
@@ -204,8 +204,8 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             filterMap = new ArrayList<Map<String, String>>(0);
         }
         List<Map<String, Object>> resultList = elasticSearchService.page(index, type, filterMap, page, size);
-        envelop.setDetailModelList(resultList);
-        envelop.setSuccessFlg(true);
+        int count = (int)elasticSearchService.count(index, type, filterMap);
+        envelop = getPageResult(resultList, count, page, size);
         return envelop;
     }
 

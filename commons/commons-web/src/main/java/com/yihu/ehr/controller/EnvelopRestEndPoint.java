@@ -39,10 +39,10 @@ public class EnvelopRestEndPoint extends BaseRestEndPoint {
         return envelop;
     }
 
-    public Envelop getPageResult(List detaiModelList, int totalCount, int currPage, int rows) {
+    public Envelop getPageResult(List detailModelList, int totalCount, int currPage, int rows) {
         Envelop result = new Envelop();
         result.setSuccessFlg(true);
-        result.setDetailModelList(detaiModelList);
+        result.setDetailModelList(detailModelList);
         result.setTotalCount(totalCount);
         result.setCurrPage(currPage);
         result.setPageSize(rows);
@@ -51,7 +51,6 @@ public class EnvelopRestEndPoint extends BaseRestEndPoint {
         } else {
             result.setTotalPage(result.getTotalCount() / result.getPageSize());
         }
-
         return result;
     }
 

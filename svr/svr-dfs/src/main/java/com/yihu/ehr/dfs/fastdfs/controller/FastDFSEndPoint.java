@@ -704,8 +704,9 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         }else {
             filterMap = new ArrayList<Map<String, String>>(0);
         }
-        envelop.setDetailModelList(elasticSearchService.page(indexName, indexType, filterMap, page, size));
-        envelop.setSuccessFlg(true);
+        List<Map<String, Object>> resultList = elasticSearchService.page(indexName, indexType, filterMap, page, size);
+        int count = (int)elasticSearchService.count(indexName, indexType, filterMap);
+        envelop = getPageResult(resultList, count, page, size);
         return envelop;
     }
 

@@ -58,18 +58,27 @@ public class ElasticSearchService {
     }
 
     public Map<String, Object> findById(String index, String type, String id) {
-        return  elasticSearchDao.findById(index, type, id);
+        return elasticSearchDao.findById(index, type, id);
     }
 
     public List<Map<String, Object>> findByField(String index, String type, String field, Object value) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-        //QueryStringQueryBuilder queryStringQueryBuilder = QueryBuilders.queryStringQuery(field + ":" + value);
         boolQueryBuilder.must(matchQueryBuilder);
         return elasticSearchDao.findByField(index, type, boolQueryBuilder);
     }
 
     public List<Map<String, Object>> page(String index, String type, List<Map<String, String>> filter, int page, int size) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+        return elasticSearchDao.page(index, type, boolQueryBuilder, page, size);
+    }
+
+    public long count(String index, String type, List<Map<String, String>> filter) {
+        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
+        return elasticSearchDao.count(index, type, boolQueryBuilder);
+    }
+
+    public QueryBuilder getQueryBuilder(List<Map<String, String>> filter) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         for(Map<String, String> param : filter) {
             String andOr = param.get("andOr");
@@ -111,6 +120,7 @@ public class ElasticSearchService {
                 }
             }
         }
-        return elasticSearchDao.page(index, type, boolQueryBuilder, page, size);
+        return boolQueryBuilder;
     }
+
 }
