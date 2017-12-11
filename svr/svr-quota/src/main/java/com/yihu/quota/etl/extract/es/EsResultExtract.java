@@ -310,17 +310,17 @@ public class EsResultExtract {
     }
 
     //根据mysql 指标分组求和 支持一个和多个字段
-    public Map<String, Integer> searcherByGroupBySql(TjQuota tjQuota , String aggsFields ,String filter) throws Exception {
+    public Map<String, Integer> searcherSumByGroupBySql(TjQuota tjQuota , String aggsFields ,String filter) throws Exception {
         initialize(tjQuota,null);
         if(StringUtils.isEmpty(filter)){
             filter =  " quotaCode='" + tjQuota.getCode() + "' ";
         }else {
-            filter = filter + " ,quotaCode='" + tjQuota.getCode() + "' ";
+            filter = filter + " and quotaCode='" + tjQuota.getCode() + "' ";
         }
         Client client = getEsClient();
         Map<String, Integer> map = null;
         try {
-            map = elasticsearchUtil.searcherByGroupBySql(client, esConfig.getIndex(), aggsFields, filter, "result");;
+            map = elasticsearchUtil.searcherSumByGroupBySql(client, esConfig.getIndex(), aggsFields, filter, "result");;
         }catch (Exception e){
             e.getMessage();
         }finally {

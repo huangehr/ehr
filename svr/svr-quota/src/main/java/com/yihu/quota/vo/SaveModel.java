@@ -210,7 +210,7 @@ public class SaveModel {
     }
 
     public void setQuotaCode(String quotaCode) {
-        this.quotaCode = quotaCode;
+        this.quotaCode = quotaCode.replaceAll("_","");
     }
 
     public String getTimeLevel() {

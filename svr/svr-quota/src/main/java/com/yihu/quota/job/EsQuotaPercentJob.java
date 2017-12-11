@@ -14,9 +14,7 @@ import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.quartz.*;
@@ -95,10 +93,16 @@ public class EsQuotaPercentJob implements Job {
                 EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
 
                 BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
-                TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaVo.getCode());
-                TermQueryBuilder termQueryQuotaDate = QueryBuilders.termQuery("quotaDate", quoataDate);
+                QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaVo.getCode().replaceAll("_", ""));
                 boolQueryBuilder.must(termQueryQuotaCode);
-                boolQueryBuilder.must(termQueryQuotaDate);
+                if( !StringUtils.isEmpty(startTime) ){
+                    RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
+                    boolQueryBuilder.must(rangeQueryStartTime);
+                }
+                if( !StringUtils.isEmpty(endTime)){
+                    RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
+                    boolQueryBuilder.must(rangeQueryEndTime);
+                }
                 Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
                 try {
                     elasticsearchUtil.queryDelete(client,boolQueryBuilder);
@@ -117,7 +121,7 @@ public class EsQuotaPercentJob implements Job {
                 //保存数据
                 Boolean success = saveDate(dataSaveModels);
                 tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                tjQuotaLog.setContent(success?"统计保存成功":"统计数据保存失败");
+                tjQuotaLog.setContent(success?"统计保存成功":"统计数据ElasticSearch保存失败");
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent("没有抽取到数据");

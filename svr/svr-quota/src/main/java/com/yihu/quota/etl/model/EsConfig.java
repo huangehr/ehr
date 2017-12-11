@@ -13,10 +13,14 @@ public class EsConfig {
     private String table;// 数据库表
     private String molecular;  // 统计百分比时的分子  指标code
     private String denominator;// 统计百分比时的分母  指标code
-    private String timekey;//根据sql去查询的key
+    private String timekey;//根据sql去查询的key 时间控制字段
     private String filter;  // where条件
     private String aggregation;//聚合方式  默认count，另有sum
     private String aggregationKey;//聚合字段
+
+    private String thousandFlag; //每千，每万 1000,10000
+    private String thousandDmolecular; //每千，每万 统计分子
+    private String thousandDenominator; //每千，每万 统计分母
 
     public String getHost() {
         return host;
@@ -113,5 +117,30 @@ public class EsConfig {
 
     public void setAggregationKey(String aggregationKey) {
         this.aggregationKey = aggregationKey;
+    }
+
+
+    public String getThousandFlag() {
+        return thousandFlag;
+    }
+
+    public void setThousandFlag(String thousandFlag) {
+        this.thousandFlag = thousandFlag;
+    }
+
+    public String getThousandDmolecular() {
+        return thousandDmolecular;
+    }
+
+    public void setThousandDmolecular(String thousandDmolecular) {
+        this.thousandDmolecular = thousandDmolecular;
+    }
+
+    public String getThousandDenominator() {
+        return thousandDenominator;
+    }
+
+    public void setThousandDenominator(String thousandDenominator) {
+        this.thousandDenominator = thousandDenominator;
     }
 }
