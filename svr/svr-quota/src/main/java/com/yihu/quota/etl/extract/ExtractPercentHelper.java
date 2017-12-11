@@ -131,7 +131,7 @@ public class ExtractPercentHelper {
                 // 每千每万人口 计算
                 if(StringUtils.isNotEmpty(esConfig.getThousandDmolecular()) &&  StringUtils.isNotEmpty(esConfig.getThousandDenominator())){
                     Map<String,DictModel> dimensionMap = getQuotaDimension(quotaDataSource.getQuotaCode());
-                    Map<String,DictModel> moleDimensionMap = getQuotaDimension(esConfig.getMolecular());
+                    Map<String,DictModel> moleDimensionMap = getQuotaDimension(esConfig.getThousandDmolecular());
                     List<String> quotaDimension = new ArrayList<>();
                     String moleDimension = "";
                     int num = 0;
@@ -160,7 +160,7 @@ public class ExtractPercentHelper {
                     Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1));
                     Calendar calendar = Calendar.getInstance();
                     int totalCount = 0;
-                    Map<String,Integer>  doneResultMap = quotaService.searcherByGroupBySql(denoTjQuota,"year","year=" + calendar.get(Calendar.YEAR));
+                    Map<String,Integer>  doneResultMap = quotaService.searcherSumByGroupBySql(denoTjQuota, "year", "year=" + calendar.get(Calendar.YEAR));
                     if(doneResultMap != null && doneResultMap.size()>0){
                         for(String key :doneResultMap.keySet())
                         totalCount = totalCount + doneResultMap.get(key);
@@ -259,9 +259,10 @@ public class ExtractPercentHelper {
                 map = moleMap;
                 moleMap.put("result","0");
             }else{
-                float point = 0;
+                String point = "0";
                 float moleVal = Float.valueOf(moleMap.get("result").toString());
-                point = (moleVal/totalCount)*Integer.valueOf(thousandFlag);
+                DecimalFormat   df = new   DecimalFormat("#.##");
+                point = df.format( (moleVal / totalCount) * Integer.valueOf(thousandFlag));
                 moleMap.put("result",point);
                 map = moleMap;
             }

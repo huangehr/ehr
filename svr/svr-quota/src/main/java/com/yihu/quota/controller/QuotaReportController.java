@@ -132,7 +132,7 @@ public class QuotaReportController extends BaseController {
 
                     }
                     //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                    Map<String, Integer> groupDataMap =  quotaService.searcherByGroupBySql(tjQuota, dimension, filter);
+                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter);
                     for(String key : groupDataMap.keySet()){
                         dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
                         xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
@@ -201,7 +201,7 @@ public class QuotaReportController extends BaseController {
         Envelop envelop = new Envelop();
         try {
             TjQuota tjQuota = quotaService.findOne(id);
-            Map<String, Integer>  resultMap = quotaService.searcherByGroupBySql(tjQuota,dimension, filters);
+            Map<String, Integer>  resultMap = quotaService.searcherSumByGroupBySql(tjQuota,dimension, filters);
             envelop.setSuccessFlg(true);
             envelop.setObj(resultMap);
             return envelop;

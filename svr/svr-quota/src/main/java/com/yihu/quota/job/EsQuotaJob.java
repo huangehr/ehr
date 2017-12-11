@@ -103,7 +103,6 @@ public class EsQuotaJob implements Job {
                     RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
                     boolQueryBuilder.must(rangeQueryEndTime);
                 }
-
                 Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
                 try {
                    elasticsearchUtil.queryDelete(client,boolQueryBuilder);
@@ -114,8 +113,7 @@ public class EsQuotaJob implements Job {
                }
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for(SaveModel saveModel :dataModels){
-                    if(saveModel.getResult() != null && Double.valueOf(saveModel.getResult())>0 ){
-                        saveModel.setQuotaCode(saveModel.getQuotaCode().replaceAll("_",""));
+                    if(saveModel.getResult() != null ){//&& Double.valueOf(saveModel.getResult())>0
                         saveModel.setQuotaDate(quoataDate);
                         dataSaveModels.add(saveModel);
                     }
@@ -124,7 +122,7 @@ public class EsQuotaJob implements Job {
                     //保存数据
                     Boolean success = saveDate(dataSaveModels);
                     tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                    tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据保存失败");
+                    tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据ElasticSearch保存失败");
                 }else {
                     tjQuotaLog.setStatus(Contant.save_status.success);
                     tjQuotaLog.setContent("统计成功,统计结果大于0的数据为0条");

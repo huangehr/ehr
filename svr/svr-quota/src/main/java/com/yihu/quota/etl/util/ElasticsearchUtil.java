@@ -169,7 +169,7 @@ public class ElasticsearchUtil {
      * @param sumField  求和字段
      * @return
      */
-    public Map<String, Integer> searcherByGroupBySql(Client client,String index, String aggsFields ,String filter , String sumField) {
+    public Map<String, Integer> searcherSumByGroupBySql(Client client,String index, String aggsFields ,String filter , String sumField) {
         Map<String,Integer> map = new HashMap<>();
 
 //       String mysql1 = "select org ,sum(result) from quota where quotaCode='depart_treat_count' group by org  ";id=16

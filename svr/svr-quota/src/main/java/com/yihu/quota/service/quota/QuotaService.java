@@ -46,8 +46,8 @@ public class QuotaService {
     }
 
 
-    public Map<String, Integer> searcherByGroupBySql(TjQuota tjQuota,String aggsField ,String filters ) throws Exception {
-        return  esResultExtract.searcherByGroupBySql(tjQuota,aggsField,filters);
+    public Map<String, Integer> searcherSumByGroupBySql(TjQuota tjQuota,String aggsField ,String filters ) throws Exception {
+        return  esResultExtract.searcherSumByGroupBySql(tjQuota, aggsField, filters);
     }
 
     //多维度 数据的总和
