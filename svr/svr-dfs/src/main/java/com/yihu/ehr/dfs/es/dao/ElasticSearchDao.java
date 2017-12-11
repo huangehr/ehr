@@ -210,4 +210,19 @@ public class ElasticSearchDao {
             releaseClient(transportClient);
         }
     }
+
+    public long count (String index, String type, QueryBuilder queryBuilder){
+        TransportClient transportClient = getClient();
+        try {
+            SearchRequestBuilder builder = transportClient.prepareSearch(index);
+            builder.setTypes(type);
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(queryBuilder);
+            builder.setExplain(true);
+            return builder.get().getHits().totalHits();
+        }finally {
+            releaseClient(transportClient);
+        }
+    }
+
 }

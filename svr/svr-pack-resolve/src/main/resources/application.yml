@@ -3,6 +3,7 @@ server:
 
 management:
   port: ${server.port}
+
 logging:
   level:
     com:
@@ -20,7 +21,6 @@ spring:
     min-idle: 8
     validation-query: SELECT 1
     test-on-borrow: true
-
   # REDIS
   redis:
     database: 0 # Database index used by the connection factory.
@@ -30,13 +30,11 @@ spring:
     #sentinel:
     #  master: # Name of Redis server.
     #  nodes: # Comma-separated list of host:port pairs.
-
     pool:
       max-active: 8 # Max number of connections that can be allocated by the pool at a given time. Use a negative value for no limit.
       max-idle: 8 # Max number of "idle" connections in the pool. Use a negative value to indicate an unlimited number of idle connections.
       max-wait: -1 # Maximum amount of time (in milliseconds) a connection allocation should block before throwing an exception when the pool is exhausted. Use a negative value to block indefinitely.
       min-idle: 1 # Target for the minimum number of idle connections to maintain in the pool. This setting only has an effect if it is positive.
-
   # SOLR (SolrProperties)
   data:
     solr:
@@ -47,11 +45,9 @@ fast-dfs:
     init-size: 5
     max-size: 20
     wait-time: 500
-
   connect-timeout: 2
   network-timeout: 30
   charset: ISO8859-1
-
   http:
     tracker-http-port: 80
     anti-steal-token: no

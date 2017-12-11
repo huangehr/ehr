@@ -19,11 +19,6 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-solr</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -59,21 +54,6 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>${dependency.scope}</scope>
@@ -94,6 +74,13 @@
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <scope>${dependency.scope}</scope>
@@ -103,17 +90,53 @@
             <artifactId>springfox-swagger2</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
+        <!-- Swagger -->
+
+        <!-- Solr -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-solr</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-solr</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Solr -->
+
+        <!-- Hbase -->
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-hbase</artifactId>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-lang</artifactId>
+                    <groupId>commons-lang</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Hbase -->
+        <!-- fastDFS -->
+        <dependency>
+            <groupId>happy.fish</groupId>
+            <artifactId>fastDFS</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-fastdfs</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <!-- fastDFS -->
 
+        <!-- logback -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -126,6 +149,7 @@
             <version>${version.logback}</version>
             <scope>${dependency.scope}</scope>
         </dependency>
+        <!-- logback -->
 
         <dependency>
             <groupId>com.yihu.ehr</groupId>
@@ -136,21 +160,6 @@
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-util</artifactId>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-hbase</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-fastdfs</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>happy.fish</groupId>
-            <artifactId>fastDFS</artifactId>
-            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
@@ -169,13 +178,30 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-entity</artifactId>
+            <artifactId>commons-redis-mq</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-redis-mq</artifactId>
+            <artifactId>commons-web</artifactId>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- 后期考虑解耦Mysql -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -188,24 +214,9 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-hbase</artifactId>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-lang</artifactId>
-                    <groupId>commons-lang</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-solr</artifactId>
+            <artifactId>commons-entity</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-web</artifactId>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 </project>
