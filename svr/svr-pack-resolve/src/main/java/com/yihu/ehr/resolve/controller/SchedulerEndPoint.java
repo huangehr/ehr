@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiParam;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
 @Api(value = "SchedulerEndPoint", description = "资源化入库任务", tags = {"档案解析服务-资源化入库任务"})
 public class SchedulerEndPoint extends EnvelopRestEndPoint {
 
+    @Value("${resolve.job.max-size}")
+    private int jobMaxSize;
     @Autowired
     private Scheduler scheduler;
 
@@ -57,13 +60,13 @@ public class SchedulerEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "添加解析任务")
     @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.POST)
     public ResponseEntity<String> addJob(
-            @ApiParam(name = "count", value = "任务数量（不要超过6）", required = true, defaultValue = "4")
+            @ApiParam(name = "count", value = "任务数量（不要超过系统设定值）", required = true, defaultValue = "4")
             @RequestParam(value = "count") int count,
             @ApiParam(name = "cronExp", value = "触发器CRON表达式", required = true, defaultValue = "0/4 * * * * ?")
             @RequestParam(value = "cronExp") String cronExp) {
         try {
-            if(count > 6) {
-                count = 6;
+            if(count > jobMaxSize) {
+                count = jobMaxSize;
             }
             GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
             Set<JobKey> jobKeys = scheduler.getJobKeys(groupMatcher);
@@ -91,7 +94,7 @@ public class SchedulerEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除解析任务")
     @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.DELETE)
     public ResponseEntity<String> removeJob(
-            @ApiParam(name = "count", value = "任务数量", required = true, defaultValue = "6")
+            @ApiParam(name = "count", value = "任务数量", required = true, defaultValue = "4")
             @RequestParam(value = "count") int count) {
         try {
             GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");

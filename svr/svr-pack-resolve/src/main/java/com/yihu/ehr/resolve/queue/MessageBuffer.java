@@ -4,6 +4,7 @@ import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.model.packs.MPackage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -18,6 +19,8 @@ import java.util.Queue;
 @Component
 public class MessageBuffer {
 
+    @Value("${resolve.job.check-time}")
+    private int jobCheckTime;
     private Queue<Object> messages = new LinkedList<>();
     private long timeThreshold = new Date().getTime();
 
@@ -38,7 +41,7 @@ public class MessageBuffer {
             String sorts = "-receiveDate";
             int count = 500;
             long dateCheck = new Date().getTime();
-            if(dateCheck - timeThreshold > 10000){
+            if(dateCheck - timeThreshold > jobCheckTime){
                 timeThreshold = new Date().getTime();
                 packageMgrClient.sendResolveMessage(filters, sorts, count);
             }
