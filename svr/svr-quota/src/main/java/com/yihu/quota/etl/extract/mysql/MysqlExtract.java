@@ -119,8 +119,9 @@ public class MysqlExtract {
         }
         //拼凑where语句
         StringBuffer whereSql = new StringBuffer();
+        whereSql.append(" where 1=1");
         if (!StringUtils.isEmpty(esConfig.getFilter())) {
-            whereSql.append(" where " + esConfig.getFilter());
+            whereSql.append(" and " + esConfig.getFilter());
         }
         if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
             if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {//全量，增量
