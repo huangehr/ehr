@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.entity.BaseIdentityEntity;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.sql.Time;
 
 /**
  * Entity - 排班表
@@ -24,10 +24,11 @@ public class Schedule extends BaseIdentityEntity {
         /** 未启用 */
         off
     }
+    private java.sql.Date date;
     // 开始时间
-    private Date start;
+    private java.sql.Time start;
     // 结束时间
-    private Date end;
+    private java.sql.Time end;
     // 车牌号码
     private String carId;
     // 执勤人员
@@ -45,7 +46,37 @@ public class Schedule extends BaseIdentityEntity {
     //性别：0代表未知、1代表男性，2代表女性
     private String gender;
 
+    @JsonFormat(pattern="yyyy-MM-dd", timezone = "GMT+8")
+    @Column(name = "date", nullable = false)
+    public java.sql.Date getDate() {
+        return date;
+    }
 
+    public void setDate(java.sql.Date date) {
+        this.date = date;
+    }
+
+    @JsonFormat(pattern="HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "start", nullable = false)
+    public Time getStart() {
+        return start;
+    }
+
+    public void setStart(Time start) {
+        this.start = start;
+    }
+
+    @JsonFormat(pattern="HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "end", nullable = false)
+    public Time getEnd() {
+        return end;
+    }
+
+    public void setEnd(Time end) {
+        this.end = end;
+    }
+
+    /**
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "start", nullable = false)
     public Date getStart() {
@@ -65,6 +96,7 @@ public class Schedule extends BaseIdentityEntity {
     public void setEnd(Date end) {
         this.end = end;
     }
+    */
 
     @Column(name = "car_id", nullable = false)
     public String getCarId() {
