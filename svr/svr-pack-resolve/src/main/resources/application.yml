@@ -131,6 +131,12 @@ ehr:
       - HDSD00_16_005 #出院日期时间 v1.3
 #error code and message
 
+resolve:
+  job:
+    max-size: 4 #解析入库最大任务数
+    check-time: 60000 #入库消息检查时间间隔
+    cron-exp: 0/4 * * * * ? #默认表达式
+
 ---
 spring:
   profiles: dev

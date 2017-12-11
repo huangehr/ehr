@@ -24,7 +24,7 @@ public class PackResolveLogger {
      * @param warn
      */
     public static void warn(String warn) {
-        logger.info(warn);
+        logger.warn(warn);
     }
 
     /**
@@ -32,7 +32,7 @@ public class PackResolveLogger {
      * @param error
      */
     public static void error(String error) {
-        logger.info(error);
+        logger.error(error);
     }
 
     /**

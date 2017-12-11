@@ -142,10 +142,13 @@ public class PackMillService {
      */
      protected String getResMetadata(String cdaVersion, String srcDataSetCode, String srcMetadataCode){
          // TODO: 翻译时需要的内容：对CODE与VALUE处理后再翻译
-        String resMetadata = redisServiceClient.getRsAdaptionMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
-        if (StringUtils.isEmpty(resMetadata)){
-            //调试的时候可将其改为LoggerService的日志输出
-            PackResolveLogger.warn(
+         if("rBUSINESS_DATE".equals(srcMetadataCode)) {
+             return null;
+         }
+         String resMetadata = redisServiceClient.getRsAdaptionMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
+         if (StringUtils.isEmpty(resMetadata)){
+             //调试的时候可将其改为LoggerService的日志输出
+             PackResolveLogger.warn(
                      String.format("Unable to get resource meta data code for ehr meta data %s of %s in %s, forget to cache them?",
                              srcMetadataCode, srcDataSetCode, cdaVersion));
              return null;
