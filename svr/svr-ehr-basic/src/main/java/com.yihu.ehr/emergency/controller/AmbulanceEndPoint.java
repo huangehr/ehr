@@ -1,9 +1,8 @@
 package com.yihu.ehr.emergency.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.emergency.service.AmbulanceService;
 import com.yihu.ehr.emergency.service.AttendanceService;
 import com.yihu.ehr.emergency.service.LocationService;
@@ -33,7 +32,7 @@ import java.util.*;
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
 @Api(value = "AmbulanceEndPoint", description = "救护车信息", tags = {"应急指挥-救护车信息"})
-public class AmbulanceEndPoint extends BaseRestEndPoint {
+public class AmbulanceEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private AmbulanceService ambulanceService;
@@ -62,8 +61,8 @@ public class AmbulanceEndPoint extends BaseRestEndPoint {
         Envelop envelop = new Envelop();
         try {
             List<Ambulance> ambulanceList = ambulanceService.search(fields, filters, sorts, page, size);
-            envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(ambulanceList);
+            int count = (int)ambulanceService.getCount(filters);
+            envelop = getPageResult(ambulanceList, count, page, size);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);

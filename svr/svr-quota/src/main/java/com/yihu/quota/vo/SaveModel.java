@@ -38,6 +38,8 @@ public class SaveModel {
     private String result;//统计结果
     private String timeLevel;// 1 日 2 周 3 月 4 年
     private String areaLevel;// 1 省 2 市 3 区县 4 机构 5团队
+    private String year;
+    private String yearName;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     @CreatedDate
@@ -208,7 +210,7 @@ public class SaveModel {
     }
 
     public void setQuotaCode(String quotaCode) {
-        this.quotaCode = quotaCode;
+        this.quotaCode = quotaCode.replaceAll("_","");
     }
 
     public String getTimeLevel() {
@@ -257,5 +259,21 @@ public class SaveModel {
 
     public void setQuotaName(String quotaName) {
         this.quotaName = quotaName;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getYearName() {
+        return yearName;
+    }
+
+    public void setYearName(String yearName) {
+        this.yearName = yearName;
     }
 }

@@ -29,6 +29,7 @@ public class ElastricSearchSave {
     private EsConfig esConfig;
 
     public Boolean save(List<SaveModel> smss, String jsonConfig) {
+        BulkResult br = null;
         try {
             //初始化参数
             esConfig = (EsConfig) JSONObject.toBean(JSONObject.fromObject(jsonConfig), EsConfig.class);
@@ -40,11 +41,12 @@ public class ElastricSearchSave {
                 Index index = new Index.Builder(obj).build();
                 bulk.addAction(index);
             }
-            BulkResult br = jestClient.execute(bulk.build());
+            br = jestClient.execute(bulk.build());
             //关闭链接
             jestClient.shutdownClient();
             return br.isSucceeded();
         } catch (Exception e) {
+            logger.error(" save es error ：" + br.getErrorMessage());
             logger.error(" save error ：" + e.getMessage());
         }
         return null;

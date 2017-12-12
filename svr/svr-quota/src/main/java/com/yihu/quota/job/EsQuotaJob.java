@@ -14,9 +14,7 @@ import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.quartz.*;
@@ -90,16 +88,21 @@ public class EsQuotaJob implements Job {
             //抽取数据 如果是累加就是 List<DataModel>  如果是相除 Map<String,List<DataModel>>
             List<SaveModel> dataModels = extract();
             if(dataModels != null && dataModels.size() > 0){
-//                String quoataDate = DateUtil.formatDate(new Date(),DateUtil.DEFAULT_DATE_YMD_FORMAT);
                 String quoataDate =  new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd");
 
                 //查询是否已经统计过,如果已统计 先删除后保存
                 EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
                 BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
-                TermQueryBuilder termQueryQuotaCode = QueryBuilders.termQuery("quotaCode", quotaVo.getCode());
-                TermQueryBuilder termQueryQuotaDate = QueryBuilders.termQuery("quotaDate", quoataDate);
+                QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaVo.getCode().replaceAll("_", ""));
                 boolQueryBuilder.must(termQueryQuotaCode);
-                boolQueryBuilder.must(termQueryQuotaDate);
+                if( !StringUtils.isEmpty(startTime) ){
+                    RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
+                    boolQueryBuilder.must(rangeQueryStartTime);
+                }
+                if( !StringUtils.isEmpty(endTime)){
+                    RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
+                    boolQueryBuilder.must(rangeQueryEndTime);
+                }
                 Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
                 try {
                    elasticsearchUtil.queryDelete(client,boolQueryBuilder);
@@ -110,7 +113,7 @@ public class EsQuotaJob implements Job {
                }
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for(SaveModel saveModel :dataModels){
-                    if(saveModel.getResult() != null && Double.valueOf(saveModel.getResult())>0 ){
+                    if(saveModel.getResult() != null ){//&& Double.valueOf(saveModel.getResult())>0
                         saveModel.setQuotaDate(quoataDate);
                         dataSaveModels.add(saveModel);
                     }
@@ -119,7 +122,7 @@ public class EsQuotaJob implements Job {
                     //保存数据
                     Boolean success = saveDate(dataSaveModels);
                     tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
-                    tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据保存失败");
+                    tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据ElasticSearch保存失败");
                 }else {
                     tjQuotaLog.setStatus(Contant.save_status.success);
                     tjQuotaLog.setContent("统计成功,统计结果大于0的数据为0条");

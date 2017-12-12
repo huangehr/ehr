@@ -115,25 +115,25 @@ public class QuotaReportController extends BaseController {
                             //查询字典数据
                             List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
                             for (DictModel dictModel : dictDatas) {
-                                String name = getFieldValueByName("name", dictModel).toString();
-                                String val = getFieldValueByName("code",dictModel).toString();
+                                String name = getFieldValueByName("name", dictModel);
+                                String val = getFieldValueByName("code",dictModel).toLowerCase();
                                 dimensionDicMap.put(val,name);
                             }
                         } else{
                             List<SaveModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
                             if(dictDatas != null ) {
                                 for (SaveModel saveModel : dictDatas) {
-                                    String name = getFieldValueByName(dimension + "Name", saveModel).toString();
-                                    String val = getFieldValueByName(dimension,saveModel).toString();
+                                    String name = getFieldValueByName(dimension + "Name", saveModel);
+                                    String val = getFieldValueByName(dimension,saveModel).toLowerCase();
                                     dimensionDicMap.put(val,name);
                                 }
                             }
                         }
-
                     }
                     //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                    Map<String, Integer> groupDataMap =  quotaService.searcherByGroupBySql(tjQuota, dimension, filter);
+                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter);
                     for(String key : groupDataMap.keySet()){
+                        key = key.toLowerCase();
                         dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
                         xAxisMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key): key,key);
                     }
@@ -201,7 +201,7 @@ public class QuotaReportController extends BaseController {
         Envelop envelop = new Envelop();
         try {
             TjQuota tjQuota = quotaService.findOne(id);
-            Map<String, Integer>  resultMap = quotaService.searcherByGroupBySql(tjQuota,dimension, filters);
+            Map<String, Integer>  resultMap = quotaService.searcherSumByGroupBySql(tjQuota,dimension, filters);
             envelop.setSuccessFlg(true);
             envelop.setObj(resultMap);
             return envelop;
@@ -240,13 +240,13 @@ public class QuotaReportController extends BaseController {
     /**
      * 根据属性名获取属性值
      * */
-    private Object getFieldValueByName(String fieldName, Object o) {
+    private String getFieldValueByName(String fieldName, Object o) {
         try {
             String firstLetter = fieldName.substring(0, 1).toUpperCase();
             String getter = "get" + firstLetter + fieldName.substring(1);
             Method method = o.getClass().getMethod(getter, new Class[] {});
             Object value = method.invoke(o, new Object[] {});
-            return value;
+            return value.toString();
         } catch (Exception e) {
             return null;
         }

@@ -3,6 +3,7 @@ package com.yihu.ehr.quota.service;
 import com.yihu.ehr.entity.quota.TjQuotaLog;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.quota.dao.XTjQuotaLogRepository;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +96,7 @@ public class TjQuotaLogService extends BaseJpaService<TjQuotaLog, XTjQuotaLogRep
     }
 
     public List<TjQuotaLog> getRecentRecord(String quotaCode,String endTime) {
-        List<TjQuotaLog> tjQuotaLogs = tjQuotaLogRepository.getRecentRecord(quotaCode, new Date(endTime));
+        List<TjQuotaLog> tjQuotaLogs = tjQuotaLogRepository.getRecentRecord(quotaCode, DateUtil.strToDate(endTime, "yyyy-MM-dd HH:mm:ss"));
         if (tjQuotaLogs != null && tjQuotaLogs.size() > 0) {
             return tjQuotaLogs;
         }
