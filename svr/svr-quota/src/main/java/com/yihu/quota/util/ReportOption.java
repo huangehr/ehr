@@ -365,7 +365,6 @@ public class ReportOption {
         } else {
             pie.center(new String[]{"50%", "50%"});
         }
-        pie.itemStyle().normal().label().position("inner");
         pie.itemStyle().emphasis().shadowBlur(10);
         pie.itemStyle().emphasis().shadowOffsetX(0);
         pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
@@ -389,7 +388,6 @@ public class ReportOption {
             pie2.type(SeriesType.pie);
             pie2.radius("40%");
             pie2.center(new String[]{"70%", "50%"});
-            pie.itemStyle().normal().label().position("inner");
             pie2.itemStyle().emphasis().shadowBlur(10);
             pie2.itemStyle().emphasis().shadowOffsetX(0);
             pie2.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
