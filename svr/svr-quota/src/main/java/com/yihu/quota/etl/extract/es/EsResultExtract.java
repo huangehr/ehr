@@ -313,9 +313,9 @@ public class EsResultExtract {
     public Map<String, Integer> searcherSumByGroupBySql(TjQuota tjQuota , String aggsFields ,String filter) throws Exception {
         initialize(tjQuota,null);
         if(StringUtils.isEmpty(filter)){
-            filter =  " quotaCode='" + tjQuota.getCode() + "' ";
+            filter =  " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
         }else {
-            filter = filter + " and quotaCode='" + tjQuota.getCode() + "' ";
+            filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
         }
         Client client = getEsClient();
         Map<String, Integer> map = null;
