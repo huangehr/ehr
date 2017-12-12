@@ -15,6 +15,7 @@ import com.github.abel533.echarts.series.Bar;
 import com.github.abel533.echarts.series.Line;
 import com.github.abel533.echarts.series.Pie;
 import com.github.abel533.echarts.series.Radar;
+import com.yihu.ehr.model.echarts.ChartDataModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -491,5 +492,78 @@ public class ReportOption {
         return option;
     }
 
+    /**
+     * 嵌套饼图
+     *
+     * @param title
+     * @param pieName
+     * @param dataModel
+     * @return
+     */
+    public Option getNestedPieEchartOption(String title, String pieName, ChartDataModel dataModel) {
+        Option option = new GsonOption();
+        // title
+        option.title().setText(title);
+        option.title().setSubtext(title);
+        option.title().x("center");
 
+        // tooltip
+        option.tooltip().trigger(Trigger.item);
+
+        // grid
+        option.grid().left("3%");
+        option.grid().right("4%");
+        option.grid().bottom("3%");
+        option.grid().containLabel(true);
+
+        // series
+        List<Pie> pieList = new ArrayList<>();
+        pieList = getPie(pieList, dataModel);
+        String temp = "20";
+        for (int i = 0; i < pieList.size(); i++) {
+            Pie pie = pieList.get(i);
+            pie.name(pieName);
+            if (i == 0) {
+                pie.radius("0%", "20%");
+            } else {
+                pie.radius((Integer.parseInt(temp) + 5) + "%", (Integer.parseInt(temp) + 20 )+ "%");
+                temp = (Integer.parseInt(temp) + 20) + "";
+            }
+            option.series().add(pie);
+        }
+        return option;
+    }
+
+    public List<Pie> getPie(List<Pie> pieList, ChartDataModel dataModel) {
+        Pie pie = new Pie();
+        if (null == dataModel.getChildren()) {
+            pie = envelopPie(pie, dataModel.getList());
+            pieList.add(pie);
+            return pieList;
+        } else {
+            pie = envelopPie(pie, dataModel.getList());
+            pieList.add(pie);
+            pieList = getPie(pieList, dataModel.getChildren());
+            return pieList;
+        }
+    }
+
+    public Pie envelopPie(Pie pie, List<Map<String, Object>> dataModel) {
+        pie.type(SeriesType.pie);
+        pie.itemStyle().emphasis().shadowBlur(10);
+        pie.itemStyle().emphasis().shadowOffsetX(0);
+        pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
+
+        List<Object> pieNameList = getList(dataModel,"NAME");
+        List<Object> pieValList = getList(dataModel,"TOTAL");
+        List<Map<String,Object>> dataList = new ArrayList<Map<String,Object>>();
+        for(int i = 0 ;i < pieValList.size(); i++){
+            Map<String,Object> map = new HashMap<>();
+            map.put("value", pieValList.get(i));
+            map.put("name", pieNameList.get(i));
+            dataList.add(map);
+        }
+        pie.setData(dataList);
+        return pie;
+    }
 }
