@@ -180,6 +180,7 @@ public class ElasticsearchUtil {
              .append(" where " ).append(filter)
              .append(" group by ").append(aggsFields);
         try {
+            System.out.println("查询分组 mysql= " + mysql.toString());
             SQLExprParser parser = new ElasticSqlExprParser(mysql.toString());
             SQLExpr expr = parser.expr();
             if (parser.getLexer().token() != Token.EOF) {
