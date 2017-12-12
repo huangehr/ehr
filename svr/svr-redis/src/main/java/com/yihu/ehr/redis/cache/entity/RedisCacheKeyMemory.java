@@ -1,6 +1,6 @@
 package com.yihu.ehr.redis.cache.entity;
 
-import com.yihu.ehr.entity.BaseIdentityEntity;
+import com.yihu.ehr.entity.BaseAssignedEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "redis_cache_key_memory")
-public class RedisCacheKeyMemory extends BaseIdentityEntity {
+public class RedisCacheKeyMemory extends BaseAssignedEntity {
 
     private int databaseNo; // Redis数据库编号
     private String type; // 数据类型

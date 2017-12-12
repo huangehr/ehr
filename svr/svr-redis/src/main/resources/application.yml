@@ -72,7 +72,12 @@ ehr-redis:
   cache:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: E:\临时文件\memory.csv
+      outFilePath: /usr/local/ehr/redisReport/memory.csv
+  server:
+    host: 172.19.103.47
+    username: root
+    password: jkzl
+    ssh-port: 22
 
 
 ---
@@ -95,7 +100,12 @@ ehr-redis:
   cache:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: E:\临时文件\memory.csv
+      outFilePath: /usr/local/ehr/redisReport/memory.csv
+  server:
+    host: 172.19.103.47
+    username: root
+    password: jkzl
+    ssh-port: 22
 
 
 ---
@@ -118,7 +128,12 @@ ehr-redis:
   cache:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: E:\临时文件\memory.csv
+      outFilePath: /usr/local/ehr/redisReport/memory.csv
+  server:
+    host: 172.19.103.47
+    username: root
+    password: jkzl
+    ssh-port: 22
 
 
 ---
@@ -141,7 +156,12 @@ ehr-redis:
   cache:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: E:\临时文件\memory.csv
+      outFilePath: /usr/local/ehr/redisReport/memory.csv
+  server:
+    host: 172.19.103.47
+    username: root
+    password: jkzl
+    ssh-port: 22
 
 
 ---
@@ -167,7 +187,12 @@ ehr-redis:
   cache:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: E:\临时文件\memory.csv
+      outFilePath: /usr/local/ehr/redisReport/memory.csv
+  server:
+    host: 172.19.103.47
+    username: root
+    password: jkzl
+    ssh-port: 22
 
 
 ---
@@ -192,4 +217,9 @@ ehr-redis:
   cache:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
-      outFilePath: E:\临时文件\memory.csv
+      outFilePath: /usr/local/ehr/redisReport/memory.csv
+  server:
+    host: 172.19.103.47
+    username: root
+    password: jkzl
+    ssh-port: 22
