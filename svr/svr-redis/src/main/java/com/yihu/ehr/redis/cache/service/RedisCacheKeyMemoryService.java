@@ -70,13 +70,18 @@ public class RedisCacheKeyMemoryService extends BaseJpaService<RedisCacheKeyMemo
     }
 
     @Transactional(readOnly = false)
+    public Iterable<RedisCacheKeyMemory> save(List<RedisCacheKeyMemory> list) {
+        return redisCacheKeyMemoryDao.save(list);
+    }
+
+    @Transactional(readOnly = false)
     public void delete(Integer id) {
         redisCacheKeyMemoryDao.delete(id);
     }
 
     @Transactional(readOnly = false)
-    public void deleteAll() {
-        redisCacheKeyMemoryDao.deleteAll();
+    public void deleteAllInBatch() {
+        redisCacheKeyMemoryDao.deleteAllInBatch();
     }
 
 }

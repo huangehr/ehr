@@ -1,8 +1,10 @@
 package com.yihu.ehr.resolve.job;
 
+import com.yihu.ehr.resolve.util.PackResolveLogger;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +20,10 @@ import static org.quartz.TriggerBuilder.newTrigger;
 @Component
 public class PackageResolveTask {
 
-    private int total = 6;
-    private String cronExp = "0/4 * * * * ?";
-
+    @Value("${resolve.job.max-size}")
+    private int jobMaxSize;
+    @Value("${resolve.job.cron-exp}")
+    private String jobCronExp;
     @Autowired
     private Scheduler scheduler;
 
@@ -31,14 +34,14 @@ public class PackageResolveTask {
             Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
             if(null != jobKeySet) {
                 int activeCount = jobKeySet.size();
-                for (int i = 0; i < total - activeCount; i++) {
+                for (int i = 0; i < jobMaxSize - activeCount; i++) {
                     String suffix = UUID.randomUUID().toString().substring(0, 8);
                     JobDetail jobDetail = newJob(PackageResourceJob.class)
                             .withIdentity("PackResolveJob-" + suffix, "PackResolve")
                             .build();
                     CronTrigger trigger = newTrigger()
                             .withIdentity("PackResolveTrigger-" + suffix)
-                            .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
+                            .withSchedule(CronScheduleBuilder.cronSchedule(jobCronExp))
                             .startNow()
                             .build();
                     scheduler.scheduleJob(jobDetail, trigger);
@@ -46,6 +49,7 @@ public class PackageResolveTask {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            PackResolveLogger.error(e.getMessage());
             //删除任务
             try {
                 GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
@@ -55,6 +59,7 @@ public class PackageResolveTask {
                 }
             } catch (SchedulerException se) {
                 se.printStackTrace();
+                PackResolveLogger.error(e.getMessage());
             }
         }
     }

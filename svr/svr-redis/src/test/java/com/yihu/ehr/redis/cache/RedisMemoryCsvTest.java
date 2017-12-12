@@ -22,17 +22,17 @@ public class RedisMemoryCsvTest {
 //        FileWriter fw = null;
 //        BufferedWriter bw = null;
         try {
-            String rdbToolPath = "C:\\Zjj_Programs\\redis-rdb-tools-rdbtools-0.1.11\\rdbtools\\cli\\rdb.py";
+            // 这两个文件路径在同一主机上。
             String rdbFilePath = "C:\\Zjj_Programs\\Redis-x64-3.2.100\\dump.rdb";
             String outFilePath = "E:\\临时文件\\memory.csv";
 
             // 该写法没效果，原因不详。
-//            String[] cmdArgs = {"python", rdbToolPath, "-c memory", rdbFilePath};
+//            String[] cmdArgs = {"rdb", "-c memory", rdbFilePath};
 //            Process pr = Runtime.getRuntime().exec(cmdArgs);
             // 获取内存分析文件流，手动导出数据到CSV文件
-//            String command = "python " + rdbToolPath + " -c memory " + rdbFilePath;
+//            String command = "rdb -c memory " + rdbFilePath;
             // 命令中指定CSV文件进行导出
-            String command = "python " + rdbToolPath + " -c memory " + rdbFilePath + " -f " + outFilePath;
+            String command = "rdb -c memory " + rdbFilePath + " -f " + outFilePath;
             Process pr = Runtime.getRuntime().exec(command);
 
             /*// 手动导出CSV文件
