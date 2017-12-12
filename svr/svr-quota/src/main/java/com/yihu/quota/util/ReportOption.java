@@ -15,6 +15,7 @@ import com.github.abel533.echarts.series.Bar;
 import com.github.abel533.echarts.series.Line;
 import com.github.abel533.echarts.series.Pie;
 import com.github.abel533.echarts.series.Radar;
+import com.github.abel533.echarts.style.itemstyle.Normal;
 import com.yihu.ehr.model.echarts.ChartDataModel;
 
 import java.util.ArrayList;
@@ -550,6 +551,9 @@ public class ReportOption {
 
     public Pie envelopPie(Pie pie, List<Map<String, Object>> dataModel) {
         pie.type(SeriesType.pie);
+        Normal normal = new Normal();
+        normal.label().position("inner");
+        pie.label().normal(normal);
         pie.itemStyle().emphasis().shadowBlur(10);
         pie.itemStyle().emphasis().shadowOffsetX(0);
         pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
