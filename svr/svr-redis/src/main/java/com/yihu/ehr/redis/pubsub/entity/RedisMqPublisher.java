@@ -1,6 +1,8 @@
 package com.yihu.ehr.redis.pubsub.entity;
 
 
+import com.yihu.ehr.entity.BaseIdentityEntity;
+
 import javax.persistence.*;
 
 /**
@@ -11,25 +13,12 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "redis_mq_publisher")
-public class RedisMqPublisher {
+public class RedisMqPublisher extends BaseIdentityEntity {
 
-    public Integer id; // 主键
     public String appId; // 应用ID
     public String authorizedCode; // 授权码
     public String channel; // 消息队列编码
-    public String createTime; // 创建时间
     public String remark; // 备注
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     @Column(name = "app_id")
     public String getAppId() {
@@ -56,15 +45,6 @@ public class RedisMqPublisher {
 
     public void setChannel(String channel) {
         this.channel = channel;
-    }
-
-    @Column(name = "create_time")
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
     }
 
     @Column(name = "remark")

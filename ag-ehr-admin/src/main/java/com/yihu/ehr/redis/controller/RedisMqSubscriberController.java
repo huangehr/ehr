@@ -1,21 +1,15 @@
 package com.yihu.ehr.redis.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
-import com.yihu.ehr.model.redis.MRedisMqSubscriber;
 import com.yihu.ehr.redis.client.RedisMqSubscriberClient;
-import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Redis消息订阅者 Controller
@@ -36,16 +30,7 @@ public class RedisMqSubscriberController extends BaseController {
     public Envelop getById(
             @ApiParam(name = "id", value = "主键", required = true)
             @PathVariable(value = "id") Integer id) throws Exception {
-        try {
-            Envelop envelop = new Envelop();
-            envelop.setSuccessFlg(true);
-            MRedisMqSubscriber mMRedisMqSubscriber = redisMqSubscriberClient.getById(id);
-            envelop.setObj(mMRedisMqSubscriber);
-            return envelop;
-        } catch (Exception e) {
-            LogService.getLogger(RedisMqSubscriberController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        return redisMqSubscriberClient.getById(id);
     }
 
     @ApiOperation(value = "根据条件获取消息订阅者")
@@ -61,17 +46,7 @@ public class RedisMqSubscriberController extends BaseController {
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "分页大小")
             @RequestParam(value = "size", required = false) int size) throws Exception {
-        Envelop envelop = new Envelop();
-        try {
-            ResponseEntity<List<MRedisMqSubscriber>> responseEntity = redisMqSubscriberClient.search(fields, filters, sorts, page, size);
-            List<MRedisMqSubscriber> mMRedisMqSubscriberList = responseEntity.getBody();
-            envelop = getResult(mMRedisMqSubscriberList, getTotalCount(responseEntity), page, size);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RedisMqSubscriberController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        return redisMqSubscriberClient.search(fields, filters, sorts, page, size);
     }
 
     @ApiOperation("新增消息订阅者")
@@ -79,17 +54,7 @@ public class RedisMqSubscriberController extends BaseController {
     public Envelop add(
             @ApiParam(name = "entityJson", value = "消息订阅者JSON", required = true)
             @RequestParam(value = "entityJson") String entityJson) throws Exception {
-        Envelop envelop = new Envelop();
-        try {
-            MRedisMqSubscriber newMRedisMqSubscriber = redisMqSubscriberClient.add(entityJson);
-            envelop.setObj(newMRedisMqSubscriber);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RedisMqSubscriberController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        return redisMqSubscriberClient.add(entityJson);
     }
 
     @ApiOperation("更新消息订阅者")
@@ -97,17 +62,7 @@ public class RedisMqSubscriberController extends BaseController {
     public Envelop update(
             @ApiParam(name = "entityJson", value = "消息订阅者JSON", required = true)
             @RequestParam(value = "entityJson") String entityJson) throws Exception {
-        Envelop envelop = new Envelop();
-        try {
-            MRedisMqSubscriber newMRedisMqSubscriber = redisMqSubscriberClient.update(entityJson);
-            envelop.setObj(newMRedisMqSubscriber);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RedisMqSubscriberController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        return redisMqSubscriberClient.update(entityJson);
     }
 
     @ApiOperation("删除消息订阅者")
@@ -115,16 +70,7 @@ public class RedisMqSubscriberController extends BaseController {
     public Envelop delete(
             @ApiParam(name = "id", value = "消息订阅者ID", required = true)
             @RequestParam(value = "id") Integer id) throws Exception {
-        Envelop envelop = new Envelop();
-        try {
-            redisMqSubscriberClient.delete(id);
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RedisMqSubscriberController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        return redisMqSubscriberClient.delete(id);
     }
 
     @ApiOperation("验证指定消息队列中订阅者应用ID是否唯一")
@@ -136,19 +82,7 @@ public class RedisMqSubscriberController extends BaseController {
             @RequestParam(value = "channel") String channel,
             @ApiParam(name = "appId", value = "订阅者应用ID", required = true)
             @RequestParam(value = "appId") String appId) throws Exception {
-        Envelop envelop = new Envelop();
-        try {
-            boolean result = redisMqSubscriberClient.isUniqueAppId(id, channel, appId);
-            envelop.setSuccessFlg(result);
-            if (!result) {
-                envelop.setErrorMsg("该消息订阅者应用ID已存在，请重新填写！");
-            }
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RedisMqSubscriberController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        return redisMqSubscriberClient.isUniqueAppId(id, channel, appId);
     }
 
     @ApiOperation("验证指定消息队列中订阅者服务地址是否唯一")
@@ -160,19 +94,7 @@ public class RedisMqSubscriberController extends BaseController {
             @RequestParam(value = "channel") String channel,
             @ApiParam(name = "subscriberUrl", value = "消息订阅者服务地址", required = true)
             @RequestParam(value = "subscriberUrl") String subscriberUrl) throws Exception {
-        Envelop envelop = new Envelop();
-        try {
-            boolean result = redisMqSubscriberClient.isUniqueSubscribedUrl(id, channel, subscriberUrl);
-            envelop.setSuccessFlg(result);
-            if (!result) {
-                envelop.setErrorMsg("该消息订阅者服务地址已存在，请重新填写！");
-            }
-            return envelop;
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogService.getLogger(RedisMqSubscriberController.class).error(e.getMessage());
-            return failed(ErrorCode.SystemError.toString());
-        }
+        return redisMqSubscriberClient.isUniqueSubscribedUrl(id, channel, subscriberUrl);
     }
 
 }
