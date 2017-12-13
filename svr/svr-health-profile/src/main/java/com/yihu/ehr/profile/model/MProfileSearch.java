@@ -1,10 +1,11 @@
-package com.yihu.ehr.profile.controller.profile;
+package com.yihu.ehr.profile.model;
 
 /**
  * @author Sand
  * @created 2016.04.29 10:05
  */
 class MProfileSearch {
+
     private String demographicId;
     private String organizationCode;
     private String patientId;
