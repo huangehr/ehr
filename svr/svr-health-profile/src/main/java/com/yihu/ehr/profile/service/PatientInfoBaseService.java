@@ -1,6 +1,7 @@
 package com.yihu.ehr.profile.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.profile.feign.*;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.map.HashedMap;
@@ -18,6 +19,10 @@ import java.util.*;
  */
 @Service
 public class PatientInfoBaseService {
+
+    @Value("${spring.application.id}")
+    private String appId;
+
     static class EventDateComparatorDesc implements Comparator<Map<String, Object>> {
         @Override
         public int compare(Map<String, Object> m1, Map<String, Object> m2) {
@@ -40,21 +45,10 @@ public class PatientInfoBaseService {
             return 0;
         }
     }
-
     @Autowired
-    XResourceClient resource; //资源服务
-
+    private XResourceClient resource; //资源服务
     @Autowired
-    XOrganizationClient organization; //机构信息服务
-
-    @Autowired
-    XRedisServiceClient redisServiceClient;
-
-    @Autowired
-    XGeographyClient addressClient;
-
-    @Value("${spring.application.id}")
-    String appId;
+    private XRedisServiceClient redisServiceClient;
 
     /**
      * 根据时间获取病龄
@@ -65,29 +59,25 @@ public class PatientInfoBaseService {
         SimpleDateFormat sd = new SimpleDateFormat("yyyyMM");
         String eventDataYear=eventData.toString().substring(0, 7).substring(0,4);
         String eventDataMonth=eventData.toString().substring(0, 7).substring(5,7);
-        String ageOfDisease="";
-
-
+        String ageOfDisease = "";
         if(Integer.parseInt(sd.format(new Date()).substring(4, 6)) - Integer.parseInt(eventDataMonth)<0){
             Integer year = Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear)-1;
             Integer month = Integer.parseInt(sd.format(new Date()).substring(4, 6))+12- Integer.parseInt(eventDataMonth);
-            if(year>0)
-            {
-                ageOfDisease = year+"年"+month+"个月";
+            if(year>0) {
+                ageOfDisease = year + "年" + month + "个月";
             }
             else{
-                ageOfDisease = month+"个月";
+                ageOfDisease = month + "个月";
             }
         }
         else{
             Integer year = Integer.parseInt(sd.format(new Date()).substring(0, 4)) - Integer.parseInt(eventDataYear);
             Integer month = Integer.parseInt(sd.format(new Date()).substring(4, 6))- Integer.parseInt(eventDataMonth);
-            if(year>0)
-            {
-                ageOfDisease = year+"年"+month+"个月";
+            if(year>0) {
+                ageOfDisease = year + "年" + month + "个月";
             }
             else{
-                ageOfDisease = month+"个月";
+                ageOfDisease = month + "个月";
             }
         }
         return ageOfDisease;
@@ -99,19 +89,18 @@ public class PatientInfoBaseService {
         int year2=0;
         int month2=0;
         if(AgeOfDisease1.split("年|个月").length>1) {
-            year1= Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
-            month1= Integer.parseInt(AgeOfDisease1.split("年|个月")[1]);
+            year1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
+            month1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[1]);
         }
         else
-            month1= Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
+            month1 = Integer.parseInt(AgeOfDisease1.split("年|个月")[0]);
         if(AgeOfDisease2.split("年|个月").length>1) {
-            year2= Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
-            month2= Integer.parseInt(AgeOfDisease2.split("年|个月")[1]);
+            year2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
+            month2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[1]);
         }
-
         else
-            month2= Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
-        if(year1*12+month1<=year2*12+month2)
+            month2 = Integer.parseInt(AgeOfDisease2.split("年|个月")[0]);
+        if(year1 * 12 + month1 <= year2 * 12 + month2)
             return 1;
         else
             return 0;
@@ -121,89 +110,88 @@ public class PatientInfoBaseService {
     /**
      * @获取患者档案基本信息  (考虑改造、mysql取值、保密字段!!!)
      */
-    public Map<String, Object> getPatientInfo(String demographicId) throws Exception {
+    public Map<String, Object> getPatientInfo(String demographicId, String version) {
         //时间排序
-        Envelop result = resource.getResources(BasisConstant.patientInfo, "*","*", "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
-        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
-            List<Map<String, Object>> list = result.getDetailModelList();
+        Envelop envelop;
+        if(version != null) {
+            envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, version);
+        }else {
+            envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, null);
+        }
+        List<Map<String, Object>> list = envelop.getDetailModelList();
+        if (list != null && list.size() > 0) {
             if (list.size() == 1) {
                 return list.get(0);
             } else {
-                Map<String, Object> re = new HashMap<>();
-                /***************** 需要合并数据 **************************/
+                //合并数据
+                Map<String, Object> result = new HashMap<>();
                 for (Map<String, Object> obj : list) {
                     for (String key : obj.keySet()) {
-                        if (!re.containsKey(key)) {
-                            re.put(key, obj.get(key));
+                        if (!result.containsKey(key)) {
+                            result.put(key, obj.get(key));
                         }
                     }
                 }
-                /*******************************************************/
-                return re;
+                return result;
             }
         } else {
-            throw new Exception("查无此人！");
+            return null;
         }
     }
 
     /*
      * @根据患者住院门诊记录做健康问题统计
      */
-    public List<Map<String, Object>> getHealthProblem(String demographicId) throws Exception {
-        List<Map<String, Object>> re = new ArrayList<>();
+    public List<Map<String, Object>> getHealthProblem(String demographicId) {
+        List<Map<String, Object>> result = new ArrayList<>();
         //获取门诊住院记录
-        Envelop result = resource.getResources(BasisConstant.patientEvent, "*", "*", "{\"q\":\"demographic_id:" + demographicId + "\"}", null, null);
-        Map<String,List<Map<String, Object>>> hpList = new HashedMap();
-        if (result.getDetailModelList() != null && result.getDetailModelList().size() > 0) {
-            List<Map<String, Object>> eventList = (List<Map<String, Object>>) result.getDetailModelList();
+        Envelop envelop = resource.getMasterData("{\"q\":\"demographic_id:" + demographicId + "\"}", null, null, null);
+        Map<String, List<Map<String, Object>>> hpMap = new HashedMap();
+        if (envelop.getDetailModelList() != null && envelop.getDetailModelList().size() > 0) {
+            List<Map<String, Object>> eventList = envelop.getDetailModelList();
             //进行降序
             Collections.sort(eventList, new EventDateComparatorDesc());
             for(Map<String, Object> event : eventList) {
                  if(event.containsKey(BasisConstant.healthProblem)) {
                      String healthProblem = event.get(BasisConstant.healthProblem).toString();
                      if(!StringUtils.isEmpty(healthProblem)) {
-                         String[] hps = event.get(BasisConstant.healthProblem).toString().split(";");
-                         for(String hp:hps) {
+                         String[] hps = healthProblem.split(";");
+                         for(String hp : hps) {
                              List<Map<String, Object>> profileList = new ArrayList<>();
-                             if(hpList.containsKey(hp)) {
-                                 profileList = hpList.get(hp);
+                             if(hpMap.containsKey(hp)) {
+                                 profileList = hpMap.get(hp);
                              }
                              profileList.add(event);
-                             hpList.put(hp,profileList);
+                             hpMap.put(hp, profileList);
                          }
                      }
                  }
             }
-            for(String healthProblemCode : hpList.keySet()) {
+            for(String healthProblemCode : hpMap.keySet()) {
                 Map<String, Object> obj = new HashedMap();
                 obj.put("healthProblemCode", healthProblemCode);
                 obj.put("healthProblemName", redisServiceClient.getHealthProblemRedis(healthProblemCode));
                 int visitTimes = 0;
                 int hospitalizationTimes = 0;
-                List<Map<String,Object>> profileList = (List<Map<String,Object>>)hpList.get(healthProblemCode);
-                for(int i=0;i<profileList.size();i++) {
-                    Map<String,Object> profile = profileList.get(i);
+                List<Map<String,Object>> profileList = hpMap.get(healthProblemCode);
+                for(int i = 0; i < profileList.size() ; i++) {
+                    Map<String, Object> profile = profileList.get(i);
                     //事件类型
                     String eventType = (String) profile.get(BasisConstant.eventType);
                     String recentEvent = "";
-                    if("0".equals(eventType))  //门诊
-                    {
+                    if("0".equals(eventType)) {
                         recentEvent =  "门诊";
                         visitTimes++;
                     }
-                    else if("1".equals(eventType))  //住院
-                    {
+                    else if("1".equals(eventType)) {
                         recentEvent =  "住院";
                         hospitalizationTimes++;
                     }
-                    else if("2".equals(eventType))  //体检
-                    {
+                    else if("2".equals(eventType)) {
                         recentEvent =  "体检";
                     }
-
                     //第一条
-                    if(i==0)
-                    {
+                    if(i == 0) {
                         obj.put("lastVisitDate", profile.get(BasisConstant.eventDate));
                         obj.put("lastVisitOrgCode", profile.get(BasisConstant.orgCode));
                         obj.put("lastVisitOrg", profile.get(BasisConstant.orgName));
@@ -211,41 +199,53 @@ public class PatientInfoBaseService {
                         obj.put("recentEvent", recentEvent);
                         obj.put("eventType", eventType);
                     }
-
                     //最后一条
-                    if(i==profileList.size()-1)
-                    {
+                    if(i==profileList.size()-1) {
                         obj.put("ageOfDisease",getAgeOfDisease(profile.get(BasisConstant.eventDate)));
                     }
-
                 }
                 obj.put("visitTimes", visitTimes);
                 obj.put("hospitalizationTimes", hospitalizationTimes);
-
-                re.add(obj);
+                result.add(obj);
             }
         }
-
-        return re;
+        return result;
     }
 		
     /*
      * @根据患者最后一次诊断记录获取诊断详情
      */
-    public List<Map<String, Object>> getHealthProblemSub(String eventType, String lastVisitRecord) throws Exception {
-        List<Map<String, Object>> re = new ArrayList<>();
-        //获取门诊断详情
-        String resourcesCode = "";
-        if (eventType.equals("0")) {
-            resourcesCode = BasisConstant.outpatientDiagnosis;
-        }else if(eventType.equals("1")) {
-            resourcesCode = BasisConstant.hospitalizedDiagnosis;
-        }else if(eventType.equals("2")) {
-            resourcesCode = BasisConstant.examinationReport;
+    public List<Map<String, Object>> getHealthProblemSub(String lastVisitRecord, String eventType) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        Envelop envelop = resource.getSubData("{\"q\":\"profile_id:" + lastVisitRecord + "\"}", null, null, null);
+        List<Map<String, Object>> envelopList = envelop.getDetailModelList();
+        Map<String, Object> onlyMap = new HashMap<>();
+        for(Map<String, Object> temp : envelopList) {
+           for(String key : temp.keySet()) {
+               if(!onlyMap.containsKey(key)) {
+                    onlyMap.put(key, temp.get(key));
+               }
+           }
         }
-        Envelop result = resource.getResourcesSub(resourcesCode, "*", "*", "{\"q\":\"profile_id:" + lastVisitRecord + "\"}", null, null);
-        re = result.getDetailModelList();
-        return re;
+        Map<String, Object> newKeyObject = new HashMap<String, Object>();
+        if(onlyMap.get("EHR_000111") != null) {
+            String typeCode = onlyMap.get("EHR_000111").toString();
+            if(typeCode.equals("0")) {
+                newKeyObject.put("DiagnosticTypeCode", "门诊");
+            }else if(typeCode.equals("1")) {
+                newKeyObject.put("DiagnosticTypeCode", "住院");
+            }else if(typeCode.equals("2")) {
+                newKeyObject.put("DiagnosticTypeCode", "体检");
+            }else {
+                newKeyObject.put("DiagnosticTypeCode", typeCode);
+            }
+        }
+        newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000113") != null ? onlyMap.get("EHR_000113") : "");
+        newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000106") != null ? onlyMap.get("EHR_000106") : "");
+        newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000112") != null ? onlyMap.get("EHR_000112") : "");
+        newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000114") != null ? onlyMap.get("EHR_000114") : "");
+        result.add(newKeyObject);
+        return result;
     }
 		
     /**

@@ -3,6 +3,7 @@ package com.yihu.ehr.redis.pubsub.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.model.redis.MRedisCacheCategory;
 import com.yihu.ehr.model.redis.MRedisMqChannel;
 import com.yihu.ehr.redis.pubsub.CustomMessageListenerAdapter;
 import com.yihu.ehr.redis.pubsub.MessageCommonBiz;
@@ -13,7 +14,6 @@ import com.yihu.ehr.redis.pubsub.service.RedisMqChannelService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqMessageLogService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqPublisherService;
 import com.yihu.ehr.redis.pubsub.service.RedisMqSubscriberService;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,10 +25,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,15 +54,26 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("根据ID获取消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.GetById, method = RequestMethod.GET)
-    public MRedisMqChannel getById(
+    public Envelop getById(
             @ApiParam(name = "id", value = "主键", required = true)
-            @PathVariable(value = "id") Integer id) throws Exception {
-        return convertToModel(redisMqChannelService.getById(id), MRedisMqChannel.class);
+            @PathVariable(value = "id") Integer id) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            MRedisMqChannel mRedisMqChannel = convertToModel(redisMqChannelService.getById(id), MRedisMqChannel.class);
+            envelop.setObj(mRedisMqChannel);
+            envelop.setSuccessFlg(true);
+            envelop.setErrorMsg("成功获取消息队列。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("获取消息队列发生异常：" + e.getMessage());
+        }
+        return envelop;
     }
 
     @ApiOperation(value = "根据条件获取消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.Search, method = RequestMethod.GET)
-    List<MRedisMqChannel> search(
+    public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空则返回全部字段")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "筛选条件")
@@ -75,47 +83,77 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page,
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
-            @RequestParam(value = "size", required = false) int size,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        List<RedisMqChannel> redisMqChannels = redisMqChannelService.search(fields, filters, sorts, page, size);
-        pagedResponse(request, response, redisMqChannelService.getCount(filters), page, size);
-        return (List<MRedisMqChannel>) convertToModels(redisMqChannels, new ArrayList<MRedisMqChannel>(), MRedisMqChannel.class, fields);
+            @RequestParam(value = "size", required = false) int size) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            List<RedisMqChannel> redisMqChannelList = redisMqChannelService.search(fields, filters, sorts, page, size);
+            int count = (int) redisMqChannelService.getCount(filters);
+            List<MRedisMqChannel> mRedisMqChannelList = (List<MRedisMqChannel>) convertToModels(redisMqChannelList, new ArrayList<MRedisMqChannel>(), MRedisMqChannel.class, fields);
+            envelop = getPageResult(mRedisMqChannelList, count, page, size);
+            envelop.setSuccessFlg(true);
+            envelop.setErrorMsg("成功获取消息队列列表。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("获取消息队列发生异常：" + e.getMessage());
+        }
+        return envelop;
     }
 
     @ApiOperation("新增消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.Save, method = RequestMethod.POST)
-    public MRedisMqChannel add(
-            @ApiParam(name = "entityJson", value = "消息队列JSON", required = true)
-            @RequestParam(value = "entityJson") String entityJson) throws Exception {
-        RedisMqChannel newRedisMqChannel = toEntity(entityJson, RedisMqChannel.class);
-        newRedisMqChannel.setCreateTime(DateTimeUtil.iso8601DateTimeFormat(new Date()));
-        newRedisMqChannel = redisMqChannelService.save(newRedisMqChannel);
+    public Envelop add(
+            @ApiParam(value = "消息队列JSON", required = true)
+            @RequestBody String entityJson) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            RedisMqChannel newEntity = objectMapper.readValue(entityJson, RedisMqChannel.class);
+            newEntity = redisMqChannelService.save(newEntity);
 
-        // 开启该订阅者的消息队列的消息监听
-        String channel = newRedisMqChannel.getChannel();
-        CustomMessageListenerAdapter messageListener = MessageCommonBiz.newCustomMessageListenerAdapter(channel);
-        redisMessageListenerContainer.addMessageListener(messageListener, new ChannelTopic(channel));
+            // 开启该订阅者的消息队列的消息监听
+            String channel = newEntity.getChannel();
+            CustomMessageListenerAdapter messageListener = MessageCommonBiz.newCustomMessageListenerAdapter(channel);
+            redisMessageListenerContainer.addMessageListener(messageListener, new ChannelTopic(channel));
 
-        return convertToModel(newRedisMqChannel, MRedisMqChannel.class);
+            MRedisCacheCategory mRedisCacheCategory = convertToModel(newEntity, MRedisCacheCategory.class);
+            envelop.setObj(mRedisCacheCategory);
+            envelop.setSuccessFlg(true);
+            envelop.setErrorMsg("成功新增消息队列。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("新增消息队列发生异常：" + e.getMessage());
+        }
+        return envelop;
     }
 
     @ApiOperation("更新消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.Save, method = RequestMethod.PUT)
-    public MRedisMqChannel update(
-            @ApiParam(name = "entityJson", value = "消息队列JSON", required = true)
-            @RequestParam(value = "entityJson") String entityJson) throws Exception {
-        RedisMqChannel updateRedisMqChannel = toEntity(entityJson, RedisMqChannel.class);
-        updateRedisMqChannel.setCreateTime(updateRedisMqChannel.getCreateTime().replace(" ", "+"));
-        updateRedisMqChannel = redisMqChannelService.save(updateRedisMqChannel);
-        return convertToModel(updateRedisMqChannel, MRedisMqChannel.class);
+    public Envelop update(
+            @ApiParam(value = "消息队列JSON", required = true)
+            @RequestBody String entityJson) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            RedisMqChannel updateEntity = objectMapper.readValue(entityJson, RedisMqChannel.class);
+            updateEntity = redisMqChannelService.save(updateEntity);
+
+            MRedisMqChannel mRedisMqChannel = convertToModel(updateEntity, MRedisMqChannel.class);
+            envelop.setObj(mRedisMqChannel);
+            envelop.setSuccessFlg(true);
+            envelop.setErrorMsg("成功更新消息队列。");
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("更新消息队列发生异常：" + e.getMessage());
+        }
+        return envelop;
     }
 
     @ApiOperation("删除消息队列")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.Delete, method = RequestMethod.DELETE)
     public Envelop delete(
             @ApiParam(name = "id", value = "消息队列ID", required = true)
-            @RequestParam(value = "id") Integer id) throws Exception {
+            @RequestParam(value = "id") Integer id) {
         Envelop envelop = new Envelop();
         RedisMqChannel redisMqChannel = redisMqChannelService.getById(id);
         String channel = redisMqChannel.getChannel();
@@ -145,22 +183,46 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
 
     @ApiOperation("验证消息队列编码是否唯一")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.IsUniqueChannel, method = RequestMethod.GET)
-    public boolean isUniqueChannel(
+    public Envelop isUniqueChannel(
             @ApiParam(name = "id", value = "消息队列ID", required = true)
             @RequestParam(value = "id") Integer id,
             @ApiParam(name = "channel", value = "消息队列编码", required = true)
-            @RequestParam(value = "channel") String channel) throws Exception {
-        return redisMqChannelService.isUniqueChannel(id, channel);
+            @RequestParam(value = "channel") String channel) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            boolean result = redisMqChannelService.isUniqueChannel(id, channel);
+            envelop.setSuccessFlg(result);
+            if (!result) {
+                envelop.setErrorMsg("该消息队列编码已被使用，请重新填写！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
+        }
+        return envelop;
     }
 
     @ApiOperation("验证消息队列名称是否唯一")
     @RequestMapping(value = ServiceApi.Redis.MqChannel.IsUniqueChannelName, method = RequestMethod.GET)
-    public boolean isUniqueChannelName(
+    public Envelop isUniqueChannelName(
             @ApiParam(name = "id", value = "消息队列ID", required = true)
             @RequestParam(value = "id") Integer id,
             @ApiParam(name = "channelName", value = "消息队列名称", required = true)
-            @RequestParam(value = "channelName") String channelName) throws Exception {
-        return redisMqChannelService.isUniqueChannelName(id, channelName);
+            @RequestParam(value = "channelName") String channelName) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            boolean result = redisMqChannelService.isUniqueChannelName(id, channelName);
+            envelop.setSuccessFlg(result);
+            if (!result) {
+                envelop.setErrorMsg("该消息队列名称已被使用，请重新填写！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("发生异常：" + e.getMessage());
+        }
+        return envelop;
     }
 
     @ApiOperation("发布消息")
@@ -171,7 +233,7 @@ public class RedisMqChannelEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "channel", value = "消息队列编码", required = true)
             @RequestParam(value = "channel") String channel,
             @ApiParam(name = "message", value = "消息", required = true)
-            @RequestParam(value = "message") String message) throws Exception {
+            @RequestParam(value = "message") String message) {
         return redisMqChannelService.sendMessage(publisherAppId, channel, message);
     }
 

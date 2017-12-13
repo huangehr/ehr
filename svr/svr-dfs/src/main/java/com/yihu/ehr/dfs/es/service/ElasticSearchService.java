@@ -109,9 +109,9 @@ public class ElasticSearchService {
                 }else if(condition.equals(">=")) {
                     rangeQueryBuilder.gte(value);
                 }else if(condition.equals("<=")) {
-                    rangeQueryBuilder.lt(value);
-                }else if(condition.equals("<")) {
                     rangeQueryBuilder.lte(value);
+                }else if(condition.equals("<")) {
+                    rangeQueryBuilder.lt(value);
                 }
                 if("and".equals(andOr)) {
                     boolQueryBuilder.must(rangeQueryBuilder);

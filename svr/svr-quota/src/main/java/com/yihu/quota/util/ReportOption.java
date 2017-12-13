@@ -15,6 +15,7 @@ import com.github.abel533.echarts.series.Bar;
 import com.github.abel533.echarts.series.Line;
 import com.github.abel533.echarts.series.Pie;
 import com.github.abel533.echarts.series.Radar;
+import com.github.abel533.echarts.style.itemstyle.Normal;
 import com.yihu.ehr.model.echarts.ChartDataModel;
 
 import java.util.ArrayList;
@@ -358,8 +359,12 @@ public class ReportOption {
         Pie pie = new Pie();
         pie.name(pieName);
         pie.type(SeriesType.pie);
-        pie.radius("55%");
-        pie.center(new String[]{"50%", "60%"});
+        pie.radius("40%");
+        if (null != data2list && data2list.size() > 0) {
+            pie.center(new String[]{"25%", "50%"});
+        } else {
+            pie.center(new String[]{"50%", "50%"});
+        }
         pie.itemStyle().emphasis().shadowBlur(10);
         pie.itemStyle().emphasis().shadowOffsetX(0);
         pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
@@ -381,8 +386,8 @@ public class ReportOption {
             Pie pie2 = new Pie();
             pie2.name(pie2Name);
             pie2.type(SeriesType.pie);
-            pie2.radius("55%");
-            pie2.center(new String[]{"50%", "60%"});
+            pie2.radius("40%");
+            pie2.center(new String[]{"70%", "50%"});
             pie2.itemStyle().emphasis().shadowBlur(10);
             pie2.itemStyle().emphasis().shadowOffsetX(0);
             pie2.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
@@ -550,6 +555,9 @@ public class ReportOption {
 
     public Pie envelopPie(Pie pie, List<Map<String, Object>> dataModel) {
         pie.type(SeriesType.pie);
+        Normal normal = new Normal();
+        normal.label().position("inner");
+        pie.label().normal(normal);
         pie.itemStyle().emphasis().shadowBlur(10);
         pie.itemStyle().emphasis().shadowOffsetX(0);
         pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");

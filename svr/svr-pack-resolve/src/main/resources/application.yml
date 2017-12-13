@@ -133,7 +133,7 @@ ehr:
 
 resolve:
   job:
-    max-size: 4 #解析入库最大任务数
+    max-size: 6 #解析入库最大任务数
     check-time: 60000 #入库消息检查时间间隔
     cron-exp: 0/4 * * * * ? #默认表达式
 

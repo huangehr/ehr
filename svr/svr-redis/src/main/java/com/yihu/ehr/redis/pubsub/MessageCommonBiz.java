@@ -4,8 +4,6 @@ import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.redis.pubsub.entity.RedisMqMessageLog;
 import com.yihu.ehr.util.id.UuidUtil;
 
-import java.util.Date;
-
 /**
  * 消息发布订阅共通业务方法
  *
@@ -30,7 +28,6 @@ public class MessageCommonBiz {
         redisMqMessageLog.setStatus("0");
         redisMqMessageLog.setIsRealConsumed("0");
         redisMqMessageLog.setConsumedNum(0);
-        redisMqMessageLog.setCreateTime(new Date());
         return redisMqMessageLog;
     }
 

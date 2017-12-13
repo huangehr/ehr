@@ -1,6 +1,7 @@
 package com.yihu.ehr.redis.pubsub.entity;
 
 
+import com.yihu.ehr.entity.BaseIdentityEntity;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
@@ -13,12 +14,10 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "redis_mq_channel")
-public class RedisMqChannel {
+public class RedisMqChannel extends BaseIdentityEntity {
 
-    public Integer id; // 主键
     public String channel; // 消息队列编码
     public String channelName; // 消息队列名称
-    public String createTime; // 创建时间
     public String messageTemplate; // 消息模版
     public String remark; // 备注
 
@@ -27,17 +26,6 @@ public class RedisMqChannel {
     public String dequeuedNum; // 出列数
     public String subscriberNum; // 订阅者数
     public String publisherNum; // 发布者数
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     @Column(name = "channel")
     public String getChannel() {
@@ -55,15 +43,6 @@ public class RedisMqChannel {
 
     public void setChannelName(String channelName) {
         this.channelName = channelName;
-    }
-
-    @Column(name = "create_time")
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
     }
 
     @Column(name = "message_template")

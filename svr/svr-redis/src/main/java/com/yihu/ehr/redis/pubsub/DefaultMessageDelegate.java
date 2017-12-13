@@ -13,7 +13,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +54,6 @@ public class DefaultMessageDelegate implements MessageDelegate {
                 // 消息队列没有订阅者的场合，
                 RedisMqMessageLog redisMqMessageLog = redisMqMessageLogService.getById(messageLogId);
                 redisMqMessageLog.setStatus("1");
-                redisMqMessageLog.setUpdateTime(new Date());
                 redisMqMessageLogService.save(redisMqMessageLog);
             } else {
                 // 遍历消息队列的订阅者，并推送消息
@@ -74,7 +72,6 @@ public class DefaultMessageDelegate implements MessageDelegate {
                     redisMqMessageLog.setStatus("1");
                     redisMqMessageLog.setIsRealConsumed("1");
                     redisMqMessageLog.setConsumedNum(oldConsumeNum + 1);
-                    redisMqMessageLog.setUpdateTime(new Date());
                     redisMqMessageLogService.save(redisMqMessageLog);
 
                     logger.info("\n--- Redis发布订阅消费的消息 ---\nchannel: " + channel
