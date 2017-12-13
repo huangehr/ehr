@@ -249,7 +249,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint{
     @RequestMapping(value = ServiceApi.Packages.Package, method = RequestMethod.POST)
     public ResponseEntity<String> resolve(
             @ApiParam(name = "packageId", value = "档案包ID，忽略此值", required = true, defaultValue = "LocalPackage")
-            @PathVariable() String packageId,
+            @PathVariable(value = "id") String packageId,
             @ApiParam(name = "file", value = "档案包文件", required = true)
             @RequestPart() MultipartFile file,
             @ApiParam(name = "password", value = "档案包密码", required = true)
