@@ -108,4 +108,20 @@ public class SchedulerEndPoint extends EnvelopRestEndPoint {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @ApiOperation(value = "获取当前任务数量")
+    @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.GET)
+    public ResponseEntity<Integer> count() {
+        try {
+            GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
+            Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
+            int count = 0;
+            if (jobKeySet != null) {
+                count = jobKeySet.size();
+            }
+            return new ResponseEntity<>(count, HttpStatus.OK);
+        } catch (SchedulerException e) {
+            return new ResponseEntity<>(-1, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

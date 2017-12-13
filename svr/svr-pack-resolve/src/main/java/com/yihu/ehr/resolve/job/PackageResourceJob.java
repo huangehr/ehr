@@ -70,12 +70,14 @@ public class PackageResourceJob implements InterruptableJob {
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
                 PackResolveLogger.error(e.getMessage());
             }
+            /**
             try {
                 scheduler.deleteJob(jobKey);
             }catch (SchedulerException se) {
                 se.printStackTrace();
                 PackResolveLogger.error(se.getMessage());
             }
+             */
         }
     }
 
@@ -88,7 +90,7 @@ public class PackageResourceJob implements InterruptableJob {
         long start = System.currentTimeMillis();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
-        //resourceService.save(resourceBucket);
+        resourceService.save(resourceBucket);
         //居民信息注册
         patientRegisterService.checkPatient(resourceBucket, pack.getId());
         //回填入库状态
