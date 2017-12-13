@@ -241,7 +241,15 @@ public class ResourceBrowseController extends BaseController {
                 //判断是否启用默认查询条件
                 Map<String, Object> params  = new HashMap<>();
                 if (queryCondition == null || queryCondition.equals("{}")) {
-                    if(org.length()>0){
+                    boolean orgFlag = false;
+                    for(Map<String, String> map:objList){
+                        for(String key :map.keySet()){
+                            if(map.get(key).equals("org")){
+                                orgFlag = true;
+                            }
+                        }
+                    }
+                    if(org.length()>0 && orgFlag){
                         if( !StringUtils.isEmpty(query)){
                             params  = objectMapper.readValue(query, new TypeReference<Map>() {});
                         }
