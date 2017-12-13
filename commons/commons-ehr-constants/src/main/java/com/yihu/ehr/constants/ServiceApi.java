@@ -36,7 +36,7 @@ public class ServiceApi {
         public static final String ResourceViewMetadata = "/resources/query/getResourceMetadata"; //资源浏览获取结构
         public static final String ResourceViewData = "/resources/query/getResourceData"; //资源浏览获取数据
         public static final String ResourceQuery = "/resources/query"; //资源查询接口
-        public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
+        //public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译
         public static final String ResourceRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourceRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
