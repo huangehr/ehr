@@ -36,7 +36,7 @@ public class ProfileCDAEndPoint extends BaseRestEndPoint {
     @ApiOperation("CDA分类")
     @RequestMapping(value = ServiceApi.Profiles.CDAClass, method = RequestMethod.GET)
     public List<Map<String, Object>> CDAClass(
-            @ApiParam(name = "profile_id", value = "档案ID", defaultValue = "41872607-9_20000001_1465894742000")
+            @ApiParam(name = "profile_id", value = "档案ID", required = true, defaultValue = "49229004X_000406450000000UX0_1485608518000")
             @RequestParam(value = "profile_id") String profile_id,
             @ApiParam(name = "event_type", value = "事件类型")
             @RequestParam(value = "event_type", required = false) String event_type) {
@@ -46,9 +46,9 @@ public class ProfileCDAEndPoint extends BaseRestEndPoint {
     @ApiOperation("CDA数据")
     @RequestMapping(value = ServiceApi.Profiles.CDAData, method = RequestMethod.GET)
     public Map<String,Object> CDAData(
-            @ApiParam(name = "profile_id", value = "档案ID", required =  true, defaultValue = "41872607-9_20000001_1465894742000")
+            @ApiParam(name = "profile_id", value = "档案ID", required =  true, defaultValue = "41872607-49229004X_000406450000000UX0_1485608518000")
             @RequestParam(value = "profile_id") String profile_id,
-            @ApiParam(name = "cda_document_id", value = "模板ID", required = true, defaultValue = "0dae000656b2e89c0dc3568e6a372ad9")
+            @ApiParam(name = "cda_document_id", value = "模板ID", required = true, defaultValue = "82e89929317a11e7b186a1ae879a6c51")
             @RequestParam(value = "cda_document_id") String cda_document_id) {
         return profileCDAService.getCDAData(profile_id, cda_document_id);
     }

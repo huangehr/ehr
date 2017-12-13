@@ -106,7 +106,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size", required = false) Integer size) {
         Envelop envelop = new Envelop();
         try {
-            envelop = resourceBrowseService.getResources(resourcesCode, "*", orgCode, areaCode, queryParams, page, size);
+            envelop = resourceBrowseService.getResultData(resourcesCode, "*", orgCode, areaCode, queryParams, page, size);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -125,7 +125,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
      * @param size
      * @return
      * @throws Exception
-     */
+
     @ApiOperation("获取资源数据（档案浏览器主要健康问题诊断详情）")
     @RequestMapping(value = ServiceApi.Resources.ResourceSubQuery, method = RequestMethod.POST)
     public Envelop getResourcesSub(
@@ -151,6 +151,8 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         }
         return envelop;
     }
+     */
+
 
     /**
      * 获取资源数据(转译)
@@ -174,7 +176,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = resourceBrowseService.getResources(resourcesCode, roleId , orgCode, areaCode, queryParams, page, size);
+        Envelop re = resourceBrowseService.getResultData(resourcesCode, roleId , orgCode, areaCode, queryParams, page, size);
         if(version!=null && version.length()>0) {
             List<Map<String,Object>> list = re.getDetailModelList();
             re.setDetailModelList(resourcesTransformService.displayCodeConvert(list,version,null));

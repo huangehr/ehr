@@ -39,7 +39,7 @@ public class ProfileDiseaseEndPoint extends EnvelopRestEndPoint{
     @ApiOperation("主要健康问题诊断详情OK")
     @RequestMapping(value = ServiceApi.Profiles.HealthProblemSub, method = RequestMethod.GET)
     public List<Map<String, Object>> HealthProblemSub(
-            @ApiParam(name = "last_visit_record", value = "最后一次诊断记录", defaultValue = "49229004X_000406450000000UX0_1485608518000")
+            @ApiParam(name = "last_visit_record", value = "最后一次诊断记录", required = true, defaultValue = "49229004X_000406450000000UX0_1485608518000")
             @RequestParam(value = "last_visit_record") String last_visit_record,
             @ApiParam(name = "event_type", value = "资源编码", defaultValue="0")
             @RequestParam(value = "event_type", required = false) String event_type) {
