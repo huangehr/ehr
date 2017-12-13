@@ -300,23 +300,39 @@ public class RsResourceController extends BaseController {
     public Envelop getRsQuotaPreview(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
+            @ApiParam(name = "quotaFilter" ,value = "指标过滤条件" )
+            @RequestParam(value = "quotaFilter" , required = false) String quotaFilter,
             @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
             @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
 
-        String filter = "";
         //-----------------用户数据权限 start
         String org = "";
         if( userOrgList != null ){
-            if( !(userOrgList.size()==1 && userOrgList.get(0).equals("null")) ) {
+            if( !(userOrgList.size()==1 && (userOrgList.get(0).equals("null") || userOrgList.get(0).equals("[]")) ) ) {
                 org = StringUtils.strip(String.join(",", userOrgList), "[]");
+                String [] orgs = org.split(",");
+                for(int i = 0;i < orgs.length; i++){
+                    if(i==0){
+                        org = " org = '" + orgs[i] + "' ";
+                    }else {
+                        org = org + " or "  +   " org = '" + orgs[i]  + "' ";
+                    }
+                }
             }
         }
-        Map<String, Object> params  = new HashMap<>();
-        if(org.length()>0){
-            params.put("org",org);
-            filter = objectMapper.writeValueAsString(params);
+        String filter = "";
+        if(StringUtils.isNotEmpty(quotaFilter)){
+            String [] quotaFilters = quotaFilter.split(";");
+            for(int i = 0;i < quotaFilters.length; i++){
+                String [] keyVal = quotaFilters[i].split("=");
+                if(i==0){
+                    filter = keyVal[0] + "='" + keyVal[1] +"' ";
+                }else {
+                    filter = filter + " and "  + keyVal[0] + "='" + keyVal[1] +"' ";
+                }
+            }
         }
         //-----------------用户数据权限 end
         Envelop envelop = new Envelop();
@@ -374,6 +390,13 @@ public class RsResourceController extends BaseController {
                     dimension = firstDimension;
                 }
 
+                if(org.length() > 0 && dimensionMap.containsKey("org")){
+                    if(filter.length() > 0){
+                        filter = filter + " and (" + org + " ) ";
+                    }else {
+                        filter =  org;
+                    }
+                }
                 if(charTypeNum > 1){
                     envelop.setObj(chartInfoModel);
                     envelop.setErrorMsg("视图由多个指标组成时，预览图形支持 多指标都属于同一类型，混合型目前支持‘柱状+柱状’,请确认图表展示类型！");
