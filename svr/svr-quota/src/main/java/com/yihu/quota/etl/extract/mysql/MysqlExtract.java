@@ -382,8 +382,8 @@ public class MysqlExtract {
                 break;
             }
             case Contant.main_dimension.area_town: {
-                code = mainOne.getCity();
-                name = mainOne.getCityName();
+                code = mainOne.getTown();
+                name = mainOne.getTownName();
                 break;
             }
             case Contant.main_dimension.area_org: {

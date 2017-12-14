@@ -123,6 +123,7 @@ public class EsQuotaJob implements Job {
                     Boolean success = saveDate(dataSaveModels);
                     tjQuotaLog.setStatus(success ? Contant.save_status.success : Contant.save_status.fail);
                     tjQuotaLog.setContent(success ? "统计保存成功" : "统计数据ElasticSearch保存失败");
+                    System.out.println(success?"统计保存成功":"统计数据ElasticSearch保存失败");
                 }else {
                     tjQuotaLog.setStatus(Contant.save_status.success);
                     tjQuotaLog.setContent("统计成功,统计结果大于0的数据为0条");
@@ -159,7 +160,6 @@ public class EsQuotaJob implements Job {
     private void initParams(JobExecutionContext context) {
         JobDataMap map = context.getJobDetail().getJobDataMap();
         Map<String, Object> params = context.getJobDetail().getJobDataMap();
-
         this.saasid = map.getString("saasid");
         this.endTime = map.getString("endTime");
         if (StringUtils.isEmpty(endTime)) {
