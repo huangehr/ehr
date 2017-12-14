@@ -300,9 +300,9 @@ public class RsResourceController extends BaseController {
     public Envelop getRsQuotaPreview(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
-            @ApiParam(name = "quotaFilter" ,value = "指标过滤条件" )
+            @ApiParam(name = "quotaFilter" ,value = "指标过滤条件" , defaultValue = "" )
             @RequestParam(value = "quotaFilter" , required = false) String quotaFilter,
-            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限" )
+            @ApiParam(name = "userOrgList" ,value = "用户拥有机构权限", defaultValue = "null" )
             @RequestParam(value = "userOrgList" , required = false) List<String> userOrgList,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension) throws IOException {
@@ -339,7 +339,6 @@ public class RsResourceController extends BaseController {
         MChartInfoModel chartInfoModel = new MChartInfoModel();;
         envelop.setObj(chartInfoModel);
         envelop.setSuccessFlg(false);
-        chartInfoModel.setResourceId(resourceId);
         Envelop resourceResult =  resourcesClient.getResourceById(resourceId);
         if(!resourceResult.isSuccessFlg()){
             envelop.setErrorMsg("视图不存在，请确认！");
@@ -403,6 +402,7 @@ public class RsResourceController extends BaseController {
                 }else {
                     MRsResources mRsResources = objectMapper.convertValue(resourceResult.getObj(), MRsResources.class);
                     chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
+                    chartInfoModel.setResourceId(resourceId);
                     chartInfoModel.setDimensionMap(dimensionMap);
                     chartInfoModel.setFirstDimension(firstDimension);
                     envelop.setObj(chartInfoModel);
