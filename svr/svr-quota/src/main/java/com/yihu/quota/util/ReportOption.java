@@ -14,14 +14,11 @@ import com.github.abel533.echarts.json.GsonOption;
 import com.github.abel533.echarts.series.Bar;
 import com.github.abel533.echarts.series.Line;
 import com.github.abel533.echarts.series.Pie;
-import com.github.abel533.echarts.series.Radar;
+//import com.github.abel533.echarts.series.Radar;
 import com.github.abel533.echarts.style.itemstyle.Normal;
 import com.yihu.ehr.model.echarts.ChartDataModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -273,9 +270,16 @@ public class ReportOption {
 //        axisTick.setType
 //        categoryAxis.axisTick(axisTick);
 
-
 //        categoryAxis.axisLabel().formatter("千米");//单位
-        categoryAxis.data(xData);
+
+        Object [] newData = new Object[5];
+        if(xData.length > 5 ){
+            newData = Arrays.copyOfRange(xData, 0, 5);
+            categoryAxis.data(newData);
+        }else{
+            categoryAxis.data(xData);
+        }
+
         option.xAxis(categoryAxis);
 
 
@@ -296,8 +300,17 @@ public class ReportOption {
                 line.itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0.4)");
 
                 List<Object> lineValList = lineDatas.get(i);
-                Object[] lineVal = (Object[]) lineValList.toArray(new Object[lineValList.size()]);
-                line.data(lineVal);
+
+                List<Object> subList = new ArrayList<>();
+                if(lineValList.size() > 5){
+                    subList = lineValList.subList(0, 5);
+                    Object[] lineVal = (Object[]) lineValList.toArray(new Object[subList.size()]);
+                    line.data(lineVal);
+                }else {
+                    Object[] lineVal = (Object[]) lineValList.toArray(new Object[lineValList.size()]);
+                    line.data(lineVal);
+                }
+
                 option.series().add(line);
             }
         }
@@ -490,9 +503,9 @@ public class ReportOption {
 
         option.polar(polar);
         // series
-        Radar radar = new Radar();
-        radar.data(new Data().name(title), radarVal);
-        option.series().add(radar);
+//        Radar radar = new Radar();
+//        radar.data(new Data().name(title), radarVal);
+//        option.series().add(radar);
         System.out.println("雷达图：" + option);
         return option;
     }
