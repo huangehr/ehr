@@ -37,13 +37,11 @@ public class ResourcesTransformService {
     public List<Map<String,Object>> displayCodeConvert(List<Map<String,Object>> resource,String version, String dataset) {
         //返回资源
         List<Map<String,Object>> returnRs =  new ArrayList<Map<String, Object>>();
-
         if(resource != null && resource.size() > 0) {
             for(Map<String,Object> map : resource) {
                 returnRs.add(displayCodeConvert(map, version, dataset));
             }
         }
-
         return returnRs;
     }
 
@@ -60,14 +58,12 @@ public class ResourcesTransformService {
         if ((resource != null && resource.size() > 0) || (schemeList != null && schemeList.size() > 0)) {
             //适配方案对应数据元
             List<RsAdapterMetadata> metadataList = new ArrayList<RsAdapterMetadata>();
-
             if(StringUtils.isBlank(dataset)) {
                 metadataList = adapterMetadataDao.findByScheme(schemeList.get(0).getId());
             }
             else {
                 metadataList = adapterMetadataDao.findBySchemeIdAndSrcDatasetCode(schemeList.get(0).getId(),dataset);
             }
-
             if(metadataList != null && metadataList.size() > 0) {
                 //数据元Map,便于对应查找
                 Map<String, List<String>> adapterMap = new HashMap<>();
@@ -82,16 +78,17 @@ public class ResourcesTransformService {
                     values.add(meta.getSrcMetadataCode());
                     adapterMap.put(key, values);
                 }
+
                 //数据元代码转换
                 for (String key : resource.keySet()) {
                     Object value = resource.get(key);
                     //字典数据
-                    if(key.lastIndexOf("_VALUE")>0) {
+                    if(key.lastIndexOf("_VALUE") > 0) {
                         String srcKey = key.substring(0, key.indexOf("_VALUE"));
                         if (adapterMap.containsKey(srcKey)) {
-                            List<String> adpaterKeys = adapterMap.get(srcKey);
-                            for(String adpaterKey : adpaterKeys) {
-                                returnMap.put(adpaterKey + "_VALUE", value);
+                            List<String> adapterKeys = adapterMap.get(srcKey);
+                            for(String adapterKey : adapterKeys) {
+                                returnMap.put(adapterKey + "_VALUE", value);
                             }
                         }
                         else{
@@ -100,15 +97,16 @@ public class ResourcesTransformService {
                     }
                     else{
                         if (adapterMap.containsKey(key)) {
-                            List<String> adpaterKeys = adapterMap.get(key);
-                            for(String adpaterKey : adpaterKeys) {
-                                returnMap.put(adpaterKey, value);
+                            List<String> adapterKeys = adapterMap.get(key);
+                            for(String adapterKey : adapterKeys) {
+                                returnMap.put(adapterKey, value);
                             }
                         }
                         else{
                             returnMap.put(key, value);
                         }
                     }
+
                 }
             }
         }
@@ -134,7 +132,7 @@ public class ResourcesTransformService {
                     returnRs.put(srcMetadataCode,resource.get(metadataId));
                 }
                 //同时返回字典值
-                if(resource.containsKey(metadataId+"_VALUE")) {
+                if(resource.containsKey(metadataId + "_VALUE")) {
                     returnRs.put(srcMetadataCode + "_VALUE", resource.get(metadataId + "_VALUE"));
                 }
             }
