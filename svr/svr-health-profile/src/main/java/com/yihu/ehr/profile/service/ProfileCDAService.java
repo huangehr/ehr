@@ -235,14 +235,58 @@ public class ProfileCDAService {
         try {
             String profileId = event.get("rowkey").toString();
             String cdaVersion = event.get("cda_version").toString();
-            List<String> SingleDataSetCodeList = new ArrayList<>();
+            List<String> singleDataSetCodeList = new ArrayList<>();
             List<String> multiDataSetCodeList = new ArrayList<>();
             Map<String, Object> result = new HashMap<>();
             //获取CDA关联数据集
             Map<String, Object> dataSetMap = new HashMap<>();
-            Map<String, List<String>> SingleDataSetMap = new HashMap<>(1);
+            Map<String, List<String>> singleDataSetMap = new HashMap<>(1);
             Map<String, List<String>> multiDataSetMap = new HashMap<>(1);
             Map<String, List<MCdaDataSet>> CDADataSetMap = cdaService.getCDADataSetByCDAIdList(cdaVersion, cdaDocumentIdList);
+            /**
+            for(String key : CDADataSetMap.keySet()) {
+                List<MCdaDataSet> CDADataSet = CDADataSetMap.get(key);
+                if (CDADataSet != null && CDADataSet.size() > 0) {
+                    Map<String, List<Object>> dataList = new HashMap<>(CDADataSet.size());
+                    for (MCdaDataSet dataSet : CDADataSet) {
+                        String dataSetCode = dataSet.getDataSetCode();
+                        String multiRecord = dataSet.getMultiRecord();
+                        if (multiRecord.equals("0")) {
+                            //主表数据
+                            //singleDataSetCodeList.add(dataSetCode);
+                            String query = "{\"q\":\"rowkey:" + profileId + "\"}";
+                            Envelop envelop = resource.getResources(dataSetCode, "*", "*",  query, 1, 1);
+                            if(envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
+                                List<Map<String, Object>> middleList = (List<Map<String, Object>>)envelop.getDetailModelList();
+                                for(Map<String, Object> temp : middleList) {
+                                    temp.put("org_area", event.get("org_area"));
+                                    temp.put("org_name", event.get("org_name"));
+                                    temp.put("event_date", event.get("event_date"));
+                                }
+                                dataList.put(dataSetCode, envelop.getDetailModelList());
+                            }
+                        } else {
+                            //细表数据
+                            //multiDataSetCodeList.add(dataSetCode);
+                            String query = "{\"q\":\"rowkey:" + profileId + "$" + dataSetCode + "$*" + "\"}";
+                            Envelop envelop = resource.getResources(dataSetCode, "*", "*",  query, 1, 1);
+                            if(envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
+                                List<Map<String, Object>> middleList = (List<Map<String, Object>>)envelop.getDetailModelList();
+                                for(Map<String, Object> temp : middleList) {
+                                    temp.put("org_area", event.get("org_area"));
+                                    temp.put("org_name", event.get("org_name"));
+                                    temp.put("event_date", event.get("event_date"));
+                                }
+                                dataList.put(dataSetCode, envelop.getDetailModelList());
+                            }
+                        }
+                    }
+                    //singleDataSetMap.put(key, singleDataSetCodeList);
+                    //multiDataSetMap.put(key, multiDataSetCodeList);
+                    dataSetMap.put(key, dataList);
+                }
+            }
+            */
             for (String key : CDADataSetMap.keySet()) {
                 List<MCdaDataSet> CDADataSet = CDADataSetMap.get(key);
                 if (CDADataSet != null && CDADataSet.size() > 0) {
@@ -251,20 +295,20 @@ public class ProfileCDAService {
                         String multiRecord = dataSet.getMultiRecord();
                         if (multiRecord.equals("0")) {
                             //主表数据
-                            SingleDataSetCodeList.add(dataSetCode);
+                            singleDataSetCodeList.add(dataSetCode);
                         } else {
                             //细表数据
                             multiDataSetCodeList.add(dataSetCode);
                         }
                     }
-                    SingleDataSetMap.put(key, SingleDataSetCodeList);
+                    singleDataSetMap.put(key, singleDataSetCodeList);
                     multiDataSetMap.put(key, multiDataSetCodeList);
                 }
             }
             //获取所有数据集数据
             MCdaTransformDto cdaTransformDto = new MCdaTransformDto();
             cdaTransformDto.setMasterJson(event);
-            cdaTransformDto.setMasterDatasetCodeList(SingleDataSetMap);
+            cdaTransformDto.setMasterDatasetCodeList(singleDataSetMap);
             cdaTransformDto.setMultiDatasetCodeList(multiDataSetMap);
             dataSetMap = resource.getCDAData(objectMapper.writeValueAsString(cdaTransformDto));
             for(String key :dataSetMap.keySet()) {
@@ -278,6 +322,7 @@ public class ProfileCDAService {
                     }
                 }
             }
+
             //获取cda document数据
             Map<String, MCDADocument> cdaMap = cdaService.getCDADocumentsList(cdaVersion, cdaDocumentIdList);
             for (String key : cdaMap.keySet()) {
