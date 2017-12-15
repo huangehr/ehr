@@ -327,10 +327,12 @@ public class RsResourceController extends BaseController {
             String [] quotaFilters = quotaFilter.split(";");
             for(int i = 0;i < quotaFilters.length; i++){
                 String [] keyVal = quotaFilters[i].split("=");
-                if(i==0){
-                    filter = keyVal[0] + "='" + keyVal[1] +"' ";
-                }else {
-                    filter = filter + " and "  + keyVal[0] + "='" + keyVal[1] +"' ";
+                if(keyVal[i].length()>1){
+                    if(i==0){
+                        filter = keyVal[0] + "='" + keyVal[1] +"' ";
+                    }else {
+                        filter = filter + " and "  + keyVal[0] + "='" + keyVal[1] +"' ";
+                    }
                 }
             }
         }
@@ -385,7 +387,7 @@ public class RsResourceController extends BaseController {
                         firstFlag =  false;
                     }
                 }
-                if(StringUtils.isEmpty(dimension)){
+                if(StringUtils.isEmpty(dimension) || dimension.equals(" ")){
                     dimension = firstDimension;
                 }
 

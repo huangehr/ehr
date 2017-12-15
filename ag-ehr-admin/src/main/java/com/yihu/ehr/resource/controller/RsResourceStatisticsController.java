@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0 + "/admin")
-@Api(value = "rs_resources_statistics",  description = "资源报表统计视图", tags = {"资源报表统计视图-》 接口"})
+@Api(value = "rs_resources_statistics",  description = "资源报表统计视图", tags = {"资源报表统计视图接口"})
 public class RsResourceStatisticsController extends ExtendController {
 
     @Autowired
