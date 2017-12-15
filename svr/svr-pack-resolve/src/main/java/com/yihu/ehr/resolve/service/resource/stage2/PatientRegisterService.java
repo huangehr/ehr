@@ -27,7 +27,7 @@ public class PatientRegisterService {
 
     public void checkPatient(ResourceBucket resourceBucket, String packId) throws JsonProcessingException, ParseException {
         //获取注册信息
-        String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString();
+        String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString().trim();
         if(!idCardNo.equals("")) {
             boolean isRegistered = patientInfoClient.isRegistered(idCardNo);
             if (!isRegistered) {
@@ -36,7 +36,7 @@ public class PatientRegisterService {
                 String name = resourceBucket.getPatientName() == null ? "":resourceBucket.getPatientName().toString();
                 demoInfo.setName(name);
                 String telephoneNo = resourceBucket.getMasterRecord().getResourceValue("EHR_000003") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000003").toString();
-                demoInfo.setTelephoneNo(telephoneNo);
+                demoInfo.setTelephoneNo("{\"联系电话\":\"" + telephoneNo + "\"}");
                 String email = resourceBucket.getMasterRecord().getResourceValue("EHR_000008") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000008").toString();
                 demoInfo.setEmail(email);
                 String birthPlace = resourceBucket.getMasterRecord().getResourceValue("EHR_000013") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_000013").toString();

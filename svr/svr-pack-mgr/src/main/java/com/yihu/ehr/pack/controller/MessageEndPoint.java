@@ -2,6 +2,7 @@ package com.yihu.ehr.pack.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.Channel;
@@ -53,7 +54,11 @@ public class MessageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "count", required = false) int count,
             HttpServletRequest request,
             HttpServletResponse response) throws ParseException, JsonProcessingException {
-
+        try {
+            packageService.updateFailPackage(3); //更新时，不应该影响消息获取
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
         List<Package> packages = packageService.search(null, filters, sorts, 1, count);
         Collection<MPackage> mPackages = new HashSet<>(packages.size());
         mPackages = convertToModels(packages, mPackages, MPackage.class, "id,pwd,remotePath,clientId");

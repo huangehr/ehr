@@ -15,15 +15,10 @@ import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.PatientRegisterService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
-import com.yihu.ehr.resolve.dao.*;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.log.LogService;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
-import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -52,9 +47,6 @@ public class PackageResourceJob implements InterruptableJob {
         PackageMgrClient packageMgrClient = SpringContext.getService(PackageMgrClient.class);
         MessageBuffer messageBuffer = SpringContext.getService(MessageBuffer.class);
         MPackage pack =  messageBuffer.getMessage();
-        JobDetail jobDetail = context.getJobDetail();
-        JobKey jobKey = jobDetail.getKey();
-        Scheduler scheduler = context.getScheduler();
         try {
             if (null != pack) {
                 PackResolveLogger.info("开始入库:" + pack.getId() + ", Timestamp:" + new Date());
@@ -66,18 +58,23 @@ public class PackageResourceJob implements InterruptableJob {
             if (StringUtils.isBlank(e.getMessage())) {
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal Server Error");
                 PackResolveLogger.error("Internal Server Error, Please See Tomcat Log!");
+                //LogService.getLogger().error("Internal Server Error, Please See Tomcat Log!");
             }else {
                 packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
                 PackResolveLogger.error(e.getMessage());
+                //LogService.getLogger().error(e.getMessage());
             }
             /**
+            JobDetail jobDetail = context.getJobDetail();
+            JobKey jobKey = jobDetail.getKey();
+            Scheduler scheduler = context.getScheduler();
             try {
                 scheduler.deleteJob(jobKey);
             }catch (SchedulerException se) {
                 se.printStackTrace();
                 PackResolveLogger.error(se.getMessage());
             }
-             */
+            */
         }
     }
 

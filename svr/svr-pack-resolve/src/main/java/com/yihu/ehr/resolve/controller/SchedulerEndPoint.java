@@ -57,9 +57,9 @@ public class SchedulerEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @ApiOperation(value = "添加解析任务")
+    @ApiOperation(value = "调整当前任务数量，返回当前系统最大任务限制数")
     @RequestMapping(value = ServiceApi.PackageResolve.Scheduler, method = RequestMethod.POST)
-    public ResponseEntity<String> addJob(
+    public ResponseEntity<Integer> addJob(
             @ApiParam(name = "count", value = "任务数量（不要超过系统设定值）", required = true, defaultValue = "4")
             @RequestParam(value = "count") int count,
             @ApiParam(name = "cronExp", value = "触发器CRON表达式", required = true, defaultValue = "0/4 * * * * ?")
@@ -78,16 +78,29 @@ public class SchedulerEndPoint extends EnvelopRestEndPoint {
                             .withIdentity("PackResolveJob-" + suffix, "PackResolve")
                             .build();
                     CronTrigger trigger = newTrigger()
-                            .withIdentity("PackResolveTrigger-" + suffix)
+                            .withIdentity("PackResolveTrigger-" + suffix, "PackResolve")
+                            .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
+                            .startNow()
+                            .build();
+                    scheduler.scheduleJob(jobDetail, trigger);
+                }
+            }else {
+                for (int i = 0; i < count; i++) {
+                    String suffix = UUID.randomUUID().toString().substring(0, 8);
+                    JobDetail jobDetail = newJob(PackageResourceJob.class)
+                            .withIdentity("PackResolveJob-" + suffix, "PackResolve")
+                            .build();
+                    CronTrigger trigger = newTrigger()
+                            .withIdentity("PackResolveTrigger-" + suffix, "PackResolve")
                             .withSchedule(CronScheduleBuilder.cronSchedule(cronExp))
                             .startNow()
                             .build();
                     scheduler.scheduleJob(jobDetail, trigger);
                 }
             }
-            return new ResponseEntity<>((String) null, HttpStatus.OK);
+            return new ResponseEntity<>(jobMaxSize, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(-1, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -99,9 +112,11 @@ public class SchedulerEndPoint extends EnvelopRestEndPoint {
         try {
             GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
             Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
-            for (JobKey jobKey : jobKeySet) {
-                scheduler.deleteJob(jobKey);
-                if (--count == 0) break;
+            if(jobKeySet != null) {
+                for (JobKey jobKey : jobKeySet) {
+                    scheduler.deleteJob(jobKey);
+                    if (--count == 0) break;
+                }
             }
             return new ResponseEntity<>((String) null, HttpStatus.OK);
         } catch (SchedulerException e) {

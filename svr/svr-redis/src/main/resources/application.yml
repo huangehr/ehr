@@ -49,7 +49,18 @@ fast-dfs:
     anti-steal-token: no
     secret-key: FastDFS1234567890
 
-
+hystrix:
+  threadpool:
+    default:
+      coreSize: 50 #并发执行的最大线程数，默认10
+      maxQueueSize: 100 #LinkedBlockingQueue的最大队列数，默认-1，使用SynchronousQueue
+      #queueSizeRejectionThreshold: 50 #配置该值后，即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝
+  command:
+      default:
+        execution:
+          isolation:
+            thread:
+              timeoutInMilliseconds: 30000 #缺省为1000
 ---
 spring:
   profiles: dev

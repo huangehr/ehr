@@ -13,12 +13,10 @@ import java.util.Date;
 @Entity
 @Table(name = "demographics")
 @Access(value = AccessType.PROPERTY)
-@Embeddable
-@IdClass(DemographicId.class)
 public class DemographicInfo {
 
     private String idCardNo;                       // 身份证
-    private Date birthday;                            // 出生日期
+    private Date birthday;                                // 出生日期
     private String birthPlace;                    // 出生地
     private String nativePlace;                    // 籍贯
     private String email;                            // 邮箱

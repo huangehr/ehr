@@ -181,12 +181,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.PUT})
     @ApiOperation(value = "修改档案包状态", notes = "修改档案包状态")
-    public ResponseEntity<MPackage> reportStatus(@ApiParam(value = "档案包编号")
-                                                 @PathVariable(value = "id") String id,
-                                                 @ApiParam(value = "状态")
-                                                 @RequestParam(value = "status") ArchiveStatus status,
-                                                 @ApiParam(value = "消息")
-                                                 @RequestBody String message) throws Exception {
+    public ResponseEntity<MPackage> reportStatus(
+            @ApiParam(value = "档案包编号")
+            @PathVariable(value = "id") String id,
+            @ApiParam(value = "状态")
+            @RequestParam(value = "status") ArchiveStatus status,
+            @ApiParam(value = "消息")
+            @RequestBody String message) throws Exception {
         Package aPackage = packService.getPackage(id);
         if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
 
@@ -203,16 +204,19 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             aPackage.setPatientId(map.get("patientId"));
             aPackage.setFinishDate(new Date());
         }
-        else if(status == ArchiveStatus.Acquired)
-        {
+        else if(status == ArchiveStatus.Acquired) {
             aPackage.setParseDate(new Date()); //入库执行时间
         }
         else {
             aPackage.setFinishDate(null);
+            Package oldPackage =  packService.getPackage(aPackage.getId());
+            if(oldPackage.getFailCount() < 3) {
+                int failCount = oldPackage.getFailCount();
+                failCount ++;
+                aPackage.setFailCount(failCount);
+            }
         }
-
         packService.save(aPackage);
-
         return new ResponseEntity<>((MPackage) null, HttpStatus.OK);
     }
 
