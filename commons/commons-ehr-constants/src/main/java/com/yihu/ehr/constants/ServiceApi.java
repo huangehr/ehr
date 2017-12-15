@@ -1138,6 +1138,7 @@ public class ServiceApi {
         public static final String GetQuotaReport = "tj/getQuotaReport";
         public static final String GetQuotaGraphicReportPreview = "tj/getQuotaGraphicReportPreview";
         public static final String GetMoreQuotaGraphicReportPreviews = "tj/getMoreQuotaGraphicReportPreviews";
+        public static final String GetQuotaRadarGraphicReportPreviews = "tj/getQuotaRadarGraphicReportPreviews";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
         public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
 
