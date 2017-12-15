@@ -37,8 +37,8 @@ public class StdPackageResolver extends PackageResolver {
         parseFiles(standardPackage, standardFolder.listFiles(), false);
 
         //解析原始数据
-        File originFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.OriginFolder);
-        parseFiles(standardPackage, originFolder.listFiles(), true);
+        //File originFolder = new File(root.getAbsolutePath() + File.separator + PackModelFactory.OriginFolder);
+        //parseFiles(standardPackage, originFolder.listFiles(), true);
     }
 
     /**

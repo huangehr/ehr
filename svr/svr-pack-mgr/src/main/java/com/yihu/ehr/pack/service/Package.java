@@ -25,16 +25,17 @@ public class Package {
     private String message;
     private String md5;
     private String orgCode;
-    private String clientId;                            // 档案应用来源
+    private String clientId;// 档案应用来源
     private Date receiveDate;
     private Date parseDate;
     private Date finishDate;
-    private boolean resourced;                          // 是否已经资源化处理
+    private boolean resourced;// 是否已经资源化处理
     private ArchiveStatus archiveStatus;
     private String eventType;//就诊事件类型 0门诊 1住院 2体检',
     private String eventNo;//就诊事件no',
     private Date eventDate;//就诊时间',
     private String patientId;//医院患者ID'
+    private int failCount;
 
     @Id
     @Column(name = "id", unique = true, nullable = false)
@@ -179,5 +180,14 @@ public class Package {
 
     public void setPatientId(String patientId) {
         this.patientId = patientId;
+    }
+
+    @Column(name = "fail_count")
+    public int getFailCount() {
+        return failCount;
+    }
+
+    public void setFailCount(int failCount) {
+        this.failCount = failCount;
     }
 }

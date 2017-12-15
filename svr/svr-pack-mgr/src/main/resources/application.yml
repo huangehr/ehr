@@ -13,7 +13,7 @@ info:
 logging:
   level:
     com:
-      netflix: DEBUG
+      netflix: INFO
 fast-dfs:
   pool:
     init-size: 5

@@ -2,6 +2,7 @@ package com.yihu.ehr.pack.service;
 
 import com.yihu.ehr.constants.ArchiveStatus;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +24,9 @@ public interface XPackageRepository extends PagingAndSortingRepository<Package, 
 
     @Query("select pack from Package pack where archiveStatus = 0 order by receiveDate asc")
     List<Package> findEarliestOne(Pageable pageable);
+
+    @Modifying
+    @Query("UPDATE Package pack SET pack.archiveStatus = 0 WHERE pack.archiveStatus = 2 AND pack.failCount < :failCount")
+    void updateFailPackage(@Param("failCount") int failCount);
+
 }
