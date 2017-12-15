@@ -457,4 +457,45 @@ public class RsResourceController extends BaseController {
         }
         return envelop;
     }
+
+    @ApiOperation(value = "获取指标统计结果echart NestedPie图表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaNestedPieReportPreviews, method = RequestMethod.GET)
+    public Envelop getQuotaNestedPieGraphicReports(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "title", value = "名称", defaultValue = "")
+            @RequestParam(value = "title", required = false) String title,
+            @ApiParam(name = "area", value = "是否区分区域", defaultValue = "")
+            @RequestParam(value = "area", required = false) String area) {
+        Envelop envelop = new Envelop();
+        MChartInfoModel chartInfoModel = new MChartInfoModel();
+        chartInfoModel.setResourceId(resourceId);
+        envelop.setObj(chartInfoModel);
+        envelop.setSuccessFlg(false);
+        try {
+            Envelop resourceResult =  resourcesClient.getResourceById(resourceId);
+            if(!resourceResult.isSuccessFlg()){
+                envelop.setErrorMsg("视图不存在，请确认！");
+                return envelop;
+            }
+            List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
+            String quotaIdStr = "";
+            if (null != list && list.size() > 0) {
+                for (ResourceQuotaModel ResourceQuota : list) {
+                    quotaIdStr += ResourceQuota.getQuotaId() + ",";
+                }
+            }
+            chartInfoModel = tjQuotaJobClient.getQuotaNestedPieGraphicReports(quotaIdStr, filter, dimension, title, area);
+            chartInfoModel.setFirstDimension(dimension);
+            envelop.setObj(chartInfoModel);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            envelop.setErrorMsg("获取图表出错！");
+        }
+        return envelop;
+    }
 }
