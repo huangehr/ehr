@@ -14,7 +14,7 @@ import com.github.abel533.echarts.json.GsonOption;
 import com.github.abel533.echarts.series.Bar;
 import com.github.abel533.echarts.series.Line;
 import com.github.abel533.echarts.series.Pie;
-//import com.github.abel533.echarts.series.Radar;
+import com.github.abel533.echarts.series.Radar;
 import com.github.abel533.echarts.style.itemstyle.Normal;
 import com.yihu.ehr.model.echarts.ChartDataModel;
 
@@ -77,11 +77,11 @@ public class ReportOption {
 //        legendDataList.add(legend);
 //        option.legend().data(legendDataList);
         //grid
-        option.grid().left("3%");
-        option.grid().right("9%");
-        option.grid().top("22%");
-        option.grid().bottom("3%");
-        option.grid().containLabel(true);
+        option.grid().x("3%");  // left
+        option.grid().y("22%");  // top
+        option.grid().x2("9%"); // right
+        option.grid().y2("3%"); // bottom
+//        option.grid().containLabel(true);
         //yAxis
         ValueAxis valueAxis = new ValueAxis();
         valueAxis.name(yName);
@@ -172,11 +172,11 @@ public class ReportOption {
 //        legendDataList.add(legend);
 //        option.legend().data(legendDataList);
         //grid
-        option.grid().left("3%");
-        option.grid().right("9%");
-        option.grid().top("22%");
-        option.grid().bottom("3%");
-        option.grid().containLabel(true);
+        option.grid().x("3%");  // left
+        option.grid().y("22%");  // top
+        option.grid().x2("9%"); // right
+        option.grid().y2("3%"); // bottom
+//        option.grid().containLabel(true);
         //yAxis
         ValueAxis valueAxis = new ValueAxis();
         valueAxis.name(yName);
@@ -249,11 +249,11 @@ public class ReportOption {
         option.tooltip().trigger(Trigger.axis);
         //toolbox
         //grid
-        option.grid().left("3%");
-        option.grid().right("9%");
-        option.grid().top("22%");
-        option.grid().bottom("3%");
-        option.grid().containLabel(true);
+        option.grid().x("3%");  // left
+        option.grid().y("22%");  // top
+        option.grid().x2("9%"); // right
+        option.grid().y2("3%"); // bottom
+//        option.grid().containLabel(true);
         //yAxis
         ValueAxis valueAxis = new ValueAxis();
         valueAxis.name(yName);
@@ -364,10 +364,10 @@ public class ReportOption {
 //        option.legend().data(legendDataList);
 
         //grid
-        option.grid().left("3%");
-        option.grid().right("4%");
-        option.grid().bottom("3%");
-        option.grid().containLabel(true);
+        option.grid().x("3%");  // left
+        option.grid().x2("4%"); // right
+        option.grid().y2("3%"); // bottom
+//        option.grid().containLabel(true);
         //series
         Pie pie = new Pie();
         pie.name(pieName);
@@ -378,9 +378,9 @@ public class ReportOption {
         } else {
             pie.center(new String[]{"50%", "50%"});
         }
-        pie.itemStyle().emphasis().shadowBlur(10);
-        pie.itemStyle().emphasis().shadowOffsetX(0);
-        pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
+//        pie.itemStyle().emphasis().shadowBlur(10);
+//        pie.itemStyle().emphasis().shadowOffsetX(0);
+//        pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
 
         List<Object> lineNameList = getList(datalist,"NAME");
         List<Object> lineValList = getList(datalist,"TOTAL");
@@ -392,7 +392,8 @@ public class ReportOption {
             dataList.add(map);
         }
 
-        pie.setData(dataList);
+//        pie.setData(dataList);
+        pie.data(dataList);
         option.series().add(pie);
 
         if(data2list != null && data2list.size() > 0){
@@ -401,9 +402,9 @@ public class ReportOption {
             pie2.type(SeriesType.pie);
             pie2.radius("40%");
             pie2.center(new String[]{"70%", "50%"});
-            pie2.itemStyle().emphasis().shadowBlur(10);
-            pie2.itemStyle().emphasis().shadowOffsetX(0);
-            pie2.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
+//            pie2.itemStyle().emphasis().shadowBlur(10);
+//            pie2.itemStyle().emphasis().shadowOffsetX(0);
+//            pie2.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
 
             List<Object> lineNameList2 = getList(data2list,"NAME");
             List<Object> lineValList2 = getList(data2list,"TOTAL");
@@ -414,7 +415,8 @@ public class ReportOption {
                 map.put("name",lineNameList2.get(i));
                 dataList2.add(map);
             }
-            pie2.setData(dataList2);
+//            pie2.setData(dataList2);
+            pie2.data(dataList2);
             option.series().add(pie2);
         }
         return option;
@@ -481,12 +483,12 @@ public class ReportOption {
         option.title().setText(title);
         option.tooltip().trigger(Trigger.axis);
         option.tooltip().axisPointer().type(PointerType.shadow);
-        option.calculable(true);
-        option.grid().left("3%");
-        option.grid().right("9%");
-        option.grid().top("22%");
-        option.grid().bottom("3%");
-        option.grid().containLabel(true);
+
+//        option.grid().left("3%");
+//        option.grid().right("9%");
+//        option.grid().top("22%");
+//        option.grid().bottom("3%");
+//        option.grid().containLabel(true);
 
         // radar 极坐标
         Polar polar = new Polar();
@@ -503,9 +505,10 @@ public class ReportOption {
 
         option.polar(polar);
         // series
-//        Radar radar = new Radar();
-//        radar.data(new Data().name(title), radarVal);
-//        option.series().add(radar);
+        Radar radar = new Radar();
+        radar.data(new Data().name(title).value(radarVal));
+        radar.itemStyle().normal().areaStyle().type("default");
+        option.series().add(radar);
         System.out.println("雷达图：" + option);
         return option;
     }
@@ -529,10 +532,10 @@ public class ReportOption {
         option.tooltip().trigger(Trigger.item);
 
         // grid
-        option.grid().left("3%");
-        option.grid().right("4%");
-        option.grid().bottom("3%");
-        option.grid().containLabel(true);
+        option.grid().x("3%");  // left
+        option.grid().x2("4%"); // right
+        option.grid().y2("3%"); // bottom
+//        option.grid().containLabel(true);
 
         // series
         List<Pie> pieList = new ArrayList<>();
@@ -570,10 +573,10 @@ public class ReportOption {
         pie.type(SeriesType.pie);
         Normal normal = new Normal();
         normal.label().position("inner");
-        pie.label().normal(normal);
-        pie.itemStyle().emphasis().shadowBlur(10);
-        pie.itemStyle().emphasis().shadowOffsetX(0);
-        pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
+//        pie.label().normal(normal);
+//        pie.itemStyle().emphasis().shadowBlur(10);
+//        pie.itemStyle().emphasis().shadowOffsetX(0);
+//        pie.itemStyle().emphasis().shadowColor("rgba(0, 0, 0, 0.5)");
 
         List<Object> pieNameList = getList(dataModel,"NAME");
         List<Object> pieValList = getList(dataModel,"TOTAL");
@@ -584,7 +587,8 @@ public class ReportOption {
             map.put("name", pieNameList.get(i));
             dataList.add(map);
         }
-        pie.setData(dataList);
+//        pie.setData(dataList);
+        pie.data(dataList);
         return pie;
     }
 }

@@ -237,5 +237,92 @@ public class QuotaReportController extends BaseController {
         return dictSql;
     }
 
+    @ApiOperation(value = "获取指标统计结果echart radar图表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaRadarGraphicReportPreviews, method = RequestMethod.GET)
+    public MChartInfoModel getQuotaRadarGraphicReports(
+            @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
+            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "title", value = "名称", defaultValue = "")
+            @RequestParam(value = "title", required = false) String title,
+            @ApiParam(name = "count", value = "总数", defaultValue = "")
+            @RequestParam(value = "count", required = false) Integer count,
+            @ApiParam(name = "area", value = "是否区分区域", defaultValue = "")
+            @RequestParam(value = "area", required = false) String area) {
+        List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
+        MChartInfoModel chartInfoModel = new MChartInfoModel();
+        try {
+            Option option = null;
+            List<String> radarNames = new ArrayList<>();
+            Map<String, Map<String, Object>> radarData = new HashMap<>();
+            List<Map<String, Object>> listData = new ArrayList<>();
+            Map<String, String> xAxisMap = new HashMap<>();
+            for(String quotaId : quotaIds) {
+                Map<String, Object> dataMap = new HashMap<>();
+                TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
+                if(null != tjQuota){
+                    String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimension);
+                    Map<String,String> dimensionDicMap = new HashMap<>();
+                    if(StringUtils.isNotEmpty(dictSql)){BasesicUtil baseUtil = new BasesicUtil();
+                        if(dimension.contains("slaveKey")){
+                            //查询字典数据
+                            List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
+                            for (DictModel dictModel : dictDatas) {
+                                String name = baseUtil.getFieldValueByName("name", dictModel);
+                                String val = baseUtil.getFieldValueByName("code", dictModel).toLowerCase();
+                                dimensionDicMap.put(val,name);
+                            }
+                        } else{
+                            List<SaveModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
+                            if(dictDatas != null ) {
+                                for (SaveModel saveModel : dictDatas) {
+                                    String name = baseUtil.getFieldValueByName(dimension + "Name", saveModel);
+                                    String val = baseUtil.getFieldValueByName(dimension,saveModel).toLowerCase();
+                                    dimensionDicMap.put(val,name);
+                                }
+                            }
+                        }
+                    }
+                    //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
+                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter);
+                    for(String key : groupDataMap.keySet()){
+                        key = key.toLowerCase();
+                        dataMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, groupDataMap.get(key));
+                        xAxisMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key): key, key);
+                    }
+                    radarNames.add(tjQuota.getName());
+                    radarData.put(tjQuota.getCode(), dataMap);
+                }
+                Integer num = 0;
+                if (StringUtils.isEmpty(area)) {
+                    for (String key : dataMap.keySet()) {
+                        num += Integer.parseInt(dataMap.get(key).toString());
+                    }
+                } else {
+                    for (String key : dataMap.keySet()) {
+                        if (dataMap.get(key).equals(area)) {
+                            num = Integer.parseInt(dataMap.get(key).toString());
+                        }
+                    }
+                }
+                Map<String, Object> map = new HashMap();
+                map.put(tjQuota.getName(), num);
+                listData.add(map);
+            }
+            ReportOption reportOption = new ReportOption();
 
+            option = reportOption.getRadarEchartOption(title, listData, count);
+            chartInfoModel.setOption(option.toString());
+            chartInfoModel.setTitle(title);
+            chartInfoModel.setxAxisMap(xAxisMap);
+            return chartInfoModel;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+            return null;
+        }
+    }
 }
