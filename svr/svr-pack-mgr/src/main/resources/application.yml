@@ -124,7 +124,7 @@ spring:
     username: healthcloud
     password: GP8Qz4qU
   redis:
-    host: 11.1.2.20 # Redis server host.
+    host: 11.1.2.22 # Redis server host.
     port: 6390
     password: Kb6wKDQP1W4
 fast-dfs:
