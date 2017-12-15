@@ -260,6 +260,11 @@ public class ServiceApi {
         public static final String RsReportViewExistByResourceId = "/resources/reportView/existByResourceId";
         public static final String RsReportViewExistReport = "/resources/reportView/existReport";
 
+        public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
+
+
+
+
 
     }
 
