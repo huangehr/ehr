@@ -57,7 +57,7 @@ spring:
   profiles: dev
 
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: chenweishan
     password: chenweishan
 
@@ -75,7 +75,7 @@ spring:
   profiles: alpha
 
   datasource:
-    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ha
     password: ha
 
@@ -93,7 +93,7 @@ spring:
   profiles: test
 
   datasource:
-    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: weifuwu
     password: weifuwu
 
@@ -113,7 +113,7 @@ spring:
   redis:
     host: 11.1.2.20 # Redis server host.
   datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ha
     password: jkzlxm
 
@@ -125,18 +125,18 @@ fast-dfs:
 spring:
   profiles: prod_fz
   datasource:
-    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
-    username: sr_healtharchive
-    password: data!@)1
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
 
   redis:
-    host: 192.168.135.40 # Redis server host.
+    host: 11.1.2.22 # Redis server host.
     port: 6390
     # Login password of the redis server.
-    password: redis!@456
+    password: Kb6wKDQP1W4
 fast-dfs:
-  tracker-server: 192.168.135.42:22122
-  public-server: http://192.168.135.42:22122
+  tracker-server: 11.1.2.9:22122
+  public-server: http://11.1.2.9:80
 
 ---
 spring:
@@ -147,10 +147,10 @@ spring:
     port: 6390
     password: q4YaQemf
   datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8
+    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
 
 fast-dfs:
   tracker-server: 10.176.97.5:22122
-  public-server: http://10.176.97.5:22122
+  public-server: http://10.176.97.5:8888
