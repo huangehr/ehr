@@ -12,6 +12,7 @@ import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
 import com.yihu.quota.service.quota.QuotaService;
+import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.util.ReportOption;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.SaveModel;
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 
@@ -110,21 +110,21 @@ public class QuotaReportController extends BaseController {
                     String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(),dimension);
                     Map<String,String> dimensionDicMap = new HashMap<>();
                     if(StringUtils.isNotEmpty(dictSql)){
-
+                        BasesicUtil baseUtil = new BasesicUtil();
                         if(dimension.contains("slaveKey")){
                             //查询字典数据
                             List<DictModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(DictModel.class));
                             for (DictModel dictModel : dictDatas) {
-                                String name = getFieldValueByName("name", dictModel);
-                                String val = getFieldValueByName("code",dictModel).toLowerCase();
+                                String name = baseUtil.getFieldValueByName("name", dictModel);
+                                String val = baseUtil.getFieldValueByName("code", dictModel).toLowerCase();
                                 dimensionDicMap.put(val,name);
                             }
                         } else{
                             List<SaveModel> dictDatas = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(SaveModel.class));
                             if(dictDatas != null ) {
                                 for (SaveModel saveModel : dictDatas) {
-                                    String name = getFieldValueByName(dimension + "Name", saveModel);
-                                    String val = getFieldValueByName(dimension,saveModel).toLowerCase();
+                                    String name = baseUtil.getFieldValueByName(dimension + "Name", saveModel);
+                                    String val = baseUtil.getFieldValueByName(dimension,saveModel).toLowerCase();
                                     dimensionDicMap.put(val,name);
                                 }
                             }
@@ -237,19 +237,5 @@ public class QuotaReportController extends BaseController {
         return dictSql;
     }
 
-    /**
-     * 根据属性名获取属性值
-     * */
-    private String getFieldValueByName(String fieldName, Object o) {
-        try {
-            String firstLetter = fieldName.substring(0, 1).toUpperCase();
-            String getter = "get" + firstLetter + fieldName.substring(1);
-            Method method = o.getClass().getMethod(getter, new Class[] {});
-            Object value = method.invoke(o, new Object[] {});
-            return value.toString();
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
 }
