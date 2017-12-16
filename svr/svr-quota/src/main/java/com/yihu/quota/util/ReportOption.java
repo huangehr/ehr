@@ -176,9 +176,8 @@ public class ReportOption {
             map.put("name",lineNameList.get(i));
             dataList.add(map);
         }
-
-//        pie.setData(dataList);
-        pie.data(dataList);
+        List<Object> list = new ArrayList<>(dataList);
+        pie.setData(list);
         option.series().add(pie);
 
         if(data2list != null && data2list.size() > 0){
@@ -200,8 +199,8 @@ public class ReportOption {
                 map.put("name",lineNameList2.get(i));
                 dataList2.add(map);
             }
-//            pie2.setData(dataList2);
-            pie2.data(dataList2);
+            List<Object> list2 = new ArrayList<>(dataList2);
+            pie2.setData(list2);
             option.series().add(pie2);
         }
         return option;
