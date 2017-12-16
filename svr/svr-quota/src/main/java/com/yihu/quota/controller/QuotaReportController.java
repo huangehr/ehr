@@ -248,13 +248,11 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
             @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "title", value = "名称", defaultValue = "")
-            @RequestParam(value = "title", required = false) String title,
-            @ApiParam(name = "count", value = "总数", defaultValue = "")
-            @RequestParam(value = "count", required = false) Integer count,
-            @ApiParam(name = "area", value = "是否区分区域", defaultValue = "")
-            @RequestParam(value = "area", required = false) String area) {
+            @RequestParam(value = "title", required = false) String title) {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
+        List<Integer> arrayNum = new ArrayList<>();
+        Integer polorCount = 50;
         try {
             Option option = null;
             List<String> radarNames = new ArrayList<>();
@@ -278,14 +276,17 @@ public class QuotaReportController extends BaseController {
                     radarNames.add(tjQuota.getName());
                     radarData.put(tjQuota.getCode(), dataMap);
                 }
-                Integer num = getNum(area, dataMap);
+                Integer num = getNum(dataMap);
+                arrayNum.add(num);
                 Map<String, Object> map = new HashMap();
                 map.put(tjQuota.getName(), num);
                 listData.add(map);
             }
             ReportOption reportOption = new ReportOption();
-
-            option = reportOption.getRadarEchartOption(title, listData, count);
+            Integer[] array = arrayNum.toArray(new Integer[arrayNum.size()]);
+            Arrays.sort(array); // 进行升序排序
+            polorCount += array[arrayNum.size() - 1];   // 雷达图极坐标
+            option = reportOption.getRadarEchartOption(title, listData, polorCount);
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
             chartInfoModel.setxAxisMap(xAxisMap);
@@ -307,9 +308,7 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
             @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "title", value = "名称", defaultValue = "")
-            @RequestParam(value = "title", required = false) String title,
-            @ApiParam(name = "area", value = "是否区分区域", defaultValue = "")
-            @RequestParam(value = "area", required = false) String area) {
+            @RequestParam(value = "title", required = false) String title) {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         MChartInfoModel chartInfoModel = new MChartInfoModel();
         try {
@@ -336,7 +335,7 @@ public class QuotaReportController extends BaseController {
                     radarNames.add(tjQuota.getName());
                     radarData.put(tjQuota.getCode(), dataMap);
                 }
-                Integer num = getNum(area, dataMap);
+                Integer num = getNum(dataMap);
                 Map<String, Object> map = new HashMap();
                 map.put("NAME", tjQuota.getName());
                 map.put("TOTAL", num);
@@ -410,20 +409,11 @@ public class QuotaReportController extends BaseController {
         return dimensionDicMap;
     }
 
-    public Integer getNum(String area, Map<String, Object> dataMap) {
+    public Integer getNum(Map<String, Object> dataMap) {
         Integer num = 0;
-        if (StringUtils.isEmpty(area)) {
-            for (String key : dataMap.keySet()) {
-                Integer result = null !=  dataMap.get(key) ? Integer.parseInt(dataMap.get(key).toString()) : 0;
-                num += result;
-            }
-        } else {
-            for (String key : dataMap.keySet()) {
-                if (dataMap.get(key).equals(area)) {
-                    Integer result = null !=  dataMap.get(key) ? Integer.parseInt(dataMap.get(key).toString()) : 0;
-                    num = result;
-                }
-            }
+        for (String key : dataMap.keySet()) {
+            Integer result = null !=  dataMap.get(key) ? Integer.parseInt(dataMap.get(key).toString()) : 0;
+            num += result;
         }
         return num;
     }
