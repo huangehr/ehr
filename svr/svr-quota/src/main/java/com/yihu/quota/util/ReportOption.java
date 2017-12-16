@@ -336,6 +336,7 @@ public class ReportOption {
             }
             option.series().add(pie);
         }
+        System.out.println("嵌套饼图：" + option);
         return option;
     }
 
@@ -376,7 +377,8 @@ public class ReportOption {
             dataList.add(map);
         }
 //        pie.setData(dataList);
-        pie.data(dataList);
+        List<Object> list = new ArrayList<>(dataList);
+        pie.setData(list);
         return pie;
     }
 }
