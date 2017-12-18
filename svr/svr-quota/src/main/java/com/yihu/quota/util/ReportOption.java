@@ -15,6 +15,7 @@ import com.github.abel533.echarts.series.Bar;
 import com.github.abel533.echarts.series.Line;
 import com.github.abel533.echarts.series.Pie;
 import com.github.abel533.echarts.series.Radar;
+import com.github.abel533.echarts.style.ItemStyle;
 import com.github.abel533.echarts.style.itemstyle.Normal;
 import com.yihu.ehr.model.echarts.ChartDataModel;
 
@@ -175,9 +176,8 @@ public class ReportOption {
             map.put("name",lineNameList.get(i));
             dataList.add(map);
         }
-
-//        pie.setData(dataList);
-        pie.data(dataList);
+        List<Object> list = new ArrayList<>(dataList);
+        pie.setData(list);
         option.series().add(pie);
 
         if(data2list != null && data2list.size() > 0){
@@ -199,8 +199,8 @@ public class ReportOption {
                 map.put("name",lineNameList2.get(i));
                 dataList2.add(map);
             }
-//            pie2.setData(dataList2);
-            pie2.data(dataList2);
+            List<Object> list2 = new ArrayList<>(dataList2);
+            pie2.setData(list2);
             option.series().add(pie2);
         }
         return option;
@@ -301,16 +301,15 @@ public class ReportOption {
      * 嵌套饼图
      *
      * @param title
-     * @param pieName
      * @param dataModel
      * @return
      */
-    public Option getNestedPieEchartOption(String title, String pieName, ChartDataModel dataModel) {
+    public Option getNestedPieEchartOption(String title, ChartDataModel dataModel) {
         Option option = new GsonOption();
         // title
         option.title().setText(title);
-        option.title().setSubtext(title);
-        option.title().x("center");
+//        option.title().setSubtext(title);
+//        option.title().x("center");
 
         // tooltip
         option.tooltip().trigger(Trigger.item);
@@ -327,15 +326,16 @@ public class ReportOption {
         String temp = "20";
         for (int i = 0; i < pieList.size(); i++) {
             Pie pie = pieList.get(i);
-            pie.name(pieName);
+            pie.name(title);
             if (i == 0) {
-                pie.radius("0%", "20%");
+                pie.radius("5%", "20%");
             } else {
                 pie.radius((Integer.parseInt(temp) + 5) + "%", (Integer.parseInt(temp) + 20 )+ "%");
                 temp = (Integer.parseInt(temp) + 20) + "";
             }
             option.series().add(pie);
         }
+        System.out.println("嵌套饼图：" + option);
         return option;
     }
 
@@ -357,6 +357,10 @@ public class ReportOption {
         pie.type(SeriesType.pie);
         Normal normal = new Normal();
         normal.label().position("inner");
+        normal.labelLine().show(false);
+        ItemStyle itemStyle = new ItemStyle();
+        itemStyle.normal(normal);
+        pie.setItemStyle(itemStyle);
 //        pie.label().normal(normal);
 //        pie.itemStyle().emphasis().shadowBlur(10);
 //        pie.itemStyle().emphasis().shadowOffsetX(0);
@@ -372,7 +376,8 @@ public class ReportOption {
             dataList.add(map);
         }
 //        pie.setData(dataList);
-        pie.data(dataList);
+        List<Object> list = new ArrayList<>(dataList);
+        pie.setData(list);
         return pie;
     }
 }

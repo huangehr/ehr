@@ -68,9 +68,17 @@ public interface TjQuotaJobClient {
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
             @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "title", value = "名称", defaultValue = "")
-            @RequestParam(value = "title", required = false) String title,
-            @ApiParam(name = "count", value = "总数", defaultValue = "")
-            @RequestParam(value = "count", required = false) Integer count,
-            @ApiParam(name = "area", value = "是否区分区域", defaultValue = "")
-            @RequestParam(value = "area", required = false) String area);
+            @RequestParam(value = "title", required = false) String title);
+
+    @ApiOperation(value = "获取指标统计结果echart NestedPie图表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaNestedPieReportPreviews, method = RequestMethod.GET)
+    MChartInfoModel getQuotaNestedPieGraphicReports(
+            @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
+            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "title", value = "名称", defaultValue = "")
+            @RequestParam(value = "title", required = false) String title);
 }
