@@ -1230,4 +1230,35 @@ public class ServiceApi {
         public static final String LocationDelete = "/location/delete";
     }
 
+    public static class FastDFS {
+        public static final String Upload = "/fastDfs/upload";
+        public static final String OldUpload = "/fastDfs/oldUpload";
+        public static final String DeleteById = "/fastDfs/deleteById";
+        public static final String DeleteByPath = "/fastDfs/deleteByPath";
+        public static final String DeleteByObjectId = "/fastDfs/deleteByObjectId";
+        public static final String Modify = "/fastDfs/modify";
+        public static final String OldModify = "/fastDfs/oldModify";
+        public static final String FileInfo = "/fastDfs/fileInfo";
+        public static final String DownloadById = "/fastDfs/downloadById";
+        public static final String DownloadByPath = "/fastDfs/downloadByPath";
+        public static final String DownloadByObjectId = "/fastDfs/downloadByObjectId";
+        public static final String DownloadToLocal = "/fastDfs/downloadToLocal";
+        public static final String GetFilePath = "/fastDfs/getFilePath";
+        public static final String Page = "/fastDfs/page";
+        public static final String Status = "/fastDfs/status";
+        public static final String GetPublicUrl = "/fastDfs/getPublicUrl";
+        public static final String SetPublicUrl = "/fastDfs/setPublicUrl";
+    }
+
+    public static class ElasticSearch {
+        public static final String Mapping = "/elasticSearch/mapping";
+        public static final String Index = "/elasticSearch/index";
+        public static final String Delete = "/elasticSearch/delete";
+        public static final String Update = "/elasticSearch/update";
+        public static final String FindById = "/elasticSearch/{id}";
+        public static final String FindByField = "/elasticSearch/findByField";
+        public static final String Page = "/elasticSearch/page";
+
+    }
+
 }

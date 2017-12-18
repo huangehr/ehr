@@ -24,7 +24,7 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
     @Autowired
     private ElasticSearchClient elasticSearchClient;
 
-    @RequestMapping(value = "/elasticSearch/mapping", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Mapping, method = RequestMethod.POST)
     @ApiOperation(value = "建立索引")
     public Envelop mapper(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -36,7 +36,7 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
         return elasticSearchClient.mapping(index, type, source);
     }
 
-    @RequestMapping(value = "/elasticSearch/index", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Index, method = RequestMethod.POST)
     @ApiOperation(value = "添加数据")
     public Envelop index(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -48,7 +48,7 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
         return elasticSearchClient.index(index, type, source);
     }
 
-    @RequestMapping(value = "/elasticSearch/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Delete, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据")
     public Envelop delete(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -60,7 +60,7 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
         return elasticSearchClient.delete(index, type, id);
     }
 
-    @RequestMapping(value = "/elasticSearch/update", method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Update, method = RequestMethod.PUT)
     @ApiOperation(value = "更新数据")
     public Envelop update(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -74,7 +74,7 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
         return elasticSearchClient.update(index, type, id, source);
     }
 
-    @RequestMapping(value = "/elasticSearch/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ElasticSearch.FindById, method = RequestMethod.GET)
     @ApiOperation(value = "获取单条数据")
     public Envelop findById(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -86,7 +86,7 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
         return elasticSearchClient.index(index, type, id);
     }
 
-    @RequestMapping(value = "/elasticSearch/findByField", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ElasticSearch.FindByField, method = RequestMethod.GET)
     @ApiOperation(value = "获取结果集")
     public Envelop findByField(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -100,7 +100,7 @@ public class ElasticSearchController extends EnvelopRestEndPoint {
         return elasticSearchClient.findByField(index, type, field, value);
     }
 
-    @RequestMapping(value = "/elasticSearch/page", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Page, method = RequestMethod.GET)
     @ApiOperation(value = "获取结果集")
     public Envelop page(
             @ApiParam(name = "index", value = "索引名称", required = true)
