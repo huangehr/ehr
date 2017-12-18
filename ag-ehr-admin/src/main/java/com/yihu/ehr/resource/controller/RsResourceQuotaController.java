@@ -4,6 +4,7 @@ import com.yihu.ehr.adapter.utils.ExtendController;
 import com.yihu.ehr.agModel.resource.ResourceQuotaModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
+import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -104,5 +105,23 @@ public class RsResourceQuotaController extends ExtendController {
             e.printStackTrace();
             return failed(FeignExceptionUtils.getErrorMsg(e));
         }
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.SearchQuotaByResourceId, method = RequestMethod.GET)
+    @ApiOperation(value = "根据resourceId获取该资源下的指标列表")
+    public Envelop getQuotaByResourceId(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId) throws Exception {
+        List<TjQuota> quotaList = null;
+        Envelop envelop = new Envelop();
+        try {
+            quotaList = resourceQuotaClient.getQuotaByResourceId(resourceId);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(quotaList);
+        } catch (Exception e) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
     }
 }

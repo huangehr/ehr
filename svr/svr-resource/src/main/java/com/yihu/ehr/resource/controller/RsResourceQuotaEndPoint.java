@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
@@ -132,5 +133,14 @@ public class RsResourceQuotaEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "resourceId") String resourceId) {
         resourceQuotaService.deleteByResourceId(resourceId);
         return Result.success("资源视图-关联指标表删除成功！");
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.SearchQuotaByResourceId, method = RequestMethod.GET)
+    @ApiOperation(value = "根据resourceId获取该资源下的指标列表")
+    public List<TjQuota> getQuotaByResourceId(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId) {
+        List<TjQuota> quotaList = resourceQuotaService.getQuotaByResourceId(resourceId);
+        return quotaList;
     }
 }
