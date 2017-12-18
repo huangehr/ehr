@@ -16,7 +16,8 @@ import java.util.Queue;
  * @version 1.0
  * @created 2016.04.01 8:37
  */
-@Component
+//@Component
+@Deprecated
 public class MessageBuffer {
 
     @Value("${resolve.job.check-time}")
