@@ -1,6 +1,7 @@
 package com.yihu.ehr.dfs.es.controller;
 
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.dfs.es.service.ElasticSearchService;
 import com.yihu.ehr.util.rest.Envelop;
@@ -30,7 +31,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ElasticSearchService elasticSearchService;
 
-    @RequestMapping(value = "/elasticSearch/mapping", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Mapping, method = RequestMethod.POST)
     @ApiOperation(value = "建立映射")
     public Envelop mapping(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -54,7 +55,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "/elasticSearch/index", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Index, method = RequestMethod.POST)
     @ApiOperation(value = "添加数据")
     public Envelop index(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -84,7 +85,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "/elasticSearch/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Delete, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除数据")
     public Envelop delete(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -99,7 +100,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "/elasticSearch/update", method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Update, method = RequestMethod.PUT)
     @ApiOperation(value = "更新数据")
     public Envelop update(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -137,7 +138,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "/elasticSearch/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ElasticSearch.FindById, method = RequestMethod.GET)
     @ApiOperation(value = "获取单条数据")
     public Envelop findById(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -158,7 +159,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "/elasticSearch/findByField", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ElasticSearch.FindByField, method = RequestMethod.GET)
     @ApiOperation(value = "获取结果集")
     public Envelop findByField(
             @ApiParam(name = "index", value = "索引名称", required = true)
@@ -176,7 +177,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = "/elasticSearch/page", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.ElasticSearch.Page, method = RequestMethod.GET)
     @ApiOperation(value = "获取结果集")
     public Envelop page(
             @ApiParam(name = "index", value = "索引名称", required = true)
