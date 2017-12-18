@@ -90,11 +90,13 @@ ehr-redis:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: /usr/local/ehr/redisReport/memory.csv
-  server:
-    host: 172.19.103.47
-    username: root
-    password: jkzl
-    ssh-port: 22
+# 由于生产环境服务器维护通过堡垒机管理，不允许代码直接通过SSH访问远程服务器。
+# 暂时注释，寻求别的方法再去掉。
+#  server:
+#    host: 172.19.103.47
+#    username: root
+#    password: jkzl
+#    ssh-port: 22
 
 ---
 spring:
@@ -120,11 +122,11 @@ ehr-redis:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: /usr/local/ehr/redisReport/memory.csv
-  server:
-    host: 172.19.103.47
-    username: root
-    password: jkzl
-    ssh-port: 22
+#  server:
+#    host: 172.19.103.47
+#    username: root
+#    password: jkzl
+#    ssh-port: 22
 
 
 
@@ -152,11 +154,11 @@ ehr-redis:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: /usr/local/ehr/redisReport/memory.csv
-  server:
-    host: 172.19.103.47
-    username: root
-    password: jkzl
-    ssh-port: 22
+#  server:
+#    host: 172.19.103.47
+#    username: root
+#    password: jkzl
+#    ssh-port: 22
 
 
 
@@ -183,11 +185,11 @@ ehr-redis:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: /usr/local/ehr/redisReport/memory.csv
-  server:
-    host: 172.19.103.47
-    username: root
-    password: jkzl
-    ssh-port: 22
+#  server:
+#    host: 172.19.103.47
+#    username: root
+#    password: jkzl
+#    ssh-port: 22
 
 ---
 spring:
@@ -214,11 +216,11 @@ ehr-redis:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: /usr/local/ehr/redisReport/memory.csv
-  server:
-    host: 172.19.103.47
-    username: root
-    password: jkzl
-    ssh-port: 22
+#  server:
+#    host: 172.19.103.47
+#    username: root
+#    password: jkzl
+#    ssh-port: 22
 
 ---
 spring:
@@ -245,8 +247,8 @@ ehr-redis:
     memory:
       rdbFilePath: /usr/local/bin/dump.rdb
       outFilePath: /usr/local/ehr/redisReport/memory.csv
-  server:
-    host: 172.19.103.47
-    username: root
-    password: jkzl
-    ssh-port: 22
+#  server:
+#    host: 172.19.103.47
+#    username: root
+#    password: jkzl
+#    ssh-port: 22
