@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.pack.dao.XDatasetPackageRepository;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.log.LogService;
@@ -35,13 +36,11 @@ import java.util.Map;
 @Transactional
 public class DatasetPackageService extends BaseJpaService<DatasetPackage, XDatasetPackageRepository> {
     @Value("${deploy.region}")
-    Short adminRegion;
-
+    private Short adminRegion;
     @Autowired
-    FastDFSUtil fastDFSUtil;
-
+    private FastDFSUtil fastDFSUtil;
     @Autowired
-    XDatasetPackageRepository datasetPackageRepository;
+    private XDatasetPackageRepository datasetPackageRepository;
 
 
     public DatasetPackage receiveDatasets(InputStream is, String pwd, String md5, String orgCode, String clientId) {

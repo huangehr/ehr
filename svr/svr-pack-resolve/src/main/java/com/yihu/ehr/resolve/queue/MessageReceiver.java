@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
  * @version 1.0
  * @created 2016.03.31 17:03
  */
-@Component
+//@Component
+@Deprecated
 public class MessageReceiver  {
 
     @Autowired

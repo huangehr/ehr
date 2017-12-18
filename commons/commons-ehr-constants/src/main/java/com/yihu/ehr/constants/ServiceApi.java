@@ -398,15 +398,11 @@ public class ServiceApi {
         public static final String PackageResolve = "/packages/resolve";
         public static final String PackageSearch = "/packages/search";
         public static final String PackageDownloads = "/packages/{id}/downloads";
-
         public static final String ResolveMessage = "/message/resolve";
-
         public static final String MessageTimer = "/message/timer";
-
         public static final String LegacyPackages = "/json_package";
-
         public static final String Prescription = "/prescription"; //处方笺维护
-        public static final String  ArchiveRelation = "/archiveRelation"; //档案关联
+        public static final String ArchiveRelation = "/archiveRelation"; //档案关联
     }
 
     //非病人维度

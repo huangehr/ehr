@@ -1,7 +1,9 @@
 package com.yihu.ehr.pack.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.constants.RedisCollection;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
@@ -18,6 +20,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -26,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
@@ -42,15 +46,10 @@ public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private DatasetPackageService datasetPackService;
-
     @Autowired
     private AppClient appClient;
-
     @Autowired
-    MessageBuffer messageBuffer;
-
-    @Autowired
-    FastDFSUtil fastDFSUtil;
+    private RedisTemplate<String, Serializable> redisTemplate;
 
 
     @RequestMapping(value = ServiceApi.DatasetPackages.AcquirePackage, method = RequestMethod.GET)
@@ -140,7 +139,7 @@ public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "md5", required = false) String md5,
             @ApiParam(name = "appKey", value = "应用ＩＤ，用于获取secret生成包密码")
             @RequestParam(value = "appKey", required = false) String appKey,
-            HttpServletRequest request)  {
+            HttpServletRequest request) throws JsonProcessingException {
 
         MApp app = appClient.getApp(appKey);
         String secret = null;
@@ -156,8 +155,8 @@ public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
         } catch (Exception ex) {
             throw new ApiException(HttpStatus.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
-
-        messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
+        redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(aPackage));
+        //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
         return aPackage;
     }
 
