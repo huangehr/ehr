@@ -64,7 +64,7 @@ public class RedisScheduledTask {
      * 生成 Redis 快照
      */
 //    @RequestMapping(value = "/redis/cache/statistics/backupRedis", method = RequestMethod.GET)
-    @Scheduled(cron = "0 30 0 15 * ?")
+    @Scheduled(cron = "0 0 0 15 * ?")
     public void backupRedis() {
         redisTemplate.execute(new RedisCallback() {
             @Override
@@ -80,7 +80,7 @@ public class RedisScheduledTask {
      * 导出 redis 内存分析报告，并导入到数据库
      */
 //    @RequestMapping(value = "/redis/cache/statistics/exportAndImportRedisMemoryData", method = RequestMethod.GET)
-    @Scheduled(cron = "0 0 0 15 * ?")
+    @Scheduled(cron = "0 30 0 15 * ?")
     public void exportAndImportRedisMemoryData() {
         long start = System.currentTimeMillis();
         try {
