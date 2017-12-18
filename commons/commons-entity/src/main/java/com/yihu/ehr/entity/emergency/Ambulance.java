@@ -33,8 +33,6 @@ public class Ambulance extends BaseAssignedEntity {
     }
 
     private Integer location;
-    // 所属医院编码
-    private String orgCode;
     // 所属医院名称
     private String orgName;
     // 随车手机号码
@@ -53,15 +51,6 @@ public class Ambulance extends BaseAssignedEntity {
 
     public void setLocation(Integer location) {
         this.location = location;
-    }
-
-    @Column(name = "org_code", nullable = false)
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
     }
 
     @Column(name = "org_name", nullable = false)

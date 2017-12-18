@@ -102,7 +102,6 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
                 childMap.put("initLatitude", location.getInitLatitude());
                 childMap.put("initAddress", location.getInitAddress());
                 childMap.put("district", location.getDistrict());
-                childMap.put("orgCode", ambulance.getOrgCode());
                 childMap.put("orgName", ambulance.getOrgName());
                 childMap.put("phone", ambulance.getPhone());
                 childMap.put("status", ambulance.getStatus());
@@ -187,12 +186,21 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
                 envelop.setErrorMsg("手机号：" + newAmbulance.getPhone() + "已存在");
                 return envelop;
             }
+            Location location = locationService.findById(newAmbulance.getLocation());
+            if(null == location) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("待命地点：" + newAmbulance.getLocation() + "不存在");
+                return envelop;
+            }
+            newAmbulance.setOrgName(location.getInitAddress());
+            /**
             Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
             if (organization == null) {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("无相关机构");
                 return envelop;
             }
+             */
             if (newAmbulance.getStatus() == Ambulance.Status.wait || newAmbulance.getStatus() == Ambulance.Status.down) {
                 ambulanceService.save(newAmbulance);
                 envelop.setSuccessFlg(true);
@@ -227,6 +235,13 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
                     envelop.setErrorMsg("手机号码重复");
                     return envelop;
                 }
+                Location location = locationService.findById(newAmbulance.getLocation());
+                if(null == location) {
+                    envelop.setSuccessFlg(false);
+                    envelop.setErrorMsg("待命地点：" + newAmbulance.getLocation() + "不存在");
+                    return envelop;
+                }
+                newAmbulance.setOrgName(location.getInitAddress());
                 /**
                 Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
                 if (organization == null) {
