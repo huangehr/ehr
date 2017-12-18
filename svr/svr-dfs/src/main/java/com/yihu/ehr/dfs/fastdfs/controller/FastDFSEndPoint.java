@@ -69,7 +69,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/fastDfs/localUpload", method = RequestMethod.POST)
     @ApiOperation(value = "本地上传文件", notes = "返回HttpUrl")
-    public Envelop fileUploadReturnId(
+    public Envelop uploadReturnHttpUrl(
             @ApiParam(name = "file", value = "文件", required = true)
             @RequestPart() MultipartFile file,
             @ApiParam(name = "creator", value = "创建者", required = true)
@@ -133,7 +133,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/fastDfs/uploadReturnId", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "上传文件", notes = "返回索引id")
-    public Envelop fileUploadReturnId(
+    public Envelop uploadReturnId(
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) {
         Envelop envelop = new Envelop();
@@ -184,7 +184,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/fastDfs/uploadReturnUrl", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "上传文件", notes = "返回url")
-    public Envelop fileUploadReturnUrl(
+    public Envelop uploadReturnUrl(
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) {
         Envelop envelop = new Envelop();
@@ -233,7 +233,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/fastDfs/uploadReturnHttpUrl", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "上传文件", notes = "返回HttpUrl")
-    public Envelop fileUploadReturnHttpUrl(
+    public Envelop uploadReturnHttpUrl(
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestBody String jsonData) {
         Envelop envelop = new Envelop();
@@ -479,7 +479,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/fastDfs/fileInfo", method = RequestMethod.GET)
     @ApiOperation(value = "获取文件信息")
-    public Envelop getFileInfo(
+    public Envelop getInfo(
             @ApiParam(name = "path", value = "路径", required = true)
             @RequestParam(value = "path") String path) {
         Envelop envelop = new Envelop();
@@ -542,7 +542,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/fastDfs/downloadByPath", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件(byPath)")
-    public Envelop downLoadByPath(
+    public Envelop downloadByPath(
             @ApiParam(name = "path", value = "文件路径", required = true)
             @RequestParam(value = "path") String path) {
         Envelop envelop = new Envelop();
@@ -577,7 +577,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/fastDfs/downloadByObjectId", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件(byObjectId)")
-    public Envelop downLoadByObjectId(
+    public Envelop downloadByObjectId(
             @ApiParam(name = "objectId", value = "对象ID", required = true)
             @RequestParam(value = "objectId") String objectId) {
         Envelop envelop = new Envelop();
@@ -611,7 +611,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/fastDfs/downloadToLocal", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件(byPath)")
-    public Envelop downLoadToLocal(
+    public Envelop downloadToLocal(
             @ApiParam(name = "remotePath", value = "远程文件路径", required = true)
             @RequestParam(value = "remotePath") String remotePath,
             @ApiParam(name = "localPath", value = "本地文件路径", required = true)
@@ -646,7 +646,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
      */
     @RequestMapping(value = "/fastDfs/getFilePath", method = RequestMethod.GET)
     @ApiOperation(value = "获取文件路径(byObjectId)")
-    public Envelop getFilePath(
+    public Envelop getPath(
             @ApiParam(name = "objectId", value = "对象ID", required = true)
             @RequestParam(value = "objectId") String objectId) {
         Envelop envelop = new Envelop();
