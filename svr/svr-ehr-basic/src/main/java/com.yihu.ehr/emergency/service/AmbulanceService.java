@@ -68,7 +68,7 @@ public class AmbulanceService extends BaseJpaService<Ambulance, AmbulanceDao> {
                 }
                 ambulance.setDistrict(map .get("district").toString());
                 */
-                ambulance.setOrgCode(map .get("orgCode").toString());
+                //ambulance.setOrgCode(map .get("orgCode").toString());
                 ambulance.setOrgName(map .get("orgName").toString());
                 ambulance.setPhone(map .get("phone").toString());
                 ambulance.setStatus(Ambulance.Status.wait);
