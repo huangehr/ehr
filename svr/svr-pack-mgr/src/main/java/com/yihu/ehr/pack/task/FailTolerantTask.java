@@ -33,7 +33,7 @@ public class FailTolerantTask {
     @Scheduled(cron = "0 0 0/1 * * ?")
     public void startTask() {
         try {
-            List<Package> packageList = packageService.search("failCount<3;archiveStatus=Failed");
+            List<Package> packageList = packageService.search(null, "failCount<3;archiveStatus=Failed", "-receiveDate", 1, 500);
             for(Package pack: packageList) {
                 String packStr = objectMapper.writeValueAsString(pack);
                 MPackage mPackage = objectMapper.readValue(packStr, MPackage.class);
