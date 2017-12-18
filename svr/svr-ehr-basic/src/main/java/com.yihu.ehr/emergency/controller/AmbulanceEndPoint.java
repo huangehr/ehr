@@ -241,6 +241,8 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
                     envelop.setErrorMsg("待命地点：" + newAmbulance.getLocation() + "不存在");
                     return envelop;
                 }
+                newAmbulance.setCreator(oldAmbulance.getCreator());
+                newAmbulance.setStatus(oldAmbulance.getStatus());
                 newAmbulance.setOrgName(location.getInitAddress());
                 /**
                 Organization organization = orgService.getOrg(newAmbulance.getOrgCode());
