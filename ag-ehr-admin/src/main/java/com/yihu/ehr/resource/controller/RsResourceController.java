@@ -296,7 +296,7 @@ public class RsResourceController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.Resources.GetRsQuotaPreview, method = RequestMethod.GET)
-    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览,支持多个指标放在一个图形上展示")
+    @ApiOperation(value = "根据资源Id获取资源视图关联指标列表预览单个图表支持 柱状，线型，饼状，雷达，旭日,支持多个指标放在一个图形上展示")
     public Envelop getRsQuotaPreview(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
@@ -403,7 +403,11 @@ public class RsResourceController extends BaseController {
                     envelop.setErrorMsg("视图由多个指标组成时，预览图形支持 多指标都属于同一类型，混合型目前支持‘柱状+柱状’,请确认图表展示类型！");
                 }else {
                     MRsResources mRsResources = objectMapper.convertValue(resourceResult.getObj(), MRsResources.class);
-                    chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
+                    if(StringUtils.isNotEmpty(mRsResources.getEchartType()) && mRsResources.getEchartType().equals("radar")){
+                        chartInfoModel = tjQuotaJobClient.getQuotaRadarGraphicReports(quotaIdstr, filter, dimension, mRsResources.getName());
+                    }else {
+                        chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
+                    }
                     chartInfoModel.setResourceId(resourceId);
                     chartInfoModel.setDimensionMap(dimensionMap);
                     chartInfoModel.setFirstDimension(firstDimension);
@@ -417,7 +421,7 @@ public class RsResourceController extends BaseController {
         return envelop;
     }
 
-    @ApiOperation(value = "获取指标统计结果echart radar图表")
+    @ApiOperation(value = "获取指标统计结果echart radar雷达图表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaRadarGraphicReportPreviews, method = RequestMethod.GET)
     public Envelop getQuotaRadarGraphicReports(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
