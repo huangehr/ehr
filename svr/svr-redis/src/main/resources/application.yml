@@ -205,6 +205,8 @@ spring:
 fast-dfs:
   tracker-server: 11.1.2.9:22122
   public-server: http://11.1.2.9:80
+  tracker-server: 11.1.2.9:22122
+  public-server: http://11.1.2.9:80
 ehr-redis:
   mq:
     pubsub:
@@ -235,6 +237,7 @@ spring:
 
 fast-dfs:
   tracker-server: 10.176.97.5:22122
+  public-server: http://10.176.97.5:8888
 ehr-redis:
   mq:
     pubsub:
