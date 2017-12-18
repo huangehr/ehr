@@ -455,7 +455,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         String groupName = objectNode.get(FastDFSUtil.GROUP_NAME).toString();
         String remoteFileName = objectNode.get(FastDFSUtil.REMOTE_FILE_NAME).toString();
         String modifier = paramMap.get("modifier");
-        String name = paramMap.get("name");
+        String name = paramMap.get("fileName");
         if (!StringUtils.isEmpty(name)) {
             source.put("name", name);
         }

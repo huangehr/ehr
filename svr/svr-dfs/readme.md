@@ -145,10 +145,76 @@ FastDFS
     b.配置说明：
         1.详见application.yml文件，其中如果有多个tracker-server，请用逗号（,）分隔
         2.新增部署服务的时候请确保基础信息管理的系统字典里面有名称为"FastDFS外链地址"的字典项，并添加值为可用的http外链地址的字典值，可添加多个
-    c.使用说明：
-	
-	
-	
+    c.调用说明：
+        1.上传文件
+            1).所有参数为jsonData的上传接口（为兼容之前的文件上传）
+            2).参数
+                jsonData
+                    - 参数格式：{"fileStr":"文件流Base64转码后生成的字符串","fileName":"中华人民共和国.jpg","objectId":"2698","creator":"0dae0003598196f1319e6d68c546d40e","description":"测试接口"}
+                    - 参数说明：objectId - 如用户ID、机构ID
+                               creator - 当前登陆用户ID
+        2.本地文件上传(Swagger)
+            1).localUpload
+            2).参数
+                file
+                    - 参数说明：文件
+                creator
+                    - 参数说明：任意(最好填写自己特有的标识)
+                objectId
+                    - 参数说明：使用默认值即可
+                description
+                    - 参数说明：文件描述
+        3.文件删除
+            1).deleteBy*
+            2).参数
+                id：唯一索引
+                path：存储路径（groupName:remoteName）
+                objectId：如用户ID，机构ID
+        4.文件修改
+            1).modify
+            2).参数
+                jsonData
+                    - 参数格式:{"fileStr":"文件流Base64转码后生成的字符串","fileName":"中华人民共和国.jpg","path":"group1:M00/1F/02/rBFuWFomFJuAfO9aAABbPC2Anrc140.jpg","_id":"AWAkvqu0uMfQEAkULzP8","modifier":"0dae0003598196f1319e6d68c546d40f"}
+                    - 参数说明:fileStr - 新文件流
+                               fileName - 新文件名
+                               path - 原先文件的路径
+                               _id - 原先文件的唯一索引
+                               modifier - 当前操作的用户ID
+        5.获取文件信息
+            1).fileInfo
+            2).参数
+                path：存储路径（groupName:remoteName）
+        6.文件下载（该接口返回文件流Base64转码后生成的字符串）
+            1).downloadBy*
+            2).参数
+                id：唯一索引
+                path：存储路径（groupName:remoteName）
+                objectId：如用户ID，机构ID
+        7.下载文件至本地（downloadToLocal）本接口为测试用，忽略
+        8.获取文件下载路径
+            1).getFilePath
+            2).参数
+                objectId：如用户ID，机构ID
+        9.获取分页
+            1).page
+            2).参数
+                filter
+                    - 参数格式：[{"andOr":"and|or","condition":">|=|<|>=|<=|?"},"field":"<filed>","value":"<value>"},<{...}>]
+                    - 参数说明：andOr跟数据库的中的AND和OR相似；condition指条件匹配程度，?相当于数据库中的like；filed指检索的字段；value为检索的值
+	            page 
+	                - 页码
+	            size
+	                - 分页大小
+	    10.获取服务器状态信息
+	        1).status
+	    11.获取外链地址(该接口返回的地址指的是可在浏览器直接访问的文件下载的根路径)
+	        1).getPublicUrl
+	    12.设置外链地址
+	        1).setPublicUrl
+	        2).参数
+	            jsonData
+	                - 参数格式：{"dictId":107,"code":"URL_1","value":"http://172.19.103.52:801","sort":1,"phoneticCode":"HTTP://172.19.103.52:80","catalog":"HTTP"}
+	                - 参数说明：字典项json串
 	
 	
 	
