@@ -32,16 +32,15 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "message_service", description = "消息服务")
+@Api(value = "MessageEndPoint", description = "消息服务")
 public class MessageEndPoint extends EnvelopRestEndPoint {
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Autowired
-    PackageService packageService;
-
+    private ObjectMapper objectMapper;
     @Autowired
-    RedisTemplate redisTemplate;
+    private PackageService packageService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @ApiOperation(value = "发送档案包解析消息", notes = "发送档案包解析消息")
     @RequestMapping(value = ServiceApi.Packages.ResolveMessage, method = RequestMethod.PUT)

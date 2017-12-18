@@ -10,7 +10,8 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
  * @author Sand
  * @created 2016.05.12 15:00
  */
-@Configuration
+//@Configuration
+@Deprecated
 public class TaskConfiguration implements SchedulingConfigurer {
 
     private ScheduledTaskRegistrar taskRegistrar;

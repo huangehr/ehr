@@ -422,14 +422,14 @@ public class RsResourceController extends BaseController {
     public Envelop getQuotaRadarGraphicReports(
             @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
             @RequestParam(value = "resourceId") String resourceId,
+            @ApiParam(name = "quotaFilter" ,value = "指标过滤条件" , defaultValue = "" )
+            @RequestParam(value = "quotaFilter" , required = false) String quotaFilter,
             @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
             @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "title", value = "名称", defaultValue = "")
-            @RequestParam(value = "title", required = false) String title,
-            @ApiParam(name = "count", value = "总数", defaultValue = "")
-            @RequestParam(value = "count", required = false) Integer count,
-            @ApiParam(name = "area", value = "是否区分区域", defaultValue = "")
-            @RequestParam(value = "area", required = false) String area) {
+            @RequestParam(value = "title", required = false) String title) {
+        String filter = filterHandle(quotaFilter);
+
         Envelop envelop = new Envelop();
         MChartInfoModel chartInfoModel = new MChartInfoModel();
         chartInfoModel.setResourceId(resourceId);
@@ -448,13 +448,73 @@ public class RsResourceController extends BaseController {
                     quotaIdStr += ResourceQuota.getQuotaId() + ",";
                 }
             }
-            chartInfoModel = tjQuotaJobClient.getQuotaRadarGraphicReports(quotaIdStr, "", dimension, title, count, area);
+            chartInfoModel = tjQuotaJobClient.getQuotaRadarGraphicReports(quotaIdStr, filter, dimension, title);
             chartInfoModel.setFirstDimension(dimension);
+            chartInfoModel.setResourceId(resourceId);
             envelop.setObj(chartInfoModel);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
             envelop.setErrorMsg("获取图表出错！");
         }
         return envelop;
+    }
+
+    @ApiOperation(value = "获取指标统计结果echart NestedPie图表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaNestedPieReportPreviews, method = RequestMethod.GET)
+    public Envelop getQuotaNestedPieGraphicReports(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "title", value = "名称", defaultValue = "")
+            @RequestParam(value = "title", required = false) String title) {
+        Envelop envelop = new Envelop();
+        MChartInfoModel chartInfoModel = new MChartInfoModel();
+        chartInfoModel.setResourceId(resourceId);
+        envelop.setObj(chartInfoModel);
+        envelop.setSuccessFlg(false);
+        String filters = filterHandle(filter);
+        try {
+            Envelop resourceResult =  resourcesClient.getResourceById(resourceId);
+            if(!resourceResult.isSuccessFlg()){
+                envelop.setErrorMsg("视图不存在，请确认！");
+                return envelop;
+            }
+            List<ResourceQuotaModel> list = resourceQuotaClient.getByResourceId(resourceId);
+            String quotaIdStr = "";
+            if (null != list && list.size() > 0) {
+                for (ResourceQuotaModel ResourceQuota : list) {
+                    quotaIdStr += ResourceQuota.getQuotaId() + ",";
+                }
+            }
+            chartInfoModel = tjQuotaJobClient.getQuotaNestedPieGraphicReports(quotaIdStr, filters, dimension, title);
+            chartInfoModel.setFirstDimension(dimension);
+            chartInfoModel.setResourceId(resourceId);
+            envelop.setObj(chartInfoModel);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            envelop.setErrorMsg("获取图表出错！");
+        }
+        return envelop;
+    }
+
+    private String filterHandle(String quotaFilter) {
+        String filter = "";
+        if(StringUtils.isNotEmpty(quotaFilter)){
+            String [] quotaFilters = quotaFilter.split(";");
+            for(int i = 0;i < quotaFilters.length; i++){
+                String [] keyVal = quotaFilters[i].split("=");
+                if(keyVal[i].length()>1){
+                    if(i==0){
+                        filter = keyVal[0] + "='" + keyVal[1] +"' ";
+                    }else {
+                        filter = filter + " and "  + keyVal[0] + "='" + keyVal[1] +"' ";
+                    }
+                }
+            }
+        }
+        return filter;
     }
 }
