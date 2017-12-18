@@ -54,7 +54,7 @@ spring:
     config:
       server:
         git:
-          uri: http://192.168.135.29:3000/jkzl/ehr.config.git
+          uri: http://11.1.2.1:3000/jkzl/ehr.config.git
           basedir: /usr/local/ehr-config
         default-label: master
 

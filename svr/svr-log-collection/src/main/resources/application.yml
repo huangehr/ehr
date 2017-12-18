@@ -92,27 +92,27 @@ kafka:
 spring:
   profiles: prod_fz
   datasource:
-    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: sr_healtharchive
-    password: data!@)1
+    url: jdbc:mysql://﻿11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
 
   data:
     mongodb:
-      host: 192.168.135.41
-      port: 29000
-      username: sr_ehr
-      password: ehr@#(2^
+      host: 11.1.2.19
+      port: 20000
+      username: jkzlehr
+      password: GMLBq1LG
       authenticationDatabase: admin
       database: ehr
 
 service-gateway:
   username: user
   password: eureka
-  url: http://192.168.135.31:10000/api/v1.0/admin
+  url: http://11.1.2.13:10000/api/v1.0/admin
 
 kafka:
   broker:
-    address: 192.168.135.46:6667
+    address: 11.1.2.21:6667
 
 
 ---

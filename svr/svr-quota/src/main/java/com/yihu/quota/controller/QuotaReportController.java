@@ -238,7 +238,7 @@ public class QuotaReportController extends BaseController {
         return dictSql;
     }
 
-    @ApiOperation(value = "获取指标统计结果echart radar图表")
+    @ApiOperation(value = "获取指标统计结果echart radar雷达图表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaRadarGraphicReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getQuotaRadarGraphicReports(
             @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)

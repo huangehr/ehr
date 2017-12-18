@@ -28,6 +28,8 @@ public class RsResource extends BaseAssignedEntity {
     private String description;
     // 资源类型
     private Integer dataSource;
+    //指标视图展示类型
+    private String echartType;
 
     @Column(name="code",nullable = false)
     public String getCode() {
@@ -88,5 +90,14 @@ public class RsResource extends BaseAssignedEntity {
 
     public void setDataSource(Integer dataSource) {
         this.dataSource = dataSource;
+    }
+
+    @Column(name="echart_type")
+    public String getEchartType() {
+        return echartType;
+    }
+
+    public void setEchartType(String echartType) {
+        this.echartType = echartType;
     }
 }

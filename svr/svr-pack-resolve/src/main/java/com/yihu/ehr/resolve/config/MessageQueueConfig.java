@@ -16,7 +16,8 @@ import javax.annotation.PostConstruct;
  * @version 1.0
  * @created 2016.03.31 17:03
  */
-@Configuration
+//@Configuration
+@Deprecated
 public class MessageQueueConfig {
 
     @Autowired
