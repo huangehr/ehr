@@ -116,8 +116,10 @@ public class RsResourceQuotaController extends ExtendController {
         Envelop envelop = new Envelop();
         try {
             quotaList = resourceQuotaClient.getQuotaByResourceId(resourceId);
+            Envelop quotaEnvelop = resourceQuotaClient.searchTreeByResourceId(resourceId);
             envelop.setSuccessFlg(true);
-            envelop.setDetailModelList(quotaList);
+            envelop.setDetailModelList(quotaEnvelop.getDetailModelList());
+            envelop.setObj(quotaList);
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
