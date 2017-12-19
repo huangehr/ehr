@@ -89,4 +89,10 @@ public interface RsResourceQuotaClient {
     @RequestMapping(value = ServiceApi.Resources.SearchTreeByResourceId, method = RequestMethod.GET)
     @ApiOperation(value = "根据resourceId获取该资源下的指标列表树")
     Envelop searchTreeByResourceId(@RequestParam(value = "resourceId") String resourceId);
+
+    @RequestMapping(value = ServiceApi.Resources.UpdateResourceQuota, method = RequestMethod.POST)
+    @ApiOperation(value = "根据resourceId修改该资源下的指标关系")
+    Envelop updateResourceQuota(
+            @RequestParam(value = "resourceId") String resourceId,
+            @RequestBody String jsonRelation);
 }

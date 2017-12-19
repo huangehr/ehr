@@ -3,6 +3,7 @@ package com.yihu.ehr.resource.service;
 import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.RsResourceQuotaDao;
+import com.yihu.ehr.resource.model.ResourceQuotaJson;
 import com.yihu.ehr.resource.model.RsResourceQuota;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -125,5 +126,13 @@ public class RsResourceQuotaService extends BaseJpaService<RsResourceQuota, RsRe
             resultList.add(parent);
         }
         return resultList;
+    }
+
+    public void updateResourceQuota(String resourceId, List<ResourceQuotaJson> list) {
+        for (ResourceQuotaJson json : list) {
+            RsResourceQuota resourceQuota = resourceQuotaDao.findByResourceIdAndQuotaId(resourceId, json.getQuotaId());
+            resourceQuota.setPid(null == json.getPid() ? null : json.getPid());
+            resourceQuotaDao.save(resourceQuota);
+        }
     }
 }

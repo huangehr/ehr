@@ -9,6 +9,7 @@ import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.resource.MResourceQuota;
+import com.yihu.ehr.resource.model.ResourceQuotaJson;
 import com.yihu.ehr.resource.model.RsResourceQuota;
 import com.yihu.ehr.resource.service.RsResourceQuotaService;
 import com.yihu.ehr.util.rest.Envelop;
@@ -17,9 +18,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,6 +167,27 @@ public class RsResourceQuotaEndPoint extends EnvelopRestEndPoint {
         resultList = resourceQuotaService.getTreeByParents(topNodeList, resourceId);
         List<TjQuota> quotaTreeByParents = resourceQuotaService.getQuotaTreeByParents(resultList);
         envelop.setDetailModelList(quotaTreeByParents);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.UpdateResourceQuota, method = RequestMethod.POST)
+    @ApiOperation(value = "根据resourceId修改该资源下的指标关系")
+    public Envelop updateResourceQuota(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId,
+            @ApiParam(name = "json", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestBody String jsonRelation) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            List<ResourceQuotaJson> list = objectMapper.readValue(jsonRelation, new TypeReference<List<ResourceQuotaJson>>() {
+            });
+            resourceQuotaService.updateResourceQuota(resourceId, list);
+            envelop.setSuccessFlg(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+            envelop.setErrorMsg(e.getMessage());
+        }
         return envelop;
     }
 }

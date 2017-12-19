@@ -28,4 +28,7 @@ public interface RsResourceQuotaDao extends PagingAndSortingRepository<RsResourc
 
     @Query(" FROM RsResourceQuota rq WHERE rq.resourceId = :resourceId and rq.pid = null ")
     List<RsResourceQuota> getTopParents(@Param("resourceId") String resourceId);
+
+    @Query("select  rq FROM RsResourceQuota rq WHERE rq.resourceId = :resourceId and rq.quotaId = :quotaId")
+    RsResourceQuota findByResourceIdAndQuotaId(@Param("resourceId")String resourceId, @Param("quotaId")Integer quotaId);
 }
