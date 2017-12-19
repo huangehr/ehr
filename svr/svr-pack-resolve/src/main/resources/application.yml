@@ -12,6 +12,7 @@ logging:
       springframework:
         web: INFO
       hibernate: ERROR
+      apache: ERROR
 
 spring:
   datasource:

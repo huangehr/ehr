@@ -672,16 +672,17 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "获取服务器状态信息")
     public Envelop status() {
         Envelop envelop = new Envelop();
-        List<Map<String, Object>> resultList;
+        Map<String, Object> resultMap;
         try {
-            resultList = fastDFSService.status();
+            resultMap = fastDFSService.status();
         }catch (IOException e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
-        envelop.setDetailModelList(resultList);
+        envelop.setDetailModelList((List) resultMap.get("space"));
+        envelop.setObj(resultMap.get("count"));
         envelop.setSuccessFlg(true);
         return envelop;
     }

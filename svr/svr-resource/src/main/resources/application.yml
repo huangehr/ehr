@@ -6,6 +6,7 @@ logging:
       springframework:
         web: INFO
       hibernate: ERROR
+      apache: ERROR
 
 server:
   port: ${svr-resource.server.port}
