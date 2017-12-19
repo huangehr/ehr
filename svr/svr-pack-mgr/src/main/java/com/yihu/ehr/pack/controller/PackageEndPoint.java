@@ -104,7 +104,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return packageList;
     }
 
-    @RequestMapping(value = "/PackageCrypto", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Packages.PackageCrypto, method = RequestMethod.POST)
     @ApiOperation(value = "档案包密码加密")
     public String getPackageCrypto(
             @ApiParam(name = "org_code", value = "机构代码")
@@ -246,6 +246,23 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
     }
 
+    @RequestMapping(value = ServiceApi.Packages.ResolveQueue, method = RequestMethod.GET)
+    @ApiOperation(value = "添加解析队列", notes = "手动添加解析队列，临时性方案")
+    public void resolveQueue(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", required = true, defaultValue = "archiveStatus=Finished")
+            @RequestParam(value = "filters") String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+receiveDate")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "500")
+            @RequestParam(value = "size") int size) throws Exception {
+        List<Package> packageList = packService.search(null, filters, sorts, page, size);
+        Collection<MPackage> packageCollection = convertToModels(packageList, new ArrayList<>(packageList.size()), MPackage.class, null);
+        for(MPackage mPackage : packageCollection) {
+            redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
+        }
+    }
 
     @RequestMapping(value = ServiceApi.Packages.LegacyPackages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案(兼容旧接口)", notes = "从集成开放平台接收健康档案数据包(兼容旧接口)")
