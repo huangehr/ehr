@@ -323,10 +323,12 @@ public class FastDFSUtil {
      * @return
      * @throws IOException
      */
-    public List<Map<String, Object>> status() throws IOException {
+    public Map<String, Object> status() throws IOException {
         TrackerGroup trackerGroup = ClientGlobal.getG_tracker_group();
         int totalServer = trackerGroup.tracker_servers.length;
+        Map<String, Object> finalMap = new HashMap<>(2);
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>(totalServer + 1);
+        Map<String, Long> groupCount = new HashMap<>();
         long totalMb  = 0;
         long freeMb = 0;
         TrackerClient trackerClient = new TrackerClient();
@@ -340,6 +342,20 @@ public class FastDFSUtil {
                 long singleFreeMb = 0;
                 resultMap.put("server", trackerServer.getInetSocketAddress());
                 for (StructGroupStat structGroupStat : structGroupStats) {
+                    String groupName = structGroupStat.getGroupName();
+                    StructStorageStat [] structStorageStats = trackerClient.listStorages(trackerServer, groupName);
+                    if(structStorageStats.length > 0) {
+                        for (StructStorageStat structStorageStat : structStorageStats) {
+                            long count = structStorageStat.getSuccessUploadCount() - structStorageStat.getSuccessDeleteCount();
+                            if (!groupCount.containsKey(groupName)) {
+                                groupCount.put(groupName, count);
+                            } else {
+                                groupCount.put(groupName, groupCount.get(groupName) + count);
+                            }
+                        }
+                    }else {
+                        groupCount.put(groupName, (long)0);
+                    }
                     long singleTotalMb1 = structGroupStat.getTotalMB();
                     singleTotalMb += singleTotalMb1;
                     long singleFreeMb1 = structGroupStat.getFreeMB();
@@ -363,7 +379,9 @@ public class FastDFSUtil {
         resultMap.put("total", totalMb/1024);
         resultMap.put("free", freeMb/1024);
         resultList.add(resultMap);
-        return resultList;
+        finalMap.put("space", resultList);
+        finalMap.put("count", groupCount);
+        return finalMap;
     }
 
 }

@@ -54,7 +54,7 @@ public class FastDFSService {
         return fastDFSDao.download(groupName, remoteFileName);
     }
 
-    public List<Map<String, Object>> status() throws IOException {
+    public Map<String, Object> status() throws IOException {
         return fastDFSDao.status();
     }
 
