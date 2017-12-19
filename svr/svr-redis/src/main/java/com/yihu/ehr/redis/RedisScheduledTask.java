@@ -46,14 +46,19 @@ public class RedisScheduledTask {
     private String rdbFilePath;
     @Value("${ehr-redis.cache.memory.outFilePath}")
     private String outFilePath;
-    @Value("${ehr-redis.server.host}")
-    private String redisServerHost;
-    @Value("${ehr-redis.server.username}")
-    private String redisServerUsername;
-    @Value("${ehr-redis.server.password}")
-    private String redisServerPwd;
-    @Value("${ehr-redis.server.ssh-port}")
-    private int redisServerSshPort;
+    // 生产环境服务器不允许代码直接通过SSH访问服务器，故暂时注释，另寻方法。
+//    @Value("${ehr-redis.server.host}")
+//    private String redisServerHost;
+//    @Value("${ehr-redis.server.username}")
+//    private String redisServerUsername;
+//    @Value("${ehr-redis.server.password}")
+//    private String redisServerPwd;
+//    @Value("${ehr-redis.server.ssh-port}")
+//    private int redisServerSshPort;
+    private String redisServerHost = "";
+    private String redisServerUsername = "";
+    private String redisServerPwd = "";
+    private int redisServerSshPort = 22;
 
     @Autowired
     private RedisCacheKeyMemoryService redisCacheKeyMemoryService;
@@ -64,7 +69,7 @@ public class RedisScheduledTask {
      * 生成 Redis 快照
      */
 //    @RequestMapping(value = "/redis/cache/statistics/backupRedis", method = RequestMethod.GET)
-    @Scheduled(cron = "0 30 0 15 * ?")
+    @Scheduled(cron = "0 0 0 15 * ?")
     public void backupRedis() {
         redisTemplate.execute(new RedisCallback() {
             @Override
@@ -80,12 +85,13 @@ public class RedisScheduledTask {
      * 导出 redis 内存分析报告，并导入到数据库
      */
 //    @RequestMapping(value = "/redis/cache/statistics/exportAndImportRedisMemoryData", method = RequestMethod.GET)
-    @Scheduled(cron = "0 0 0 15 * ?")
+    @Scheduled(cron = "0 30 0 15 * ?")
     public void exportAndImportRedisMemoryData() {
         long start = System.currentTimeMillis();
         try {
             // 导出内存分析报告CSV文件（得到的内存值是近似值，比实际略小）
-            exportRedisMemoryReport();
+            // 生产环境服务器不允许代码直接通过SSH访问服务器，故暂时注释，另寻方法。
+//            exportRedisMemoryReport();
 
             long export = System.currentTimeMillis();
             logger.info("成功导出Redis内存分析报告，耗时：" + (export - start) + " 毫秒");

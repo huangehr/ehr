@@ -57,4 +57,28 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "dimension", required = false) String dimension,
             @ApiParam(name = "title", value = "视图名称", defaultValue = "")
             @RequestParam(value = "title", required = false) String title);
+
+    @ApiOperation(value = "获取指标统计结果echart radar雷达图表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaRadarGraphicReportPreviews, method = RequestMethod.GET)
+    MChartInfoModel getQuotaRadarGraphicReports(
+            @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
+            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "title", value = "名称", defaultValue = "")
+            @RequestParam(value = "title", required = false) String title);
+
+    @ApiOperation(value = "获取指标统计结果echart NestedPie旭日图表")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaNestedPieReportPreviews, method = RequestMethod.GET)
+    MChartInfoModel getQuotaNestedPieGraphicReports(
+            @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
+            @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
+            @ApiParam(name = "filter", value = "过滤", defaultValue = "")
+            @RequestParam(value = "filter", required = false) String filter,
+            @ApiParam(name = "dimension", value = "维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension,
+            @ApiParam(name = "title", value = "名称", defaultValue = "")
+            @RequestParam(value = "title", required = false) String title);
 }
