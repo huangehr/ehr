@@ -52,7 +52,7 @@ fast-dfs:
 hystrix:
   threadpool:
     default:
-      coreSize: 50 #并发执行的最大线程数，默认10
+      coreSize: 60 #并发执行的最大线程数，默认10
       maxQueueSize: 100 #LinkedBlockingQueue的最大队列数，默认-1，使用SynchronousQueue
       #queueSizeRejectionThreshold: 50 #配置该值后，即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝
   command:
