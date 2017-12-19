@@ -62,6 +62,7 @@ public class PackageResourceJob implements InterruptableJob {
                 pack = objectMapper.readValue(packStr, MPackage.class);
             }
             if (pack != null) {
+                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
                 PackResolveLogger.info("开始入库:" + pack.getId() + ", Timestamp:" + new Date());
                 //LogService.getLogger().info("开始入库:" + pack.getId() + ", Timestamp:" + new Date());
                 doResolve(pack, packageMgrClient);
