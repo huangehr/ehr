@@ -845,5 +845,21 @@ public class ResourceBrowseService {
         }
         return areaList;
     }
+
+
+    /**
+     *
+     * @param queryParams
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public Page<String> getSolrIndexs(String queryParams, Integer page, Integer size) throws Exception {
+        return resourceBrowseDao.getSolrIndexs(queryParams,page,size);
 }
+
+
+}
+
 
