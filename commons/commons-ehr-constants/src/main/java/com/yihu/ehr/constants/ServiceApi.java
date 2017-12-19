@@ -76,6 +76,9 @@ public class ServiceApi {
         public static final String GetQuotaChartByQuotaId = "/resourceQuota/getQuotaChartByQuotaId";
         public static final String GetRQNameByResourceId = "/resourceQuota/getRQNameByResourceId";
         public static final String DelRQNameByResourceId = "/resourceQuota/delRQNameByResourceId";
+        public static final String SearchQuotaByResourceId = "/resourceQuota/getQuotaByResourceId";
+        public static final String SearchTreeByResourceId = "/resourceQuota/searchTreeByResourceId";
+        public static final String UpdateResourceQuota = "/resourceQuota/updateResourceQuota";
 
         public static final String ResourceMetadataList = "/resources/rs_metadata";
         public static final String ResourceMetadataBatch = "/resources/rs_metadata/batch";
