@@ -7,6 +7,7 @@ import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.Token;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -167,18 +168,23 @@ public class ElasticsearchUtil {
      * @param aggsFields 分组字段 支持多个
      * @param filter 条件
      * @param sumField  求和字段
+     * @param orderFild 排序字段
+     * @param order 排序 asc,desc
      * @return
      */
-    public Map<String, Integer> searcherSumByGroupBySql(Client client,String index, String aggsFields ,String filter , String sumField) {
-        Map<String,Integer> map = new HashMap<>();
+    public Map<String, Integer> searcherSumByGroupBySql(Client client,String index, String aggsFields ,String filter , String sumField,String orderFild,String order) {
+        Map<String,Integer> map = new LinkedHashMap<>();
 
 //       String mysql1 = "select org ,sum(result) from quota where quotaCode='depart_treat_count' group by org  ";id=16
         StringBuffer mysql = new StringBuffer("select ");
         mysql.append(aggsFields)
              .append(" ,sum(").append(sumField).append(") ")
              .append(" from ").append(index)
-             .append(" where " ).append(filter)
+             .append(" where ").append(filter)
              .append(" group by ").append(aggsFields);
+            if(StringUtils.isNotEmpty(orderFild) && StringUtils.isNotEmpty(order)){
+                mysql.append(" order by ").append(orderFild).append(" ").append(order);
+            }
         try {
             System.out.println("查询分组 mysql= " + mysql.toString());
             SQLExprParser parser = new ElasticSqlExprParser(mysql.toString());
@@ -267,7 +273,7 @@ public class ElasticsearchUtil {
      * @param map
      * @param sb
      */
-    private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,Integer>map, StringBuffer sb) {
+    private void expainJson(Iterator<Terms.Bucket> gradeBucketIt,Map<String,Integer> map, StringBuffer sb) {
         while (gradeBucketIt.hasNext()) {
             Terms.Bucket b =  gradeBucketIt.next();
             if (b.getAggregations().asList().get(0) instanceof StringTerms) {

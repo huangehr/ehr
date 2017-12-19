@@ -137,8 +137,8 @@ ehr:
 
 resolve:
   job:
-    init-size: 3 #解析入库初始任务数
-    max-size: 6 #解析入库最大任务数
+    init-size: 4 #解析入库初始任务数
+    max-size: 8 #解析入库最大任务数
     check-time: 60000 #入库消息检查时间间隔
     cron-exp: 0/4 * * * * ? #解析任务触发间隔表达式
 
