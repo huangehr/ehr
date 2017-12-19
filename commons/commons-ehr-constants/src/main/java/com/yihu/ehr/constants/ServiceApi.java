@@ -403,6 +403,8 @@ public class ServiceApi {
         public static final String LegacyPackages = "/json_package";
         public static final String Prescription = "/prescription"; //处方笺维护
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
+        public static final String ResolveQueue = "/resolveQueue";
+        public static final String PackageCrypto = "/PackageCrypto";
     }
 
     //非病人维度
