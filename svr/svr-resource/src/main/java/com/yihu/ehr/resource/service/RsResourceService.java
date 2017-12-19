@@ -187,6 +187,7 @@ public class RsResourceService extends BaseJpaService<RsResource, RsResourceDao>
                     detailMap.put("data_source", rsResource.getDataSource());
                     detailMap.put("grant_type", rsResource.getGrantType());
                     detailMap.put("category_name", rsResourceCategory.getName());
+                    detailMap.put("isNestedPie", "nestedPie".equalsIgnoreCase(rsResource.getEchartType()) ? true : false);
                     detailList.add(detailMap);
                 }
             }

@@ -156,7 +156,7 @@ public class ExtractPercentHelper {
                     Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1));
                     int totalCount = 0;
                     Calendar calendar = Calendar.getInstance();
-                    Map<String,Integer>  doneResultMap = quotaService.searcherSumByGroupBySql(denoTjQuota, "year", "year=" + calendar.get(Calendar.YEAR));
+                    Map<String,Integer>  doneResultMap = quotaService.searcherSumByGroupBySql(denoTjQuota, "year", "year=" + calendar.get(Calendar.YEAR),"result","","");
                     if(doneResultMap != null && doneResultMap.size()>0){
                         for(String key :doneResultMap.keySet())
                         totalCount = totalCount + doneResultMap.get(key);
