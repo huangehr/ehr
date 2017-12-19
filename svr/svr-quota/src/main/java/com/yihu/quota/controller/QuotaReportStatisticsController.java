@@ -64,7 +64,7 @@ public class QuotaReportStatisticsController extends BaseController {
             boolean flag = true;
             while (flag){
                 filter = filter + currentYear;
-                resultMap = quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter);
+                resultMap = quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","year","asc");
                 if(resultMap != null && resultMap.size() > 0){
                     for(String key:resultMap.keySet()){
                         MapDict mapDict = new MapDict();
