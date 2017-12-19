@@ -170,19 +170,17 @@ public class RsResourceQuotaEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.Resources.UpdateResourceQuota, method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Resources.UpdateResourceQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "根据resourceId修改该资源下的指标关系")
     public Envelop updateResourceQuota(
-            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
-            @RequestParam(value = "resourceId") String resourceId,
-            @ApiParam(name = "json", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String jsonRelation) {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
             List<ResourceQuotaJson> list = objectMapper.readValue(jsonRelation, new TypeReference<List<ResourceQuotaJson>>() {
             });
-            resourceQuotaService.updateResourceQuota(resourceId, list);
+            resourceQuotaService.updateResourceQuota(list);
             envelop.setSuccessFlg(true);
         } catch (IOException e) {
             e.printStackTrace();

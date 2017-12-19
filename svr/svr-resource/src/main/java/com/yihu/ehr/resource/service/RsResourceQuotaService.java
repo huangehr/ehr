@@ -128,11 +128,14 @@ public class RsResourceQuotaService extends BaseJpaService<RsResourceQuota, RsRe
         return resultList;
     }
 
-    public void updateResourceQuota(String resourceId, List<ResourceQuotaJson> list) {
+    public void updateResourceQuota(List<ResourceQuotaJson> list) {
         for (ResourceQuotaJson json : list) {
-            RsResourceQuota resourceQuota = resourceQuotaDao.findByResourceIdAndQuotaId(resourceId, json.getQuotaId());
-            resourceQuota.setPid(null == json.getPid() ? null : json.getPid());
-            resourceQuotaDao.save(resourceQuota);
+            RsResourceQuota resourceQuota = resourceQuotaDao.findByResourceIdAndQuotaId(json.getResourceId(), json.getQuotaId());
+            Integer pid = json.getPid();
+            if (null != pid && pid != 0) {
+                resourceQuota.setPid(pid);
+                resourceQuotaDao.save(resourceQuota);
+            };
         }
     }
 }

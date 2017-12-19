@@ -130,13 +130,11 @@ public class RsResourceQuotaController extends ExtendController {
     @RequestMapping(value = ServiceApi.Resources.UpdateResourceQuota, method = RequestMethod.POST)
     @ApiOperation(value = "根据resourceId修改该资源下的指标关系")
     public Envelop updateResourceQuota(
-            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
-            @RequestParam(value = "resourceId") String resourceId,
-            @ApiParam(name = "json", value = "过滤器，为空检索所有条件", defaultValue = "")
-            @RequestParam String jsonRelation)  throws Exception {
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestParam("model") String model) throws Exception {
         Envelop envelop = new Envelop();
         try {
-            envelop = resourceQuotaClient.updateResourceQuota(resourceId, jsonRelation);
+            envelop = resourceQuotaClient.updateResourceQuota(model);
         } catch (Exception e) {
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg(e.getMessage());
