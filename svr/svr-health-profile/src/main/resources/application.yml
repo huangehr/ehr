@@ -110,7 +110,7 @@ spring:
   profiles: prod
 
   datasource:
-    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8&useSSL=false
     username: ha
     password: jkzlxm
   application:
@@ -126,24 +126,27 @@ fast-dfs:
 spring:
   profiles: prod_fz
   datasource:
-    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: sr_healtharchive
-    password: data!@)1
-  application:
-    id: JKZL
-fast-dfs:
-  tracker-server: 192.168.135.42:22122
-  public-server: http://192.168.135.42:22122
-
----
-spring:
-  profiles: prod_sr
-  datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://﻿11.1.2.5:3306/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
   application:
     id: JKZL
+fast-dfs:
+  tracker-server: 11.1.2.9:22122
+  public-server: http://11.1.2.9:80
+
+---
+spring:
+  profiles: prod_sr
+
+  datasource:
+    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&amp;characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
+  application:
+    id: JKZL
+
+
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ArchiveStatus;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
+import com.yihu.ehr.pack.dao.XDatasetPackageRepository;
+import com.yihu.ehr.pack.dao.XPackageRepository;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.util.id.ObjectId;
 import com.yihu.ehr.util.log.LogService;
@@ -31,14 +33,13 @@ import java.util.*;
 @Service
 @Transactional
 public class PackageService extends BaseJpaService<Package, XPackageRepository> {
+
     @Value("${deploy.region}")
-    Short adminRegion;
-
+    private Short adminRegion;
     @Autowired
-    FastDFSUtil fastDFSUtil;
-
+    private FastDFSUtil fastDFSUtil;
     @Autowired
-    XDatasetPackageRepository datasetPackageRepository;
+    private XDatasetPackageRepository datasetPackageRepository;
 
     public Package receive(InputStream is, String pwd, String md5, String orgCode, String clientId) {
         Map<String, String> metaData = storeJsonPackage(is);
@@ -134,6 +135,7 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
             aPackage.setPwd(pwd);
             aPackage.setReceiveDate(new Date());
             aPackage.setArchiveStatus(ArchiveStatus.Received);
+            aPackage.setFailCount(0);
             getRepo().save(aPackage);
 
             return aPackage;
@@ -187,5 +189,9 @@ public class PackageService extends BaseJpaService<Package, XPackageRepository> 
     
     private XPackageRepository getRepo(){
         return (XPackageRepository)getRepository();
+    }
+
+    public void updateFailPackage(int failCount){
+        getRepo().updateFailPackage(failCount);
     }
 }

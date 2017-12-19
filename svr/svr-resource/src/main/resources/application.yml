@@ -131,30 +131,30 @@ fast-dfs:
 spring:
   profiles: prod_fz
   datasource:
-    url: jdbc:mysql://192.168.135.39:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: sr_healtharchive
-    password: data!@)1
+    url: jdbc:mysql://﻿11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
   redis:
-    host: 192.168.135.40 # Redis server host.
+    host: 11.1.2.22 # Redis server host.
     port: 6390
-    password: redis!@456
+    password: Kb6wKDQP1W4
   data:
     solr:
-      #zk-host: 11.1.2.51,11.1.2.52,11.1.2.53:2181/solr # ZooKeeper host address in the form HOST:PORT.
-      zk-host: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com:2181/solr
+      #zk-host: 11.1.2.3,11.1.2.20,11.1.2.21:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      zk-host: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com:2181/solr
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com
+    - hbase.zookeeper.quorum: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com
 
 fast-dfs:
-  tracker-server: 192.168.135.42:22122
-  public-server: http://192.168.135.42:22122
+  tracker-server: 11.1.2.9:22122
+  public-server: http://11.1.2.9:80
 
 ---
 spring:
   profiles: prod_sr
   datasource:
-    url: jdbc:mysql://10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql:///10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
   redis:
@@ -163,10 +163,11 @@ spring:
     password: q4YaQemf
   data:
     solr:
-      zk-host: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com:2181/solr
+      #zk-host: 11.1.2.51,11.1.2.52,11.1.2.53:2181/solr # ZooKeeper host address in the form HOST:PORT.
+      zk-host: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com:2181/solr
 hadoop:
   hbase-properties:
-    - hbase.zookeeper.quorum: node1.jkzl.com,node2.jkzl.com,node3.jkzl.com
+    - hbase.zookeeper.quorum: node2.jkzl.com,node3.jkzl.com,node1.jkzl.com
 fast-dfs:
   tracker-server: 10.176.97.5:22122
   public-server: http://10.176.97.5:8888

@@ -140,7 +140,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     public MDemographicInfo getPatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        DemographicInfo demographicInfo = demographicService.getDemographicInfo(new DemographicId(idCardNo));
+        DemographicInfo demographicInfo = demographicService.getDemographicInfo(idCardNo);
         MDemographicInfo demographicModel = convertToModel(demographicInfo,MDemographicInfo.class);
         return demographicModel;
     }
@@ -192,7 +192,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestBody String patientModelJsonData) throws Exception{
         DemographicInfo demographicInfo = toEntity(patientModelJsonData, DemographicInfo.class);
-        DemographicInfo old = demographicService.getDemographicInfo(new DemographicId(demographicInfo.getIdCardNo()));
+        DemographicInfo old = demographicService.getDemographicInfo(demographicInfo.getIdCardNo());
         if(old==null)
             throw new ApiException(HttpStatus.NOT_FOUND, "该对象没找到");
         BeanUtils.copyProperties(demographicInfo, old, "registerTime");
@@ -232,7 +232,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     public boolean resetPass(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        demographicService.resetPass(new DemographicId(idCardNo));
+        demographicService.resetPass(idCardNo);
         return true;
     }
 
@@ -323,7 +323,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception {
 
-        return demographicService.getDemographicInfo(new DemographicId(idCardNo)) != null;
+        return demographicService.getDemographicInfo(idCardNo) != null;
     }
 
     @RequestMapping(value = "/populations/telphoneNumberIs_exist/{telphone_number}",method = RequestMethod.GET)

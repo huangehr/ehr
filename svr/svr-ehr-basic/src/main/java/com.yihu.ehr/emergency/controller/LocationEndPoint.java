@@ -106,14 +106,9 @@ public class LocationEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "ids", value = "id列表(int)1,2,3,...")
             @RequestParam(value = "ids") String ids){
         Envelop envelop = new Envelop();
-        String [] idArr = ids.split(",");
-        Integer [] idArr1 = new Integer[idArr.length];
-        for(int i = 0; i < idArr.length; i++) {
-            idArr1[i] = new Integer(idArr[i]);
-        }
         //List<Integer> idList = toEntity(ids, List.class);
         try {
-            List<Ambulance> ambulanceList = ambulanceService.search("id=" + ids.substring(1, ids.length() - 1));
+            List<Ambulance> ambulanceList = ambulanceService.search("location=" + ids);
             if(ambulanceList == null || ambulanceList.size() > 0) {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("不能删除已有关联车辆的待命地点");
@@ -125,7 +120,12 @@ public class LocationEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
-        locationService.delete(idArr1);
+        String [] idArrStr = ids.split(",");
+        Integer [] idArrInt = new Integer[idArrStr.length];
+        for(int i = 0; i < idArrStr.length; i++) {
+            idArrInt[i] = new Integer(idArrStr[i]);
+        }
+        locationService.delete(idArrInt);
         envelop.setSuccessFlg(true);
         return envelop;
     }

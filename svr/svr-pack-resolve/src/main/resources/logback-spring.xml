@@ -55,7 +55,7 @@
 		</filter>
 	</appender>
 
-	<logger name="com.yihu.ehr.resolve.util.PackResolveLogger" level="INFO" additivity="false">
+	<logger name="com.yihu.ehr.resolve.util.PackResolveLogger" level="ERROR" additivity="false">
 		<appender-ref ref="infoFile" />
 		<appender-ref ref="warnFile" />
 		<appender-ref ref="errorFile" />

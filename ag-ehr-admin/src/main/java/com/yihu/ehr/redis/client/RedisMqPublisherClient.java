@@ -3,18 +3,12 @@ package com.yihu.ehr.redis.client;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.model.redis.MRedisMqPublisher;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.List;
 
 /**
  * Redis消息发布者 Client
@@ -29,13 +23,13 @@ public interface RedisMqPublisherClient {
 
     @ApiOperation("根据ID获取消息发布者")
     @RequestMapping(value = ServiceApi.Redis.MqPublisher.GetById, method = RequestMethod.GET)
-    public MRedisMqPublisher getById(
+    public Envelop getById(
             @ApiParam(name = "id", value = "主键", required = true)
             @PathVariable(value = "id") Integer id);
 
     @ApiOperation(value = "根据条件获取消息发布者")
     @RequestMapping(value = ServiceApi.Redis.MqPublisher.Search, method = RequestMethod.GET)
-    public ResponseEntity<List<MRedisMqPublisher>> search(
+    public Envelop search(
             @ApiParam(name = "fields", value = "返回的字段，为空则返回全部字段")
             @RequestParam(value = "fields", required = false) String fields,
             @ApiParam(name = "filters", value = "筛选条件")
@@ -49,25 +43,25 @@ public interface RedisMqPublisherClient {
 
     @ApiOperation("新增消息发布者")
     @RequestMapping(value = ServiceApi.Redis.MqPublisher.Save, method = RequestMethod.POST)
-    public MRedisMqPublisher add(
-            @ApiParam(name = "entityJson", value = "消息发布者JSON", required = true)
-            @RequestParam(value = "entityJson") String entityJson);
+    public Envelop add(
+            @ApiParam(value = "消息发布者JSON", required = true)
+            @RequestBody String entityJson);
 
     @ApiOperation("更新消息发布者")
     @RequestMapping(value = ServiceApi.Redis.MqPublisher.Save, method = RequestMethod.PUT)
-    public MRedisMqPublisher update(
-            @ApiParam(name = "entityJson", value = "消息发布者JSON", required = true)
-            @RequestParam(value = "entityJson") String entityJson);
+    public Envelop update(
+            @ApiParam(value = "消息发布者JSON", required = true)
+            @RequestBody String entityJson);
 
     @ApiOperation("删除消息发布者")
     @RequestMapping(value = ServiceApi.Redis.MqPublisher.Delete, method = RequestMethod.DELETE)
-    public void delete(
+    public Envelop delete(
             @ApiParam(name = "id", value = "消息发布者ID", required = true)
             @RequestParam(value = "id") Integer id);
 
     @ApiOperation("验证指定消息队列中发布者应用ID是否唯一")
     @RequestMapping(value = ServiceApi.Redis.MqPublisher.IsUniqueAppId, method = RequestMethod.GET)
-    public boolean isUniqueAppId(
+    public Envelop isUniqueAppId(
             @ApiParam(name = "id", value = "消息订阅者ID", required = true)
             @RequestParam(value = "id") Integer id,
             @ApiParam(name = "channel", value = "消息队列编码", required = true)

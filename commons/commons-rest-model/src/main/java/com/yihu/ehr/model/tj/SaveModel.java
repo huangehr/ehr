@@ -20,6 +20,8 @@ public class SaveModel {
     private String slaveKey3Name;
     private String slaveKey4;//从维度  4级维度
     private String slaveKey4Name;
+    private String year;//年份
+    private String yearName;//
 
     public String getOrg() {
         return org;
@@ -165,4 +167,19 @@ public class SaveModel {
         this.teamName = teamName;
     }
 
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getYearName() {
+        return yearName;
+    }
+
+    public void setYearName(String yearName) {
+        this.yearName = yearName;
+    }
 }

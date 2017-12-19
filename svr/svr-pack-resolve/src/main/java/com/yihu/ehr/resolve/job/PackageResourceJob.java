@@ -3,6 +3,7 @@ package com.yihu.ehr.resolve.job;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ArchiveStatus;
+import com.yihu.ehr.constants.RedisCollection;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.model.packs.MPackage;
@@ -10,26 +11,21 @@ import com.yihu.ehr.resolve.config.MetricNames;
 import com.yihu.ehr.resolve.feign.PackageMgrClient;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
-import com.yihu.ehr.resolve.queue.MessageBuffer;
 import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.PatientRegisterService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
-import com.yihu.ehr.resolve.dao.*;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
-import com.yihu.ehr.util.log.LogService;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
-import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 档案包解析作业。
@@ -49,32 +45,40 @@ public class PackageResourceJob implements InterruptableJob {
 
     @Override
     public void execute(JobExecutionContext context) {
+        //弃用消息接口
+        //MessageBuffer messageBuffer = SpringContext.getService(MessageBuffer.class);
+        //MPackage pack =  messageBuffer.getMessage();
+        //pack = packageMgrClient.getResolvePackage();
+
         PackageMgrClient packageMgrClient = SpringContext.getService(PackageMgrClient.class);
-        MessageBuffer messageBuffer = SpringContext.getService(MessageBuffer.class);
-        MPackage pack =  messageBuffer.getMessage();
-        JobDetail jobDetail = context.getJobDetail();
-        JobKey jobKey = jobDetail.getKey();
-        Scheduler scheduler = context.getScheduler();
+        //该对象要采用名称的方式获取，否则：expected single matching bean but found 3: redisTemplate,sessionRedisTemplate,stringRedisTemplate
+        RedisTemplate<String, Serializable> redisTemplate = SpringContext.getService("redisTemplate");
+        ObjectMapper objectMapper = SpringContext.getService(ObjectMapper.class);
+        Serializable serializable = redisTemplate.opsForList().rightPop(RedisCollection.PackageList);
+        MPackage pack = null;
         try {
-            if (null != pack) {
+            if(serializable != null) {
+                String packStr = serializable.toString();
+                pack = objectMapper.readValue(packStr, MPackage.class);
+            }
+            if (pack != null) {
+                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Acquired, "正在入库中");
                 PackResolveLogger.info("开始入库:" + pack.getId() + ", Timestamp:" + new Date());
                 //LogService.getLogger().info("开始入库:" + pack.getId() + ", Timestamp:" + new Date());
                 doResolve(pack, packageMgrClient);
             }
         }catch (Exception e) {
             e.printStackTrace();
-            if (StringUtils.isBlank(e.getMessage())) {
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal Server Error");
-                PackResolveLogger.error("Internal Server Error, Please See Tomcat Log!");
-            }else {
-                packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
-                PackResolveLogger.error(e.getMessage());
-            }
-            try {
-                scheduler.deleteJob(jobKey);
-            }catch (SchedulerException se) {
-                se.printStackTrace();
-                PackResolveLogger.error(se.getMessage());
+            if(pack != null) {
+                if (StringUtils.isBlank(e.getMessage())) {
+                    packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, "Internal Server Error");
+                    PackResolveLogger.error("Internal Server Error, Please See Tomcat Log!");
+                    //LogService.getLogger().error("Internal Server Error, Please See Tomcat Log!");
+                } else {
+                    packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Failed, e.getMessage());
+                    PackResolveLogger.error(e.getMessage());
+                    //LogService.getLogger().error(e.getMessage());
+                }
             }
         }
     }
@@ -88,7 +92,7 @@ public class PackageResourceJob implements InterruptableJob {
         long start = System.currentTimeMillis();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
-        //resourceService.save(resourceBucket);
+        resourceService.save(resourceBucket);
         //居民信息注册
         patientRegisterService.checkPatient(resourceBucket, pack.getId());
         //回填入库状态

@@ -36,7 +36,7 @@ public class ServiceApi {
         public static final String ResourceViewMetadata = "/resources/query/getResourceMetadata"; //资源浏览获取结构
         public static final String ResourceViewData = "/resources/query/getResourceData"; //资源浏览获取数据
         public static final String ResourceQuery = "/resources/query"; //资源查询接口
-        public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
+        //public static final String ResourceSubQuery = "/resources/sub_query"; //详细资源查询接口
         public static final String ResourceQueryTransform = "/resources/query/transform"; //资源查询接口+转译
         public static final String ResourceRawFiles = "/resources/query/raw_files"; //非结构资源查询接口
         public static final String ResourceRawFilesList = "/resources/query/raw_files_list"; //非结构资源List查询接口
@@ -261,6 +261,11 @@ public class ServiceApi {
         public static final String RsReportViewExistByResourceId = "/resources/reportView/existByResourceId";
         public static final String RsReportViewExistReport = "/resources/reportView/existReport";
 
+        public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
+
+
+
+
 
     }
 
@@ -394,15 +399,13 @@ public class ServiceApi {
         public static final String PackageResolve = "/packages/resolve";
         public static final String PackageSearch = "/packages/search";
         public static final String PackageDownloads = "/packages/{id}/downloads";
-
         public static final String ResolveMessage = "/message/resolve";
-
         public static final String MessageTimer = "/message/timer";
-
         public static final String LegacyPackages = "/json_package";
-
         public static final String Prescription = "/prescription"; //处方笺维护
-        public static final String  ArchiveRelation = "/archiveRelation"; //档案关联
+        public static final String ArchiveRelation = "/archiveRelation"; //档案关联
+        public static final String ResolveQueue = "/packages/resolveQueue";
+        public static final String PackageCrypto = "/PackageCrypto";
     }
 
     //非病人维度
@@ -1134,6 +1137,8 @@ public class ServiceApi {
         public static final String GetQuotaReport = "tj/getQuotaReport";
         public static final String GetQuotaGraphicReportPreview = "tj/getQuotaGraphicReportPreview";
         public static final String GetMoreQuotaGraphicReportPreviews = "tj/getMoreQuotaGraphicReportPreviews";
+        public static final String GetQuotaRadarGraphicReportPreviews = "tj/getQuotaRadarGraphicReportPreviews";
+        public static final String GetQuotaNestedPieReportPreviews = "tj/getQuotaNestedPieReportPreviews";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
         public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
 
@@ -1233,6 +1238,37 @@ public class ServiceApi {
         public static final String LocationSave = "/location/save";
         public static final String LocationUpdate = "/location/update";
         public static final String LocationDelete = "/location/delete";
+    }
+
+    public static class FastDFS {
+        public static final String Upload = "/fastDfs/upload";
+        public static final String OldUpload = "/fastDfs/oldUpload";
+        public static final String DeleteById = "/fastDfs/deleteById";
+        public static final String DeleteByPath = "/fastDfs/deleteByPath";
+        public static final String DeleteByObjectId = "/fastDfs/deleteByObjectId";
+        public static final String Modify = "/fastDfs/modify";
+        public static final String OldModify = "/fastDfs/oldModify";
+        public static final String FileInfo = "/fastDfs/fileInfo";
+        public static final String DownloadById = "/fastDfs/downloadById";
+        public static final String DownloadByPath = "/fastDfs/downloadByPath";
+        public static final String DownloadByObjectId = "/fastDfs/downloadByObjectId";
+        public static final String DownloadToLocal = "/fastDfs/downloadToLocal";
+        public static final String GetFilePath = "/fastDfs/getFilePath";
+        public static final String Page = "/fastDfs/page";
+        public static final String Status = "/fastDfs/status";
+        public static final String GetPublicUrl = "/fastDfs/getPublicUrl";
+        public static final String SetPublicUrl = "/fastDfs/setPublicUrl";
+    }
+
+    public static class ElasticSearch {
+        public static final String Mapping = "/elasticSearch/mapping";
+        public static final String Index = "/elasticSearch/index";
+        public static final String Delete = "/elasticSearch/delete";
+        public static final String Update = "/elasticSearch/update";
+        public static final String FindById = "/elasticSearch/{id}";
+        public static final String FindByField = "/elasticSearch/findByField";
+        public static final String Page = "/elasticSearch/page";
+
     }
 
 }

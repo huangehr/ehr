@@ -1,9 +1,7 @@
 package com.yihu.ehr.pack.controller;
 
-import com.yihu.ehr.constants.ServiceApi;
-import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ArchiveStatus;
-import com.yihu.ehr.constants.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.yihu.ehr.constants.*;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
@@ -23,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
 
@@ -45,22 +45,18 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "package_service", description = "档案包服务")
+@Api(value = "PackageEndPoint", description = "档案包服务")
 public class PackageEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private SecurityClient securityClient;
-
     @Autowired
     private PackageService packService;
-
     @Autowired
     private UserClient userClient;
-
     @Autowired
-    MessageBuffer messageBuffer;
-
+    private FastDFSUtil fastDFSUtil;
     @Autowired
-    FastDFSUtil fastDFSUtil;
+    private RedisTemplate<String, Serializable> redisTemplate;
 
     @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
     @ApiOperation(value = "搜索档案包", response = MPackage.class, responseContainer = "List", notes = "搜索档案包")
@@ -108,13 +104,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         return packageList;
     }
 
-    @RequestMapping(value = "/PackageCrypto", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Packages.PackageCrypto, method = RequestMethod.POST)
     @ApiOperation(value = "档案包密码加密")
-    public String getPackageCrypto(@ApiParam(name = "org_code", value = "机构代码")
-                                 @RequestParam(value = "org_code") String orgCode,
-                                 @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
-                                 @RequestParam(value = "package_crypto") String packageCrypto) throws Exception
-    {
+    public String getPackageCrypto(
+            @ApiParam(name = "org_code", value = "机构代码")
+            @RequestParam(value = "org_code") String orgCode,
+            @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
+            @RequestParam(value = "package_crypto") String packageCrypto) throws Exception {
         MKey key = securityClient.getOrgKey(orgCode);
         if (key == null ||  key.getPublicKey()==null) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
@@ -126,7 +122,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
-    public void savePackageWithOrg(
+    public void savePackageWithOrg (
             @ApiParam(name = "pack", value = "档案包", allowMultiple = true)
             @RequestPart() MultipartFile pack,
             @ApiParam(name = "org_code", value = "机构代码")
@@ -135,10 +131,10 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "package_crypto") String packageCrypto,
             @ApiParam(name = "md5", value = "档案包MD5")
             @RequestParam(value = "md5", required = false) String md5,
-            HttpServletRequest request)  {
+            HttpServletRequest request) throws JsonProcessingException {
 
         MKey key = securityClient.getOrgKey(orgCode);
-        Package aPackage =null;
+        Package aPackage;
         if (key == null ||  key.getPrivateKey()==null) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
         }
@@ -148,8 +144,8 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         } catch (Exception ex) {
             throw new ApiException(HttpStatus.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
-
-        messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
+        redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(aPackage));
+        //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 
     @RequestMapping(value = ServiceApi.Packages.AcquirePackage, method = RequestMethod.GET)
@@ -159,8 +155,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(required = false) String id) throws Exception {
         String re = "";
         Package aPackage = packService.acquirePackage(id);
-        if(aPackage!=null)
-        {
+        if(aPackage!=null) {
             re = objectMapper.writeValueAsString(aPackage);
         }
         return re;
@@ -181,12 +176,13 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.PUT})
     @ApiOperation(value = "修改档案包状态", notes = "修改档案包状态")
-    public ResponseEntity<MPackage> reportStatus(@ApiParam(value = "档案包编号")
-                                                 @PathVariable(value = "id") String id,
-                                                 @ApiParam(value = "状态")
-                                                 @RequestParam(value = "status") ArchiveStatus status,
-                                                 @ApiParam(value = "消息")
-                                                 @RequestBody String message) throws Exception {
+    public ResponseEntity<MPackage> reportStatus(
+            @ApiParam(value = "档案包编号")
+            @PathVariable(value = "id") String id,
+            @ApiParam(value = "状态")
+            @RequestParam(value = "status") ArchiveStatus status,
+            @ApiParam(value = "消息")
+            @RequestBody String message) throws Exception {
         Package aPackage = packService.getPackage(id);
         if (aPackage == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
 
@@ -203,32 +199,37 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             aPackage.setPatientId(map.get("patientId"));
             aPackage.setFinishDate(new Date());
         }
-        else if(status == ArchiveStatus.Acquired)
-        {
+        else if(status == ArchiveStatus.Acquired) {
             aPackage.setParseDate(new Date()); //入库执行时间
         }
         else {
             aPackage.setFinishDate(null);
+            Package oldPackage =  packService.getPackage(aPackage.getId());
+            if(oldPackage.getFailCount() < 3) {
+                int failCount = oldPackage.getFailCount();
+                failCount ++;
+                aPackage.setFailCount(failCount);
+            }
         }
-
         packService.save(aPackage);
-
         return new ResponseEntity<>((MPackage) null, HttpStatus.OK);
     }
 
 
     @RequestMapping(value = ServiceApi.Packages.Package, method = {RequestMethod.DELETE})
     @ApiOperation(value = "删除档案包", response = Object.class, notes = "删除一个数据包")
-    public void deletePackage(@ApiParam(name = "id", value = "档案包编号")
-                              @PathVariable(value = "id") String id) {
+    public void deletePackage(
+            @ApiParam(name = "id", value = "档案包编号")
+            @PathVariable(value = "id") String id) {
         packService.deletePackage(id);
     }
 
     @RequestMapping(value = ServiceApi.Packages.PackageDownloads, method = {RequestMethod.GET})
     @ApiOperation(value = "下载档案包", notes = "下载档案包")
-    public ResponseEntity<MPackage> downloadPackage(@ApiParam(name = "id", value = "档案包编号")
-                                                    @PathVariable(value = "id") String id,
-                                                    HttpServletResponse response) throws Exception {
+    public ResponseEntity<MPackage> downloadPackage(
+            @ApiParam(name = "id", value = "档案包编号")
+            @PathVariable(value = "id") String id,
+            HttpServletResponse response) throws Exception {
         try {
             InputStream is = packService.downloadFile(id);
             if (is == null) return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
@@ -245,6 +246,23 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
     }
 
+    @RequestMapping(value = ServiceApi.Packages.ResolveQueue, method = RequestMethod.GET)
+    @ApiOperation(value = "添加解析队列", notes = "手动添加解析队列，临时性方案")
+    public void resolveQueue(
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", required = true, defaultValue = "archiveStatus=Finished")
+            @RequestParam(value = "filters") String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+receiveDate")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
+            @RequestParam(value = "page") int page,
+            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "500")
+            @RequestParam(value = "size") int size) throws Exception {
+        List<Package> packageList = packService.search(null, filters, sorts, page, size);
+        Collection<MPackage> packageCollection = convertToModels(packageList, new ArrayList<>(packageList.size()), MPackage.class, null);
+        for(MPackage mPackage : packageCollection) {
+            redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
+        }
+    }
 
     @RequestMapping(value = ServiceApi.Packages.LegacyPackages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案(兼容旧接口)", notes = "从集成开放平台接收健康档案数据包(兼容旧接口)")
@@ -270,6 +288,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         String unzipPwd = RSA.decrypt(packageCrypto, RSA.genPrivateKey(privateKey));
         Package aPackage = packService.receive(multipartFile.getInputStream(), unzipPwd, md5, null, null);
 
-        messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
+        //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
+
 }

@@ -106,7 +106,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size", required = false) Integer size) {
         Envelop envelop = new Envelop();
         try {
-            envelop = resourceBrowseService.getResources(resourcesCode, "*", orgCode, areaCode, queryParams, page, size);
+            envelop = resourceBrowseService.getResultData(resourcesCode, "*", orgCode, areaCode, queryParams, page, size);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -125,7 +125,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
      * @param size
      * @return
      * @throws Exception
-     */
+
     @ApiOperation("获取资源数据（档案浏览器主要健康问题诊断详情）")
     @RequestMapping(value = ServiceApi.Resources.ResourceSubQuery, method = RequestMethod.POST)
     public Envelop getResourcesSub(
@@ -151,6 +151,8 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         }
         return envelop;
     }
+     */
+
 
     /**
      * 获取资源数据(转译)
@@ -174,7 +176,7 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "size", required = false) Integer size,
             @ApiParam(name = "version", value = "版本号")
             @RequestParam(value = "version", required = false) String version) throws Exception {
-        Envelop re = resourceBrowseService.getResources(resourcesCode, roleId , orgCode, areaCode, queryParams, page, size);
+        Envelop re = resourceBrowseService.getResultData(resourcesCode, roleId , orgCode, areaCode, queryParams, page, size);
         if(version!=null && version.length()>0) {
             List<Map<String,Object>> list = re.getDetailModelList();
             re.setDetailModelList(resourcesTransformService.displayCodeConvert(list,version,null));
@@ -256,42 +258,40 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("获取Cda Data")
-    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Map<String,Object> getCDAData( @ApiParam(name="cdaTransformDtoJson",value="资源数据模型",required = true)
-                                           @RequestBody String cdaTransformDtoJson) throws Exception {
-        MCdaTransformDto cdaTransformDto =  objectMapper.readValue(cdaTransformDtoJson,MCdaTransformDto.class);
-
-        Map<String,Object> re = new HashMap<>();
-        Map<String, Object> obj = cdaTransformDto.getMasterJson();
-        Map<String, List<String>> masterDatasetCodeMap = cdaTransformDto.getMasterDatasetCodeList();
-        Map<String, List<String>> multiDatasetCodeMap = cdaTransformDto.getMultiDatasetCodeList();
-        String profileId = obj.get("rowkey").toString();
-        String cdaVersion = obj.get("cda_version").toString();
-        for(String key:masterDatasetCodeMap.keySet()) {
-            Map<String,Object> map=new HashMap<>();
-            List<String> masterDatasetList = masterDatasetCodeMap.get(key);
-            List<String> multiDatasetList = multiDatasetCodeMap.get(key);
-
-            for (int i = 0; i < masterDatasetList.size(); i++) {
+    @RequestMapping(value = ServiceApi.Resources.getCDAData, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Map<String, Object> getCDAData(
+            @ApiParam(name = "cdaTransformDtoJson",value = "资源数据模型", required = true)
+            @RequestBody String cdaTransformDtoJson) throws Exception {
+        MCdaTransformDto cdaTransformDto =  objectMapper.readValue(cdaTransformDtoJson, MCdaTransformDto.class);
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> event = cdaTransformDto.getMasterJson();
+        Map<String, List<String>> masterDataSetCodeMap = cdaTransformDto.getMasterDatasetCodeList();
+        Map<String, List<String>> multiDataSetCodeMap = cdaTransformDto.getMultiDatasetCodeList();
+        String profileId = event.get("rowkey").toString();
+        String cdaVersion = event.get("cda_version").toString();
+        for(String key : masterDataSetCodeMap.keySet()) {
+            Map<String, Object> map = new HashMap<>();
+            List<String> masterDataSetList = masterDataSetCodeMap.get(key);
+            List<String> multiDataSetList = multiDataSetCodeMap.get(key);
+            for (int i = 0; i < masterDataSetList.size(); i++) {
                 List<Map<String, Object>> dataList = new ArrayList<>();
-                String dataset = masterDatasetList.get(i);
-                dataList.add(resourcesTransformService.stdMasterTransform(obj, dataset, cdaVersion));
-                map.put(dataset, dataList);
+                String dataSet = masterDataSetList.get(i);
+                dataList.add(resourcesTransformService.stdMasterTransform(event, dataSet, cdaVersion));
+                map.put(dataSet, dataList);
             }
-            for (int i = 0; i < multiDatasetList.size(); i++) {
-                String dataset = multiDatasetList.get(i);
-                String q = "{\"table\":\"" + dataset + "\",\"q\":\"profile_id:" + profileId + "\"}";
-                Page<Map<String, Object>> result = resourceBrowseService.getEhrCenterSub(q, null, null);
-
+            for (int i = 0; i < multiDataSetList.size(); i++) {
+                String dataSet = multiDataSetList.get(i);
+                String q = "{\"table\":\"" + dataSet + "\",\"q\":\"profile_id:" + profileId + "\"}";
+                Page<Map<String, Object>> page = resourceBrowseService.getEhrCenterSub(q, null, null);
                 if (cdaVersion != null && cdaVersion.length() > 0) {
-                    map.put(dataset, resourcesTransformService.displayCodeConvert(result.getContent(), cdaVersion, null));
+                    map.put(dataSet, resourcesTransformService.displayCodeConvert(page.getContent(), cdaVersion, null));
                 } else {
-                    map.put(dataset, result.getContent());
+                    map.put(dataSet, page.getContent());
                 }
             }
-            re.put(key,map);
+            result.put(key,map);
         }
-        return re;
+        return result;
     }
 
 

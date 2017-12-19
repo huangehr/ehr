@@ -121,36 +121,6 @@ public class ResourceBrowseService {
     }
 
     /**
-     * 获取资源数据
-     * @param resourcesCode
-     * @param orgCode
-     * @param areaCode
-     * @param queryParams Mysql为sql语句，Hbase为solr查询语法
-     * @param page
-     * @param size
-     * @return
-     * @throws Exception
-     */
-    public Envelop getResources(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
-        return getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size, false);
-    }
-
-    /**
-     * 获取资源数据(档案浏览器主要健康问题诊断详情)
-     * @param resourcesCode
-     * @param orgCode
-     * @param areaCode
-     * @param queryParams Mysql为sql语句，Hbase为solr查询语法
-     * @param page
-     * @param size
-     * @return
-     * @throws Exception
-     */
-    public Envelop getResourcesSub(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
-        return getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size, true);
-    }
-
-    /**
      * 资源浏览
      * @return
      */
@@ -191,7 +161,7 @@ public class ResourceBrowseService {
      */
     public Envelop resourcesBrowse(String resourcesCode, String methodName, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception {
         //获取结果集
-        Envelop envelop = getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size, false);
+        Envelop envelop = getResultData(resourcesCode, roleId, orgCode, areaCode, queryParams, page, size);
         //如果资源查询为细表则增加主表信息
         if(methodName.endsWith("Sub") && envelop.isSuccessFlg() && envelop.getDetailModelList() != null) {
             List<Map<String,Object>> oldList = envelop.getDetailModelList();
@@ -312,7 +282,7 @@ public class ResourceBrowseService {
             String dealDStr = dStr.substring(1, dStr.length() - 1).replaceAll(" ", "");
             queryParams = addParams(queryParams,"dFl", dealDStr);
         }
-        Page<Map<String,Object>> result = (Page<Map<String,Object>>)resourceBrowseDao.getEhrCenter(queryParams, page, size);
+        Page<Map<String, Object>> result = resourceBrowseDao.getEhrCenter(queryParams, page, size);
         if(result != null) {
             envelop.setSuccessFlg(true);
             envelop.setCurrPage(result.getNumber());
@@ -333,11 +303,10 @@ public class ResourceBrowseService {
      * @param queryParams
      * @param page
      * @param size
-     * @param isSpecialScan
      * @return
      * @throws Exception
      */
-    private Envelop getResultData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size, boolean isSpecialScan) throws Exception{
+    public Envelop getResultData(String resourcesCode, String roleId, String orgCode, String areaCode, String queryParams, Integer page, Integer size) throws Exception{
         Envelop envelop = new Envelop();
         RsResource rsResources = rsResourceDao.findByCode(resourcesCode);
         if(rsResources != null) {
@@ -446,53 +415,7 @@ public class ResourceBrowseService {
                     envelop.setCurrPage(result.getNumber());
                     envelop.setPageSize(result.getSize());
                     envelop.setTotalCount(new Long(result.getTotalElements()).intValue());
-                    if(result.getContent() != null && result.getContent().size() > 0) {
-                        //转译
-                        //List<Map<String,Object>> list = new ArrayList<>();
-                        //遍历所有行
-                        /**
-                        for(int i=0;i<result.getContent().size();i++) {
-                            Map<String,Object> oldObj = result.getContent().get(i);
-                            Map<String,Object> newObj = new HashMap<>();
-                            //遍历资源数据元
-                            for(DtoResourceMetadata metadata : metadataList) {
-                                String key = metadata.getId();
-                                if(oldObj.containsKey(key)) {
-                                    newObj.put(metadata.getId(),oldObj.get(key));
-                                    if(metadata.getDictCode()!=null && metadata.getDictCode().length()>0 && !metadata.getDictCode().equals("0")) {
-                                        if(oldObj.containsKey(key+"_VALUE")) {
-                                            newObj.put(metadata.getId()+"_VALUE",oldObj.get(key+"_VALUE"));
-                                        }
-                                    }
-                                }
-                            }
-                            for(String key : oldObj.keySet()) {
-                                //统计字段
-                                if (key.startsWith("$")) {
-                                    newObj.put(key,oldObj.get(key));
-                                }
-                            }
-                            list.add(newObj);
-                        }
-                        */
-                        envelop.setDetailModelList(result.getContent());
-                    }
-                    //for -> 档案浏览器主要健康问题诊断详情
-                    if (isSpecialScan) {
-                        if ((resourcesCode.equals("RS_OUTPATIENT_DIAGNOSIS") || resourcesCode.equals("RS_HOSPITALIZED_DIAGNOSIS")) && envelop.getDetailModelList() != null) {
-                            List<Map<String, Object>> transformKeyList = new ArrayList<>();
-                            for (Map<String, Object> temp : (List<Map<String, Object>>) envelop.getDetailModelList()) {
-                                Map<String, Object> newKeyObject = new HashMap<String, Object>();
-                                newKeyObject.put("DiagnosticTypeCode", temp.get("EHR_000111") != null ? temp.get("EHR_000111") : "");
-                                newKeyObject.put("DiagnosticDate", temp.get("EHR_000113") != null ? temp.get("EHR_000113") : "");
-                                newKeyObject.put("SignatureDoctor", temp.get("EHR_000106") != null ? temp.get("EHR_000106") : "");
-                                newKeyObject.put("DiagnosticName", temp.get("EHR_000112") != null ? temp.get("EHR_000112") : "");
-                                newKeyObject.put("DiagnosticInstructions", temp.get("EHR_000114") != null ? temp.get("EHR_000114") : "");
-                                transformKeyList.add(newKeyObject);
-                            }
-                            envelop.setDetailModelList(transformKeyList);
-                        }
-                    }
+                    envelop.setDetailModelList(result.getContent());
                 }
                 else {
                     envelop.setErrorMsg("数据库数据检索失败");

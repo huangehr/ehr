@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.patient.feign.GeographyClient;
+import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -25,9 +26,9 @@ import java.util.*;
  * @version 1.0
  * @created 04-6月-2015 19:53:04
  */
-@Transactional
 @Service
-public class DemographicService {
+@Transactional
+public class DemographicService extends BaseJpaService {
 
     @PersistenceContext
     protected EntityManager entityManager;
@@ -37,11 +38,8 @@ public class DemographicService {
     @Autowired
     private GeographyClient addressClient;
 
-    public DemographicService() {
-    }
 
-
-    public DemographicInfo getDemographicInfo(DemographicId id) {
+    public DemographicInfo getDemographicInfo(String id) {
         DemographicInfo demInfo = demographicInfoRepository.findOne(id);
         return demInfo;
     }
@@ -145,12 +143,12 @@ public class DemographicService {
 
 
 
-    public void delete(DemographicId id) {
+    public void delete(String id) {
         DemographicInfo di = (DemographicInfo) getDemographicInfo(id);
         demographicInfoRepository.delete(di);
     }
 
-    public void resetPass(DemographicId id) {
+    public void resetPass(String id) {
 
         String pwd = "123456";
         DemographicInfo demInfo = getDemographicInfo(id);

@@ -132,19 +132,15 @@ public class ExtractPercentHelper {
                 if(StringUtils.isNotEmpty(esConfig.getThousandDmolecular()) &&  StringUtils.isNotEmpty(esConfig.getThousandDenominator())){
                     Map<String,DictModel> dimensionMap = getQuotaDimension(quotaDataSource.getQuotaCode());
                     Map<String,DictModel> moleDimensionMap = getQuotaDimension(esConfig.getThousandDmolecular());
-                    List<String> quotaDimension = new ArrayList<>();
                     String moleDimension = "";
                     int num = 0;
-//                    String dimendion = "";
                     for(String key : dimensionMap.keySet()){
                         for(String molekey : moleDimensionMap.keySet()){
-                            if(key.equals(molekey) && dimensionMap.get(key).getCode().equals( moleDimensionMap.get(molekey).getCode() )){
+                            if(key.equals(molekey)){
                                 moleDimension = moleDimension + moleDimensionMap.get(molekey).getName() + ";";
                                 num ++;
                             }
                         }
-//                        dimendion = dimendion + dimensionMap.get(key).getCode() +",";
-                        quotaDimension.add(dimensionMap.get(key).getName());
                     }
                     if(num != dimensionMap.size()){
                         message = "指标维度无法与分子指标维度匹配";
@@ -158,9 +154,9 @@ public class ExtractPercentHelper {
                     param.put("startTime",startTime);
                     param.put("endTime",endTime);
                     Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1));
-                    Calendar calendar = Calendar.getInstance();
                     int totalCount = 0;
-                    Map<String,Integer>  doneResultMap = quotaService.searcherSumByGroupBySql(denoTjQuota, "year", "year=" + calendar.get(Calendar.YEAR));
+                    Calendar calendar = Calendar.getInstance();
+                    Map<String,Integer>  doneResultMap = quotaService.searcherSumByGroupBySql(denoTjQuota, "year", "year=" + calendar.get(Calendar.YEAR),"result","","");
                     if(doneResultMap != null && doneResultMap.size()>0){
                         for(String key :doneResultMap.keySet())
                         totalCount = totalCount + doneResultMap.get(key);

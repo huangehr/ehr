@@ -13,7 +13,7 @@ import java.util.List;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface XDemographicInfoRepository extends PagingAndSortingRepository<DemographicInfo, DemographicId> {
+public interface XDemographicInfoRepository extends PagingAndSortingRepository<DemographicInfo, String> {
 
     @Query("select demographicInfo from DemographicInfo demographicInfo where 1=1")
     public List<DemographicInfo> getOrgByCode(@Param("orgCode") String orgCode);

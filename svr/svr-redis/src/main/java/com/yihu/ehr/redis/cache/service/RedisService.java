@@ -39,32 +39,6 @@ public class RedisService {
     private StdDataSetKeySchema stdDataSetKeySchema;
     @Autowired
     private StdMetaDataKeySchema stdMetaDataKeySchema;
-    @Autowired
-    private AppKeySchema appKeySchema;
-
-    /**
-     * 前端app 获取单条缓存
-     * @return
-     */
-    public String getRedisApp(String key) {
-        return appKeySchema.getRedisApp(key);
-    }
-
-    /**
-     * 前端app 保存单条缓存
-     * @return
-     */
-    public void setRedisApp(String key, String val){
-        appKeySchema.setRedisApp(key,val);
-    }
-
-    /**
-     * 前端app 删除单条缓存
-     * @return
-     */
-    public void deleteRedisApp(String key){
-        appKeySchema.deleteRedisApp(key);
-    }
 
     /**
      *获取地址redis
