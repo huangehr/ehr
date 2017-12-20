@@ -228,25 +228,22 @@ public class PatientInfoBaseService {
            }
         }
         Map<String, Object> newKeyObject = new HashMap<String, Object>();
-        if(onlyMap.get("EHR_000111") != null) {
-            String typeCode = onlyMap.get("EHR_000111").toString();
-            if(typeCode.equals("0")) {
-                newKeyObject.put("DiagnosticTypeCode", "门诊");
-                newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000113") != null ? onlyMap.get("EHR_000113") : "");
-                newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000106") != null ? onlyMap.get("EHR_000106") : "");
-                newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000112") != null ? onlyMap.get("EHR_000112") : "");
-                newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000114") != null ? onlyMap.get("EHR_000114") : "");
-            }else if(typeCode.equals("1")) {
-                newKeyObject.put("DiagnosticTypeCode", "住院");
-                newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000296") != null ? onlyMap.get("EHR_000296") : "");
-                newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000290") != null ? onlyMap.get("EHR_000290") : "");
-                newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000295") != null ? onlyMap.get("EHR_000295") : "");
-                newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000297") != null ? onlyMap.get("EHR_000297") : "");
-            }else if(typeCode.equals("2")) {
-                newKeyObject.put("DiagnosticTypeCode", "体检");
-            }else {
-                newKeyObject.put("DiagnosticTypeCode", typeCode);
-            }
+        if(eventType.equals("0")) {
+            newKeyObject.put("DiagnosticTypeCode", "门诊");
+            newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000113") != null ? onlyMap.get("EHR_000113") : "");
+            newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000106") != null ? onlyMap.get("EHR_000106") : "");
+            newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000112") != null ? onlyMap.get("EHR_000112") : "");
+            newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000114") != null ? onlyMap.get("EHR_000114") : "");
+        }else if(eventType.equals("1")) {
+            newKeyObject.put("DiagnosticTypeCode", "住院");
+            newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000296") != null ? onlyMap.get("EHR_000296") : "");
+            newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000290") != null ? onlyMap.get("EHR_000290") : "");
+            newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000295") != null ? onlyMap.get("EHR_000295") : "");
+            newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000297") != null ? onlyMap.get("EHR_000297") : "");
+        }else if(eventType.equals("2")) {
+            newKeyObject.put("DiagnosticTypeCode", "体检");
+        }else {
+            newKeyObject.put("DiagnosticTypeCode", eventType);
         }
         result.add(newKeyObject);
         return result;
