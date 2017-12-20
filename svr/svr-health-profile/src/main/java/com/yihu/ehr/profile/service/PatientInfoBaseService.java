@@ -173,25 +173,23 @@ public class PatientInfoBaseService {
                 obj.put("healthProblemName", redisServiceClient.getHealthProblemRedis(healthProblemCode));
                 int visitTimes = 0;
                 int hospitalizationTimes = 0;
-                List<Map<String,Object>> profileList = hpMap.get(healthProblemCode);
-                for(int i = 0; i < profileList.size() ; i++) {
+                List<Map<String, Object>> profileList = hpMap.get(healthProblemCode);
+                for (int i = 0; i < profileList.size(); i++) {
                     Map<String, Object> profile = profileList.get(i);
                     //事件类型
                     String eventType = (String) profile.get(BasisConstant.eventType);
                     String recentEvent = "";
-                    if("0".equals(eventType)) {
-                        recentEvent =  "门诊";
+                    if ("0".equals(eventType)) {
+                        recentEvent = "门诊";
                         visitTimes++;
-                    }
-                    else if("1".equals(eventType)) {
-                        recentEvent =  "住院";
+                    } else if ("1".equals(eventType)) {
+                        recentEvent = "住院";
                         hospitalizationTimes++;
-                    }
-                    else if("2".equals(eventType)) {
-                        recentEvent =  "体检";
+                    } else if ("2".equals(eventType)) {
+                        recentEvent = "体检";
                     }
                     //第一条
-                    if(i == 0) {
+                    if (i == 0) {
                         obj.put("lastVisitDate", profile.get(BasisConstant.eventDate));
                         obj.put("lastVisitOrgCode", profile.get(BasisConstant.orgCode));
                         obj.put("lastVisitOrg", profile.get(BasisConstant.orgName));
@@ -200,8 +198,8 @@ public class PatientInfoBaseService {
                         obj.put("eventType", eventType);
                     }
                     //最后一条
-                    if(i==profileList.size()-1) {
-                        obj.put("ageOfDisease",getAgeOfDisease(profile.get(BasisConstant.eventDate)));
+                    if (i == profileList.size() - 1) {
+                        obj.put("ageOfDisease", getAgeOfDisease(profile.get(BasisConstant.eventDate)));
                     }
                 }
                 obj.put("visitTimes", visitTimes);
@@ -228,22 +226,23 @@ public class PatientInfoBaseService {
            }
         }
         Map<String, Object> newKeyObject = new HashMap<String, Object>();
-        if(onlyMap.get("EHR_000111") != null) {
-            String typeCode = onlyMap.get("EHR_000111").toString();
-            if(typeCode.equals("0")) {
-                newKeyObject.put("DiagnosticTypeCode", "门诊");
-            }else if(typeCode.equals("1")) {
-                newKeyObject.put("DiagnosticTypeCode", "住院");
-            }else if(typeCode.equals("2")) {
-                newKeyObject.put("DiagnosticTypeCode", "体检");
-            }else {
-                newKeyObject.put("DiagnosticTypeCode", typeCode);
-            }
+        if(eventType.equals("0")) {
+            newKeyObject.put("DiagnosticTypeCode", "门诊");
+            newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000113") != null ? onlyMap.get("EHR_000113") : "");
+            newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000106") != null ? onlyMap.get("EHR_000106") : "");
+            newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000112") != null ? onlyMap.get("EHR_000112") : "");
+            newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000114") != null ? onlyMap.get("EHR_000114") : "");
+        }else if(eventType.equals("1")) {
+            newKeyObject.put("DiagnosticTypeCode", "住院");
+            newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000296") != null ? onlyMap.get("EHR_000296") : "");
+            newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000290") != null ? onlyMap.get("EHR_000290") : "");
+            newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000295") != null ? onlyMap.get("EHR_000295") : "");
+            newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000297") != null ? onlyMap.get("EHR_000297") : "");
+        }else if(eventType.equals("2")) {
+            newKeyObject.put("DiagnosticTypeCode", "体检");
+        }else {
+            newKeyObject.put("DiagnosticTypeCode", eventType);
         }
-        newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000113") != null ? onlyMap.get("EHR_000113") : "");
-        newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000106") != null ? onlyMap.get("EHR_000106") : "");
-        newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000112") != null ? onlyMap.get("EHR_000112") : "");
-        newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000114") != null ? onlyMap.get("EHR_000114") : "");
         result.add(newKeyObject);
         return result;
     }
