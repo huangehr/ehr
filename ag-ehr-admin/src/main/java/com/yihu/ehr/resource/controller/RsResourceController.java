@@ -406,7 +406,7 @@ public class RsResourceController extends BaseController {
                     if(StringUtils.isNotEmpty(mRsResources.getEchartType()) && mRsResources.getEchartType().equals("radar")){
                         chartInfoModel = tjQuotaJobClient.getQuotaRadarGraphicReports(quotaIdstr, filter, dimension, mRsResources.getName());
                     }else if(StringUtils.isNotEmpty(mRsResources.getEchartType()) && mRsResources.getEchartType().equals("nestedPie")){
-                        chartInfoModel = tjQuotaJobClient.getQuotaNestedPieGraphicReports(quotaIdstr, filter, dimension, mRsResources.getName());
+                        chartInfoModel = tjQuotaJobClient.getQuotaNestedPieGraphicReports(resourceId, quotaIdstr, filter, dimension, mRsResources.getName());
                     }else {
                         chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
                     }
@@ -495,7 +495,7 @@ public class RsResourceController extends BaseController {
                     quotaIdStr += ResourceQuota.getQuotaId() + ",";
                 }
             }
-            chartInfoModel = tjQuotaJobClient.getQuotaNestedPieGraphicReports(quotaIdStr, filters, dimension, title);
+            chartInfoModel = tjQuotaJobClient.getQuotaNestedPieGraphicReports(resourceId, quotaIdStr, filters, dimension, title);
             chartInfoModel.setFirstDimension(dimension);
             chartInfoModel.setResourceId(resourceId);
             envelop.setObj(chartInfoModel);
