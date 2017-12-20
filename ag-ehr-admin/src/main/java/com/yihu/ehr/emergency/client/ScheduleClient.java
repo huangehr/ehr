@@ -47,10 +47,16 @@ public interface ScheduleClient {
             @RequestBody String schedule);
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation("更新单条记录，只允许更新时间和状态")
+    @ApiOperation("更新单条记录")
     Envelop update(
             @ApiParam(name = "schedule", value = "排班")
             @RequestBody String schedule);
+
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleBathUpdate, method = RequestMethod.PUT)
+    @ApiOperation("更新多条数据")
+    Envelop bathUpdate(
+            @ApiParam(name = "schedules", value = "排班")
+            @RequestParam(value = "schedules") String schedules);
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入排班信息")
