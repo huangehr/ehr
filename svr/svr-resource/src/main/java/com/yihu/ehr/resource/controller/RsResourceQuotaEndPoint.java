@@ -4,19 +4,26 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.resource.MResourceQuota;
+import com.yihu.ehr.resource.model.ResourceQuotaJson;
 import com.yihu.ehr.resource.model.RsResourceQuota;
 import com.yihu.ehr.resource.service.RsResourceQuotaService;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -132,5 +139,53 @@ public class RsResourceQuotaEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "resourceId") String resourceId) {
         resourceQuotaService.deleteByResourceId(resourceId);
         return Result.success("资源视图-关联指标表删除成功！");
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.SearchQuotaByResourceId, method = RequestMethod.GET)
+    @ApiOperation(value = "根据resourceId获取该资源下的指标列表")
+    public List<TjQuota> getQuotaByResourceId(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId) {
+        List<TjQuota> quotaList = resourceQuotaService.getQuotaByResourceId(resourceId);
+        return quotaList;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.SearchTreeByResourceId, method = RequestMethod.GET)
+    @ApiOperation(value = "根据resourceId获取该资源下的指标列表树")
+    public Envelop searchTreeByResourceId(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId) throws ParseException {
+        Envelop envelop = new Envelop();
+        List<RsResourceQuota> resultList = new ArrayList<>();
+
+        // 获取最顶层的资源报表分类集合
+        List<RsResourceQuota> topNodeList = resourceQuotaService.getChildrenByPid(-1, resourceId);
+        if (topNodeList.size() == 0) {
+            envelop.setDetailModelList(resultList);
+            return envelop;
+        }
+        resultList = resourceQuotaService.getTreeByParents(topNodeList, resourceId);
+        List<TjQuota> quotaTreeByParents = resourceQuotaService.getQuotaTreeByParents(resultList);
+        envelop.setDetailModelList(quotaTreeByParents);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Resources.UpdateResourceQuota, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据resourceId修改该资源下的指标关系")
+    public Envelop updateResourceQuota(
+            @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
+            @RequestBody String jsonRelation) {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+        try {
+            List<ResourceQuotaJson> list = objectMapper.readValue(jsonRelation, new TypeReference<List<ResourceQuotaJson>>() {
+            });
+            resourceQuotaService.updateResourceQuota(list);
+            envelop.setSuccessFlg(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
     }
 }

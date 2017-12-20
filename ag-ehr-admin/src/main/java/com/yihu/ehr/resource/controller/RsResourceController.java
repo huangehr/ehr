@@ -405,6 +405,8 @@ public class RsResourceController extends BaseController {
                     MRsResources mRsResources = objectMapper.convertValue(resourceResult.getObj(), MRsResources.class);
                     if(StringUtils.isNotEmpty(mRsResources.getEchartType()) && mRsResources.getEchartType().equals("radar")){
                         chartInfoModel = tjQuotaJobClient.getQuotaRadarGraphicReports(quotaIdstr, filter, dimension, mRsResources.getName());
+                    }else if(StringUtils.isNotEmpty(mRsResources.getEchartType()) && mRsResources.getEchartType().equals("nestedPie")){
+                        chartInfoModel = tjQuotaJobClient.getQuotaNestedPieGraphicReports(quotaIdstr, filter, dimension, mRsResources.getName());
                     }else {
                         chartInfoModel = tjQuotaJobClient.getMoreQuotaGraphicReportPreviews(quotaIdstr, charstr, filter, dimension, mRsResources.getName());
                     }

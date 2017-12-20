@@ -42,8 +42,6 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
     private AttendanceService attendanceService;
     @Autowired
     private LocationService locationService;
-    @Autowired
-    private OrgService orgService;
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceList, method = RequestMethod.GET)
     @ApiOperation(value = "获取所有救护车列表")
@@ -279,7 +277,7 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
             String [] idArr = ids.split(",");
             for (String id : idArr) {
                 Ambulance ambulance = ambulanceService.findById(id);
-                if (ambulance.getStatus() != Ambulance.Status.wait || ambulance.getStatus() != Ambulance.Status.down) {
+                if (ambulance.getStatus() != Ambulance.Status.wait && ambulance.getStatus() != Ambulance.Status.down) {
                     envelop.setSuccessFlg(false);
                     envelop.setErrorMsg("车辆：" + id + "，处于执勤状态，无法删除");
                     return envelop;
@@ -319,7 +317,7 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "type", value = "字段名")
             @RequestParam(value ="type") String type,
             @ApiParam(name = "values", value = "车牌号、电话号码")
-            @RequestBody String values) throws Exception {
+            @RequestParam(value ="values") String values) throws Exception {
         List existPhones = ambulanceService.idExist(type, toEntity(values, String[].class));
         return existPhones;
     }

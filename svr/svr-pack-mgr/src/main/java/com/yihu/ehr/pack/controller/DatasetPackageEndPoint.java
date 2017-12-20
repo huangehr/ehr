@@ -41,7 +41,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "package_service", description = "档案包服务（非病人维度兼容）")
+@Api(value = "package_service", description = "档案包服务（非病人维度兼容）", tags = {"档案包服务-档案包服务（非病人维度兼容）"})
 public class DatasetPackageEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

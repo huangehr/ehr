@@ -19,8 +19,10 @@ import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -262,14 +264,45 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleBathUpdate, method = RequestMethod.PUT)
+    @ApiOperation("更新多条数据")
+    public Envelop bathUpdate(
+            @ApiParam(name = "schedules", value = "排班")
+            @RequestParam(value = "schedules") String schedules) throws IOException{
+        Envelop envelop = new Envelop();
+        List<Map<String, Object>> scheduleList = objectMapper.readValue(schedules, List.class);
+        for(Map<String, Object> newSchedule : scheduleList) {
+            Schedule old = scheduleService.findById((int)newSchedule.get("id"));
+            Ambulance ambulance = ambulanceService.findById(old.getCarId());
+            if(ambulance.getStatus() != Ambulance.Status.wait && ambulance.getStatus() != Ambulance.Status.down) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("相关车辆正在执勤，不允许更新");
+                return envelop;
+            }
+            if((new Date().getTime() - old.getDate().getTime()) > 0 ) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("历史记录不能更新");
+                return envelop;
+            }
+            old.setDutyName(newSchedule.get("dutyName") == null? "": newSchedule.get("dutyName").toString());
+            old.setGender(newSchedule.get("gender") == null? "": newSchedule.get("gender").toString());
+            old.setDutyNum(newSchedule.get("dutyNum") == null? "": newSchedule.get("dutyNum").toString());
+            old.setDutyPhone(newSchedule.get("dutyPhone") == null? "": newSchedule.get("dutyPhone").toString());
+            scheduleService.save(old);
+        }
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
     @RequestMapping(value = ServiceApi.Emergency.ScheduleBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入排班信息")
     public boolean createSchedulesBatch(
             @ApiParam(name = "schedules", value = "排班信息", defaultValue = "")
-            @RequestBody String schedules) throws Exception{
+            @RequestParam(value = "schedules") String schedules) throws Exception{
         List models = objectMapper.readValue(schedules, new TypeReference<List>() {});
         scheduleService.addSchedulesBatch(models);
         return true;
     }
+
 
 }
