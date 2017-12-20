@@ -7,12 +7,15 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.echarts.ChartDataModel;
 import com.yihu.ehr.model.resource.MChartInfoModel;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.quota.model.jpa.RsResourceQuota;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
+import com.yihu.quota.model.rest.QuotaTreeModel;
 import com.yihu.quota.service.dimension.TjDimensionMainService;
 import com.yihu.quota.service.dimension.TjDimensionSlaveService;
 import com.yihu.quota.service.quota.QuotaService;
+import com.yihu.quota.service.resource.ResourceQuotaService;
 import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.util.ReportOption;
 import com.yihu.quota.vo.DictModel;
@@ -51,6 +54,8 @@ public class QuotaReportController extends BaseController {
     private QuotaService quotaService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ResourceQuotaService resourceQuotaService;
 
 
     /**
@@ -307,6 +312,8 @@ public class QuotaReportController extends BaseController {
     @ApiOperation(value = "获取指标统计结果echart NestedPie图表")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaNestedPieReportPreviews, method = RequestMethod.GET)
     public MChartInfoModel getQuotaNestedPieGraphicReports(
+            @ApiParam(name = "resourceId", value = "资源ID", defaultValue = "")
+            @RequestParam(value = "resourceId") String resourceId,
             @ApiParam(name = "quotaIdStr", value = "指标ID,多个用,拼接", required = true)
             @RequestParam(value = "quotaIdStr" , required = true) String quotaIdStr,
             @ApiParam(name = "filter", value = "过滤", defaultValue = "")
@@ -316,65 +323,20 @@ public class QuotaReportController extends BaseController {
             @ApiParam(name = "title", value = "名称", defaultValue = "")
             @RequestParam(value = "title", required = false) String title) {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
+        Option option = null;
         MChartInfoModel chartInfoModel = new MChartInfoModel();
+        List<QuotaTreeModel> quotaTreeModels = new ArrayList<>();
+        List<RsResourceQuota> resultList = new ArrayList<>();
+        Map<String, String> xAxisMap = new HashMap<>();
         try {
-            Option option = null;
-            ChartDataModel chartDataModel = new ChartDataModel();
-            List<String> radarNames = new ArrayList<>();
-            Map<String, Map<String, Object>> radarData = new HashMap<>();
-            List<Map<String, Object>> listData = new ArrayList<>();
-            Map<String, String> xAxisMap = new HashMap<>();
-            for(String quotaId : quotaIds) {
-                Map<String, Object> dataMap = new HashMap<>();
-                TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
-                if(null != tjQuota){
-                    String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimension);
-                    Map<String,String> dimensionDicMap = new HashMap<>();
-                    dimensionDicMap = setDimensionMap(dictSql, dimension, dimensionDicMap);
-                    //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
-                    for(String key : groupDataMap.keySet()){
-                        key = key.toLowerCase();
-                        dataMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, groupDataMap.get(key));
-                        xAxisMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key): key, key);
-                    }
-                    radarNames.add(tjQuota.getName());
-                    radarData.put(tjQuota.getCode(), dataMap);
-                }
-                Integer num = getNum(dataMap);
-                Map<String, Object> map = new HashMap();
-                map.put("NAME", tjQuota.getName());
-                map.put("TOTAL", num);
-                listData.add(map);
+            // 获取最顶层的资源
+            List<RsResourceQuota> topNodeList = resourceQuotaService.getChildrenByPid(-1, resourceId);
+            if (topNodeList.size() == 0) {
+                return chartInfoModel;
             }
-            // 确定父子关系 --暂未实现
-            List<Map<String, Object>> listMap = new ArrayList<>();
-            List<Map<String, Object>> listChild = new ArrayList<>();
-            List<Map<String, Object>> lastChild = new ArrayList<>();
-            if (null != listData && listData.size() > 0) {
-                for (int i = 0; i < listData.size(); i++) {
-                    if (i < 2) {
-                        listMap.add(listData.get(i));
-                    } else if(i < 6) {
-                        listChild.add(listData.get(i));
-                    } else {
-                        lastChild.add(listData.get(i));
-                    }
-                }
-            }
-            if (null != listMap && listMap.size() > 0) {
-                chartDataModel.setList(listMap);
-            }
-            if (null != listChild && listChild.size() > 0) {
-                ChartDataModel chartDataModel1 = new ChartDataModel();
-                chartDataModel1.setList(listChild);
-                chartDataModel.setChildren(chartDataModel1);
-            }
-            if (null != listChild && listChild.size() > 0 && null != lastChild && lastChild.size() > 0) {
-                ChartDataModel chartDataModel1 = new ChartDataModel();
-                chartDataModel1.setList(lastChild);
-                chartDataModel.getChildren().setChildren(chartDataModel1);
-            }
+            resultList = resourceQuotaService.getTreeByParents(topNodeList, resourceId);
+            List<RsResourceQuota> quotaList = restructuringResourceQuota(resultList, dimension, filter, xAxisMap);
+            ChartDataModel chartDataModel = integrateDate(quotaList);
 
             ReportOption reportOption = new ReportOption();
 
@@ -388,6 +350,74 @@ public class QuotaReportController extends BaseController {
             invalidUserException(e, -1, "查询失败:" + e.getMessage());
             return null;
         }
+    }
+
+    public List<RsResourceQuota> restructuringResourceQuota(List<RsResourceQuota> resultList, String dimension, String filter, Map<String, String> xAxisMap) throws Exception{
+        List<RsResourceQuota> myResourceQuota = new ArrayList<>();
+        if (null != resultList && resultList.size() > 0) {
+            for (RsResourceQuota rq : resultList) {
+                RsResourceQuota parent = rq;
+                TjQuota tjQuota = quotaService.findOne(Integer.valueOf(rq.getQuotaId()));
+                Map<String, Object> dataMap = new HashMap<>();
+                if(null != tjQuota) {
+                    String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimension);
+                    Map<String,String> dimensionDicMap = new HashMap<>();
+                    dimensionDicMap = setDimensionMap(dictSql, dimension, dimensionDicMap);
+                    //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
+                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
+                    for(String key : groupDataMap.keySet()){
+                        key = key.toLowerCase();
+                        dataMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, groupDataMap.get(key));
+                    }
+                }
+                Integer num = getNum(dataMap);
+                List<Map<String, Object>> mapList = new ArrayList<>();
+                Map<String, Object> map = new HashMap();
+                map.put("NAME", tjQuota.getName());
+                map.put("TOTAL", num);
+                mapList.add(map);
+                rq.setMapList(mapList);
+                List<RsResourceQuota> children = rq.getChildren();
+                if (null != children && children.size() > 0) {
+                    for (RsResourceQuota child : children) {
+                        RsResourceQuota quota = child;
+                        List<RsResourceQuota> childLists = restructuringResourceQuota(children, dimension, filter, xAxisMap);
+                        rq.setChildren(childLists);
+                        if (null != child.getChildren() && child.getChildren().size() > 0) {
+                            List<RsResourceQuota> childList = restructuringResourceQuota(child.getChildren(), dimension, filter, xAxisMap);
+                            quota.setChildren(childList);
+                        }
+                        children.clear();
+                        children.add(quota);
+                    }
+                }
+                parent.setChildren(children);
+                myResourceQuota.add(parent);
+            }
+        }
+        return myResourceQuota;
+    }
+
+    public ChartDataModel integrateDate(List<RsResourceQuota> resultList) {
+        ChartDataModel chartDataModel = new ChartDataModel();
+        if (null != resultList && resultList.size() > 0) {
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (RsResourceQuota rq : resultList) {
+                list.addAll(rq.getMapList());
+            }
+            chartDataModel.setList(list);
+            List<ChartDataModel> chartDataModelList = new ArrayList<>();
+            List<Map<String, Object>> chilidList = new ArrayList<>();
+            ChartDataModel chartDataModel2 = new ChartDataModel();
+            for (RsResourceQuota rq : resultList) {
+                if (null != rq.getChildren() && rq.getChildren().size() > 0) {
+                    chilidList.addAll(integrateDate(rq.getChildren()).getList());
+//                    chartDataModelList.add(chartDataModel1);
+                }
+            }
+            chartDataModel.setChildren(chartDataModel2);
+        }
+        return chartDataModel;
     }
 
     private Map<String,String> setDimensionMap(String dictSql, String dimension, Map<String,String> dimensionDicMap) {
