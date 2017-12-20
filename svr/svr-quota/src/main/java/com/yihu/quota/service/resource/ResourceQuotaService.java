@@ -16,9 +16,9 @@ public class ResourceQuotaService {
     @Autowired
     private RsResourceQuotaDao rsResourceQuotaDao;
 
-    public List<String> getQuotaRelation(String resourceId, Integer pid) {
-        List<String> list = rsResourceQuotaDao.fingQuotaRelation(resourceId, pid);
-        return list;
+    public Integer getQuotaCount(String resourceId) {
+        Integer count = rsResourceQuotaDao.fingQuotaCount(resourceId);
+        return count;
     }
 
     public List<RsResourceQuota> getChildrenByPid(Integer pid, String resourceId) {
@@ -41,5 +41,15 @@ public class ResourceQuotaService {
             resultList.add(parent);
         }
         return resultList;
+    }
+
+    public List<RsResourceQuota> getChildrenByPidList(List<Integer> pid, String resourceId) {
+        List<RsResourceQuota> children = new ArrayList<>();
+        if (null == pid || pid.size() == 0) {
+            children = rsResourceQuotaDao.getTopParents(resourceId);
+        } else {
+            children = rsResourceQuotaDao.findChildByPidAndResourceIds(resourceId, pid);
+        }
+        return children;
     }
 }
