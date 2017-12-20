@@ -61,6 +61,7 @@ public interface ScheduleClient {
     @RequestMapping(value = ServiceApi.Emergency.ScheduleBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入排班信息")
     boolean createSchedulesBatch(
-            @RequestBody String schedules);
+            @ApiParam(name = "schedules", value = "排班")
+            @RequestParam(value = "schedules") String schedules);
 
 }
