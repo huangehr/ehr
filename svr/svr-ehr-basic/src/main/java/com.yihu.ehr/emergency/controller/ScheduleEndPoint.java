@@ -266,7 +266,7 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
     @ApiOperation("批量导入排班信息")
     public boolean createSchedulesBatch(
             @ApiParam(name = "schedules", value = "排班信息", defaultValue = "")
-            @RequestBody String schedules) throws Exception{
+            @RequestParam(value = "schedules") String schedules) throws Exception{
         List models = objectMapper.readValue(schedules, new TypeReference<List>() {});
         scheduleService.addSchedulesBatch(models);
         return true;
