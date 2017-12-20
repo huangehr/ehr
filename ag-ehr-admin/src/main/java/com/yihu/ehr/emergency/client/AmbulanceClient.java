@@ -41,7 +41,7 @@ public interface AmbulanceClient{
             @RequestParam(value = "page") int page,
             @RequestParam(value = "size") int size);
 
-    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdate, method = RequestMethod.PUT)
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceUpdateStatus, method = RequestMethod.PUT)
     @ApiOperation(value = "更新救护车状态信息")
     Envelop updateStatus(
             @RequestParam(value = "carId") String carId,
@@ -70,10 +70,10 @@ public interface AmbulanceClient{
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence,method = RequestMethod.POST)
     @ApiOperation("获取已存在车牌号、电话号码")
     List idExistence(
-            @ApiParam(name = "type", value = "字段名", defaultValue = "")
+            @ApiParam(name = "type", value = "字段名")
             @RequestParam(value ="type") String type,
-            @ApiParam(name = "values", value = "", defaultValue = "")
-            @RequestBody String values);
+            @ApiParam(name = "values", value = "值")
+            @RequestParam(value ="values") String values);
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulancesBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入救护车")

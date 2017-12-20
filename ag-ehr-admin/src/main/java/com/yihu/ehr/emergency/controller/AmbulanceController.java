@@ -104,9 +104,9 @@ public class AmbulanceController extends BaseController {
     @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在车牌号、电话号码")
     public List idExistence(
-            @ApiParam(name = "type", value = "字段名", defaultValue = "")
+            @ApiParam(name = "type", value = "字段名")
             @RequestParam(value ="type") String type,
-            @ApiParam(name = "values", value = "", defaultValue = "")
+            @ApiParam(name = "values", value = "值")
             @RequestParam(value ="values") String values) throws Exception {
         List vals = ambulanceClient.idExistence(type,values);
         return vals;

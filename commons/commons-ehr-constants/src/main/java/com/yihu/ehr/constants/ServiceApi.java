@@ -404,6 +404,7 @@ public class ServiceApi {
         public static final String Prescription = "/prescription"; //处方笺维护
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
         public static final String ResolveQueue = "/packages/resolveQueue";
+        public static final String QueueSize = "/packages/queueSize";
         public static final String PackageCrypto = "/PackageCrypto";
     }
 
@@ -1215,7 +1216,7 @@ public class ServiceApi {
         public static final String AmbulanceSave = "/ambulance/save";
         public static final String AmbulanceUpdate = "/ambulance/update";
         public static final String AmbulanceDelete = "/ambulance/delete";
-        public static final String AmbulanceIdOrPhoneExistence = "/ambulance/IdOrPhoneExistence";
+        public static final String AmbulanceIdOrPhoneExistence = "/ambulance/idOrPhoneExistence";
         public static final String AmbulancesBatch = "/ambulances/batch";
 
         // 出勤记录

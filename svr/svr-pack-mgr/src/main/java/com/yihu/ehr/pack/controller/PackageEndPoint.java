@@ -45,7 +45,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "PackageEndPoint", description = "档案包服务")
+@Api(value = "PackageEndPoint", description = "档案包", tags = {"档案包服务-档案包"})
 public class PackageEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private SecurityClient securityClient;
@@ -246,7 +246,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = ServiceApi.Packages.ResolveQueue, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Packages.ResolveQueue, method = RequestMethod.POST)
     @ApiOperation(value = "添加解析队列", notes = "手动添加解析队列，临时性方案")
     public void resolveQueue(
             @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", required = true, defaultValue = "archiveStatus=Finished")
@@ -262,6 +262,12 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         for(MPackage mPackage : packageCollection) {
             redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
         }
+    }
+
+    @RequestMapping(value = ServiceApi.Packages.QueueSize, method = RequestMethod.GET)
+    @ApiOperation(value = "获取当前解析队列数")
+    public long queueSize() throws Exception {
+        return redisTemplate.opsForList().size(RedisCollection.PackageList);
     }
 
     @RequestMapping(value = ServiceApi.Packages.LegacyPackages, method = RequestMethod.POST)
