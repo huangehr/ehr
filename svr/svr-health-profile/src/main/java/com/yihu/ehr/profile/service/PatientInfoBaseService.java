@@ -235,7 +235,7 @@ public class PatientInfoBaseService {
               	newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000113") != null ? onlyMap.get("EHR_000113") : "");
         		newKeyObject.put("SignatureDoctor", onlyMap.get("EHR_000106") != null ? onlyMap.get("EHR_000106") : "");
         		newKeyObject.put("DiagnosticName", onlyMap.get("EHR_000112") != null ? onlyMap.get("EHR_000112") : "");
-        		newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000114") != null ? onlyMap.get("EHR_000114") : "")
+        		newKeyObject.put("DiagnosticInstructions", onlyMap.get("EHR_000114") != null ? onlyMap.get("EHR_000114") : "");
             }else if(typeCode.equals("1")) {
                 newKeyObject.put("DiagnosticTypeCode", "住院");
             	newKeyObject.put("DiagnosticDate", onlyMap.get("EHR_000296") != null ? onlyMap.get("EHR_000296") : "");
