@@ -682,7 +682,6 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             return envelop;
         }
         envelop.setDetailModelList((List) resultMap.get("space"));
-        envelop.setObj(resultMap.get("count"));
         envelop.setSuccessFlg(true);
         return envelop;
     }
