@@ -40,6 +40,67 @@ public class ResourceBrowseDao {
     @Autowired
     private SolrQuery solr;
 
+
+    /**
+     * 获取solr索引列表
+     * queryParams可为solr表达式，也可为json例：{"q":"*:*","saas":"*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}
+     * 有join参数做join操作
+     */
+    public Page<String> getSolrIndexs(String queryParams, Integer page, Integer size) throws Exception {
+        String core = ResourceCore.MasterTable;
+        String q = "";
+        String fq = "";
+        String basicFl = "";
+        String dFl = "";
+        String sort = "";
+        if (queryParams != null && queryParams.length() > 0) {
+            if (queryParams.startsWith("{") && queryParams.endsWith("}")) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, String> obj = objectMapper.readValue(queryParams, Map.class);
+                if (obj.containsKey("q")) {
+                    q = obj.get("q");
+                    if (obj.containsKey("saas") && !obj.get("saas").equals("*")) {
+                        q += " AND (" + obj.get("saas") + ")";
+                    }
+                }
+                else{
+                    if (obj.containsKey("saas") && !obj.get("saas").equals("*")) {
+                        q = obj.get("saas");
+                    }
+                }
+                if (obj.containsKey("basicFl")) {
+                    basicFl = obj.get("basicFl");
+                }
+                if (obj.containsKey("dFl")) {
+                    dFl = obj.get("dFl");
+                }
+                if (obj.containsKey("sort")) {
+                    sort = obj.get("sort");
+                }
+                //join操作
+                if (obj.containsKey("join")) {
+                    String join = obj.get("join");
+                    fq = q;
+                    q = "{!join fromIndex=" + subJoinCore + " from=profile_id to=rowkey}" +join;
+                }
+            }
+            else {
+                q = queryParams;
+            }
+        }
+
+        //默认第一页
+        if (page == null) {
+            page = defaultPage;
+        }
+        //默认行数
+        if (size == null) {
+            size = defaultSize;
+        }
+        return hbase.queryIndexBySolr(core, q, sort, fq, basicFl, dFl, page, size);
+    }
+
+
     /**
      * 获取Hbase主表
      * queryParams可为solr表达式，也可为json例：{"q":"*:*","saas":"*","join":"*:*","fl":"","sort":"{\"field1\":\"asc\",\"field2\":\"desc\"}""}

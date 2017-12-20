@@ -102,10 +102,10 @@ public class QuotaReportController extends BaseController {
             Option option = null;
             List<List<Object>> optionData = new ArrayList<>();
             List<String> lineNames = new ArrayList<>();
-            Map<String,Map<String, Object>> lineData = new HashMap<>();
-            Map<String, String> xAxisMap = new HashMap<>();
+            Map<String,Map<String, Object>> lineData = new LinkedHashMap<>();
+            Map<String, String> xAxisMap = new LinkedHashMap<>();
             for(String quotaId:quotaIds){
-                Map<String, Object> dataMap = new HashMap<>();
+                Map<String, Object> dataMap = new LinkedHashMap<>();
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(quotaId));
                 if(tjQuota != null){
                     String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(),dimension);
@@ -132,7 +132,7 @@ public class QuotaReportController extends BaseController {
                         }
                     }
                     //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter);
+                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
                     for(String key : groupDataMap.keySet()){
                         key = key.toLowerCase();
                         dataMap.put(dimensionDicMap.containsKey(key)?dimensionDicMap.get(key):key,groupDataMap.get(key));
@@ -142,7 +142,7 @@ public class QuotaReportController extends BaseController {
                     lineData.put(tjQuota.getCode(), dataMap);
                 }
             }
-            Map<String, Object> quotaMap = new HashMap<>();
+            Map<String, Object> quotaMap = new LinkedHashMap<>();
             ReportOption reportOption = new ReportOption();
 
             int size = 0;
@@ -202,7 +202,7 @@ public class QuotaReportController extends BaseController {
         Envelop envelop = new Envelop();
         try {
             TjQuota tjQuota = quotaService.findOne(id);
-            Map<String, Integer>  resultMap = quotaService.searcherSumByGroupBySql(tjQuota,dimension, filters);
+            Map<String, Integer>  resultMap = quotaService.searcherSumByGroupBySql(tjQuota,dimension, filters,"result","","");
             envelop.setSuccessFlg(true);
             envelop.setObj(resultMap);
             return envelop;
@@ -258,6 +258,9 @@ public class QuotaReportController extends BaseController {
             List<String> radarNames = new ArrayList<>();
             Map<String, Map<String, Object>> radarData = new HashMap<>();
             List<Map<String, Object>> listData = new ArrayList<>();
+            int testNum = 10;
+            List<Map<String, Object>> testListData = new ArrayList<>();
+
             Map<String, String> xAxisMap = new HashMap<>();
             for(String quotaId : quotaIds) {
                 Map<String, Object> dataMap = new HashMap<>();
@@ -267,7 +270,7 @@ public class QuotaReportController extends BaseController {
                     Map<String,String> dimensionDicMap = new HashMap<>();
                     dimensionDicMap = setDimensionMap(dictSql, dimension, dimensionDicMap);
                     //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter);
+                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
                     for(String key : groupDataMap.keySet()){
                         key = key.toLowerCase();
                         dataMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, groupDataMap.get(key));
@@ -281,12 +284,15 @@ public class QuotaReportController extends BaseController {
                 Map<String, Object> map = new HashMap();
                 map.put(tjQuota.getName(), num);
                 listData.add(map);
+                map.put(tjQuota.getName(), testNum + 10);
+                testNum ++;
+                testListData.add(map);
             }
             ReportOption reportOption = new ReportOption();
             Integer[] array = arrayNum.toArray(new Integer[arrayNum.size()]);
             Arrays.sort(array); // 进行升序排序
             polorCount += array[arrayNum.size() - 1];   // 雷达图极坐标
-            option = reportOption.getRadarEchartOption(title, listData, polorCount);
+            option = reportOption.getRadarEchartOption(title, testListData, polorCount);
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
             chartInfoModel.setxAxisMap(xAxisMap);
@@ -326,7 +332,7 @@ public class QuotaReportController extends BaseController {
                     Map<String,String> dimensionDicMap = new HashMap<>();
                     dimensionDicMap = setDimensionMap(dictSql, dimension, dimensionDicMap);
                     //使用分组计算 返回结果实例： groupDataMap -> "4205000000-儿-1": 200 =>group by 三个字段
-                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter);
+                    Map<String, Integer> groupDataMap =  quotaService.searcherSumByGroupBySql(tjQuota, dimension, filter,"result","","");
                     for(String key : groupDataMap.keySet()){
                         key = key.toLowerCase();
                         dataMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, groupDataMap.get(key));

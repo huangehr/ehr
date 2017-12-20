@@ -108,7 +108,7 @@ public class AmbulanceController extends BaseController {
             @RequestParam(value ="type") String type,
             @ApiParam(name = "values", value = "值")
             @RequestParam(value ="values") String values) throws Exception {
-        List vals = ambulanceClient.idExistence(type,values);
+        List vals = ambulanceClient.idExistence(type, values);
         return vals;
     }
 

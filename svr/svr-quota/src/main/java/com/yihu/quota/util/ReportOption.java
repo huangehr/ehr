@@ -314,12 +314,6 @@ public class ReportOption {
         // tooltip
         option.tooltip().trigger(Trigger.item);
 
-        // grid
-        option.grid().x("3%");  // left
-        option.grid().x2("4%"); // right
-        option.grid().y2("3%"); // bottom
-//        option.grid().containLabel(true);
-
         // series
         List<Pie> pieList = new ArrayList<>();
         pieList = getPie(pieList, dataModel);

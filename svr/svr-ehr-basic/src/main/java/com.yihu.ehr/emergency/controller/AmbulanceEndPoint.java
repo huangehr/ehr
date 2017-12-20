@@ -277,7 +277,7 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
             String [] idArr = ids.split(",");
             for (String id : idArr) {
                 Ambulance ambulance = ambulanceService.findById(id);
-                if (ambulance.getStatus() != Ambulance.Status.wait  && ambulance.getStatus() != Ambulance.Status.down) {
+                if (ambulance.getStatus() != Ambulance.Status.wait && ambulance.getStatus() != Ambulance.Status.down) {
                     envelop.setSuccessFlg(false);
                     envelop.setErrorMsg("车辆：" + id + "，处于执勤状态，无法删除");
                     return envelop;

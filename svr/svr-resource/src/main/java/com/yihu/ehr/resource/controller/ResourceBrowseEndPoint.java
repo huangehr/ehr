@@ -338,5 +338,21 @@ public class ResourceBrowseEndPoint extends EnvelopRestEndPoint {
         return re;
     }
 
+    @ApiOperation("获取solr索引列表")
+    @RequestMapping(value = ServiceApi.Resources.SolrIndexData, method = RequestMethod.GET)
+    public Envelop getSolrIndex(@ApiParam(name = "queryParams", defaultValue = "{\"q\":\"*:*\"}") @RequestParam(value = "queryParams", required = false) String queryParams,
+                                @ApiParam("page") @RequestParam(value = "page", required = false) Integer page,
+                                @ApiParam("size") @RequestParam(value = "size", required = false) Integer size,
+                                @ApiParam("version") @RequestParam(value = "version", required = false) String version) throws Exception {
+        Page<String> result = resourceBrowseService.getSolrIndexs(queryParams, page, size);
+        Envelop re = new Envelop();
+        re.setSuccessFlg(true);
+        re.setCurrPage(result.getNumber());
+        re.setPageSize(result.getSize());
+        re.setTotalCount(new Long(result.getTotalElements()).intValue());
+        re.setDetailModelList(result.getContent());
+        return re;
+    }
+
 
 }

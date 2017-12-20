@@ -3,6 +3,7 @@ package com.yihu.ehr.entity.quota;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/6/9.
@@ -28,6 +29,8 @@ public class TjQuota implements Serializable {
     private String remark;
     private Integer quotaType;
     private String metadataCode;
+
+    private List<TjQuota> children;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -191,5 +194,14 @@ public class TjQuota implements Serializable {
 
     public void setMetadataCode(String metadataCode) {
         this.metadataCode = metadataCode;
+    }
+
+    @Transient
+    public List<TjQuota> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<TjQuota> children) {
+        this.children = children;
     }
 }

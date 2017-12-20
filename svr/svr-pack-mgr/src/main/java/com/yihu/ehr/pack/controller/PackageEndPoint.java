@@ -134,7 +134,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             HttpServletRequest request) throws JsonProcessingException {
 
         MKey key = securityClient.getOrgKey(orgCode);
-        Package aPackage = null;
+        Package aPackage;
         if (key == null ||  key.getPrivateKey()==null) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
         }
@@ -296,4 +296,5 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
         //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
+
 }

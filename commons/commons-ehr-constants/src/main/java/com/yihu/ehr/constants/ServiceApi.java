@@ -46,6 +46,7 @@ public class ServiceApi {
         public static final String ResourceMasterStat = "/resources/query/master_stat"; //主表资源统计接口
         public static final String ResourceSubStat = "/resources/query/sub_stat"; //细表资源查询接口
         public static final String ResourceMysql = "/resources/query/mysql"; //mysql资源查询接口
+        public static final String SolrIndexData = "/resources/query/solrIndex"; //solr索引列表查询接口
 
         //资源浏览
         public static final String ResourceBrowseCategories = "/resources/ResourceBrowses/categories";
@@ -75,6 +76,9 @@ public class ServiceApi {
         public static final String GetQuotaChartByQuotaId = "/resourceQuota/getQuotaChartByQuotaId";
         public static final String GetRQNameByResourceId = "/resourceQuota/getRQNameByResourceId";
         public static final String DelRQNameByResourceId = "/resourceQuota/delRQNameByResourceId";
+        public static final String SearchQuotaByResourceId = "/resourceQuota/getQuotaByResourceId";
+        public static final String SearchTreeByResourceId = "/resourceQuota/searchTreeByResourceId";
+        public static final String UpdateResourceQuota = "/resourceQuota/updateResourceQuota";
 
         public static final String ResourceMetadataList = "/resources/rs_metadata";
         public static final String ResourceMetadataBatch = "/resources/rs_metadata/batch";
@@ -1238,6 +1242,37 @@ public class ServiceApi {
         public static final String LocationSave = "/location/save";
         public static final String LocationUpdate = "/location/update";
         public static final String LocationDelete = "/location/delete";
+    }
+
+    public static class FastDFS {
+        public static final String Upload = "/fastDfs/upload";
+        public static final String OldUpload = "/fastDfs/oldUpload";
+        public static final String DeleteById = "/fastDfs/deleteById";
+        public static final String DeleteByPath = "/fastDfs/deleteByPath";
+        public static final String DeleteByObjectId = "/fastDfs/deleteByObjectId";
+        public static final String Modify = "/fastDfs/modify";
+        public static final String OldModify = "/fastDfs/oldModify";
+        public static final String FileInfo = "/fastDfs/fileInfo";
+        public static final String DownloadById = "/fastDfs/downloadById";
+        public static final String DownloadByPath = "/fastDfs/downloadByPath";
+        public static final String DownloadByObjectId = "/fastDfs/downloadByObjectId";
+        public static final String DownloadToLocal = "/fastDfs/downloadToLocal";
+        public static final String GetFilePath = "/fastDfs/getFilePath";
+        public static final String Page = "/fastDfs/page";
+        public static final String Status = "/fastDfs/status";
+        public static final String GetPublicUrl = "/fastDfs/getPublicUrl";
+        public static final String SetPublicUrl = "/fastDfs/setPublicUrl";
+    }
+
+    public static class ElasticSearch {
+        public static final String Mapping = "/elasticSearch/mapping";
+        public static final String Index = "/elasticSearch/index";
+        public static final String Delete = "/elasticSearch/delete";
+        public static final String Update = "/elasticSearch/update";
+        public static final String FindById = "/elasticSearch/{id}";
+        public static final String FindByField = "/elasticSearch/findByField";
+        public static final String Page = "/elasticSearch/page";
+
     }
 
 }

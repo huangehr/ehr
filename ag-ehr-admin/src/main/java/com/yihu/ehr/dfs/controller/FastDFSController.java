@@ -10,8 +10,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * EndPoint - 文件服务
@@ -26,45 +26,36 @@ public class FastDFSController extends EnvelopRestEndPoint {
     private FastDFSClient fastDFSClient;
 
     /**
-     * 上传文件，返回索引ID
-     * @param jsonData
+     * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接
+     * @param file
+     * @param creator
+     * @param objectId
      * @return
-     * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/uploadReturnId", method = RequestMethod.POST)
-    @ApiOperation(value = "上传文件", notes = "返回索引id")
-    public Envelop fileUploadReturnId(
-            @ApiParam(name = "jsonData", value = "文件资源", required = true)
-            @RequestParam(value = "jsonData") String jsonData) {
-        return fastDFSClient.fileUploadReturnId(jsonData);
+    @RequestMapping(value = ServiceApi.FastDFS.Upload, method = RequestMethod.POST)
+    @ApiOperation(value = "文件上传", notes = "返回相关索引信息,以及HttpUrl下载连接")
+    public Envelop upload(
+            @ApiParam(name = "file", value = "文件", required = true)
+            @RequestPart(value = "file") MultipartFile file,
+            @ApiParam(name = "creator", value = "创建者", required = true)
+            @RequestParam(value = "creator") String creator,
+            @ApiParam(name = "objectId", value = "创建者标识", required = true, defaultValue = "EHR")
+            @RequestParam(value = "objectId") String objectId) {
+        return fastDFSClient.upload(file, creator, objectId);
     }
 
     /**
-     * 上传文件，返回URL
+     * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)
      * @param jsonData
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/uploadReturnUrl", method = RequestMethod.POST)
-    @ApiOperation(value = "上传文件", notes = "返回url")
-    public Envelop fileUploadReturnUrl(
+    @RequestMapping(value = ServiceApi.FastDFS.OldUpload, method = RequestMethod.POST)
+    @ApiOperation(value = "上传文件", notes = "返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)")
+    public Envelop upload(
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestParam(value = "jsonData") String jsonData) {
-        return fastDFSClient.fileUploadReturnUrl(jsonData);
-    }
-
-    /**
-     * 上传文件，返回整个HttpUrl
-     * @param jsonData
-     * @return
-     * @throws Exception
-     */
-    @RequestMapping(value = "/fastDfs/uploadReturnHttpUrl", method = RequestMethod.POST)
-    @ApiOperation(value = "上传文件", notes = "返回httpUrl")
-    public Envelop fileUploadReturnHttpUrl(
-            @ApiParam(name = "jsonData", value = "文件资源", required = true)
-            @RequestParam(value = "jsonData") String jsonData) {
-        return fastDFSClient.fileUploadReturnHttpUrl(jsonData);
+        return fastDFSClient.upload(jsonData);
     }
 
     /**
@@ -73,7 +64,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/deleteById", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.FastDFS.DeleteById, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源表对应关系，并且删除fastDfs相对应文件")
     public Envelop deleteById(
             @ApiParam(name = "id", value = "id", required = true)
@@ -87,7 +78,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/deleteByPath", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.FastDFS.DeleteByPath, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源表对应关系，并且删除fastDfs相对应文件")
     public Envelop deleteByPath(
             @ApiParam(name = "path", value = "文件路径", required = true)
@@ -101,7 +92,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/deleteByObjectId", method = RequestMethod.DELETE)
+    @RequestMapping(value = ServiceApi.FastDFS.DeleteByObjectId, method = RequestMethod.DELETE)
     @ApiOperation(value = "删除资源表对应关系，并且删除fastDfs相对应文件")
     public Envelop deleteByObjectId(
             @ApiParam(name = "objectId", value = "对象ID", required = true)
@@ -110,34 +101,35 @@ public class FastDFSController extends EnvelopRestEndPoint {
     }
 
     /**
-     * 修改文件信息
-     * @param jsonData
+     * 修改文件 - 返回相关索引信息,以及HttpUrl下载连接
+     * @param file
+     * @param path
+     * @param _id
+     * @param modifier
      * @return
-     * @throws Exception
-    @RequestMapping(value = "/fastDfs/modify", method = RequestMethod.POST)
-    @ApiOperation(value = "上传文件", notes = "上传文件返回url")
-    public Envelop modify(
-            @ApiParam(name = "jsonData", value = "文件资源")
-            @RequestBody String jsonData) throws Exception {
-        Envelop envelop = new Envelop();
-        Map<String, String> paramMap = toEntity(jsonData.substring(9), Map.class);
-        //FastDFS fileResource = toEntity(jsonData, FastDFS.class);
-        //fileResource.setId(getObjectId(BizObject.FileResource));
-        int size = fastDFSService.modify(paramMap);
-        envelop.setSuccessFlg(true);
-        envelop.setObj(size);
-        return envelop;
-    }
      */
+    @RequestMapping(value = ServiceApi.FastDFS.Modify, method = RequestMethod.POST)
+    @ApiOperation(value = "修改文件", notes = "返回相关索引信息,以及HttpUrl下载连接")
+    public Envelop modify(
+            @ApiParam(name = "file", value = "文件", required = true)
+            @RequestPart(value = "file") MultipartFile file,
+            @ApiParam(name = "path", value = "旧文件路径", required = true)
+            @RequestParam(value = "path") String path,
+            @ApiParam(name = "_id", value = "旧文件唯一索引ID", required = true)
+            @RequestParam(value = "_id") String _id,
+            @ApiParam(name = "modifier", value = "修改者", required = true)
+            @RequestParam(value = "modifier") String modifier) {
+        return fastDFSClient.modify(file, path, _id, modifier);
+    }
 
     /**
-     * 修改文件信息
+     * 修改文件 - 返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)
      * @param jsonData
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/modify", method = RequestMethod.POST)
-    @ApiOperation(value = "修改文件")
+    @RequestMapping(value = ServiceApi.FastDFS.OldModify, method = RequestMethod.POST)
+    @ApiOperation(value = "修改文件", notes = "返回相关索引信息,以及HttpUrl下载连接(兼容旧接口)")
     public Envelop modify(
             @ApiParam(name = "jsonData", value = "文件资源", required = true)
             @RequestParam(value = "jsonData") String jsonData) {
@@ -150,7 +142,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/fileInfo", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.FastDFS.FileInfo, method = RequestMethod.GET)
     @ApiOperation(value = "获取文件信息")
     public Envelop getFileInfo(
             @ApiParam(name = "path", value = "路径", required = true)
@@ -164,7 +156,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/downloadById", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.FastDFS.DownloadById, method = RequestMethod.GET)
     @ApiOperation(value = "下载文件(byId)")
     public Envelop downloadById (
             @ApiParam(name = "id", value = "id", required = true)
@@ -178,12 +170,12 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/downloadByPath", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.FastDFS.DownloadByPath, method = RequestMethod.GET)
     @ApiOperation(value = "下载文件(byPath)")
-    public Envelop downLoadByPath(
+    public Envelop downloadByPath(
             @ApiParam(name = "path", value = "文件路径", required = true)
             @RequestParam(value = "path") String path) {
-       return fastDFSClient.downLoadByPath(path);
+       return fastDFSClient.downloadByPath(path);
     }
 
     /**
@@ -192,12 +184,12 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/downloadByObjectId", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.FastDFS.DownloadByObjectId, method = RequestMethod.GET)
     @ApiOperation(value = "下载文件(byObjectId)")
-    public Envelop downLoadByObjectId(
+    public Envelop downloadByObjectId(
             @ApiParam(name = "objectId", value = "对象ID", required = true)
             @RequestParam(value = "objectId") String objectId) {
-        return fastDFSClient.downLoadByObjectId(objectId);
+        return fastDFSClient.downloadByObjectId(objectId);
     }
 
     /**
@@ -206,7 +198,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/getFilePath", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.FastDFS.GetFilePath, method = RequestMethod.GET)
     @ApiOperation(value = "获取文件路径(byObjectId)")
     public Envelop getFilePath(
             @ApiParam(name = "objectId", value = "对象ID", required = true)
@@ -222,7 +214,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/fastDfs/page", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.FastDFS.Page, method = RequestMethod.GET)
     @ApiOperation(value = "获取结果集")
     public Envelop page(
             @ApiParam(name = "filter", value = "过滤条件")
@@ -238,7 +230,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * 获取服务器状态信息
      * @return
      */
-    @RequestMapping(value = "/fastDfs/status", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.FastDFS.Status, method = RequestMethod.GET)
     @ApiOperation(value = "获取服务器状态信息")
     public Envelop status() {
         return fastDFSClient.status();
@@ -248,7 +240,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * 获取外链地址
      * @return
      */
-    @RequestMapping(value = "/fastDfs/getPublicUrl", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.FastDFS.GetPublicUrl, method = RequestMethod.GET)
     @ApiOperation(value = "获取外链地址")
     public Envelop getPublicUrl() {
         return fastDFSClient.getPublicUrl();
@@ -258,7 +250,7 @@ public class FastDFSController extends EnvelopRestEndPoint {
      * 设置外链地址
      * @return
      */
-    @RequestMapping(value = "/fastDfs/setPublicUrl", method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.FastDFS.SetPublicUrl, method = RequestMethod.POST)
     @ApiOperation(value = "设置外链地址")
     public Envelop setPublicUrl(
             @ApiParam(name = "jsonData", value = "字典项JSON结构")

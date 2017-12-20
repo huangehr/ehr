@@ -6,15 +6,10 @@ logging:
       hibernate: ERROR
 
 server:
-  port: 7777
+  port: ${svr-dfs.server.port}
 
-#management:
-#  port: ${server.port}
-# -- 后续删除的配置 start
-deploy:
-  region: 3502
-
-# -- 后续删除的配置 end
+management:
+  port: ${server.port}
 
 info:
   app:

@@ -67,13 +67,13 @@ public interface AmbulanceClient{
     Envelop findById(
             @RequestParam(value = "id") String id);
 
-    @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence,method = RequestMethod.POST)
+    @RequestMapping(value = ServiceApi.Emergency.AmbulanceIdOrPhoneExistence, method = RequestMethod.POST)
     @ApiOperation("获取已存在车牌号、电话号码")
     List idExistence(
             @ApiParam(name = "type", value = "字段名")
-            @RequestParam(value ="type") String type,
+            @RequestParam(value = "type") String type,
             @ApiParam(name = "values", value = "值")
-            @RequestParam(value ="values") String values);
+            @RequestParam(value = "values") String values);
 
     @RequestMapping(value = ServiceApi.Emergency.AmbulancesBatch, method = RequestMethod.POST)
     @ApiOperation("批量导入救护车")
