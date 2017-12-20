@@ -32,7 +32,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "MessageEndPoint", description = "消息服务")
+@Api(value = "MessageEndPoint", description = "消息服务", tags = {"档案包服务-消息服务"})
 public class MessageEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

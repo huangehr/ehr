@@ -1,6 +1,7 @@
 package com.yihu.ehr.resolve.job;
 
 import com.yihu.ehr.hbase.HBaseAdmin;
+import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -35,8 +36,6 @@ public class HealthCheckTask {
     @Value("${resolve.job.cron-exp}")
     private String jobCronExp;
     @Autowired
-    private Scheduler scheduler;
-    @Autowired
     private DiscoveryClient discoveryClient;
     @Autowired
     private HBaseAdmin hBaseAdmin;
@@ -45,6 +44,7 @@ public class HealthCheckTask {
     @Scheduled(cron = "0 0 0/1 * * ?")
     public void startTask() {
         PackResolveLogger.info("Health Check:" + new Date());
+        Scheduler scheduler = SpringContext.getService(Scheduler.class);
         GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
         //检查集群信息
         try {

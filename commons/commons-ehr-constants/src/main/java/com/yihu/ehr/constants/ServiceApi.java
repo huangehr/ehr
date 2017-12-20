@@ -408,6 +408,7 @@ public class ServiceApi {
         public static final String Prescription = "/prescription"; //处方笺维护
         public static final String ArchiveRelation = "/archiveRelation"; //档案关联
         public static final String ResolveQueue = "/packages/resolveQueue";
+        public static final String QueueSize = "/packages/queueSize";
         public static final String PackageCrypto = "/PackageCrypto";
     }
 
