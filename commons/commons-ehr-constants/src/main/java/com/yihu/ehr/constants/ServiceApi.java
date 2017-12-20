@@ -1219,7 +1219,7 @@ public class ServiceApi {
         public static final String AmbulanceSave = "/ambulance/save";
         public static final String AmbulanceUpdate = "/ambulance/update";
         public static final String AmbulanceDelete = "/ambulance/delete";
-        public static final String AmbulanceIdOrPhoneExistence = "/ambulance/IdOrPhoneExistence";
+        public static final String AmbulanceIdOrPhoneExistence = "/ambulance/idOrPhoneExistence";
         public static final String AmbulancesBatch = "/ambulances/batch";
 
         // 出勤记录

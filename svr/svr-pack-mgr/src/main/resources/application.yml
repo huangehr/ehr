@@ -13,7 +13,7 @@ info:
 logging:
   level:
     com:
-      netflix: DEBUG
+      netflix: INFO
 fast-dfs:
   pool:
     init-size: 5
@@ -120,7 +120,7 @@ fast-dfs:
 spring:
   profiles: prod_fz
   datasource:
-    url: jdbc:mysql://﻿11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
   redis:
