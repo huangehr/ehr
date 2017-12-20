@@ -325,19 +325,12 @@ public class QuotaReportController extends BaseController {
         List<String> quotaIds = Arrays.asList(quotaIdStr.split(","));
         Option option = null;
         MChartInfoModel chartInfoModel = new MChartInfoModel();
-        List<QuotaTreeModel> quotaTreeModels = new ArrayList<>();
-        List<RsResourceQuota> resultList = new ArrayList<>();
         Map<String, String> xAxisMap = new HashMap<>();
         try {
+            Integer quotaCount = resourceQuotaService.getQuotaCount(resourceId);
             // 获取最顶层的资源
-            List<RsResourceQuota> topNodeList = resourceQuotaService.getChildrenByPid(-1, resourceId);
-            if (topNodeList.size() == 0) {
-                return chartInfoModel;
-            }
-            resultList = resourceQuotaService.getTreeByParents(topNodeList, resourceId);
-            List<RsResourceQuota> quotaList = restructuringResourceQuota(resultList, dimension, filter, xAxisMap);
-            ChartDataModel chartDataModel = integrateDate(quotaList);
-
+            List<Integer> quotaId = new ArrayList<>();
+            ChartDataModel chartDataModel = getChartDataModel(quotaId, quotaCount, resourceId, dimension, filter, xAxisMap);
             ReportOption reportOption = new ReportOption();
 
             option = reportOption.getNestedPieEchartOption(title, chartDataModel);
@@ -352,9 +345,16 @@ public class QuotaReportController extends BaseController {
         }
     }
 
-    public List<RsResourceQuota> restructuringResourceQuota(List<RsResourceQuota> resultList, String dimension, String filter, Map<String, String> xAxisMap) throws Exception{
-        List<RsResourceQuota> myResourceQuota = new ArrayList<>();
+    public ChartDataModel getChartDataModel(List<Integer> quotaId, Integer count, String resourceId, String dimension, String filter, Map<String, String> xAxisMap) throws Exception {
+        ChartDataModel chartDataModel = new ChartDataModel();
+        List<RsResourceQuota> resultList = resourceQuotaService.getChildrenByPidList(quotaId, resourceId);
+        quotaId.clear();
+        for (RsResourceQuota rq : resultList) {
+            quotaId.add(Integer.valueOf(rq.getQuotaId()));
+        }
+        count = count - resultList.size();
         if (null != resultList && resultList.size() > 0) {
+            List<Map<String, Object>> list = new ArrayList<>();
             for (RsResourceQuota rq : resultList) {
                 RsResourceQuota parent = rq;
                 TjQuota tjQuota = quotaService.findOne(Integer.valueOf(rq.getQuotaId()));
@@ -368,6 +368,7 @@ public class QuotaReportController extends BaseController {
                     for(String key : groupDataMap.keySet()){
                         key = key.toLowerCase();
                         dataMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key) : key, groupDataMap.get(key));
+                        xAxisMap.put(dimensionDicMap.containsKey(key) ? dimensionDicMap.get(key): key, key);
                     }
                 }
                 Integer num = getNum(dataMap);
@@ -377,45 +378,15 @@ public class QuotaReportController extends BaseController {
                 map.put("TOTAL", num);
                 mapList.add(map);
                 rq.setMapList(mapList);
-                List<RsResourceQuota> children = rq.getChildren();
-                if (null != children && children.size() > 0) {
-                    for (RsResourceQuota child : children) {
-                        RsResourceQuota quota = child;
-                        List<RsResourceQuota> childLists = restructuringResourceQuota(children, dimension, filter, xAxisMap);
-                        rq.setChildren(childLists);
-                        if (null != child.getChildren() && child.getChildren().size() > 0) {
-                            List<RsResourceQuota> childList = restructuringResourceQuota(child.getChildren(), dimension, filter, xAxisMap);
-                            quota.setChildren(childList);
-                        }
-                        children.clear();
-                        children.add(quota);
-                    }
-                }
-                parent.setChildren(children);
-                myResourceQuota.add(parent);
-            }
-        }
-        return myResourceQuota;
-    }
-
-    public ChartDataModel integrateDate(List<RsResourceQuota> resultList) {
-        ChartDataModel chartDataModel = new ChartDataModel();
-        if (null != resultList && resultList.size() > 0) {
-            List<Map<String, Object>> list = new ArrayList<>();
-            for (RsResourceQuota rq : resultList) {
                 list.addAll(rq.getMapList());
             }
             chartDataModel.setList(list);
-            List<ChartDataModel> chartDataModelList = new ArrayList<>();
-            List<Map<String, Object>> chilidList = new ArrayList<>();
-            ChartDataModel chartDataModel2 = new ChartDataModel();
-            for (RsResourceQuota rq : resultList) {
-                if (null != rq.getChildren() && rq.getChildren().size() > 0) {
-                    chilidList.addAll(integrateDate(rq.getChildren()).getList());
-//                    chartDataModelList.add(chartDataModel1);
-                }
+        }
+        if (count > 0) {
+            ChartDataModel chartDataModel2 = getChartDataModel(quotaId, count, resourceId, dimension, filter, xAxisMap);
+            if (null != chartDataModel2) {
+                chartDataModel.setChildren(chartDataModel2);
             }
-            chartDataModel.setChildren(chartDataModel2);
         }
         return chartDataModel;
     }
