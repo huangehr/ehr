@@ -12,6 +12,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -36,15 +37,36 @@ public class HealthCheckTask {
     @Value("${resolve.job.cron-exp}")
     private String jobCronExp;
     @Autowired
+    private Scheduler scheduler;
+    @Autowired
     private DiscoveryClient discoveryClient;
     @Autowired
     private HBaseAdmin hBaseAdmin;
+
+    @PostConstruct
+    private void init() {
+        try {
+            for (int i = 0; i < jobInitSize; i++) {
+                String suffix = UUID.randomUUID().toString().substring(0, 8);
+                JobDetail jobDetail = newJob(PackageResourceJob.class)
+                        .withIdentity("PackResolveJob-" + suffix, "PackResolve")
+                        .build();
+                CronTrigger trigger = newTrigger()
+                        .withIdentity("PackResolveTrigger-" + suffix, "PackResolve")
+                        .withSchedule(CronScheduleBuilder.cronSchedule(jobCronExp))
+                        .startNow()
+                        .build();
+                scheduler.scheduleJob(jobDetail, trigger);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     //@Scheduled(cron = "0/4 * * * * ?")
     @Scheduled(cron = "0 0 0/1 * * ?")
     public void startTask() {
         PackResolveLogger.info("Health Check:" + new Date());
-        Scheduler scheduler = SpringContext.getService(Scheduler.class);
         GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
         //检查集群信息
         try {

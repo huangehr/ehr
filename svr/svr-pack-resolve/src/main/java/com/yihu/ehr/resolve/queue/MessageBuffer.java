@@ -20,8 +20,6 @@ import java.util.Queue;
 @Deprecated
 public class MessageBuffer {
 
-    @Value("${resolve.job.check-time}")
-    private int jobCheckTime;
     private Queue<Object> messages = new LinkedList<>();
     private long timeThreshold = new Date().getTime();
 
@@ -42,7 +40,7 @@ public class MessageBuffer {
             String sorts = "-receiveDate";
             int count = 500;
             long dateCheck = new Date().getTime();
-            if(dateCheck - timeThreshold > jobCheckTime){
+            if(dateCheck - timeThreshold > 60000){
                 timeThreshold = new Date().getTime();
                 packageMgrClient.sendResolveMessage(filters, sorts, count);
             }
