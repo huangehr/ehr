@@ -33,9 +33,9 @@ public class QcDailyReportService extends BaseJpaService<QcDailyReport, XQcDaily
         query.setString("orgCode", orgCode);
         query.setDate("quotaDate", quotaDate);
         List<Object> list = query.list();
-        if(list.size()== 0) {
+        if (list.size() == 0) {
             return null;
-        }else {
+        } else {
             return list;
         }
 
@@ -43,64 +43,64 @@ public class QcDailyReportService extends BaseJpaService<QcDailyReport, XQcDaily
 
 
     //查询昨天
-    public List<Object> getYesterdayData(String orgCode,Date quotaDate) {
+    public List<Object> getYesterdayData(String orgCode, Date quotaDate) {
         Session session = currentSession();
         String hql = "select qc.createDate,qc.realHospitalNum,qc.realOutpatientNum,qc.id " +
-                "from QcDailyReport qc where  qc.orgCode=:orgCode and  TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 1 " ;
+                "from QcDailyReport qc where  qc.orgCode=:orgCode and  TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 1 ";
         Query query = session.createQuery(hql);
         query.setString("orgCode", orgCode);
         query.setDate("quotaDate", quotaDate);
         List<Object> list = query.list();
-        if(list.size()== 0) {
+        if (list.size() == 0) {
             return null;
-        }else {
+        } else {
             return list;
         }
 
     }
 
     //当天的数据
-    public List<Object> getTodayData(String orgCode,Date quotaDate) {
+    public List<Object> getTodayData(String orgCode, Date quotaDate) {
         Session session = currentSession();
         String hql = "select qc.createDate,qc.realHospitalNum,qc.realOutpatientNum,qc.id " +
-                "from QcDailyReport qc where  qc.orgCode=:orgCode and  TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 0 " ;
+                "from QcDailyReport qc where  qc.orgCode=:orgCode and  TO_DAYS(:quotaDate) - TO_DAYS(qc.createDate) = 0 ";
         Query query = session.createQuery(hql);
         query.setString("orgCode", orgCode);
         query.setDate("quotaDate", quotaDate);
         List<Object> list = query.list();
-        if(list.size()== 0) {
+        if (list.size() == 0) {
             return null;
-        }else {
+        } else {
             return list;
         }
 
     }
 
 
-    public int getOrgDailyReportDetailCount(String reportId,String timelyFlag,String archiveType,String storageFlag) {
+    public int getOrgDailyReportDetailCount(String reportId, String timelyFlag, String archiveType, String storageFlag) {
         Session session = currentSession();
         String hql = "select count(1) from QcDailyReportDetail qcd where  qcd.reportId=:reportId";
-        if(StringUtils.isNotEmpty(timelyFlag)){
+        if (StringUtils.isNotEmpty(timelyFlag)) {
             hql = hql + " and qcd.timelyFlag=:timelyFlag";
         }
-        if(StringUtils.isNotEmpty(archiveType)){
+        if (StringUtils.isNotEmpty(archiveType)) {
             hql = hql + " and qcd.archiveType =:archiveType";
         }
-        if(StringUtils.isNotEmpty(storageFlag)){
+        if (StringUtils.isNotEmpty(storageFlag)) {
             hql = hql + " and qcd.storageFlag =:storageFlag";
         }
         Query query = session.createQuery(hql);
         query.setString("reportId", reportId);
-        if(StringUtils.isNotEmpty(archiveType)){
+        if (StringUtils.isNotEmpty(archiveType)) {
             query.setString("archiveType", archiveType);
         }
-        if(StringUtils.isNotEmpty(timelyFlag)){
+        if (StringUtils.isNotEmpty(timelyFlag)) {
             query.setString("timelyFlag", timelyFlag);
         }
-        if(StringUtils.isNotEmpty(storageFlag)){
+        if (StringUtils.isNotEmpty(storageFlag)) {
             query.setString("storageFlag", storageFlag);
         }
-        return ((Long)query.list().get(0)).intValue();
+        return ((Long) query.list().get(0)).intValue();
     }
 
 
