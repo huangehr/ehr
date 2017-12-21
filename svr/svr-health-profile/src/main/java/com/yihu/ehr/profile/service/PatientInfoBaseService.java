@@ -173,25 +173,23 @@ public class PatientInfoBaseService {
                 obj.put("healthProblemName", redisServiceClient.getHealthProblemRedis(healthProblemCode));
                 int visitTimes = 0;
                 int hospitalizationTimes = 0;
-                List<Map<String,Object>> profileList = hpMap.get(healthProblemCode);
-                for(int i = 0; i < profileList.size() ; i++) {
+                List<Map<String, Object>> profileList = hpMap.get(healthProblemCode);
+                for (int i = 0; i < profileList.size(); i++) {
                     Map<String, Object> profile = profileList.get(i);
                     //事件类型
                     String eventType = (String) profile.get(BasisConstant.eventType);
                     String recentEvent = "";
-                    if("0".equals(eventType)) {
-                        recentEvent =  "门诊";
+                    if ("0".equals(eventType)) {
+                        recentEvent = "门诊";
                         visitTimes++;
-                    }
-                    else if("1".equals(eventType)) {
-                        recentEvent =  "住院";
+                    } else if ("1".equals(eventType)) {
+                        recentEvent = "住院";
                         hospitalizationTimes++;
-                    }
-                    else if("2".equals(eventType)) {
-                        recentEvent =  "体检";
+                    } else if ("2".equals(eventType)) {
+                        recentEvent = "体检";
                     }
                     //第一条
-                    if(i == 0) {
+                    if (i == 0) {
                         obj.put("lastVisitDate", profile.get(BasisConstant.eventDate));
                         obj.put("lastVisitOrgCode", profile.get(BasisConstant.orgCode));
                         obj.put("lastVisitOrg", profile.get(BasisConstant.orgName));
@@ -200,8 +198,8 @@ public class PatientInfoBaseService {
                         obj.put("eventType", eventType);
                     }
                     //最后一条
-                    if(i==profileList.size()-1) {
-                        obj.put("ageOfDisease",getAgeOfDisease(profile.get(BasisConstant.eventDate)));
+                    if (i == profileList.size() - 1) {
+                        obj.put("ageOfDisease", getAgeOfDisease(profile.get(BasisConstant.eventDate)));
                     }
                 }
                 obj.put("visitTimes", visitTimes);

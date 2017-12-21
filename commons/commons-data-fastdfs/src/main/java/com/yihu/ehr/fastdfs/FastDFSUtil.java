@@ -327,8 +327,8 @@ public class FastDFSUtil {
         TrackerGroup trackerGroup = ClientGlobal.getG_tracker_group();
         int totalServer = trackerGroup.tracker_servers.length;
         Map<String, Object> finalMap = new HashMap<>(2);
+        Map<String, Long> finalGroupCount = new HashMap<>();
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>(totalServer + 1);
-        Map<String, Long> groupCount = new HashMap<>();
         long totalMb  = 0;
         long freeMb = 0;
         TrackerClient trackerClient = new TrackerClient();
@@ -341,6 +341,7 @@ public class FastDFSUtil {
                 long singleTotalMb = 0;
                 long singleFreeMb = 0;
                 resultMap.put("server", trackerServer.getInetSocketAddress());
+                Map<String, Long> groupCount = new HashMap<>();
                 for (StructGroupStat structGroupStat : structGroupStats) {
                     String groupName = structGroupStat.getGroupName();
                     StructStorageStat [] structStorageStats = trackerClient.listStorages(trackerServer, groupName);
@@ -364,6 +365,19 @@ public class FastDFSUtil {
                 trackerServer.close();
                 resultMap.put("total", singleTotalMb / 1024);
                 resultMap.put("free", singleFreeMb / 1024);
+                resultMap.put("fileCount", groupCount);
+                for(String key : groupCount.keySet()) {
+                    if(finalGroupCount.containsKey(key)) {
+                        for(String key2 : finalGroupCount.keySet()) {
+                            if(key2.equals(key)) {
+                                long count = finalGroupCount.get(key2) + groupCount.get(key2);
+                                finalGroupCount.put(key2, count);
+                            }
+                        }
+                    }else {
+                        finalGroupCount.put(key, groupCount.get(key));
+                    }
+                }
                 resultList.add(resultMap);
                 totalMb += singleTotalMb;
                 freeMb += singleFreeMb;
@@ -378,9 +392,9 @@ public class FastDFSUtil {
         resultMap.put("server", "all");
         resultMap.put("total", totalMb/1024);
         resultMap.put("free", freeMb/1024);
+        resultMap.put("fileCount", finalGroupCount);
         resultList.add(resultMap);
         finalMap.put("space", resultList);
-        finalMap.put("count", groupCount);
         return finalMap;
     }
 
