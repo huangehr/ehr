@@ -41,7 +41,7 @@ public class ProfileDiseaseEndPoint extends EnvelopRestEndPoint{
     public List<Map<String, Object>> HealthProblemSub(
             @ApiParam(name = "last_visit_record", value = "最后一次诊断记录", required = true, defaultValue = "49229004X_000406450000000UX0_1485608518000")
             @RequestParam(value = "last_visit_record") String last_visit_record,
-            @ApiParam(name = "event_type", value = "资源编码", required = true, defaultValue = "0")
+            @ApiParam(name = "event_type", value = "事件类型", required = true, defaultValue = "0")
             @RequestParam(value = "event_type") String event_type) {
         return patient.getHealthProblemSub(last_visit_record, event_type);
     }
