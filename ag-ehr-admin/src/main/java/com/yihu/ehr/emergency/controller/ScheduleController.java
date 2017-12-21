@@ -64,11 +64,19 @@ public class ScheduleController extends BaseController {
     }
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleUpdate, method = RequestMethod.PUT)
-    @ApiOperation("更新单条记录，只允许更新时间和状态")
+    @ApiOperation("更新单条记录")
     public Envelop update(
             @ApiParam(name = "schedule", value = "排班")
             @RequestParam(value = "schedule") String schedule){
         return scheduleClient.update(schedule);
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleBathUpdate, method = RequestMethod.PUT)
+    @ApiOperation("更新多条记录")
+    public Envelop bathUpdate(
+            @ApiParam(name = "schedules", value = "排班")
+            @RequestParam(value = "schedules") String schedules){
+        return scheduleClient.bathUpdate(schedules);
     }
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleBatch, method = RequestMethod.POST)

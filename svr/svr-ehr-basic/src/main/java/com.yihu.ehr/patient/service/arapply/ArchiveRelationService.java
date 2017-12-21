@@ -179,31 +179,5 @@ public class ArchiveRelationService  extends BaseJpaService<ArchiveRelation, XAr
         return result;
     }
 
-    //统计最近七天采集总数
-    public List<Object> getCollectTocalCount() {
-        Session session = currentSession();
-        String sql = "SELECT count(1),date_format(create_date, '%Y-%c-%d') as date FROM archive_relation " +
-                " where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(create_date) GROUP BY date_format(create_date, '%Y-%c-%d')";
-        SQLQuery query = session.createSQLQuery(sql);
-        return query.list();
-    }
 
-    //统计最近七天采集门诊、住院各总数
-    public List<Object> getCollectEventTypeCount(int eventType) {
-        Session session = currentSession();
-        String sql = "SELECT count(1),date_format(event_date, '%Y-%c-%d') as date,event_type FROM archive_relation " +
-                "where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(event_date) and  event_type=:eventType  GROUP BY date_format(event_date, '%Y-%c-%d'),event_type;";
-        SQLQuery query = session.createSQLQuery(sql);
-        query.setParameter("eventType",eventType);
-        return query.list();
-    }
-
-    //统计今天门诊、住院各总数
-    public List<Object> getCollectTodayEventTypeCount() {
-        Session session = currentSession();
-        String sql = "SELECT count(1),event_type FROM archive_relation " +
-                "where DATE_SUB(CURDATE(), INTERVAL 1 DAY) < date(event_date) GROUP BY event_type";
-        SQLQuery query = session.createSQLQuery(sql);
-        return query.list();
-    }
 }

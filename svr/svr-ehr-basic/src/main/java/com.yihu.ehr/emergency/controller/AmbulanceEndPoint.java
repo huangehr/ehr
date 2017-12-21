@@ -317,7 +317,7 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "type", value = "字段名")
             @RequestParam(value ="type") String type,
             @ApiParam(name = "values", value = "车牌号、电话号码")
-            @RequestParam String values) throws Exception {
+            @RequestParam(value ="values") String values) throws Exception {
         List existPhones = ambulanceService.idExist(type, toEntity(values, String[].class));
         return existPhones;
     }

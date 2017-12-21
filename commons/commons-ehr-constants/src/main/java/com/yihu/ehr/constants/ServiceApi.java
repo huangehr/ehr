@@ -1248,6 +1248,7 @@ public class ServiceApi {
         public static final String ScheduleLevel = "/schedule/level";
         public static final String ScheduleSave = "/schedule/save";
         public static final String ScheduleUpdate = "/schedule/update";
+        public static final String ScheduleBathUpdate = "/schedule/bathUpdate";
         public static final String ScheduleBatch = "/schedules/batch";
 
         // 待命地点

@@ -33,30 +33,4 @@ public class SchedulerConfig {
         return bean;
     }
 
-    @Value("${resolve.job.init-size}")
-    private int jobInitSize;
-    @Value("${resolve.job.cron-exp}")
-    private String jobCronExp;
-    @Autowired
-    private Scheduler scheduler;
-
-    @PostConstruct
-    private void init() {
-        try {
-            for (int i = 0; i < jobInitSize; i++) {
-                String suffix = UUID.randomUUID().toString().substring(0, 8);
-                JobDetail jobDetail = newJob(PackageResourceJob.class)
-                        .withIdentity("PackResolveJob-" + suffix, "PackResolve")
-                        .build();
-                CronTrigger trigger = newTrigger()
-                        .withIdentity("PackResolveTrigger-" + suffix, "PackResolve")
-                        .withSchedule(CronScheduleBuilder.cronSchedule(jobCronExp))
-                        .startNow()
-                        .build();
-                scheduler.scheduleJob(jobDetail, trigger);
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
