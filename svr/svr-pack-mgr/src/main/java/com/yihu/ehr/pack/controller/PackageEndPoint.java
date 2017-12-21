@@ -140,11 +140,12 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         }
         try {
             String password = RSA.decrypt(packageCrypto, RSA.genPrivateKey(key.getPrivateKey()));
-             aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
+            aPackage = packService.receive(pack.getInputStream(), password, md5, orgCode, getClientId(request));
         } catch (Exception ex) {
             throw new ApiException(HttpStatus.FORBIDDEN, "javax.crypto.BadPaddingException." + ex.getMessage());
         }
-        redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(aPackage));
+        MPackage mPackage = convertToModel(aPackage, MPackage.class);
+        redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
         //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 
@@ -155,7 +156,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(required = false) String id) throws Exception {
         String re = "";
         Package aPackage = packService.acquirePackage(id);
-        if(aPackage!=null) {
+        if(aPackage != null) {
             re = objectMapper.writeValueAsString(aPackage);
         }
         return re;
@@ -247,21 +248,27 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Packages.ResolveQueue, method = RequestMethod.POST)
-    @ApiOperation(value = "添加解析队列", notes = "手动添加解析队列，临时性方案")
-    public void resolveQueue(
-            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", required = true, defaultValue = "archiveStatus=Finished")
-            @RequestParam(value = "filters") String filters,
-            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "+receiveDate")
+    @ApiOperation(value = "添加解析队列", notes = "队列中无消息的时候才可添加状态为Received或者Acquired的数据")
+    public String resolveQueue(
+            @ApiParam(name = "status", value = "(Received || Acquired || Failed || Finished)", required = true)
+            @RequestParam(value = "status") String status,
+            @ApiParam(name = "sorts", value = "排序(建议使用默认值，以解析较早之前的数据)", defaultValue = "+receiveDate")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "page", value = "页码", required = true, defaultValue = "1")
-            @RequestParam(value = "page") int page,
-            @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "500")
-            @RequestParam(value = "size") int size) throws Exception {
-        List<Package> packageList = packService.search(null, filters, sorts, page, size);
-        Collection<MPackage> packageCollection = convertToModels(packageList, new ArrayList<>(packageList.size()), MPackage.class, null);
-        for(MPackage mPackage : packageCollection) {
+            @ApiParam(name = "count", value = "数量", required = true, defaultValue = "500")
+            @RequestParam(value = "count") int count) throws Exception {
+        if(status.trim().equals("Received") || status.trim().equals("Acquired")) {
+            if(redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
+                return "添加失败，队列中存在消息！";
+            }
+        }
+        List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
+        for(Package rPackage : packageList) {
+            rPackage.setArchiveStatus(ArchiveStatus.Received);
+            packService.save(rPackage);
+            MPackage mPackage = convertToModel(rPackage, MPackage.class);
             redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
         }
+        return "添加成功！";
     }
 
     @RequestMapping(value = ServiceApi.Packages.QueueSize, method = RequestMethod.GET)
