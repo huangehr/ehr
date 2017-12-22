@@ -11,19 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 机构类型管理 Entity
+ * 卫生机构类别 Entity
  *
  * @author 张进军
  * @date 2017/12/21 12:00
  */
 @Entity
-@Table(name = "org_type_category")
+@Table(name = "org_health_category")
 public class OrgTypeCategory extends BaseIdentityEntity {
 
     public Integer pid; // 父级主键
     public Integer topPid; // 顶级主键
-    public String code; // 机构类型编码
-    public String name; // 机构类型名称
+    public String code; // 卫生机构类别编码
+    public String name; // 卫生机构类别名称
     public String remark; // 备注
 
     // 临时字段
