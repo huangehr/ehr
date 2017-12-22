@@ -9,18 +9,18 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 机构类型管理
+ * 卫生机构类别
  *
  * @author 张进军
  * @date 2017/12/21 12:00
  */
-public class MOrgTypeCategory implements Serializable {
+public class MOrgHealthCategory implements Serializable {
 
     public Integer id; // 主键
     public Integer pid; // 父级主键
     public Integer topPid; // 顶级主键
-    public String code; // 机构类型编码
-    public String name; // 机构类型名称
+    public String code; // 卫生机构类别编码
+    public String name; // 卫生机构类别名称
     public String remark; // 备注
     public Date createDate; // 创建时间
     public String creator; // 创建者

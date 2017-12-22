@@ -1180,16 +1180,16 @@ public class ServiceApi {
         public static final String GetOrgDeptInfoList = "/org/userId/getOrgDeptInfoList";
         public static final String getseaOrgsByOrgCode="/organizations/seaOrgsByOrgCode";
 
-        // 机构类型管理
-        public static class TypeCategory {
-            public static final String Prefix = "/org/typeCategory/";
-            public static final String GetById = "/org/typeCategory/{id}";
-            public static final String FindAll = "/org/typeCategory/findAll";
-            public static final String Search = "/org/typeCategory/search";
-            public static final String Save = "/org/typeCategory/save";
-            public static final String Delete = "/org/typeCategory/delete";
-            public static final String IsUniqueCode = "/org/typeCategory/isUniqueCode";
-            public static final String IsUniqueName = "/org/typeCategory/isUniqueName";
+        // 卫生机构类别
+        public static class HealthCategory {
+            public static final String Prefix = "/org/healthCategory/";
+            public static final String GetById = "/org/healthCategory/{id}";
+            public static final String FindAll = "/org/healthCategory/findAll";
+            public static final String Search = "/org/healthCategory/search";
+            public static final String Save = "/org/healthCategory/save";
+            public static final String Delete = "/org/healthCategory/delete";
+            public static final String IsUniqueCode = "/org/healthCategory/isUniqueCode";
+            public static final String IsUniqueName = "/org/healthCategory/isUniqueName";
         }
 
     }

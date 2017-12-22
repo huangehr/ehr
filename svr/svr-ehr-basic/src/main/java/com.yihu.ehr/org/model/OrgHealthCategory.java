@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "org_health_category")
-public class OrgTypeCategory extends BaseIdentityEntity {
+public class OrgHealthCategory extends BaseIdentityEntity {
 
     public Integer pid; // 父级主键
     public Integer topPid; // 顶级主键
@@ -28,7 +28,7 @@ public class OrgTypeCategory extends BaseIdentityEntity {
 
     // 临时字段
     private String text; // 名称，树形下拉框使用
-    private List<OrgTypeCategory> children = new ArrayList<>(); // 子节点
+    private List<OrgHealthCategory> children = new ArrayList<>(); // 子节点
 
     @Column(name = "pid")
     public Integer getPid() {
@@ -85,11 +85,11 @@ public class OrgTypeCategory extends BaseIdentityEntity {
     }
 
     @Transient
-    public List<OrgTypeCategory> getChildren() {
+    public List<OrgHealthCategory> getChildren() {
         return children;
     }
 
-    public void setChildren(List<OrgTypeCategory> children) {
+    public void setChildren(List<OrgHealthCategory> children) {
         this.children = children;
     }
 }
