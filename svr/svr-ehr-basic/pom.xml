@@ -90,6 +90,42 @@
             <artifactId>spring-boot-actuator</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
+
+        <!-- App -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+
+        <!-- File Resource -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>happy.fish</groupId>
+            <artifactId>fastDFS</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+
+        <!-- Org -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.4</version>
+        </dependency>
+
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-ehr-constants</artifactId>
@@ -125,52 +161,17 @@
             <artifactId>commons-web</artifactId>
             <scope>compile</scope>
         </dependency>
-
-        <!-- App -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-
-        <!-- File Resource -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-
-
         <dependency>
             <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-fastdfs</artifactId>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
-            <groupId>happy.fish</groupId>
-            <artifactId>fastDFS</artifactId>
-            <scope>${dependency.scope}</scope>
-        </dependency>
-
-        <!-- Org -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.4</version>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-solr</artifactId>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>
-
-
-
 
 </project>
