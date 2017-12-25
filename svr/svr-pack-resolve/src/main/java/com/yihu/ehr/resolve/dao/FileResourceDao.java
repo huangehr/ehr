@@ -25,7 +25,7 @@ public class FileResourceDao {
     private HBaseDao hbaseDao;
 
     public void save(ResourceBucket resBucket) throws Exception {
-        if (resBucket.getProfileType() == ProfileType.File){
+        if (resBucket.getProfileType() == ProfileType.File && !resBucket.isReUploadFlg()){
             TableBundle bundle = new TableBundle();
             Map<String, CdaDocument> cdaDocuments = resBucket.getCdaDocuments();
             for(String rowkey : cdaDocuments.keySet()) {

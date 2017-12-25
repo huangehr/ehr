@@ -25,26 +25,27 @@ public class RelationDao {
     private ObjectMapper objectMapper;
 
     public void save(ResourceBucket resourceBucket) throws Exception {
-        ArchiveRelation relation = new ArchiveRelation();
-        relation.setName(resourceBucket.getPatientName());
-        relation.setOrgCode(resourceBucket.getOrgCode());
-        relation.setOrgName(resourceBucket.getOrgName());
-        relation.setCardType(resourceBucket.getCardType());
-        relation.setCardNo(resourceBucket.getCardId());
-        relation.setEventNo(resourceBucket.getEventNo());
-        relation.setEventDate(resourceBucket.getEventDate());
-        relation.setEventType(StringUtils.isEmpty(resourceBucket.getEventType()) ? "" : String.valueOf(resourceBucket.getEventType().getType()));
-        relation.setProfileId(resourceBucket.getId());
-        relation.setCreateDate(new Date());
-        String idCardNo = resourceBucket.getDemographicId();
-        if (!StringUtils.isEmpty(idCardNo)) {
-            relation.setIdCardNo(idCardNo);
-            relation.setStatus("1");
-            relation.setRelationDate(new Date());
-        } else {
-            relation.setStatus("0");
+        if(!resourceBucket.isReUploadFlg()) {
+            ArchiveRelation relation = new ArchiveRelation();
+            relation.setName(resourceBucket.getPatientName());
+            relation.setOrgCode(resourceBucket.getOrgCode());
+            relation.setOrgName(resourceBucket.getOrgName());
+            relation.setCardType(resourceBucket.getCardType());
+            relation.setCardNo(resourceBucket.getCardId());
+            relation.setEventNo(resourceBucket.getEventNo());
+            relation.setEventDate(resourceBucket.getEventDate());
+            relation.setEventType(StringUtils.isEmpty(resourceBucket.getEventType()) ? "" : String.valueOf(resourceBucket.getEventType().getType()));
+            relation.setProfileId(resourceBucket.getId());
+            relation.setCreateDate(new Date());
+            String idCardNo = resourceBucket.getDemographicId();
+            if (!StringUtils.isEmpty(idCardNo)) {
+                relation.setIdCardNo(idCardNo);
+                relation.setStatus("1");
+                relation.setRelationDate(new Date());
+            } else {
+                relation.setStatus("0");
+            }
+            archiveClient.archiveRelation(objectMapper.writeValueAsString(relation));
         }
-        archiveClient.archiveRelation(objectMapper.writeValueAsString(relation));
     }
-
 }

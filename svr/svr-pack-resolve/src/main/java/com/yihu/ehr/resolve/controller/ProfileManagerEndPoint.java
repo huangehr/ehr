@@ -22,13 +22,11 @@ import java.util.Map;
 public class ProfileManagerEndPoint {
 
     @Autowired
-    PrescriptionService prescriptionService;
-
+    private PrescriptionService prescriptionService;
     @Autowired
-    ArchiveRelationService archiveRelationService;
-
+    private ArchiveRelationService archiveRelationService;
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @ApiOperation(value = "处方笺信息维护")
     @RequestMapping(value = ServiceApi.Packages.Prescription, method = RequestMethod.POST)

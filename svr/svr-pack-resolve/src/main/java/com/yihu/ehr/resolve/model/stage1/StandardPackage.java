@@ -57,6 +57,8 @@ public class StandardPackage {
     private String clientId;
     //ICD10诊断列表
     private List<String> diagnosisList;
+    //重传标识
+    private boolean reUploadFlg;
     //数据集合
     protected Map<String, PackageDataSet> dataSets = new TreeMap<>();
 
@@ -249,6 +251,14 @@ public class StandardPackage {
     }
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public boolean isReUploadFlg() {
+        return reUploadFlg;
+    }
+
+    public void setReUploadFlg(boolean reUploadFlg) {
+        this.reUploadFlg = reUploadFlg;
     }
 
     /**

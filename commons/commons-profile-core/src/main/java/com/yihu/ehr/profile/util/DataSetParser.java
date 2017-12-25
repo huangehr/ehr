@@ -2,6 +2,7 @@ package com.yihu.ehr.profile.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -38,23 +39,24 @@ public class DataSetParser {
         String version = jsonNode.get("inner_version") == null ? "" : jsonNode.get("inner_version").asText();
         String createTime = jsonNode.get("create_date") == null ? "" : jsonNode.get("create_date").asText();
         String eventTime = jsonNode.path("event_time") == null ? "" : jsonNode.path("event_time").asText();
+        boolean reUploadFlg = jsonNode.path("reUploadFlg") == null ? false : jsonNode.path("reUploadFlg").asBoolean();
 
         //验证档案基础数据的完整性，当其中某字段为空的情况下直接提示档案包信息缺失。
-        String errorMsg = "";
+        StringBuilder errorMsg = new StringBuilder();
         if(StringUtils.isEmpty(code)){
-            errorMsg = errorMsg + "dataSetCode is null;";
+            errorMsg.append("dataSetCode is null;");
         }
         if(StringUtils.isEmpty(patientId)){
-            errorMsg = errorMsg + "patientId is null;";
+            errorMsg.append("patientId is null;");
         }
-        if(StringUtils.isEmpty(eventNo)  && !"HDSA00_01".equals(code)){
-            errorMsg = errorMsg + "eventNo is null;";
+        if(StringUtils.isEmpty(eventNo) && !"HDSA00_01".equals(code)){
+            errorMsg.append("eventNo is null;");
         }
         if(StringUtils.isEmpty(orgCode)){
-            errorMsg = errorMsg + "orgCode is null;";
+            errorMsg.append("orgCode is null;");
         }
-        if(!StringUtils.isEmpty(errorMsg)){
-            throw new RuntimeException(errorMsg);
+        if(!StringUtils.isEmpty(errorMsg.toString())){
+            throw new RuntimeException(errorMsg.toString());
         }
 
         try {
@@ -63,8 +65,9 @@ public class DataSetParser {
             dataSet.setCdaVersion(version);
             dataSet.setCode(code);
             dataSet.setOrgCode(orgCode);
-            dataSet.setEventTime(DateTimeUtil.simpleDateParse(eventTime));
+            dataSet.setEventTime(DateUtil.strToDate(eventTime));
             dataSet.setCreateTime(DateTimeUtil.simpleDateParse(createTime));
+            dataSet.setReUploadFlg(reUploadFlg);
             JsonNode dataNode = jsonNode.get("data");
             for (int i = 0; i < dataNode.size(); i ++) {
                 MetaDataRecord record = new MetaDataRecord();
@@ -73,7 +76,8 @@ public class DataSetParser {
                 while (iterator.hasNext()) {
                     Map.Entry<String, JsonNode> item = iterator.next();
                     String metaDataKey = item.getKey();
-                    if (metaDataKey.equals("EVENT_NO")) continue; //metaData.equals("PATIENT_ID") ||
+                    //if (metaDataKey.equals("EVENT_NO")) continue;
+                    // metaData.equals("PATIENT_ID") ||
                     /*String[] qualifiedMetaData = translateMetaData(
                             version, dataSetCode, metaData,
                             item.getValue().asText().equals("null") ? "" : item.getValue().asText(),
