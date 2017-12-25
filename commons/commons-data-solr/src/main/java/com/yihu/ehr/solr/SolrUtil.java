@@ -91,7 +91,7 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Query Time:" + qtime);
+//        System.out.print("Solr Query Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
         pool.close(conn); //释放连接
