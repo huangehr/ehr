@@ -52,7 +52,8 @@ public interface FileResourceClient {
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/image_view", method = RequestMethod.GET)
     @ApiOperation(value = "查看图片")
-    String imageView(@RequestParam(value = "storagePath") String storagePath);
+    String imageView(
+            @RequestParam(value = "storagePath") String storagePath);
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_path", method = RequestMethod.GET)
     @ApiOperation(value = "获取文件路径")
@@ -66,10 +67,12 @@ public interface FileResourceClient {
 
     @ApiOperation(value = "根据文件的id，获取文件的真实访问路径")
     @RequestMapping(value = ApiVersion.Version1_0 + "/file/getRealPathById", method = RequestMethod.GET)
-    String getRealPathById(@RequestParam(value = "fileId") String fileId);
+    String getRealPathById(
+            @RequestParam(value = "fileId") String fileId);
 
     @ApiOperation(value = "根据文件的存储路径，获取文件的真实访问路径")
     @RequestMapping(value = ApiVersion.Version1_0 + "/file/getRealPathByStoragePath", method = RequestMethod.GET)
-    String getRealPathByStoragePath(@RequestParam(value = "storagePath") String storagePath);
+    String getRealPathByStoragePath(
+            @RequestParam(value = "storagePath") String storagePath);
 
 }
