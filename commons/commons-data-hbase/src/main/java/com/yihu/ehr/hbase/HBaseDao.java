@@ -189,6 +189,8 @@ public class HBaseDao extends AbstractHBaseClient {
     public String[] findRowKeys(String tableName, String rowKeyRegEx) throws Exception {
         Scan scan = new Scan();
         scan.addFamily(Bytes.toBytes("basic"));
+        scan.setStartRow(rowKeyRegEx.substring(1, rowKeyRegEx.length()).getBytes());
+        //scan.setStopRow(rowKeyRegEx.substring(1, rowKeyRegEx.length()).getBytes());
         scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new RegexStringComparator(rowKeyRegEx)));
         List<String> list = new LinkedList<>();
         hbaseTemplate.find(tableName, scan, new RowMapper<Void>() {
@@ -296,11 +298,46 @@ public class HBaseDao extends AbstractHBaseClient {
     }
 
     /**
+     * 通过表名和rowKey获取指定列族下的值
+     * @param tableName 表名
+     * @param rowKey rowKey
+     * @param familyName 列族
+     * @return
+     */
+    public Map<String, String> get(String tableName, String rowKey, String familyName) {
+        return hbaseTemplate.get(tableName, rowKey, familyName, new RowMapper<Map<String, String>>(){
+            @Override
+            public Map<String, String> mapRow(Result result, int rowNum) throws Exception {
+                /**
+                 List<Cell> ceList = result.listCells();
+                 String res = "";
+                 if(ceList != null && ceList.size() > 0){
+                 for(Cell cell:ceList){
+                 res = Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
+                 }
+                 }
+                 return res;
+                 */
+                Map<String, String> map = new HashMap<>();
+                NavigableMap<byte[], byte[]> navigableMaps = result.getFamilyMap(familyName.getBytes());
+                if(null != navigableMaps) {
+                    for (byte[] key : navigableMaps.keySet()) {
+                        String keys = new String(key);
+                        String values = new String(navigableMaps.get(key));
+                        map.put(keys, values);
+                    }
+                }
+                return map;
+            }
+        });
+    }
+
+    /**
      * 通过表名和rowKey获取指定列族下的列名的值
      * @param tableName 表名
      * @param rowKey rowKey
      * @param familyName 列族
-     * @param qualifier 列表
+     * @param qualifier 列名
      * @return
      */
     public String get(String tableName, String rowKey, String familyName, String qualifier) {

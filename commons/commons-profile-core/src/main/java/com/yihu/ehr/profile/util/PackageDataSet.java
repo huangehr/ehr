@@ -27,6 +27,7 @@ public class PackageDataSet {
     protected Date eventTime;
     protected Date createTime;
     protected boolean isMultiRecord = false;
+    protected boolean reUploadFlg = false;
     protected Map<String, MetaDataRecord> records = new TreeMap<>();
 
 
@@ -98,6 +99,14 @@ public class PackageDataSet {
     }
     public void setMultiRecord(boolean multiRecord) {
         isMultiRecord = multiRecord;
+    }
+
+    public boolean isReUploadFlg() {
+        return reUploadFlg;
+    }
+
+    public void setReUploadFlg(boolean reUploadFlg) {
+        this.reUploadFlg = reUploadFlg;
     }
 
     public void addRecord(String recordKey, MetaDataRecord record) {

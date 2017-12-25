@@ -44,7 +44,6 @@ public class FailTolerantTask {
                 for(Package pack: packageList) {
                     String packStr = objectMapper.writeValueAsString(pack);
                     MPackage mPackage = objectMapper.readValue(packStr, MPackage.class);
-                    packageService.save(pack);
                     redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
                 }
             }
