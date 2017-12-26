@@ -1243,6 +1243,7 @@ public class ServiceApi {
         public static final String AttendanceList = "/attendance/list";
         public static final String AttendanceDelete = "/attendance/delete";
         public static final String AttendanceDetail= "/attendance/detail";
+        public static final String AttendanceAnalysis= "/attendance/analysis";
         // 排班
         public static final String ScheduleList = "/schedule/list";
         public static final String ScheduleLevel = "/schedule/level";

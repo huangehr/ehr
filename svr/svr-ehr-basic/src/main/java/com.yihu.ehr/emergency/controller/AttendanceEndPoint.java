@@ -7,9 +7,11 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.emergency.service.AmbulanceService;
 import com.yihu.ehr.emergency.service.AttendanceService;
+import com.yihu.ehr.emergency.service.LocationService;
 import com.yihu.ehr.emergency.service.ScheduleService;
 import com.yihu.ehr.entity.emergency.Ambulance;
 import com.yihu.ehr.entity.emergency.Attendance;
+import com.yihu.ehr.entity.emergency.Location;
 import com.yihu.ehr.entity.emergency.Schedule;
 import com.yihu.ehr.user.service.UserManager;
 import com.yihu.ehr.util.rest.Envelop;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -37,6 +40,8 @@ public class AttendanceEndPoint extends EnvelopRestEndPoint {
     private AttendanceService attendanceService;
     @Autowired
     private AmbulanceService ambulanceService;
+    @Autowired
+    private LocationService locationService;
     @Autowired
     private ScheduleService scheduleService;
     @Autowired
@@ -254,5 +259,203 @@ public class AttendanceEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg(e.getMessage());
         }
         return envelop;
+    }
+
+    @RequestMapping(value = "/attendance/queryChart1", method = RequestMethod.GET)
+    @ApiOperation("出车次数分析")
+    public Envelop queryChart1(
+            @ApiParam(name = "flag", value = "查询类型月、季、年（1,2,3）")
+             @RequestParam(value = "flag", required = false) String flag) {
+        Envelop envelop = new Envelop();
+        try {
+            Map<String,Object> map = new HashMap<String,Object>();
+            map.put("chart1",attendanceService.queryChart1(flag));
+            envelop.setSuccessFlg(true);
+            envelop.setObj(map);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = "/attendance/queryChart3", method = RequestMethod.GET)
+    @ApiOperation("出勤地点热力图")
+    public Envelop queryChart3() {
+        Envelop envelop = new Envelop();
+        try {
+            Map<String,Object> map = new HashMap<String,Object>();
+            map.put("chart3",attendanceService.queryChart3());
+            envelop.setSuccessFlg(true);
+            envelop.setObj(map);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceAnalysis, method = RequestMethod.GET)
+    @ApiOperation("出勤记录分析")
+    public Envelop analysis() {
+        Envelop envelop = new Envelop();
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Map<String,Object> map = new HashMap<String,Object>();
+            List<Location> locations = locationService.search("");
+            List<Map<String,Object>> list =  attendanceService.queryChart5();
+            List<Map<String,Object>> list2 = new ArrayList<Map<String,Object>>();
+            List<Map<String,Object>> list5 = new ArrayList<Map<String,Object>>();
+            List<Map<String,Object>> list6 = new ArrayList<Map<String,Object>>();
+            //时间占比分析
+            if(!list.isEmpty()){
+                for(Location model :locations) {
+                    List<Map<String, Object>> l1 = new ArrayList<Map<String, Object>>();
+                    Map<String, Object> m1 = new HashMap<String, Object>();
+                    int i1 = 0;
+                    int i2 = 0;
+                    int i3 = 0;
+                    int i4 = 0;
+                    for (Map<String, Object> map1 : list) {
+                        if (map1.get("init_address").equals(model.getInitAddress())) {
+                            Date createDate = sdf.parse(map1.get("create_date").toString());
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(createDate);
+                            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                            if (hour >= 0 && hour < 6) {
+                                i1++;
+                            } else if (hour >= 6 && hour < 12) {
+                                i2++;
+                            } else if (hour >= 12 && hour < 18) {
+                                i3++;
+                            } else if (hour >= 18 && hour < 24) {
+                                i4++;
+                            }
+                        }
+                    }
+                    Map<String, Object> map11 = new HashMap<String, Object>();
+                    map11.put("name", "00:00-06:00");
+                    map11.put("value", i1);
+                    l1.add(map11);
+                    Map<String, Object> map12 = new HashMap<String, Object>();
+                    map12.put("name", "06:00-12:00");
+                    map12.put("value", i2);
+                    l1.add(map12);
+                    Map<String, Object> map13 = new HashMap<String, Object>();
+                    map13.put("name", "12:00-18:00");
+                    map13.put("value", i3);
+                    l1.add(map13);
+                    Map<String, Object> map14 = new HashMap<String, Object>();
+                    map14.put("name", "18:00-24:00");
+                    map14.put("value", i4);
+                    l1.add(map14);
+                    m1.put(model.getInitAddress(), l1);
+                    list6.add(m1);
+                }
+                //时间占比分析
+                int i1=0;
+                int i2=0;
+                int i3=0;
+                int i4=0;
+                for(Map<String,Object> map1:list){
+                    Date createDate = sdf.parse(map1.get("create_date").toString());
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(createDate);
+                    int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                    if(hour>=0&&hour<6){
+                        i1++;
+                    }else if(hour>=6&&hour<12){
+                        i2++;
+                    }else if(hour>=12&&hour<18){
+                        i3++;
+                    }else if(hour>=18&&hour<24){
+                        i4++;
+                    }
+                }
+                Map<String,Object> map11 = new HashMap<String,Object>();
+                map11.put("name","00:00-06:00");
+                map11.put("value",i1);
+                list5.add(map11);
+                Map<String,Object> map12 = new HashMap<String,Object>();
+                map12.put("name","06:00-12:00");
+                map12.put("value",i2);
+                list5.add(map12);
+                Map<String,Object> map13 = new HashMap<String,Object>();
+                map13.put("name","12:00-18:00");
+                map13.put("value",i3);
+                list5.add(map13);
+                Map<String,Object> map14 = new HashMap<String,Object>();
+                map14.put("name","18:00-24:00");
+                map14.put("value",i4);
+                list5.add(map14);
+            }
+            //出车趋势图
+            List<String> dateList = getDate();
+            List<Map<String,Object>> data = attendanceService.queryChart2(dateList.get(0),dateList.get(dateList.size()-1));
+            for(Location model :locations) {
+                List<Map<String,Object>> l =  new ArrayList<Map<String,Object>>();
+                Map<String,Object> address = new HashMap<String,Object>();
+                for(int i=0;i<dateList.size();i++){
+                    Map<String,Object> m = new HashMap<String,Object>();
+                    m.put(dateList.get(i),getData(dateList.get(i),model.getInitAddress(),data));
+                    l.add(m);
+                }
+                address.put(model.getInitAddress(),l);
+                list2.add(address);
+            }
+
+            map.put("chart1",attendanceService.queryChart1("1"));
+            map.put("chart2",list2);
+            map.put("chart4",attendanceService.queryChart4());
+            map.put("chart5",list5);
+            map.put("chart6",list6);
+            map.put("chart7",attendanceService.queryChart7());
+            envelop.setSuccessFlg(true);
+            envelop.setObj(map);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    /**
+     * 获取近一个月日期
+     * @return
+     */
+    public List<String> getDate(){
+        List<String> list = new ArrayList<String>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+        for(int i=29;i>1;i--) {
+            calendar.setTime(new Date());
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) -i);
+            list.add(sdf.format(calendar.getTime()));
+        }
+        calendar.setTime(new Date());
+        list.add(sdf.format(calendar.getTime()));
+        return list;
+    }
+
+    /**
+     * 根据日期和地点获取总数
+     * @param date
+     * @param address
+     * @return
+     */
+    public int getData(String date, String address,List<Map<String,Object>> data){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        int i=0;
+        if(!data.isEmpty()){
+            for(Map<String,Object> map :data){
+                if(date.equals(sdf.format(map.get("create_date")))&&address.equals(map.get("name"))){
+                    i+=Integer.parseInt(map.get("value")+"");
+                }
+            }
+        }
+        return i;
     }
 }
