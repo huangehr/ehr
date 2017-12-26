@@ -35,7 +35,7 @@ public class PackageResolveService {
     private Map<ProfileType, PackageResolver> packageResolvers;
 
 
-    private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
+    private final static String TempPath = System.getProperty("java.io.tmpdir") +  java.io.File.separator;
 
     @PostConstruct
     private void init() {
