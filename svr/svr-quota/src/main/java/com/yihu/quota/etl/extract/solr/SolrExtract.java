@@ -10,7 +10,6 @@ import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import org.apache.solr.client.solrj.response.PivotField;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -235,8 +234,8 @@ public class SolrExtract {
 
     /**
      * @param allData
-     * @param dictData
-     * @param dictType
+     * @param dictData 细维度集合
+     * @param dictType 主维度类型
      */
     private void setAllData(Map<String, SaveModel> allData, List<SaveModel> dictData, String dictType) {
         switch (dictType) {
@@ -280,6 +279,14 @@ public class SolrExtract {
                 });
                 break;
             }
+            case Contant.main_dimension.time_year: {
+                // 设置年份
+                dictData.stream().forEach(one -> {
+                    this.timeLevel = Contant.main_dimension_timeLevel.year;
+                    setOneData(allData, one.getYear(), one, null);
+                });
+                break;
+            }
         }
     }
 
@@ -296,7 +303,6 @@ public class SolrExtract {
         one.setSaasId(null);
         allData.put(key, one);
     }
-
 
 
 }
