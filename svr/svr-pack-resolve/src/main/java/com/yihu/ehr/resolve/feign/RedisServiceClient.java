@@ -13,9 +13,10 @@ import springfox.documentation.annotations.ApiIgnore;
  * @author hzp
  * @created 2017.04.28
  */
-@ApiIgnore
-@FeignClient(name = MicroServices.Redis)
-@RequestMapping(ApiVersion.Version1_0)
+//@ApiIgnore
+//@FeignClient(name = MicroServices.Redis)
+//@RequestMapping(ApiVersion.Version1_0)
+@Deprecated
 public interface RedisServiceClient {
 
 

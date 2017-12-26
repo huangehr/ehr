@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum EventType {
     Clinic(0),              // 门诊
     Resident(1),            // 住院
-    MedicalExam(2);         // 体检
+    MedicalExam(2),         // 体检
+    InfectCard(3),          // 传染病报告卡信息
+    reUpload(4);         // 补传
 
     int type;
 

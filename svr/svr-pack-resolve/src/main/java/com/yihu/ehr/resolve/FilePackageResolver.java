@@ -9,12 +9,12 @@ import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.profile.util.QualifierTranslator;
-import com.yihu.ehr.resolve.feign.RedisServiceClient;
 import com.yihu.ehr.resolve.model.stage1.CdaDocument;
 import com.yihu.ehr.resolve.model.stage1.FilePackage;
 import com.yihu.ehr.resolve.model.stage1.OriginFile;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.*;
+import com.yihu.ehr.resolve.service.resource.stage2.RedisService;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
@@ -38,9 +38,9 @@ import java.util.Map;
 public class FilePackageResolver extends PackageResolver {
 
     @Autowired
-    RedisServiceClient redisServiceClient;
+    private RedisService redisService;
     @Autowired
-    FastDFSUtil fastDFSUtil;
+    private FastDFSUtil fastDFSUtil;
 
 
     @Override
@@ -183,7 +183,7 @@ public class FilePackageResolver extends PackageResolver {
     protected String translateMetaDataCode(String cdaVersion,
                                            String dataSetCode,
                                            String metaData) {
-        String metaDataType = redisServiceClient.getMetaDataType(cdaVersion, dataSetCode, metaData);
+        String metaDataType = redisService.getMetaDataType(cdaVersion, dataSetCode, metaData);
         if (StringUtils.isEmpty(metaDataType)) {
             String msg = "Meta data %1 in data set %2 is not found in version %3. FORGET cache standards or it's INVALID?"
                     .replace("%1", metaData)

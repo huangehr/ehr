@@ -8,11 +8,13 @@ import com.yihu.ehr.profile.util.PackageDataSet;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.service.resource.stage1.PackModelFactory;
 import com.yihu.ehr.resolve.service.resource.stage1.extractor.KeyDataExtractor;
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +53,33 @@ public class StdPackageResolver extends PackageResolver {
      * @throws IOException
      */
     private void parseFiles(StandardPackage standardPackage, File[] files, boolean origin) throws Exception, IOException {
-        for (File file : files) {
-            //将单个JSON文件转化为单个数据集
+        List<PackageDataSet> packageDataSetList = new ArrayList<>(files.length);
+        //新增补传判断---------------Start---------------
+        for(File file : files) {
             PackageDataSet dataSet = generateDataSet(file, origin);
+            packageDataSetList.add(dataSet);
+            if(dataSet.isReUploadFlg()){
+                standardPackage.setReUploadFlg(true);
+            }
+        }
+        if(standardPackage.isReUploadFlg()) {
+            for(PackageDataSet dataSet : packageDataSetList) {
+                String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
+                dataSet.setCode(dataSetCode);
+                standardPackage.setEventDate(dataSet.getEventTime());
+                standardPackage.setPatientId(dataSet.getPatientId());
+                standardPackage.setEventNo(dataSet.getEventNo());
+                standardPackage.setEventType(EventType.reUpload);
+                standardPackage.setOrgCode(dataSet.getOrgCode());
+                standardPackage.setCdaVersion(dataSet.getCdaVersion());
+                standardPackage.setCreateDate(dataSet.getCreateTime());
+                standardPackage.insertDataSet(dataSetCode, dataSet);
+            }
+            return;
+        }
+        //---------------End---------------
+        for (PackageDataSet dataSet : packageDataSetList) {
+            //将单个JSON文件转化为单个数据集
             String dataSetCode = origin ? DataSetUtil.originDataSetCode(dataSet.getCode()) : dataSet.getCode();
             dataSet.setCode(dataSetCode);
             // Extract key data from data set if exists
@@ -100,7 +126,6 @@ public class StdPackageResolver extends PackageResolver {
                     }
                 }
             }
-
             standardPackage.setPatientId(dataSet.getPatientId());
             standardPackage.setEventNo(dataSet.getEventNo());
             standardPackage.setOrgCode(dataSet.getOrgCode());
