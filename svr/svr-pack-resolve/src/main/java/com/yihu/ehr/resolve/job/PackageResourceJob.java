@@ -17,6 +17,7 @@ import com.yihu.ehr.resolve.service.resource.stage2.PatientRegisterService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -37,7 +38,7 @@ import java.util.Map;
 @Component
 public class PackageResourceJob implements InterruptableJob {
 
-    private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
+    private final static String LocalTempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
