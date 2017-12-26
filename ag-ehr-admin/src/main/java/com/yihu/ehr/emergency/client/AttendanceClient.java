@@ -60,6 +60,20 @@ public interface AttendanceClient {
     @RequestMapping(value = ServiceApi.Emergency.AttendanceDetail, method = RequestMethod.GET)
     @ApiOperation("出勤记录详情")
     Envelop detail(
-            @ApiParam(name = "id", value = "id")
-            @RequestParam(value = "id") String id);
+            @ApiParam(name = "flag", value = "查询类型月、季、年（1,2,3）")
+            @RequestParam(value = "flag") String flag);
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceAnalysis, method = RequestMethod.GET)
+    @ApiOperation("出勤记录分析")
+    Envelop analysis();
+
+    @RequestMapping(value = "/attendance/queryChart1", method = RequestMethod.GET)
+    @ApiOperation("出车次数分析")
+    Envelop queryChart1(
+            @ApiParam(name = "flag", value = "查询类型月、季、年（1,2,3）")
+            @RequestParam(value = "flag") String flag);
+
+    @RequestMapping(value = "/attendance/queryChart3", method = RequestMethod.GET)
+    @ApiOperation("出勤地点热力图")
+    Envelop queryChart3();
 }

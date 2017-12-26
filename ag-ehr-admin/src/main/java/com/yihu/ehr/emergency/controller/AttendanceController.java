@@ -85,4 +85,24 @@ public class AttendanceController extends BaseController {
             @RequestParam(value = "id") String id){
         return attendanceClient.detail(id);
     }
+
+    @RequestMapping(value = ServiceApi.Emergency.AttendanceAnalysis, method = RequestMethod.GET)
+    @ApiOperation("出勤记录分析")
+    public Envelop analysis(){
+        return attendanceClient.analysis();
+    }
+
+    @RequestMapping(value = "/attendance/queryChart1", method = RequestMethod.GET)
+    @ApiOperation("出车次数分析")
+    public Envelop queryChart1(
+            @ApiParam(name = "flag", value = "查询类型月、季、年（1,2,3）")
+            @RequestParam(value = "flag") String flag){
+        return attendanceClient.queryChart1(flag);
+    }
+
+    @RequestMapping(value = "/attendance/queryChart3", method = RequestMethod.GET)
+    @ApiOperation("出勤地点热力图")
+    public Envelop queryChart3(){
+        return attendanceClient.queryChart3();
+    }
 }
