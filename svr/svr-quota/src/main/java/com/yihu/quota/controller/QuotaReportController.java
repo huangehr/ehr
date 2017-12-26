@@ -263,8 +263,6 @@ public class QuotaReportController extends BaseController {
             List<String> radarNames = new ArrayList<>();
             Map<String, Map<String, Object>> radarData = new HashMap<>();
             List<Map<String, Object>> listData = new ArrayList<>();
-            int testNum = 10;
-            List<Map<String, Object>> testListData = new ArrayList<>();
 
             Map<String, String> xAxisMap = new HashMap<>();
             for(String quotaId : quotaIds) {
@@ -289,15 +287,12 @@ public class QuotaReportController extends BaseController {
                 Map<String, Object> map = new HashMap();
                 map.put(tjQuota.getName(), num);
                 listData.add(map);
-                map.put(tjQuota.getName(), testNum + 10);
-                testNum ++;
-                testListData.add(map);
             }
             ReportOption reportOption = new ReportOption();
             Integer[] array = arrayNum.toArray(new Integer[arrayNum.size()]);
             Arrays.sort(array); // 进行升序排序
             polorCount += array[arrayNum.size() - 1];   // 雷达图极坐标
-            option = reportOption.getRadarEchartOption(title, testListData, polorCount);
+            option = reportOption.getRadarEchartOption(title, listData, polorCount);
             chartInfoModel.setOption(option.toString());
             chartInfoModel.setTitle(title);
             chartInfoModel.setxAxisMap(xAxisMap);
