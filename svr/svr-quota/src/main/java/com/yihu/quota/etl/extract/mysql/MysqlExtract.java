@@ -1,6 +1,5 @@
 package com.yihu.quota.etl.extract.mysql;
 
-import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.etl.Contant;
@@ -10,11 +9,6 @@ import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import org.elasticsearch.search.aggregations.bucket.terms.DoubleTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.metrics.valuecount.InternalValueCount;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -357,10 +351,10 @@ public class MysqlExtract {
                 break;
             }
             case Contant.main_dimension.time_year: {
-                //设置省的全部的值
+                //设置年份
                 dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince());
-                    setOneData(allData, one.getYear(), one, Contant.main_dimension_timeLevel.year);
+                    this.timeLevel = Contant.main_dimension_timeLevel.year;
+                    setOneData(allData, one.getYear(), one, null);
                 });
                 break;
             }
