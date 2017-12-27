@@ -18,7 +18,7 @@ public class SaveModelOrgHealthCategory {
     private String orgHealthCategoryCode;     //卫生机构类型代码
     private String orgHealthCategoryName;   //卫生机构类型名字
     private String orgHealthCategoryId;
-    private String orgHealthCategoryPId;
+    private String orgHealthCategoryPid;
     private String town;    //区县代码
     private String townName;//区县名称
     private String year;
@@ -92,12 +92,12 @@ public class SaveModelOrgHealthCategory {
         this.orgHealthCategoryId = orgHealthCategoryId;
     }
 
-    public String getOrgHealthCategoryPId() {
-        return orgHealthCategoryPId;
+    public String getOrgHealthCategoryPid() {
+        return orgHealthCategoryPid;
     }
 
-    public void setOrgHealthCategoryPId(String orgHealthCategoryPId) {
-        this.orgHealthCategoryPId = orgHealthCategoryPId;
+    public void setOrgHealthCategoryPid(String orgHealthCategoryPid) {
+        this.orgHealthCategoryPid = orgHealthCategoryPid;
     }
 
     public String getTown() {
