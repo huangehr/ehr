@@ -4,6 +4,7 @@ import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.etl.Contant;
+import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
@@ -35,6 +36,8 @@ public class SolrExtract {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     SolrUtil solrUtil;
+    @Autowired
+    ExtractUtil extractUtil;
     @Autowired
     SolrQuery solrQuery;
 
@@ -133,9 +136,15 @@ public class SolrExtract {
                 for(Map<String, Object> objectMap : list){
                     long count = 0;
                     String mainSlavesStr = "";
+                    int num = 1;
                     for(String key : objectMap.keySet()){
                         if(mainMap.get(key) != null){
-                            mainSlavesStr = mainSlavesStr + objectMap.get(key);
+                            if( num ==1){
+                                mainSlavesStr = mainSlavesStr + objectMap.get(key);
+                                num ++;
+                            }else{
+                                mainSlavesStr = mainSlavesStr + "-" + objectMap.get(key);
+                            }
                         }else if(key.equals("$count")){
                             if(objectMap.get(key) != null){
                                 count = Long.valueOf(objectMap.get(key).toString() );
@@ -161,9 +170,16 @@ public class SolrExtract {
     private void compute(List<TjQuotaDimensionMain> qdm,List<TjQuotaDimensionSlave> qds,
             List<SaveModel> returnList, Map<String, Long> map) throws Exception {
         Map<String, SaveModel> allData = new HashMap<>();
+        extractUtil.setQuotaVo(quotaVo);
         //初始化主细维度
-        for(TjQuotaDimensionMain qmain:qdm){
-            allData= initDimension(qds, qmain, allData);
+        if(qdm!=null && qdm.size()>0){
+            if(qdm.size() == 1){
+                allData= extractUtil.initDimension(qds, qdm.get(0), allData);
+            }else {
+                allData= extractUtil.initDimensionMoreMain(qds, qdm, allData);
+            }
+        }else{
+            allData= initDimension(qds, null, allData);
         }
         for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
             String key = oneMap.getKey();
