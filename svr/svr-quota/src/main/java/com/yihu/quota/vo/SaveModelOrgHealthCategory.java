@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Created by janseny on 2017/12/26.
  */
-public class SaveModelOrgHealthCategory extends SaveModel{
+public class SaveModelOrgHealthCategory{
     @JestId
     private String id;
     private String orgHealthCategoryQuotaCode;//指标code
@@ -34,12 +34,10 @@ public class SaveModelOrgHealthCategory extends SaveModel{
     @CreatedDate
     private Date orgHealthCategorySCreateTime;//创建时间
 
-    @Override
     public String getId() {
         return id;
     }
 
-    @Override
     public void setId(String id) {
         this.id = id;
     }
