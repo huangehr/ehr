@@ -82,7 +82,7 @@ public class OrgHealthCategoryStatisticsService {
         for (Map<String, Object> item : allOrgHealthCategoryList) {
             int id = (int) item.get("id");
             Object itemPid = item.get("pid");
-            boolean isEndpoint = (boolean) item.get("isEndpoint");
+            boolean isEndpoint = Boolean.parseBoolean(item.get("isEndpoint").toString());
             if (itemPid != null && (int) itemPid == pid) {
                 if (isEndpoint) {
                     endpointList.add(item);
@@ -124,7 +124,6 @@ public class OrgHealthCategoryStatisticsService {
             String slaveKey1 = null;
             String slaveKey2 = null;
             String slaveKey3 = null;
-            String slaveKey4 = null;
             if (endpointsStatisticList.size() > 0) {
                 Map<String, Object> endpoint = endpointsStatisticList.get(0);
                 quotaCode = endpoint.get("quotaCode").toString();
@@ -135,21 +134,19 @@ public class OrgHealthCategoryStatisticsService {
                 slaveKey1 = endpoint.get("slaveKey1") == null ? null : endpoint.get("slaveKey1").toString();
                 slaveKey2 = endpoint.get("slaveKey2") == null ? null : endpoint.get("slaveKey2").toString();
                 slaveKey3 = endpoint.get("slaveKey3") == null ? null : endpoint.get("slaveKey3").toString();
-                slaveKey4 = endpoint.get("slaveKey4") == null ? null : endpoint.get("slaveKey4").toString();
             }
 
             SaveModelOrgHealthCategory model;
             for (Map<String, Object> item : allOrgHealthCategoryList) {
                 model = new SaveModelOrgHealthCategory();
-                model.setQuotaCode(quotaCode);
-                model.setQuotaName(quotaName);
-                model.setQuotaDate(quotaDate);
-                model.setTown(town);
-                model.setYear(year);
-                model.setSlaveKey1(slaveKey1);
-                model.setSlaveKey2(slaveKey2);
-                model.setSlaveKey3(slaveKey3);
-                model.setSlaveKey4(slaveKey4);
+                model.setOrgHealthCategoryCode(quotaCode);
+                model.setOrgHealthCategoryName(quotaName);
+                model.setOrgHealthCategoryQuotaDate(quotaDate);
+                model.setOrgHealthCategoryTown(town);
+                model.setOrgHealthCategoryYear(year);
+                model.setOrgHealthCategorySlaveKey1(slaveKey1);
+                model.setOrgHealthCategorySlaveKey2(slaveKey2);
+                model.setOrgHealthCategorySlaveKey3(slaveKey3);
                 model.setOrgHealthCategoryId(item.get("id").toString());
                 String pid = item.get("pid") == null ? null : item.get("pid").toString();
                 model.setOrgHealthCategoryPid(pid);
