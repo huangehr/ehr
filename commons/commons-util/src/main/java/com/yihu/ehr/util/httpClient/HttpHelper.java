@@ -16,16 +16,16 @@ import java.util.Map;
 @Service
 public class HttpHelper {
 
-    @Value("${http-service.sslKeystore}")
+    @Value("${http-service.sslKeystore:''}")
     private String sslKeystore;
 
-    @Value("${http-service.sslPassword}")
+    @Value("${http-service.sslPassword:''}")
     private String sslPassword;
 
-    @Value("${http-service.httpsUser}")
+    @Value("${http-service.httpsUser:''}")
     private String httpsUser;
 
-    @Value("${http-service.httpsUserPassword}")
+    @Value("${http-service.httpsUserPassword:''}")
     private String httpsUserPassword;
 
     private SSLConnectionSocketFactory  getDefaultSSL()

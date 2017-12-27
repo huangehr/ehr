@@ -15,7 +15,7 @@ import java.util.List;
  * @author linaz
  * @created 2016.05.11 11:32
  */
-@FeignClient(name=MicroServices.FileResource)
+@FeignClient(name = MicroServices.FileResource)
 public interface FileResourceClient {
 
     @RequestMapping(value = ApiVersion.Version1_0 + "/files_upload", method = RequestMethod.POST)

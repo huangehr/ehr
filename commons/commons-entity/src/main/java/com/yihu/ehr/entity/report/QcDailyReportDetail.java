@@ -14,7 +14,7 @@ public class QcDailyReportDetail {
 
     private String id;
     private String reportId;
-    private String archiveType;//档案分类  outpatient - 门诊    hospital - 住院
+    private String archiveType;//档案分类  outpatient - 门诊    inpatient - 住院
     private String patientId;//病人id
     private String eventNo;//事件号
     private Date eventTime;//事件时间

@@ -25,7 +25,7 @@ import java.util.List;
 public class FileResourceController {
 
     @Autowired
-    FileResourceClient fileResourceClient;
+    private FileResourceClient fileResourceClient;
 
     @RequestMapping(value = "/files", method = RequestMethod.POST)
     @ApiOperation(value = "上传文件")
