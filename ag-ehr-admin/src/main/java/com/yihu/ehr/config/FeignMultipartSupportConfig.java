@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Scope;
 /**
  * Created by progr1mmer on 2017/12/16.
  */
-@Configuration
+//@Configuration
 public class FeignMultipartSupportConfig {
 
     @Bean

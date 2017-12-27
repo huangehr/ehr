@@ -4,7 +4,6 @@ import com.yihu.ehr.constants.ProfileType;
 import com.yihu.ehr.profile.util.DataSetUtil;
 import com.yihu.ehr.profile.util.MetaDataRecord;
 import com.yihu.ehr.profile.util.PackageDataSet;
-import com.yihu.ehr.resolve.feign.RedisServiceClient;
 import com.yihu.ehr.resolve.model.stage1.FilePackage;
 import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.*;
@@ -29,7 +28,7 @@ import java.util.Set;
 public class PackMillService {
 
     @Autowired
-    private RedisServiceClient redisServiceClient;
+    private RedisService redisService;
 
     /**
      * 将解析好的档案包拆解成资源。
@@ -39,28 +38,25 @@ public class PackMillService {
     public ResourceBucket grindingPackModel(StandardPackage stdPack) throws  Exception{
         ResourceBucket resourceBucket = new ResourceBucket();
         BeanUtils.copyProperties(stdPack, resourceBucket);
-        //机构名称、机构区域
-        if(!StringUtils.isBlank(resourceBucket.getOrgCode())) {
-            //获取机构名称
-            String orgName = redisServiceClient.getOrgRedis(resourceBucket.getOrgCode());
-            if(!StringUtils.isBlank(orgName)) {
-                resourceBucket.setOrgName(orgName);
-            }
-            //获取机构区域
-            String orgArea = redisServiceClient.getOrgAreaRedis(resourceBucket.getOrgCode());
-            if(!StringUtils.isBlank(orgArea)) {
-                resourceBucket.setOrgArea(orgArea);
-            }
+        //获取机构名称
+        String orgName = redisService.getOrgName(resourceBucket.getOrgCode());
+        if(!StringUtils.isBlank(orgName)) {
+            resourceBucket.setOrgName(orgName);
+        }
+        //获取机构区域
+        String orgArea = redisService.getOrgArea(resourceBucket.getOrgCode());
+        if(!StringUtils.isBlank(orgArea)) {
+            resourceBucket.setOrgArea(orgArea);
         }
 
         //门诊/住院诊断、健康问题
-        if(stdPack.getDiagnosisList()!=null && stdPack.getDiagnosisList().size()>0) {
+        if(stdPack.getDiagnosisList() != null && stdPack.getDiagnosisList().size() > 0) {
             List<String> healthProblemList = new ArrayList<>();
             for(String diagnosis : stdPack.getDiagnosisList()) {
-                String healthProblem = redisServiceClient.getIcd10HpCodeRedis(diagnosis);//通过ICD10获取健康问题
+                String healthProblem = redisService.getHpCodeByIcd10(diagnosis);//通过ICD10获取健康问题
                 if(!StringUtils.isEmpty(healthProblem)) {
                     String[] hpCodeList = healthProblem.split(";");
-                    for(String hpCode:hpCodeList) {
+                    for(String hpCode : hpCodeList) {
                         if(!healthProblemList.contains(hpCode)) {
                             healthProblemList.add(hpCode);
                         }
@@ -79,7 +75,7 @@ public class PackMillService {
             if(DataSetUtil.isOriginDataSet(srcDataSet.getCode())){
                 continue;
             }
-            Boolean isMultiRecord = Boolean.valueOf(redisServiceClient.getDataSetMultiRecord(srcDataSet.getCdaVersion(), srcDataSet.getCode()));
+            Boolean isMultiRecord = Boolean.valueOf(redisService.getDataSetMultiRecord(srcDataSet.getCdaVersion(), srcDataSet.getCode()));
             if(null == isMultiRecord) {
                 throw new RuntimeException("IsMultiRecord Can not be null");
             }
@@ -102,13 +98,18 @@ public class PackMillService {
                 }
             } else {
                 SubRecords subRecords = resourceBucket.getSubRecords();
-                int index = 0;
+                Integer index = 0;
+                char cIndex = 'a';
                 for (String key : keys){
                     SubRecord subRecord = new SubRecord();
                     if (stdPack.getProfileType() == ProfileType.DataSet){
                         subRecord.setRowkey(stdPack.getId(), srcDataSet.getCode(), srcDataSet.getPk());
                     }else {
-                        subRecord.setRowkey(stdPack.getId(), srcDataSet.getCode(), index++ );
+                        if(resourceBucket.isReUploadFlg()) {
+                            subRecord.setRowkey(stdPack.getId(), srcDataSet.getCode(), ("") + (cIndex ++));
+                        }else {
+                            subRecord.setRowkey(stdPack.getId(), srcDataSet.getCode(), index ++);
+                        }
                     }
                     MetaDataRecord metaDataRecord = srcDataSet.getRecord(key);
                     for (String metaDataCode : metaDataRecord.getMetaDataCodes()){
@@ -145,7 +146,7 @@ public class PackMillService {
          if("rBUSINESS_DATE".equals(srcMetadataCode)) {
              return null;
          }
-         String resMetadata = redisServiceClient.getRsAdaptionMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
+         String resMetadata = redisService.getRsAdapterMetaData(cdaVersion, srcDataSetCode, srcMetadataCode);
          if (StringUtils.isEmpty(resMetadata)){
              //调试的时候可将其改为LoggerService的日志输出
              PackResolveLogger.warn(
@@ -191,7 +192,7 @@ public class PackMillService {
      * @return
      */
     public String getMetadataDict(String metadataId) {
-        String dictCode = redisServiceClient.getRsMetaData(metadataId);
+        String dictCode = redisService.getRsMetaData(metadataId);
         return dictCode;
     }
 
@@ -203,7 +204,7 @@ public class PackMillService {
      * @return
      */
     public String[] getDict(String version, String dictCode, String srcDictEntryCode) {
-        String dict = redisServiceClient.getRsAdaptionDict(version, dictCode, srcDictEntryCode);
+        String dict = redisService.getRsAdapterDict(version, dictCode, srcDictEntryCode);
         if(dict != null) {
             return dict.split("&");
         }

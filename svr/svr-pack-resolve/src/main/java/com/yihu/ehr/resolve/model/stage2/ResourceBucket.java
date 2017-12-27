@@ -50,6 +50,8 @@ public class ResourceBucket {
     private String diagnosis;
     //健康问题，分号分隔
     private String healthProblem;
+    //重传标识
+    private boolean reUploadFlg;
     // 主记录
     protected MasterRecord masterRecord;
     //子记录
@@ -213,5 +215,13 @@ public class ResourceBucket {
 
     public void setHealthProblem(String healthProblem) {
         this.healthProblem = healthProblem;
+    }
+
+    public boolean isReUploadFlg() {
+        return reUploadFlg;
+    }
+
+    public void setReUploadFlg(boolean reUploadFlg) {
+        this.reUploadFlg = reUploadFlg;
     }
 }

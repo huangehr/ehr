@@ -24,18 +24,17 @@ import java.util.List;
 public class FileResourceController {
 
     @Autowired
-    FileResourceClient fileResourceClient;
+    private FileResourceClient fileResourceClient;
 
     @RequestMapping(value = "/files", method = RequestMethod.POST)
     @ApiOperation(value = "上传文件")
     public String pictureUpload(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestBody String fileStr,
+            @RequestParam(value = "file_str") String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
             @RequestParam(value = "json_data") String jsonData) {
-        //return fileResourceClient.fileUpload(fileStr, fileName, "Prefix"+ jsonData);
         return fileResourceClient.fileUpload(fileStr, fileName, jsonData);
     }
 
@@ -43,12 +42,11 @@ public class FileResourceController {
     @ApiOperation(value = "上传文件，并返回存储相对路径")
     public String pictureUploadReturnUrl(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestBody String fileStr,
+            @RequestParam(value = "file_str") String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
             @RequestParam(value = "json_data") String jsonData) {
-        //return fileResourceClient.fileUploadReturnUrl(fileStr, fileName, "Prefix" + jsonData);
         return fileResourceClient.fileUploadReturnUrl(fileStr, fileName, jsonData);
     }
 
@@ -56,12 +54,11 @@ public class FileResourceController {
     @ApiOperation(value = "上传文件，并返回存储绝对路径")
     public String pictureUploadReturnHttpUrl(
             @ApiParam(name = "file_str", value = "文件流转化后的字符串")
-            @RequestBody String fileStr,
+            @RequestParam(value = "file_str") String fileStr,
             @ApiParam(name = "file_name", value = "文件名")
             @RequestParam(value = "file_name") String fileName,
             @ApiParam(name = "json_data", value = "文件资源属性")
             @RequestParam(value = "json_data") String jsonData) {
-        //return fileResourceClient.fileUploadReturnHttpUrl(fileStr, fileName, "Prefix" + jsonData);
         return fileResourceClient.fileUploadReturnHttpUrl(fileStr, fileName, jsonData);
     }
 

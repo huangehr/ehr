@@ -4,11 +4,14 @@ import com.yihu.ehr.hbase.HBaseDao;
 import com.yihu.ehr.hbase.TableBundle;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.profile.family.MasterResourceFamily;
+import com.yihu.ehr.resolve.model.stage2.MasterRecord;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.util.ResourceStorageUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 /**
  * 档案资源主库。
@@ -24,21 +27,51 @@ public class MasterResourceDao {
     private HBaseDao hbaseDao;
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
+        String rowKey = resBucket.getId();
         TableBundle bundle = new TableBundle();
-        // delete legacy data if they are exist
-        String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, "^" + resBucket.getId());
-        if (legacyRowKeys != null && legacyRowKeys.length > 0){
-            bundle.addRows(legacyRowKeys);
-            hbaseDao.delete(ResourceCore.MasterTable, bundle);
+        if(resBucket.isReUploadFlg()) { //补传处理
+            Map<String, String> originResult = hbaseDao.get(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
+            if(!originResult.isEmpty()) {
+                MasterRecord masterRecord = resBucket.getMasterRecord();
+                Map<String, String> supplement = masterRecord.getDataGroup();
+                for(String key : supplement.keySet()) {
+                    if(!originResult.containsKey(key)) {
+                        originResult.put(key, supplement.get(key));
+                    }
+                }
+                hbaseDao.deleteFamily(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
+                bundle.addValues(rowKey, MasterResourceFamily.Data, originResult);
+                hbaseDao.save(ResourceCore.MasterTable, bundle);
+            }else {
+                throw new RuntimeException("Please upload the complete package first !");
+            }
+        }else {
+            // delete legacy data if they are exist
+            /**
+            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.MasterTable, "^" + rowKey);
+            if (legacyRowKeys != null && legacyRowKeys.length > 0) {
+                bundle.addRows(legacyRowKeys);
+                hbaseDao.delete(ResourceCore.MasterTable, bundle);
+            }
+            */
+            //主表直接GET
+            String legacy = hbaseDao.get(ResourceCore.MasterTable, rowKey);
+            if(StringUtils.isNotEmpty(legacy)) {
+                hbaseDao.delete(ResourceCore.MasterTable, rowKey);
+            }
+            // now save the data to hbase
+            bundle.clear();
+            bundle.addValues(
+                    rowKey,
+                    MasterResourceFamily.Basic,
+                    ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Basic, resBucket)
+            );
+            bundle.addValues(
+                    rowKey,
+                    MasterResourceFamily.Data,
+                    ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Data, resBucket)
+            );
+            hbaseDao.save(ResourceCore.MasterTable, bundle);
         }
-        // now save the data to hbase
-        bundle.clear();
-        bundle.addValues(resBucket.getId(),
-                MasterResourceFamily.Basic,
-                ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Basic, resBucket));
-        bundle.addValues(resBucket.getId(),
-                MasterResourceFamily.Data,
-                ResourceStorageUtil.getMasterResCells(MasterResourceFamily.Data, resBucket));
-        hbaseDao.save(ResourceCore.MasterTable, bundle);
     }
 }

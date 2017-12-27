@@ -29,26 +29,47 @@ public class SubResourceDao {
 
     public void saveOrUpdate(ResourceBucket resBucket) throws Exception {
         TableBundle bundle = new TableBundle();
-        // delete legacy data if they are exist
-        String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + resBucket.getId());
-        if (legacyRowKeys != null && legacyRowKeys.length > 0){
-            bundle.addRows(legacyRowKeys);
-            hbaseDao.delete(ResourceCore.SubTable, bundle);
+        if (resBucket.isReUploadFlg()) { //补传处理
+            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + resBucket.getId());
+            if(legacyRowKeys != null && legacyRowKeys.length > 0) {
+                for (SubRecord record : resBucket.getSubRecords().getRecords()) {
+                    //重复补传的时候删除上次补传数据
+                    hbaseDao.delete(ResourceCore.SubTable, record.getRowkey());
+                    bundle.addValues(
+                            record.getRowkey(),
+                            SubResourceFamily.Basic,
+                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record));
+                    bundle.addValues(
+                            record.getRowkey(),
+                            SubResourceFamily.Data,
+                            ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record));
+                }
+                hbaseDao.save(ResourceCore.SubTable, bundle);
+            }else {
+                throw new RuntimeException("Please upload the complete package first !");
+            }
+        } else {
+            // delete legacy data if they are exist
+            String legacyRowKeys[] = hbaseDao.findRowKeys(ResourceCore.SubTable, "^" + resBucket.getId());
+            if (legacyRowKeys != null && legacyRowKeys.length > 0) {
+                bundle.addRows(legacyRowKeys);
+                hbaseDao.delete(ResourceCore.SubTable, bundle);
+            }
+            bundle.clear();
+            // now save the data to hbase
+            SubRecords subRecords = resBucket.getSubRecords();
+            for (SubRecord record : subRecords.getRecords()) {
+                bundle.addValues(
+                        record.getRowkey(),
+                        SubResourceFamily.Basic,
+                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record));
+                bundle.addValues(
+                        record.getRowkey(),
+                        SubResourceFamily.Data,
+                        ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record));
+            }
+            hbaseDao.save(ResourceCore.SubTable, bundle);
         }
-        bundle.clear();
-        // now save the data to hbase
-        SubRecords subRecords = resBucket.getSubRecords();
-        for (SubRecord record : subRecords.getRecords()){
-            bundle.addValues(
-                    record.getRowkey(),
-                    SubResourceFamily.Basic,
-                    ResourceStorageUtil.getSubResCells(SubResourceFamily.Basic, record));
-            bundle.addValues(
-                    record.getRowkey(),
-                    SubResourceFamily.Data,
-                    ResourceStorageUtil.getSubResCells(SubResourceFamily.Data, record));
-        }
-        hbaseDao.save(ResourceCore.SubTable, bundle);
     }
 
     /**
