@@ -114,7 +114,7 @@ public class OrgHealthCategoryStatisticsService {
      * @return
      */
     private boolean saveToEs(List<Map<String, Object>> endpointsStatisticList, List<Map<String, Object>> allOrgHealthCategoryList) {
-        boolean finalFlag = true;
+        boolean result = false;
         try {
             String quotaCode = null;
             String quotaName = null;
@@ -158,12 +158,12 @@ public class OrgHealthCategoryStatisticsService {
                 model.setOrgHealthCategoryName(item.get("name").toString());
                 esClient.index("quota_index", "quota", objectMapper.writeValueAsString(model));
             }
+            result = true;
         } catch (Exception e) {
             e.printStackTrace();
-            finalFlag = false;
         }
 
-        return finalFlag;
+        return result;
     }
 
 }
