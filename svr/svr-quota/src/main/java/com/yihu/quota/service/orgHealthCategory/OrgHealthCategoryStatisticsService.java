@@ -33,8 +33,9 @@ public class OrgHealthCategoryStatisticsService {
      * 然后合计父节点统计结果，再将卫生机构类别集合统计结果保存到ES库中。
      *
      * @param endpointsStatisticList 卫生机构类别末节点统计结果
+     * @return 保存成功的状态
      */
-    public void countResultsAndSaveToEs(List<Map<String, Object>> endpointsStatisticList) {
+    public boolean countResultsAndSaveToEs(List<Map<String, Object>> endpointsStatisticList) {
         // 获取所有卫生机构类别的集合
         String sql = "SELECT id, pid, code, name, 0 AS result, 'false' AS isEndpoint FROM org_health_category ORDER BY code ";
         List<Map<String, Object>> allOrgHealthCategoryList = jdbcTemplate.queryForList(sql);
@@ -66,22 +67,7 @@ public class OrgHealthCategoryStatisticsService {
         totalMap.put("result", totalResult);
         allOrgHealthCategoryList.add(totalMap);
 
-        try {
-            // 保存到ES库中
-            SaveModelOrgHealthCategory model;
-            for (Map<String, Object> item : allOrgHealthCategoryList) {
-                model = new SaveModelOrgHealthCategory();
-                model.setOrgHealthCategoryId(item.get("id").toString());
-                String pid = item.get("pid") == null ? null : item.get("pid").toString();
-                model.setOrgHealthCategoryPid(pid);
-                String code = item.get("code") == null ? null : item.get("pid").toString();
-                model.setOrgHealthCategoryCode(code);
-                model.setOrgHealthCategoryName(item.get("name").toString());
-                esClient.index("quota_index", "quota", objectMapper.writeValueAsString(model));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return saveToEs(endpointsStatisticList, allOrgHealthCategoryList);
     }
 
     /**
@@ -118,6 +104,66 @@ public class OrgHealthCategoryStatisticsService {
         return endpointList.stream()
                 .mapToInt(item -> item.get("result") != null ? Integer.parseInt(item.get("result").toString()) : 0)
                 .sum();
+    }
+
+    /**
+     * 将卫生机构类别统计结果保存到ES库中
+     *
+     * @param endpointsStatisticList   卫生机构类别末节点统计结果
+     * @param allOrgHealthCategoryList 所有卫生机构类集合
+     * @return
+     */
+    private boolean saveToEs(List<Map<String, Object>> endpointsStatisticList, List<Map<String, Object>> allOrgHealthCategoryList) {
+        boolean finalFlag = true;
+        try {
+            String quotaCode = null;
+            String quotaName = null;
+            String quotaDate = null;
+            String town = null;
+            String year = null;
+            String slaveKey1 = null;
+            String slaveKey2 = null;
+            String slaveKey3 = null;
+            String slaveKey4 = null;
+            if (endpointsStatisticList.size() > 0) {
+                Map<String, Object> endpoint = endpointsStatisticList.get(0);
+                quotaCode = endpoint.get("quotaCode").toString();
+                quotaName = endpoint.get("quotaName").toString();
+                quotaDate = endpoint.get("quotaDate").toString();
+                town = endpoint.get("town") == null ? null : endpoint.get("town").toString();
+                year = endpoint.get("year") == null ? null : endpoint.get("year").toString();
+                slaveKey1 = endpoint.get("slaveKey1") == null ? null : endpoint.get("slaveKey1").toString();
+                slaveKey2 = endpoint.get("slaveKey2") == null ? null : endpoint.get("slaveKey2").toString();
+                slaveKey3 = endpoint.get("slaveKey3") == null ? null : endpoint.get("slaveKey3").toString();
+                slaveKey4 = endpoint.get("slaveKey4") == null ? null : endpoint.get("slaveKey4").toString();
+            }
+
+            SaveModelOrgHealthCategory model;
+            for (Map<String, Object> item : allOrgHealthCategoryList) {
+                model = new SaveModelOrgHealthCategory();
+                model.setQuotaCode(quotaCode);
+                model.setQuotaName(quotaName);
+                model.setQuotaDate(quotaDate);
+                model.setTown(town);
+                model.setYear(year);
+                model.setSlaveKey1(slaveKey1);
+                model.setSlaveKey2(slaveKey2);
+                model.setSlaveKey3(slaveKey3);
+                model.setSlaveKey4(slaveKey4);
+                model.setOrgHealthCategoryId(item.get("id").toString());
+                String pid = item.get("pid") == null ? null : item.get("pid").toString();
+                model.setOrgHealthCategoryPid(pid);
+                String code = item.get("code") == null ? null : item.get("pid").toString();
+                model.setOrgHealthCategoryCode(code);
+                model.setOrgHealthCategoryName(item.get("name").toString());
+                esClient.index("quota_index", "quota", objectMapper.writeValueAsString(model));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            finalFlag = false;
+        }
+
+        return finalFlag;
     }
 
 }
