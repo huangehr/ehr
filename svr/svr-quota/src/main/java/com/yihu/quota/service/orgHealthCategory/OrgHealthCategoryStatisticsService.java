@@ -34,7 +34,7 @@ public class OrgHealthCategoryStatisticsService {
      *
      * @param endpointsStatisticList 卫生机构类别末节点统计结果
      */
-    public void fillEndpoints(List<Map<String, Object>> endpointsStatisticList) {
+    public void countResultsAndSaveToEs(List<Map<String, Object>> endpointsStatisticList) {
         // 获取所有卫生机构类别的集合
         String sql = "SELECT id, pid, code, name, 0 AS result, 'false' AS isEndpoint FROM org_health_category ORDER BY code ";
         List<Map<String, Object>> allOrgHealthCategoryList = jdbcTemplate.queryForList(sql);
