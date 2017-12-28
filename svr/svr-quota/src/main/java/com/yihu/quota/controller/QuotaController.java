@@ -90,7 +90,7 @@ public class QuotaController extends BaseController {
      * @param id
      * @return
      */
-    @ApiOperation(value = "获取指标执行结果分页")
+    @ApiOperation(value = "获取特殊机构指标执行结果分页")
     @RequestMapping(value = ServiceApi.TJ.TjGetOrgHealthCategoryQuotaResult, method = RequestMethod.GET)
     public Envelop getOrgHealthCategoryQuotaResult(
             @ApiParam(name = "id", value = "指标任务ID", required = true)

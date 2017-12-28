@@ -7,6 +7,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +32,7 @@ public interface EsClient {
             @ApiParam(name = "type", value = "索引类型", required = true)
             @RequestParam(value = "type") String type,
             @ApiParam(name = "source", value = "值（JSON字符串）", required = true)
-            @RequestParam(value = "source") String source);
+            @RequestBody String source);
 
     @ApiOperation("删除ES索引")
     @RequestMapping(value = ServiceApi.ElasticSearch.Delete, method = RequestMethod.POST)
