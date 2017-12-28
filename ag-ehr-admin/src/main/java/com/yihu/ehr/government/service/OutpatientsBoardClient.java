@@ -21,11 +21,11 @@ import springfox.documentation.annotations.ApiIgnore;
 public interface OutpatientsBoardClient {
 
     @ApiOperation("本月门急诊人次")
-    @RequestMapping(value = "/statistics/mothVisit", method = RequestMethod.POST)
+    @RequestMapping(value = "/statistics/{position}", method = RequestMethod.POST)
     Envelop outpatientsBoardCount(
             @ApiParam(name = "core", value = "集合", required = true)
             @RequestParam(value = "core") String core,
-            @ApiParam(name = "filter", value = "查询条件", required = true)
-            @RequestParam(value = "filter") String filter);
+            @ApiParam(name = "position", value = "指标位置", required = true)
+            @RequestParam(value = "position") String position);
 
 }

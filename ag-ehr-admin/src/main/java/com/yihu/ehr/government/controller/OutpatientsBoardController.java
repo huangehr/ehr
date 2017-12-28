@@ -30,10 +30,10 @@ public class OutpatientsBoardController extends BaseController {
         public Envelop outpatientsBoardCount(
                 @ApiParam(name = "core", value = "集合", required = true)
                 @RequestParam(value = "core") String core,
-                @ApiParam(name = "filter", value = "查询条件", required = true)
-                @RequestParam(value = "filter") String filter) {
+                @ApiParam(name = "position", value = "指标位置", required = true)
+                @RequestParam(value = "position") String position) {
             Envelop envelop = new Envelop();
-            envelop=outpatientsBoardClient.outpatientsBoardCount(core,filter);
+            envelop=outpatientsBoardClient.outpatientsBoardCount(core,position);
             return envelop;
         }
 
