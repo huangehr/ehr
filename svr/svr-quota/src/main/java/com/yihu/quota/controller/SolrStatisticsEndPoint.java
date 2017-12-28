@@ -2,11 +2,7 @@ package com.yihu.quota.controller;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.eureka.V1AwareInstanceInfoConverter;
-import com.sun.javafx.binding.StringFormatter;
-import com.sun.tools.internal.xjc.model.nav.EagerNClass;
 import com.yihu.ehr.constants.ApiVersion;
-import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.SolrQuery;
@@ -15,8 +11,6 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
