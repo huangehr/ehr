@@ -11,6 +11,7 @@ import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
+import org.apache.solr.client.solrj.response.RangeFacet;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class SolrExtract {
 
     public List<SaveModel> statiscSlor(
             List<TjQuotaDimensionMain> qdm, List<TjQuotaDimensionSlave> qds,QuotaVo quotaVo) throws Exception {
-        List<SaveModel> returnList = new ArrayList<>();
+
         String core = esConfig.getTable();//"HealthProfile"
         String fq = null;
         String q = null;
@@ -79,14 +80,18 @@ public class SolrExtract {
         Map<String,String> mainMap = new HashMap<>();
         Map<String,String> slaveMap = new HashMap<>();
         for (int i = 0; i < qdm.size(); i++) {
-            groupFields = groupFields + qdm.get(i).getKeyVal() + ",";
             mainMap.put(qdm.get(i).getKeyVal(),qdm.get(i).getKeyVal());
+            if( !qdm.get(i).getMainCode().trim().equals("year")){
+                groupFields = groupFields + qdm.get(i).getKeyVal() + ",";
+            }
         }
         for (int i = 0; i < qds.size(); i++) {
             groupFields = groupFields + qds.get(i).getKeyVal() + ",";
             slaveMap.put(qds.get(i).getKeyVal(),qds.get(i).getKeyVal());
         }
-        groupFields = groupFields.substring(0,groupFields.length()-1);
+        if(groupFields.length() > 2){
+            groupFields = groupFields.substring(0,groupFields.length()-1);
+        }
         if (!StringUtils.isEmpty(esConfig.getTimekey())) {
             //1 全量 2 增量
             if(quotaVo!=null && quotaVo.getDataLevel().equals(Contant.quota.dataLeval_oneDay)){
@@ -117,21 +122,75 @@ public class SolrExtract {
             }
             System.out.println(fq);
         }
+
+        if(esConfig.getFilter() != null){
+            if(StringUtils.isEmpty(fq)){
+                fq = esConfig.getFilter();
+            }else {
+                fq += " AND " +  esConfig.getFilter();
+            }
+        }
+
+
+        List<String> years = new ArrayList<>();
+        if(qdm.size() > 0){
+            for(TjQuotaDimensionMain main:qdm){
+                if(main.getMainCode().trim().equals("year")){
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(2015, 01, 01);
+                    List<RangeFacet> rangeFacets = solrUtil.getFacetDateRange(core, main.getKeyVal(), calendar.getTime(), new Date(), "+1YEAR", null);
+                    for(RangeFacet rangeFacet : rangeFacets){
+                        List<RangeFacet.Count> counts  = rangeFacet.getCounts();
+                        for(RangeFacet.Count count:counts){
+                            years.add(count.getValue().substring(0, 4));
+                        }
+                    }
+                }
+            }
+        }
         Map<String,Long> map = new HashMap<>();
+        List<SaveModel> returnList = new ArrayList<>();
+        String yearfq = esConfig.getTimekey() +":[year-01-01T00:00:00Z TO year-12-31T23:59:59Z]";
         //core 表名 q 查询条件  fq 过滤条件  group 分
-        if( (qdm.size() + qds.size()) == 1){
+        if( (qdm.size() + qds.size()) == 1 || ((qdm.size() + qds.size())==2 && years.size()>0)){
             //单分组查询
-            Map<String, Long>  resMap = solrUtil.groupCount(core, q, fq, groupFields, 0, 1000);
-            compute(qdm,qds,returnList,resMap);
-            return returnList;
+            if(years != null && years.size() > 0 ) {
+                for (String year : years) {
+                    fq += " " + yearfq.replaceAll("year", year);
+                    Map<String, Long>  resMap = solrUtil.groupCount(core, q, fq, groupFields, 0, 1000);
+                    computeYear(qdm, qds, returnList, resMap,year);
+                }
+                return returnList;
+            }else{
+                Map<String, Long>  resMap = solrUtil.groupCount(core, q, fq, groupFields, 0, 1000);
+                compute(qdm,qds,returnList,resMap);
+                return returnList;
+            }
         }else {
             //多分组查询
             List<Map<String, Object>>   list = null;
+            if(years != null && years.size() > 0 ){
+
+                for(String year : years){
+                    fq += " " + yearfq.replaceAll("year",year);
+                    try {
+                        List<Map<String, Object>>  groupList = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
+                        for(Map<String, Object> mapObj : groupList){
+                            list.add(mapObj);
+                        }
+                    }catch (Exception e){
+                        throw  new Exception("solr查询数据出错！" + e.getMessage());
+                    }
+                }
+            }else {
+
+            }
             try {
-                  list = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
+                list = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
             }catch (Exception e){
                 throw  new Exception("solr查询数据出错！" + e.getMessage());
             }
+
             if(list != null && list.size() > 0){
                 for(Map<String, Object> objectMap : list){
                     long count = 0;
@@ -190,6 +249,35 @@ public class SolrExtract {
             }else{
                 saveModel.setResult("0");
             }
+            returnList.add(saveModel);
+        }
+    }
+
+    private void computeYear(List<TjQuotaDimensionMain> qdm,List<TjQuotaDimensionSlave> qds,
+                         List<SaveModel> returnList, Map<String, Long> map,String year) throws Exception {
+        Map<String, SaveModel> allData = new HashMap<>();
+        extractUtil.setQuotaVo(quotaVo);
+        //初始化主细维度
+        if(qdm!=null && qdm.size()>0){
+            if(qdm.size() == 1){
+                allData= extractUtil.initDimension(qds, qdm.get(0), allData);
+            }else {
+                allData= extractUtil.initDimensionMoreMain(qds, qdm, allData);
+            }
+        }else{
+            allData= initDimension(qds, null, allData);
+        }
+        for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
+            String key = oneMap.getKey();
+            SaveModel saveModel = oneMap.getValue();
+            Long num = map.get(key);
+            if(saveModel != null && num != null){
+                saveModel.setResult(num.toString());
+            }else{
+                saveModel.setResult("0");
+            }
+            saveModel.setYear(year);
+            saveModel.setYearName(year);
             returnList.add(saveModel);
         }
     }
