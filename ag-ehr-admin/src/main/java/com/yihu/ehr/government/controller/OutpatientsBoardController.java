@@ -26,7 +26,7 @@ public class OutpatientsBoardController extends BaseController {
         private OutpatientsBoardClient outpatientsBoardClient;
 
         @RequestMapping(value = ServiceApi.Government.OutpatientsBoardCount, method = RequestMethod.POST)
-        @ApiOperation(value = "根据统计周期类型、起止时间、指标编码统计结果")
+        @ApiOperation(value = "统计门诊 当月相关数据")
         public Envelop outpatientsBoardCount(
                 @ApiParam(name = "core", value = "集合", required = true)
                 @RequestParam(value = "core") String core,
@@ -37,5 +37,17 @@ public class OutpatientsBoardController extends BaseController {
             return envelop;
         }
 
+
+    @ApiOperation("医院门急诊人次分布")
+    @RequestMapping(value = ServiceApi.Government.GetMonthDistribution, method = RequestMethod.POST)
+    public Envelop getMonthDistribution(
+            @ApiParam(name = "core", value = "集合", required = true)
+            @RequestParam(value = "core") String core,
+            @ApiParam(name = "year", value = "年份", required = true)
+            @RequestParam(value = "year") String year) {
+        Envelop envelop = new Envelop();
+        envelop=outpatientsBoardClient.getMonthDistribution(core,year);
+        return envelop;
+    }
 
 }

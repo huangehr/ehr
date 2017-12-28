@@ -2,6 +2,7 @@ package com.yihu.ehr.government.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,5 +28,13 @@ public interface OutpatientsBoardClient {
             @RequestParam(value = "core") String core,
             @ApiParam(name = "position", value = "指标位置", required = true)
             @RequestParam(value = "position") String position);
+
+    @ApiOperation("医院门急诊人次分布")
+    @RequestMapping(value = ServiceApi.Government.GetMonthDistribution, method = RequestMethod.POST)
+    Envelop getMonthDistribution(
+            @ApiParam(name = "core", value = "集合", required = true)
+            @RequestParam(value = "core") String core,
+            @ApiParam(name = "year", value = "年份", required = true)
+            @RequestParam(value = "year") String year);
 
 }

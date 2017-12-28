@@ -1218,6 +1218,7 @@ public class ServiceApi {
         public static final String GetReportByMenuId = "/governmentMenuReportMonitorType/getReportByMenuId";
         //政府服务平台-门诊仪表盘-start
         public static final String OutpatientsBoardCount = "/government/outpatientsBoardCount";
+        public static final String GetMonthDistribution = "/statistics/monthDistribution";
 
         //政府服务平台-门诊仪表盘-end
 
