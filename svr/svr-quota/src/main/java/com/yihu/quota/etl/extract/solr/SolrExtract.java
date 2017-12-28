@@ -89,7 +89,9 @@ public class SolrExtract {
             groupFields = groupFields + qds.get(i).getKeyVal() + ",";
             slaveMap.put(qds.get(i).getKeyVal(),qds.get(i).getKeyVal());
         }
-        groupFields = groupFields.substring(0,groupFields.length()-1);
+        if(groupFields.length() > 2){
+            groupFields = groupFields.substring(0,groupFields.length()-1);
+        }
         if (!StringUtils.isEmpty(esConfig.getTimekey())) {
             //1 全量 2 增量
             if(quotaVo!=null && quotaVo.getDataLevel().equals(Contant.quota.dataLeval_oneDay)){
@@ -167,21 +169,22 @@ public class SolrExtract {
         }else {
             //多分组查询
             List<Map<String, Object>>   list = null;
-//            if(years != null && years.size() > 0 ){
-//
-//                for(String year : years){
-//                    fq = esConfig.getTimekey()+ yearfq.replaceAll("year",year);
-//                    try {
-//                        List<Map<String, Object>>  groupList = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
-//                        for(Map<String, Object> mapObj : groupList){
-//                            list.add(mapObj);
-//                        }
-//                    }catch (Exception e){
-//                        throw  new Exception("solr查询数据出错！" + e.getMessage());
-//                    }
-//                }
-//            }else {
-//            }
+            if(years != null && years.size() > 0 ){
+
+                for(String year : years){
+                    fq = esConfig.getTimekey()+ yearfq.replaceAll("year",year);
+                    try {
+                        List<Map<String, Object>>  groupList = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
+                        for(Map<String, Object> mapObj : groupList){
+                            list.add(mapObj);
+                        }
+                    }catch (Exception e){
+                        throw  new Exception("solr查询数据出错！" + e.getMessage());
+                    }
+                }
+            }else {
+
+            }
             try {
                 list = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
             }catch (Exception e){
