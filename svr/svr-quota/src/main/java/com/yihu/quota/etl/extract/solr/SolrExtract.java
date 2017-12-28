@@ -3,7 +3,6 @@ package com.yihu.quota.etl.extract.solr;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
@@ -128,7 +127,7 @@ public class SolrExtract {
             if(StringUtils.isEmpty(fq)){
                 fq = esConfig.getFilter();
             }else {
-                fq = " AND " +  esConfig.getFilter();
+                fq += " AND " +  esConfig.getFilter();
             }
         }
 
