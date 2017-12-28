@@ -50,4 +50,12 @@ public class OutpatientsBoardController extends BaseController {
         return envelop;
     }
 
+    @ApiOperation("本月各类医院门急诊人次")
+    @RequestMapping(value = ServiceApi.Government.GetRescue, method = RequestMethod.POST)
+    public Envelop getRescue() {
+        Envelop envelop =outpatientsBoardClient.getRescue();
+        return envelop;
+    }
+
+
 }

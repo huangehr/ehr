@@ -37,4 +37,8 @@ public interface OutpatientsBoardClient {
             @ApiParam(name = "year", value = "年份", required = true)
             @RequestParam(value = "year") String year);
 
+    @ApiOperation("医院门急诊人次分布")
+    @RequestMapping(value = ServiceApi.Government.GetRescue, method = RequestMethod.POST)
+    Envelop getRescue();
+
 }

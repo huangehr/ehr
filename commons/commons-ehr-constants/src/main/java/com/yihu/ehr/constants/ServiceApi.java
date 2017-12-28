@@ -1219,6 +1219,7 @@ public class ServiceApi {
         //政府服务平台-门诊仪表盘-start
         public static final String OutpatientsBoardCount = "/government/outpatientsBoardCount";
         public static final String GetMonthDistribution = "/statistics/monthDistribution";
+        public static final String GetRescue = "/statistics/rescue";
 
         //政府服务平台-门诊仪表盘-end
 
