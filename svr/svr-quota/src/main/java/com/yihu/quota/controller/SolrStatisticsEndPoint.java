@@ -3,6 +3,7 @@ package com.yihu.quota.controller;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.SolrQuery;
@@ -30,7 +31,7 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
     private SolrUtil solr;
 
     @ApiOperation("本月科室门诊人次")
-    @RequestMapping(value = "/outpatientService/statisticDeptOutpatientSum", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.OutpatientServiceStatistic.StatisticDeptOutpatientSum, method = RequestMethod.GET)
     public Envelop statisticDeptOutpatientSum() {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
@@ -52,7 +53,7 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
     }
 
     @ApiOperation("本月科室转诊人次")
-    @RequestMapping(value = "/outpatientService/statisticDeptTransferTreatmentSum", method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.OutpatientServiceStatistic.StatisticDeptTransferTreatmentSum, method = RequestMethod.GET)
     public Envelop statisticDeptTransferTreatmentSum() {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
