@@ -126,7 +126,7 @@ public class OrgHealthCategoryStatisticsService {
             String slaveKey3 = null;
             if (endpointsStatisticList.size() > 0) {
                 Map<String, Object> endpoint = endpointsStatisticList.get(0);
-                quotaCode = endpoint.get("quotaCode").toString();
+                quotaCode = endpoint.get("quotaCode").toString().replaceAll("_","");
                 quotaName = endpoint.get("quotaName").toString();
                 quotaDate = endpoint.get("quotaDate").toString();
                 town = endpoint.get("town") == null ? null : endpoint.get("town").toString();
@@ -139,8 +139,8 @@ public class OrgHealthCategoryStatisticsService {
             SaveModelOrgHealthCategory model;
             for (Map<String, Object> item : allOrgHealthCategoryList) {
                 model = new SaveModelOrgHealthCategory();
-                model.setOrgHealthCategoryCode(quotaCode);
-                model.setOrgHealthCategoryName(quotaName);
+                model.setOrgHealthCategoryQuotaCode(quotaCode);
+                model.setOrgHealthCategoryQuotaName(quotaName);
                 model.setOrgHealthCategoryQuotaDate(quotaDate);
                 model.setOrgHealthCategoryTown(town);
                 model.setOrgHealthCategoryYear(year);
@@ -150,10 +150,10 @@ public class OrgHealthCategoryStatisticsService {
                 model.setOrgHealthCategoryId(item.get("id").toString());
                 String pid = item.get("pid") == null ? null : item.get("pid").toString();
                 model.setOrgHealthCategoryPid(pid);
-                String code = item.get("code") == null ? null : item.get("pid").toString();
+                String code = item.get("code") == null ? null : item.get("code").toString();
                 model.setOrgHealthCategoryCode(code);
                 model.setOrgHealthCategoryName(item.get("name").toString());
-                esClient.index("quota_index", "quota", objectMapper.writeValueAsString(model));
+                esClient.index("quota_index", "orgHealthCategoryQuota", objectMapper.writeValueAsString(model));
             }
             result = true;
         } catch (Exception e) {

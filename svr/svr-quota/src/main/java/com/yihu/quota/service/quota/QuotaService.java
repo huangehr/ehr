@@ -34,6 +34,10 @@ public class QuotaService {
         return  esResultExtract.queryResultPage(tjQuota, filters, pageNo, pageSize);
     }
 
+    public List<Map<String, Object>> queryResultPageByCode(String code,String filters ,int pageNo,int pageSize) throws Exception {
+        TjQuota tjQuota= quotaDao.findByCode(code);
+        return  esResultExtract.queryResultPage(tjQuota, filters, pageNo, pageSize);
+    }
 
     public long getQuotaTotalCount(Integer id,String filters) throws Exception {
         TjQuota tjQuota= quotaDao.findOne(id);
