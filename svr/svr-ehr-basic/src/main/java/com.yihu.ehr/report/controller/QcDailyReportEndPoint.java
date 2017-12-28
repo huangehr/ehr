@@ -22,11 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by janseny on 2017/5/8.
@@ -55,19 +56,17 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
             @RequestParam(value = "size", required = false) int size,
             @ApiParam(name = "page", value = "页码", defaultValue = "1")
-            @RequestParam(value = "page", required = false) int page,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            @RequestParam(value = "page", required = false) int page) throws Exception {
 
         ListResult listResult = new ListResult();
         List<QcDailyReport> qcDailyReportList = qcDailyReportService.search(fields, filters, sorts, page, size);
-        if(qcDailyReportList != null){
+        if (qcDailyReportList != null) {
             listResult.setDetailModelList(qcDailyReportList);
-            listResult.setTotalCount((int)qcDailyReportService.getCount(filters));
+            listResult.setTotalCount((int) qcDailyReportService.getCount(filters));
             listResult.setCode(200);
             listResult.setCurrPage(page);
             listResult.setPageSize(size);
-        }else{
+        } else {
             listResult.setCode(200);
             listResult.setMessage("查询无数据");
             listResult.setTotalCount(0);
@@ -79,9 +78,9 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "新增档案上传日报")
     public MQcDailyReport add(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestBody QcDailyReport model) throws Exception{
+            @RequestBody QcDailyReport model) throws Exception {
         model.setAddDate(new Date());
-        return getModel( qcDailyReportService.save(model) );
+        return getModel(qcDailyReportService.save(model));
     }
 
 
@@ -89,7 +88,7 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "修改档案上传日报")
     public MQcDailyReport update(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
-            @RequestBody QcDailyReport model) throws Exception{
+            @RequestBody QcDailyReport model) throws Exception {
         return getModel(qcDailyReportService.save(model));
     }
 
@@ -97,7 +96,7 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "删除档案上传日报")
     public boolean delete(
             @ApiParam(name = "id", value = "编号", defaultValue = "")
-            @RequestParam(value = "id") String id) throws Exception{
+            @RequestParam(value = "id") String id) throws Exception {
         qcDailyReportService.delete(id);
         return true;
     }
@@ -105,11 +104,11 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Report.GetQcDailyReportDetail, method = RequestMethod.GET)
     @ApiOperation(value = "查询数据完整性详细数据")
-    QcDailyReportDetail search( @RequestParam(value = "filters", required = false) String filters) throws ParseException {
+    QcDailyReportDetail search(@RequestParam(value = "filters", required = false) String filters) throws ParseException {
         List<QcDailyReportDetail> list = qcDailyReportDetailService.search(filters);
-        if(list.isEmpty()){
-            return  null;
-        }else{
+        if (list.isEmpty()) {
+            return null;
+        } else {
             return list.get(0);
         }
     }
@@ -132,16 +131,16 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page
     ) throws Exception {
 
-        page = (page-1)*size;
+        page = (page - 1) * size;
         ListResult listResult = new ListResult();
         List<QcDailyReportDetail> qcDailyReportDetailList = qcDailyReportDetailService.getQcDailyReportDetailList(reportId, archiveType, startDate, endDate, page, size);
-        if(qcDailyReportDetailList != null){
+        if (qcDailyReportDetailList != null) {
             listResult.setDetailModelList(qcDailyReportDetailList);
-            listResult.setTotalCount( qcDailyReportDetailService.getQcDailyReportDetailListCount(reportId, archiveType, startDate, endDate) );
+            listResult.setTotalCount(qcDailyReportDetailService.getQcDailyReportDetailListCount(reportId, archiveType, startDate, endDate));
             listResult.setCode(200);
             listResult.setCurrPage(page);
             listResult.setPageSize(size);
-        }else{
+        } else {
             listResult.setCode(200);
             listResult.setMessage("查询无数据");
             listResult.setTotalCount(0);
@@ -152,9 +151,9 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.Report.AddQcDailyReportDetailList, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "新增质控包数据完整性详细数据日报")
-    boolean addQcDailyReportDetailList(@RequestBody String details ) throws IOException {
-        List<QcDailyReportDetail> list =  getModelList(details);
-        for(QcDailyReportDetail qcDailyReportDetail:list){
+    boolean addQcDailyReportDetailList(@RequestBody String details) throws IOException {
+        List<QcDailyReportDetail> list = getModelList(details);
+        for (QcDailyReportDetail qcDailyReportDetail : list) {
             qcDailyReportDetailService.save(qcDailyReportDetail);
         }
         return true;
@@ -165,50 +164,51 @@ public class QcDailyReportEndPoint extends EnvelopRestEndPoint {
     ObjectResult addQcDailyReportDetail(
             @ApiParam(name = "model", value = "json数据模型", defaultValue = "")
             @RequestBody String model) throws IOException {
-        QcDailyReportDetail obj = objectMapper.readValue(model,QcDailyReportDetail.class);
+        QcDailyReportDetail obj = objectMapper.readValue(model, QcDailyReportDetail.class);
         obj = qcDailyReportDetailService.save(obj);
         return Result.success("更新成功！", obj);
     }
 
     protected List<QcDailyReportDetail> getModelList(String modelStr) throws IOException {
         List<Map<String, Object>> models = new ArrayList<>();
-        models = objectMapper.readValue(modelStr, new TypeReference<List>() {});
-        List<QcDailyReportDetail> list =  new ArrayList<>();
-        for(int i=0; i < models.size(); i++) {
+        models = objectMapper.readValue(modelStr, new TypeReference<List>() {
+        });
+        List<QcDailyReportDetail> list = new ArrayList<>();
+        for (int i = 0; i < models.size(); i++) {
             QcDailyReportDetail qcDailyReportDetail = new QcDailyReportDetail();
             Map<String, Object> model = models.get(i);
             qcDailyReportDetail.setEventNo(model.get("eventNo").toString());
-            if(model.get("eventTime") != null){
+            if (model.get("eventTime") != null) {
                 qcDailyReportDetail.setEventTime(DateUtil.parseDate(model.get("eventTime").toString(), "yyyy-MM-dd HH:mm:ss"));
             }
-            if(model.get("patientId") != null){
+            if (model.get("patientId") != null) {
                 qcDailyReportDetail.setPatientId(model.get("patientId").toString());
             }
-            if(model.get("reportId") != null){
+            if (model.get("reportId") != null) {
                 qcDailyReportDetail.setReportId(model.get("reportId").toString());
             }
-            if(model.get("archiveType") != null){
+            if (model.get("archiveType") != null) {
                 qcDailyReportDetail.setArchiveType(model.get("archiveType").toString());
             }
-            if(model.get("acqFlag") != null){
+            if (model.get("acqFlag") != null) {
                 int af = Integer.valueOf(model.get("acqFlag").toString());
                 qcDailyReportDetail.setAcqFlag(af);
             }
-            if(model.get("timelyFlag") != null){
+            if (model.get("timelyFlag") != null) {
                 int tf = Integer.valueOf(model.get("timelyFlag").toString());
                 qcDailyReportDetail.setTimelyFlag(tf);
             }
             qcDailyReportDetail.setAddDate(new Date());
             list.add(qcDailyReportDetail);
         }
-        return  list;
+        return list;
     }
 
-    protected MQcDailyReport getModel(QcDailyReport o){
+    protected MQcDailyReport getModel(QcDailyReport o) {
         return convertToModel(o, MQcDailyReport.class);
     }
 
-    protected MQcDailyReportDetail getModelDetail(QcDailyReportDetail o){
+    protected MQcDailyReportDetail getModelDetail(QcDailyReportDetail o) {
         return convertToModel(o, MQcDailyReportDetail.class);
     }
 
