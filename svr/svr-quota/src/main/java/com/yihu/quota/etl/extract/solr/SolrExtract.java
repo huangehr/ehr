@@ -157,9 +157,9 @@ public class SolrExtract {
             //单分组查询
             if(years != null && years.size() > 0 ) {
                 for (String year : years) {
-                    fq = yearfq.replaceAll("year", year);
+                    fq += " " + yearfq.replaceAll("year", year);
                     Map<String, Long>  resMap = solrUtil.groupCount(core, q, fq, groupFields, 0, 1000);
-                    computeYear(qdm,qds,returnList,resMap,year);
+                    computeYear(qdm, qds, returnList, resMap,year);
                 }
                 return returnList;
             }else{
@@ -173,7 +173,7 @@ public class SolrExtract {
             if(years != null && years.size() > 0 ){
 
                 for(String year : years){
-                    fq = esConfig.getTimekey()+ yearfq.replaceAll("year",year);
+                    fq += " " + yearfq.replaceAll("year",year);
                     try {
                         List<Map<String, Object>>  groupList = solrQuery.getGroupMultList(core, groupFields, customGroup, q, fq);
                         for(Map<String, Object> mapObj : groupList){
