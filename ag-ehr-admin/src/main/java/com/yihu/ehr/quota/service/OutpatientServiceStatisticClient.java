@@ -13,7 +13,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * 临时报表接口--门急诊服务统计接口 Client
  */
-@FeignClient(name = MicroServices.Patient)
+@FeignClient(name = MicroServices.Quota)
 @RequestMapping(value = ApiVersion.Version1_0)
 @ApiIgnore
 public interface OutpatientServiceStatisticClient {
