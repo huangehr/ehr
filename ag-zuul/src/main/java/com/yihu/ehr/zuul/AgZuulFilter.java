@@ -35,8 +35,8 @@ public class AgZuulFilter extends ZuulFilter {
     public Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
-        LOG.info(String.format("%s >>> %s", request.getMethod(), request.getRequestURL().toString()));
-        String accessToken = request.getParameter("accessToken");
+        LOG.debug(String.format("%s >>> %s", request.getMethod(), request.getRequestURL().toString()));
+        //String accessToken = request.getParameter("accessToken");
         /**
         if(accessToken == null) {
             LOG.warn("token is empty");
