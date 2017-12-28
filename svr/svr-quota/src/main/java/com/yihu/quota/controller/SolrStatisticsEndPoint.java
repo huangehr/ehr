@@ -11,16 +11,13 @@ import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.solr.client.solrj.response.FieldStatsInfo;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
@@ -37,19 +34,41 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop statisticDeptOutpatientSum() {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
-        try {
-            String startDay = "2017-01-01T00:00:00Z";
-//            String startDay = getCurrMonthFirstDay();
-            String endDay = getCurrMonthLastDay();
-            String fq = "event_type:0 AND event_date:[" + startDay + " TO " + endDay + "]";
-            String statsField = "event_no";
-            String groupField = "EHR_000081"; // 科室
-            List<FieldStatsInfo> list = solr.getStats("HealthProfile", null, fq, statsField, groupField);
 
+        try {
+            String startDay = getCurrMonthFirstDay();
+            String endDay = getCurrMonthLastDay();
+            String fq = String.format("event_type:0 AND event_date:[%s TO %s]", startDay, endDay);
+            String facetField = "EHR_000081"; // 按【科室】分组
+            Map<String, Object> result = oneFieldGroup(facetField, fq);
+
+            envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setErrorMsg("统计【本月科室门诊人次】发生异常");
+        }
+        return envelop;
+    }
+
+    @ApiOperation("本月科室转诊人次")
+    @RequestMapping(value = "/outpatientService/statisticDeptTransferTreatmentSum", method = RequestMethod.GET)
+    public Envelop statisticDeptTransferTreatmentSum() {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(false);
+
+        try {
+            String startDay = getCurrMonthFirstDay();
+            String endDay = getCurrMonthLastDay();
+            String fq = String.format("event_type:0 AND EHR_000083:T AND event_date:[%s TO %s]", startDay, endDay);
+            String facetField = "EHR_000081"; // 按【科室】分组
+            Map<String, Object> result = oneFieldGroup(facetField, fq);
+
+            envelop.setObj(result);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setErrorMsg("统计【本月科室转诊人次】发生异常");
         }
         return envelop;
     }
@@ -109,6 +128,33 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(true);
         envelop.setDetailModelList(dataList);
         return envelop;
+    }
+
+    /**
+     * 根据指定字段分组统计
+     *
+     * @param facetField 分组字段名
+     * @param fq 筛选条件
+     * @return
+     * @throws Exception
+     */
+    private Map<String, Object> oneFieldGroup(String facetField, String fq) throws Exception {
+        String startDay = getCurrMonthFirstDay();
+        String endDay = getCurrMonthLastDay();
+        FacetField facetResult = solr.getFacetField("HealthProfile", facetField, fq, 0, 0, -1, false);
+        List<FacetField.Count> facetCountList = facetResult.getValues();
+
+        List<String> nameList = new ArrayList<>();
+        List<Long> valList = new ArrayList<>();
+        for(FacetField.Count item : facetCountList) {
+            nameList.add(item.getName());
+            valList.add(item.getCount());
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("nameList", nameList);
+        result.put("valList", valList);
+        return result;
     }
 
     /**
