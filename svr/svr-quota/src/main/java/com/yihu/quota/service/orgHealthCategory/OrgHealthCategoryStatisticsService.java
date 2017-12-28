@@ -126,7 +126,7 @@ public class OrgHealthCategoryStatisticsService {
             String slaveKey3 = null;
             if (endpointsStatisticList.size() > 0) {
                 Map<String, Object> endpoint = endpointsStatisticList.get(0);
-                quotaCode = endpoint.get("quotaCode").toString().replaceAll("_","");
+                quotaCode = endpoint.get("quotaCode").toString().replaceAll("_", "");
                 quotaName = endpoint.get("quotaName").toString();
                 quotaDate = endpoint.get("quotaDate").toString();
                 town = endpoint.get("town") == null ? null : endpoint.get("town").toString();
@@ -161,6 +161,53 @@ public class OrgHealthCategoryStatisticsService {
         }
 
         return result;
+    }
+
+    /**
+     * 根据父级ID，递归获取卫生机构类别的父级及其子级集合，形成树形结构。
+     *
+     * @param pid 父级ID，为 -1 时获取整棵树。
+     * @return 父级及其子集的树形结构数据
+     */
+    public List<Map<String, Object>> getOrgHealthCategoryTreeByPid(int pid) {
+        List<Map<String, Object>> treeList = new ArrayList<>();
+
+        List<Map<String, Object>> childList = new ArrayList<>();
+        if (pid == -1) {
+            childList = getOrgHealthCategoryTopNodes();
+        } else {
+            childList = getOrgHealthCategoryChildrenByPid(pid);
+        }
+        for (Map<String, Object> child : childList) {
+            child.put("children", getOrgHealthCategoryTreeByPid((int) child.get("id")));
+            treeList.add(child);
+        }
+
+        return treeList;
+    }
+
+    /**
+     * 根据ID，获取卫生机构类别信息
+     */
+    private Map<String, Object> getOrgHealthCategoryById(int id) {
+        String sql = "SELECT o.id, o.pid, o.code, o.name AS text, NULL AS children FROM org_health_category o WHERE o.id = " + id;
+        return (Map<String, Object>) jdbcTemplate.queryForMap(sql);
+    }
+
+    /**
+     * 获取卫生机构类别顶级节点
+     */
+    private List<Map<String, Object>> getOrgHealthCategoryTopNodes() {
+        String sql = "SELECT o.id, o.pid, o.code, o.name AS text, NULL AS children FROM org_health_category o WHERE o.pid IS NULL";
+        return (List<Map<String, Object>>) jdbcTemplate.queryForList(sql);
+    }
+
+    /**
+     * 根据卫生机构类别父级点ID，获取其子节点集合
+     */
+    private List<Map<String, Object>> getOrgHealthCategoryChildrenByPid(int pid) {
+        String sql = "SELECT o.id, o.pid, o.code, o.name AS text, NULL AS children FROM org_health_category o WHERE o.pid = " + pid;
+        return (List<Map<String, Object>>) jdbcTemplate.queryForList(sql);
     }
 
 }
