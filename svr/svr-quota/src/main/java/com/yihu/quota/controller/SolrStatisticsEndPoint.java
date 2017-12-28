@@ -9,9 +9,14 @@ import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.quota.service.org.OrgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +31,9 @@ import java.util.*;
 public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    private SolrQuery solrQuery;
-    @Autowired
     private SolrUtil solr;
+    @Autowired
+    private OrgService orgService;
 
     @ApiOperation("本月科室门诊人次")
     @RequestMapping(value = ServiceApi.OutpatientServiceStatistic.StatisticDeptOutpatientSum, method = RequestMethod.GET)
@@ -83,13 +88,13 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
             @PathVariable(value = "position") String position) throws Exception {
         if (position.equals("1")) {
             return emergencyRoom(core);
-        } else if (position.equals("2")) {
+        }else if(position.equals("2")){
             return hundredPeople(core);
-        } else if (position.equals("3")) {
+        }else if(position.equals("3")){
             return emergency(core);
-        } else if (position.equals("4")) {
+        }else if(position.equals("4")) {
             return referral(core);
-        } else {
+        }else {
             Envelop envelop = new Envelop();
             envelop.setSuccessFlg(false);
             envelop.setErrorMsg("参数：" + position + "，有误！");
@@ -160,7 +165,6 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
 
     /**
      * 本月门急诊人次
-     *
      * @return
      */
     private Envelop emergencyRoom(String core) throws Exception {
@@ -300,6 +304,98 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setObj(clinic);
         return envelop;
     }
+
+    @ApiOperation("医院门急诊人次分布")
+    @RequestMapping(value = "/statistics/monthDistribution", method = RequestMethod.POST)
+    public Envelop monthDistribution(
+            @ApiParam(name = "core", value = "集合", required = true)
+            @RequestParam(value = "core") String core,
+            @ApiParam(name = "year", value = "年份", required = true)
+            @RequestParam(value = "year") String year) throws Exception {
+        Envelop envelop = new Envelop();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, new Integer(year));
+        int month = calendar.get(Calendar.MONTH) + 1;
+        List<Map<String, Integer>> dataList = new ArrayList<>(month);
+        for(int i = 1; i <= month; i ++) {
+            String monthStr;
+            if(i < 10) {
+                monthStr = "0" + i;
+            }else {
+                monthStr = "" + i;
+            }
+            String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
+            calendar.set(Calendar.MONTH, i - 1);
+            int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, day);
+            String q = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
+            Map<String, Integer> data = solr.getFacetQuery(core, q);
+            data.put(monthStr, data.get(q));
+            data.remove(q);
+            dataList.add(data);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(dataList);
+        return envelop;
+    }
+
+    /**
+     * 本月各类医院门急诊人次
+     * @return
+     */
+    @ApiOperation("本月各类医院门急诊人次")
+    @RequestMapping(value = "/statistics/rescue", method = RequestMethod.POST)
+    public Envelop variousTypes() throws Exception{
+        Envelop envelop = new Envelop();
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String monthStr;
+        if(month < 10) {
+            monthStr = "0" + month;
+        }else {
+            monthStr = "" + month;
+        }
+        String dayStr;
+        if(day < 10) {
+            dayStr = "0" + day;
+        }else {
+            dayStr = "" + day;
+        }
+        String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
+        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String fq = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
+        FacetField facetField = solr.getFacetField("HealthProfile", "org_code", fq, 0, 0, 1000000, false);
+        List<FacetField.Count> list = facetField.getValues();
+        Map<String, Long> dataMap = new HashMap<>(list.size());
+        for(FacetField.Count count : list) {
+            dataMap.put(count.getName(), count.getCount());
+        }
+        Map<String, Long> resultMap = new HashMap<>();
+        for(String code : dataMap.keySet()) {
+            String level = orgService.getLevel(code);
+            if(!StringUtils.isEmpty(level)) {
+                if(resultMap.containsKey(level)) {
+                    long count = resultMap.get(level) + dataMap.get(code);
+                    resultMap.put(level, count);
+                }else {
+                    resultMap.put(level, dataMap.get(code));
+                }
+            }else {
+                if(resultMap.containsKey("9")) {
+                    long count = resultMap.get("9") + dataMap.get(code);
+                    resultMap.put("9", count);
+                }else {
+                    resultMap.put("9", dataMap.get(code));
+                }
+            }
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(resultMap);
+        return envelop;
+    }
+
 
     /**
      * 新增参数
