@@ -2,6 +2,7 @@ package com.yihu.quota.service.orgHealthCategory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.quota.client.EsClient;
+import com.yihu.quota.vo.SaveModel;
 import com.yihu.quota.vo.SaveModelOrgHealthCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -136,24 +137,27 @@ public class OrgHealthCategoryStatisticsService {
                 slaveKey3 = endpoint.get("slaveKey3") == null ? null : endpoint.get("slaveKey3").toString();
             }
 
-            SaveModelOrgHealthCategory model;
+            SaveModel model;
             for (Map<String, Object> item : allOrgHealthCategoryList) {
-                model = new SaveModelOrgHealthCategory();
-                model.setOrgHealthCategoryQuotaCode(quotaCode);
-                model.setOrgHealthCategoryQuotaName(quotaName);
-                model.setOrgHealthCategoryQuotaDate(quotaDate);
-                model.setOrgHealthCategoryTown(town);
-                model.setOrgHealthCategoryYear(year);
-                model.setOrgHealthCategorySlaveKey1(slaveKey1);
-                model.setOrgHealthCategorySlaveKey2(slaveKey2);
-                model.setOrgHealthCategorySlaveKey3(slaveKey3);
+                model = new SaveModel();
+                model.setQuotaCode(quotaCode);
+                model.setQuotaName(quotaName);
+                model.setQuotaDate(quotaDate);
+                model.setTown(town);
+                model.setTownName(town);
+                model.setYear(year);
+                model.setYearName(year);
+                model.setSlaveKey1(slaveKey1);
+                model.setSlaveKey2(slaveKey2);
+                model.setSlaveKey3(slaveKey3);
                 model.setOrgHealthCategoryId(item.get("id").toString());
                 String pid = item.get("pid") == null ? null : item.get("pid").toString();
                 model.setOrgHealthCategoryPid(pid);
                 String code = item.get("code") == null ? null : item.get("code").toString();
                 model.setOrgHealthCategoryCode(code);
                 model.setOrgHealthCategoryName(item.get("name").toString());
-                esClient.index("quota_index", "orgHealthCategoryQuota", objectMapper.writeValueAsString(model));
+                model.setResult(item.get("result").toString());
+                esClient.index("quota_index", "quota", objectMapper.writeValueAsString(model));
             }
             result = true;
         } catch (Exception e) {
