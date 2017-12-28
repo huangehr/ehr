@@ -6,7 +6,6 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.query.common.model.QueryCondition;
-import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.service.org.OrgService;
@@ -14,10 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.StringUtils;
-import org.apache.solr.client.solrj.response.FacetField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +23,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(description = "门急诊服务统计接口", tags = {"临时报表接口--门急诊服务统计接口"})
+@Api(value = "SolrStatisticsEndPoint", description = "门急诊服务统计接口", tags = {"临时报表接口--门急诊服务统计接口"})
 public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
@@ -40,14 +36,12 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop statisticDeptOutpatientSum() {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
-
         try {
             String startDay = getCurrMonthFirstDay();
             String endDay = getCurrMonthLastDay();
             String fq = String.format("event_type:0 AND event_date:[%s TO %s]", startDay, endDay);
             String facetField = "EHR_000081"; // 按【科室】分组
             Map<String, Object> result = oneFieldGroup(facetField, fq);
-
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -62,14 +56,12 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop statisticDeptTransferTreatmentSum() {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
-
         try {
             String startDay = getCurrMonthFirstDay();
             String endDay = getCurrMonthLastDay();
             String fq = String.format("event_type:0 AND EHR_000083:T AND event_date:[%s TO %s]", startDay, endDay);
             String facetField = "EHR_000081"; // 按【科室】分组
             Map<String, Object> result = oneFieldGroup(facetField, fq);
-
             envelop.setObj(result);
             envelop.setSuccessFlg(true);
         } catch (Exception e) {
@@ -77,6 +69,30 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("统计【本月科室转诊人次】发生异常");
         }
         return envelop;
+    }
+
+    /**
+     * 根据指定字段分组统计
+     * @param facetField 分组字段名
+     * @param fq 筛选条件
+     * @return
+     * @throws Exception
+     */
+    private Map<String, Object> oneFieldGroup(String facetField, String fq) throws Exception {
+        String startDay = getCurrMonthFirstDay();
+        String endDay = getCurrMonthLastDay();
+        FacetField facetResult = solr.getFacetField("HealthProfile", facetField, fq, 0, 0, -1, false);
+        List<FacetField.Count> facetCountList = facetResult.getValues();
+        List<String> nameList = new ArrayList<>();
+        List<Long> valList = new ArrayList<>();
+        for(FacetField.Count item : facetCountList) {
+            nameList.add(item.getName());
+            valList.add(item.getCount());
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("nameList", nameList);
+        result.put("valList", valList);
+        return result;
     }
 
     @ApiOperation("当月相关数据")
@@ -100,67 +116,6 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg("参数：" + position + "，有误！");
             return envelop;
         }
-    }
-
-    @ApiOperation("医院门急诊人次分布")
-    @RequestMapping(value = "/statistics/monthDistribution", method = RequestMethod.POST)
-    public Envelop monthDistribution(
-            @ApiParam(name = "core", value = "集合", required = true)
-            @RequestParam(value = "core") String core,
-            @ApiParam(name = "year", value = "年份", required = true)
-            @RequestParam(value = "year") String year) throws Exception {
-        Envelop envelop = new Envelop();
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, new Integer(year));
-        int month = calendar.get(Calendar.MONTH) + 1;
-        List<Map<String, Integer>> dataList = new ArrayList<>(month);
-        for (int i = 1; i <= month; i++) {
-            String monthStr;
-            if (i < 10) {
-                monthStr = "0" + i;
-            } else {
-                monthStr = "" + i;
-            }
-            String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
-            calendar.set(Calendar.MONTH, i - 1);
-            int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-            String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, day);
-            String q = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
-            Map<String, Integer> data = solr.getFacetQuery(core, q);
-            data.put(monthStr, data.get(q));
-            data.remove(q);
-            dataList.add(data);
-        }
-        envelop.setSuccessFlg(true);
-        envelop.setDetailModelList(dataList);
-        return envelop;
-    }
-
-    /**
-     * 根据指定字段分组统计
-     *
-     * @param facetField 分组字段名
-     * @param fq 筛选条件
-     * @return
-     * @throws Exception
-     */
-    private Map<String, Object> oneFieldGroup(String facetField, String fq) throws Exception {
-        String startDay = getCurrMonthFirstDay();
-        String endDay = getCurrMonthLastDay();
-        FacetField facetResult = solr.getFacetField("HealthProfile", facetField, fq, 0, 0, -1, false);
-        List<FacetField.Count> facetCountList = facetResult.getValues();
-
-        List<String> nameList = new ArrayList<>();
-        List<Long> valList = new ArrayList<>();
-        for(FacetField.Count item : facetCountList) {
-            nameList.add(item.getName());
-            valList.add(item.getCount());
-        }
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("nameList", nameList);
-        result.put("valList", valList);
-        return result;
     }
 
     /**
@@ -197,7 +152,6 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
 
     /**
      * 本月每百门急诊入院人数
-     *
      * @param core
      * @return
      * @throws Exception
@@ -241,7 +195,6 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
 
     /**
      * 本月急诊总人次数
-     *
      * @return
      */
     private Envelop emergency(String core) throws Exception {
@@ -339,10 +292,6 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    /**
-     * 本月各类医院门急诊人次
-     * @return
-     */
     @ApiOperation("本月各类医院门急诊人次")
     @RequestMapping(value = "/statistics/rescue", method = RequestMethod.POST)
     public Envelop variousTypes() throws Exception{
@@ -395,7 +344,6 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setObj(resultMap);
         return envelop;
     }
-
 
     /**
      * 新增参数
