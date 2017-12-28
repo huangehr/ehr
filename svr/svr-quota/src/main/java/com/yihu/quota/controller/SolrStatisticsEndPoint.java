@@ -8,9 +8,14 @@ import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.quota.service.org.OrgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +31,9 @@ import java.util.*;
 public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
-    private SolrQuery solrQuery;
-    @Autowired
     private SolrUtil solr;
+    @Autowired
+    private OrgService orgService;
 
     @ApiOperation("当月相关数据")
     @RequestMapping(value = "/statistics/{position}", method = RequestMethod.POST)
@@ -226,6 +231,62 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
+    /**
+     * 本月各类医院门急诊人次
+     * @return
+     */
+    @ApiOperation("本月各类医院门急诊人次")
+    @RequestMapping(value = "/statistics/rescue", method = RequestMethod.POST)
+    public Envelop variousTypes() throws Exception{
+        Envelop envelop = new Envelop();
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String monthStr;
+        if(month < 10) {
+            monthStr = "0" + month;
+        }else {
+            monthStr = "" + month;
+        }
+        String dayStr;
+        if(day < 10) {
+            dayStr = "0" + day;
+        }else {
+            dayStr = "" + day;
+        }
+        String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
+        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String fq = String.format("event_type:0 AND event_date:[2017-07-00T00:00:00Z TO %s]", start, end);
+        FacetField facetField = solr.getFacetField("HealthProfile", "org_code", fq, 0, 0, 1000000, false);
+        List<FacetField.Count> list = facetField.getValues();
+        Map<String, Long> dataMap = new HashMap<>(list.size());
+        for(FacetField.Count count : list) {
+            dataMap.put(count.getName(), count.getCount());
+        }
+        Map<String, Long> resultMap = new HashMap<>();
+        for(String code : dataMap.keySet()) {
+            String level = orgService.getLevel(code);
+            if(!StringUtils.isEmpty(level)) {
+                if(resultMap.containsKey(level)) {
+                    long count = resultMap.get(level) + dataMap.get(code);
+                    resultMap.put(level, count);
+                }else {
+                    resultMap.put(level, dataMap.get(code));
+                }
+            }else {
+                if(resultMap.containsKey("9")) {
+                    long count = resultMap.get("9") + dataMap.get(code);
+                    resultMap.put("9", count);
+                }else {
+                    resultMap.put("9", dataMap.get(code));
+                }
+            }
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setObj(resultMap);
+        return envelop;
+    }
 
 
     /**
