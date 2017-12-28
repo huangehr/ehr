@@ -86,7 +86,6 @@ public class EsQuotaJob implements Job {
         tjQuotaLog.setStartTime(new Date());
         try {
             //抽取数据 如果是累加就是 List<DataModel>  如果是相除 Map<String,List<DataModel>>
-            deleteRecord();
             List<SaveModel> dataModels = extract();
             if(dataModels != null && dataModels.size() > 0){
                 if(dataModels!=null && dataModels.size()==1 && dataModels.get(0).getQuotaCode().equals("orgHealthCategory")){
@@ -140,21 +139,15 @@ public class EsQuotaJob implements Job {
     private void deleteRecord() throws Exception {
         EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
         BoolQueryBuilder boolQueryBuilder =  QueryBuilders.boolQuery();
-        if(esConfig.getType().equals("orgHealthCategoryQuota")){
-            QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("orgHealthCategoryQuotaCode:" + quotaVo.getCode().replaceAll("_", ""));
-            boolQueryBuilder.must(termQueryQuotaCode);
-        }else{
-            QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaVo.getCode().replaceAll("_", ""));
-            boolQueryBuilder.must(termQueryQuotaCode);
-        }
-
+        QueryStringQueryBuilder termQueryQuotaCode = QueryBuilders.queryStringQuery("quotaCode:" + quotaVo.getCode().replaceAll("_", ""));
+        boolQueryBuilder.must(termQueryQuotaCode);
         if( !StringUtils.isEmpty(startTime) ){
             RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
-                    boolQueryBuilder.must(rangeQueryStartTime);
+//                    boolQueryBuilder.must(rangeQueryStartTime);
         }
         if( !StringUtils.isEmpty(endTime)){
             RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
-                    boolQueryBuilder.must(rangeQueryEndTime);
+//                    boolQueryBuilder.must(rangeQueryEndTime);
         }
         Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
         try {
