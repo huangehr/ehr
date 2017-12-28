@@ -9,40 +9,30 @@ import java.util.Date;
 /**
  * Created by janseny on 2017/12/26.
  */
-public class SaveModelOrgHealthCategory {
+public class SaveModelOrgHealthCategory{
     @JestId
     private String id;
-    private String quotaCode;//指标code
-    private String quotaName;//指标名称
-    private String quotaDate;//统计的指标对应时间 如今天凌晨统计昨天的数据，那就是昨天的时间
+    private String orgHealthCategoryQuotaCode;//指标code
+    private String orgHealthCategoryQuotaName;//指标名称
+    private String orgHealthCategoryQuotaDate;//统计的指标对应时间 如今天凌晨统计昨天的数据，那就是昨天的时间
     private String orgHealthCategoryCode;     //卫生机构类型代码
     private String orgHealthCategoryName;   //卫生机构类型名字
     private String orgHealthCategoryId;
     private String orgHealthCategoryPid;
-    private String town;    //区县代码
-    private String townName;//区县名称
-    private String year;
-    private String yearName;
-    private String result;//统计结果
-    private String slaveKey1;//从维度  1级维度
-    private String slaveKey1Name;
-    private String slaveKey2;//从维度  2级维度
-    private String slaveKey2Name;
-    private String slaveKey3;//从维度  3级维度
-    private String slaveKey3Name;
-    private String slaveKey4;//从维度  4级维度
-    private String slaveKey4Name;
+    private String orgHealthCategoryTown;    //区县代码
+    private String orgHealthCategoryTownName;//区县名称
+    private String orgHealthCategoryYear;
+    private String orgHealthCategoryYearName;
+    private String orgHealthCategoryResult;//统计结果
+    private String orgHealthCategorySlaveKey1;//从维度  1级维度
+    private String orgHealthCategorySlaveKey1Name;
+    private String orgHealthCategorySlaveKey2;//从维度  2级维度
+    private String orgHealthCategorySlaveKey2Name;
+    private String orgHealthCategorySlaveKey3;//从维度  3级维度
+    private String orgHealthCategorySlaveKey3Name;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     @CreatedDate
-    private Date createTime;//创建时间
-
-    public String getQuotaDate() {
-        return quotaDate;
-    }
-
-    public void setQuotaDate(String quotaDate) {
-        this.quotaDate = quotaDate;
-    }
+    private Date orgHealthCategorySCreateTime;//创建时间
 
     public String getId() {
         return id;
@@ -52,20 +42,28 @@ public class SaveModelOrgHealthCategory {
         this.id = id;
     }
 
-    public String getQuotaCode() {
-        return quotaCode;
+    public String getOrgHealthCategoryQuotaCode() {
+        return orgHealthCategoryQuotaCode;
     }
 
-    public void setQuotaCode(String quotaCode) {
-        this.quotaCode = quotaCode;
+    public void setOrgHealthCategoryQuotaCode(String orgHealthCategoryQuotaCode) {
+        this.orgHealthCategoryQuotaCode = orgHealthCategoryQuotaCode;
     }
 
-    public String getQuotaName() {
-        return quotaName;
+    public String getOrgHealthCategoryQuotaName() {
+        return orgHealthCategoryQuotaName;
     }
 
-    public void setQuotaName(String quotaName) {
-        this.quotaName = quotaName;
+    public void setOrgHealthCategoryQuotaName(String orgHealthCategoryQuotaName) {
+        this.orgHealthCategoryQuotaName = orgHealthCategoryQuotaName;
+    }
+
+    public String getOrgHealthCategoryQuotaDate() {
+        return orgHealthCategoryQuotaDate;
+    }
+
+    public void setOrgHealthCategoryQuotaDate(String orgHealthCategoryQuotaDate) {
+        this.orgHealthCategoryQuotaDate = orgHealthCategoryQuotaDate;
     }
 
     public String getOrgHealthCategoryCode() {
@@ -100,115 +98,99 @@ public class SaveModelOrgHealthCategory {
         this.orgHealthCategoryPid = orgHealthCategoryPid;
     }
 
-    public String getTown() {
-        return town;
+    public String getOrgHealthCategoryTown() {
+        return orgHealthCategoryTown;
     }
 
-    public void setTown(String town) {
-        this.town = town;
+    public void setOrgHealthCategoryTown(String orgHealthCategoryTown) {
+        this.orgHealthCategoryTown = orgHealthCategoryTown;
     }
 
-    public String getTownName() {
-        return townName;
+    public String getOrgHealthCategoryTownName() {
+        return orgHealthCategoryTownName;
     }
 
-    public void setTownName(String townName) {
-        this.townName = townName;
+    public void setOrgHealthCategoryTownName(String orgHealthCategoryTownName) {
+        this.orgHealthCategoryTownName = orgHealthCategoryTownName;
     }
 
-    public String getYear() {
-        return year;
+    public String getOrgHealthCategoryYear() {
+        return orgHealthCategoryYear;
     }
 
-    public void setYear(String year) {
-        this.year = year;
+    public void setOrgHealthCategoryYear(String orgHealthCategoryYear) {
+        this.orgHealthCategoryYear = orgHealthCategoryYear;
     }
 
-    public String getYearName() {
-        return yearName;
+    public String getOrgHealthCategoryYearName() {
+        return orgHealthCategoryYearName;
     }
 
-    public void setYearName(String yearName) {
-        this.yearName = yearName;
+    public void setOrgHealthCategoryYearName(String orgHealthCategoryYearName) {
+        this.orgHealthCategoryYearName = orgHealthCategoryYearName;
     }
 
-    public String getResult() {
-        return result;
+    public String getOrgHealthCategoryResult() {
+        return orgHealthCategoryResult;
     }
 
-    public void setResult(String result) {
-        this.result = result;
+    public void setOrgHealthCategoryResult(String orgHealthCategoryResult) {
+        this.orgHealthCategoryResult = orgHealthCategoryResult;
     }
 
-    public String getSlaveKey1() {
-        return slaveKey1;
+    public String getOrgHealthCategorySlaveKey1() {
+        return orgHealthCategorySlaveKey1;
     }
 
-    public void setSlaveKey1(String slaveKey1) {
-        this.slaveKey1 = slaveKey1;
+    public void setOrgHealthCategorySlaveKey1(String orgHealthCategorySlaveKey1) {
+        this.orgHealthCategorySlaveKey1 = orgHealthCategorySlaveKey1;
     }
 
-    public String getSlaveKey1Name() {
-        return slaveKey1Name;
+    public String getOrgHealthCategorySlaveKey1Name() {
+        return orgHealthCategorySlaveKey1Name;
     }
 
-    public void setSlaveKey1Name(String slaveKey1Name) {
-        this.slaveKey1Name = slaveKey1Name;
+    public void setOrgHealthCategorySlaveKey1Name(String orgHealthCategorySlaveKey1Name) {
+        this.orgHealthCategorySlaveKey1Name = orgHealthCategorySlaveKey1Name;
     }
 
-    public String getSlaveKey2() {
-        return slaveKey2;
+    public String getOrgHealthCategorySlaveKey2() {
+        return orgHealthCategorySlaveKey2;
     }
 
-    public void setSlaveKey2(String slaveKey2) {
-        this.slaveKey2 = slaveKey2;
+    public void setOrgHealthCategorySlaveKey2(String orgHealthCategorySlaveKey2) {
+        this.orgHealthCategorySlaveKey2 = orgHealthCategorySlaveKey2;
     }
 
-    public String getSlaveKey2Name() {
-        return slaveKey2Name;
+    public String getOrgHealthCategorySlaveKey2Name() {
+        return orgHealthCategorySlaveKey2Name;
     }
 
-    public void setSlaveKey2Name(String slaveKey2Name) {
-        this.slaveKey2Name = slaveKey2Name;
+    public void setOrgHealthCategorySlaveKey2Name(String orgHealthCategorySlaveKey2Name) {
+        this.orgHealthCategorySlaveKey2Name = orgHealthCategorySlaveKey2Name;
     }
 
-    public String getSlaveKey3() {
-        return slaveKey3;
+    public String getOrgHealthCategorySlaveKey3() {
+        return orgHealthCategorySlaveKey3;
     }
 
-    public void setSlaveKey3(String slaveKey3) {
-        this.slaveKey3 = slaveKey3;
+    public void setOrgHealthCategorySlaveKey3(String orgHealthCategorySlaveKey3) {
+        this.orgHealthCategorySlaveKey3 = orgHealthCategorySlaveKey3;
     }
 
-    public String getSlaveKey3Name() {
-        return slaveKey3Name;
+    public String getOrgHealthCategorySlaveKey3Name() {
+        return orgHealthCategorySlaveKey3Name;
     }
 
-    public void setSlaveKey3Name(String slaveKey3Name) {
-        this.slaveKey3Name = slaveKey3Name;
+    public void setOrgHealthCategorySlaveKey3Name(String orgHealthCategorySlaveKey3Name) {
+        this.orgHealthCategorySlaveKey3Name = orgHealthCategorySlaveKey3Name;
     }
 
-    public String getSlaveKey4() {
-        return slaveKey4;
+    public Date getOrgHealthCategorySCreateTime() {
+        return orgHealthCategorySCreateTime;
     }
 
-    public void setSlaveKey4(String slaveKey4) {
-        this.slaveKey4 = slaveKey4;
-    }
-
-    public String getSlaveKey4Name() {
-        return slaveKey4Name;
-    }
-
-    public void setSlaveKey4Name(String slaveKey4Name) {
-        this.slaveKey4Name = slaveKey4Name;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setOrgHealthCategorySCreateTime(Date orgHealthCategorySCreateTime) {
+        this.orgHealthCategorySCreateTime = orgHealthCategorySCreateTime;
     }
 }
