@@ -33,4 +33,14 @@ public interface EsClient {
             @ApiParam(name = "source", value = "值（JSON字符串）", required = true)
             @RequestParam(value = "source") String source);
 
+    @ApiOperation("删除ES索引")
+    @RequestMapping(value = ServiceApi.ElasticSearch.Delete, method = RequestMethod.POST)
+    public Envelop delete(
+            @ApiParam(name = "index", value = "索引名称", required = true)
+            @RequestParam(value = "index") String index,
+            @ApiParam(name = "type", value = "索引类型", required = true)
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "id", value = "id(多个id值以,分隔)", required = true)
+            @RequestParam(value = "id") String id);
+
 }

@@ -84,6 +84,46 @@ public class QuotaController extends BaseController {
         return envelop;
     }
 
+
+    /**
+     * 查询结果
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "获取指标执行结果分页")
+    @RequestMapping(value = ServiceApi.TJ.TjGetOrgHealthCategoryQuotaResult, method = RequestMethod.GET)
+    public Envelop getOrgHealthCategoryQuotaResult(
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "pageNo", value = "页码", defaultValue = "0")
+            @RequestParam(value = "pageNo" , required = false ,defaultValue = "0") int pageNo,
+            @ApiParam(name = "pageSize", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "pageSize" , required = false ,defaultValue ="15") int pageSize
+    ) {
+        Envelop envelop = new Envelop();
+        try {
+            if(filters!=null){
+                filters = URLDecoder.decode(filters, "UTF-8");
+            }
+            List<Map<String, Object>> resultList = quotaService.queryResultPage(id, filters, pageNo, pageSize);
+            long totalCount = quotaService.getQuotaTotalCount(id,filters);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(resultList);
+            envelop.setCurrPage(pageNo);
+            envelop.setPageSize(pageSize);
+            envelop.setTotalCount((int) totalCount);
+            return envelop;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+        }
+        envelop.setSuccessFlg(false);
+        return envelop;
+    }
+
+
     /**
      * 获取指标统计不同维度结果总量
      * @param id
