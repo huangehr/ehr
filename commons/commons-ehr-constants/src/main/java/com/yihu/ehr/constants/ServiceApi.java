@@ -1297,4 +1297,9 @@ public class ServiceApi {
 
     }
 
+    public static class OutpatientServiceStatistic {
+        public static final String StatisticDeptOutpatientSum = "/outpatientServiceStatistic/statisticDeptOutpatientSum";
+        public static final String StatisticDeptTransferTreatmentSum = "/outpatientServiceStatistic/statisticDeptTransferTreatmentSum";
+    }
+
 }
