@@ -1134,6 +1134,7 @@ public class ServiceApi {
 
 
         public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
+        public static final String TjGetOrgHealthCategoryQuotaResult = "/tj/tjGetOrgHealthCategoryQuotaResult";
         public static final String TjQuotaExecute = "/job/execuJob";
 
 

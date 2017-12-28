@@ -43,6 +43,7 @@
         <module>../svr/svr-redis</module>
         <module>../svr/svr-quota</module>
         <module>../svr/svr-log-collection</module>
+        <module>../ag-zuul</module>
     </modules>
 
     <build>

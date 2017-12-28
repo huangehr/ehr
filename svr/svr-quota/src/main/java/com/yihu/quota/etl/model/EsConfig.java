@@ -22,6 +22,10 @@ public class EsConfig {
     private String thousandDmolecular; //每千，每万 统计分子
     private String thousandDenominator; //每千，每万 统计分母
 
+    private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
+
+    private String superiorCode;//上级指标code
+
     public String getHost() {
         return host;
     }
@@ -142,5 +146,22 @@ public class EsConfig {
 
     public void setThousandDenominator(String thousandDenominator) {
         this.thousandDenominator = thousandDenominator;
+    }
+
+
+    public String getEspecialType() {
+        return especialType;
+    }
+
+    public void setEspecialType(String especialType) {
+        this.especialType = especialType;
+    }
+
+    public String getSuperiorCode() {
+        return superiorCode;
+    }
+
+    public void setSuperiorCode(String superiorCode) {
+        this.superiorCode = superiorCode;
     }
 }
