@@ -3,6 +3,7 @@ package com.yihu.quota.controller;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.eureka.V1AwareInstanceInfoConverter;
+import com.sun.javafx.binding.StringFormatter;
 import com.sun.tools.internal.xjc.model.nav.EagerNClass;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -17,15 +18,10 @@ import io.swagger.annotations.ApiParam;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by progr1mmer on 2017/12/28.
@@ -40,44 +36,201 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private SolrUtil solr;
 
-    @ApiOperation("每月就诊或住院人次")
-    @RequestMapping(value = "/statistics/mothVisit", method = RequestMethod.POST)
+    @ApiOperation("当月相关数据")
+    @RequestMapping(value = "/statistics/{position}", method = RequestMethod.POST)
     public Envelop statistics(
             @ApiParam(name = "core", value = "集合", required = true)
             @RequestParam(value = "core") String core,
-            @ApiParam(name = "filter", value = "查询条件", required = true)
-            @RequestParam(value = "filter") String filter) throws Exception {
-        Envelop envelop = new Envelop();
-        String queryParams = "";
-        List<QueryCondition> ql = parseCondition(filter);
-        queryParams = addParams(queryParams,"q", solrQuery.conditionToString(ql));
-        //Solr查询
-        Map<String, String> obj = objectMapper.readValue(queryParams, Map.class);
-        Map<String, Integer> dataMap = solr.getFacetQuery(core, obj.get("q"));
-        if(dataMap != null) {
-            envelop.setObj(dataMap.get(obj.get("q")));
+            @ApiParam(name = "position", value = "位置参数1,2,3,4", required = true)
+            @PathVariable(value = "position") String position) throws Exception {
+        if (position.equals("1")) {
+            return emergencyRoom(core);
+        }else if(position.equals("2")){
+            return hundredPeople(core);
+        }else if(position.equals("3")){
+            return emergency(core);
+        }else if(position.equals("4")) {
+            return referral(core);
         }else {
-            envelop.setObj(0);
+            Envelop envelop = new Envelop();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("参数：" + position + "，有误！");
+            return envelop;
         }
+    }
+
+    /**
+     * 本月门急诊人次
+     * @return
+     */
+    public Envelop emergencyRoom (String core) throws Exception{
+        Envelop envelop = new Envelop();
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String monthStr;
+        if(month < 10) {
+            monthStr = "0" + month;
+        }else {
+            monthStr = "" + month;
+        }
+        String dayStr;
+        if(day < 10) {
+            dayStr = "0" + day;
+        }else {
+            dayStr = "" + day;
+        }
+        String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
+        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String q = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
+        Map<String, Integer> data1 = solr.getFacetQuery(core, q);
+        Integer clinic = data1.get(q);
         envelop.setSuccessFlg(true);
+        envelop.setObj(clinic);
         return envelop;
-        /**
-        SolrDocumentList solrList = solr.query(core, obj.get("q"), null, null, 0, 1000000);
-        List<String> list = new ArrayList<String>();
-        long count = 0;
-        if(solrList!=null && solrList.getNumFound()>0) {
-            count = solrList.getNumFound();
-            for (SolrDocument doc : solrList){
-                String rowkey = String.valueOf(doc.getFieldValue("rowkey"));
-                list.add(rowkey);
-            }
+    }
+
+    /**
+     * 本月每百门急诊入院人数
+     * @param core
+     * @return
+     * @throws Exception
+     */
+    public Envelop hundredPeople(String core) throws Exception{
+        Envelop envelop = new Envelop();
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String monthStr;
+        if(month < 10) {
+            monthStr = "0" + month;
+        }else {
+            monthStr = "" + month;
         }
+        String dayStr;
+        if(day < 10) {
+            dayStr = "0" + day;
+        }else {
+            dayStr = "" + day;
+        }
+        //获取当月住院数据
+        String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
+        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String q = String.format("event_type:1 AND event_date:[%s TO %s]", start, end);
+        Map<String, Integer> data1 = solr.getFacetQuery(core, q);
+        Integer hospitalized = data1.get(q);
+        //获取当月门诊数据
+        q = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
+        Map<String, Integer> data2 = solr.getFacetQuery(core, q);
+        Integer clinic = data2.get(q);
+        if(clinic == 0) {
+            clinic = 1;
+        }
+        int count = hospitalized/clinic/100;
         envelop.setSuccessFlg(true);
         envelop.setObj(count);
         return envelop;
-         */
     }
 
+    /**
+     * 本月急诊总人次数
+     * @return
+     */
+    public Envelop emergency(String core) throws Exception{
+        Envelop envelop = new Envelop();
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String monthStr;
+        if(month < 10) {
+            monthStr = "0" + month;
+        }else {
+            monthStr = "" + month;
+        }
+        String dayStr;
+        if(day < 10) {
+            dayStr = "0" + day;
+        }else {
+            dayStr = "" + day;
+        }
+        String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
+        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String q = String.format("event_type:0 AND EHR_001240:51 AND event_date:[%s TO %s]", start, end);
+        Map<String, Integer> data1 = solr.getFacetQuery(core, q);
+        Integer clinic = data1.get(q);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(clinic);
+        return envelop;
+    }
+
+    /**
+     * 本月转诊人次
+     * @return
+     */
+    public Envelop referral(String core) throws Exception{
+        Envelop envelop = new Envelop();
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String monthStr;
+        if(month < 10) {
+            monthStr = "0" + month;
+        }else {
+            monthStr = "" + month;
+        }
+        String dayStr;
+        if(day < 10) {
+            dayStr = "0" + day;
+        }else {
+            dayStr = "" + day;
+        }
+        String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
+        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String q = String.format("event_type:0 AND EHR_000083:T AND event_date:[%s TO %s]", start, end);
+        Map<String, Integer> data1 = solr.getFacetQuery(core, q);
+        Integer clinic = data1.get(q);
+        envelop.setSuccessFlg(true);
+        envelop.setObj(clinic);
+        return envelop;
+    }
+
+    @ApiOperation("医院门急诊人次分布")
+    @RequestMapping(value = "/statistics/monthDistribution", method = RequestMethod.POST)
+    public Envelop monthDistribution(
+            @ApiParam(name = "core", value = "集合", required = true)
+            @RequestParam(value = "core") String core,
+            @ApiParam(name = "year", value = "年份", required = true)
+            @RequestParam(value = "year") String year) throws Exception {
+        Envelop envelop = new Envelop();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, new Integer(year));
+        int month = calendar.get(Calendar.MONTH) + 1;
+        List<Map<String, Integer>> dataList = new ArrayList<>(month);
+        for(int i = 1; i <= month; i ++) {
+            String monthStr;
+            if(i < 10) {
+                monthStr = "0" + i;
+            }else {
+                monthStr = "" + i;
+            }
+            String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
+            calendar.set(Calendar.MONTH, i - 1);
+            int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, day);
+            String q = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
+            Map<String, Integer> data = solr.getFacetQuery(core, q);
+            data.put(monthStr, data.get(q));
+            data.remove(q);
+            dataList.add(data);
+        }
+        envelop.setSuccessFlg(true);
+        envelop.setDetailModelList(dataList);
+        return envelop;
+    }
 
 
 
