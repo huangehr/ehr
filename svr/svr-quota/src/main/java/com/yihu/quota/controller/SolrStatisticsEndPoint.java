@@ -126,7 +126,7 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         String monthStr;
         if (month < 10) {
@@ -160,7 +160,7 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         String monthStr;
         if (month < 10) {
@@ -201,7 +201,7 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         String monthStr;
         if (month < 10) {
@@ -234,7 +234,7 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         String monthStr;
         if (month < 10) {
@@ -268,6 +268,11 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, new Integer(year));
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         int month = calendar.get(Calendar.MONTH) + 1;
         List<Map<String, Integer>> dataList = new ArrayList<>(month);
         for(int i = 1; i <= month; i ++) {
@@ -279,7 +284,13 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
             }
             String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
             calendar.set(Calendar.MONTH, i - 1);
-            int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            int day;
+            if(i == month) {
+                Calendar calendar1 = Calendar.getInstance();
+                day = calendar1.get(Calendar.DAY_OF_MONTH);
+            }else {
+                day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            }
             String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, day);
             String q = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
             Map<String, Integer> data = solr.getFacetQuery(core, q);
@@ -298,7 +309,7 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         String monthStr;
         if(month < 10) {
@@ -355,53 +366,6 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(true);
         envelop.setObj(resap);
         return envelop;
-    }
-
-    /**
-     * 新增参数
-     *
-     * @return
-     */
-    private String addParams(String oldParams, String key, String value) {
-        String newParam = "";
-        if (value.startsWith("[") && value.endsWith("]")) {
-            newParam = "\"" + key + "\":" + value;
-        } else {
-            newParam = "\"" + key + "\":\"" + value.replace("\"", "\\\"") + "\"";
-        }
-        if (oldParams != null && oldParams.length() > 3 && oldParams.startsWith("{") && oldParams.endsWith("}")) {
-            return oldParams.substring(0, oldParams.length() - 1) + "," + newParam + "}";
-        } else {
-            return "{" + newParam + "}";
-        }
-    }
-
-    /**
-     * 查询条件转换
-     *
-     * @param queryCondition
-     * @return
-     * @throws Exception
-     */
-    private List<QueryCondition> parseCondition(String queryCondition) throws IOException {
-        List<QueryCondition> ql = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Map.class);
-        List<Map<String, Object>> list = objectMapper.readValue(queryCondition, javaType);
-        if (list != null && list.size() > 0) {
-            for (Map<String, Object> item : list) {
-                String andOr = String.valueOf(item.get("andOr")).trim();
-                String field = String.valueOf(item.get("field")).trim();
-                String cond = String.valueOf(item.get("condition")).trim();
-                String value = String.valueOf(item.get("value"));
-                if (value.indexOf(",") > 0) {
-                    ql.add(new QueryCondition(andOr, cond, field, value.split(",")));
-                } else {
-                    ql.add(new QueryCondition(andOr, cond, field, value));
-                }
-            }
-        }
-        return ql;
     }
 
     // 获取当月第一天日期（精确到00:00:00）
