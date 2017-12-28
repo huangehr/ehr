@@ -257,7 +257,7 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         }
         String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
         String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
-        String fq = String.format("event_type:0 AND event_date:[2017-07-00T00:00:00Z TO %s]", start, end);
+        String fq = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
         FacetField facetField = solr.getFacetField("HealthProfile", "org_code", fq, 0, 0, 1000000, false);
         List<FacetField.Count> list = facetField.getValues();
         Map<String, Long> dataMap = new HashMap<>(list.size());
