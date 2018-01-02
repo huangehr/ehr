@@ -254,22 +254,21 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "status") ArchiveStatus status,
             @ApiParam(name = "sorts", value = "排序(建议使用默认值，以解析较早之前的数据)", defaultValue = "+receiveDate")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "count", value = "数量", required = true, defaultValue = "500")
+            @ApiParam(name = "count", value = "数量（不要超过10000）", required = true, defaultValue = "500")
             @RequestParam(value = "count") int count) throws Exception {
-        if(redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
-            return "添加失败，队列中存在消息！";
-        }
-        if(status == ArchiveStatus.Received) {
-            //状态为0的数据不在此重新更新状态
-            List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
-            for(Package rPackage : packageList) {
-                MPackage mPackage = convertToModel(rPackage, MPackage.class);
-                redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
+        if(status == ArchiveStatus.Received || status == ArchiveStatus.Acquired) {
+            if(redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
+                return "添加失败，队列中存在消息！";
+            }else {
+                List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
+                for(Package rPackage : packageList) {
+                    MPackage mPackage = convertToModel(rPackage, MPackage.class);
+                    redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
+                }
             }
         }else {
             List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
             for (Package rPackage : packageList) {
-                //重新归档
                 rPackage.setArchiveStatus(ArchiveStatus.Received);
                 packService.save(rPackage);
                 MPackage mPackage = convertToModel(rPackage, MPackage.class);
