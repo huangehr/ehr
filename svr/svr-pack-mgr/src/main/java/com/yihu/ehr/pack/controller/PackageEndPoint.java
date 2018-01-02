@@ -256,20 +256,20 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "count", value = "数量", required = true, defaultValue = "500")
             @RequestParam(value = "count") int count) throws Exception {
-        if(status == ArchiveStatus.Received || status == ArchiveStatus.Acquired) {
-            if(redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
-                return "添加失败，队列中存在消息！";
-            }else {
-                //状态为0或者1的数据不在此重新更新状态，当数据量庞大的时候可以减少数据库的负担
-                List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
-                for(Package rPackage : packageList) {
-                    MPackage mPackage = convertToModel(rPackage, MPackage.class);
-                    redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
-                }
+        if(redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
+            return "添加失败，队列中存在消息！";
+        }
+        if(status == ArchiveStatus.Received) {
+            //状态为0的数据不在此重新更新状态
+            List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
+            for(Package rPackage : packageList) {
+                MPackage mPackage = convertToModel(rPackage, MPackage.class);
+                redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
             }
         }else {
             List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
             for (Package rPackage : packageList) {
+                //重新归档
                 rPackage.setArchiveStatus(ArchiveStatus.Received);
                 packService.save(rPackage);
                 MPackage mPackage = convertToModel(rPackage, MPackage.class);
