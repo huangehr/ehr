@@ -21,4 +21,7 @@ public interface RedisCacheKeyRuleDao extends PagingAndSortingRepository<RedisCa
     @Query(" FROM RedisCacheKeyRule a WHERE a.id <> :id AND a.code = :code ")
     RedisCacheKeyRule isUniqueCode(@Param("id") Integer id, @Param("code") String code);
 
+    @Query(" FROM RedisCacheKeyRule a WHERE a.id <> :id AND a.categoryCode = :categoryCode AND a.expression LIKE :similarExpression ")
+    RedisCacheKeyRule isUniqueExpression(@Param("id") Integer id, @Param("categoryCode") String categoryCode, @Param("similarExpression") String similarExpression);
+
 }

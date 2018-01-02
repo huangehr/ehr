@@ -75,4 +75,14 @@ public interface RedisCacheKeyRuleClient {
             @ApiParam(name = "code", value = "缓存Key规则编码", required = true)
             @RequestParam(value = "code") String code);
 
+    @ApiOperation("验证类似的缓存Key规则表达式是否已经存在")
+    @RequestMapping(value = ServiceApi.Redis.CacheKeyRule.IsUniqueExpression, method = RequestMethod.GET)
+    public Envelop isUniqueExpression(
+            @ApiParam(name = "id", value = "缓存Key规则ID", required = true)
+            @RequestParam(value = "id") Integer id,
+            @ApiParam(name = "categoryCode", value = "缓存分类编码", required = true)
+            @RequestParam(value = "categoryCode") String categoryCode,
+            @ApiParam(name = "expression", value = "缓存Key规则表达式", required = true)
+            @RequestParam(value = "expression") String expression);
+
 }
