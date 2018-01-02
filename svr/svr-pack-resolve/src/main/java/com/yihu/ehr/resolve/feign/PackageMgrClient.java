@@ -18,8 +18,8 @@ import java.util.Map;
  * @created 2016.03.28 9:27
  */
 @ApiIgnore
-//@FeignClient(name = MicroServices.Package)
-@FeignClient(name = "svr-pack-mgr-s")
+@FeignClient(name = MicroServices.Package)
+//@FeignClient(name = "svr-pack-mgr-s")
 @RequestMapping(ApiVersion.Version1_0)
 public interface PackageMgrClient {
 
