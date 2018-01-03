@@ -200,6 +200,7 @@ public class RedisCacheKeyRuleEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         envelop.setSuccessFlg(false);
         try {
+            CacheCommonBiz.validateKeyRule(expression);
             boolean result = redisCacheKeyRuleService.isUniqueExpression(id, categoryCode, expression);
             envelop.setSuccessFlg(result);
             if (!result) {

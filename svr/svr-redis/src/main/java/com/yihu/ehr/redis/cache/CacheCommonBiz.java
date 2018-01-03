@@ -79,6 +79,10 @@ public class CacheCommonBiz {
     public static boolean validateKeyRule(String keyRule) throws ApiException {
         String errorMsg = "";
 
+        if (!keyRule.contains("{") && !keyRule.contains("}")) {
+            return true;
+        }
+
         int leftBraceNum = countLeftBrace(keyRule);
         int rightBraceNum = countRightBrace(keyRule);
 
@@ -114,6 +118,10 @@ public class CacheCommonBiz {
     public static List<String> parseParamNames(String keyRule) {
         List<String> paramNames = new ArrayList<>();
 
+        if (!keyRule.contains("{") && !keyRule.contains("}")) {
+            return paramNames;
+        }
+
         int preIndex = 0;
         while (preIndex != -1) {
             int start = keyRule.indexOf("{", preIndex);
@@ -136,6 +144,10 @@ public class CacheCommonBiz {
      * @return 替换后的字符串
      */
     public static String replaceParams(String keyRule, String replacement) {
+        if (!keyRule.contains("{") && !keyRule.contains("}")) {
+            return keyRule;
+        }
+
         int preIndex = 0;
         while (preIndex != -1) {
             int start = keyRule.indexOf("{", preIndex);
@@ -182,16 +194,17 @@ public class CacheCommonBiz {
 
     // 测试
     public static void main(String[] args) {
-//        String keyRule = "zjj.{a}"; // yes
+//        String keyRule = "zjj"; // yes
+        String keyRule = "zjj.{aa}xx{b}xx"; // yes
 //        String keyRule = "zjj.{aa{a}a}"; // no
 //        String keyRule = "zjj.{aa{a}"; // no
 //        String keyRule = "zjj.{a}{"; // no
 //        String keyRule = "zjj.{a}{"; // no
-        String keyRule = "zjj.{}{a}"; // no
+//        String keyRule = "zjj.{}{a}"; // no
 
-        validateKeyRule(keyRule);
+//        validateKeyRule(keyRule);
 
-//        String newKeyRule = replaceParams(keyRule, "*");
+        String newKeyRule = replaceParams(keyRule, "*");
 //        System.out.println(newKeyRule);
     }
 

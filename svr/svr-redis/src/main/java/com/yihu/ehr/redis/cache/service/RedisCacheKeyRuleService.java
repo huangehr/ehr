@@ -1,7 +1,6 @@
 package com.yihu.ehr.redis.cache.service;
 
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.redis.cache.CacheCommonBiz;
 import com.yihu.ehr.redis.cache.dao.RedisCacheKeyRuleDao;
 import com.yihu.ehr.redis.cache.entity.RedisCacheKeyRule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +57,9 @@ public class RedisCacheKeyRuleService extends BaseJpaService<RedisCacheKeyRule, 
     }
 
     public Boolean isUniqueExpression(Integer id, String categoryCode, String expression) {
-        String similarExpression = CacheCommonBiz.replaceParams(expression, "%");
-        RedisCacheKeyRule redisCacheKeyRule = redisCacheKeyRuleDao.isUniqueExpression(id, categoryCode, similarExpression);
+        // todo 存在问题：模糊匹配不准确
+//        String similarExpression = CacheCommonBiz.replaceParams(expression, "%");
+        RedisCacheKeyRule redisCacheKeyRule = redisCacheKeyRuleDao.isUniqueExpression(id, categoryCode, expression);
         if (redisCacheKeyRule == null) {
             return true;
         } else {
