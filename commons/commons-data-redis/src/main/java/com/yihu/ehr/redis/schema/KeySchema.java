@@ -1,5 +1,6 @@
-package com.yihu.ehr.redis;
+package com.yihu.ehr.redis.schema;
 
+import com.yihu.ehr.redis.client.RedisClient;
 import com.yihu.ehr.util.string.StringBuilderEx;
 import org.springframework.beans.factory.annotation.Autowired;
 

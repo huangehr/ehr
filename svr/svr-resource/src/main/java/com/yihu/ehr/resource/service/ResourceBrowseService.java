@@ -3,13 +3,11 @@ package com.yihu.ehr.resource.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.model.app.MApp;
 import com.yihu.ehr.profile.core.ResourceCore;
 import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.query.services.HbaseQuery;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.resource.dao.*;
-import com.yihu.ehr.resource.feign.AppClient;
 import com.yihu.ehr.resource.feign.RedisClient;
 import com.yihu.ehr.resource.model.*;
 import com.yihu.ehr.util.rest.Envelop;
@@ -41,9 +39,7 @@ public class ResourceBrowseService {
     @Autowired
     private RsResourceDefaultParamDao resourceDefaultParamDao;
     @Autowired
-    private RedisClient redisClient;
-    @Autowired
-    private AppClient appClient;
+    private RedisService redisService;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -273,7 +269,7 @@ public class ResourceBrowseService {
             List<String> paramList = new ArrayList<String>(customizeList.size() * 2);
             for(String id : customizeList) {
                 paramList.add(id);
-                String dictCode = redisClient.getRsMetaData(id);
+                String dictCode = redisService.getRsMetaData(id);
                 if(!StringUtils.isEmpty(dictCode)) {
                     paramList.add(id + "_VALUE");
                 }
@@ -398,7 +394,7 @@ public class ResourceBrowseService {
                 for(DtoResourceMetadata metadata : metadataList) {
                     String id = metadata.getId();
                     metadataIdList.add(id);
-                    String dictCode = redisClient.getRsMetaData(id);
+                    String dictCode = redisService.getRsMetaData(id);
                     if(!StringUtils.isEmpty(dictCode)) {
                         metadataIdList.add(id + "_VALUE");
                     }
@@ -559,166 +555,6 @@ public class ResourceBrowseService {
 
     public Page<Map<String,Object>> getMysqlData(String queryParams, Integer page, Integer size) throws Exception {
         return resourceBrowseDao.getMysqlData(queryParams, page, size);
-    }
-
-    /**
-     * 获取权限并集
-     */
-    private String getSaas(String appId, String orgCode) throws Exception {
-        String saas = "";
-        String appSaasArea = "*";
-        String appSaasOrg = "*";
-        List<String> areaList = new ArrayList<>();
-        List<String> orgList = new ArrayList<>();
-
-        //APP权限范围，不为JKZL的话获取所属机构权限范围
-        if(!appId.toUpperCase().equals("JKZL")) {
-            MApp app = appClient.getApp(appId);
-            if(app == null) {
-                throw new Exception("无效appId.");
-            }
-            //获取APP所属机构
-            String appOrg = app.getOrg();
-            appSaasArea = redisClient.getOrgSaasAreaRedis(appOrg);
-            appSaasOrg = redisClient.getOrgSaasOrgRedis(appOrg);
-        }
-
-        //单独APP权限控制
-        if(StringUtils.isEmpty(orgCode)) { //机构为空
-            //所有权限
-            if("*".equals(appSaasArea) && "*".equals(appSaasOrg)) {
-                saas = "*";
-            } else{
-                //【APP权限】存在区域授权范围
-                if(!StringUtils.isEmpty(appSaasArea) && !appSaasArea.equals("*")) {
-                    String[] arrayArea = appSaasArea.split(",");
-                    for(String area : arrayArea) {
-                        if(!areaList.contains(area)) {
-                            areaList.add(area);
-                        }
-                    }
-                }
-                //【APP权限】存在机构授权范围
-                if(!StringUtils.isEmpty(appSaasOrg) && !appSaasOrg.equals("*")) {
-                    String[] arrayOrg = appSaasOrg.split(",");
-                    for(String org : arrayOrg) {
-                        if(!orgList.contains(org)) {
-                            orgList.add(org);
-                        }
-                    }
-                }
-            }
-        }
-        //机构权限控制
-        else {
-            //String[] orgCodeList = orgCode.split(",");
-            List<String> areaListApp = new ArrayList<>();
-            List<String> orgListApp = new ArrayList<>();
-            //for (String orgCo:orgCodeList) {
-
-            //String orgSaasArea = redisServiceClient.getOrgSaasAreaRedis(orgCo);
-            //String orgSaasOrg = redisServiceClient.getOrgSaasOrgRedis(orgCo);
-            String orgSaasArea = redisClient.getOrgSaasAreaRedis(orgCode);
-            String orgSaasOrg = redisClient.getOrgSaasOrgRedis(orgCode);
-
-            //************* 单独机构权限控制 *************
-            if ("*".equals(appSaasArea) && "*".equals(appSaasOrg)) {
-
-                //【机构权限】存在区域授权范围
-                if (!StringUtils.isEmpty(orgSaasArea) && !orgSaasArea.equals("*")) {
-                    String[] arrayArea = orgSaasArea.split(",");
-                    for (String area : arrayArea) {
-                        if (!areaList.contains(area)) {
-                            areaList.add(area);
-                        }
-                    }
-                }
-                //【机构权限】存在机构授权范围
-                if (!StringUtils.isEmpty(orgSaasOrg) && !orgSaasOrg.equals("*")) {
-                    String[] arrayOrg = orgSaasOrg.split(",");
-                    for (String org : arrayOrg) {
-                        if (!orgList.contains(org)) {
-                            orgList.add(org);
-                        }
-                    }
-                }
-                //所有权限
-                if ("*".equals(orgSaasArea) && "*".equals(orgSaasOrg)) {
-                    saas = "*";
-                }
-            }
-            //************* APP权限和机构权限并集 *************
-            else {
-                //【APP权限】存在区域授权范围
-                if (!StringUtils.isEmpty(appSaasArea) && !appSaasArea.equals("*")) {
-                    String[] arrayArea = appSaasArea.split(",");
-                    for (String area : arrayArea) {
-                        if (!areaListApp.contains(area)) {
-                            areaListApp.add(area);
-                        }
-                    }
-                }
-                //【APP权限】存在机构授权范围
-                if (!StringUtils.isEmpty(appSaasOrg) && !appSaasOrg.equals("*")) {
-                    String[] arrayOrg = appSaasOrg.split(",");
-                    for (String org : arrayOrg) {
-                        if (!orgListApp.contains(org)) {
-                            orgListApp.add(org);
-                        }
-                    }
-                }
-                //********【机构权限】存在区域授权范围【区域并集】  ***************
-                if (!StringUtils.isEmpty(orgSaasArea)) {
-                    if ("*".equals(orgSaasArea)) {
-                        areaList = areaListApp;
-                    } else {
-                        String[] arrayArea = orgSaasArea.split(",");
-                        areaList = containArea(areaListApp, arrayArea);
-                    }
-                }
-                //【机构权限】存在机构授权范围
-                if (!StringUtils.isEmpty(orgSaasOrg)) {
-                    if ("*".equals(orgSaasOrg)) {
-                        orgList = orgListApp;
-                    } else {
-                        String[] arrayOrg = orgSaasOrg.split(",");
-                        for (String org : arrayOrg) {
-                            //判断机构权限是否在APP权限范围内
-                            if (orgListApp.contains(org)) {
-                                orgList.add(org);
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
-        if(areaList.size()>0) {
-            for(String area : areaList) {
-                if(area.endsWith("0000")) { //省
-                    area = area.substring(0,area.length()-4)+"*";
-                }
-                else if(area.endsWith("00")) { //市
-                    area = area.substring(0,area.length()-2)+"*";
-                }
-                if(StringUtils.isEmpty(saas)) {
-                    saas = "org_area:"+area;
-                } else{
-                    saas += " OR org_area:" + area;
-                }
-            }
-        }
-        if(orgList.size()>0) {
-            for(String org :orgList) {
-                if(StringUtils.isEmpty(saas)) {
-                    saas = "org_code:" + org;
-                }
-                else{
-                    saas += " OR org_code:" + org;
-                }
-            }
-        }
-        return saas;
     }
 
     /**

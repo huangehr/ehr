@@ -1,4 +1,4 @@
-package com.yihu.ehr.redis;
+package com.yihu.ehr.redis.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
