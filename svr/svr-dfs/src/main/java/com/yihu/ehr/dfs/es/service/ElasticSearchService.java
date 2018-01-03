@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Service - Es搜索服务
@@ -50,6 +49,16 @@ public class ElasticSearchService {
         elasticSearchDao.delete(index, type, idArr);
     }
 
+    public void deleteByField(String index, String type, String field, Object value) {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
+        boolQueryBuilder.must(matchQueryBuilder);
+        List<String> idList = elasticSearchDao.getIds(index, type, boolQueryBuilder);
+        String [] idArr = new String[idList.size()];
+        idArr = idList.toArray(idArr);
+        elasticSearchDao.delete(index, type, idArr);
+    }
+
     public Map<String, Object> update(String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
         if(source.containsKey("_id")) {
             source.remove("_id");
@@ -68,23 +77,23 @@ public class ElasticSearchService {
         return elasticSearchDao.findByField(index, type, boolQueryBuilder);
     }
 
-    public List<Map<String, Object>> page(String index, String type, List<Map<String, String>> filter, int page, int size) {
+    public List<Map<String, Object>> page(String index, String type, List<Map<String, Object>> filter, int page, int size) {
         QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
         return elasticSearchDao.page(index, type, boolQueryBuilder, page, size);
     }
 
-    public long count(String index, String type, List<Map<String, String>> filter) {
+    public long count(String index, String type, List<Map<String, Object>> filter) {
         QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
         return elasticSearchDao.count(index, type, boolQueryBuilder);
     }
 
-    public QueryBuilder getQueryBuilder(List<Map<String, String>> filter) {
+    private QueryBuilder getQueryBuilder(List<Map<String, Object>> filter) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        for(Map<String, String> param : filter) {
-            String andOr = param.get("andOr");
-            String condition = param.get("condition");
-            String field = param.get("field");
-            String value = param.get("value");
+        for(Map<String, Object> param : filter) {
+            String andOr = String.valueOf(param.get("andOr"));
+            String condition = String.valueOf(param.get("condition"));
+            String field = String.valueOf(param.get("field"));
+            Object value = param.get("value");
             if(condition.equals("=")) {
                 MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
                 if("and".equals(andOr)) {

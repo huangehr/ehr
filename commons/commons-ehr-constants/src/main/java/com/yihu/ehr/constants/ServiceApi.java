@@ -1292,6 +1292,7 @@ public class ServiceApi {
         public static final String Mapping = "/elasticSearch/mapping";
         public static final String Index = "/elasticSearch/index";
         public static final String Delete = "/elasticSearch/delete";
+        public static final String DeleteByField = "/elasticSearch/deleteByField";
         public static final String Update = "/elasticSearch/update";
         public static final String FindById = "/elasticSearch/{id}";
         public static final String FindByField = "/elasticSearch/findByField";

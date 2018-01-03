@@ -196,7 +196,8 @@ public class ElasticSearchDao {
             builder.setTypes(type);
             builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
             builder.setQuery(queryBuilder);
-            builder.setFrom((page - 1) * size).setSize(size).setExplain(true);
+            builder.setFrom((page - 1) * size).setSize(size);
+            builder.setExplain(true);
             SearchResponse response = builder.get();
             SearchHits hits = response.getHits();
             List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
@@ -211,7 +212,28 @@ public class ElasticSearchDao {
         }
     }
 
-    public long count (String index, String type, QueryBuilder queryBuilder){
+    public List<String> getIds(String index, String type, QueryBuilder queryBuilder){
+        TransportClient transportClient = getClient();
+        try {
+            SearchRequestBuilder builder = transportClient.prepareSearch(index);
+            builder.setTypes(type);
+            builder.setSearchType(SearchType.DFS_QUERY_THEN_FETCH);
+            builder.setQuery(queryBuilder);
+            builder.setFrom(0).setSize(10000);
+            builder.setExplain(true);
+            SearchResponse response = builder.get();
+            SearchHits hits = response.getHits();
+            List<String> resultList = new ArrayList<>();
+            for (SearchHit hit : hits.getHits()) {
+                resultList.add(hit.getId());
+            }
+            return resultList;
+        }finally {
+            releaseClient(transportClient);
+        }
+    }
+
+    public long count(String index, String type, QueryBuilder queryBuilder){
         TransportClient transportClient = getClient();
         try {
             SearchRequestBuilder builder = transportClient.prepareSearch(index);
