@@ -20,6 +20,7 @@ import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
 import com.yihu.ehr.resolve.service.resource.stage2.PatientRegisterService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.log.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -87,17 +88,18 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             String zipFile = downloadTo(pack.getRemotePath());
             StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
             ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-            resourceService.save(resourceBucket);
+            resourceService.save(resourceBucket, standardPackage);
             //居民信息注册
             patientRegisterService.checkPatient(resourceBucket, packId);
             //回填入库状态
             Map<String, String> map = new HashMap();
             map.put("profileId", standardPackage.getId());
             map.put("demographicId", standardPackage.getDemographicId());
-            map.put("eventType", String.valueOf(standardPackage.getEventType().getType()));
+            map.put("eventType", standardPackage.getEventType() == null ? "":String.valueOf(standardPackage.getEventType().getType()));
             map.put("eventNo", standardPackage.getEventNo());
             map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
             map.put("patientId", standardPackage.getPatientId());
+            map.put("reUploadFlg", String.valueOf(standardPackage.isReUploadFlg()));
             packageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
             //是否返回数据
@@ -147,7 +149,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             List<StandardPackage> standardPackages = packageResolveService.doResolveNonArchive(pack, zipFile);
             for (StandardPackage standardPackage : standardPackages) {
                 ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-                resourceService.save(resourceBucket);
+                resourceService.save(resourceBucket, standardPackage);
                 patientRegisterService.checkPatient(resourceBucket, packId);
                 String json = standardPackage.toJson();
                 returnJson.add(json);
@@ -161,6 +163,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             map.put("eventNo", standardPackages.get(0).getEventNo());
             map.put("eventDate", DateUtil.toStringLong(standardPackages.get(0).getEventDate()));
             map.put("patientId", standardPackages.get(0).getPatientId());
+            map.put("reUploadFlg", String.valueOf(standardPackages.get(0).isReUploadFlg()));
             datasetPackageMgrClient.reportStatus(packId, ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
             getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
             if (echo) {
@@ -258,7 +261,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "clientId") String clientId,
             @ApiParam(name = "persist", value = "是否入库", required = true, defaultValue = "false")
             @RequestParam(value = "persist", defaultValue = "false") boolean persist) throws Throwable {
-        String zipFile = System.getProperty("java.io.tmpdir") + packageId + ".zip";
+        String zipFile = System.getProperty("java.io.tmpdir") + java.io.File.separator + packageId + ".zip";
         try {
             BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(zipFile)));
             FileCopyUtils.copy(file.getInputStream(), stream);
@@ -268,14 +271,14 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             pack.setId(packageId);
             pack.setClientId(clientId);
             pack.setArchiveStatus(ArchiveStatus.Received);
-            StandardPackage packModel = packageResolveService.doResolve(pack, zipFile);
-            packModel.setClientId(clientId);
-            ResourceBucket resourceBucket = packMillService.grindingPackModel(packModel);
+            StandardPackage standardPackage = packageResolveService.doResolve(pack, zipFile);
+            standardPackage.setClientId(clientId);
+            ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
             if (persist) {
-                resourceService.save(resourceBucket);
+                resourceService.save(resourceBucket, standardPackage);
                 patientRegisterService.checkPatient(resourceBucket, packageId);
             }
-            return new ResponseEntity<>(packModel.toJson(), HttpStatus.OK);
+            return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -298,7 +301,6 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             MPackage pack = entity.getBody();
             String zipFile = downloadTo(pack.getRemotePath());
             StandardPackage packModel = packageResolveService.doResolve(pack, zipFile);
-
             return new ResponseEntity<>(packModel.toJson(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -307,7 +309,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
 
     private String downloadTo(String filePath) throws Exception {
         String[] tokens = filePath.split(":");
-        return fastDFSUtil.download(tokens[0], tokens[1], System.getProperty("java.io.tmpdir"));
+        return fastDFSUtil.download(tokens[0], tokens[1], System.getProperty("java.io.tmpdir") + java.io.File.separator);
     }
 
     private MetricRegistry getMetricRegistry() {

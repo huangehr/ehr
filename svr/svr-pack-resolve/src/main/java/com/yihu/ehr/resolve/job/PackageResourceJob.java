@@ -17,6 +17,7 @@ import com.yihu.ehr.resolve.service.resource.stage2.PatientRegisterService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
 import com.yihu.ehr.util.datetime.DateUtil;
+import com.yihu.ehr.util.log.LogService;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -37,7 +38,7 @@ import java.util.Map;
 @Component
 public class PackageResourceJob implements InterruptableJob {
 
-    private final static String LocalTempPath = System.getProperty("java.io.tmpdir");
+    private final static String LocalTempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
 
     @Override
     public void interrupt() throws UnableToInterruptJobException {
@@ -92,17 +93,18 @@ public class PackageResourceJob implements InterruptableJob {
         long start = System.currentTimeMillis();
         StandardPackage standardPackage = resolveEngine.doResolve(pack, downloadTo(pack.getRemotePath()));
         ResourceBucket resourceBucket = packMill.grindingPackModel(standardPackage);
-        resourceService.save(resourceBucket);
+        resourceService.save(resourceBucket, standardPackage);
         //居民信息注册
         patientRegisterService.checkPatient(resourceBucket, pack.getId());
         //回填入库状态
         Map<String,String> map = new HashMap();
         map.put("profileId",standardPackage.getId());
         map.put("demographicId",standardPackage.getDemographicId());
-        map.put("eventType",String.valueOf(standardPackage.getEventType().getType()));
+        map.put("eventType", standardPackage.getEventType() == null? "":String.valueOf(standardPackage.getEventType().getType()));
         map.put("eventNo",standardPackage.getEventNo());
         map.put("eventDate", DateUtil.toStringLong(standardPackage.getEventDate()));
-        map.put("patientId",standardPackage.getPatientId());
+        map.put("patientId", standardPackage.getPatientId());
+        map.put("reUploadFlg", String.valueOf(standardPackage.isReUploadFlg()));
         packageMgrClient.reportStatus(pack.getId(), ArchiveStatus.Finished, objectMapper.writeValueAsString(map));
         getMetricRegistry().histogram(MetricNames.ResourceJob).update((System.currentTimeMillis() - start) / 1000);
     }

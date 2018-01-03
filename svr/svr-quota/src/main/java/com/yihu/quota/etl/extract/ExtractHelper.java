@@ -24,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +88,11 @@ public class ExtractHelper {
             //判断数据源是什么类型,根据类型和数据库相关的配置信息抽取数据
             if ( TjDataSource.type_es.equals(quotaDataSource.getCode()) ) {
                 //查询ES数据
-                return esExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
+                if( (!StringUtils.isEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals("orgHealthCategory")){
+                    return esExtract.extractOrgHealthCategory(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
+                }else{
+                    return esExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel,saasid, quotaVo,esConfig);
+                }
             }else if( TjDataSource.type_solr.equals(quotaDataSource.getCode()) ){
                 //查询 solr 数据
                 return  solrExtract.extract(tjQuotaDimensionMains,tjQuotaDimensionSlaves,startTime,endTime,timeLevel, quotaVo,esConfig);

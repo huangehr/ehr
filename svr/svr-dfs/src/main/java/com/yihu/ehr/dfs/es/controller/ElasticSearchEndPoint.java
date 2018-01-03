@@ -75,13 +75,8 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
-        if (result != null) {
-            envelop.setSuccessFlg(true);
-            envelop.setObj(result);
-            return envelop;
-        }
-        envelop.setSuccessFlg(false);
-        envelop.setErrorMsg("插入数据前请先建立索引");
+        envelop.setSuccessFlg(true);
+        envelop.setObj(result);
         return envelop;
     }
 
@@ -96,6 +91,23 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "id") String id) {
         Envelop envelop = new Envelop();
         elasticSearchService.delete(index, type, id.split(","));
+        envelop.setSuccessFlg(true);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.ElasticSearch.DeleteByField, method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除数据（单次不能超过10000条）")
+    public Envelop deleteByField(
+            @ApiParam(name = "index", value = "索引名称", required = true)
+            @RequestParam(value = "index") String index,
+            @ApiParam(name = "type", value = "索引类型", required = true)
+            @RequestParam(value = "type") String type,
+            @ApiParam(name = "field", value = "字段", required = true)
+            @RequestParam(value = "field") String field,
+            @ApiParam(name = "value", value = "字段值", required = true)
+            @RequestParam(value = "value") String value) {
+        Envelop envelop = new Envelop();
+        elasticSearchService.deleteByField(index, type, field, value);
         envelop.setSuccessFlg(true);
         return envelop;
     }
@@ -169,7 +181,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "field", value = "字段", required = true)
             @RequestParam(value = "field") String field,
             @ApiParam(name = "value", value = "字段值", required = true)
-            @RequestParam(value = "value") String value) {
+            @RequestParam(value = "value") Object value) {
         Envelop envelop = new Envelop();
         List<Map<String, Object>> resultList = elasticSearchService.findByField(index, type, field, value);
         envelop.setSuccessFlg(true);
@@ -191,7 +203,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
-        List<Map<String, String>> filterMap;
+        List<Map<String, Object>> filterMap;
         if(!StringUtils.isEmpty(filter)) {
             try {
                 filterMap = objectMapper.readValue(filter, List.class);
@@ -202,7 +214,7 @@ public class ElasticSearchEndPoint extends EnvelopRestEndPoint {
                 return envelop;
             }
         }else {
-            filterMap = new ArrayList<Map<String, String>>(0);
+            filterMap = new ArrayList<Map<String, Object>>(0);
         }
         List<Map<String, Object>> resultList = elasticSearchService.page(index, type, filterMap, page, size);
         int count = (int)elasticSearchService.count(index, type, filterMap);

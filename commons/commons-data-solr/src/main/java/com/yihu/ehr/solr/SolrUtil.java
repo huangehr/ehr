@@ -91,7 +91,6 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Query Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
         pool.close(conn); //释放连接
@@ -141,7 +140,6 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Query Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
         pool.close(conn); //释放连接
@@ -181,7 +179,6 @@ public class SolrUtil {
         query.setStart(start);
         rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Count Time:" + qtime);
         SolrDocumentList docs = rsp.getResults();
 
         pool.close(conn);
@@ -216,8 +213,6 @@ public class SolrUtil {
         QueryResponse rsp = conn.query(query);
         List<FacetField.Count> countList = rsp.getFacetField(groupField).getValues();
         qtime = rsp.getQTime();
-        System.out.print("Solr Group Time:" + qtime);
-
         Map<String, Long> rmap = new HashMap<String, Long>();
         for (FacetField.Count count : countList) {
             if (count.getCount() > 0)
@@ -255,7 +250,6 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Group Time:" + qtime);
         List<FacetField> facets = rsp.getFacetFields();
 
         pool.close(conn);
@@ -290,8 +284,6 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Group Time:" + qtime);
-
         NamedList<List<PivotField>> namedList = rsp.getFacetPivot();
 
         pool.close(conn);
@@ -332,7 +324,6 @@ public class SolrUtil {
 
         QueryResponse rsp = conn.query(query);
         qtime = rsp.getQTime();
-        System.out.print("Solr Stats Time:" + qtime);
 
         Map<String, FieldStatsInfo> stats = rsp.getFieldStatsInfo();
         pool.close(conn);

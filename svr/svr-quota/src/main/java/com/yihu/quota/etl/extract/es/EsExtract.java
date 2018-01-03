@@ -5,14 +5,19 @@ import com.alibaba.druid.sql.ast.expr.SQLQueryExpr;
 import com.alibaba.druid.sql.parser.ParserException;
 import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.Token;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.es.ElasticFactory;
+import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
+import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
+import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
+import com.yihu.quota.vo.SaveModelOrgHealthCategory;
 import net.sf.json.JSONObject;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -52,12 +57,21 @@ public class EsExtract {
     private ElasticFactory elasticFactory;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private QuotaService quotaService;
+    @Autowired
+    private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
+
+
+
     private String startTime;
     private String endTime;
     private String timeLevel;
     private String saasid;
     private QuotaVo quotaVo;
     private EsConfig esConfig;
+
+    private static String orgHealthCategory = "orgHealthCategory";
 
 
     public List<SaveModel> extract(List<TjQuotaDimensionMain> qdm,//主维度
@@ -76,17 +90,131 @@ public class EsExtract {
         this.quotaVo = quotaVo;
         this.esConfig = esConfig;
 
-        //拼凑查询的sql
-        Map<String, TjQuotaDimensionMain> sqls = getSql(qdm, qds);
-        //根据sql查询ES
-        List<SaveModel> saveModels = null;
-        try {
-            saveModels = queryEsBySql(sqls, qds);
-        }catch (Exception e){
-            throw new Exception("es 查询数据出错！" +e.getMessage() );
+            List<SaveModel> saveModels = null;
+            //普通通用 拼接sql 方式
+            //拼凑查询的sql
+            Map<String, TjQuotaDimensionMain> sqls = getSql(qdm, qds);
+            //根据sql查询ES
+            try {
+                saveModels = queryEsBySql(sqls, qds);
+            }catch (Exception e){
+                throw new Exception("es 查询数据出错！" +e.getMessage() );
+            }
+        return saveModels;
+
+    }
+
+    public List<SaveModel> extractOrgHealthCategory(List<TjQuotaDimensionMain> qdm,//主维度
+                                   List<TjQuotaDimensionSlave> qds,//细维度
+                                   String startTime,//开始时间
+                                   String endTime, //结束时间
+                                   String timeLevel, //时间维度  1日,2 周, 3 月,4 年
+                                   String saasid,//saasid
+                                   QuotaVo quotaVo,//指标code
+                                   EsConfig esConfig //es配置
+    ) throws Exception {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.timeLevel = timeLevel;
+        this.saasid = saasid;
+        this.quotaVo = quotaVo;
+        this.esConfig = esConfig;
+
+        List<SaveModel> saveModels = new ArrayList<>();
+        if( (!StringUtils.isEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+            //二次统计   特殊类型：卫生机构类型
+            List<Map<String, Object>> orgTypeList = new ArrayList<>();
+
+            String quotaCode = esConfig.getSuperiorCode();
+            List<Map<String, Object>> mapList =  quotaService.queryResultPageByCode(quotaCode, "", 1, 500);
+            if(mapList != null && mapList.size() > 0){
+                for(Map<String,Object> map : mapList){
+                    String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId from organizations where org_code=";
+                    dictSql = dictSql + "'"+ map.get("org") + "'";
+                    List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
+                    if(organizations != null && organizations.size() > 0){
+                        if(!StringUtils.isEmpty(organizations.get(0).getHosTypeId())){
+                            map.put(orgHealthCategory,organizations.get(0).getHosTypeId());
+                            orgTypeList.add(map);
+                        }
+                    }
+                }
+            }
+
+            List<Map<String, Object>> sumOrgTypeList =  stastisOrtType(orgTypeList,qdm, qds);
+
+            boolean resultFlag = orgHealthCategoryStatisticsService.countResultsAndSaveToEs(sumOrgTypeList);
+            SaveModel saveModel = new SaveModel();
+            saveModel.setQuotaCode(orgHealthCategory);
+            if(resultFlag){
+                saveModel.setSaasId("success");
+            }else {
+                saveModel.setSaasId("fail");
+            }
+            saveModels.add(saveModel);
         }
         return saveModels;
 
+    }
+
+
+    public List<Map<String, Object>> stastisOrtType(List<Map<String, Object>> orgTypeList,List<TjQuotaDimensionMain> qdm,
+                                                    List<TjQuotaDimensionSlave> qds){
+        Map<String, Object> dimensionMap = new HashMap<>();
+        for(TjQuotaDimensionMain main:qdm){
+            if(!main.getMainCode().trim().equals("org")){
+                dimensionMap.put(main.getMainCode(),main.getMainCode());
+            }
+        }
+        for(TjQuotaDimensionSlave slave:qds){
+            dimensionMap.put(slave.getSlaveCode(),slave.getSlaveCode());
+        }
+
+        List<Map<String, Object>> sumOrgTypeList = new ArrayList<>();
+        Map<String,String> typeMap = new HashMap<>();
+        if(orgTypeList != null && orgTypeList.size() > 0){
+            for(Map<String,Object> map : orgTypeList){
+                if( !StringUtils.isEmpty(map.get(orgHealthCategory))){
+                    String key = map.get(orgHealthCategory).toString();
+                    for(String dimen:dimensionMap.keySet()){
+                        key = key + "-" + map.get(dimen);
+                    }
+                    typeMap.put(key, key);
+                }
+            }
+        }
+
+        if(typeMap != null && typeMap.size() > 0){
+            for(String type : typeMap.keySet()){
+                Map<String, Object> sumOrgTypeMap = new HashMap<>();
+                int count = 0;
+                int num = 0;
+                if(orgTypeList != null && orgTypeList.size() > 0){
+                    for(Map<String,Object> map : orgTypeList){
+                        num ++;
+                        String key = map.get(orgHealthCategory).toString();
+                        for(String dimen:dimensionMap.keySet()){
+                            key = key + "-" + map.get(dimen);
+                        }
+                        if(type.equals(key)){
+                            count = count + Integer.valueOf(map.get("result").toString());
+                            if(dimensionMap != null && dimensionMap.size() > 0){
+                                for(String dimen:dimensionMap.keySet()){
+                                    sumOrgTypeMap.put(dimen,map.get(dimen));
+                                }
+                            }
+                            sumOrgTypeMap.put("quotaCode",quotaVo.getCode());
+                            sumOrgTypeMap.put("quotaName",quotaVo.getName());
+                            sumOrgTypeMap.put("quotaDate",map.get("quotaDate"));
+                        }
+                    }
+                }
+                sumOrgTypeMap.put("code",type);
+                sumOrgTypeMap.put("result",count);
+                sumOrgTypeList.add(sumOrgTypeMap);
+            }
+        }
+        return  sumOrgTypeList;
     }
 
     private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData,Integer key) {

@@ -12,6 +12,7 @@ import com.yihu.ehr.dfs.fastdfs.service.FastDFSService;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.dict.MDictionaryEntry;
 import com.yihu.ehr.model.dict.MSystemDict;
+import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +20,8 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.csource.common.MyException;
 import org.csource.fastdfs.FileInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -111,12 +114,21 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
-        if(null == publicServer || publicServer.isEmpty()) {
-            publicServer = getPublicUrl().getDetailModelList();
-        }
         String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
-        newSource.put("httpUrl", publicUrl + "/" + path);
+        if(null == publicServer || publicServer.isEmpty()) {
+            try {
+                publicServer = getPublicUrl().getDetailModelList();
+                if(null != publicServer && !publicServer.isEmpty()) {
+                    String publicUrl = publicServer.get((int) (Math.random() * publicServer.size()));
+                    newSource.put("httpUrl", publicUrl + "/" + path);
+                }
+            }catch (Exception e) {
+                LoggerFactory.getLogger(FastDFSEndPoint.class).error(e.getMessage());
+            }
+        }else {
+            String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
+            newSource.put("httpUrl", publicUrl + "/" + path);
+        }
         envelop.setSuccessFlg(true);
         envelop.setObj(newSource);
         return envelop;
@@ -165,12 +177,21 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             envelop.setErrorMsg(e.getMessage());
             return envelop;
         }
-        if(null == publicServer || publicServer.isEmpty()) {
-            publicServer = getPublicUrl().getDetailModelList();
-        }
         String path = groupName.substring(1, groupName.length() - 1) + "/" + remoteFileName.substring(1, remoteFileName.length() - 1);
-        String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
-        newSource.put("httpUrl", publicUrl + "/" + path);
+        if(null == publicServer || publicServer.isEmpty()) {
+            try {
+                publicServer = getPublicUrl().getDetailModelList();
+                if(null != publicServer && !publicServer.isEmpty()) {
+                    String publicUrl = publicServer.get((int) (Math.random() * publicServer.size()));
+                    newSource.put("httpUrl", publicUrl + "/" + path);
+                }
+            }catch (Exception e) {
+                LoggerFactory.getLogger(FastDFSEndPoint.class).error(e.getMessage());
+            }
+        }else {
+            String publicUrl = publicServer.get((int)(Math.random() * publicServer.size()));
+            newSource.put("httpUrl", publicUrl + "/" + path);
+        }
         envelop.setSuccessFlg(true);
         envelop.setObj(newSource);
         return envelop;
@@ -645,7 +666,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
-        List<Map<String, String>> filterMap;
+        List<Map<String, Object>> filterMap;
         if(!StringUtils.isEmpty(filter)) {
             try {
                 filterMap = objectMapper.readValue(filter, List.class);
@@ -656,7 +677,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
                 return envelop;
             }
         }else {
-            filterMap = new ArrayList<Map<String, String>>(0);
+            filterMap = new ArrayList<Map<String, Object>>(0);
         }
         List<Map<String, Object>> resultList = elasticSearchService.page(indexName, indexType, filterMap, page, size);
         int count = (int)elasticSearchService.count(indexName, indexType, filterMap);
@@ -697,8 +718,8 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
         if (null == publicServer || publicServer.isEmpty()) {
             MSystemDict systemDict = systemDictClient.getDictionaryByPhoneticCode(dictCode);
             Envelop envelop1 = systemDictEntryClient.listByDictId(systemDict.getId());
-            if(envelop1.isSuccessFlg()) {
-                List<Map<String, Object>> list = envelop1.getDetailModelList();
+            List<Map<String, Object>> list = envelop1.getDetailModelList();
+            if(envelop1.isSuccessFlg() && null != list && !list.isEmpty()) {
                 publicServer = new ArrayList<String>(list.size());
                 for(Map dictEntry : list) {
                     publicServer.add(String.valueOf(dictEntry.get("value")));

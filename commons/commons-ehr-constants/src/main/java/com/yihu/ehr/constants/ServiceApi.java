@@ -972,6 +972,7 @@ public class ServiceApi {
             public static final String Delete = "/redis/cache/keyRule/delete";
             public static final String IsUniqueName = "/redis/cache/keyRule/isUniqueName";
             public static final String IsUniqueCode = "/redis/cache/keyRule/isUniqueCode";
+            public static final String IsUniqueExpression = "/redis/cache/keyRule/isUniqueExpression";
         }
         // 缓存操作
         public static class CacheOperation {
@@ -1134,6 +1135,7 @@ public class ServiceApi {
 
 
         public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
+        public static final String TjGetOrgHealthCategoryQuotaResult = "/tj/tjGetOrgHealthCategoryQuotaResult";
         public static final String TjQuotaExecute = "/job/execuJob";
 
 
@@ -1215,6 +1217,13 @@ public class ServiceApi {
         public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
         public static final String GetReportByMenuId = "/governmentMenuReportMonitorType/getReportByMenuId";
+        //政府服务平台-门诊仪表盘-start
+        public static final String OutpatientsBoardCount = "/government/outpatientsBoardCount";
+        public static final String GetMonthDistribution = "/statistics/monthDistribution";
+        public static final String GetRescue = "/statistics/rescue";
+
+        //政府服务平台-门诊仪表盘-end
+
     }
 
     public static class SystemDict {
@@ -1283,11 +1292,17 @@ public class ServiceApi {
         public static final String Mapping = "/elasticSearch/mapping";
         public static final String Index = "/elasticSearch/index";
         public static final String Delete = "/elasticSearch/delete";
+        public static final String DeleteByField = "/elasticSearch/deleteByField";
         public static final String Update = "/elasticSearch/update";
         public static final String FindById = "/elasticSearch/{id}";
         public static final String FindByField = "/elasticSearch/findByField";
         public static final String Page = "/elasticSearch/page";
 
+    }
+
+    public static class OutpatientServiceStatistic {
+        public static final String StatisticDeptOutpatientSum = "/outpatientServiceStatistic/statisticDeptOutpatientSum";
+        public static final String StatisticDeptTransferTreatmentSum = "/outpatientServiceStatistic/statisticDeptTransferTreatmentSum";
     }
 
 }

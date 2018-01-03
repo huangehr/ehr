@@ -93,16 +93,4 @@ public class RedisMqChannelController extends BaseController {
         return redisMqChannelClient.isUniqueChannelName(id, channelName);
     }
 
-    @ApiOperation("发布消息")
-    @RequestMapping(value = ServiceApi.Redis.MqChannel.SendMessage, method = RequestMethod.POST)
-    public Envelop sendMessage(
-            @ApiParam(name = "publisherAppId", value = "发布者应用ID", required = true)
-            @RequestParam(value = "publisherAppId") String publisherAppId,
-            @ApiParam(name = "channel", value = "消息队列编码", required = true)
-            @RequestParam(value = "channel") String channel,
-            @ApiParam(name = "message", value = "消息", required = true)
-            @RequestParam(value = "message") String message) {
-        return redisMqChannelClient.sendMessage(publisherAppId, channel, message);
-    }
-
 }
