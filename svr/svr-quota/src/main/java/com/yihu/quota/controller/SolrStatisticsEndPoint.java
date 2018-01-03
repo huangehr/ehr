@@ -324,8 +324,20 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
                 }
             }
         }
+
+        Map<String, Object> resap = new HashMap<>();
+        // dictId=99 (医院等级)
+        Map<String,Object> dictEntrysMap = orgService.getDictEntries(99);
+        for(String code : resultMap.keySet()) {
+            if(null != dictEntrysMap.get(code)){
+                resap.put(dictEntrysMap.get(code).toString(),resultMap.get(code));
+            }else{
+                resap.put(code,resultMap.get(code));
+            }
+        }
+
         envelop.setSuccessFlg(true);
-        envelop.setObj(resultMap);
+        envelop.setObj(resap);
         return envelop;
     }
 
