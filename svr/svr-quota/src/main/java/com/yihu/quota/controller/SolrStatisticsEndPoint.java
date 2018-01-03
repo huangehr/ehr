@@ -1,11 +1,8 @@
 package com.yihu.quota.controller;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.query.common.model.QueryCondition;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.service.org.OrgService;
@@ -17,7 +14,7 @@ import org.apache.solr.common.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -126,22 +123,16 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         String monthStr;
         if (month < 10) {
             monthStr = "0" + month;
         } else {
             monthStr = "" + month;
         }
-        String dayStr;
-        if (day < 10) {
-            dayStr = "0" + day;
-        } else {
-            dayStr = "" + day;
-        }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
-        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String end = dateFormat.format(calendar.getTime());
         String q = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
         Map<String, Integer> data1 = solr.getFacetQuery(core, q);
         Integer clinic = data1.get(q);
@@ -160,23 +151,17 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         String monthStr;
         if (month < 10) {
             monthStr = "0" + month;
         } else {
             monthStr = "" + month;
         }
-        String dayStr;
-        if (day < 10) {
-            dayStr = "0" + day;
-        } else {
-            dayStr = "" + day;
-        }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         //获取当月住院数据
         String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
-        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String end = dateFormat.format(calendar.getTime());
         String q = String.format("event_type:1 AND event_date:[%s TO %s]", start, end);
         Map<String, Integer> data1 = solr.getFacetQuery(core, q);
         Integer hospitalized = data1.get(q);
@@ -201,22 +186,16 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         String monthStr;
         if (month < 10) {
             monthStr = "0" + month;
         } else {
             monthStr = "" + month;
         }
-        String dayStr;
-        if (day < 10) {
-            dayStr = "0" + day;
-        } else {
-            dayStr = "" + day;
-        }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
-        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String end = dateFormat.format(calendar.getTime());
         String q = String.format("event_type:0 AND EHR_001240:51 AND event_date:[%s TO %s]", start, end);
         Map<String, Integer> data1 = solr.getFacetQuery(core, q);
         Integer clinic = data1.get(q);
@@ -234,22 +213,16 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         String monthStr;
         if (month < 10) {
             monthStr = "0" + month;
         } else {
             monthStr = "" + month;
         }
-        String dayStr;
-        if (day < 10) {
-            dayStr = "0" + day;
-        } else {
-            dayStr = "" + day;
-        }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
-        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String end = dateFormat.format(calendar.getTime());
         String q = String.format("event_type:0 AND EHR_000083:T AND event_date:[%s TO %s]", start, end);
         Map<String, Integer> data1 = solr.getFacetQuery(core, q);
         Integer clinic = data1.get(q);
@@ -264,10 +237,19 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "core", value = "集合", required = true)
             @RequestParam(value = "core") String core,
             @ApiParam(name = "year", value = "年份", required = true)
-            @RequestParam(value = "year") String year) throws Exception {
+            @RequestParam(value = "year") int year) throws Exception {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, new Integer(year));
+        int nowYear = calendar.get(Calendar.YEAR);
+        if(nowYear > year) {
+            calendar.set(Calendar.MONTH, 11);
+        }
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         int month = calendar.get(Calendar.MONTH) + 1;
         List<Map<String, Integer>> dataList = new ArrayList<>(month);
         for(int i = 1; i <= month; i ++) {
@@ -278,9 +260,17 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
                 monthStr = "" + i;
             }
             String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
+            String end;
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             calendar.set(Calendar.MONTH, i - 1);
-            int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-            String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, day);
+            int day;
+            if(i == month && nowYear == year) {
+                Calendar calendar1 = Calendar.getInstance();
+                end = dateFormat.format(calendar1.getTime());
+            }else {
+                day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                end = String.format("%s-%s-%sT23:59:59Z", year, monthStr, day);
+            }
             String q = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
             Map<String, Integer> data = solr.getFacetQuery(core, q);
             data.put(monthStr, data.get(q));
@@ -298,22 +288,16 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         String monthStr;
         if(month < 10) {
             monthStr = "0" + month;
         }else {
             monthStr = "" + month;
         }
-        String dayStr;
-        if(day < 10) {
-            dayStr = "0" + day;
-        }else {
-            dayStr = "" + day;
-        }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String start = String.format("%s-%s-01T00:00:00Z", year, monthStr);
-        String end = String.format("%s-%s-%sT00:00:00Z", year, monthStr, dayStr);
+        String end = dateFormat.format(calendar.getTime());
         String fq = String.format("event_type:0 AND event_date:[%s TO %s]", start, end);
         FacetField facetField = solr.getFacetField("HealthProfile", "org_code", fq, 0, 0, 1000000, false);
         List<FacetField.Count> list = facetField.getValues();
@@ -340,56 +324,21 @@ public class SolrStatisticsEndPoint extends EnvelopRestEndPoint {
                 }
             }
         }
-        envelop.setSuccessFlg(true);
-        envelop.setObj(resultMap);
-        return envelop;
-    }
 
-    /**
-     * 新增参数
-     *
-     * @return
-     */
-    private String addParams(String oldParams, String key, String value) {
-        String newParam = "";
-        if (value.startsWith("[") && value.endsWith("]")) {
-            newParam = "\"" + key + "\":" + value;
-        } else {
-            newParam = "\"" + key + "\":\"" + value.replace("\"", "\\\"") + "\"";
-        }
-        if (oldParams != null && oldParams.length() > 3 && oldParams.startsWith("{") && oldParams.endsWith("}")) {
-            return oldParams.substring(0, oldParams.length() - 1) + "," + newParam + "}";
-        } else {
-            return "{" + newParam + "}";
-        }
-    }
-
-    /**
-     * 查询条件转换
-     *
-     * @param queryCondition
-     * @return
-     * @throws Exception
-     */
-    private List<QueryCondition> parseCondition(String queryCondition) throws IOException {
-        List<QueryCondition> ql = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        JavaType javaType = mapper.getTypeFactory().constructParametricType(List.class, Map.class);
-        List<Map<String, Object>> list = objectMapper.readValue(queryCondition, javaType);
-        if (list != null && list.size() > 0) {
-            for (Map<String, Object> item : list) {
-                String andOr = String.valueOf(item.get("andOr")).trim();
-                String field = String.valueOf(item.get("field")).trim();
-                String cond = String.valueOf(item.get("condition")).trim();
-                String value = String.valueOf(item.get("value"));
-                if (value.indexOf(",") > 0) {
-                    ql.add(new QueryCondition(andOr, cond, field, value.split(",")));
-                } else {
-                    ql.add(new QueryCondition(andOr, cond, field, value));
-                }
+        Map<String, Object> resap = new HashMap<>();
+        // dictId=99 (医院等级)
+        Map<String,Object> dictEntrysMap = orgService.getDictEntries(99);
+        for(String code : resultMap.keySet()) {
+            if(null != dictEntrysMap.get(code)){
+                resap.put(dictEntrysMap.get(code).toString(),resultMap.get(code));
+            }else{
+                resap.put(code,resultMap.get(code));
             }
         }
-        return ql;
+
+        envelop.setSuccessFlg(true);
+        envelop.setObj(resap);
+        return envelop;
     }
 
     // 获取当月第一天日期（精确到00:00:00）

@@ -666,7 +666,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "size", value = "分页大小", required = true, defaultValue = "15")
             @RequestParam(value = "size") int size) {
         Envelop envelop = new Envelop();
-        List<Map<String, String>> filterMap;
+        List<Map<String, Object>> filterMap;
         if(!StringUtils.isEmpty(filter)) {
             try {
                 filterMap = objectMapper.readValue(filter, List.class);
@@ -677,7 +677,7 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
                 return envelop;
             }
         }else {
-            filterMap = new ArrayList<Map<String, String>>(0);
+            filterMap = new ArrayList<Map<String, Object>>(0);
         }
         List<Map<String, Object>> resultList = elasticSearchService.page(indexName, indexType, filterMap, page, size);
         int count = (int)elasticSearchService.count(indexName, indexType, filterMap);

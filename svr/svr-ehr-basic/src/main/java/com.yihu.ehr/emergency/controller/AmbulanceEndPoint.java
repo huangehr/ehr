@@ -89,25 +89,30 @@ public class AmbulanceEndPoint extends EnvelopRestEndPoint {
             List<Ambulance> ambulanceList = ambulanceService.search(fields, filters, sorts, page, size);
             Date date = new Date();
             for (Ambulance ambulance : ambulanceList) {
-                Map<String, Object> resultMap = new HashMap<String, Object>();
-                List<Schedule> scheduleList = scheduleService.findMatch(ambulance.getId(), date);
-                Attendance attendance = attendanceService.findByCreateDateAndCarId(date, ambulance.getId());
-                Location location = locationService.findById(ambulance.getLocation());
-                Map<String, Object> childMap = new HashMap<String, Object>();
-                childMap.put("id", ambulance.getId());
-                childMap.put("location", location.getId());
-                childMap.put("initLongitude", location.getInitLongitude());
-                childMap.put("initLatitude", location.getInitLatitude());
-                childMap.put("initAddress", location.getInitAddress());
-                childMap.put("district", location.getDistrict());
-                childMap.put("orgName", ambulance.getOrgName());
-                childMap.put("phone", ambulance.getPhone());
-                childMap.put("status", ambulance.getStatus());
-                childMap.put("entityName", ambulance.getEntityName());
-                childMap.put("dutyList", scheduleList);
-                childMap.put("attendance", attendance);
-                resultMap.put("car", childMap);
-                resultList.add(resultMap);
+                if(ambulance.getStatus() != Ambulance.Status.down) {
+                    List<Schedule> scheduleList = scheduleService.findMatch(ambulance.getId(), date);
+                    if (scheduleList.size() >= 3) {
+                        Map<String, Object> resultMap = new HashMap<String, Object>();
+                        Attendance attendance = attendanceService.findByCreateDateAndCarId(date, ambulance.getId());
+                        Location location = locationService.findById(ambulance.getLocation());
+                        Map<String, Object> childMap = new HashMap<String, Object>();
+                        childMap.put("id", ambulance.getId());
+                        childMap.put("location", location.getId());
+                        childMap.put("initLongitude", location.getInitLongitude());
+                        childMap.put("initLatitude", location.getInitLatitude());
+                        childMap.put("initAddress", location.getInitAddress());
+                        childMap.put("district", location.getDistrict());
+                        childMap.put("orgName", ambulance.getOrgName());
+                        childMap.put("phone", ambulance.getPhone());
+                        childMap.put("status", ambulance.getStatus());
+                        childMap.put("entityName", ambulance.getEntityName());
+                        childMap.put("dutyList", scheduleList);
+                        childMap.put("attendance", attendance);
+                        resultMap.put("car", childMap);
+                        resultList.add(resultMap);
+                    }
+                }
+
             }
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(resultList);

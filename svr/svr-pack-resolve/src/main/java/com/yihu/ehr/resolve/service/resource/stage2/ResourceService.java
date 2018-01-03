@@ -5,6 +5,7 @@ import com.yihu.ehr.resolve.dao.FileResourceDao;
 import com.yihu.ehr.resolve.dao.MasterResourceDao;
 import com.yihu.ehr.resolve.dao.RelationDao;
 import com.yihu.ehr.resolve.dao.SubResourceDao;
+import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,9 +30,9 @@ public class ResourceService {
     @Autowired
     private RelationDao relationDao;
 
-    public void save(ResourceBucket resourceBucket) throws Exception {
+    public void save(ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
         // 资源主表
-        masterResRepo.saveOrUpdate(resourceBucket);
+        masterResRepo.saveOrUpdate(resourceBucket, standardPackage);
 
         // 资源子表
         subResRepo.saveOrUpdate(resourceBucket);

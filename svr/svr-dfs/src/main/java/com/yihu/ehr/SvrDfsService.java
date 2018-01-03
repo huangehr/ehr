@@ -18,14 +18,14 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 @EnableFeignClients
 @EnableDiscoveryClient
-public class SvrDfsApplication extends SpringBootServletInitializer {
+public class SvrDfsService extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        SpringApplication.run(SvrDfsApplication.class, args);
+        SpringApplication.run(SvrDfsService.class, args);
     }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(SvrDfsApplication.class);
+        return application.sources(SvrDfsService.class);
     }
 }
