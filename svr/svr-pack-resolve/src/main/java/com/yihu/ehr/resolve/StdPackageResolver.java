@@ -69,7 +69,6 @@ public class StdPackageResolver extends PackageResolver {
                 standardPackage.setEventDate(dataSet.getEventTime());
                 standardPackage.setPatientId(dataSet.getPatientId());
                 standardPackage.setEventNo(dataSet.getEventNo());
-                standardPackage.setEventType(EventType.reUpload);
                 standardPackage.setOrgCode(dataSet.getOrgCode());
                 standardPackage.setCdaVersion(dataSet.getCdaVersion());
                 standardPackage.setCreateDate(dataSet.getCreateTime());
