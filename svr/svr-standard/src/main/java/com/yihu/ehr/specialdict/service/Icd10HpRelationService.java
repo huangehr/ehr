@@ -1,6 +1,7 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.specialdict.dao.Icd10HpRelationRepository;
 import com.yihu.ehr.specialdict.model.Icd10HpRelation;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,10 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class Icd10HpRelationService extends BaseJpaService<Icd10HpRelation, XIcd10HpRelationRepository> {
+public class Icd10HpRelationService extends BaseJpaService<Icd10HpRelation, Icd10HpRelationRepository> {
 
     @Autowired
-    private XIcd10HpRelationRepository Icd10hpReRepo;
+    private Icd10HpRelationRepository Icd10hpReRepo;
 
     public boolean isExist(long icd10Id,long hpId){
         Icd10HpRelation icd10HpRelation = Icd10hpReRepo.findByIcd10IdAndHpId(icd10Id,hpId);

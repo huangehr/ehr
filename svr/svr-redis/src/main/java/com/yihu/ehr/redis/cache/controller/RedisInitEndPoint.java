@@ -3,8 +3,8 @@ package com.yihu.ehr.redis.cache.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.redis.RedisClient;
 import com.yihu.ehr.redis.cache.service.RedisInitService;
+import com.yihu.ehr.redis.client.RedisClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RedisInit", description = "Redis初始化服务（使用原生SQL提高效率）")
+@Api(value = "RedisInitEndPoint", description = "Redis初始化服务", tags = {"缓存服务-数据初始化接口"})
 public class RedisInitEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

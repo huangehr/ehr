@@ -19,8 +19,9 @@ import springfox.documentation.annotations.ApiIgnore;
  * @version 1.0
  * @created 2016.3.2
  */
-@ApiIgnore
-@FeignClient(name = MicroServices.Standard)
+//@ApiIgnore
+//@FeignClient(name = MicroServices.Standard)
+@Deprecated
 public interface DispatchLogClient {
 
 
