@@ -254,13 +254,12 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "status") ArchiveStatus status,
             @ApiParam(name = "sorts", value = "排序(建议使用默认值，以解析较早之前的数据)", defaultValue = "+receiveDate")
             @RequestParam(value = "sorts", required = false) String sorts,
-            @ApiParam(name = "count", value = "数量", required = true, defaultValue = "500")
+            @ApiParam(name = "count", value = "数量（不要超过10000）", required = true, defaultValue = "500")
             @RequestParam(value = "count") int count) throws Exception {
         if(status == ArchiveStatus.Received || status == ArchiveStatus.Acquired) {
             if(redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
                 return "添加失败，队列中存在消息！";
             }else {
-                //状态为0或者1的数据不在此重新更新状态，当数据量庞大的时候可以减少数据库的负担
                 List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
                 for(Package rPackage : packageList) {
                     MPackage mPackage = convertToModel(rPackage, MPackage.class);

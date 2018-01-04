@@ -972,6 +972,7 @@ public class ServiceApi {
             public static final String Delete = "/redis/cache/keyRule/delete";
             public static final String IsUniqueName = "/redis/cache/keyRule/isUniqueName";
             public static final String IsUniqueCode = "/redis/cache/keyRule/isUniqueCode";
+            public static final String IsUniqueExpression = "/redis/cache/keyRule/isUniqueExpression";
         }
         // 缓存操作
         public static class CacheOperation {
@@ -1291,6 +1292,7 @@ public class ServiceApi {
         public static final String Mapping = "/elasticSearch/mapping";
         public static final String Index = "/elasticSearch/index";
         public static final String Delete = "/elasticSearch/delete";
+        public static final String DeleteByField = "/elasticSearch/deleteByField";
         public static final String Update = "/elasticSearch/update";
         public static final String FindById = "/elasticSearch/{id}";
         public static final String FindByField = "/elasticSearch/findByField";
