@@ -1,6 +1,8 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.specialdict.dao.Icd10IndicatorRelationRepository;
+import com.yihu.ehr.specialdict.dao.IndicatorsDictRepository;
 import com.yihu.ehr.specialdict.model.IndicatorsDict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,12 +22,12 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, XIndicatorsDictRepository>{
+public class IndicatorsDictService extends BaseJpaService<IndicatorsDict, IndicatorsDictRepository>{
 
     @Autowired
-    private XIndicatorsDictRepository indicatorsDictRepo;
+    private IndicatorsDictRepository indicatorsDictRepo;
     @Autowired
-    private XIcd10IndicatorRelationRepository icd10IndicatorReRepo;
+    private Icd10IndicatorRelationRepository icd10IndicatorReRepo;
 
 
     public Page<IndicatorsDict> getDictList(String sorts, int page, int size) {

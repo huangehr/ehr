@@ -1,7 +1,6 @@
 
 package com.yihu.ehr.redis.schema;
 
-import com.yihu.ehr.redis.KeySchema;
 import org.springframework.stereotype.Component;
 
 /**

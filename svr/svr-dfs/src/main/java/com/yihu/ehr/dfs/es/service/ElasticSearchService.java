@@ -1,10 +1,7 @@
 package com.yihu.ehr.dfs.es.service;
 
-import com.yihu.ehr.dfs.es.dao.ElasticSearchDao;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
+import com.yihu.ehr.elasticsearch.ElasticSearchUtil;
 import org.elasticsearch.index.engine.DocumentMissingException;
-import org.elasticsearch.index.query.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,122 +11,52 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Service - Es搜索服务
- * Created by progr1mmer on 2017/12/2.
+ * Created by progr1mmer on 2018/1/4.
  */
 @Service
 public class ElasticSearchService {
 
     @Autowired
-    private ElasticSearchDao elasticSearchDao;
+    private ElasticSearchUtil elasticSearchUtil;
 
-    public void mapping(String index, String type, Map<String, Map<String, String>> source) throws IOException{
-        XContentBuilder xContentBuilder = XContentFactory.jsonBuilder().startObject().startObject("properties");
-        for(String field : source.keySet()) {
-            xContentBuilder.startObject(field);
-            Map<String, String> propsMap = source.get(field);
-            for(String prop : propsMap.keySet()) {
-                xContentBuilder.field(prop, propsMap.get(prop));
-            }
-            xContentBuilder.endObject();
-        }
-        xContentBuilder.endObject().endObject();
-        elasticSearchDao.mapping(index, type, xContentBuilder);
+    public void mapping(String index, String type, Map<String, Map<String, String>> source) throws IOException {
+        elasticSearchUtil.mapping(index, type, source);
     }
 
     public void remove(String index){
-        elasticSearchDao.remove(index);
+        elasticSearchUtil.remove(index);
     }
 
-    public Map<String, Object> index(String index, String type, Map<String, Object> source) throws ParseException{
-        return elasticSearchDao.index(index, type, source);
+    public Map<String, Object> index(String index, String type, Map<String, Object> source) throws ParseException {
+        return elasticSearchUtil.index(index, type, source);
     }
 
     public void delete(String index, String type, String [] idArr) {
-        elasticSearchDao.delete(index, type, idArr);
+        elasticSearchUtil.delete(index, type, idArr);
     }
 
     public void deleteByField(String index, String type, String field, Object value) {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-        boolQueryBuilder.must(matchQueryBuilder);
-        List<String> idList = elasticSearchDao.getIds(index, type, boolQueryBuilder);
-        String [] idArr = new String[idList.size()];
-        idArr = idList.toArray(idArr);
-        elasticSearchDao.delete(index, type, idArr);
+        elasticSearchUtil.deleteByField(index, type, field, value);
     }
 
     public Map<String, Object> update(String index, String type, String id, Map<String, Object> source) throws DocumentMissingException {
-        if(source.containsKey("_id")) {
-            source.remove("_id");
-        }
-        return elasticSearchDao.update(index, type, id, source);
+        return elasticSearchUtil.update(index, type, id, source);
     }
 
     public Map<String, Object> findById(String index, String type, String id) {
-        return elasticSearchDao.findById(index, type, id);
+        return elasticSearchUtil.findById(index, type, id);
     }
 
     public List<Map<String, Object>> findByField(String index, String type, String field, Object value) {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-        boolQueryBuilder.must(matchQueryBuilder);
-        return elasticSearchDao.findByField(index, type, boolQueryBuilder);
+        return elasticSearchUtil.findByField(index, type, field, value);
     }
 
     public List<Map<String, Object>> page(String index, String type, List<Map<String, Object>> filter, int page, int size) {
-        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
-        return elasticSearchDao.page(index, type, boolQueryBuilder, page, size);
+        return elasticSearchUtil.page(index, type, filter, page, size);
     }
 
     public long count(String index, String type, List<Map<String, Object>> filter) {
-        QueryBuilder boolQueryBuilder = getQueryBuilder(filter);
-        return elasticSearchDao.count(index, type, boolQueryBuilder);
-    }
-
-    private QueryBuilder getQueryBuilder(List<Map<String, Object>> filter) {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        for(Map<String, Object> param : filter) {
-            String andOr = String.valueOf(param.get("andOr"));
-            String condition = String.valueOf(param.get("condition"));
-            String field = String.valueOf(param.get("field"));
-            Object value = param.get("value");
-            if(condition.equals("=")) {
-                MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-                if("and".equals(andOr)) {
-                    boolQueryBuilder.must(matchQueryBuilder);
-                }else if("or".equals(andOr)) {
-                    boolQueryBuilder.should(matchQueryBuilder);
-                }
-            }else if (condition.equals("?")) {
-                QueryStringQueryBuilder queryStringQueryBuilder = QueryBuilders.queryStringQuery(field + ":" + value);
-                if("and".equals(andOr)) {
-                    boolQueryBuilder.must(queryStringQueryBuilder);
-                }else if("or".equals(andOr)) {
-                    boolQueryBuilder.should(queryStringQueryBuilder);
-                }
-            }else {
-                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(field);;
-                if(field.endsWith("Date")) {
-                    rangeQueryBuilder.format("yyyy-MM-dd HH:mm:ss");
-                }
-                if(condition.equals(">")) {
-                    rangeQueryBuilder.gt(value);
-                }else if(condition.equals(">=")) {
-                    rangeQueryBuilder.gte(value);
-                }else if(condition.equals("<=")) {
-                    rangeQueryBuilder.lte(value);
-                }else if(condition.equals("<")) {
-                    rangeQueryBuilder.lt(value);
-                }
-                if("and".equals(andOr)) {
-                    boolQueryBuilder.must(rangeQueryBuilder);
-                }else if("or".equals(andOr)) {
-                    boolQueryBuilder.should(rangeQueryBuilder);
-                }
-            }
-        }
-        return boolQueryBuilder;
+        return elasticSearchUtil.count(index, type, filter);
     }
 
 }

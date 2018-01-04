@@ -41,6 +41,7 @@
         <module>../ag-ehr-cloud</module>
         <module>../ag-portal-cloud</module>
         <module>../svr/svr-redis</module>
+        <module>../svr/svr-redis-memory</module>
         <module>../svr/svr-quota</module>
         <module>../svr/svr-log-collection</module>
         <module>../ag-zuul</module>
@@ -367,6 +368,11 @@
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-data-solr</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-data-elasticsearch</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
             <dependency>
