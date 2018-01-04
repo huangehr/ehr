@@ -4,6 +4,9 @@ logging:
       springframework:
         web: INFO
       hibernate: ERROR
+    com:
+      yihu:
+        ehr: WARN
 
 server:
   port: ${svr-dfs.server.port}
@@ -35,6 +38,15 @@ fast-dfs:
     name: dfs #ES索引名称
     type: info #ES索引类型
 
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    max-active: 5
+    max-idle: 2
+    min-idle: 2
+    validation-query: SELECT 1
+    test-on-borrow: true
+
 elasticsearch:
   pool:
     init-size: 5
@@ -43,53 +55,83 @@ elasticsearch:
 ---
 spring:
   profiles: dev
+  datasource:
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: chenweishan
+    password: chenweishan
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
 
 ---
 spring:
   profiles: alpha
+  datasource:
+    url: jdbc:mysql://192.168.1.220:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ha
+    password: ha
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 172.19.103.54:22122
+  public-server: http://172.19.103.54:80
 
 ---
 spring:
   profiles: test
+  datasource:
+    url: jdbc:mysql://172.19.103.50:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: weifuwu
+    password: weifuwu
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 172.19.103.13:22122
+  public-server: http://172.19.103.52:80
 
 ---
 spring:
   profiles: prod
+  datasource:
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ha
+    password: jkzlxm
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 11.1.2.9:22122
+  public-server: http://ds.ehr.yihu.com:22122
 
 ---
 spring:
   profiles: prod_fz
+  datasource:
+    url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 11.1.2.9:22122
+  public-server: http://11.1.2.9:80
 
 ---
 spring:
   profiles: prod_sr
+  datasource:
+    url: jdbc:mysql:///10.176.97.9:3310/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: healthcloud
+    password: GP8Qz4qU
 elasticsearch:
   cluster-name: elasticsearch
   cluster-nodes: 172.17.110.17:9300
 fast-dfs:
   tracker-server: 11.1.2.9:22122
+  public-server: http://10.176.97.5:8888
