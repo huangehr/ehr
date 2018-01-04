@@ -10,6 +10,9 @@ import com.yihu.ehr.adaption.model.OrgDictItem;
 import com.yihu.ehr.adaption.model.OrgMetaData;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MDispatchLog;
+import com.yihu.ehr.standard.model.DispatchLog;
+import com.yihu.ehr.standard.service.DispatchLogService;
+import com.yihu.ehr.standard.service.DispatchService;
 import com.yihu.ehr.util.compress.Zipper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,10 +59,9 @@ public class AdapterInfoSendService {
     @Autowired
     private AdapterDictService adapterDictService;
     @Autowired
-    private DispatchLogClient dispatchLogClient;
-
+    private DispatchLogService dispatchLogService;
     @Autowired
-    StandardDispatchClient standardDispatchClient;
+    private DispatchService dispatchService;
 
     public String getFileSystemPath() {
         String strPath = System.getProperty("java.io.tmpdir");
@@ -613,14 +615,19 @@ public class AdapterInfoSendService {
 
     public Map<String, Object> getStandardAndMappingInfo(String versionCode, String strOrgCode) throws Exception{
         Map<String, Object> resultMap = new HashMap<>();
-        MDispatchLog dispatchLog = dispatchLogClient.getLog(versionCode, strOrgCode);
+        DispatchLog dispatchLog = null;
+        List ls = dispatchLogService.findByFields(
+                new String[]{"stdVersionId", "orgId"},
+                new Object[]{versionCode, strOrgCode});
+        if (ls.size() > 0) {
+            dispatchLog = (DispatchLog)ls.get(0);
+        }
         if(dispatchLog!=null) {
             resultMap.put(FastDFSUtil.GROUP_NAME,dispatchLog.getFileGroup());//setFilePath
             resultMap.put(FastDFSUtil.REMOTE_FILE_NAME, dispatchLog.getFilePath());//setFileName
             resultMap.put("password", dispatchLog.getPassword());
             resultMap.put("ErrorMsg", "");
             resultMap.put("IsSuccess", "true");
-
             return resultMap;
         }
         return null;
@@ -657,7 +664,7 @@ public class AdapterInfoSendService {
         }
 
         //根据版本号获取采集标准文件
-        Map<String, Object> standardMap = standardDispatchClient.createSchemeInfo(versionCode);
+        Map<String, Object> standardMap = dispatchService.sendStandard(versionCode);
 
         if (standardMap == null) {
             standardMap = new HashMap<>();
@@ -702,9 +709,9 @@ public class AdapterInfoSendService {
         resultMap.put("ErrorMsg", "");
         resultMap.put("IsSuccess", "true");
 
-        dispatchLogClient.deleteLog(versionCode, strOrgCode);
+        dispatchLogService.delete(versionCode, strOrgCode);
 
-        MDispatchLog logInfo = new MDispatchLog();
+        DispatchLog logInfo = new DispatchLog();
         logInfo.setOrgId(strOrgCode);
         logInfo.setStdVersionId(versionCode);
         logInfo.setDispatchTime(new Date());
@@ -713,7 +720,7 @@ public class AdapterInfoSendService {
         logInfo.setPassword(strPwd);
         ObjectMapper objectMapper = new ObjectMapper();
         String model = objectMapper.writeValueAsString(logInfo);
-        dispatchLogClient.saveLog(model);
+        dispatchLogService.save(logInfo);
 
         return resultMap;
     }

@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "Standard-Dispatch", description = "分发与下载服务")
+@Api(value = "DispatchEndPoint", description = "分发与下载", tags = {"标准服务-分发与下载"})
 public class DispatchEndPoint extends ExtendEndPoint {
 
     @Autowired

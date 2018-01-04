@@ -32,13 +32,13 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(value = "adapterDataSet", description = "适配数据集接口", tags = {"适配数据集"})
+@Api(value = "AdapterDataSetEndPoint", description = "数据集", tags = {"适配服务-数据集"})
 public class AdapterDataSetEndPoint extends ExtendEndPoint<MAdapterDataSet> {
 
     @Autowired
-    AdapterDataSetService adapterDataSetService;
+    private AdapterDataSetService adapterDataSetService;
     @Autowired
-    OrgAdapterPlanService orgAdapterPlanService;
+    private OrgAdapterPlanService orgAdapterPlanService;
 
     @RequestMapping(value = "/plan/{planId}/datasets", method = RequestMethod.GET)
     @ApiOperation(value = "查询定制数据集")

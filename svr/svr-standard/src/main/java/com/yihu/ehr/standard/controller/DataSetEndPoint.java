@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "Dataset", description = "数据集服务")
+@Api(value = "DataSetEndPoint", description = "数据集", tags = {"标准服务-数据集"})
 public class DataSetEndPoint extends ExtendEndPoint<MStdDataSet> {
 
     @Autowired

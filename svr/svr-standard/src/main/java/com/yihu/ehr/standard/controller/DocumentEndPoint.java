@@ -29,7 +29,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "cda document", description = "CDA文档服务")
+@Api(value = "DocumentEndPoint", description = "CDA文档", tags = {"标准服务-CDA文档"})
 public class DocumentEndPoint extends ExtendEndPoint<MCDADocument> {
 
     @Autowired
