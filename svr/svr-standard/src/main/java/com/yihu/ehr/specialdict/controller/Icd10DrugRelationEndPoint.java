@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "Icd10DrugRelation", description = "ICD10和疾病关系管理接口")
+@Api(value = "Icd10DrugRelationEndPoint", description = "ICD10和疾病关系", tags = {"特殊字典-ICD10和疾病关系"})
 public class Icd10DrugRelationEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

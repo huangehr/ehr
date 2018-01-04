@@ -1,6 +1,7 @@
 package com.yihu.ehr.specialdict.service;
 
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.specialdict.dao.Icd10IndicatorRelationRepository;
 import com.yihu.ehr.specialdict.model.Icd10IndicatorRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,12 +24,12 @@ import java.util.List;
  */
 @Transactional
 @Service
-public class Icd10IndicatorRelationService extends BaseJpaService<Icd10IndicatorRelation, XIcd10IndicatorRelationRepository> {
+public class Icd10IndicatorRelationService extends BaseJpaService<Icd10IndicatorRelation, Icd10IndicatorRelationRepository> {
 
     @PersistenceContext
     protected EntityManager entityManager;
     @Autowired
-    private XIcd10IndicatorRelationRepository icd10IndicatorRelaRepo;
+    private Icd10IndicatorRelationRepository icd10IndicatorRelaRepo;
 
     public boolean isExist(long icd10Id,long indicatorId){
         Icd10IndicatorRelation icd10IndicatorRelation = icd10IndicatorRelaRepo.findByIcd10IdAndIndicatorId(icd10Id, indicatorId);
