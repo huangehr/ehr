@@ -1,6 +1,6 @@
-package com.yihu.ehr.dfs.es.service;
+package com.yihu.ehr.elasticsearch.service;
 
-import com.yihu.ehr.dfs.es.dao.ElasticSearchDao;
+import com.yihu.ehr.elasticsearch.dao.ElasticSearchDao;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.engine.DocumentMissingException;

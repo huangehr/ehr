@@ -1,6 +1,6 @@
-package com.yihu.ehr.dfs.es.dao;
+package com.yihu.ehr.elasticsearch.dao;
 
-import com.yihu.ehr.dfs.es.config.ElasticSearchConfig;
+import com.yihu.ehr.elasticsearch.config.ElasticSearchConfig;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.get.GetRequest;

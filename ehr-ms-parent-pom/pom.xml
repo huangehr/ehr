@@ -372,6 +372,11 @@
             </dependency>
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
+                <artifactId>commons-data-elasticsearch</artifactId>
+                <version>${version.ehr}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yihu.ehr</groupId>
                 <artifactId>commons-redis-keyschema</artifactId>
                 <version>${version.ehr}</version>
             </dependency>
