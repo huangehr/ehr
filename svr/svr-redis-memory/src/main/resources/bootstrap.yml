@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-redis-memory-zjj
+    name: svr-redis-memory
 
 ---
 spring:
