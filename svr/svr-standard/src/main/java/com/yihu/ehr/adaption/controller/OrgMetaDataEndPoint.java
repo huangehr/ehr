@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter/org")
-@Api(value = "orgmetadata", description = "机构数据元", tags = {"机构数据元"})
+@Api(value = "OrgMetaDataEndPoint", description = "机构数据元", tags = {"适配服务-机构数据元"})
 public class OrgMetaDataEndPoint extends ExtendEndPoint<MOrgMetaData> {
 
     @Autowired

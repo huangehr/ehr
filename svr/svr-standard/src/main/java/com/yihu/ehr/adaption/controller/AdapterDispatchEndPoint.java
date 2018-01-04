@@ -8,6 +8,8 @@ import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.standard.MCDAVersion;
+import com.yihu.ehr.standard.model.CDAVersion;
+import com.yihu.ehr.standard.service.CdaVersionService;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.rest.RestEcho;
 import io.swagger.annotations.Api;
@@ -31,15 +33,15 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter_dispatcher")
-@Api(value = "Adapter-Dispatch", description = "适配分发接口", tags = {"标准化", "适配方案", "分发"})
-public class AdapterDispatchController {
+@Api(value = "AdapterDispatchEndPoint", description = "适配分发", tags = {"适配服务-标准化、适配方案、分发"})
+public class AdapterDispatchEndPoint {
 
     @Autowired
     private AdapterInfoSendService adapterInfoSendService;
     @Autowired
     private OrgAdapterPlanService orgAdapterPlanService;
     @Autowired
-    private StdVersionClient stdVersionClient;
+    private CdaVersionService cdaVersionService;
     @Autowired
     private FastDFSUtil fastDFSUtil;
 
@@ -154,7 +156,7 @@ public class AdapterDispatchController {
 
             if (listPlan != null && listPlan.size() > 0) {
                 RestEcho restEcho = new RestEcho().success();
-                MCDAVersion version = stdVersionClient.getVersion(listPlan.get(0).getVersion());
+                CDAVersion version = cdaVersionService.getVersion(listPlan.get(0).getVersion());
                 restEcho.putResult("version", version.getVersion());
                 restEcho.putResult("timestamp", version.getCommitTime());
                 return restEcho;

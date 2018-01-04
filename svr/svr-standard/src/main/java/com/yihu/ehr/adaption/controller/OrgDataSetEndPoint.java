@@ -27,8 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter/org")
-@Api(value = "orgdataset", description = "机构数据集管理接口", tags = {"机构数据集"})
-
+@Api(value = "OrgDataSetEndPoint", description = "机构数据集", tags = {"适配服务-机构数据集"})
 public class OrgDataSetEndPoint extends ExtendEndPoint<MOrgDataSet> {
 
     @Autowired

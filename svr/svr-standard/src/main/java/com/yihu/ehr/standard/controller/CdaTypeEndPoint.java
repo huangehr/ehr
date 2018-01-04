@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RequestMapping(ApiVersion.Version1_0)
 @RestController
-@Api(value = "CdaTypeEndPoint", description = "CDA类别服务")
+@Api(value = "CdaTypeEndPoint", description = "CDA类别", tags = {"标准服务-CDA类别"})
 public class CdaTypeEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
