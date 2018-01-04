@@ -1,4 +1,4 @@
-package com.yihu.ehr.dfs.es.config;
+package com.yihu.ehr.elasticsearch.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
