@@ -48,22 +48,16 @@ spring:
     username: chenweishan
     password: chenweishan
 
-#  redis:
-#    host: 172.19.103.47
-#    port: 6379
-#    password: redis!@456
   redis:
-    host: localhost
+    host: 172.19.103.47
     port: 6379
-    password:
+    password: redis!@456
 
 ehr-redis:
   cache:
     memory:
-#      rdbFilePath: /usr/local/bin/dump.rdb
-#      outFilePath: /home/ehr/redisReport/memory.csv
-      rdbFilePath: C:\Zjj_Programs\Redis-x64-3.2.100\dump.rdb
-      outFilePath: D:\temp\memory.csv
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: /home/ehr/redisReport/memory.csv
 
 ---
 spring:
