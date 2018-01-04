@@ -1,6 +1,6 @@
-package com.yihu.ehr.redis.cache;
+package com.yihu.ehr.redisMemory.cache;
 
-import com.yihu.ehr.redis.cache.entity.RedisCacheKeyMemory;
+import com.yihu.ehr.redisMemory.cache.entity.RedisCacheKeyMemory;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 
