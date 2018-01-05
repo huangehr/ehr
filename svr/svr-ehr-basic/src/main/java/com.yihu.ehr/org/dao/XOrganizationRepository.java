@@ -64,4 +64,7 @@ public interface XOrganizationRepository extends PagingAndSortingRepository<Orga
 
     @Query("select org.id from Organization org where org.orgCode in(:orgCode)")
     List<String> getIdByOrgCode(@Param("orgCode") List<String> orgCode);
+
+    @Query("select org from Organization org where org.orgType='Hospital' and org.ing !='' and  org.ing is not null and org.lat!='' and org.lat is not null" )
+    List<Organization> getHospital();
 }

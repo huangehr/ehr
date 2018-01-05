@@ -794,5 +794,9 @@ public class OrganizationController extends BaseController {
         return envelop;
     }
 
-
+    @RequestMapping(value = "/organizations/getHospital", method = RequestMethod.GET)
+    @ApiOperation(value = "查询所有经纬度医院列表")
+    public Envelop getHospital() throws Exception {
+        return orgClient.getHospital();
+    }
 }
