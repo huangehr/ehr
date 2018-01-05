@@ -272,4 +272,8 @@ public class OrgService extends BaseJpaService<Organization, XOrganizationReposi
         return sqlQuery.list();
     }
 
+    public List<Organization> getHospital() {
+        List<Organization> list =  organizationRepository.getHospital();
+        return list;
+    }
 }

@@ -28,6 +28,7 @@
         <module>../commons/commons-data-mysql</module>
         <module>../commons/commons-data-redis</module>
         <module>../commons/commons-data-solr</module>
+        <module>../commons/commons-data-elasticsearch</module>
         <module>../commons/commons-profile-core</module>
         <module>../commons/commons-rest-model</module>
         <module>../commons/commons-admin-gateway-model</module>

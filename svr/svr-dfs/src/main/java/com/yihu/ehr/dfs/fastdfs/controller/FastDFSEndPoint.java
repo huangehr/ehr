@@ -5,14 +5,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.dfs.client.SystemDictClient;
-import com.yihu.ehr.dfs.client.SystemDictEntryClient;
 import com.yihu.ehr.dfs.es.service.ElasticSearchService;
 import com.yihu.ehr.dfs.fastdfs.service.FastDFSService;
+import com.yihu.ehr.dfs.fastdfs.service.SystemDictEntryService;
+import com.yihu.ehr.dfs.fastdfs.service.SystemDictService;
+import com.yihu.ehr.entity.dict.SystemDict;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
-import com.yihu.ehr.model.dict.MDictionaryEntry;
-import com.yihu.ehr.model.dict.MSystemDict;
-import com.yihu.ehr.util.log.LogService;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,10 +19,10 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.csource.common.MyException;
 import org.csource.fastdfs.FileInfo;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,9 +57,9 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ElasticSearchService elasticSearchService;
     @Autowired
-    private SystemDictClient systemDictClient;
+    private SystemDictService systemDictService;
     @Autowired
-    private SystemDictEntryClient systemDictEntryClient;
+    private SystemDictEntryService systemDictEntryService;
 
     /**
      * 文件上传 - 返回相关索引信息,以及HttpUrl下载连接
@@ -716,13 +715,13 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
     public Envelop getPublicUrl() {
         Envelop envelop = new Envelop();
         if (null == publicServer || publicServer.isEmpty()) {
-            MSystemDict systemDict = systemDictClient.getDictionaryByPhoneticCode(dictCode);
-            Envelop envelop1 = systemDictEntryClient.listByDictId(systemDict.getId());
-            List<Map<String, Object>> list = envelop1.getDetailModelList();
-            if(envelop1.isSuccessFlg() && null != list && !list.isEmpty()) {
-                publicServer = new ArrayList<String>(list.size());
-                for(Map dictEntry : list) {
-                    publicServer.add(String.valueOf(dictEntry.get("value")));
+            SystemDict systemDict = systemDictService.findByPhoneticCode(dictCode);
+            Page<SystemDictEntry> page =  systemDictEntryService.findByDictId(systemDict.getId(), 0, 100);
+            if(page != null) {
+                List<SystemDictEntry> systemDictEntryList = page.getContent();
+                publicServer = new ArrayList<String>(systemDictEntryList.size());
+                for (SystemDictEntry dictEntry : systemDictEntryList) {
+                    publicServer.add(String.valueOf(dictEntry.getValue()));
                 }
             }
         }
@@ -741,13 +740,14 @@ public class FastDFSEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "jsonData", value = "字典项JSON结构")
             @RequestBody String jsonData) {
         Envelop envelop = new Envelop();
-        MDictionaryEntry mDictionaryEntry;
+        SystemDictEntry entry;
         synchronized (FastDFSEndPoint.class) {
-            mDictionaryEntry = systemDictEntryClient.updateDictEntry(jsonData);
+            entry = toEntity(jsonData, SystemDictEntry.class);
+            systemDictEntryService.createDictEntry(entry);
             publicServer = null;
             publicServer = getPublicUrl().getDetailModelList();
         }
-        envelop.setObj(mDictionaryEntry);
+        envelop.setObj(entry);
         envelop.setSuccessFlg(true);
         return envelop;
     }

@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
@@ -64,7 +63,7 @@ public class DefaultMessageDelegate implements MessageDelegate {
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
                     HttpEntity<String> entity = new HttpEntity<>(messageContent, headers);
-                    restTemplate.exchange(subscribedUrl, HttpMethod.POST, entity, String.class);
+                    restTemplate.postForObject(subscribedUrl, entity, String.class);
 
                     // 更新消息状态为已消费
                     RedisMqMessageLog redisMqMessageLog = redisMqMessageLogService.getById(messageLogId);

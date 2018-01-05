@@ -45,8 +45,8 @@ public class Contant {
      */
     public static class main_dimension {
         public static final String time_day = "1";//时间维度 日
-        public static final String time_month = "2";//时间维度 周
-        public static final String time_week = "3";//时间维度  月
+        public static final String time_week = "2";//时间维度 周
+        public static final String time_month = "3";//时间维度  月
         public static final String time_year = "4";//时间维度 年
         public static final String area_province = "5";//行政区划 省
         public static final String area_city = "6";//行政区划 市

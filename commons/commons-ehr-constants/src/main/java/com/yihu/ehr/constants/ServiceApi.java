@@ -973,6 +973,7 @@ public class ServiceApi {
             public static final String Delete = "/redis/cache/keyRule/delete";
             public static final String IsUniqueName = "/redis/cache/keyRule/isUniqueName";
             public static final String IsUniqueCode = "/redis/cache/keyRule/isUniqueCode";
+            public static final String IsUniqueExpression = "/redis/cache/keyRule/isUniqueExpression";
         }
         // 缓存操作
         public static class CacheOperation {

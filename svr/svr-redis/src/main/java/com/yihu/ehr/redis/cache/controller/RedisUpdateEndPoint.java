@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0)
-@Api(value = "RedisUpdate", description = "Redis更新服务")
+@Api(value = "RedisUpdateEndPoint", description = "Redis更新服务", tags = {"缓存服务-缓存更新接口"})
 public class RedisUpdateEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
