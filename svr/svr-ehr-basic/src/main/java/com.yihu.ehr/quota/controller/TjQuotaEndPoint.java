@@ -248,4 +248,15 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         }
         return listResult;
     }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.GET)
+    @ApiOperation("获取已存在指标编码/指标名称")
+    public List emailsExistence(
+            @ApiParam(name = "type", value = "类型")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name="json",value="json")
+            @RequestBody String json) throws Exception {
+        List values = tjQuotaService.isExist(type,toEntity(json, String[].class));
+        return values;
+    }
 }

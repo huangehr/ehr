@@ -6,7 +6,6 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
-import com.yihu.ehr.model.tj.MQuotaConfigModel;
 import com.yihu.ehr.model.tj.MTjQuotaModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2017/6/9.
@@ -74,6 +72,11 @@ public interface TjQuotaClient {
             @RequestParam(value = "quotaName", required = false) String quotaName,
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "pageSize") Integer pageSize);
+
+    @RequestMapping(value =  ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.GET)
+    List isExist(
+            @RequestParam(value = "type")String type,
+            @RequestBody String json);
 
 
 }

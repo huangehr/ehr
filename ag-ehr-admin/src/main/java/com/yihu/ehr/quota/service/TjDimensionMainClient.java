@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+
 /**
  * @author janseny
  * @version 1.0
@@ -51,5 +53,9 @@ public interface TjDimensionMainClient {
     @RequestMapping(value = ServiceApi.TJ.TjDimensionMainName,method = RequestMethod.GET)
     @ApiOperation(value = "验证名称是否存在")
     public boolean isNameExists( @RequestParam(value = "name") String name);
+
+    @RequestMapping(value =  ServiceApi.TJ.TjDimensionMainIsExist,method = RequestMethod.GET)
+    @ApiOperation(value = "获取主维度编码")
+    List tjDimensionMainIsExist(@RequestBody String mainCode);
 
 }

@@ -10,8 +10,13 @@ import com.yihu.ehr.model.common.Result;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 /**
  * @author janseny
@@ -53,4 +58,8 @@ public interface TjDimensionSlaveClient {
     @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveName,method = RequestMethod.GET)
     @ApiOperation(value = "验证名称是否存在")
     public boolean isNameExists( @RequestParam(value = "name") String name);
+
+    @RequestMapping(value =  ServiceApi.TJ.TjDimensionSlaveIsExist,method = RequestMethod.GET)
+    @ApiOperation(value = "获取细维度编码")
+    List tjDimensionSlaveIsExist(@RequestBody String slaveCode);
 }

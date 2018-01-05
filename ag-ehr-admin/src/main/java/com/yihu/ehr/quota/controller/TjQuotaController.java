@@ -296,4 +296,19 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         return tjQuotaClient.hasConfigDimension(quotaCode);
     }
 
+    /**
+     *
+     * @param type   验证字段名称： code/name
+     * @param json
+     * @return
+     */
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.GET)
+    public List isExistDataSetCode(
+            @ApiParam(name = "type", value = "待验证字段名")
+            @RequestParam(value = "type")String type,
+            @ApiParam(name = "json", value = "待验证的值")
+            @RequestParam(value = "json")String json){
+        return tjQuotaClient.isExist(type,json);
+    }
+
 }

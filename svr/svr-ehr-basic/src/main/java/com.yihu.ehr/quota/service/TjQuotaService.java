@@ -4,7 +4,6 @@ import com.yihu.ehr.entity.quota.TjQuota;
 import com.yihu.ehr.entity.quota.TjQuotaDataSave;
 import com.yihu.ehr.entity.quota.TjQuotaDataSource;
 import com.yihu.ehr.model.tj.MQuotaConfigModel;
-import com.yihu.ehr.model.tj.MTjQuotaLog;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.quota.dao.XTjQuotaRepository;
 import org.hibernate.Query;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -87,5 +84,23 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
         Object ob  = (query.list().get(0));
         int count = Integer.parseInt(ob.toString());
         return count;
+    }
+
+
+    /**
+     * 查询指标编码/指标名称是否已存在， 返回已存在数据
+     */
+    public List isExist(String type,String[] values)
+    {
+        String sql ="";
+        if("code".equals(type)){
+            sql = "SELECT code FROM tj_quota WHERE code in(:values)";
+
+        }else{
+            sql = "SELECT name FROM tj_quota WHERE name in(:values)";
+        }
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("values", values);
+        return sqlQuery.list();
     }
 }
