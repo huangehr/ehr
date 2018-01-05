@@ -76,7 +76,7 @@ public class QuotaCategoryService extends BaseJpaService<QuotaCategory, XQuotaCa
      */
     public List getQuotaCategoryByName(String[] names)
     {
-        String sql = "SELECT id, name FROM tj_quota_category WHERE name in(:names)";
+        String sql = "SELECT name, id FROM tj_quota_category WHERE name in(:names)";
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
         sqlQuery.setParameterList("names", names);
         return sqlQuery.list();
