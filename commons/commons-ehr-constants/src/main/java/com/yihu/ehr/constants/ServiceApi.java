@@ -1158,7 +1158,7 @@ public class ServiceApi {
         public static final String TjQuotaChartId = "/tj/tjQuotaChart/{id}";
         public static final String GetAllTjQuotaChart = "/tj/getAllTjQuotaChart";
 
-
+        public static final String getQuotaCategoryByName = "/quotaCategory/getQuotaCategoryByName";
 
     }
 
