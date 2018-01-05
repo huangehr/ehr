@@ -33,9 +33,9 @@ public class PackageResolveService {
     @Autowired
     private ApplicationContext context;
     private Map<ProfileType, PackageResolver> packageResolvers;
+    private ImmediateDataResolver immediateDataResolver;
 
-
-    private final static String TempPath = System.getProperty("java.io.tmpdir") +  java.io.File.separator;
+    private final static String TempPath = System.getProperty("java.io.tmpdir") + java.io.File.separator;
 
     @PostConstruct
     private void init() {
@@ -44,6 +44,7 @@ public class PackageResolveService {
         packageResolvers.put(File, context.getBean(FilePackageResolver.class));
         packageResolvers.put(Link, context.getBean(LinkPackageResolver.class));
         packageResolvers.put(DataSet, context.getBean(DataSetPackageResolver.class));
+        immediateDataResolver = context.getBean(ImmediateDataResolver.class);
     }
 
     /**
@@ -93,10 +94,11 @@ public class PackageResolveService {
     }
 
     /**
-     *  非档案类型的病人数据解析入库流程
-     *  1.归档包保存某个数据集的相关数据，获取归档包并解析
-     *  2. 对关联字典的数据元进行标准化，将字典的值直接写入数据
-     *  3. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finis
+     * 非档案类型的病人数据解析入库流程
+     * 1.归档包保存某个数据集的相关数据，获取归档包并解析
+     * 2. 对关联字典的数据元进行标准化，将字典的值直接写入数据
+     * 3. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finis
+     *
      * @param pack
      * @param zipFile
      * @return
@@ -110,7 +112,7 @@ public class PackageResolveService {
                 throw new RuntimeException("Invalid package file, package id: " + pack.getId());
             }
             PackageResolver packageResolver = packageResolvers.get(ProfileType.DataSet);
-            List<StandardPackage> standardPackages = packageResolver.resolveDataSets(root,pack.getClientId());
+            List<StandardPackage> standardPackages = packageResolver.resolveDataSets(root, pack.getClientId());
             //profile.determineEventType();
             return standardPackages;
         } finally {
@@ -145,6 +147,7 @@ public class PackageResolveService {
         }
     }
 
+
     private void houseKeep(String zipFile, File root) {
         try {
             FileUtils.deleteQuietly(new File(zipFile));
@@ -152,6 +155,29 @@ public class PackageResolveService {
         } catch (Exception e) {
             LogService.getLogger(PackageResolveService.class).warn("House keep failed after package resolve: " + e.getMessage());
         }
+    }
+
+
+
+    /* -------------------- 以下是 即时交互的档案入库 ------------------------------*/
+
+    /**
+     * 即时交互档案数据解析入库流程
+     * 1. 解析哥哥数据集数据
+     * 2. 对关联字典的数据元进行标准化，将字典的值直接写入数据
+     * 3. 解析完的数据存入HBase，并将JSON文档的状态标记为 Finis
+     *
+     * @param data     档案数据
+     * @param clientId 应用ID
+     * @return
+     * @throws Exception
+     */
+    public StandardPackage doResolveImmediateData(String data, String clientId) throws Exception {
+        StandardPackage standardPackage = new StandardPackage();
+        immediateDataResolver.resolve(standardPackage, data);
+        standardPackage.setClientId(clientId);
+        standardPackage.regularRowKey();
+        return standardPackage;
     }
 
 

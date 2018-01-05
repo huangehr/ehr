@@ -1,11 +1,8 @@
-package com.yihu.ehr.redis;
+package com.yihu.ehr.redisMemory;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-import com.yihu.ehr.redis.cache.RedisCacheKeyMemorySetMapper;
-import com.yihu.ehr.redis.cache.entity.RedisCacheKeyMemory;
-import com.yihu.ehr.redis.cache.service.RedisCacheKeyMemoryService;
+import com.yihu.ehr.redisMemory.cache.RedisCacheKeyMemorySetMapper;
+import com.yihu.ehr.redisMemory.cache.entity.RedisCacheKeyMemory;
+import com.yihu.ehr.redisMemory.cache.service.RedisCacheKeyMemoryService;
 import com.yihu.ehr.util.id.UuidUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +21,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,19 +42,6 @@ public class RedisScheduledTask {
     private String rdbFilePath;
     @Value("${ehr-redis.cache.memory.outFilePath}")
     private String outFilePath;
-    // 生产环境服务器不允许代码直接通过SSH访问服务器，故暂时注释，另寻方法。
-//    @Value("${ehr-redis.server.host}")
-//    private String redisServerHost;
-//    @Value("${ehr-redis.server.username}")
-//    private String redisServerUsername;
-//    @Value("${ehr-redis.server.password}")
-//    private String redisServerPwd;
-//    @Value("${ehr-redis.server.ssh-port}")
-//    private int redisServerSshPort;
-    private String redisServerHost = "";
-    private String redisServerUsername = "";
-    private String redisServerPwd = "";
-    private int redisServerSshPort = 22;
 
     @Autowired
     private RedisCacheKeyMemoryService redisCacheKeyMemoryService;
@@ -68,7 +51,7 @@ public class RedisScheduledTask {
     /**
      * 生成 Redis 快照
      */
-//    @RequestMapping(value = "/redis/cache/statistics/backupRedis", method = RequestMethod.GET)
+//    @RequestMapping(value = "/redis-memory/cache/statistics/backupRedis", method = RequestMethod.GET)
     @Scheduled(cron = "0 0 0 15 * ?")
     public void backupRedis() {
         redisTemplate.execute(new RedisCallback() {
@@ -84,14 +67,15 @@ public class RedisScheduledTask {
     /**
      * 导出 redis 内存分析报告，并导入到数据库
      */
-//    @RequestMapping(value = "/redis/cache/statistics/exportAndImportRedisMemoryData", method = RequestMethod.GET)
+//    @RequestMapping(value = "/redis-memory/cache/statistics/exportAndImportRedisMemoryData", method = RequestMethod.GET)
     @Scheduled(cron = "0 30 0 15 * ?")
     public void exportAndImportRedisMemoryData() {
         long start = System.currentTimeMillis();
         try {
             // 导出内存分析报告CSV文件（得到的内存值是近似值，比实际略小）
-            // 生产环境服务器不允许代码直接通过SSH访问服务器，故暂时注释，另寻方法。
-//            exportRedisMemoryReport();
+            String command = "rdb -c memory " + rdbFilePath + " -f " + outFilePath;
+            Process pr = Runtime.getRuntime().exec(command);
+            pr.waitFor();
 
             long export = System.currentTimeMillis();
             logger.info("成功导出Redis内存分析报告，耗时：" + (export - start) + " 毫秒");
@@ -131,66 +115,6 @@ public class RedisScheduledTask {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("发生异常：" + e.getMessage());
-        }
-    }
-
-    /**
-     * 导出 Redis 的内存分析报告为CSV文件
-     */
-    private void exportRedisMemoryReport() throws Exception {
-        long start = System.currentTimeMillis();
-
-        FileOutputStream fileOut = null;
-        BufferedOutputStream bufOut = null;
-        try {
-            JSch jsch = new JSch();
-            Session session = jsch.getSession(redisServerUsername, redisServerHost);
-            session.setPassword(redisServerPwd);
-            session.setPort(redisServerSshPort);
-            session.setUserInfo(new DefaultJSchUserInfo());
-            session.connect();
-
-            long conEnd = System.currentTimeMillis();
-            logger.info("JSch 连接耗时：" + (conEnd - start) + " 毫秒");
-
-            String command = "rdb -c memory " + rdbFilePath;
-            ChannelExec channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand(command);
-            channel.setInputStream(null);
-            channel.setErrStream(System.err);
-            InputStream in = channel.getInputStream();
-            channel.connect();
-
-            File outFile = new File(outFilePath);
-            if (!outFile.exists()) outFile.createNewFile();
-
-            fileOut = new FileOutputStream(outFile);
-            bufOut = new BufferedOutputStream(fileOut);
-            byte[] tmp = new byte[1024];
-            int count = 0;
-            while ((count = in.read(tmp, 0, 1024)) != -1) {
-                bufOut.write(tmp, 0, count);
-            }
-            bufOut.flush();
-
-            logger.info("生成Redis内存分析报告文件，耗时：" + (System.currentTimeMillis() - conEnd) + " 毫秒");
-
-            channel.disconnect();
-            session.disconnect();
-        } catch (Exception e) {
-            logger.error("生成Redis内存分析报告发生异常：" + e.getMessage());
-            throw new Exception();
-        } finally {
-            try {
-                if (bufOut != null) {
-                    bufOut.close();
-                }
-                if (fileOut != null) {
-                    fileOut.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 

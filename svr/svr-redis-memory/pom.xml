@@ -9,9 +9,9 @@
         <relativePath>../../ehr-ms-parent-pom</relativePath>
     </parent>
 
-    <artifactId>svr-redis</artifactId>
+    <artifactId>svr-redis-memory</artifactId>
     <!--<packaging>${packaging.type}</packaging>-->
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <properties>
         <wagonServerId>192.168.1.220</wagonServerId>
         <wagonUrl>scp://sand:timeneverstop@192.168.1.221/home/sand/ehr-release</wagonUrl>
@@ -37,6 +37,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-batch</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
@@ -73,6 +78,16 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <scope>${dependency.scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
             <scope>${dependency.scope}</scope>
         </dependency>
         <dependency>
@@ -117,11 +132,6 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-data-redis</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-web</artifactId>
             <scope>compile</scope>
         </dependency>
@@ -130,9 +140,15 @@
             <artifactId>commons-entity</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.yihu.ehr</groupId>
-            <artifactId>commons-rest-model</artifactId>
-        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

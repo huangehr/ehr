@@ -428,6 +428,7 @@ public class ServiceApi {
         public static final String ResolveQueue = "/packages/resolveQueue";
         public static final String QueueSize = "/packages/queueSize";
         public static final String PackageCrypto = "/PackageCrypto";
+        public static final String ImmediateResolve = "/immediate/resolve";
     }
 
     //非病人维度

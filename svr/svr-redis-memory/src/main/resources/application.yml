@@ -1,5 +1,5 @@
 server:
-  port: ${svr-redis.server.port}
+  port: ${svr-redis-memory.server.port}
 
 management:
   port: ${server.port}
@@ -39,31 +39,6 @@ spring:
     test-on-borrow: true
 
 
-fast-dfs:
-  pool:
-    init-size: 5
-    max-size: 20
-    wait-time: 500
-  connect-timeout: 2
-  network-timeout: 30
-  charset: ISO8859-1
-  http:
-    tracker-http-port: 80
-    anti-steal-token: no
-    secret-key: FastDFS1234567890
-
-hystrix:
-  threadpool:
-    default:
-      coreSize: 60 #并发执行的最大线程数，默认10
-      maxQueueSize: 100 #LinkedBlockingQueue的最大队列数，默认-1，使用SynchronousQueue
-      #queueSizeRejectionThreshold: 50 #配置该值后，即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝
-  command:
-      default:
-        execution:
-          isolation:
-            thread:
-              timeoutInMilliseconds: 30000 #缺省为1000
 ---
 spring:
   profiles: dev
@@ -74,20 +49,15 @@ spring:
     password: chenweishan
 
   redis:
-    host: 172.19.103.47 # Redis server host.
+    host: 172.19.103.47
     port: 6379
     password: redis!@456
 
-fast-dfs:
-  tracker-server: 172.19.103.13:22122
-  public-server: http://172.19.103.52:80
-
 ehr-redis:
-  mq:
-    pubsub:
-      publisherAppId: svr-redis
-      responseTimeChannel: redis.cache.reponse-time
-
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: /home/ehr/redisReport/memory.csv
 
 ---
 spring:
@@ -101,15 +71,11 @@ spring:
   redis:
     host: 192.168.1.220 # Redis server host.
 
-fast-dfs:
-  tracker-server: 172.19.103.54:22122
-  public-server: http://172.19.103.54:22122
-
 ehr-redis:
-  mq:
-    pubsub:
-      publisherAppId: svr-redis
-      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: /home/ehr/redisReport/memory.csv
 
 
 ---
@@ -122,17 +88,13 @@ spring:
     password: weifuwu
 
   redis:
-    host: 172.19.103.47 # Redis server host.
-
-fast-dfs:
-  tracker-server: 172.19.103.13:22122
-  public-server: http://172.19.103.52:80
+    host: 172.19.103.47
 
 ehr-redis:
-  mq:
-    pubsub:
-      publisherAppId: svr-redis
-      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: /home/ehr/redisReport/memory.csv
 
 
 ---
@@ -140,20 +102,18 @@ spring:
   profiles: prod
 
   redis:
-    host: 11.1.2.20 # Redis server host.
+    host: 11.1.2.20
+
   datasource:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ha
     password: jkzlxm
 
-fast-dfs:
-  tracker-server: 11.1.2.9:22122
-  public-server: http://ds.ehr.yihu.com:22122
 ehr-redis:
-  mq:
-    pubsub:
-      publisherAppId: svr-redis
-      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: /home/ehr/redisReport/memory.csv
 
 
 ---
@@ -165,18 +125,15 @@ spring:
     password: GP8Qz4qU
 
   redis:
-    host: 11.1.2.22 # Redis server host.
+    host: 11.1.2.22
     port: 6390
-    # Login password of the redis server.
     password: Kb6wKDQP1W4
-fast-dfs:
-  tracker-server: 11.1.2.9:22122
-  public-server: http://11.1.2.9:80
+
 ehr-redis:
-  mq:
-    pubsub:
-      publisherAppId: svr-redis
-      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: /home/ehr/redisReport/memory.csv
 
 
 ---
@@ -184,7 +141,7 @@ spring:
   profiles: prod_sr
 
   redis:
-    host: 10.176.97.5 # Redis server host.
+    host: 10.176.97.5
     port: 6390
     password: q4YaQemf
 
@@ -193,12 +150,8 @@ spring:
     username: healthcloud
     password: GP8Qz4qU
 
-fast-dfs:
-  tracker-server: 10.176.97.5:22122
-  public-server: http://10.176.97.5:8888
-
 ehr-redis:
-  mq:
-    pubsub:
-      publisherAppId: svr-redis
-      responseTimeChannel: redis.cache.reponse-time
+  cache:
+    memory:
+      rdbFilePath: /usr/local/bin/dump.rdb
+      outFilePath: /home/ehr/redisReport/memory.csv
