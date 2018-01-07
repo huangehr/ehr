@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller.profile.converter;
+package com.yihu.ehr.profile.converter;
 
 import com.yihu.ehr.constants.EventType;
 import com.yihu.ehr.model.standard.MCDADocument;
