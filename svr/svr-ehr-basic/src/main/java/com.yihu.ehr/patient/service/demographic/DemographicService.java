@@ -2,6 +2,7 @@ package com.yihu.ehr.patient.service.demographic;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.model.geography.MGeography;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.patient.feign.GeographyClient;

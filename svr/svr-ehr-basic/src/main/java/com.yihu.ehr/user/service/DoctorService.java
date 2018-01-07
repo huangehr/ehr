@@ -1,17 +1,15 @@
 package com.yihu.ehr.user.service;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.org.dao.XOrganizationRepository;
 import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.patient.dao.XDemographicInfoRepository;
-import com.yihu.ehr.patient.service.demographic.DemographicInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.user.dao.XDoctorRepository;
 import com.yihu.ehr.user.dao.XUserRepository;
 import com.yihu.ehr.user.entity.Doctors;
 import com.yihu.ehr.user.entity.User;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.datetime.DateUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Column;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
