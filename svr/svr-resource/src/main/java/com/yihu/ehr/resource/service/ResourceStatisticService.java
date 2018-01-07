@@ -1,5 +1,6 @@
 package com.yihu.ehr.resource.service;
 
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.FlushMode;
@@ -19,10 +20,32 @@ import java.util.List;
 @Service
 public class ResourceStatisticService extends BaseJpaService {
 
+    public BigInteger getPatientArchiveCount() {
+        Session session = currentSession();
+        String sql = "SELECT COUNT(*) FROM archive_relation";
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        return (BigInteger)query.uniqueResult();
+    }
+
+    public BigInteger getMedicalResourcesCount() {
+        Session session = currentSession();
+        String sql = "SELECT COUNT(*) FROM organizations";
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        BigInteger count = (BigInteger) query.uniqueResult();
+        String sql1 = "SELECT COUNT(*) FROM doctors";
+        Query query1 = session.createSQLQuery(sql1);
+        query1.setFlushMode(FlushMode.COMMIT);
+        BigInteger count1 = (BigInteger) query1.uniqueResult();
+        return count.add(count1);
+    }
+
     public BigInteger getDemographicCount() {
         Session session = currentSession();
         String hql = "SELECT COUNT(*) FROM demographics";
         Query query = session.createSQLQuery(hql);
+        query.setFlushMode(FlushMode.COMMIT);
         return (BigInteger) query.uniqueResult();
     }
 
@@ -129,6 +152,27 @@ public class ResourceStatisticService extends BaseJpaService {
         return (BigInteger)query.uniqueResult();
     }
 
+    public List<SystemDictEntry> getSystemDictEntry(Long dictId) {
+        Session session = currentSession();
+        String hql = "SELECT systemDictEntry FROM SystemDictEntry systemDictEntry WHERE systemDictEntry.dictId = :dictId";
+        Query query = session.createQuery(hql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setLong("dictId", dictId);
+        return query.list();
+    }
+
+    public List<Object> getStatisticsDemographicsAgeCount() {
+        Session session = currentSession();;
+        String sql = "SELECT count(1), tt.age  from(  " +
+                " SELECT t1.id ,  " +
+                "  ELT(   CEIL(  FLOOR( TIMESTAMPDIFF(MONTH, STR_TO_DATE(t1.id ,'%Y%m%d'), CURDATE())/12) /10+1 ), " +
+                " '0-1','1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','> 90') as age from ( "+
+                " SELECT CASE when length(id)=15  then CONCAT('19',substr(id ,7,6)) ELSE substr(id ,7,8) end  id  from demographics t )t1 "+
+                " )tt WHERE tt.age is not null  GROUP BY tt.age";
+        SQLQuery query = session.createSQLQuery(sql);
+        return query.list();
+    }
+
     public List getJsonArchiveReceiveDateGroup(Date before) {
         Session session = currentSession();
         String hql = "SELECT DATE_FORMAT(receiveDate, '%Y-%m-%d'), COUNT(*) FROM JsonArchives jsonArchives WHERE jsonArchives.receiveDate > :before GROUP BY DATE_FORMAT(receiveDate, '%Y-%m-%d')";
@@ -165,31 +209,4 @@ public class ResourceStatisticService extends BaseJpaService {
         return (String) query.uniqueResult();
     }
 
-    //统计最近七天采集总数
-    public List<Object> getCollectTocalCount() {
-        Session session = currentSession();
-        String sql = "SELECT count(1), date_format(receive_date, '%Y-%c-%d') as date FROM json_archives " +
-                " where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(receive_date) GROUP BY date_format(receive_date, '%Y-%c-%d')";
-        SQLQuery query = session.createSQLQuery(sql);
-        return query.list();
-    }
-
-    //统计最近七天采集门诊、住院各总数
-    public List<Object> getCollectEventTypeCount(int eventType) {
-        Session session = currentSession();
-        String sql = "SELECT count(1), date_format(receive_date, '%Y-%c-%d') as date, event_type FROM json_archives " +
-                "where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(receive_date) and  event_type=:eventType  GROUP BY date_format(receive_date, '%Y-%c-%d'), event_type;";
-        SQLQuery query = session.createSQLQuery(sql);
-        query.setParameter("eventType", eventType);
-        return query.list();
-    }
-
-    //统计今天门诊、住院各总数
-    public List<Object> getCollectTodayEventTypeCount() {
-        Session session = currentSession();
-        String sql = "SELECT count(1), event_type FROM json_archives " +
-                "where DATE_SUB(CURDATE(), INTERVAL 1 DAY) < date(event_date) GROUP BY event_type";
-        SQLQuery query = session.createSQLQuery(sql);
-        return query.list();
-    }
 }

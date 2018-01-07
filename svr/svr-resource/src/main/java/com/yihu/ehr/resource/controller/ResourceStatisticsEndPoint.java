@@ -3,6 +3,7 @@ package com.yihu.ehr.resource.controller;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.tj.EchartReportModel;
 import com.yihu.ehr.model.tj.MapDataModel;
 import com.yihu.ehr.resource.service.ResourceStatisticService;
@@ -39,6 +40,52 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     private ResourceStatisticService statisticService;
     @Autowired
     private SolrUtil solrUtil;
+
+    @RequestMapping(value = ServiceApi.DataCenter.GetPatientArchiveCount, method = RequestMethod.GET)
+    @ApiOperation(value = "顶部栏 - 居民建档数")
+    public Envelop getPatientArchiveCount(){
+        Envelop envelop = new Envelop();
+        BigInteger count = statisticService.getPatientArchiveCount();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(count);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataCenter.GetMedicalResourcesCount, method = RequestMethod.GET)
+    @ApiOperation(value = "顶部栏 - 医疗资源建档数")
+    public Envelop getMedicalResourcesCount() {
+        Envelop envelop = new Envelop();
+        BigInteger count = statisticService.getMedicalResourcesCount();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(count);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataCenter.GetHealthArchiveCount, method = RequestMethod.GET)
+    @ApiOperation(value = "顶部栏 - 健康档案建档数")
+    public Envelop getHealthArchiveCount() {
+        Envelop envelop = new Envelop();
+        BigInteger count = statisticService.getJsonArchiveCount("3");
+        envelop.setSuccessFlg(true);
+        envelop.setObj(count);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.DataCenter.GetHealthArchiveCount, method = RequestMethod.GET)
+    @ApiOperation(value = "顶部栏 - 电子病例建档数")
+    public Envelop getElectronicCasesCount(){
+        Envelop envelop = new Envelop();
+        try {
+            long count = solrUtil.count("HealthProfile", "*:*");
+            envelop.setSuccessFlg(true);
+            envelop.setObj(count);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 
     @RequestMapping(value = ServiceApi.DataCenter.GetHealthCardBindingAmount, method = RequestMethod.GET)
     @ApiOperation(value = "全员人口个案库 - 健康卡绑定量")
@@ -461,27 +508,25 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    /**
     @RequestMapping(value = ServiceApi.DataCenter.GetArchiveDistribution, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案 - 健康档案分布情况")
     public Envelop getArchiveDistribution() throws Exception {
         Envelop envelop = new Envelop();
         List<EchartReportModel> echartReportModels = new ArrayList<>();
-        Page<SystemDictEntry> systemDictEntryList = systemDictEntryService.findByDictId(89, 0, 1000);
-        if (systemDictEntryList != null && systemDictEntryList.getContent() != null) {
-            List<SystemDictEntry> ageList = systemDictEntryList.getContent();
+        List<SystemDictEntry> ageDictEntryList = statisticService.getSystemDictEntry((long)89);
+        if (ageDictEntryList != null) {
             Map<String, Integer> ageMap = new LinkedHashMap<>();
-            for (SystemDictEntry systemDictEntry : ageList) {
+            for (SystemDictEntry systemDictEntry : ageDictEntryList) {
                 ageMap.put(systemDictEntry.getValue(), 0);
             }
-            List<Object> list = demographicService.getStatisticsDemographicsAgeCount();
+            List<Object> list = statisticService.getStatisticsDemographicsAgeCount();
             if (list != null && list.size() > 0) {
                 EchartReportModel echartReportModel = new EchartReportModel();
                 Map<String, Integer> newAgeMap = ageMap;
                 for (int i = 0; i < list.size(); i++) {
-                    Map<Integer, Object> mapVal = converMapObject(list.get(i));
-                    int val = Integer.valueOf(mapVal.get(0).toString());
-                    String age = mapVal.get(1).toString();
+                    Object[] dataArr = (Object [])list.get(i);
+                    int val = Integer.valueOf(dataArr[0].toString());
+                    String age = dataArr[1].toString();
                     for (String key : ageMap.keySet()) {
                         if (key.equals(age)) {
                             newAgeMap.put(key, val);
@@ -499,21 +544,23 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
                     ydata[i] = Integer.valueOf(yObdata[i].toString());
                     xdata[i] = xObdata[i].toString();
                 }
+                echartReportModel.setName("健康档案分布情况");
                 echartReportModel.setxData(xdata);
                 echartReportModel.setyData(ydata);
                 echartReportModels.add(echartReportModel);
             }
         } else {
-            List<Object> list = demographicService.getStatisticsDemographicsAgeCount();
+            List<Object> list = statisticService.getStatisticsDemographicsAgeCount();
             if (list != null && list.size() > 0) {
                 EchartReportModel echartReportModel = new EchartReportModel();
                 String[] xdata = new String[list.size()];
                 int[] ydata = new int[list.size()];
                 for (int i = 0; i < list.size(); i++) {
-                    Map<Integer, Object> mapVal = converMapObject(list.get(i));
-                    ydata[i] = Integer.valueOf(mapVal.get(0).toString());
-                    xdata[i] = mapVal.get(1).toString();
+                    Object[] dataArr = (Object [])list.get(i);
+                    ydata[i] = Integer.valueOf(dataArr[0].toString());
+                    xdata[i] = dataArr[1].toString();
                 }
+                echartReportModel.setName("健康档案分布情况");
                 echartReportModel.setxData(xdata);
                 echartReportModel.setyData(ydata);
                 echartReportModels.add(echartReportModel);
@@ -523,7 +570,6 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         envelop.setSuccessFlg(true);
         return envelop;
     }
-    */
 
     @RequestMapping(value = ServiceApi.DataCenter.GetStorageAnalysis, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案 - 健康档案入库情况分析")
@@ -667,7 +713,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
     public Envelop getElectronicMedicalDeptDistributed() {
         Envelop envelop = new Envelop();
         try {
-            FacetField facetField = solrUtil.getFacetField("HealthProfile", "org_code", null, 0, 0, 1000000, false);
+            FacetField facetField = solrUtil.getFacetField("HealthProfile", "EHR_000081", null, 0, 0, 1000000, false);
             List<FacetField.Count> countList = facetField.getValues();
             Map<String, Long> dataMap = new HashMap<>(countList.size());
             for (FacetField.Count count : countList) {

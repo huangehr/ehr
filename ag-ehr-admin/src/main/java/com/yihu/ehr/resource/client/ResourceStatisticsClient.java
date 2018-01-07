@@ -14,10 +14,26 @@ import springfox.documentation.annotations.ApiIgnore;
  * Client - 数据资源中心
  * Created by Progr1mmer on 2018/01/05.
  */
+@ApiIgnore
 @FeignClient(name = MicroServices.Resource)
 @RequestMapping(value = ApiVersion.Version1_0)
-@ApiIgnore
 public interface ResourceStatisticsClient {
+
+    @RequestMapping(value = ServiceApi.DataCenter.GetPatientArchiveCount, method = RequestMethod.GET)
+    @ApiOperation(value = "顶部栏 - 居民建档数")
+    Envelop getPatientArchiveCount();
+
+    @RequestMapping(value = ServiceApi.DataCenter.GetMedicalResourcesCount, method = RequestMethod.GET)
+    @ApiOperation(value = "顶部栏 - 医疗资源建档数")
+    Envelop getMedicalResourcesCount();
+
+    @RequestMapping(value = ServiceApi.DataCenter.GetHealthArchiveCount, method = RequestMethod.GET)
+    @ApiOperation(value = "顶部栏 - 健康档案建档数")
+    Envelop getHealthArchiveCount();
+
+    @RequestMapping(value = ServiceApi.DataCenter.GetHealthArchiveCount, method = RequestMethod.GET)
+    @ApiOperation(value = "顶部栏 - 电子病例建档数")
+    Envelop getElectronicCasesCount();
 
     @RequestMapping(value = ServiceApi.DataCenter.GetHealthCardBindingAmount, method = RequestMethod.GET)
     @ApiOperation(value = "全员人口个案库 - 健康卡绑定量")
@@ -55,11 +71,9 @@ public interface ResourceStatisticsClient {
     @ApiOperation(value = "健康档案 - 档案来源分布情况")
     Envelop getArchiveSource();
 
-    /**
     @RequestMapping(value = ServiceApi.DataCenter.GetArchiveDistribution, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案 - 健康档案分布情况")
     Envelop getArchiveDistribution();
-    */
 
     @RequestMapping(value = ServiceApi.DataCenter.GetStorageAnalysis, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案 - 健康档案入库情况分析")
