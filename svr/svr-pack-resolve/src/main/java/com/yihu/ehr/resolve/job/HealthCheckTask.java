@@ -1,7 +1,6 @@
 package com.yihu.ehr.resolve.job;
 
 import com.yihu.ehr.hbase.HBaseAdmin;
-import com.yihu.ehr.lang.SpringContext;
 import com.yihu.ehr.resolve.util.PackResolveLogger;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -28,8 +27,6 @@ import static org.quartz.TriggerBuilder.newTrigger;
 @Component
 public class HealthCheckTask {
 
-    private static String  SVR_REDIS = "svr-redis";
-    private static String  SVR_EHR_BASIC = "svr-ehr-basic";
     private static String  SVR_PACK_MGR = "svr-pack-mgr";
 
     @Value("${resolve.job.init-size}")
@@ -63,8 +60,7 @@ public class HealthCheckTask {
         }
     }
 
-    //@Scheduled(cron = "0/4 * * * * ?")
-    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 0/20 * * * ?")
     public void startTask() {
         PackResolveLogger.info("Health Check:" + new Date());
         GroupMatcher groupMatcher = GroupMatcher.groupEquals("PackResolve");
@@ -72,7 +68,6 @@ public class HealthCheckTask {
         try {
             hBaseAdmin.isTableExists("HealthProfile");
         }catch (Exception e) {
-            PackResolveLogger.error(e.getMessage());
             try {
                 Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
                 if(jobKeySet != null) {
@@ -83,13 +78,12 @@ public class HealthCheckTask {
             }catch (SchedulerException se) {
                 PackResolveLogger.error(se.getMessage());
             }
+            PackResolveLogger.error(e.getMessage());
             return;
         }
         //检查微服务信息
-        List<ServiceInstance> redis = discoveryClient.getInstances(SVR_REDIS);
-        List<ServiceInstance> basic = discoveryClient.getInstances(SVR_EHR_BASIC);
         List<ServiceInstance> mgr = discoveryClient.getInstances(SVR_PACK_MGR);
-        if(redis.isEmpty() || basic.isEmpty() || mgr.isEmpty()) {
+        if(mgr.isEmpty()) {
             try {
                 Set<JobKey> jobKeySet = scheduler.getJobKeys(groupMatcher);
                 if(jobKeySet != null) {
