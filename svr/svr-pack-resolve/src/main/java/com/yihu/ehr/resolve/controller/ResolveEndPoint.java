@@ -17,7 +17,7 @@ import com.yihu.ehr.resolve.model.stage1.StandardPackage;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
 import com.yihu.ehr.resolve.service.resource.stage1.PackageResolveService;
 import com.yihu.ehr.resolve.service.resource.stage2.PackMillService;
-import com.yihu.ehr.resolve.service.resource.stage2.PatientRegisterService;
+import com.yihu.ehr.resolve.service.resource.stage2.PatientService;
 import com.yihu.ehr.resolve.service.resource.stage2.ResourceService;
 import com.yihu.ehr.util.datetime.DateUtil;
 import io.swagger.annotations.Api;
@@ -48,7 +48,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private ResourceService resourceService;
     @Autowired
-    private PatientRegisterService patientRegisterService;
+    private PatientService patientService;
     @Autowired
     private PackMillService packMillService;
     @Autowired
@@ -89,7 +89,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
             resourceService.save(resourceBucket, standardPackage);
             //居民信息注册
-            patientRegisterService.checkPatient(resourceBucket, packId);
+            patientService.checkPatient(resourceBucket, packId);
             //回填入库状态
             Map<String, String> map = new HashMap();
             map.put("profileId", standardPackage.getId());
@@ -149,7 +149,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             for (StandardPackage standardPackage : standardPackages) {
                 ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
                 resourceService.save(resourceBucket, standardPackage);
-                patientRegisterService.checkPatient(resourceBucket, packId);
+                patientService.checkPatient(resourceBucket, packId);
                 String json = standardPackage.toJson();
                 returnJson.add(json);
             }
@@ -275,7 +275,7 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
             if (persist) {
                 resourceService.save(resourceBucket, standardPackage);
-                patientRegisterService.checkPatient(resourceBucket, packageId);
+                patientService.checkPatient(resourceBucket, packageId);
             }
             return new ResponseEntity<>(standardPackage.toJson(), HttpStatus.OK);
         } catch (Exception e) {
@@ -324,9 +324,9 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             long start = System.currentTimeMillis();
             StandardPackage standardPackage = packageResolveService.doResolveImmediateData(data,clientId);
             ResourceBucket resourceBucket = packMillService.grindingPackModel(standardPackage);
-            resourceService.save(resourceBucket);
+            resourceService.save(resourceBucket, standardPackage);
             //居民信息注册
-            patientRegisterService.checkPatient(resourceBucket, null);
+            patientService.checkPatient(resourceBucket, null);
             //回填入库状态
             Map<String, String> map = new HashMap();
             map.put("profileId", standardPackage.getId());
