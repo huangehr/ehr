@@ -1,7 +1,6 @@
 package com.yihu.ehr.patient.dao;
 
-import com.yihu.ehr.patient.service.demographic.DemographicId;
-import com.yihu.ehr.patient.service.demographic.DemographicInfo;
+import com.yihu.ehr.entity.patient.DemographicInfo;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
