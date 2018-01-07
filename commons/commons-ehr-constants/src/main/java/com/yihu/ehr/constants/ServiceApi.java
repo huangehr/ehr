@@ -1135,6 +1135,7 @@ public class ServiceApi {
         public static final String TjQuotaTypeIsExist  ="/quota/type_isExist";
         public static final String TjDimensionMainIsExist = "/quota/TjDimensionMainIsExist";
         public static final String TjDimensionSlaveIsExist = "/quota/TjDimensionSlaveIsExist";
+        public static final String TjQuotaBatch = "/tjQuota/batch";
 
 
         public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";

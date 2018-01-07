@@ -1,5 +1,6 @@
 package com.yihu.ehr.quota.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -19,12 +20,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/6/9.
@@ -258,5 +260,30 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             @RequestBody String json) throws Exception {
         List values = tjQuotaService.isExist(type,toEntity(json, String[].class));
         return values;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "批量导入指标、主维度、细维度", notes = "批量导入指标、主维度、细维度")
+    public boolean tjQuotaBatch(
+            @RequestBody Map<String,Object> lsMap) throws Exception {
+        List saveLs=new ArrayList();
+        List quotaMainLs=new ArrayList();
+        List quotaSlaveLs=new ArrayList();
+        if(null != lsMap && lsMap.size()>0){
+            for(String key:lsMap.keySet()){
+                if("saveLs".equals(key)){
+                    saveLs = (List)lsMap.get(key);
+
+                }else if("quotaMainLs".equals(key)){
+                    quotaMainLs = (List)lsMap.get(key);
+                }else{
+                    quotaSlaveLs = (List)lsMap.get(key);
+                }
+            }
+        }
+
+        tjQuotaService.tjQuotaBatch(saveLs);
+        return true;
     }
 }
