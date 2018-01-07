@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller.profile.converter;
+package com.yihu.ehr.profile.converter;
 
 import org.springframework.stereotype.Service;
 

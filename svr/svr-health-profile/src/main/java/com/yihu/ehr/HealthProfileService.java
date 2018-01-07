@@ -20,14 +20,14 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 @EnableDiscoveryClient
 @EnableFeignClients
-public class HealthProfileSvrApp extends SpringBootServletInitializer{
+public class HealthProfileService extends SpringBootServletInitializer{
 
     public static void main(String[] args) {
-        SpringApplication.run(HealthProfileSvrApp.class, args);
+        SpringApplication.run(HealthProfileService.class, args);
     }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(HealthProfileSvrApp.class);
+        return application.sources(HealthProfileService.class);
     }
 }
