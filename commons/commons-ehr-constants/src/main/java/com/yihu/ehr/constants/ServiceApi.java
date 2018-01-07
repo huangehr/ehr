@@ -266,31 +266,26 @@ public class ServiceApi {
 
         public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
 
-    }
-
-    public static class DataCenter {
-
-        public static final String GetPatientArchiveCount = "/dataCenter/getPatientArchiveCount";
-        public static final String GetMedicalResourcesCount = "/dataCenter/getMedicalResourcesCount";
-        public static final String GetHealthArchiveCount = "/dataCenter/getHealthArchiveCount";
-        public static final String GetElectronicCasesCount = "/dataCenter/getElectronicCasesCount";
-        public static final String GetHealthCardBindingAmount = "/dataCenter/getHealthCardBindingAmount";
-        public static final String GetInfoDistribution = "/dataCenter/getInfoDistribution";
-        public static final String GetNewSituation = "/dataCenter/getNewSituation";
-        public static final String GetOrgArchives = "/dataCenter/getOrgArchives";
-        public static final String GetMedicalStaffDistribution = "/dataCenter/getMedicalStaffDistribution";
-        public static final String GetMedicalStaffRatio = "/dataCenter/getMedicalStaffRatio";
-        public static final String GetCumulativeIntegration = "/dataCenter/getCumulativeIntegration";
-        public static final String GteTotallyToBeIntegrated = "dataCenter/gteTotallyToBeIntegrated";
-        public static final String GetArchiveSource = "/dataCenter/getArchiveSource";
-        public static final String GetArchiveDistribution = "/dataCenter/getArchiveDistribution";
-        public static final String GetStorageAnalysis = "/dataCenter/getStorageAnalysis";
-        public static final String GetElectronicMedicalSource = "/dataCenter/getElectronicMedicalSource";
-        public static final String GetElectronicMedicalOrgDistributed = "/dataCenter/getElectronicMedicalOrgDistributed";
-        public static final String GetElectronicMedicalDeptDistributed = "/dataCenter/getElectronicMedicalDeptDistributed";
-        public static final String GetElectronicMedicalAcquisitionSituation = "/dataCenter/getElectronicMedicalAcquisitionSituation";
-        public static final String GetArchiveStatisticalReportInfo = "/statisticsReport/getArchiveStatisticalReportInfo";
-        public static final String GetArchiveTotalVisitReportInfo = "/statisticsReport/getArchiveTotalVisitReportInfo";
+        //资源中心首页
+        public static final String GetPatientArchiveCount = "/resource/center/getPatientArchiveCount";
+        public static final String GetMedicalResourcesCount = "/resource/center/getMedicalResourcesCount";
+        public static final String GetHealthArchiveCount = "/resource/center/getHealthArchiveCount";
+        public static final String GetElectronicCasesCount = "/resource/center/getElectronicCasesCount";
+        public static final String GetHealthCardBindingAmount = "/resource/center/getHealthCardBindingAmount";
+        public static final String GetInfoDistribution = "/resource/center/getInfoDistribution";
+        public static final String GetNewSituation = "/resource/center/getNewSituation";
+        public static final String GetOrgArchives = "/resource/center/getOrgArchives";
+        public static final String GetMedicalStaffDistribution = "/resource/center/getMedicalStaffDistribution";
+        public static final String GetMedicalStaffRatio = "/resource/center/getMedicalStaffRatio";
+        public static final String GetCumulativeIntegration = "/resource/center/getCumulativeIntegration";
+        public static final String GteTotallyToBeIntegrated = "resource/center/gteTotallyToBeIntegrated";
+        public static final String GetArchiveSource = "/resource/center/getArchiveSource";
+        public static final String GetArchiveDistribution = "/resource/center/getArchiveDistribution";
+        public static final String GetStorageAnalysis = "/resource/center/getStorageAnalysis";
+        public static final String GetElectronicMedicalSource = "/resource/center/getElectronicMedicalSource";
+        public static final String GetElectronicMedicalOrgDistributed = "/resource/center/getElectronicMedicalOrgDistributed";
+        public static final String GetElectronicMedicalDeptDistributed = "/resource/center/getElectronicMedicalDeptDistributed";
+        public static final String GetElectronicMedicalAcquisitionSituation = "/resource/center/getElectronicMedicalAcquisitionSituation";
 
     }
 
