@@ -510,7 +510,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.DataCenter.GetArchiveDistribution, method = RequestMethod.GET)
     @ApiOperation(value = "健康档案 - 健康档案分布情况")
-    public Envelop getArchiveDistribution() throws Exception {
+    public Envelop getArchiveDistribution() {
         Envelop envelop = new Envelop();
         List<EchartReportModel> echartReportModels = new ArrayList<>();
         List<SystemDictEntry> ageDictEntryList = statisticService.getSystemDictEntry((long)89);

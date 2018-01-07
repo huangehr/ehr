@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by Progr1mmer on 2018/01/05.
  */
 @RestController
-@RequestMapping(ApiVersion.Version1_0)
+@RequestMapping(ApiVersion.Version1_0 + ServiceApi.GateWay.admin)
 @Api(value = "ResourceStatisticsController", description = "数据资源中心首页", tags = {"资源服务-数据资源中心首页"})
 public class ResourceCenterStatisticsController extends EnvelopRestEndPoint {
 
@@ -43,7 +43,7 @@ public class ResourceCenterStatisticsController extends EnvelopRestEndPoint {
         return resourceStatisticsClient.getHealthArchiveCount();
     }
 
-    @RequestMapping(value = ServiceApi.DataCenter.GetHealthArchiveCount, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DataCenter.GetElectronicCasesCount, method = RequestMethod.GET)
     @ApiOperation(value = "顶部栏 - 电子病例建档数")
     public Envelop getElectronicCasesCount(){
         return resourceStatisticsClient.getElectronicCasesCount();
@@ -124,7 +124,7 @@ public class ResourceCenterStatisticsController extends EnvelopRestEndPoint {
 
     @RequestMapping(value = ServiceApi.DataCenter.GetElectronicMedicalOrgDistributed, method = RequestMethod.GET)
     @ApiOperation(value = "电子病例 - 电子病历采集医院分布")
-    public Envelop getElectronicMedicalOrgDistributed() throws Exception {
+    public Envelop getElectronicMedicalOrgDistributed() {
         return resourceStatisticsClient.getElectronicMedicalOrgDistributed();
     }
 

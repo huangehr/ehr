@@ -31,7 +31,7 @@ public interface ResourceCenterStatisticsClient {
     @ApiOperation(value = "顶部栏 - 健康档案建档数")
     Envelop getHealthArchiveCount();
 
-    @RequestMapping(value = ServiceApi.DataCenter.GetHealthArchiveCount, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DataCenter.GetElectronicCasesCount, method = RequestMethod.GET)
     @ApiOperation(value = "顶部栏 - 电子病例建档数")
     Envelop getElectronicCasesCount();
 
