@@ -266,9 +266,30 @@ public class ServiceApi {
 
         public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
 
+    }
 
+    public static class DataCenter {
 
-
+        public static final String GetPatientArchiveCount = "/dataCenter/getPatientArchiveCount";
+        public static final String GetMedicalResourcesCount = "/dataCenter/getMedicalResourcesCount";
+        public static final String GetHealthArchiveCount = "/dataCenter/getHealthArchiveCount";
+        public static final String GetHealthCardBindingAmount = "/dataCenter/getHealthCardBindingAmount";
+        public static final String GetInfoDistribution = "/dataCenter/getInfoDistribution";
+        public static final String GetNewSituation = "/dataCenter/getNewSituation";
+        public static final String GetOrgArchives = "/dataCenter/getOrgArchives";
+        public static final String GetMedicalStaffDistribution = "/dataCenter/getMedicalStaffDistribution";
+        public static final String GetMedicalStaffRatio = "/dataCenter/getMedicalStaffRatio";
+        public static final String GetCumulativeIntegration = "/dataCenter/getCumulativeIntegration";
+        public static final String GteTotallyToBeIntegrated = "dataCenter/gteTotallyToBeIntegrated";
+        public static final String GetArchiveSource = "/dataCenter/getArchiveSource";
+        public static final String GetArchiveDistribution = "/dataCenter/getArchiveDistribution";
+        public static final String GetStorageAnalysis = "/dataCenter/getStorageAnalysis";
+        public static final String GetElectronicMedicalSource = "/dataCenter/getElectronicMedicalSource";
+        public static final String GetElectronicMedicalOrgDistributed = "/dataCenter/getElectronicMedicalOrgDistributed";
+        public static final String GetElectronicMedicalDeptDistributed = "/dataCenter/getElectronicMedicalDeptDistributed";
+        public static final String GetElectronicMedicalAcquisitionSituation = "/dataCenter/getElectronicMedicalAcquisitionSituation";
+        public static final String GetArchiveStatisticalReportInfo = "/statisticsReport/getArchiveStatisticalReportInfo";
+        public static final String GetArchiveTotalVisitReportInfo = "/statisticsReport/getArchiveTotalVisitReportInfo";
 
     }
 
@@ -410,6 +431,7 @@ public class ServiceApi {
         public static final String ResolveQueue = "/packages/resolveQueue";
         public static final String QueueSize = "/packages/queueSize";
         public static final String PackageCrypto = "/PackageCrypto";
+        public static final String ImmediateResolve = "/immediate/resolve";
     }
 
     //非病人维度

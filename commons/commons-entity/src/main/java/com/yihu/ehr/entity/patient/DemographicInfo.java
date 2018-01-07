@@ -1,4 +1,4 @@
-package com.yihu.ehr.patient.service.demographic;
+package com.yihu.ehr.entity.patient;
 
 import javax.persistence.*;
 import java.util.Date;
