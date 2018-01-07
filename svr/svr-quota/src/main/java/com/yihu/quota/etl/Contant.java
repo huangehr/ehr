@@ -56,8 +56,8 @@ public class Contant {
     }
 
     public static class quota {
-        public static final String dataLeval_all = "1";
-        public static final String dataLeval_oneDay = "2";
+        public static final String dataLevel_all = "1"; // 全量
+        public static final String dataLevel_increase = "2"; // 增量
 
         public static final String aggregation_count = "count";
         public static final String aggregation_sum = "sum";
