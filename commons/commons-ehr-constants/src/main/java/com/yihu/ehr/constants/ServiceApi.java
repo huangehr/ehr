@@ -273,6 +273,7 @@ public class ServiceApi {
         public static final String GetPatientArchiveCount = "/dataCenter/getPatientArchiveCount";
         public static final String GetMedicalResourcesCount = "/dataCenter/getMedicalResourcesCount";
         public static final String GetHealthArchiveCount = "/dataCenter/getHealthArchiveCount";
+        public static final String GetElectronicCasesCount = "/dataCenter/getElectronicCasesCount";
         public static final String GetHealthCardBindingAmount = "/dataCenter/getHealthCardBindingAmount";
         public static final String GetInfoDistribution = "/dataCenter/getInfoDistribution";
         public static final String GetNewSituation = "/dataCenter/getNewSituation";

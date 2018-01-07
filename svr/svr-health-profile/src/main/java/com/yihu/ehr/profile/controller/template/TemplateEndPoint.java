@@ -1,4 +1,4 @@
-package com.yihu.ehr.profile.controller;
+package com.yihu.ehr.profile.controller.template;
 
 import com.google.common.io.Files;
 import com.yihu.ehr.constants.ServiceApi;
