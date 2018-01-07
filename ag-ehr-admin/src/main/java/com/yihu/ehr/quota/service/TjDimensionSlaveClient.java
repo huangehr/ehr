@@ -59,7 +59,7 @@ public interface TjDimensionSlaveClient {
     @ApiOperation(value = "验证名称是否存在")
     public boolean isNameExists( @RequestParam(value = "name") String name);
 
-    @RequestMapping(value =  ServiceApi.TJ.TjDimensionSlaveIsExist,method = RequestMethod.GET)
+    @RequestMapping(value =  ServiceApi.TJ.TjDimensionSlaveIsExist,method = RequestMethod.POST)
     @ApiOperation(value = "获取细维度编码")
     List tjDimensionSlaveIsExist(@RequestBody String slaveCode);
 }

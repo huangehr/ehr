@@ -54,7 +54,7 @@ public interface TjDimensionMainClient {
     @ApiOperation(value = "验证名称是否存在")
     public boolean isNameExists( @RequestParam(value = "name") String name);
 
-    @RequestMapping(value =  ServiceApi.TJ.TjDimensionMainIsExist,method = RequestMethod.GET)
+    @RequestMapping(value =  ServiceApi.TJ.TjDimensionMainIsExist,method = RequestMethod.POST)
     @ApiOperation(value = "获取主维度编码")
     List tjDimensionMainIsExist(@RequestBody String mainCode);
 

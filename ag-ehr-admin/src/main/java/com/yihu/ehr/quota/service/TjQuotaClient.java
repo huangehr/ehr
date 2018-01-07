@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2017/6/9.
@@ -74,13 +73,13 @@ public interface TjQuotaClient {
             @RequestParam(value = "page") Integer page,
             @RequestParam(value = "pageSize") Integer pageSize);
 
-    @RequestMapping(value =  ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.GET)
-    List isExist(
+    @RequestMapping(value =  ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.POST)
+    List tjQuotaTypeIsExist(
             @RequestParam(value = "type")String type,
             @RequestBody String json);
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "批量导入指标、主维度、细维度", notes = "批量导入指标、主维度、细维度")
     boolean tjQuotaBatch(
-            @RequestBody Map<String,Object> lsMap) ;
+            @RequestBody String lsMap) ;
 }

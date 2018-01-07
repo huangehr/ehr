@@ -94,7 +94,7 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
     /**
      * 查询指标编码/指标名称是否已存在， 返回已存在数据
      */
-    public List isExist(String type,String[] values)
+    public List tjQuotaTypeIsExist(String type,String[] values)
     {
         String sql ="";
         if("code".equals(type)){
@@ -214,7 +214,7 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
         sb.append("'"+"1" +"',");
         sb.append("'"+ "统计指标:" + quotaName+"',");
         sb.append("'"+ "1" +"',");
-        sb.append(""+ 2 +"')");
+        sb.append("'"+ 2 +"')");
         currentSession().createSQLQuery(sb.toString()).executeUpdate();
     }
 }

@@ -129,7 +129,7 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
         }
     }
 
-    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainIsExist,method = RequestMethod.POST)
     @ApiOperation("获取已存在主维度编码")
     public List TjDimensionMainIsExist(
             @ApiParam(name="mainCode",value="mainCode")

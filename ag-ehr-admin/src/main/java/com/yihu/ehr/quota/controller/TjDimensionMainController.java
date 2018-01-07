@@ -238,7 +238,7 @@ public class TjDimensionMainController extends ExtendController<TjDimensionMain>
      * @param mainCode
      * @return
      */
-    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainIsExist,method = RequestMethod.POST)
     public List TjDimensionMainIsExist(
             @ApiParam(name = "mainCode", value = "主维度编码")
             @RequestParam(value = "mainCode")String mainCode){

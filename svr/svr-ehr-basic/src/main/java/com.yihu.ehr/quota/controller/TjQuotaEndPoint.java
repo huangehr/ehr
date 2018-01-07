@@ -1,5 +1,6 @@
 package com.yihu.ehr.quota.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -255,14 +256,15 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         return listResult;
     }
 
-    @RequestMapping(value = ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.POST)
     @ApiOperation("获取已存在指标编码/指标名称")
-    public List emailsExistence(
+    public List tjQuotaTypeIsExist(
             @ApiParam(name = "type", value = "类型")
             @RequestParam(value = "type") String type,
             @ApiParam(name="json",value="json")
             @RequestBody String json) throws Exception {
-        List values = tjQuotaService.isExist(type,toEntity(json, String[].class));
+
+        List values = tjQuotaService.tjQuotaTypeIsExist(type,toEntity(json, String[].class));
         return values;
     }
 
@@ -270,31 +272,30 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @ApiOperation(value = "批量导入指标、主维度、细维度", notes = "批量导入指标、主维度、细维度")
     public boolean tjQuotaBatch(
-            @RequestBody Map<String,Object> lsMap) throws Exception {
+            @RequestBody String lsMap) throws Exception {
+        Map<String,Object> values = objectMapper.readValue(lsMap , new TypeReference<Map<String,Object>>() {});
         List saveLs=new ArrayList();
         List quotaMainLs=new ArrayList();
         List quotaSlaveLs=new ArrayList();
-        if(null != lsMap && lsMap.size()>0){
-            for(String key:lsMap.keySet()){
+        if(null != values && values.size()>0){
+            for(String key:values.keySet()){
 
                 if("saveLs".equals(key)){
                     //指标、数据源、数据存储
-                    saveLs = (List)lsMap.get(key);
+                    saveLs = (List)values.get(key);
                     tjQuotaService.tjQuotaBatch(saveLs);
 
                 }else if("quotaMainLs".equals(key)){
                     //主维度
-                    quotaMainLs = (List)lsMap.get(key);
+                    quotaMainLs = (List)values.get(key);
                     tjQuotaDimensionMainService.addTjQuotaDimensionMainBatch(quotaMainLs);
                 }else{
                     //细维度
-                    quotaSlaveLs = (List)lsMap.get(key);
+                    quotaSlaveLs = (List)values.get(key);
                     tjQuotaDimensionSlaveService.addTjQuotaDimensionSlaveBatch(quotaSlaveLs);
                 }
             }
         }
-
-
         return true;
     }
 }

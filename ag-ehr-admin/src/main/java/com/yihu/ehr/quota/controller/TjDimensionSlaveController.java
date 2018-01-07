@@ -261,7 +261,7 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
      * @param slaveCode
      * @return
      */
-    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveIsExist,method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveIsExist,method = RequestMethod.POST)
     public List TjDimensionSlaveIsExist(
             @ApiParam(name = "slaveCode", value = "细维度编码")
             @RequestParam(value = "slaveCode")String slaveCode){
