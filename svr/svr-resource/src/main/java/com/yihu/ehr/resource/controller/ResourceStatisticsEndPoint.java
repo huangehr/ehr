@@ -71,7 +71,7 @@ public class ResourceStatisticsEndPoint extends EnvelopRestEndPoint {
         return envelop;
     }
 
-    @RequestMapping(value = ServiceApi.DataCenter.GetHealthArchiveCount, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.DataCenter.GetElectronicCasesCount, method = RequestMethod.GET)
     @ApiOperation(value = "顶部栏 - 电子病例建档数")
     public Envelop getElectronicCasesCount(){
         Envelop envelop = new Envelop();
