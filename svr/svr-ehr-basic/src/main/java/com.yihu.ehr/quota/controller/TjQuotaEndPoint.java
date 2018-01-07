@@ -1,6 +1,5 @@
 package com.yihu.ehr.quota.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -26,7 +25,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/6/9.
@@ -49,6 +51,8 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     TjDataSourceService tjDataSourceService;
     @Autowired
     TjQuotaDimensionMainService tjQuotaDimensionMainService;
+    @Autowired
+    TjQuotaDimensionSlaveService tjQuotaDimensionSlaveService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询统计指标表")
@@ -272,18 +276,25 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
         List quotaSlaveLs=new ArrayList();
         if(null != lsMap && lsMap.size()>0){
             for(String key:lsMap.keySet()){
+
                 if("saveLs".equals(key)){
+                    //指标、数据源、数据存储
                     saveLs = (List)lsMap.get(key);
+                    tjQuotaService.tjQuotaBatch(saveLs);
 
                 }else if("quotaMainLs".equals(key)){
+                    //主维度
                     quotaMainLs = (List)lsMap.get(key);
+                    tjQuotaDimensionMainService.addTjQuotaDimensionMainBatch(quotaMainLs);
                 }else{
+                    //细维度
                     quotaSlaveLs = (List)lsMap.get(key);
+                    tjQuotaDimensionSlaveService.addTjQuotaDimensionSlaveBatch(quotaSlaveLs);
                 }
             }
         }
 
-        tjQuotaService.tjQuotaBatch(saveLs);
+
         return true;
     }
 }
