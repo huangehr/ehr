@@ -255,4 +255,16 @@ public class TjDimensionSlaveController extends ExtendController<TjDimensionSlav
         }
         return list;
     }
+
+    /**
+     *验证细维度编码是否存在
+     * @param slaveCode
+     * @return
+     */
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveIsExist,method = RequestMethod.POST)
+    public List TjDimensionSlaveIsExist(
+            @ApiParam(name = "slaveCode", value = "细维度编码")
+            @RequestParam(value = "slaveCode")String slaveCode){
+        return tjDimensionSlaveClient.tjDimensionSlaveIsExist(slaveCode);
+    }
 }

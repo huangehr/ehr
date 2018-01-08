@@ -1,11 +1,9 @@
 package com.yihu.ehr.redisMemory;
 
-import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.redisMemory.cache.RedisCacheKeyMemorySetMapper;
 import com.yihu.ehr.redisMemory.cache.entity.RedisCacheKeyMemory;
 import com.yihu.ehr.redisMemory.cache.service.RedisCacheKeyMemoryService;
 import com.yihu.ehr.util.id.UuidUtil;
-import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -21,9 +19,6 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -36,9 +31,9 @@ import java.util.List;
  * @date 2017/12/6 09:22
  */
 @Component
-@RestController
-@RequestMapping(value = ApiVersion.Version1_0)
-@Api(description = "定时任务", tags = {"缓存服务管理--定时任务"})
+//@RestController
+//@RequestMapping(value = ApiVersion.Version1_0)
+//@Api(description = "定时任务", tags = {"缓存服务管理--定时任务"})
 public class RedisScheduledTask {
 
     Logger logger = LoggerFactory.getLogger(RedisScheduledTask.class);
@@ -56,7 +51,7 @@ public class RedisScheduledTask {
     /**
      * 生成 Redis 快照
      */
-    @RequestMapping(value = "/redis-memory/cache/statistics/backupRedis", method = RequestMethod.GET)
+//    @RequestMapping(value = "/redis-memory/cache/statistics/backupRedis", method = RequestMethod.GET)
     @Scheduled(cron = "0 0 0 15 * ?")
     public void backupRedis() {
         redisTemplate.execute(new RedisCallback() {
@@ -72,7 +67,7 @@ public class RedisScheduledTask {
     /**
      * 导出 redis 内存分析报告，并导入到数据库
      */
-    @RequestMapping(value = "/redis-memory/cache/statistics/exportAndImportRedisMemoryData", method = RequestMethod.GET)
+//    @RequestMapping(value = "/redis-memory/cache/statistics/exportAndImportRedisMemoryData", method = RequestMethod.GET)
     @Scheduled(cron = "0 30 0 15 * ?")
     public void exportAndImportRedisMemoryData() {
         long start = System.currentTimeMillis();

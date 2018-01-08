@@ -209,6 +209,7 @@ public class ServiceApi {
         public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
         public static final String RsReportCategoryByApp = "/resources/reportCategory/getAllCategoryByApp";
         public static final String RsReportCategoryByIds = "/resources/reportCategory/getAllCategoryByIds";
+        public static final String RsReportCategoryIdsByCode = "/resources/reportCategory/getCategoryIdsByCode";
 
         /**
          * 资源报表分类和应用
@@ -266,9 +267,26 @@ public class ServiceApi {
 
         public static final String StatisticsGetDoctorsGroupByTown = "/resources/statistics/getDoctorsGroupByTown";
 
-
-
-
+        //资源中心首页
+        public static final String GetPatientArchiveCount = "/resource/center/getPatientArchiveCount";
+        public static final String GetMedicalResourcesCount = "/resource/center/getMedicalResourcesCount";
+        public static final String GetHealthArchiveCount = "/resource/center/getHealthArchiveCount";
+        public static final String GetElectronicCasesCount = "/resource/center/getElectronicCasesCount";
+        public static final String GetHealthCardBindingAmount = "/resource/center/getHealthCardBindingAmount";
+        public static final String GetInfoDistribution = "/resource/center/getInfoDistribution";
+        public static final String GetNewSituation = "/resource/center/getNewSituation";
+        public static final String GetOrgArchives = "/resource/center/getOrgArchives";
+        public static final String GetMedicalStaffDistribution = "/resource/center/getMedicalStaffDistribution";
+        public static final String GetMedicalStaffRatio = "/resource/center/getMedicalStaffRatio";
+        public static final String GetCumulativeIntegration = "/resource/center/getCumulativeIntegration";
+        public static final String GteTotallyToBeIntegrated = "resource/center/gteTotallyToBeIntegrated";
+        public static final String GetArchiveSource = "/resource/center/getArchiveSource";
+        public static final String GetArchiveDistribution = "/resource/center/getArchiveDistribution";
+        public static final String GetStorageAnalysis = "/resource/center/getStorageAnalysis";
+        public static final String GetElectronicMedicalSource = "/resource/center/getElectronicMedicalSource";
+        public static final String GetElectronicMedicalOrgDistributed = "/resource/center/getElectronicMedicalOrgDistributed";
+        public static final String GetElectronicMedicalDeptDistributed = "/resource/center/getElectronicMedicalDeptDistributed";
+        public static final String GetElectronicMedicalAcquisitionSituation = "/resource/center/getElectronicMedicalAcquisitionSituation";
 
     }
 
@@ -410,6 +428,7 @@ public class ServiceApi {
         public static final String ResolveQueue = "/packages/resolveQueue";
         public static final String QueueSize = "/packages/queueSize";
         public static final String PackageCrypto = "/PackageCrypto";
+        public static final String ImmediateResolve = "/immediate/resolve";
     }
 
     //非病人维度
@@ -1132,6 +1151,10 @@ public class ServiceApi {
         public static final String GetTjQuotaByCode = "/tj/getTjQuotaByCode";
         public static final String TjQuotaConfigInfo = "/tj/quotaConfigInfo";
         public static final String TjHasConfigDimension = "/tj/hasConfigDimension";
+        public static final String TjQuotaTypeIsExist  ="/quota/type_isExist";
+        public static final String TjDimensionMainIsExist = "/quota/TjDimensionMainIsExist";
+        public static final String TjDimensionSlaveIsExist = "/quota/TjDimensionSlaveIsExist";
+        public static final String TjQuotaBatch = "/tjQuota/batch";
 
 
         public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
@@ -1155,7 +1178,7 @@ public class ServiceApi {
         public static final String TjQuotaChartId = "/tj/tjQuotaChart/{id}";
         public static final String GetAllTjQuotaChart = "/tj/getAllTjQuotaChart";
 
-
+        public static final String getQuotaCategoryByName = "/quotaCategory/getQuotaCategoryByName";
 
     }
 
@@ -1216,7 +1239,7 @@ public class ServiceApi {
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
         public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
-        public static final String GetReportByMenuId = "/governmentMenuReportMonitorType/getReportByMenuId";
+        public static final String GetReportByMenuCode = "/governmentMenuReportMonitorType/getReportByMenuCode";
         //政府服务平台-门诊仪表盘-start
         public static final String OutpatientsBoardCount = "/government/outpatientsBoardCount";
         public static final String GetMonthDistribution = "/statistics/monthDistribution";

@@ -118,7 +118,7 @@ public class MysqlExtract {
             whereSql.append(" and " + esConfig.getFilter());
         }
         if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
-            if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {//全量，增量
+            if (Contant.quota.dataLevel_increase.endsWith(quotaVo.getDataLevel())) {//全量，增量
                 whereSql.append(" and " + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
                 whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
             }else{
