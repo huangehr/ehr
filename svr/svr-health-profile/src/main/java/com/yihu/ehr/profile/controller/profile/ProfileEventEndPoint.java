@@ -1,14 +1,11 @@
 package com.yihu.ehr.profile.controller.profile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.XTransformClient;
-import com.yihu.ehr.profile.model.MedicationStat;
 import com.yihu.ehr.profile.service.*;
-import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,44 +26,14 @@ import java.util.Map;
  * @created 2017.06.22
  */
 @RestController
-@Api(value = "档案事件接口", description = "档案事件接口")
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@Api(value = "ProfileEventEndPoint", description = "档案事件接口", tags = {"档案影像服务 - 档案事件接口"})
 public class ProfileEventEndPoint extends BaseRestEndPoint {
 
     @Autowired
-    private PatientInfoBaseService patient;
-    @Autowired
-    private ObjectMapper mapper;
-    @Autowired
-    private PatientEventService patientEvent;
-    @Autowired
-    private PatientInfoDetailService patientDetail;
+    private ProfileEventService patientEvent;
     @Autowired
     private XTransformClient transform;
-    @Autowired
-    private IndicatorsService indicatorsService;
-
-    @ApiOperation("患者基本信息OK")
-    @RequestMapping(value = ServiceApi.Profiles.ProfileInfo, method = RequestMethod.GET)
-    public Map<String, Object> profileInfo(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
-            @RequestParam(value = "demographic_id") String demographic_id,
-            @ApiParam(name = "version", value = "版本号", defaultValue = "59083976eebd")
-            @RequestParam(value = "version", required = false) String version) {
-        return patient.getPatientInfo(demographic_id, version);
-    }
-
-    @ApiOperation("患者患病史JSON")
-    @RequestMapping(value = ServiceApi.Profiles.ProfileHistory, method = RequestMethod.GET)
-    public String ProfileHistory(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "362321200108017313")
-            @RequestParam(value = "demographic_id") String demographic_id) {
-
-        return "[{\"pastHistoryType\":\"家族病史\",\"pastHistoryContents\":\"也就是医学中常常提到的家族史，也指某一种病的患者的家族成员（较大范围的家族成员，不仅限于祖孙等直系亲属）中发病情况。家族病史分为阴性跟阳性。 1)阴性（即没有发现同样病的患者）。临床上无家族史 2)阳性（即发现有同样病的患者）。比如：临床上讲糖尿病家族史、高血压病家族史、遗传型疾病家族史等。\"},\n" +
-                "  {\"pastHistoryType\":\"传染史\",\"pastHistoryContents\":\"传染史..\"},\n" +
-                "  {\"pastHistoryType\":\"家族史\",\"pastHistoryContents\":\"家族史..\"},\n" +
-                "  {\"pastHistoryType\":\"手术史\",\"pastHistoryContents\":\"手术史..\"}]";
-    }
 
     @ApiOperation("门诊/住院事件(时间轴)OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvents, method = RequestMethod.GET)
@@ -78,6 +45,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         return patientEvent.getPatientEvents(demographic_id, events_type);
     }
 
+    /**
     @ApiOperation("全文检索（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.ProfileLucene, method = RequestMethod.GET)
     public Envelop ProfileLucene(
@@ -98,7 +66,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
-
+    */
 
 		
     /*@ApiOperation("就诊过的疾病OK")
@@ -125,8 +93,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         return patient.getPatientYear(demographic_id);
     }   */
 
-
-
+    /**
     @ApiOperation("某次就诊事件OK")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvent, method = RequestMethod.GET)
     public Map<String,Object> MedicalEvent(
@@ -161,10 +128,11 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
 
         return patientDetail.getMedicationStat(demographic_id, hp_id);
     }
-
+    */
 
 
     /***************************** 指标 ***************************************************/
+    /**
     @ApiOperation("获取某个健康问题指标（待需求）")
     @RequestMapping(value = ServiceApi.Profiles.IndicatorsClass, method = RequestMethod.GET)
     public List<Map<String,Object>> IndicatorsClass(
@@ -200,6 +168,7 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         re.setDetailModelList(adapterBatch(version,re.getDetailModelList()));
         return re;
     }
+     */
 
     /**
      * 单条记录转适配
@@ -208,9 +177,9 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     private Map<String,Object> adapterOne(String version,Map<String,Object> obj) throws Exception {
         if(version != null) {
             MStdTransformDto stdTransformDto = new MStdTransformDto();
-            stdTransformDto.setSource(mapper.writeValueAsString(obj));
+            stdTransformDto.setSource(objectMapper.writeValueAsString(obj));
             stdTransformDto.setVersion(version);
-            return transform.stdTransform(mapper.writeValueAsString(stdTransformDto));
+            return transform.stdTransform(objectMapper.writeValueAsString(stdTransformDto));
         }
         else{
             return obj;
@@ -225,8 +194,8 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
         if(version!=null) {
             MStdTransformDto stdTransformDto = new MStdTransformDto();
             stdTransformDto.setVersion(version);
-            stdTransformDto.setSource(mapper.writeValueAsString(list));
-            return transform.stdTransformList(mapper.writeValueAsString(stdTransformDto));
+            stdTransformDto.setSource(objectMapper.writeValueAsString(list));
+            return transform.stdTransformList(objectMapper.writeValueAsString(stdTransformDto));
         }
         else{
             return list;

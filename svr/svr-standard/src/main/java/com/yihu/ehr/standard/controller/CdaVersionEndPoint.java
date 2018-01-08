@@ -26,7 +26,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "version", description = "版本服务")
+@Api(value = "CdaVersionEndPoint", description = "版本", tags = {"标准服务-版本"})
 public class CdaVersionEndPoint extends ExtendEndPoint<MCDAVersion> {
 
     @Autowired

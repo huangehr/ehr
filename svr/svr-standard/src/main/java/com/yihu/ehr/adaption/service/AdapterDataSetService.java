@@ -2,7 +2,6 @@ package com.yihu.ehr.adaption.service;
 
 
 import com.yihu.ehr.adaption.dao.AdapterDataSetRepository;
-import com.yihu.ehr.adaption.feignclient.DictClient;
 import com.yihu.ehr.adaption.model.AdapterDataSet;
 import com.yihu.ehr.adaption.model.DataSetMappingInfo;
 import com.yihu.ehr.adaption.model.MetadataMappingInfo;
@@ -10,6 +9,7 @@ import com.yihu.ehr.adaption.model.OrgAdapterPlan;
 import com.yihu.ehr.model.adaption.MAdapterDataVo;
 import com.yihu.ehr.model.adaption.MAdapterRelationship;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.standard.service.DictService;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -35,13 +35,11 @@ import java.util.Map;
  */
 @Service
 public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, AdapterDataSetRepository> {
-    @Autowired
-    OrgAdapterPlanService orgAdapterPlanManager;
-    @Autowired
-    AdapterDictService adapterDictService;
-    @Autowired
-    DictClient dictClient;
 
+    @Autowired
+    private AdapterDictService adapterDictService;
+    @Autowired
+    private DictService dictService;
 
     /**
      * 根据方案ID及查询条件查询数据集适配关系
@@ -250,7 +248,8 @@ public class AdapterDataSetService extends BaseJpaService<AdapterDataSet, Adapte
         //新增需要适配的字典
         Long planId = adapterDataSet.getAdapterPlanId();
         String cdaVersion = orgAdapterPlan.getVersion();
-        Map map = dictClient.getDictMapByIds(cdaVersion, adapterDataSet.getDataSetId(), adapterDataSet.getMetaDataId());
+
+        Map map = dictService.getDictMapByIds(cdaVersion, adapterDataSet.getDataSetId(), adapterDataSet.getMetaDataId());
         if (map != null) {
             Long dictId = Long.parseLong(String.valueOf(map.get("dictId")));
             adapterDataSet.setStdDict(dictId);

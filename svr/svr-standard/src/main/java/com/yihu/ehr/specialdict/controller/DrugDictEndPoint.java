@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "DrugDict", description = "药品字典管理接口")
+@Api(value = "DrugDictEndPoint", description = "药品字典", tags = {"特殊字典-药品字典"})
 public class DrugDictEndPoint extends EnvelopRestEndPoint {
 
     @Autowired

@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "Meta data", description = "数据元服务")
+@Api(value = "MetaDataEndPoint", description = "数据元", tags = {"标准服务-数据元"})
 public class MetaDataEndPoint extends ExtendEndPoint<MStdMetaData> {
 
     @Autowired

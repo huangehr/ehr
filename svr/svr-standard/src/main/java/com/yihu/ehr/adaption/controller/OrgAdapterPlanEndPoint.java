@@ -2,7 +2,6 @@ package com.yihu.ehr.adaption.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.adaption.common.ExtendEndPoint;
-import com.yihu.ehr.adaption.feignclient.DispatchLogClient;
 import com.yihu.ehr.adaption.model.AdapterCustomize;
 import com.yihu.ehr.adaption.model.AdapterDataSet;
 import com.yihu.ehr.adaption.model.OrgAdapterPlan;
@@ -34,7 +33,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(value = "plan", description = "适配器管理接口", tags = {"适配器管理"})
+@Api(value = "OrgAdapterPlanEndPoint", description = "机构适配器", tags = {"适配服务-机构适配器"})
 public class OrgAdapterPlanEndPoint extends ExtendEndPoint<MAdapterPlan> {
     @Autowired
     private OrgAdapterPlanService orgAdapterPlanService;
@@ -42,10 +41,6 @@ public class OrgAdapterPlanEndPoint extends ExtendEndPoint<MAdapterPlan> {
     private AdapterDataSetService adapterDataSetService;
     @Autowired
     AdapterInfoSendService adapterInfoSendService;
-    @Autowired
-    ObjectMapper objectMapper;
-    @Autowired
-    DispatchLogClient dispatchLogClient;
     @Autowired
     DataSetService dataSetService;
     @Autowired

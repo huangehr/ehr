@@ -3,6 +3,7 @@ package com.yihu.ehr.profile.controller.profile;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.profile.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,8 +26,8 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "档案CDA接口", description = "档案CDA接口")
-public class ProfileCDAEndPoint extends BaseRestEndPoint {
+@Api(value = "ProfileCDAEndPoint", description = "档案CDA接口", tags = "档案影像服务 - 档案CDA接口")
+public class ProfileCDAEndPoint extends EnvelopRestEndPoint {
 
     @Autowired
     private ProfileCDAService profileCDAService;

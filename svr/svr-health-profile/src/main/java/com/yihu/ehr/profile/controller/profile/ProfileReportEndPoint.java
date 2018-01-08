@@ -29,14 +29,14 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "档案检查检验接口", description = "档案检查检验接口")
+@Api(value = "ProfileReportEndPoint", description = "档案检查检验接口", tags = {"档案影像服务 - 检查检验接口"})
 public class ProfileReportEndPoint extends BaseRestEndPoint {
 
     @Autowired
     ObjectMapper mapper;
 
     @Autowired
-    PatientInfoBaseService patient;
+    ProfileInfoBaseService patient;
 
     @Autowired
     PatientInfoDetailService patientDetail;

@@ -15,6 +15,7 @@ import com.yihu.ehr.org.model.Organization;
 import com.yihu.ehr.org.service.OrgDeptService;
 import com.yihu.ehr.org.service.OrgService;
 import com.yihu.ehr.util.phonics.PinyinUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -440,4 +441,20 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
             }
         return  map;
     };
+
+    @RequestMapping(value = "/organizations/getHospital", method = RequestMethod.GET)
+    @ApiOperation(value = "查询所有经纬度医院列表")
+    public Envelop getHospital() throws Exception {
+        Envelop envelop = new Envelop();
+        try {
+            List<Organization> orgs = orgService.getHospital();
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(orgs);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 }

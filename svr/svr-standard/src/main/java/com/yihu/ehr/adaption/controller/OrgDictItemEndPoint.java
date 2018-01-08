@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter/org")
-@Api(value = "orgdictitem", description = "机构字典项", tags = {"机构字典项"})
+@Api(value = "OrgDictItemEndPoint", description = "机构字典项", tags = {"适配服务-机构字典项"})
 public class OrgDictItemEndPoint extends ExtendEndPoint<MOrgDictItem> {
 
     @Autowired

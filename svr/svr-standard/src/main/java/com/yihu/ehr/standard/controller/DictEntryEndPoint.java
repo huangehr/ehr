@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "Entry", description = "字典项服务")
+@Api(value = "DictEntryEndPoint", description = "字典项", tags = {"标准服务-字典项"})
 public class DictEntryEndPoint extends ExtendEndPoint<MStdDictEntry> {
 
     @Autowired

@@ -28,7 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "standard source", description = "标准来源服务")
+@Api(value = "StdSourceEndPoint", description = "标准来源服务", tags = {"标准服务-标准来源"})
 public class StdSourceEndPoint extends ExtendEndPoint<MStdSource> {
 
     @Autowired

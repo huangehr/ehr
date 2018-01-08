@@ -1,5 +1,6 @@
 package com.yihu.ehr.report.feign;
 
+import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.model.packs.MPackage;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Collection;
 
 @FeignClient(value = MicroServices.Package)
+@RequestMapping(ApiVersion.Version1_0)
 public interface PackMgrClient {
     @RequestMapping(value = ServiceApi.Packages.PackageSearch, method = RequestMethod.GET)
     Collection<MPackage> packageList(

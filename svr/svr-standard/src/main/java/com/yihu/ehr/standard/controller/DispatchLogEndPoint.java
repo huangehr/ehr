@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "dispatch-log", description = "分发与下载日志服务")
+@Api(value = "DispatchLogEndPoint", description = "分发与下载日志", tags = {"标准服务-分发与下载日志"})
 public class DispatchLogEndPoint extends ExtendEndPoint<MDispatchLog> {
 
     @Autowired
@@ -41,8 +41,9 @@ public class DispatchLogEndPoint extends ExtendEndPoint<MDispatchLog> {
         List ls = dispatchLogService.findByFields(
                 new String[]{"stdVersionId", "orgId"},
                 new Object[]{versionCode, orgCode});
-        if (ls.size() > 0)
+        if (ls.size() > 0) {
             return getModel(ls.get(0));
+        }
         return null;
     }
 

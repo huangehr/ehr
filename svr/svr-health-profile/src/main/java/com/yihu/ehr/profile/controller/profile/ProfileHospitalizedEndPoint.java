@@ -6,7 +6,6 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseRestEndPoint;
 import com.yihu.ehr.model.resource.MStdTransformDto;
 import com.yihu.ehr.profile.feign.XTransformClient;
-import com.yihu.ehr.profile.model.MedicationStat;
 import com.yihu.ehr.profile.service.*;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
@@ -30,14 +29,14 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = ApiVersion.Version1_0, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@Api(value = "档案住院接口", description = "档案住院接口")
+@Api(value = "ProfileHospitalizedEndPoint", description = "住院接口", tags = {"档案影像服务 - 住院接口"})
 public class ProfileHospitalizedEndPoint extends BaseRestEndPoint {
 
     @Autowired
     ObjectMapper mapper;
 
     @Autowired
-    PatientInfoBaseService patient;
+    ProfileInfoBaseService patient;
 
     @Autowired
     PatientInfoDetailService patientDetail;

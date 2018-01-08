@@ -30,7 +30,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0 + "/adapter")
-@Api(value = "adapterDict", description = "适配字典管理接口", tags = {"适配字典管理"})
+@Api(value = "AdapterDictEndPoint", description = "字典", tags = {"适配服务-字典"})
 public class AdapterDictEndPoint extends ExtendEndPoint<MAdapterDict> {
 
     @Autowired
