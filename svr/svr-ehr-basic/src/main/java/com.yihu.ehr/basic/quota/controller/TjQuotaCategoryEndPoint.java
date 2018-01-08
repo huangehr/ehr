@@ -2,6 +2,7 @@ package com.yihu.ehr.basic.quota.controller;
 
 import com.yihu.ehr.basic.quota.service.TjQuotaCategoryService;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.quota.TjQuotaCategory;
 import com.yihu.ehr.model.common.ListResult;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wxw on 2017/8/31.
@@ -156,4 +159,20 @@ public class TjQuotaCategoryEndPoint extends EnvelopRestEndPoint {
         List<TjQuotaCategory> quotaCategories = quotaCategoryService.getQuotaCategoryChild();
         return (List<MQuotaCategory>) convertToModels(quotaCategories, new ArrayList<MQuotaCategory>(quotaCategories.size()), MQuotaCategory.class, null);
     }
+
+    @RequestMapping(value = ServiceApi.TJ.getQuotaCategoryByName, method = RequestMethod.POST)
+    @ApiOperation("根据指标分类名称获取指标分类的id和name")
+    public Map<String,String> getQuotaCategoryByName(
+            @ApiParam(name = "name", value = "指标分类名称", defaultValue = "")
+            @RequestBody String name)throws Exception{
+        Map<String, String> map = new HashMap<>();
+        List<Object> list = (List<Object>)quotaCategoryService.getQuotaCategoryByName(toEntity(name, String[].class));
+        for(int i = 0 ;i < list.size() ; i++){
+            Object[] objectList=(Object[])list.get(i);
+            if(null!=objectList[0]&&null!=objectList[1]){
+                map.put(objectList[0].toString(), objectList[1].toString());
+            }
+        }
+        return  map;
+    };
 }

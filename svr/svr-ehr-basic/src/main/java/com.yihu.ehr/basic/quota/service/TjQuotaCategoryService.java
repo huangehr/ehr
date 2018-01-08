@@ -3,6 +3,8 @@ package com.yihu.ehr.basic.quota.service;
 import com.yihu.ehr.basic.quota.dao.XTjQuotaCategoryRepository;
 import com.yihu.ehr.entity.quota.TjQuotaCategory;
 import com.yihu.ehr.query.BaseJpaService;
+import com.yihu.ehr.quota.dao.XQuotaCategoryRepository;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,5 +70,16 @@ public class TjQuotaCategoryService extends BaseJpaService<TjQuotaCategory, XTjQ
 
     public List<TjQuotaCategory> getQuotaCategoryChild(){
         return quotaCategoryRepository.getQuotaCategoryChild();
+    }
+
+    /**
+     * 查询指标分类是否已存在， 返回已存在指标分类id、name
+     */
+    public List getQuotaCategoryByName(String[] names)
+    {
+        String sql = "SELECT name, id FROM tj_quota_category WHERE name in(:names)";
+        SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
+        sqlQuery.setParameterList("names", names);
+        return sqlQuery.list();
     }
 }

@@ -9,7 +9,6 @@ import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.save.es.ElasticFactory;
-import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
@@ -17,7 +16,6 @@ import com.yihu.quota.service.quota.QuotaService;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
-import com.yihu.quota.vo.SaveModelOrgHealthCategory;
 import net.sf.json.JSONObject;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -43,7 +41,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -470,7 +467,7 @@ public class EsExtract {
             //拼凑where语句
             StringBuffer whereSql = new StringBuffer();
             if ( !StringUtils.isEmpty(esConfig.getTimekey())) {
-                if (Contant.quota.dataLeval_oneDay.endsWith(quotaVo.getDataLevel())) {
+                if (Contant.quota.dataLevel_increase.endsWith(quotaVo.getDataLevel())) {
                     whereSql.append("" + esConfig.getTimekey() + " >= '" + startTime + "'");//startTime 默认是 昨天
                     whereSql.append( " and " + esConfig.getTimekey() + " < '" + endTime + "'");//默认今天
                 }else{

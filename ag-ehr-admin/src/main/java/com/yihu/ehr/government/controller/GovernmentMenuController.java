@@ -239,15 +239,15 @@ public class GovernmentMenuController extends ExtendController<GovernmentMenuMod
         }
     }
 
-    @RequestMapping(value = ServiceApi.Government.GetReportByMenuId, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Government.GetReportByMenuCode, method = RequestMethod.GET)
     @ApiOperation(value = "根据菜单id获取报表内容")
     public Envelop getReportByMenuId(
-            @ApiParam(name = "menuId", value = "菜单Id", defaultValue = "")
-            @RequestParam(value = "menuId", required = false) String menuId) {
+            @ApiParam(name = "code", value = "分类编码", defaultValue = "")
+            @RequestParam(value = "code", required = false) String code) {
         Envelop envelop = new Envelop();
         List<RsReportCategoryInfoModel> list = new ArrayList<>();
         try {
-            List<Integer> CategoryIds = reportMonitorTypeClient.getMonitorTypeIdByGovernmentMenuId(menuId);
+            List<Integer> CategoryIds = rsReportCategoryClient.getCategoryIdsByCode(code);
             if (null != CategoryIds && CategoryIds.size() > 0) {
                 List<RsReportCategoryInfoModel> categoryInfoModelList = rsReportCategoryClient.getCategoryByIds(CategoryIds);
                 if (null != categoryInfoModelList && categoryInfoModelList.size() > 0) {
