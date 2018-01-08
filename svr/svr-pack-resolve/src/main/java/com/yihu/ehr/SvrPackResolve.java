@@ -24,14 +24,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableFeignClients
 @EnableScheduling
-public class PackResolveApplication extends SpringBootServletInitializer {
+public class SvrPackResolve extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
-        SpringApplication.run(PackResolveApplication.class, args);
+        SpringApplication.run(SvrPackResolve.class, args);
     }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(PackResolveApplication.class);
+        return application.sources(SvrPackResolve.class);
     }
 }

@@ -19,14 +19,14 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 @EnableDiscoveryClient
 @EnableFeignClients
-public class StandardService extends SpringBootServletInitializer{
+public class SvrStandard extends SpringBootServletInitializer{
 
     public static void main(String[] args) {
-        SpringApplication.run(StandardService.class, args);
+        SpringApplication.run(SvrStandard.class, args);
     }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(StandardService.class);
+        return application.sources(SvrStandard.class);
     }
 }
