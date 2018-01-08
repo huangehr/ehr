@@ -49,6 +49,11 @@ public class OrgHealthCategoryStatisticsService {
                     item.put("result", endpoint.get("result"));
                     item.put("isEndpoint", "true");
                 }
+                item.put("town", endpoint.get("town"));
+                item.put("year", endpoint.get("year"));
+                item.put("slaveKey1", endpoint.get("slaveKey1"));
+                item.put("slaveKey2", endpoint.get("slaveKey2"));
+                item.put("slaveKey3", endpoint.get("slaveKey3"));
             }
         }
 
@@ -67,8 +72,8 @@ public class OrgHealthCategoryStatisticsService {
         totalMap.put("name", "合计");
         totalMap.put("result", totalResult);
         allOrgHealthCategoryList.add(totalMap);
-
-        return saveToEs(endpointsStatisticList, allOrgHealthCategoryList);
+        return true;
+//        return saveToEs(endpointsStatisticList, allOrgHealthCategoryList);
     }
 
     /**
@@ -130,16 +135,16 @@ public class OrgHealthCategoryStatisticsService {
                 quotaCode = endpoint.get("quotaCode").toString().replaceAll("_", "");
                 quotaName = endpoint.get("quotaName").toString();
                 quotaDate = endpoint.get("quotaDate").toString();
-                town = endpoint.get("town") == null ? null : endpoint.get("town").toString();
-                year = endpoint.get("year") == null ? null : endpoint.get("year").toString();
-                slaveKey1 = endpoint.get("slaveKey1") == null ? null : endpoint.get("slaveKey1").toString();
-                slaveKey2 = endpoint.get("slaveKey2") == null ? null : endpoint.get("slaveKey2").toString();
-                slaveKey3 = endpoint.get("slaveKey3") == null ? null : endpoint.get("slaveKey3").toString();
             }
 
             SaveModel model;
             for (Map<String, Object> item : allOrgHealthCategoryList) {
                 model = new SaveModel();
+                town = item.get("town") == null ? null : item.get("town").toString();
+                year = item.get("year") == null ? null : item.get("year").toString();
+                slaveKey1 = item.get("slaveKey1") == null ? null : item.get("slaveKey1").toString();
+                slaveKey2 = item.get("slaveKey2") == null ? null : item.get("slaveKey2").toString();
+                slaveKey3 = item.get("slaveKey3") == null ? null : item.get("slaveKey3").toString();
                 model.setQuotaCode(quotaCode);
                 model.setQuotaName(quotaName);
                 model.setQuotaDate(quotaDate);
