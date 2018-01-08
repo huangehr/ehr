@@ -128,4 +128,13 @@ public class TjDimensionSlaveEndPoint extends EnvelopRestEndPoint {
         }
     }
 
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionSlaveIsExist,method = RequestMethod.POST)
+    @ApiOperation("获取已存在细维度编码")
+    public List TjDimensionSlaveIsExist(
+            @ApiParam(name="slaveCode",value="slaveCode")
+            @RequestBody String slaveCode) throws Exception {
+        List values = tjDimensionSlaveService.tjDimensionSlaveIsExist(toEntity(slaveCode, String[].class));
+        return values;
+    }
+
 }

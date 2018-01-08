@@ -1150,6 +1150,10 @@ public class ServiceApi {
         public static final String GetTjQuotaByCode = "/tj/getTjQuotaByCode";
         public static final String TjQuotaConfigInfo = "/tj/quotaConfigInfo";
         public static final String TjHasConfigDimension = "/tj/hasConfigDimension";
+        public static final String TjQuotaTypeIsExist  ="/quota/type_isExist";
+        public static final String TjDimensionMainIsExist = "/quota/TjDimensionMainIsExist";
+        public static final String TjDimensionSlaveIsExist = "/quota/TjDimensionSlaveIsExist";
+        public static final String TjQuotaBatch = "/tjQuota/batch";
 
 
         public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
@@ -1173,7 +1177,7 @@ public class ServiceApi {
         public static final String TjQuotaChartId = "/tj/tjQuotaChart/{id}";
         public static final String GetAllTjQuotaChart = "/tj/getAllTjQuotaChart";
 
-
+        public static final String getQuotaCategoryByName = "/quotaCategory/getQuotaCategoryByName";
 
     }
 

@@ -1,5 +1,6 @@
 package com.yihu.ehr.quota.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
@@ -19,12 +20,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/6/9.
@@ -47,6 +52,8 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
     TjDataSourceService tjDataSourceService;
     @Autowired
     TjQuotaDimensionMainService tjQuotaDimensionMainService;
+    @Autowired
+    TjQuotaDimensionSlaveService tjQuotaDimensionSlaveService;
 
     @RequestMapping(value = ServiceApi.TJ.GetTjQuotaList, method = RequestMethod.GET)
     @ApiOperation(value = "根据查询条件查询统计指标表")
@@ -247,5 +254,48 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             listResult.setTotalCount(0);
         }
         return listResult;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.POST)
+    @ApiOperation("获取已存在指标编码/指标名称")
+    public List tjQuotaTypeIsExist(
+            @ApiParam(name = "type", value = "类型")
+            @RequestParam(value = "type") String type,
+            @ApiParam(name="json",value="json")
+            @RequestBody String json) throws Exception {
+
+        List values = tjQuotaService.tjQuotaTypeIsExist(type,toEntity(json, String[].class));
+        return values;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaBatch, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @ApiOperation(value = "批量导入指标、主维度、细维度", notes = "批量导入指标、主维度、细维度")
+    public boolean tjQuotaBatch(
+            @RequestBody String lsMap) throws Exception {
+        Map<String,Object> values = objectMapper.readValue(lsMap , new TypeReference<Map<String,Object>>() {});
+        List saveLs=new ArrayList();
+        List quotaMainLs=new ArrayList();
+        List quotaSlaveLs=new ArrayList();
+        if(null != values && values.size()>0){
+            for(String key:values.keySet()){
+
+                if("saveLs".equals(key)){
+                    //指标、数据源、数据存储
+                    saveLs = (List)values.get(key);
+                    tjQuotaService.tjQuotaBatch(saveLs);
+
+                }else if("quotaMainLs".equals(key)){
+                    //主维度
+                    quotaMainLs = (List)values.get(key);
+                    tjQuotaDimensionMainService.addTjQuotaDimensionMainBatch(quotaMainLs);
+                }else{
+                    //细维度
+                    quotaSlaveLs = (List)values.get(key);
+                    tjQuotaDimensionSlaveService.addTjQuotaDimensionSlaveBatch(quotaSlaveLs);
+                }
+            }
+        }
+        return true;
     }
 }
