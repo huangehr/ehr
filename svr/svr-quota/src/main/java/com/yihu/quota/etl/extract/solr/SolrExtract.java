@@ -94,7 +94,7 @@ public class SolrExtract {
         }
         if (!StringUtils.isEmpty(esConfig.getTimekey())) {
             //1 全量 2 增量
-            if(quotaVo!=null && quotaVo.getDataLevel().equals(Contant.quota.dataLeval_oneDay)){
+            if(quotaVo!=null && quotaVo.getDataLevel().equals(Contant.quota.dataLevel_increase)){
                 fq = esConfig.getTimekey()+":[";
                 //起始时间
                 if (!StringUtils.isEmpty(startTime)) {
