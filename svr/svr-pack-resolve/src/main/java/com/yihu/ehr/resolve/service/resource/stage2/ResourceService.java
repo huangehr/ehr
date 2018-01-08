@@ -28,7 +28,7 @@ public class ResourceService {
     @Autowired
     private FileResourceDao fileResRepo;
     @Autowired
-    private RelationDao relationDao;
+    private RelationService relationService;
 
     public void save(ResourceBucket resourceBucket, StandardPackage standardPackage) throws Exception {
         // 资源主表
@@ -41,6 +41,6 @@ public class ResourceService {
         fileResRepo.save(resourceBucket);
 
         //保存MYSQL关联记录
-        relationDao.save(resourceBucket);
+        relationService.relation(resourceBucket);
     }
 }

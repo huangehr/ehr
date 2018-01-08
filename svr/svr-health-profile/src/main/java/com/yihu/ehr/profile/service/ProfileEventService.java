@@ -15,11 +15,10 @@ import java.util.*;
  * @author hzp 2016-06-27
  */
 @Service
-public class PatientEventService {
+public class ProfileEventService {
 
     @Value("${spring.application.id}")
     private String appId;
-
     @Autowired
     private XResourceClient resource; //资源服务
 
