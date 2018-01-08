@@ -128,4 +128,13 @@ public class TjDimensionMainEndPoint extends EnvelopRestEndPoint {
             return false;
         }
     }
+
+    @RequestMapping(value = ServiceApi.TJ.TjDimensionMainIsExist,method = RequestMethod.POST)
+    @ApiOperation("获取已存在主维度编码")
+    public List TjDimensionMainIsExist(
+            @ApiParam(name="mainCode",value="mainCode")
+            @RequestBody String mainCode) throws Exception {
+        List values = tjDimensionMainService.tjDimensionMainIsExist(toEntity(mainCode, String[].class));
+        return values;
+    }
 }
