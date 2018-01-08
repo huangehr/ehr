@@ -1,9 +1,9 @@
-package com.yihu.ehr.basic.patient.service.demographic;
+package com.yihu.ehr.basic.patient.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yihu.ehr.basic.address.service.AddressService;
 import com.yihu.ehr.basic.patient.dao.XDemographicInfoRepository;
-import com.yihu.ehr.entity.patient.DemographicInfo;
+import com.yihu.ehr.entity.patient.Demographic;
 import com.yihu.ehr.query.BaseJpaService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Query;
@@ -41,16 +41,16 @@ public class DemographicService extends BaseJpaService {
     private AddressService addressService;
 
 
-    public DemographicInfo getDemographicInfo(String id) {
-        DemographicInfo demInfo = demographicInfoRepository.findOne(id);
+    public Demographic getDemographicInfo(String id) {
+        Demographic demInfo = demographicInfoRepository.findOne(id);
         return demInfo;
     }
 
-    public DemographicInfo getDemographicInfoBytelephoneNo(String telephoneNo) {
+    public Demographic getDemographicInfoBytelephoneNo(String telephoneNo) {
         //{"联系电话":"15965368965"}
         telephoneNo="{\"联系电话\":\""+telephoneNo+"\"}";
-        List<DemographicInfo> demInfoList = demographicInfoRepository.getDemographicInfoByTelephoneNo(telephoneNo);
-        DemographicInfo demInfo=null;
+        List<Demographic> demInfoList = demographicInfoRepository.getDemographicInfoByTelephoneNo(telephoneNo);
+        Demographic demInfo=null;
         if(null!=demInfoList&&demInfoList.size()>0){
             demInfo=demInfoList.get(0);
         }
@@ -60,17 +60,17 @@ public class DemographicService extends BaseJpaService {
 
 
 
-    public void save(DemographicInfo demographicInfo) throws JsonProcessingException {
+    public void save(Demographic demographicInfo) throws JsonProcessingException {
         demographicInfoRepository.save(demographicInfo);
     }
 
 
-    public boolean savePatient(DemographicInfo demographicInfo) throws Exception{
+    public boolean savePatient(Demographic demographicInfo) throws Exception{
         save(demographicInfo);
         return true;
     }
 
-    public List<DemographicInfo> searchPatient(Map<String, Object> args) {
+    public List<Demographic> searchPatient(Map<String, Object> args) {
         Session session = entityManager.unwrap(Session.class);
         String search = (String) args.get("search");
         Integer page = (Integer) args.get("page");
@@ -99,7 +99,7 @@ public class DemographicService extends BaseJpaService {
         }
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
-        List<DemographicInfo> demographicInfos = query.list();
+        List<Demographic> demographicInfos = query.list();
         return demographicInfos;
     }
 
@@ -131,18 +131,18 @@ public class DemographicService extends BaseJpaService {
     }
 
     public void delete(String id) {
-        DemographicInfo di = (DemographicInfo) getDemographicInfo(id);
+        Demographic di = (Demographic) getDemographicInfo(id);
         demographicInfoRepository.delete(di);
     }
 
     public void resetPass(String id) {
 
         String pwd = "123456";
-        DemographicInfo demInfo = getDemographicInfo(id);
+        Demographic demInfo = getDemographicInfo(id);
         demInfo.setPassword(DigestUtils.md5Hex(pwd));
         demographicInfoRepository.save(demInfo);
     }
-    public List<DemographicInfo> searchPatientByParams(Map<String, Object> args) {
+    public List<Demographic> searchPatientByParams(Map<String, Object> args) {
         Session session = entityManager.unwrap(Session.class);
         String search = (String) args.get("search");
         Integer page = (Integer) args.get("page");
@@ -195,7 +195,7 @@ public class DemographicService extends BaseJpaService {
         }
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
-        List<DemographicInfo> demographicInfos = query.list();
+        List<Demographic> demographicInfos = query.list();
         return demographicInfos;
     }
 
@@ -248,7 +248,7 @@ public class DemographicService extends BaseJpaService {
         return ((Long)query.list().get(0)).intValue();
     }
 
-    public List<DemographicInfo> searchPatientByParams2(Map<String, Object> args) {
+    public List<Demographic> searchPatientByParams2(Map<String, Object> args) {
         Session session = entityManager.unwrap(Session.class);
         String search = (String) args.get("search");
         Integer page = (Integer) args.get("page");
@@ -311,7 +311,7 @@ public class DemographicService extends BaseJpaService {
         }
         query.setMaxResults(pageSize);
         query.setFirstResult((page - 1) * pageSize);
-        List<DemographicInfo> demographicInfos = query.list();
+        List<Demographic> demographicInfos = query.list();
         return demographicInfos;
     }
 
@@ -384,9 +384,9 @@ public class DemographicService extends BaseJpaService {
         return locationList;
     }
 
-    public DemographicInfo getDemographicInfoByIdCardNo(String idCardNo) {
-        List<DemographicInfo> demInfoList = demographicInfoRepository.getDemographicInfoByIdCardNo(idCardNo);
-        DemographicInfo demInfo=null;
+    public Demographic getDemographicInfoByIdCardNo(String idCardNo) {
+        List<Demographic> demInfoList = demographicInfoRepository.getDemographicInfoByIdCardNo(idCardNo);
+        Demographic demInfo=null;
         if(null!=demInfoList&&demInfoList.size()>0){
             demInfo=demInfoList.get(0);
         }

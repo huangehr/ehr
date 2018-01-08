@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.patient.service.card;
+package com.yihu.ehr.entity.patient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -15,7 +15,7 @@ import java.util.Date;
 @Table(name = "virtual_cards")
 @Access(value = AccessType.PROPERTY)
 
-public class AbstractVirtualCard extends AbstractCard {
+public class VirtualCard extends AbstractCard {
 
 
 	String id;				    // 卡ID
@@ -29,7 +29,7 @@ public class AbstractVirtualCard extends AbstractCard {
 	String DType;
 	String platform;
 
-	public AbstractVirtualCard() {
+	public VirtualCard() {
 //		id  = UUID.randomUUID().toString().replace("-","");
 	}
 

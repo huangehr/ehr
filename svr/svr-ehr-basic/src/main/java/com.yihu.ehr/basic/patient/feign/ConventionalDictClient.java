@@ -16,8 +16,9 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 /**
  * Created by Administrator on 2016/1/4.
  */
-@FeignClient(name = MicroServices.Dictionary)
-@ApiIgnore
+//@FeignClient(name = MicroServices.Dictionary)
+//@ApiIgnore
+@Deprecated
 public interface ConventionalDictClient {
 
     @RequestMapping(value = ApiVersion.Version1_0+"/dictionaries/martial_status", method = GET )

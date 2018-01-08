@@ -1,4 +1,4 @@
-package com.yihu.ehr.saas.controller;
+package com.yihu.ehr.organization.controller;
 
 import com.yihu.ehr.agModel.orgSaas.AreaSaasModel;
 import com.yihu.ehr.agModel.orgSaas.OrgSaasModel;
@@ -8,9 +8,9 @@ import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.geography.service.AddressClient;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.geography.MGeographyDict;
+import com.yihu.ehr.organization.service.OrgSaasClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
 import com.yihu.ehr.redis.client.RedisUpdateClient;
-import com.yihu.ehr.saas.service.OrgSaasClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by zdm on 2017/5/26.

@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.patient.service.authentication;
+package com.yihu.ehr.entity.patient;
 
 import org.hibernate.annotations.GenericGenerator;
 
