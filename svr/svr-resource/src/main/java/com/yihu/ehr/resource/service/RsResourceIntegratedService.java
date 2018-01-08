@@ -3,7 +3,7 @@ package com.yihu.ehr.resource.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.entity.quota.TjQuota;
-import com.yihu.ehr.entity.report.QuotaCategory;
+import com.yihu.ehr.entity.quota.TjQuotaCategory;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resource.dao.ResourceBrowseMetadataDao;
 import com.yihu.ehr.resource.dao.RsResourceDao;
@@ -132,14 +132,14 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
      * 根据parentId获取指标分类主体列表
      * @return
      */
-    public List<QuotaCategory> findQuotaCategoryList(int parentId, String filters) {
+    public List<TjQuotaCategory> findQuotaCategoryList(int parentId, String filters) {
         String sql;
         if(parentId != 0 && filters != null) {
             sql = "select * from tj_quota_category where parent_id = " + parentId + " AND name like " + "'%" + filters + "%'";
         }else {
             sql = "select * from tj_quota_category where parent_id = " + parentId;
         }
-        RowMapper rowMapper =  BeanPropertyRowMapper.newInstance(QuotaCategory.class);
+        RowMapper rowMapper =  BeanPropertyRowMapper.newInstance(TjQuotaCategory.class);
         return jdbcTemplate.query(sql, rowMapper);
     }
 
@@ -148,7 +148,7 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
      * @param quotaCategory
      * @return
      */
-    public List<TjQuota> findQuotaMetadataList(QuotaCategory quotaCategory) {
+    public List<TjQuota> findQuotaMetadataList(TjQuotaCategory quotaCategory) {
         String sql = "";
         if(quotaCategory != null) {
             sql = "select * from tj_quota tj where tj.quota_type = " + quotaCategory.getId();
@@ -164,7 +164,7 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
      * @param quotaCategory
      * @return
      */
-    public Map<String, Object> getTreeMap(QuotaCategory quotaCategory, int level, String filters) {
+    public Map<String, Object> getTreeMap(TjQuotaCategory quotaCategory, int level, String filters) {
         Map<String, Object> masterMap = new HashMap<String, Object>();
         if(quotaCategory != null) {
             /**
@@ -199,10 +199,10 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
             /**
              * 处理子集数据
              */
-            List<QuotaCategory> hList = findQuotaCategoryList(quotaCategory.getId(), filters);
+            List<TjQuotaCategory> hList = findQuotaCategoryList(quotaCategory.getId(), filters);
             if(hList != null) {
                 List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
-                for(QuotaCategory quotaCategory1: hList) {
+                for(TjQuotaCategory quotaCategory1: hList) {
                     childList.add(getTreeMap(quotaCategory1, level + 1, filters));
                 }
                 masterMap.put("child", childList);
@@ -356,9 +356,9 @@ public class RsResourceIntegratedService extends BaseJpaService<RsResource, RsRe
         /**
          * 获取最上级目录
          */
-        List<QuotaCategory> parentList = findQuotaCategoryList(0, filters);
+        List<TjQuotaCategory> parentList = findQuotaCategoryList(0, filters);
         if(parentList != null) {
-            for(QuotaCategory quotaCategory : parentList) {
+            for(TjQuotaCategory quotaCategory : parentList) {
                 Map<String, Object> childMap = getTreeMap(quotaCategory, 0, filters);
                 if (filters != null && !filters.equals("")) {
                     if(((List<String>) childMap.get("child")).size() > 0) {
