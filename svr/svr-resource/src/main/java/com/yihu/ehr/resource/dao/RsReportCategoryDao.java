@@ -18,15 +18,18 @@ public interface RsReportCategoryDao extends CrudRepository<RsReportCategory, In
     @Query(" FROM RsReportCategory rc WHERE rc.pid = :pid ")
     List<RsReportCategory> getChildrenByPid(@Param("pid") Integer pid);
 
-    @Query(" FROM RsReportCategory rc WHERE rc.pid = null ")
+    @Query(" FROM RsReportCategory rc WHERE rc.pid = 0 ")
     List<RsReportCategory> getTopParents();
 
     @Query(" FROM RsReportCategory rc WHERE rc.id <> :id AND rc.code = :code ")
     RsReportCategory isUniqueCode(@Param("id") Integer id, @Param("code") String code);
 
-    @Query(" FROM RsReportCategory rc WHERE rc.id <> :id AND rc.name = :name ")
+    @Query(" FROM RsReportCategory rc WHERE rc.pid = :id AND rc.name = :name ")
     RsReportCategory isUniqueName(@Param("id") Integer id, @Param("name") String name);
 
     @Query("from RsReportCategory rc where rc.id in(:ids)")
     List<RsReportCategory> findCategoryByIds(@Param("ids") List<Integer> ids);
+
+    @Query("select rc.id from RsReportCategory rc where rc.pid =(select r.id from RsReportCategory r where r.code = :code)")
+    List<Integer> findCategoryIds(@Param("code") String code);
 }

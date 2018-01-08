@@ -209,6 +209,7 @@ public class ServiceApi {
         public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
         public static final String RsReportCategoryByApp = "/resources/reportCategory/getAllCategoryByApp";
         public static final String RsReportCategoryByIds = "/resources/reportCategory/getAllCategoryByIds";
+        public static final String RsReportCategoryIdsByCode = "/resources/reportCategory/getCategoryIdsByCode";
 
         /**
          * 资源报表分类和应用
@@ -1238,7 +1239,7 @@ public class ServiceApi {
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
         public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
-        public static final String GetReportByMenuId = "/governmentMenuReportMonitorType/getReportByMenuId";
+        public static final String GetReportByMenuCode = "/governmentMenuReportMonitorType/getReportByMenuCode";
         //政府服务平台-门诊仪表盘-start
         public static final String OutpatientsBoardCount = "/government/outpatientsBoardCount";
         public static final String GetMonthDistribution = "/statistics/monthDistribution";
