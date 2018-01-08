@@ -34,7 +34,7 @@ public interface TjQuotaJobClient {
             @RequestParam(value = "pageSize" , required = false) int pageSize
     );
 
-    @ApiOperation(value = "获取指标统计不同维度结果总量")
+    @ApiOperation(value = "获取指标统计不同维度结果数据")
     @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
     Envelop getQuotaTotalCount(
             @ApiParam(name = "id", value = "指标任务ID", required = true)
