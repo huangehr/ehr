@@ -1,6 +1,7 @@
-package com.yihu.ehr.basic.patient.service.authentication;
+package com.yihu.ehr.basic.patient.service;
 
 import com.yihu.ehr.basic.patient.dao.XAuthenticationRepository;
+import com.yihu.ehr.entity.patient.Authentication;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

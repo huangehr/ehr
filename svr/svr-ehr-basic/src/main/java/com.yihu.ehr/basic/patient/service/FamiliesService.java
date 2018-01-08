@@ -1,5 +1,8 @@
-package com.yihu.ehr.basic.patient.service.family;
+package com.yihu.ehr.basic.patient.service;
 
+import com.yihu.ehr.basic.patient.dao.XFamiliesRepository;
+import com.yihu.ehr.basic.patient.dao.XMembersRepository;
+import com.yihu.ehr.entity.patient.Families;
 import com.yihu.ehr.query.BaseJpaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

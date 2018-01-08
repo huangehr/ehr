@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.patient.service.demographic;
+package com.yihu.ehr.entity.patient;
 
 import java.io.Serializable;
 import java.util.Objects;

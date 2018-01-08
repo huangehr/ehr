@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.patient.service.card;
+package com.yihu.ehr.entity.patient;
 
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.patient.service.arapply;
+package com.yihu.ehr.basic.patient.service;
 
 import com.yihu.ehr.basic.patient.dao.XMedicalCardsDao;
 import com.yihu.ehr.entity.patient.MedicalCards;

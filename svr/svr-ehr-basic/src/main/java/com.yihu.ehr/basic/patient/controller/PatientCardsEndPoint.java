@@ -2,9 +2,9 @@ package com.yihu.ehr.basic.patient.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yihu.ehr.basic.patient.service.arapply.ArchiveRelationService;
-import com.yihu.ehr.basic.patient.service.arapply.MedicalCardsService;
-import com.yihu.ehr.basic.patient.service.arapply.UserCardsService;
+import com.yihu.ehr.basic.patient.service.ArchiveRelationService;
+import com.yihu.ehr.basic.patient.service.MedicalCardsService;
+import com.yihu.ehr.basic.patient.service.UserCardsService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;

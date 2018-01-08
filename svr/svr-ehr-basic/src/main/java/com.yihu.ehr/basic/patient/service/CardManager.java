@@ -1,11 +1,14 @@
-package com.yihu.ehr.basic.patient.service.card;
+package com.yihu.ehr.basic.patient.service;
 
+import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
 import com.yihu.ehr.basic.patient.dao.XAbstractPhysicalCardRepository;
 import com.yihu.ehr.basic.patient.dao.XAbstractVirtualCardRepository;
-import com.yihu.ehr.basic.patient.feign.ConventionalDictClient;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
+import com.yihu.ehr.entity.patient.AbstractCard;
+import com.yihu.ehr.entity.patient.PhysicalCard;
+import com.yihu.ehr.entity.patient.VirtualCard;
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
-import com.yihu.ehr.model.dict.MConventionalDict;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +35,7 @@ public class CardManager {
     @PersistenceContext
     protected EntityManager entityManager;
     @Autowired
-    private ConventionalDictClient conventionalDictClient;
+    private SystemDictEntryService systemDictEntryService;
     @Autowired
     private XAbstractPhysicalCardRepository abstractPhysicalCardRepository;
     @Autowired
@@ -40,8 +43,8 @@ public class CardManager {
 
     public AbstractCard getCard(String id, String cardType) {
         AbstractCard card = null;
-        MConventionalDict cardTypeDict = conventionalDictClient.getCardType(cardType);
-        if (!cardTypeDict.checkIsVirtualCard()) {
+        SystemDictEntry cardTypeDict = systemDictEntryService.getDictEntry(10, cardType);
+        if (!cardTypeDict.getCatalog().equals("VirtualCard")) {
             card = abstractPhysicalCardRepository.findOne(id);
         } else {
             card = abstractVirtualCardRepository.findOne(id);
@@ -159,11 +162,12 @@ public class CardManager {
     }
 
     public boolean save(AbstractCard card){
-        if(conventionalDictClient.getCardType(card.getCardType()).checkIsVirtualCard()){
-            AbstractVirtualCard abstractVirtualCard = (AbstractVirtualCard) card;
+        SystemDictEntry cardTypeDict = systemDictEntryService.getDictEntry(10, card.getCardType());
+        if(cardTypeDict.getCatalog().equals("VirtualCard")){
+            VirtualCard abstractVirtualCard = (VirtualCard) card;
             abstractVirtualCardRepository.save(abstractVirtualCard);
         }else {
-            AbstractPhysicalCard abstractPhysicalCard = (AbstractPhysicalCard)card;
+            PhysicalCard abstractPhysicalCard = (PhysicalCard)card;
             abstractPhysicalCardRepository.save(abstractPhysicalCard);
         }
         return true;
@@ -172,7 +176,7 @@ public class CardManager {
     public boolean saveCard(AbstractCard card) {
         if (card.getNumber().length() == 0 || card.getCardType() == null) {
             throw new ApiException(ErrorCode.RepeatCode,"卡信息不全, 无法更新");
-        } else if (card.getStatus() == conventionalDictClient.getCardStatus("Invalid").getValue()) {
+        } else if (card.getStatus() == systemDictEntryService.getDictEntry(9, "Invalid").getValue()) {
             throw new ApiException(ErrorCode.CardIsToVoid,"卡已作废, 无法更新");
         }
         return save(card);

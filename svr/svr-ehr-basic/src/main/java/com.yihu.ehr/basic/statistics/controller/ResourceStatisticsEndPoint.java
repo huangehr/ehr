@@ -1,10 +1,9 @@
 package com.yihu.ehr.basic.statistics.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
-import com.yihu.ehr.basic.patient.service.arapply.ArchiveRelationService;
-import com.yihu.ehr.basic.patient.service.arapply.UserCardsService;
-import com.yihu.ehr.basic.patient.service.demographic.DemographicService;
+import com.yihu.ehr.basic.patient.service.ArchiveRelationService;
+import com.yihu.ehr.basic.patient.service.UserCardsService;
+import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.statistics.service.ResourceStatisticService;
 import com.yihu.ehr.basic.user.service.DoctorService;
 import com.yihu.ehr.constants.ApiVersion;

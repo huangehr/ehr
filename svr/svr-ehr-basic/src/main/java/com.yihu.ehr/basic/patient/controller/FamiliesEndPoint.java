@@ -1,7 +1,7 @@
 package com.yihu.ehr.basic.patient.controller;
 
-import com.yihu.ehr.basic.patient.service.family.Families;
-import com.yihu.ehr.basic.patient.service.family.FamiliesService;
+import com.yihu.ehr.entity.patient.Families;
+import com.yihu.ehr.basic.patient.service.FamiliesService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;

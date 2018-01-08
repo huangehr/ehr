@@ -1,6 +1,6 @@
 package com.yihu.ehr.basic.patient.dao;
 
-import com.yihu.ehr.basic.patient.service.authentication.Authentication;
+import com.yihu.ehr.entity.patient.Authentication;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**

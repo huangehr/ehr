@@ -1,7 +1,7 @@
 package com.yihu.ehr.basic.patient.controller;
 
-import com.yihu.ehr.basic.patient.service.card.AbstractCard;
-import com.yihu.ehr.basic.patient.service.card.CardManager;
+import com.yihu.ehr.entity.patient.AbstractCard;
+import com.yihu.ehr.basic.patient.service.CardManager;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.model.patient.MAbstractCard;

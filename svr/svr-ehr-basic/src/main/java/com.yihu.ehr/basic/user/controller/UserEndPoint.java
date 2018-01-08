@@ -2,13 +2,13 @@ package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yihu.ehr.basic.dict.service.SystemDictEntryService;
-import com.yihu.ehr.basic.patient.service.demographic.DemographicService;
+import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.security.service.UserSecurityService;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.entity.dict.SystemDictEntry;
-import com.yihu.ehr.entity.patient.DemographicInfo;
+import com.yihu.ehr.entity.patient.Demographic;
 import com.yihu.ehr.entity.security.UserKey;
 import com.yihu.ehr.entity.security.UserSecurity;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
@@ -156,7 +156,7 @@ public class UserEndPoint extends EnvelopRestEndPoint {
             doctors.setPhone(user.getTelephone());
             doctorService.save(doctors);
         }
-        DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(user.getIdCardNo());
+        Demographic demographicInfo = demographicService.getDemographicInfoByIdCardNo(user.getIdCardNo());
         if (!StringUtils.isEmpty(demographicInfo)) {
             demographicInfo.setName(user.getRealName());
             demographicInfo.setTelephoneNo("{\"联系电话\":\"" + user.getTelephone() + "\"}");

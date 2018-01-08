@@ -1,4 +1,4 @@
-package com.yihu.ehr.saas.service;
+package com.yihu.ehr.organization.service;
 
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.MicroServices;
