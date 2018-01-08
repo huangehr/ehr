@@ -1,5 +1,6 @@
-package com.yihu.ehr.basic.patient.service.family;
+package com.yihu.ehr.basic.patient.dao;
 
+import com.yihu.ehr.entity.patient.Families;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**

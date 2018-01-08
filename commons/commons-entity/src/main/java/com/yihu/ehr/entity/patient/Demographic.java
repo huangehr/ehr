@@ -13,7 +13,7 @@ import java.util.Date;
 @Entity
 @Table(name = "demographics")
 @Access(value = AccessType.PROPERTY)
-public class DemographicInfo {
+public class Demographic {
 
     private String idCardNo;                       // 身份证
     private Date birthday;                                // 出生日期
@@ -33,7 +33,7 @@ public class DemographicInfo {
     private String localPath = "";
     private Date registerTime;                      //注册时间
 
-    public DemographicInfo() {
+    public Demographic() {
     }
 
     @Id

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.patient.dao.XDemographicInfoRepository;
 import com.yihu.ehr.basic.user.dao.XUserRepository;
 import com.yihu.ehr.basic.user.entity.User;
-import com.yihu.ehr.entity.patient.DemographicInfo;
+import com.yihu.ehr.entity.patient.Demographic;
 import com.yihu.ehr.basic.org.dao.OrganizationRepository;
 import com.yihu.ehr.basic.org.model.Organization;
 import com.yihu.ehr.query.BaseJpaService;
@@ -150,7 +150,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
         Map<String, Object> map;
         SQLQuery query;
         int total = 0;
-        DemographicInfo demographicInfo =null;
+        Demographic demographicInfo =null;
         for(int i=1; i<=doctorLs.size(); i++){
             map = doctorLs.get(i-1);
             sql.append("('"+ null2Space(map .get("code")) +"'");
@@ -181,7 +181,7 @@ public class DoctorService extends BaseJpaService<Doctors, XDoctorRepository> {
             }else
                 sql.append(",");
             //创建居民
-            demographicInfo =new DemographicInfo();
+            demographicInfo =new Demographic();
             String idCardNo="123456";
             if(null!=map .get("idCardNo")&&StringUtils.isEmpty(map .get("idCardNo").toString())){
                 idCardNo=map .get("idCardNo").toString();

@@ -1,6 +1,6 @@
 package com.yihu.ehr.basic.patient.dao;
 
-import com.yihu.ehr.basic.patient.service.card.AbstractPhysicalCard;
+import com.yihu.ehr.entity.patient.PhysicalCard;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
@@ -8,6 +8,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * @version 1.0
  * @created 2015.12.16 15:10
  */
-public interface XAbstractPhysicalCardRepository extends PagingAndSortingRepository<AbstractPhysicalCard, String> {
+public interface XAbstractPhysicalCardRepository extends PagingAndSortingRepository<PhysicalCard, String> {
 
 }

@@ -1,12 +1,12 @@
 package com.yihu.ehr.basic.user.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.yihu.ehr.basic.patient.service.demographic.DemographicService;
+import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.constants.BizObject;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.entity.patient.DemographicInfo;
+import com.yihu.ehr.entity.patient.Demographic;
 import com.yihu.ehr.model.org.MOrgDeptJson;
 import com.yihu.ehr.model.user.MDoctor;
 import com.yihu.ehr.basic.org.model.OrgDept;
@@ -138,7 +138,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
         user = userManager.saveUser(user);
 
         //创建居民
-        DemographicInfo demographicInfo =new DemographicInfo();
+        Demographic demographicInfo =new Demographic();
         demographicInfo.setPassword(DigestUtils.md5Hex(default_password));
         demographicInfo.setRegisterTime(new Date());
         demographicInfo.setIdCardNo(d.getIdCardNo());
@@ -170,7 +170,7 @@ public class DoctorEndPoint extends EnvelopRestEndPoint {
             user.setTelephone(doctors.getPhone());
             userManager.save(user);
         }
-        DemographicInfo demographicInfo = demographicService.getDemographicInfoByIdCardNo(doctors.getIdCardNo());
+        Demographic demographicInfo = demographicService.getDemographicInfoByIdCardNo(doctors.getIdCardNo());
         if (!StringUtils.isEmpty(demographicInfo)) {
             demographicInfo.setName(doctors.getName());
             demographicInfo.setGender(doctors.getSex());

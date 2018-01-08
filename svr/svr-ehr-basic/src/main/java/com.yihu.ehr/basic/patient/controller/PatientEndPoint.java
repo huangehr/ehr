@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.unboundid.util.json.JSONObject;
-import com.yihu.ehr.basic.patient.service.demographic.DemographicId;
-import com.yihu.ehr.basic.patient.service.demographic.DemographicService;
+import com.yihu.ehr.entity.patient.DemographicId;
+import com.yihu.ehr.basic.patient.service.DemographicService;
 import com.yihu.ehr.basic.user.entity.Doctors;
 import com.yihu.ehr.basic.user.entity.RoleUser;
 import com.yihu.ehr.basic.user.entity.User;
@@ -14,7 +14,7 @@ import com.yihu.ehr.basic.user.service.RoleUserService;
 import com.yihu.ehr.basic.user.service.UserService;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
-import com.yihu.ehr.entity.patient.DemographicInfo;
+import com.yihu.ehr.entity.patient.Demographic;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.patient.MDemographicInfo;
@@ -105,7 +105,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
 //        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
 //        return getResult(mDemographicInfos,totalCount);
 
-        List<DemographicInfo> demographicInfos = demographicService.searchPatient(conditionMap);
+        List<Demographic> demographicInfos = demographicService.searchPatient(conditionMap);
         Long totalCount =Long.parseLong(demographicService.searchPatientTotalCount(conditionMap).toString());
         pagedResponse(request, response, totalCount, page, rows);
         return (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
@@ -140,7 +140,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     public MDemographicInfo getPatient(
             @ApiParam(name = "id_card_no", value = "身份证号", defaultValue = "")
             @PathVariable(value = "id_card_no") String idCardNo) throws Exception{
-        DemographicInfo demographicInfo = demographicService.getDemographicInfo(idCardNo);
+        Demographic demographicInfo = demographicService.getDemographicInfo(idCardNo);
         MDemographicInfo demographicModel = convertToModel(demographicInfo,MDemographicInfo.class);
         return demographicModel;
     }
@@ -167,7 +167,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     public MDemographicInfo createPatient(
             @ApiParam(name = "json_data", value = "身份证号", defaultValue = "")
             @RequestBody String jsonData) throws Exception{
-        DemographicInfo demographicInfo = toEntity(jsonData, DemographicInfo.class);
+        Demographic demographicInfo = toEntity(jsonData, Demographic.class);
         String pwd = "123456";
         if(!StringUtils.isEmpty(demographicInfo.getIdCardNo())&&demographicInfo.getIdCardNo().length()>7){
             pwd=demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length()-6,demographicInfo.getIdCardNo().length());
@@ -191,8 +191,8 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
     public MDemographicInfo updatePatient(
             @ApiParam(name = "patient_model_json_data", value = "身份证号", defaultValue = "")
             @RequestBody String patientModelJsonData) throws Exception{
-        DemographicInfo demographicInfo = toEntity(patientModelJsonData, DemographicInfo.class);
-        DemographicInfo old = demographicService.getDemographicInfo(demographicInfo.getIdCardNo());
+        Demographic demographicInfo = toEntity(patientModelJsonData, Demographic.class);
+        Demographic old = demographicService.getDemographicInfo(demographicInfo.getIdCardNo());
         if(old==null)
             throw new ApiException(HttpStatus.NOT_FOUND, "该对象没找到");
         BeanUtils.copyProperties(demographicInfo, old, "registerTime");
@@ -281,7 +281,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
             path = groupName.substring(1,groupName.length()-1) + ":" + remoteFileName.substring(1,remoteFileName.length()-1);
 
         } catch (Exception e) {
-            LogService.getLogger(DemographicInfo.class).error("人口头像图片上传失败；错误代码："+e);
+            LogService.getLogger(Demographic.class).error("人口头像图片上传失败；错误代码："+e);
         }
         //返回文件路径
         return path;
@@ -312,7 +312,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (MyException e) {
-            LogService.getLogger(DemographicInfo.class).error("人口头像图片下载失败；错误代码：" + e);
+            LogService.getLogger(Demographic.class).error("人口头像图片下载失败；错误代码：" + e);
         }
         return imageStream;
     }
@@ -392,7 +392,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
         //        Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
         //        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
         //        return getResult(mDemographicInfos,totalCount);
-                List<DemographicInfo> demographicInfos = demographicService.searchPatientByParams(conditionMap);
+                List<Demographic> demographicInfos = demographicService.searchPatientByParams(conditionMap);
                 Long totalCount =Long.parseLong(demographicService.searchPatientByParamsTotalCount(conditionMap).toString());
                 pagedResponse(request, response, totalCount, page, rows);
                 return (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
@@ -447,7 +447,7 @@ public class PatientEndPoint extends EnvelopRestEndPoint {
         //        Integer totalCount = demographicService.searchPatientTotalCount(conditionMap);
         //        List<MDemographicInfo> mDemographicInfos = (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);
         //        return getResult(mDemographicInfos,totalCount);
-        List<DemographicInfo> demographicInfos = demographicService.searchPatientByParams2(conditionMap);
+        List<Demographic> demographicInfos = demographicService.searchPatientByParams2(conditionMap);
         Long totalCount =Long.parseLong(demographicService.searchPatientByParamsTotalCount2(conditionMap).toString());
         pagedResponse(request, response, totalCount, page, rows);
         return (List<MDemographicInfo>)convertToModels(demographicInfos,new ArrayList<MDemographicInfo>(demographicInfos.size()), MDemographicInfo.class, null);

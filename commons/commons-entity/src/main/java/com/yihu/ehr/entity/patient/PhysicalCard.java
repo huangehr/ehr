@@ -1,4 +1,4 @@
-package com.yihu.ehr.basic.patient.service.card;
+package com.yihu.ehr.entity.patient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "physical_cards")
 @Access(value = AccessType.PROPERTY)
-public class AbstractPhysicalCard extends AbstractCard implements Serializable {
+public class PhysicalCard extends AbstractCard implements Serializable {
 
 	  String id;				    // 卡ID
 	  String number;				// 卡号
@@ -35,7 +35,7 @@ public class AbstractPhysicalCard extends AbstractCard implements Serializable {
 	  Date validityDateBegin;		// 有效期起始时间
 	  Date validityDateEnd;		// 有效期结束时间
 
-	public AbstractPhysicalCard() {
+	public PhysicalCard() {
 		id  = UUID.randomUUID().toString().replace("-","");
 	}
 
