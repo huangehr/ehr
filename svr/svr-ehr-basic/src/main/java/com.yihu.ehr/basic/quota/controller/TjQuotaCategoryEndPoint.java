@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(ApiVersion.Version1_0)
-@Api(value = "QuotaCategory", description = "指标分类管理", tags = {"指标分类-管理"})
+@Api(value = "TjQuotaCategoryEndPoint", description = "指标分类管理", tags = {"指标分类-管理"})
 public class TjQuotaCategoryEndPoint extends EnvelopRestEndPoint {
     @Autowired
     private TjQuotaCategoryService quotaCategoryService;

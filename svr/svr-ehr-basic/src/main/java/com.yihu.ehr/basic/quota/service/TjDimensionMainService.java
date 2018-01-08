@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.quota.dao.XTjDimensionMainRepository;
 import com.yihu.ehr.entity.quota.TjDimensionMain;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.quota.dao.XTjDimensionMainRepository;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

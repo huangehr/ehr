@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.basic.quota.dao.XTjDimensionSlaveRepository;
 import com.yihu.ehr.entity.quota.TjDimensionSlave;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.quota.dao.XTjDimensionSlaveRepository;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +22,7 @@ public class TjDimensionSlaveService extends BaseJpaService<TjDimensionSlave, XT
 
 
     @Autowired
-    XTjDimensionSlaveRepository tjDimensionSlaveRepository;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
+    private XTjDimensionSlaveRepository tjDimensionSlaveRepository;
 
     /**
      * 根据ID获取.
@@ -50,8 +45,7 @@ public class TjDimensionSlaveService extends BaseJpaService<TjDimensionSlave, XT
     /**
      * 查询细维度编码是否已存在， 返回已存在数据
      */
-    public List tjDimensionSlaveIsExist(String[] values)
-    {
+    public List tjDimensionSlaveIsExist(String[] values) {
         String sql = "SELECT code FROM tj_dimension_slave WHERE code in(:values)";
         SQLQuery sqlQuery = currentSession().createSQLQuery(sql);
         sqlQuery.setParameterList("values", values);

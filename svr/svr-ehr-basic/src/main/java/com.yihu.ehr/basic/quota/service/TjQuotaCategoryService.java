@@ -3,7 +3,6 @@ package com.yihu.ehr.basic.quota.service;
 import com.yihu.ehr.basic.quota.dao.XTjQuotaCategoryRepository;
 import com.yihu.ehr.entity.quota.TjQuotaCategory;
 import com.yihu.ehr.query.BaseJpaService;
-import com.yihu.ehr.quota.dao.XQuotaCategoryRepository;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,7 @@ import java.util.List;
 @Service
 @Transactional
 public class TjQuotaCategoryService extends BaseJpaService<TjQuotaCategory, XTjQuotaCategoryRepository> {
+
     @Autowired
     private XTjQuotaCategoryRepository quotaCategoryRepository;
 
