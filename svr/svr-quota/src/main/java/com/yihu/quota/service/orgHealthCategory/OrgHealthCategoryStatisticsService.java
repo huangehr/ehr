@@ -72,8 +72,7 @@ public class OrgHealthCategoryStatisticsService {
         totalMap.put("name", "合计");
         totalMap.put("result", totalResult);
         allOrgHealthCategoryList.add(totalMap);
-        return true;
-//        return saveToEs(endpointsStatisticList, allOrgHealthCategoryList);
+        return saveToEs(endpointsStatisticList, allOrgHealthCategoryList);
     }
 
     /**
