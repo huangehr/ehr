@@ -94,7 +94,7 @@ public class SolrExtract {
         }
         if (!StringUtils.isEmpty(esConfig.getTimekey())) {
             //1 全量 2 增量
-            if(quotaVo!=null && quotaVo.getDataLevel().equals(Contant.quota.dataLeval_oneDay)){
+            if(quotaVo!=null && quotaVo.getDataLevel().equals(Contant.quota.dataLevel_increase)){
                 fq = esConfig.getTimekey()+":[";
                 //起始时间
                 if (!StringUtils.isEmpty(startTime)) {
@@ -240,17 +240,21 @@ public class SolrExtract {
         }else{
             allData= initDimension(qds, null, allData);
         }
-        for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
-            String key = oneMap.getKey();
-            SaveModel saveModel = oneMap.getValue();
-            Long num = map.get(key);
-            if(saveModel != null && num != null){
-                saveModel.setResult(num.toString());
-            }else{
-                saveModel.setResult("0");
+
+
+        for(String key :map.keySet()){
+            SaveModel saveModel = allData.get(key);
+            Long count = 0L;
+            if(map.get(key) != null){
+                count = map.get(key);
             }
-            returnList.add(saveModel);
+            if(saveModel != null && count != null){
+                saveModel.setResult(count.toString());
+                returnList.add(saveModel);
+            }
         }
+        //数据源中不存在的组合 保存数据为0  待实现
+        //ToDo
     }
 
     private void computeYear(List<TjQuotaDimensionMain> qdm,List<TjQuotaDimensionSlave> qds,

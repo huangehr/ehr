@@ -159,7 +159,7 @@ public class ResourceBrowseController extends BaseController {
         return resourceBrowseClient.getResourceData(resourcesCode, roleId, orgCode, areaCode, queryCondition, page, size);
     }
 
-    @ApiOperation("指标资源浏览")
+    @ApiOperation("指标视图查询列表浏览")
     @RequestMapping(value = ServiceApi.Resources.ResourceBrowseQuotaResourceData, method = RequestMethod.GET)
     public Envelop getQuotaResourceData(
             @ApiParam("资源Id")
@@ -198,6 +198,7 @@ public class ResourceBrowseController extends BaseController {
                 envelop.setErrorMsg("指标编码有误");
                 return envelop;
             }
+            //查询多个指标交集维度
             List<Map<String, String>> qsdList = tjQuotaSynthesizeQueryClient.getTjQuotaSynthesiseDimension(quotaCodes.substring(0, quotaCodes.length() - 1));
             if(qsdList == null || qsdList.size() <= 0) {
                 envelop.setSuccessFlg(true);
@@ -256,6 +257,7 @@ public class ResourceBrowseController extends BaseController {
                         params.put("org",org);
                         query = objectMapper.writeValueAsString(params);
                     }
+                    //获取指标统计不同维度结果数据
                     envelop1 = tjQuotaJobClient.getQuotaTotalCount(resourceQuotaModel.getQuotaId(), query, dimension.substring(0, dimension.length() - 1));
                     envelopList.add(envelop1);
                 } else {
