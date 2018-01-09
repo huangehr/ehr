@@ -21,14 +21,6 @@ spring:
     username: weifuwu
     password: weifuwu
 
-  data:
-    mongodb:
-      host: 192.168.1.220
-      port: 27017
-      username: admin
-      password: admin
-      authenticationDatabase: admin
-      database: ehr
 
 service-gateway:
   username: user
@@ -38,6 +30,15 @@ service-gateway:
 kafka:
   broker:
     address: node1.hde.h3c.com:6667
+
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
+
+
 ---
 spring:
   profiles: dev
@@ -46,15 +47,6 @@ spring:
     username: weifuwu
     password: weifuwu
 
-  data:
-    mongodb:
-      host: 192.168.1.220
-      port: 27017
-      username: admin
-      password: admin
-      authenticationDatabase: admin
-      database: ehr
-
 service-gateway:
   username: user
   password: eureka
@@ -63,6 +55,15 @@ service-gateway:
 kafka:
   broker:
     address: node1.hde.h3c.com:6667
+
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
+
+
 ---
 spring:
   profiles: prod
@@ -70,15 +71,6 @@ spring:
     url: jdbc:mysql://172.19.103.77/wlyy?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
     username: root
     password: 123456
-
-  data:
-    mongodb:
-      host: 192.168.1.220
-      port: 27017
-      username: admin
-      password: admin
-      authenticationDatabase: admin
-      database: ehr
 
 service-gateway:
   username: user
@@ -88,6 +80,15 @@ service-gateway:
 kafka:
   broker:
     address: node1.hde.h3c.com:6667
+
+es:
+  index: wlyy_quota_test
+  type: wlyy_quota_test
+  host:  http://172.19.103.68:9200
+  tHost: 172.19.103.68:9300
+  clusterName: jkzl
+
+
 ---
 spring:
   profiles: prod_fz
@@ -95,15 +96,6 @@ spring:
     url: jdbc:mysql://11.1.2.5:3306/healtharchive?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: healthcloud
     password: GP8Qz4qU
-
-  data:
-    mongodb:
-      host: 11.1.2.19
-      port: 20000
-      username: jkzlehr
-      password: GMLBq1LG
-      authenticationDatabase: admin
-      database: ehr
 
 service-gateway:
   username: user
@@ -123,14 +115,6 @@ spring:
     username: healthcloud
     password: GP8Qz4qU
 
-  data:
-    mongodb:
-      host: 10.176.97.9
-      port: 29000
-      username: jkzlehr
-      password: GMLBq1LG
-      authenticationDatabase: admin
-      database: ehr
 
 service-gateway:
   username: user
