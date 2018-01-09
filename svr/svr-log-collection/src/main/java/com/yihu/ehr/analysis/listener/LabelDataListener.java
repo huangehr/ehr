@@ -1,17 +1,21 @@
 package com.yihu.ehr.analysis.listener;
 
+import com.yihu.ehr.analysis.config.es.ElasticFactory;
 import com.yihu.ehr.analysis.model.BusinessDataModel;
 import com.yihu.ehr.analysis.model.OperatorDataModel;
 import com.yihu.ehr.analysis.service.AppFeatureService;
+import io.searchbox.client.JestResult;
+import io.searchbox.core.BulkResult;
+import io.searchbox.core.Index;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -21,15 +25,15 @@ public class LabelDataListener {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
-    private MongoTemplate mongoTemplate;
+    private ElasticFactory elasticFactory;
     @Autowired
     private OperatorDataModel operatorDataModel;
     @Autowired
     private BusinessDataModel businessDataModel;
 
 
-    private static String mongoDb_Business_TableName = "CloudBusinessLog";
-    private static String mongoDb_Operator_TableName = "CloudOperatorLog";
+    public static String mongoDb_Business_TableName = "cloud_business_log";
+    public static String mongoDb_Operator_TableName = "cloud_operator_log";
 
     //@Scheduled(cron = "0 0/1 * * * ?") //每分钟执行一次
     //正式库的 topic名字是flumeLog
@@ -68,25 +72,28 @@ public class LabelDataListener {
         switch (logType) {
             case "1": {
                 //统一网关的日志
-                insertMongo(operatorDataModel.getByJsonObject(jsonObject),mongoDb_Operator_TableName);
+                insertES(operatorDataModel.getByJsonObject(jsonObject), mongoDb_Operator_TableName);
                 break;
             }
             case "3": {
                 //云平台后台业务操作日志
-                insertMongo(businessDataModel.getByJsonObject(jsonObject),mongoDb_Business_TableName);
+                insertES(businessDataModel.getByJsonObject(jsonObject), mongoDb_Business_TableName);
                 break;
             }
             case "2": {
                 //采集日志
-                insertMongo(businessDataModel.getByJsonObject(jsonObject),mongoDb_Business_TableName);
+                insertES(businessDataModel.getByJsonObject(jsonObject), mongoDb_Business_TableName);
                 break;
             }
         }
 
     }
 
-    private void insertMongo(Object data, String tableName) {
-        mongoTemplate.insert( data, tableName);
+    private void insertES(Object data, String tableName) throws IOException {
+        Index index = new Index.Builder(data).index(tableName).type(tableName).build();
+        JestResult jestResult = elasticFactory.getJestClient().execute(index);
+        System.out.println(jestResult.isSucceeded());
+        // mongoTemplate.insert( data, tableName);
     }
 //    @Scheduled(fixedRate=20000)//每20秒执行一次。开始
 //    public void testTasks() {
