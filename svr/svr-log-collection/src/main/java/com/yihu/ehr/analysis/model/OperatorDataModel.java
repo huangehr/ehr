@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by Administrator on 2017/2/9.
@@ -47,6 +48,7 @@ public class OperatorDataModel extends DataModel implements Serializable {
     public  OperatorDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
         OperatorDataModel operatorDataModel = new OperatorDataModel();
         try {
+            operatorDataModel.setCode(UUID.randomUUID().toString().replace("-",""));
             operatorDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
             operatorDataModel.setCaller(jsonObject.getString("caller"));
             operatorDataModel.setTime(changeTime(jsonObject.getString("time")));

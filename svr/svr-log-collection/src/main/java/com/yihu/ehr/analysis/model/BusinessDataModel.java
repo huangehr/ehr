@@ -12,10 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/2/9.
@@ -65,6 +62,7 @@ public class BusinessDataModel extends DataModel implements Serializable {
     public BusinessDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
         BusinessDataModel businessDataModel = new BusinessDataModel();
         try {
+            businessDataModel.setCode(UUID.randomUUID().toString().replace("-",""));
             businessDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
             businessDataModel.setCaller(jsonObject.getString("caller"));
             businessDataModel.setTime(changeTime(jsonObject.getString("time")));
