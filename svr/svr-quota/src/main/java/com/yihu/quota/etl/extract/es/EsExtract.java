@@ -137,10 +137,12 @@ public class EsExtract {
                     }
                 }
             }
+            boolean resultFlag = false;
+            List<List<Map<String, Object>>> sumOrgTypeList =  stastisOrtType(orgTypeList,qdm, qds);
+            for(List<Map<String, Object>> list:sumOrgTypeList){
+                resultFlag = orgHealthCategoryStatisticsService.countResultsAndSaveToEs(list);
+            }
 
-            List<Map<String, Object>> sumOrgTypeList =  stastisOrtType(orgTypeList,qdm, qds);
-
-            boolean resultFlag = orgHealthCategoryStatisticsService.countResultsAndSaveToEs(sumOrgTypeList);
             SaveModel saveModel = new SaveModel();
             saveModel.setQuotaCode(orgHealthCategory);
             if(resultFlag){
@@ -155,7 +157,14 @@ public class EsExtract {
     }
 
 
-    public List<Map<String, Object>> stastisOrtType(List<Map<String, Object>> orgTypeList,List<TjQuotaDimensionMain> qdm,
+    /**
+     * 统计整理 不同维度的组合数据
+     * @param orgTypeList
+     * @param qdm
+     * @param qds
+     * @return
+     */
+    public List<List<Map<String, Object>>> stastisOrtType(List<Map<String, Object>> orgTypeList,List<TjQuotaDimensionMain> qdm,
                                                     List<TjQuotaDimensionSlave> qds){
         Map<String, Object> dimensionMap = new HashMap<>();
         for(TjQuotaDimensionMain main:qdm){
@@ -167,52 +176,62 @@ public class EsExtract {
             dimensionMap.put(slave.getSlaveCode(),slave.getSlaveCode());
         }
 
-        List<Map<String, Object>> sumOrgTypeList = new ArrayList<>();
-        Map<String,String> typeMap = new HashMap<>();
+        Map<String,String> dimenTypeMap = new HashMap<>();
+        Map<String,String> orgDimenTypeMap = new HashMap<>();
         if(orgTypeList != null && orgTypeList.size() > 0){
             for(Map<String,Object> map : orgTypeList){
                 if( !StringUtils.isEmpty(map.get(orgHealthCategory))){
-                    String key = map.get(orgHealthCategory).toString();
+                    String key = "";
+                    String orgTypekey = map.get(orgHealthCategory).toString();
                     for(String dimen:dimensionMap.keySet()){
-                        key = key + "-" + map.get(dimen);
+                        key += "-" + map.get(dimen);
+                        orgTypekey += "-" + map.get(dimen);
                     }
-                    typeMap.put(key, key);
+                    dimenTypeMap.put(key, key);//map 不重复
+                    orgDimenTypeMap.put(orgTypekey, orgTypekey);//map 不重复
                 }
             }
         }
-
-        if(typeMap != null && typeMap.size() > 0){
-            for(String type : typeMap.keySet()){
-                Map<String, Object> sumOrgTypeMap = new HashMap<>();
+        List<List<Map<String, Object>>> dimenSumList = new ArrayList<>();
+        if(dimenTypeMap != null && dimenTypeMap.size() > 0){
+            for(String type : dimenTypeMap.keySet()){
+                List<Map<String, Object>> sumOrgTypeList = new ArrayList<>();
                 int count = 0;
-                int num = 0;
-                if(orgTypeList != null && orgTypeList.size() > 0){
-                    for(Map<String,Object> map : orgTypeList){
-                        num ++;
-                        String key = map.get(orgHealthCategory).toString();
-                        for(String dimen:dimensionMap.keySet()){
-                            key = key + "-" + map.get(dimen);
-                        }
-                        if(type.equals(key)){
-                            count = count + Integer.valueOf(map.get("result").toString());
-                            if(dimensionMap != null && dimensionMap.size() > 0){
-                                for(String dimen:dimensionMap.keySet()){
-                                    sumOrgTypeMap.put(dimen,map.get(dimen));
+                for(String orgDimenType : orgDimenTypeMap.keySet()){
+                    Map<String, Object> sumDimenMap = new HashMap<>();
+                    if(orgDimenType.contains(type) && orgTypeList != null && orgTypeList.size() > 0){
+                        for(Map<String,Object> map : orgTypeList){
+                            String key = map.get(orgHealthCategory).toString();
+                            for(String dimen:dimensionMap.keySet()){
+                                key += "-" + map.get(dimen);
+                            }
+                            if(orgDimenType.equals(key)){
+                                sumDimenMap.put("code",map.get(orgHealthCategory).toString());
+                                count = count + Integer.valueOf(map.get("result").toString());
+                                if(dimensionMap != null && dimensionMap.size() > 0){
+                                    for(String dimen:dimensionMap.keySet()){
+                                        sumDimenMap.put(dimen,map.get(dimen));
+                                    }
                                 }
                             }
-                            sumOrgTypeMap.put("quotaCode",quotaVo.getCode());
-                            sumOrgTypeMap.put("quotaName",quotaVo.getName());
-                            sumOrgTypeMap.put("quotaDate",map.get("quotaDate"));
+                            sumDimenMap.put("quotaDate",map.get("quotaDate"));
                         }
+                        sumDimenMap.put("quotaCode",quotaVo.getCode());
+                        sumDimenMap.put("quotaName",quotaVo.getName());
+                        sumDimenMap.put("result",count);
+                        sumOrgTypeList.add(sumDimenMap);
                     }
                 }
-                sumOrgTypeMap.put("code",type);
-                sumOrgTypeMap.put("result",count);
-                sumOrgTypeList.add(sumOrgTypeMap);
+                dimenSumList.add(sumOrgTypeList);
             }
         }
-        return  sumOrgTypeList;
+        return  dimenSumList;
     }
+
+
+
+
+
 
     private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData,Integer key) {
         try {
@@ -344,10 +363,7 @@ public class EsExtract {
                 Map<String,Integer> map = new HashMap<>();
                 //递归解析json
                 expainJson(gradeBucketIt, map, null);
-                compute(tjQuotaDimensionSlaves,
-                        returnList,
-                        one,
-                        map);
+                compute(tjQuotaDimensionSlaves,returnList,one, map);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -360,17 +376,17 @@ public class EsExtract {
         //初始化主细维度
         allData= initDimension(tjQuotaDimensionSlaves, one, allData);
 
-        for(Map.Entry<String,SaveModel> oneMap:allData.entrySet()){
-            String key = oneMap.getKey().toLowerCase();//es 查询出结果默认是小写
-            SaveModel saveModel=oneMap.getValue();
-            Integer num = map.get(key);
-            if(saveModel!=null){
-                saveModel.setResult(num.toString());
-            }else{
-                saveModel.setResult("0");
+
+        for(String key :map.keySet()){
+            SaveModel saveModel = allData.get(key);
+            Integer count =  map.get(key);
+            if(saveModel != null ){
+                saveModel.setResult(count.toString());
+                returnList.add(saveModel);
             }
-            returnList.add(saveModel);
         }
+        //数据源中不存在的组合 保存数据为0  待实现
+        //ToDo
     }
 
     /**

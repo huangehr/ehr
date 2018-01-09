@@ -2,6 +2,7 @@ package com.yihu.ehr.quota.controller;
 
 import com.yihu.ehr.agModel.tj.QuotaCategoryModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.common.ListResult;
 import com.yihu.ehr.model.tj.MQuotaCategory;
@@ -267,5 +268,23 @@ public class QuotaCategoryController extends BaseController {
             ex.printStackTrace();
             return failedSystem();
         }
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.getQuotaCategoryByName, method = RequestMethod.POST)
+    @ApiOperation("根据指标分类名称获取指标分类的id和name")
+    public Envelop seaOrgsByOrgCode(
+            @ApiParam(name = "name", value = "指标分类名称")
+            @RequestParam(value = "name") String name) throws Exception {
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        try{
+            Map<String,String> categoryMap= quotaCategoryClient.getQuotaCategoryByName(name);
+            envelop.setObj(categoryMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("系统出错！");
+        }
+        return envelop;
     }
 }

@@ -209,6 +209,7 @@ public class ServiceApi {
         public static final String RsReportCategoryNoPageCategories = "/resources/reportCategory/getAllCategories";
         public static final String RsReportCategoryByApp = "/resources/reportCategory/getAllCategoryByApp";
         public static final String RsReportCategoryByIds = "/resources/reportCategory/getAllCategoryByIds";
+        public static final String RsReportCategoryIdsByCode = "/resources/reportCategory/getCategoryIdsByCode";
 
         /**
          * 资源报表分类和应用
@@ -1150,6 +1151,10 @@ public class ServiceApi {
         public static final String GetTjQuotaByCode = "/tj/getTjQuotaByCode";
         public static final String TjQuotaConfigInfo = "/tj/quotaConfigInfo";
         public static final String TjHasConfigDimension = "/tj/hasConfigDimension";
+        public static final String TjQuotaTypeIsExist  ="/quota/type_isExist";
+        public static final String TjDimensionMainIsExist = "/quota/TjDimensionMainIsExist";
+        public static final String TjDimensionSlaveIsExist = "/quota/TjDimensionSlaveIsExist";
+        public static final String TjQuotaBatch = "/tjQuota/batch";
 
 
         public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
@@ -1173,7 +1178,7 @@ public class ServiceApi {
         public static final String TjQuotaChartId = "/tj/tjQuotaChart/{id}";
         public static final String GetAllTjQuotaChart = "/tj/getAllTjQuotaChart";
 
-
+        public static final String getQuotaCategoryByName = "/quotaCategory/getQuotaCategoryByName";
 
     }
 
@@ -1234,7 +1239,7 @@ public class ServiceApi {
         public static final String GovernmentMenuReportMonitorTypeDelete = "/governmentMenuReportMonitorType/delete";
         public static final String MonitorTypeList = "/governmentMenuReportMonitorType/MonitorTypeList";
 
-        public static final String GetReportByMenuId = "/governmentMenuReportMonitorType/getReportByMenuId";
+        public static final String GetReportByMenuCode = "/governmentMenuReportMonitorType/getReportByMenuCode";
         //政府服务平台-门诊仪表盘-start
         public static final String OutpatientsBoardCount = "/government/outpatientsBoardCount";
         public static final String GetMonthDistribution = "/statistics/monthDistribution";

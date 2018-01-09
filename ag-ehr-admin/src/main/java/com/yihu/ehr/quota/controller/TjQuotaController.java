@@ -296,4 +296,33 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         return tjQuotaClient.hasConfigDimension(quotaCode);
     }
 
+    /**
+     *
+     * @param type   验证字段名称： code/name
+     * @param json
+     * @return
+     */
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaTypeIsExist,method = RequestMethod.POST)
+    public List tjQuotaTypeIsExist(
+            @ApiParam(name = "type", value = "待验证字段名")
+            @RequestParam(value = "type")String type,
+            @ApiParam(name = "json", value = "待验证的值")
+            @RequestParam(value = "json")String json){
+        return tjQuotaClient.tjQuotaTypeIsExist(type,json);
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaBatch, method = RequestMethod.POST)
+    @ApiOperation("批量导入指标、主维度、细维度")
+    public Object tjQuotaBatch(
+            @ApiParam(name = "lsMap", value = "指标、主维度、细维度")
+            @RequestParam(value = "lsMap")String lsMap) throws Exception {
+        try{
+
+            return tjQuotaClient.tjQuotaBatch(lsMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            return "系统出错！";
+        }
+    }
+
 }
