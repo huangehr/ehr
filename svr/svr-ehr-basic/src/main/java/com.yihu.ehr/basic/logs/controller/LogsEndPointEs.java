@@ -58,10 +58,10 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
         int begin = (page - 1) * size + 1;
-        StringBuffer sql = new StringBuffer("select * from cloud_business_log where 1=1 ");
-        StringBuffer sqlCount = new StringBuffer("select count(*) num from cloud_business_log where 1=1 ");
+        StringBuffer sql = new StringBuffer("select * from "+mongoDb_Business_TableName+" where 1=1 ");
+        StringBuffer sqlCount = new StringBuffer("select count(*) num from "+mongoDb_Business_TableName+" where 1=1 ");
         if (!org.springframework.util.StringUtils.isEmpty(data)) {
-            String dataSql = " and response like '%" + data + "'%";
+            String dataSql = " and response like '%" + data + "%'";
             sql.append(dataSql);
             sqlCount.append(dataSql);
         }
@@ -80,7 +80,7 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             sqlCount.append(dataSql);
         }
         if (!org.springframework.util.StringUtils.isEmpty(caller)) {
-            String dataSql = " and caller like '%" + caller + "'%";
+            String dataSql = " and caller like '%" + caller + "%'";
             sql.append(dataSql);
             sqlCount.append(dataSql);
         }
@@ -125,10 +125,10 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
         int begin = (page - 1) * size + 1;
-        StringBuffer sql = new StringBuffer("select * from cloud_operator_log where 1=1 ");
-        StringBuffer sqlCount = new StringBuffer("select count(*) num from cloud_operator_log where 1=1 ");
+        StringBuffer sql = new StringBuffer("select * from "+mongoDb_Operator_TableName+" where 1=1 ");
+        StringBuffer sqlCount = new StringBuffer("select count(*) num from "+mongoDb_Operator_TableName+" where 1=1 ");
         if (!org.springframework.util.StringUtils.isEmpty(data)) {
-            String dataSql = " and response like '%" + data + "'%";
+            String dataSql = " and response like '%" + data + "%'";
             sql.append(dataSql);
             sqlCount.append(dataSql);
         }
@@ -147,7 +147,7 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             sqlCount.append(dataSql);
         }
         if (!org.springframework.util.StringUtils.isEmpty(caller)) {
-            String dataSql = " and caller like '%" + caller + "'%";
+            String dataSql = " and caller like '%" + caller + "%'";
             sql.append(dataSql);
             sqlCount.append(dataSql);
         }
@@ -178,7 +178,7 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
     public ListResult getBussinessLogById(
             @ApiParam(name = "logId", value = "logId", defaultValue = "")
             @RequestParam(value = "logId", required = false) String logId) throws Exception {
-        String sql = "select * from cloud_operator_log where code='" + logId + "'";
+        String sql = "select * from "+mongoDb_Business_TableName+" where code='" + logId + "'";
         List<Map<String, Object>> logsModelList = elasticsearchUtil.excuteDataModel(sql);
         ListResult listResult = new ListResult();
         if (logsModelList.size() > 0) {
@@ -201,7 +201,7 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             @ApiParam(name = "logId", value = "logId", defaultValue = "")
             @RequestParam(value = "logId", required = false) String logId) throws Exception {
 
-        String sql = "select * from cloud_operator_log where code='" + logId + "'";
+        String sql = "select * from "+mongoDb_Operator_TableName+" where code='" + logId + "'";
         List<Map<String, Object>> logsModelList = elasticsearchUtil.excuteDataModel(sql);
         ListResult listResult = new ListResult();
         if (logsModelList.size() > 0) {
@@ -239,10 +239,10 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             @RequestParam(value = "page", required = false) int page) throws Exception {
 
         int begin = (page - 1) * size + 1;
-        StringBuffer sql = new StringBuffer("select * from cloud_business_log where 1=1 ");
-        StringBuffer sqlCount = new StringBuffer("select count(*) num from cloud_business_log where 1=1 ");
+        StringBuffer sql = new StringBuffer("select * from "+mongoDb_Business_TableName+" where 1=1 ");
+        StringBuffer sqlCount = new StringBuffer("select count(*) num from "+mongoDb_Business_TableName+" where 1=1 ");
         if (!org.springframework.util.StringUtils.isEmpty(data)) {
-            String dataSql = " and response like '%" + data + "'%";
+            String dataSql = " and response like '%" + data + "%'";
             sql.append(dataSql);
             sqlCount.append(dataSql);
         }
@@ -266,7 +266,7 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             sqlCount.append(dataSql);
         }
         if (!org.springframework.util.StringUtils.isEmpty(caller)) {
-            String dataSql = " and caller like '%" + caller + "'%";
+            String dataSql = " and caller like '%" + caller + "%'";
             sql.append(dataSql);
             sqlCount.append(dataSql);
         }
@@ -312,10 +312,10 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             @ApiParam(name = "page", value = "当前页码", defaultValue = "1")
             @RequestParam(value = "page", required = false) int page) throws Exception {
         int begin = (page - 1) * size + 1;
-        StringBuffer sql = new StringBuffer("select * from cloud_operator_log where 1=1 ");
-        StringBuffer sqlCount = new StringBuffer("select count(*) num from cloud_operator_log where 1=1 ");
+        StringBuffer sql = new StringBuffer("select * from "+mongoDb_Operator_TableName+" where 1=1 ");
+        StringBuffer sqlCount = new StringBuffer("select count(*) num from "+mongoDb_Operator_TableName+" where 1=1 ");
         if (!org.springframework.util.StringUtils.isEmpty(data)) {
-            String dataSql = " and response like '%" + data + "'%";
+            String dataSql = " and response like '%" + data + "%'";
             sql.append(dataSql);
             sqlCount.append(dataSql);
         }
@@ -339,7 +339,7 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             sqlCount.append(dataSql);
         }
         if (!org.springframework.util.StringUtils.isEmpty(caller)) {
-            String dataSql = " and caller like '%" + caller + "'%";
+            String dataSql = " and caller like '%" + caller + "%'";
             sql.append(dataSql);
             sqlCount.append(dataSql);
         }
