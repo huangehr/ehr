@@ -45,11 +45,12 @@ public class QuotaService {
         return count;
     }
 
+    //指标分组统计数量 - 只支持一个字段
     public List<Map<String, Object>> searcherByGroup(TjQuota tjQuota,String filters,String aggsField ) throws Exception {
         return  esResultExtract.searcherByGroup(tjQuota, filters,aggsField );
     }
 
-
+    //根据mysql 指标分组求和 支持一个和多个字段
     public Map<String, Integer> searcherSumByGroupBySql(TjQuota tjQuota,String aggsField ,String filters,String sumField ,String orderFild,String order) throws Exception {
         return  esResultExtract.searcherSumByGroupBySql(tjQuota, aggsField, filters,sumField,orderFild,order);
     }
@@ -123,7 +124,7 @@ public class QuotaService {
             dimensions = new String[]{"quotaDate"};
         }
         TjQuota tjQuota= quotaDao.findOne(id);
-        List<Map<String, Object>> resultListMap = esResultExtract.getQuotaReport(tjQuota, filters,1000);
+        List<Map<String, Object>> resultListMap = esResultExtract.getQuotaReport(tjQuota, filters,10000);
 
         Map<String,Map<String, Object>> cloumnMap = new HashMap<>();
 
@@ -213,6 +214,10 @@ public class QuotaService {
     }
 
 
+    public  List<Map<String, Object>> getQuotaResultList(TjQuota tjQuota,String filters) throws Exception {
+        List<Map<String, Object>> resultListMap = esResultExtract.getQuotaReport(tjQuota, filters,10000);
+        return  resultListMap;
+    }
 
 
 

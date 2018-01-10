@@ -1,6 +1,7 @@
 package com.yihu.quota.service.orgHealthCategory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.elasticsearch.ElasticSearchClient;
 import com.yihu.quota.client.EsClient;
 import com.yihu.quota.vo.SaveModel;
 import com.yihu.quota.vo.SaveModelOrgHealthCategory;
@@ -25,7 +26,7 @@ public class OrgHealthCategoryStatisticsService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private EsClient esClient;
+    private ElasticSearchClient esClient;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -161,7 +162,8 @@ public class OrgHealthCategoryStatisticsService {
                 model.setOrgHealthCategoryCode(code);
                 model.setOrgHealthCategoryName(item.get("name").toString());
                 model.setResult(item.get("result").toString());
-                esClient.index("quota_index", "quota", objectMapper.writeValueAsString(model));
+                Map<String, Object> sourceMap = objectMapper.readValue(objectMapper.writeValueAsString(model), Map.class);
+                esClient.index("medical_service_index", "medical_service", sourceMap);
             }
             result = true;
         } catch (Exception e) {
