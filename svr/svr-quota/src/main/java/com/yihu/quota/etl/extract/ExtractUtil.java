@@ -1,6 +1,5 @@
 package com.yihu.quota.etl.extract;
 
-import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.etl.Contant;
@@ -19,10 +18,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by janseny on 2017/7/10.
@@ -30,7 +31,9 @@ import java.util.*;
 @Component
 @Scope("prototype")
 public class ExtractUtil {
+
     private Logger logger = LoggerFactory.getLogger(ExtractUtil.class);
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -53,53 +56,53 @@ public class ExtractUtil {
     }
 
     /**
-     * 初始化主细维度
+     * 将主细维度的字典项转换成 SaveModel（多个个主维度场合）
      */
-    public  Map<String, SaveModel>  initDimensionMoreMain(List<TjQuotaDimensionSlave> dimensionSlaves, List<TjQuotaDimensionMain> dimensionMains, Map<String, SaveModel> allData) throws Exception {
-        try{
-            if(dimensionMains !=null){
+    public Map<String, SaveModel> initDimensionMoreMain(List<TjQuotaDimensionSlave> dimensionSlaves, List<TjQuotaDimensionMain> dimensionMains, Map<String, SaveModel> allData) throws Exception {
+        try {
+            if (dimensionMains != null) {
                 //查询字典数据
                 List<SaveModel> dictData = jdbcTemplate.query(dimensionMains.get(0).getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
                 if (dictData == null) {
                     throw new Exception("主纬度配置有误");
-                }else {
+                } else {
                     //设置到map里面
                     setAllData(allData, dictData, dimensionMains.get(0).getType());
                 }
             }
 
-            for (int i=0 ;i<dimensionMains.size();i++) {
-                if(i != 0){
+            for (int i = 0; i < dimensionMains.size(); i++) {
+                if (i != 0) {
                     List<SaveModel> saveDataMain = jdbcTemplate.query(dimensionMains.get(i).getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-                    allData = setOtherMainData(allData, saveDataMain, dimensionMains.get(i).getMainCode(),dimensionMains.get(i).getType());
+                    allData = setOtherMainData(allData, saveDataMain, dimensionMains.get(i).getMainCode(), dimensionMains.get(i).getType());
                 }
             }
 
-            for (int i=0 ;i<dimensionSlaves.size();i++) {
+            for (int i = 0; i < dimensionSlaves.size(); i++) {
                 List<DictModel> dictDataSlave = jdbcTemplate.query(dimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
                 if (dictDataSlave == null) {
                     throw new Exception("细纬度配置有误");
-                }else {
-                    allData = setAllSlaveData(allData, dictDataSlave,i);
+                } else {
+                    allData = setAllSlaveData(allData, dictDataSlave, i);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new Exception("纬度配置有误");
         }
         return allData;
     }
 
     /**
-     * 初始化主细维度
+     * 将主细维度的字典项转换成 SaveModel（一个主维度场合）
      */
-    public  Map<String, SaveModel>  initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, TjQuotaDimensionMain quotaDimensionMain, Map<String, SaveModel> allData) throws Exception {
-        try{
-            if(quotaDimensionMain !=null){
+    public Map<String, SaveModel> initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, TjQuotaDimensionMain quotaDimensionMain, Map<String, SaveModel> allData) throws Exception {
+        try {
+            if (quotaDimensionMain != null) {
                 //查询字典数据
                 List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
                 if (dictData == null) {
                     throw new Exception("主纬度配置有误");
-                }else {
+                } else {
                     //设置到map里面
                     setAllData(allData, dictData, quotaDimensionMain.getType());
                 }
@@ -108,33 +111,34 @@ public class ExtractUtil {
                 List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
                 if (dictDataSlave == null) {
                     throw new Exception("细纬度配置有误");
-                }else {
-                    allData = setAllSlaveData(allData, dictDataSlave,i);
+                } else {
+                    allData = setAllSlaveData(allData, dictDataSlave, i);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new Exception("纬度配置有误");
         }
         return allData;
     }
 
     //如果选择多个维度，除了第一个维度外其他维度组合
-    public Map<String, SaveModel> setOtherMainData(Map<String, SaveModel> allData, List<SaveModel> saveDataMain,String code,String dimensionType) {
+    private Map<String, SaveModel> setOtherMainData(Map<String, SaveModel> allData, List<SaveModel> saveDataMain, String code, String dimensionType) {
         try {
             Map<String, SaveModel> returnAllData = new HashMap<>();
             for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
                 for (int i = 0; i < saveDataMain.size(); i++) {
                     SaveModel mainOne = saveDataMain.get(i);
                     //设置新key
-                    String codeVal = getMainCode(mainOne,dimensionType,"code");
-                    String nameVal = getMainCode(mainOne,dimensionType,"name");;
+                    String codeVal = getMainCode(mainOne, dimensionType, "code");
+                    String nameVal = getMainCode(mainOne, dimensionType, "name");
+                    ;
                     StringBuffer newKey = new StringBuffer(one.getKey() + "-" + codeVal);
                     //设置新的value
                     SaveModel saveModelTemp = new SaveModel();
                     BeanUtils.copyProperties(one.getValue(), saveModelTemp);
                     code = code.substring(0, 1).toUpperCase() + code.substring(1);
-                    StringBuffer keyMethodName = new StringBuffer("set"+code);
-                    StringBuffer nameMethodName = new StringBuffer("set"+code + "Name");
+                    StringBuffer keyMethodName = new StringBuffer("set" + code);
+                    StringBuffer nameMethodName = new StringBuffer("set" + code + "Name");
 
                     SaveModel.class.getMethod(keyMethodName.toString(), String.class).invoke(saveModelTemp, codeVal);
                     SaveModel.class.getMethod(nameMethodName.toString(), String.class).invoke(saveModelTemp, nameVal);
@@ -148,8 +152,7 @@ public class ExtractUtil {
         return null;
     }
 
-
-    public Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData,Integer key) {
+    private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData, Integer key) {
         try {
             Map<String, SaveModel> returnAllData = new HashMap<>();
             for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
@@ -181,12 +184,11 @@ public class ExtractUtil {
      * @param dictData
      * @param dictType
      */
-    public void setAllData(Map<String, SaveModel> allData, List<SaveModel> dictData, String dictType) {
+    private void setAllData(Map<String, SaveModel> allData, List<SaveModel> dictData, String dictType) {
         switch (dictType) {
             case Contant.main_dimension.area_province: {
                 //设置省的全部的值
                 dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince());
                     setOneData(allData, one.getProvince(), one, Contant.main_dimension_areaLevel.area_province);
                 });
                 break;
@@ -194,7 +196,6 @@ public class ExtractUtil {
             case Contant.main_dimension.area_city: {
                 //设置市的全部的值
                 dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity());
                     setOneData(allData, one.getCity(), one, Contant.main_dimension_areaLevel.area_city);
                 });
                 break;
@@ -202,7 +203,6 @@ public class ExtractUtil {
             case Contant.main_dimension.area_town: {
                 //设置区的全部的值
                 dictData.stream().forEach(one -> {
-                    //StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown());
                     setOneData(allData, one.getTown(), one, Contant.main_dimension_areaLevel.area_town);
                 });
                 break;
@@ -210,7 +210,6 @@ public class ExtractUtil {
             case Contant.main_dimension.area_org: {
                 //设置机构
                 dictData.stream().forEach(one -> {
-                    // StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown() + "-" + one.getHospital());
                     setOneData(allData, one.getOrg(), one, Contant.main_dimension_areaLevel.area_org);
                 });
                 break;
@@ -218,7 +217,6 @@ public class ExtractUtil {
             case Contant.main_dimension.area_team: {
                 //设置团队
                 dictData.stream().forEach(one -> {
-                    // StringBuffer key = new StringBuffer(one.getProvince() + "-" + one.getCity() + "-" + one.getTown() + "-" + one.getHospital() + "-" + one.getTeam());
                     setOneData(allData, one.getTeam(), one, Contant.main_dimension_areaLevel.area_team);
                 });
                 break;
@@ -234,7 +232,7 @@ public class ExtractUtil {
         }
     }
 
-    public String getMainCode(SaveModel mainOne,String dimensionType,String returnType) {
+    private String getMainCode(SaveModel mainOne, String dimensionType, String returnType) {
         String code = "";
         String name = "";
         switch (dimensionType) {
@@ -269,16 +267,16 @@ public class ExtractUtil {
                 break;
             }
         }
-        if(returnType.equals("code")){
+        if (returnType.equals("code")) {
             return code;
         }
-        if(returnType.equals("name")){
+        if (returnType.equals("name")) {
             return name;
         }
         return "";
     }
 
-    public void setOneData(Map<String, SaveModel> allData, String key, SaveModel one, String areaLevel) {
+    private void setOneData(Map<String, SaveModel> allData, String key, SaveModel one, String areaLevel) {
         one.setAreaLevel(areaLevel);
         one.setResult("0");
         one.setCreateTime(new Date());
@@ -292,7 +290,7 @@ public class ExtractUtil {
         allData.put(key, one);
     }
 
-    private SaveModel setSaveModel(SaveModel one ) {
+    private SaveModel setSaveModel(SaveModel one) {
         one.setResult("0");
         one.setCreateTime(new Date());
         LocalDate today = LocalDate.now();
@@ -304,6 +302,5 @@ public class ExtractUtil {
         one.setSaasId(null);
         return one;
     }
-
 
 }
