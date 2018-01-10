@@ -27,6 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Order(1)
     @Configuration
     public static class AuthorizationApiSecurityConfig extends WebSecurityConfigurerAdapter {
+
         @Autowired
         private EhrUserDetailsService userDetailsService;
         @Autowired
@@ -38,8 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Override
         public void configure(WebSecurity web) throws Exception {
-            web
-                    .ignoring()
+            web.ignoring()
                     //swagger-ui界面---start
                     .antMatchers("/swagger-ui.html")
                     .antMatchers("/swagger-resources/**")
@@ -47,13 +47,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/configuration/**")
                     .antMatchers("/webjars/springfox-swagger-ui/**")
                     //swagger-ui界面---end
-                    .antMatchers("/oauth/accesstoken")
-                    .antMatchers("/oauth/refreshtoken")
-                    .antMatchers("/oauth/validtoken")
+                    .antMatchers("/oauth/accessToken")
+                    .antMatchers("/oauth/refreshToken")
+                    .antMatchers("/oauth/validToken")
                     .antMatchers("/oauth/confirm_access")
+                    .antMatchers("/oauth/sso")
                     .antMatchers("/oauth/authorize");
-
-
         }
 
         @Override
@@ -72,10 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Autowired
         public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-            auth
-                    .userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-            // .passwordEncoder(passwordEncoder());
-
+            auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
         }
     }
 
