@@ -1,19 +1,22 @@
 package com.yihu.ehr.oauth2.oauth2.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
+import javax.sql.DataSource;
 import java.util.Map;
 
 /**
  * Created by progr1mmer on 2017/9/19.
  */
-@Component
-public class EhrAppsService {
+public class EhrJdbcAccessUrlService {
 
-    @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    public EhrJdbcAccessUrlService(DataSource dataSource) {
+        Assert.notNull(dataSource, "DataSource required");
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
 
     public String getValidUrl(String clientId, String redirectUriParameter) {
         String cleanUrl = "";
