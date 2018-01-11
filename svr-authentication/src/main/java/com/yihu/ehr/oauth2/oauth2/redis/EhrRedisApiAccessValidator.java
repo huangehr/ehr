@@ -65,7 +65,9 @@ public class EhrRedisApiAccessValidator {
         if(serializable != null) {
             int count = new Integer(serializable.toString());
             if(count > 0 ) {
+                long expire = redisTemplate.getExpire(key);
                 redisTemplate.opsForValue().set(key, --count);
+                redisTemplate.expire(key, expire, TimeUnit.SECONDS);
                 return true;
             }else {
                 return false;
