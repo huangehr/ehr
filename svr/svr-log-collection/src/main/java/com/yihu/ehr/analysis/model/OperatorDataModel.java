@@ -48,7 +48,6 @@ public class OperatorDataModel extends DataModel implements Serializable {
     public  OperatorDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
         OperatorDataModel operatorDataModel = new OperatorDataModel();
         try {
-            operatorDataModel.setCode(UUID.randomUUID().toString().replace("-",""));
             operatorDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
             operatorDataModel.setCaller(jsonObject.getString("caller"));
             operatorDataModel.setTime(changeTime(jsonObject.getString("time")));

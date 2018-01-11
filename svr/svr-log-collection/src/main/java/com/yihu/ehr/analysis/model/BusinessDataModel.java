@@ -62,7 +62,6 @@ public class BusinessDataModel extends DataModel implements Serializable {
     public BusinessDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
         BusinessDataModel businessDataModel = new BusinessDataModel();
         try {
-            businessDataModel.setCode(UUID.randomUUID().toString().replace("-", ""));
             businessDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
             businessDataModel.setCaller(jsonObject.getString("caller"));
             businessDataModel.setTime(changeTime(jsonObject.getString("time")));

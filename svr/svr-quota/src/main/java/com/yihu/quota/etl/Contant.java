@@ -1,5 +1,6 @@
 package com.yihu.quota.etl;
 
+import com.yihu.ehr.util.datetime.DateUtil;
 import org.joda.time.DateTime;
 import org.springframework.util.StringUtils;
 
@@ -111,7 +112,7 @@ public class Contant {
             if (StringUtils.isEmpty(key)) {
                 key = day;
             }
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DateUtil.utcDateTimePattern);
             switch (key) {
                 case year: {
                     //去年度第一天
@@ -207,7 +208,7 @@ public class Contant {
          * @return
          */
         private static String getYesterday() {
-            return new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+            return new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString(DateUtil.utcDateTimePattern);
         }
     }
 

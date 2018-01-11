@@ -4,7 +4,7 @@ import com.yihu.ehr.agModel.portal.ItResourceModel;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.portal.MItResource;
-import com.yihu.ehr.portal.service.ItResourceClient;
+import com.yihu.ehr.portal.client.ItResourceClient;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0 + "/admin")
 @RestController
 @Api(value = "itResource", description = "可下载资源管理", tags = {"云门户-可下载资源管理"})
-public class InResourceController  extends BaseController {
+public class ItResourceController extends BaseController {
 
     @Autowired
     private ItResourceClient itResourceClient;
