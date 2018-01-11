@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.service;
+package com.yihu.ehr.portal.client;
 
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
@@ -17,10 +17,10 @@ import java.util.List;
 /**
  * Created by yeshijie on 2017/2/17.
  */
-@FeignClient(name= MicroServices.Portal)
+@FeignClient(name = MicroServices.Portal)
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
-public interface MessageRemindClient {
+public interface PortalMessageRemindClient {
 
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemind, method = RequestMethod.GET)
     @ApiOperation(value = "获取提醒消息列表", notes = "根据查询条件获取提醒消息列表在前端表格展示")
@@ -30,6 +30,18 @@ public interface MessageRemindClient {
             @RequestParam(value = "sorts", required = false) String sorts,
             @RequestParam(value = "size", required = false) int size,
             @RequestParam(value = "page", required = false) int page);
+
+    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindCount, method = RequestMethod.GET)
+    @ApiOperation(value = "获取消息提醒信息数量", notes = "消息提醒数量")
+    int getMessageRemindCount(@RequestParam(value = "filters") String filters);
+
+    @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindReaded, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "阅读-消息信息")
+    MMessageRemind updateMsgRemindReaded( @PathVariable(value = "remindId") Long remindId);
+
+
+    //-------------------------------------  以上为云平台网关移动过来的接口 ----------------------------------
+
 
     @RequestMapping(value = ServiceApi.MessageRemind.MessageRemindAdmin, method = RequestMethod.GET)
     @ApiOperation(value = "获取提醒消息信息", notes = "提醒消息信息")

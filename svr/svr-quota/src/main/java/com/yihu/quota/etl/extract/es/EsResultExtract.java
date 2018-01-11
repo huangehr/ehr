@@ -2,6 +2,7 @@ package com.yihu.quota.etl.extract.es;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yihu.ehr.elasticsearch.ElasticSearchPool;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.etl.util.ElasticsearchUtil;
 import com.yihu.quota.etl.util.EsClientUtil;
@@ -43,6 +44,7 @@ public class EsResultExtract {
     private String province;
     private String city;
     private String town;
+    private String year;
     private String slaveKey1;
     private String slaveKey2;
     private String result;
@@ -51,6 +53,8 @@ public class EsResultExtract {
     private EsConfig esConfig;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
+    @Autowired
+    ElasticSearchPool elasticSearchPool;
     @Autowired
     EsConfigUtil esConfigUtil;
     @Autowired
@@ -68,6 +72,7 @@ public class EsResultExtract {
         this.province = null;
         this.city = null;
         this.town = null;
+        this.year = null;
         this.quotaCode = null;
         this.result = null;
         this.slaveKey1 = null;
@@ -92,6 +97,8 @@ public class EsResultExtract {
                             this.city = params.get(key).toString();
                         else if(key.equals("town"))
                             this.town = params.get(key).toString();
+                        else if(key.equals("year"))
+                            this.year = params.get(key).toString();
                         else if(key.equals("slaveKey1"))
                             this.slaveKey1 = params.get(key).toString();
                         else if(key.equals("slaveKey2"))
@@ -132,7 +139,8 @@ public class EsResultExtract {
     }
 
     public Client getEsClient(){
-       return esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+        esConfigUtil.getConfig(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
+        return elasticSearchPool.getClient();
     }
 
     public List<Map<String, Object>> queryResultPage(TjQuota tjQuota ,String filters,int pageNo,int pageSize) throws Exception {
@@ -238,6 +246,11 @@ public class EsResultExtract {
         if( !StringUtils.isEmpty(town) ){
             QueryStringQueryBuilder termTown = QueryBuilders.queryStringQuery("town:" + town);
             boolQueryBuilder.must(termTown);
+        }
+
+        if( !StringUtils.isEmpty(year) ){
+            QueryStringQueryBuilder termYear = QueryBuilders.queryStringQuery("year:" + year);
+            boolQueryBuilder.must(termYear);
         }
         if( !StringUtils.isEmpty(startTime) ){
             RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);

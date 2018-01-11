@@ -1,12 +1,9 @@
 package com.yihu.ehr.analysis.listener;
 
-import com.yihu.ehr.analysis.config.es.ElasticFactory;
+import com.yihu.ehr.analysis.listener.save.LogSaver;
+import com.yihu.ehr.analysis.listener.save.impl.ESLogSaver;
 import com.yihu.ehr.analysis.model.BusinessDataModel;
 import com.yihu.ehr.analysis.model.OperatorDataModel;
-import com.yihu.ehr.analysis.service.AppFeatureService;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.BulkResult;
-import io.searchbox.core.Index;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -15,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -25,12 +21,11 @@ public class LabelDataListener {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
-    private ElasticFactory elasticFactory;
-    @Autowired
     private OperatorDataModel operatorDataModel;
     @Autowired
     private BusinessDataModel businessDataModel;
 
+    private LogSaver logSaver;
 
     public static String mongoDb_Business_TableName = "cloud_business_log";
     public static String mongoDb_Operator_TableName = "cloud_operator_log";
@@ -72,29 +67,31 @@ public class LabelDataListener {
         switch (logType) {
             case "1": {
                 //统一网关的日志
-                insertES(operatorDataModel.getByJsonObject(jsonObject), mongoDb_Operator_TableName);
+                logSaver.save(operatorDataModel.getByJsonObject(jsonObject), mongoDb_Operator_TableName);
                 break;
             }
             case "3": {
                 //云平台后台业务操作日志
-                insertES(businessDataModel.getByJsonObject(jsonObject), mongoDb_Business_TableName);
+                logSaver.save(businessDataModel.getByJsonObject(jsonObject), mongoDb_Business_TableName);
                 break;
             }
             case "2": {
                 //采集日志
-                insertES(businessDataModel.getByJsonObject(jsonObject), mongoDb_Business_TableName);
+                logSaver.save(businessDataModel.getByJsonObject(jsonObject), mongoDb_Business_TableName);
                 break;
             }
         }
 
     }
 
-    private void insertES(Object data, String tableName) throws IOException {
-        Index index = new Index.Builder(data).index(tableName).type(tableName).build();
-        JestResult jestResult = elasticFactory.getJestClient().execute(index);
-        System.out.println(jestResult.isSucceeded());
-        // mongoTemplate.insert( data, tableName);
+    public LogSaver getLogSaveManager() {
+        return logSaver;
     }
+
+    public void setLogSaveManager(LogSaver logSaver) {
+        this.logSaver = logSaver;
+    }
+
 //    @Scheduled(fixedRate=20000)//每20秒执行一次。开始
 //    public void testTasks() {
 //    }

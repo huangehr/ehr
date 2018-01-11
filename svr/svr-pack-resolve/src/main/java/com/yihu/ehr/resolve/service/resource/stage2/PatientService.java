@@ -1,6 +1,6 @@
 package com.yihu.ehr.resolve.service.resource.stage2;
 
-import com.yihu.ehr.entity.patient.Demographic;
+import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resolve.dao.PatientDao;
 import com.yihu.ehr.resolve.model.stage2.ResourceBucket;
@@ -23,7 +23,7 @@ import java.util.Date;
  */
 @Service
 @Transactional
-public class PatientService extends BaseJpaService<Demographic, PatientDao>{
+public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
 
     @Autowired
     private PatientDao patientDao;
@@ -34,7 +34,7 @@ public class PatientService extends BaseJpaService<Demographic, PatientDao>{
         if(!idCardNo.equals("")) {
             boolean isRegistered = isExists(idCardNo);
             if (!isRegistered) {
-                Demographic demographicInfo = new Demographic();
+                DemographicInfo demographicInfo = new DemographicInfo();
                 demographicInfo.setIdCardNo(idCardNo);
                 String name = resourceBucket.getPatientName() == null ? "":resourceBucket.getPatientName().toString();
                 demographicInfo.setName(name);
@@ -57,7 +57,7 @@ public class PatientService extends BaseJpaService<Demographic, PatientDao>{
                 String homeAddress = resourceBucket.getMasterRecord().getResourceValue("EHR_001227") == null ? "":resourceBucket.getMasterRecord().getResourceValue("EHR_001227").toString();
                 demographicInfo.setHomeAddress(homeAddress);
                 //注册
-                Demographic demographicInfo1 = registered(demographicInfo);
+                DemographicInfo demographicInfo1 = registered(demographicInfo);
                 if(null == demographicInfo1.getRegisterTime()) {
                     PackResolveLogger.warn("档案包:" + packId + ",关联居民:" + idCardNo + ",注册失败!");
                 }
@@ -77,7 +77,7 @@ public class PatientService extends BaseJpaService<Demographic, PatientDao>{
         return count.compareTo(new BigInteger("0")) > 0;
     }
 
-    private Demographic registered(Demographic demographicInfo) {
+    private DemographicInfo registered(DemographicInfo demographicInfo) {
         String password = "123456";
         if(demographicInfo.getIdCardNo().length() > 7) {
             password = demographicInfo.getIdCardNo().substring(demographicInfo.getIdCardNo().length()-6,demographicInfo.getIdCardNo().length());

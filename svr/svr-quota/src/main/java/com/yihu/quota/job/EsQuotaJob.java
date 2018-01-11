@@ -143,11 +143,11 @@ public class EsQuotaJob implements Job {
         boolQueryBuilder.must(termQueryQuotaCode);
         if( !StringUtils.isEmpty(startTime) ){
             RangeQueryBuilder rangeQueryStartTime = QueryBuilders.rangeQuery("quotaDate").gte(startTime);
-//                    boolQueryBuilder.must(rangeQueryStartTime);
+                    boolQueryBuilder.must(rangeQueryStartTime);
         }
         if( !StringUtils.isEmpty(endTime)){
             RangeQueryBuilder rangeQueryEndTime = QueryBuilders.rangeQuery("quotaDate").lte(endTime);
-//                    boolQueryBuilder.must(rangeQueryEndTime);
+                    boolQueryBuilder.must(rangeQueryEndTime);
         }
         Client client = esClientUtil.getClient(esConfig.getHost(), esConfig.getPort(),esConfig.getIndex(),esConfig.getType(), esConfig.getClusterName());
         try {
@@ -176,24 +176,30 @@ public class EsQuotaJob implements Job {
     private void initParams(JobExecutionContext context) {
         JobDataMap map = context.getJobDetail().getJobDataMap();
         Map<String, Object> params = context.getJobDetail().getJobDataMap();
-        this.saasid = map.getString("saasid");
-        this.endTime = map.getString("endTime");
-        if (StringUtils.isEmpty(endTime)) {
-            endTime = LocalDate.now().toString("yyyy-MM-dd"); //2017-06-01 默认今天
-        }
-        this.startTime = map.getString("startTime");
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = Contant.main_dimension_timeLevel.getStartTime(timeLevel);
-        }
-
         Object object =  map.get("quota");
         if(object!=null){
             BeanUtils.copyProperties(object,this.quotaVo);
         }
+
+        this.saasid = map.getString("saasid");
         this.timeLevel = (String) map.get("timeLevel");
         if (StringUtils.isEmpty(this.timeLevel)) {
             this.timeLevel = Contant.main_dimension_timeLevel.day;
         }
+        if( ! quotaVo.getExecType().equals("1")){  //1 立即执行  初始化所有数据
+            this.startTime = map.getString("startTime");
+            if (StringUtils.isEmpty(startTime)) {
+                startTime = Contant.main_dimension_timeLevel.getStartTime(timeLevel);
+            }
+
+            this.endTime = map.getString("endTime");
+            if (StringUtils.isEmpty(endTime)) {
+                endTime = LocalDate.now().toString("yyyy-MM-dd");
+            }
+        }
+
+
+
     }
 
     @Transactional

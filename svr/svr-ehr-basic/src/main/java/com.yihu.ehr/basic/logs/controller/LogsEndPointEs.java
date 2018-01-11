@@ -178,7 +178,7 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
     public ListResult getBussinessLogById(
             @ApiParam(name = "logId", value = "logId", defaultValue = "")
             @RequestParam(value = "logId", required = false) String logId) throws Exception {
-        String sql = "select * from "+mongoDb_Business_TableName+" where code='" + logId + "'";
+        String sql = "select * from "+mongoDb_Business_TableName+" where _id='" + logId + "'";
         List<Map<String, Object>> logsModelList = elasticsearchUtil.excuteDataModel(sql);
         ListResult listResult = new ListResult();
         if (logsModelList.size() > 0) {
@@ -201,7 +201,7 @@ public class LogsEndPointEs extends EnvelopRestEndPoint {
             @ApiParam(name = "logId", value = "logId", defaultValue = "")
             @RequestParam(value = "logId", required = false) String logId) throws Exception {
 
-        String sql = "select * from "+mongoDb_Operator_TableName+" where code='" + logId + "'";
+        String sql = "select * from "+mongoDb_Operator_TableName+" where _id='" + logId + "'";
         List<Map<String, Object>> logsModelList = elasticsearchUtil.excuteDataModel(sql);
         ListResult listResult = new ListResult();
         if (logsModelList.size() > 0) {

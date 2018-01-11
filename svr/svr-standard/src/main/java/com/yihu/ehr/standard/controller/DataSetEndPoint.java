@@ -195,4 +195,14 @@ public class DataSetEndPoint extends ExtendEndPoint<MStdDataSet> {
         dataSetService.batchInsertDictsAndEntry(models, version);
         return true;
     }
+
+    @RequestMapping(value = ServiceApi.Standards.GetDataSetByCode, method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "根据Code获取数据集", notes = "根据Code获取数据集")
+    public Map<String,Object> getDataSetByCode(
+            @ApiParam(name = "version", value = "版本号", defaultValue = "")
+            @RequestParam(value = "version") String version,
+            @ApiParam(name = "code", value = "数据集code", defaultValue = "")
+            @RequestParam(value = "code") String code) throws Exception {
+        return dataSetService.getDataSetByCode(code,version);
+    }
 }

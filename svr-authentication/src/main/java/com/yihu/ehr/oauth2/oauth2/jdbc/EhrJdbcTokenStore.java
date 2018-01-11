@@ -34,9 +34,9 @@ import java.util.List;
  * @version 1.0
  * @created 2016.03.05 15:38
  */
-public class EhrJDBCTokenStoreService implements TokenStore {
+public class EhrJdbcTokenStore implements TokenStore {
 
-    private static final Log LOG = LogFactory.getLog(EhrJDBCTokenStoreService.class);
+    private static final Log LOG = LogFactory.getLog(EhrJdbcTokenStore.class);
 
     private static final String DEFAULT_ACCESS_TOKEN_INSERT_STATEMENT = "insert into oauth_access_token (token_id, token, authentication_id, user_name, client_id, authentication, refresh_token,create_time) values (?, ?, ?, ?, ?, ?, ?,now())";
 
@@ -94,7 +94,7 @@ public class EhrJDBCTokenStoreService implements TokenStore {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public EhrJDBCTokenStoreService(DataSource dataSource) {
+    public EhrJdbcTokenStore(DataSource dataSource) {
         Assert.notNull(dataSource, "DataSource required");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
