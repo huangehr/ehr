@@ -1,25 +1,17 @@
 package com.yihu.ehr.analysis.controller;
 
 import com.yihu.ehr.analysis.config.es.ElasticFactory;
+import com.yihu.ehr.analysis.listener.save.impl.ESLogSaver;
 import com.yihu.ehr.analysis.listener.LabelDataListener;
 import com.yihu.ehr.analysis.model.OperatorDataModel;
 import com.yihu.ehr.analysis.service.QuotaService;
-import com.yihu.ehr.util.rest.Envelop;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Index;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by chenweida on 2018/1/9.
@@ -34,6 +26,8 @@ public class QuotaController {
     private ElasticFactory elasticFactory;
     @Autowired
     private QuotaService quotaService;
+    @Autowired
+    private ESLogSaver esLogSaver;
 
     @RequestMapping(value = "/testAdd", method = RequestMethod.POST)
     @ApiOperation(value = "测试添加数据到ES")
@@ -61,14 +55,8 @@ public class QuotaController {
         jsonObject.put("data",chlidrenData);
 
         OperatorDataModel operatorDataModel = new OperatorDataModel().getByJsonObject(jsonObject);
-        insertMongo(operatorDataModel, LabelDataListener.mongoDb_Operator_TableName);
+        esLogSaver.save(operatorDataModel, LabelDataListener.mongoDb_Operator_TableName);
         return null;
-    }
-
-    private void insertMongo(Object data, String tableName) throws IOException {
-        Index index = new Index.Builder(data).index(tableName).type(tableName).build();
-        JestResult jestResult = elasticFactory.getJestClient().execute(index);
-        System.out.println(jestResult.isSucceeded());
     }
     /**
      * {
