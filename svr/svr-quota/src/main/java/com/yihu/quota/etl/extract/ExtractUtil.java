@@ -20,10 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by janseny on 2017/7/10.
@@ -47,18 +44,87 @@ public class ExtractUtil {
     private String timeLevel;
     private EsConfig esConfig;
 
-    public QuotaVo getQuotaVo() {
-        return quotaVo;
+    /**
+     * 融合主细维度、其组合统计值为SaveModel
+     */
+    public void compute(List<TjQuotaDimensionMain> qdm,
+                        List<TjQuotaDimensionSlave> qds,
+                        List<SaveModel> returnList,
+                        Map<String, Long> countsMap,
+                        Map<String, String> daySlaveDictMap,
+                        QuotaVo quotaVo) throws Exception {
+        if (countsMap == null || countsMap.size() == 0) {
+            return;
+        }
+        this.quotaVo = quotaVo;
+
+        // 将主细维度的字典项转换成 SaveModel
+        Map<String, SaveModel> allData = new HashMap<>();
+        if (qdm.size() == 1) {
+            allData = initDimension(qds, qdm.get(0), allData, daySlaveDictMap);
+        } else {
+            allData = initDimensionMoreMain(qds, qdm, allData, daySlaveDictMap);
+        }
+
+        // 设置维度组合的统计值
+        for (Map.Entry<String, Long> entry : countsMap.entrySet()) {
+            String key = entry.getKey();
+            SaveModel saveModel = allData.get(key);
+            if (saveModel != null) {
+                saveModel.setResult(countsMap.get(key).toString());
+                saveModel.setQuotaDate(daySlaveDictMap.get(key));
+                returnList.add(saveModel);
+            }
+        }
     }
 
-    public void setQuotaVo(QuotaVo quotaVo) {
-        this.quotaVo = quotaVo;
+    /**
+     * 将主细维度的字典项转换成 SaveModel（一个主维度场合）
+     */
+    private Map<String, SaveModel> initDimension(List<TjQuotaDimensionSlave> dimensionSlaves,
+                                                 TjQuotaDimensionMain dimensionMain,
+                                                 Map<String, SaveModel> allData,
+                                                 Map<String, String> daySlaveDictMap) throws Exception {
+        try {
+            if (dimensionMain != null) {
+                //查询字典数据
+                List<SaveModel> dictData = jdbcTemplate.query(dimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+                if (dictData == null) {
+                    throw new Exception("主纬度配置有误");
+                } else {
+                    //设置到map里面
+                    setAllData(allData, dictData, dimensionMain.getType());
+                }
+            }
+
+            for (int i = 0; i < dimensionSlaves.size(); i++) {
+                List<DictModel> dictDataSlave = new ArrayList<>();
+                if (dimensionSlaves.get(i).getId() != null) {
+                    dictDataSlave = jdbcTemplate.query(dimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                } else { // 在solr、mysql抽取中默认追加的按天统计的维度
+                    DictModel dict;
+                    for (Map.Entry<String, String> item : daySlaveDictMap.entrySet()) {
+                        dict = new DictModel();
+                        dict.setName(item.getValue());
+                        dict.setCode(item.getValue());
+                        dictDataSlave.add(dict);
+                    }
+                }
+                allData = setAllSlaveData(allData, dictDataSlave, i);
+            }
+        } catch (Exception e) {
+            throw new Exception("纬度配置有误");
+        }
+        return allData;
     }
 
     /**
      * 将主细维度的字典项转换成 SaveModel（多个个主维度场合）
      */
-    public Map<String, SaveModel> initDimensionMoreMain(List<TjQuotaDimensionSlave> dimensionSlaves, List<TjQuotaDimensionMain> dimensionMains, Map<String, SaveModel> allData) throws Exception {
+    private Map<String, SaveModel> initDimensionMoreMain(List<TjQuotaDimensionSlave> dimensionSlaves,
+                                                         List<TjQuotaDimensionMain> dimensionMains,
+                                                         Map<String, SaveModel> allData,
+                                                         Map<String, String> daySlaveDictMap) throws Exception {
         try {
             if (dimensionMains != null) {
                 //查询字典数据
@@ -79,41 +145,19 @@ public class ExtractUtil {
             }
 
             for (int i = 0; i < dimensionSlaves.size(); i++) {
-                List<DictModel> dictDataSlave = jdbcTemplate.query(dimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-                if (dictDataSlave == null) {
-                    throw new Exception("细纬度配置有误");
-                } else {
-                    allData = setAllSlaveData(allData, dictDataSlave, i);
+                List<DictModel> dictDataSlave = new ArrayList<>();
+                if (dimensionSlaves.get(i).getId() != null) {
+                    dictDataSlave = jdbcTemplate.query(dimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
+                } else { // 在solr、mysql抽取中默认追加的按天统计的维度
+                    DictModel dict;
+                    for (Map.Entry<String, String> item : daySlaveDictMap.entrySet()) {
+                        dict = new DictModel();
+                        dict.setName(item.getValue());
+                        dict.setCode(item.getValue());
+                        dictDataSlave.add(dict);
+                    }
                 }
-            }
-        } catch (Exception e) {
-            throw new Exception("纬度配置有误");
-        }
-        return allData;
-    }
-
-    /**
-     * 将主细维度的字典项转换成 SaveModel（一个主维度场合）
-     */
-    public Map<String, SaveModel> initDimension(List<TjQuotaDimensionSlave> tjQuotaDimensionSlaves, TjQuotaDimensionMain quotaDimensionMain, Map<String, SaveModel> allData) throws Exception {
-        try {
-            if (quotaDimensionMain != null) {
-                //查询字典数据
-                List<SaveModel> dictData = jdbcTemplate.query(quotaDimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
-                if (dictData == null) {
-                    throw new Exception("主纬度配置有误");
-                } else {
-                    //设置到map里面
-                    setAllData(allData, dictData, quotaDimensionMain.getType());
-                }
-            }
-            for (int i = 0; i < tjQuotaDimensionSlaves.size(); i++) {
-                List<DictModel> dictDataSlave = jdbcTemplate.query(tjQuotaDimensionSlaves.get(i).getDictSql(), new BeanPropertyRowMapper(DictModel.class));
-                if (dictDataSlave == null) {
-                    throw new Exception("细纬度配置有误");
-                } else {
-                    allData = setAllSlaveData(allData, dictDataSlave, i);
-                }
+                allData = setAllSlaveData(allData, dictDataSlave, i);
             }
         } catch (Exception e) {
             throw new Exception("纬度配置有误");
@@ -122,9 +166,12 @@ public class ExtractUtil {
     }
 
     //如果选择多个维度，除了第一个维度外其他维度组合
-    private Map<String, SaveModel> setOtherMainData(Map<String, SaveModel> allData, List<SaveModel> saveDataMain, String code, String dimensionType) {
+    private Map<String, SaveModel> setOtherMainData(Map<String, SaveModel> allData,
+                                                    List<SaveModel> saveDataMain,
+                                                    String code,
+                                                    String dimensionType) {
+        Map<String, SaveModel> returnAllData = new HashMap<>();
         try {
-            Map<String, SaveModel> returnAllData = new HashMap<>();
             for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
                 for (int i = 0; i < saveDataMain.size(); i++) {
                     SaveModel mainOne = saveDataMain.get(i);
@@ -145,16 +192,15 @@ public class ExtractUtil {
                     returnAllData.put(newKey.toString(), saveModelTemp);
                 }
             }
-            return returnAllData;
         } catch (Exception e) {
             e.getMessage();
         }
-        return null;
+        return returnAllData;
     }
 
     private Map<String, SaveModel> setAllSlaveData(Map<String, SaveModel> allData, List<DictModel> dictData, Integer key) {
+        Map<String, SaveModel> returnAllData = new HashMap<>();
         try {
-            Map<String, SaveModel> returnAllData = new HashMap<>();
             for (Map.Entry<String, SaveModel> one : allData.entrySet()) {
                 for (int i = 0; i < dictData.size(); i++) {
                     DictModel dictOne = dictData.get(i);
@@ -172,11 +218,10 @@ public class ExtractUtil {
                     returnAllData.put(newKey.toString(), saveModelTemp);
                 }
             }
-            return returnAllData;
         } catch (Exception e) {
             e.getMessage();
         }
-        return null;
+        return returnAllData;
     }
 
     /**
@@ -281,8 +326,6 @@ public class ExtractUtil {
         one.setResult("0");
         one.setCreateTime(new Date());
         LocalDate today = LocalDate.now();
-        String yesterDay = (new DateTime().minusDays(1)).toString("yyyy-MM-dd");
-        one.setQuotaDate(yesterDay);
         one.setQuotaCode(quotaVo.getCode());
         one.setQuotaName(quotaVo.getName());
         one.setTimeLevel(timeLevel);
