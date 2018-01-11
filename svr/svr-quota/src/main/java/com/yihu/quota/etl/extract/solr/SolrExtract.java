@@ -21,8 +21,8 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 /**
- * 对solr抽取数据，基于指标配置维度+按天维度统计值作为最小单位分组聚合，保存聚合结果到ES，
- * 二次统计基于以上的聚合结果进行统计。
+ * 对solr抽取数据，基于指标配置维度(不包括按周、月年等时间范围维度)+按天维度统计值作为最小单位分组聚合，
+ * 保存聚合结果到ES。二次统计基于以上的聚合结果进行统计。
  * <p>
  * Created by janseny on 2017/7/10.
  */
