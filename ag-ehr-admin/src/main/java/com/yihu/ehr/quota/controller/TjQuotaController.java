@@ -244,7 +244,7 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
             }
         }else {
             envelop.setSuccessFlg(false);
-            envelop.setErrorMsg("无log返回！");
+            envelop.setErrorMsg("任务还在执行中，请稍后再进行查看日志！");
         }
         return envelop;
     }

@@ -1,18 +1,18 @@
 package com.yihu.ehr.analysis.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yihu.ehr.analysis.service.AppFeatureService;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.collections.CollectionUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/2/9.
@@ -28,27 +28,30 @@ import java.util.Map;
  * 6 register  // 注册
  * 7 archive // 健康档案
  * {
-     * time:"" 时间
-     * ,logType:2 日志类型
-     * ,caller:"" 调用者
-     * ,data:{
-         * ,businessType:""  业务类型
-         * ,patient:"" 居民
-         * ,data:{} 业务数据
-     * } 数据
+ * time:"" 时间
+ * ,logType:2 日志类型
+ * ,caller:"" 调用者
+ * ,data:{
+ * ,businessType:""  业务类型
+ * ,patient:"" 居民
+ * ,data:{} 业务数据
+ * } 数据
  * }
  */
-@Document
 @Component
 public class BusinessDataModel extends DataModel implements Serializable {
-
+    Map<String, Map<String, String>> cache = new HashMap<>();
     @Autowired
     private AppFeatureService appFeatureService;
     private String data;
     private String businessType;
     private String patient;
     private String url;
-    private String responseTime;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX")
+    @CreatedDate
+    @JSONField(format = "yyyy-MM-dd'T'HH:mm:ssXX")
+    private Date responseTime;
     private String responseCode;
     private String response;
     private String appKey;
@@ -59,29 +62,34 @@ public class BusinessDataModel extends DataModel implements Serializable {
     public BusinessDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
         BusinessDataModel businessDataModel = new BusinessDataModel();
         try {
+            businessDataModel.setCode(UUID.randomUUID().toString().replace("-", ""));
             businessDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
             businessDataModel.setCaller(jsonObject.getString("caller"));
-            businessDataModel.setTime(jsonObject.getString("time"));
+            businessDataModel.setTime(changeTime(jsonObject.getString("time")));
 
             JSONObject chlidren = jsonObject.getJSONObject("data");
             businessDataModel.setPatient(chlidren.getString("patient"));
             businessDataModel.setUrl(chlidren.getString("url"));
-            businessDataModel.setResponseTime(String.valueOf(chlidren.getInt("responseTime")));
+            businessDataModel.setResponseTime(changeTime(String.valueOf(chlidren.getInt("responseTime"))));
             businessDataModel.setResponseCode(String.valueOf(chlidren.getInt("responseCode")));
             businessDataModel.setResponse(chlidren.getString("response"));
             businessDataModel.setAppKey(chlidren.getString("appKey"));
 
             String url = chlidren.getString("url");
-            if( ! StringUtils.isEmpty(url) ){
+            if (!StringUtils.isEmpty(url)) {
+                Map<String, String> map = new HashMap<>();
+                if (cache.containsKey(url)) {
+                    map = cache.get(url);
+                } else {
                 /*String a = url.substring(url.lastIndexOf(":"));
                 String b = a.substring(a.indexOf("/") + 1);
                 String urlApi = b.substring(b.indexOf("/") + 1);*/
-                Object obj = appFeatureService.appFeatureFindUrl(url);
-                Map<String,String> map = new HashMap<>();
-                if(obj != null){
-                    map = appFeatureService.getOperatPageName(obj);
+                    Object obj = appFeatureService.appFeatureFindUrl(url);
+                    if (obj != null) {
+                        map = appFeatureService.getOperatPageName(obj);
+                    }
                 }
-                if(map != null && map.size() > 0){
+                if (map != null && map.size() > 0) {
                     businessDataModel.setOperation(map.get("operation"));
                     businessDataModel.setFunction(map.get("function"));
                 }
@@ -100,11 +108,11 @@ public class BusinessDataModel extends DataModel implements Serializable {
         this.url = url;
     }
 
-    public String getResponseTime() {
+    public Date getResponseTime() {
         return responseTime;
     }
 
-    public void setResponseTime(String responseTime) {
+    public void setResponseTime(Date responseTime) {
         this.responseTime = responseTime;
     }
 

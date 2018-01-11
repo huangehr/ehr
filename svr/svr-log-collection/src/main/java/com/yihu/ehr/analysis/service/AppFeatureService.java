@@ -38,7 +38,6 @@ public class AppFeatureService {
         String resultStr = "";
         Envelop envelop = new Envelop();
         Map<String, Object> params = new HashMap<>();
-
         StringBuffer stringBuffer = new StringBuffer();
         if (!StringUtils.isEmpty(url)) {
             stringBuffer.append("url=" + url);

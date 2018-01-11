@@ -1,6 +1,5 @@
 package com.yihu.ehr.resolve.service.resource.stage2;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yihu.ehr.entity.patient.DemographicInfo;
 import com.yihu.ehr.query.BaseJpaService;
 import com.yihu.ehr.resolve.dao.PatientDao;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.util.Date;
 
 /**

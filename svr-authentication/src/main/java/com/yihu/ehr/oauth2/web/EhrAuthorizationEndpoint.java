@@ -1,9 +1,9 @@
 package com.yihu.ehr.oauth2.web;
 
-import com.yihu.ehr.oauth2.oauth2.jdbc.EhrAppsService;
-import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCAuthorizationCodeService;
-import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCClientDetailsService;
-import com.yihu.ehr.oauth2.oauth2.jdbc.EhrJDBCTokenStoreService;
+import com.yihu.ehr.oauth2.oauth2.EhrTokenGranter;
+import com.yihu.ehr.oauth2.oauth2.EhrUserDetailsService;
+import com.yihu.ehr.oauth2.oauth2.jdbc.*;
+import com.yihu.ehr.oauth2.oauth2.redis.EhrRedisApiAccessValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,7 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.*;
 import org.springframework.security.oauth2.common.util.OAuth2Utils;
@@ -20,17 +22,15 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.approval.DefaultUserApprovalHandler;
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.endpoint.*;
 import org.springframework.security.oauth2.provider.implicit.ImplicitTokenRequest;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestValidator;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.DefaultSessionAttributeStore;
-import org.springframework.web.bind.support.SessionAttributeStore;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
@@ -45,6 +45,9 @@ import java.security.Principal;
 import java.util.*;
 
 /**
+ * Ehr Oauth2 Server
+ * Sso & authorization_code implicit Endpoint
+ *
  * 自定义授权入口。由于Spring使用了自带授权入口Bean{@link AuthorizationEndpoint}，但其使用@FrameworkEndpoint标识，
  * 因此用户自定义的Controller不会与之冲突，放心地使用常规方式创建新的Controller即可。
  * <p>
@@ -53,26 +56,37 @@ import java.util.*;
  * @author Sand
  * @version 1.0
  * @created 2016.03.04 10:56
+ *
+ * Modify by Progr1mmer on 2018/01/08.
+ *
  */
 @Controller
 @SessionAttributes("authorizationRequest")
 public class EhrAuthorizationEndpoint extends AbstractEndpoint {
+
     @Autowired
-    private EhrJDBCAuthorizationCodeService authorizationCodeServices;
+    private AuthorizationCodeServices inMemoryAuthorizationCodeServices;
     @Autowired
-    private EhrJDBCTokenStoreService ehrJDBCTokenStoreService;
+    private EhrJdbcTokenStore ehrJdbcTokenStore;
     @Autowired
-    private EhrJDBCClientDetailsService jdbcClientDetailsService;
+    private EhrJdbcClientDetailsService ehrJdbcClientDetailsService;
     @Autowired
-    private EhrAppsService ehrAppsService;
+    private EhrJdbcAccessUrlService ehrJDBCAccessUrlService;
+    @Autowired
+    private EhrJdbcUserSecurityService ehrJDBCUserSecurityService;
+    @Autowired
+    private EhrUserDetailsService ehrUserDetailsService;
+    @Autowired
+    private EhrTokenGranter ehrTokenGranter;
+    @Autowired
+    private EhrRedisApiAccessValidator ehrRedisApiAccessValidator;
 
     private RedirectResolver redirectResolver = new DefaultRedirectResolver();
     private UserApprovalHandler userApprovalHandler = new DefaultUserApprovalHandler();
-    private SessionAttributeStore sessionAttributeStore = new DefaultSessionAttributeStore();
     private OAuth2RequestValidator oauth2RequestValidator = new DefaultOAuth2RequestValidator();
+    private Object implicitLock = new Object();
     private String userApprovalPage = "forward:/oauth/confirm_access";
     private String errorPage = "forward:/oauth/error";
-    private Object implicitLock = new Object();
 
     @Autowired
     private AuthorizationServerEndpointsConfiguration configuration;
@@ -80,20 +94,193 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
     @PostConstruct
     public void init() throws Exception {
         AuthorizationServerEndpointsConfigurer configurer = configuration.getEndpointsConfigurer();
-        configurer.setClientDetailsService(jdbcClientDetailsService);
-        configurer.tokenStore(ehrJDBCTokenStoreService);
-        configurer.authorizationCodeServices(authorizationCodeServices);
-
+        configurer.setClientDetailsService(ehrJdbcClientDetailsService);
+        configurer.tokenStore(ehrJdbcTokenStore);
+        configurer.authorizationCodeServices(inMemoryAuthorizationCodeServices);
         FrameworkEndpointHandlerMapping mapping = configuration.getEndpointsConfigurer().getFrameworkEndpointHandlerMapping();
         this.setUserApprovalPage(extractPath(mapping, "/oauth/confirm_access"));
         this.setProviderExceptionHandler(configurer.getExceptionTranslator());
         this.setErrorPage(extractPath(mapping, "/oauth/error"));
         this.setTokenGranter(configurer.getTokenGranter());
         this.setClientDetailsService(configurer.getClientDetailsService());
-        this.setAuthorizationCodeServices(authorizationCodeServices);
+        this.setAuthorizationCodeServices(inMemoryAuthorizationCodeServices);
         this.setOAuth2RequestFactory(configurer.getOAuth2RequestFactory());
         this.setOAuth2RequestValidator(configurer.getOAuth2RequestValidator());
         this.setUserApprovalHandler(configurer.getUserApprovalHandler());
+    }
+
+    /**
+     * oauth2
+     * @param model
+     * @param sessionStatus
+     * @param principal
+     * @param parameters
+     * @return
+     */
+    @RequestMapping(value = "/oauth/authorize")
+    public ModelAndView authorize(Map<String, Object> model, SessionStatus sessionStatus, Principal principal, @RequestParam Map<String, String> parameters){
+        // Pull out the authorization request first, using the OAuth2RequestFactory. All further logic should
+        // query off of the authorization request instead of referring back to the parameters map. The contents of the
+        // parameters map will be stored without change in the AuthorizationRequest object once it is created.
+        AuthorizationRequest authorizationRequest = getOAuth2RequestFactory().createAuthorizationRequest(parameters);
+        Set<String> responseTypes = authorizationRequest.getResponseTypes();
+        if (!responseTypes.contains("token") && !responseTypes.contains("code")) {
+            sessionStatus.setComplete();
+            throw new UnsupportedResponseTypeException("Unsupported response types: " + responseTypes);
+        }
+        if (authorizationRequest.getClientId() == null) {
+            sessionStatus.setComplete();
+            throw new InvalidClientException("A client id must be provided");
+        }
+        try {
+            String userName = "unAuth";
+            if (!(principal instanceof Authentication) || !((Authentication) principal).isAuthenticated()) {
+                if(parameters.containsKey("pk")) {
+                    String pk = parameters.get("pk");
+                    String keyId = ehrJDBCUserSecurityService.getDefaultKeyIdSelectStatement(pk);
+                    String userId = ehrJDBCUserSecurityService.getDefaultUserIdByKeyIdSelectStatement(keyId);
+                    userName = ehrJDBCUserSecurityService.getDefaultUserNameByUserId(userId);
+                    UserDetails userDetails = ehrUserDetailsService.loadUserByUsername(userName);
+                    if(StringUtils.isEmpty(keyId) || StringUtils.isEmpty(userId) || StringUtils.isEmpty(userName)) {
+                        throw new InsufficientAuthenticationException("Illegal pk");
+                    }
+                    UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
+                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                    securityContext.setAuthentication(userToken);
+                    //SecurityContextHolder.setContext(securityContext);
+                    SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+                    securityContextHolderStrategy.setContext(securityContext);
+                    principal = userToken;
+                }
+                else {
+                    throw new InsufficientAuthenticationException("A pk must be present.");
+                }
+            }
+            ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());
+            // The resolved redirect URI is either the redirect_uri from the parameters or the one from
+            // clientDetails. Either way we need to store it on the AuthorizationRequest.
+            //String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
+            String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
+            String resolvedRedirect = redirectResolver.resolveRedirect(redirectUriParameter, client);
+            if(!StringUtils.hasText(resolvedRedirect)) {
+                throw new RedirectMismatchException("A redirectUri must be either supplied or preconfigured in the ClientDetails");
+            }else {
+                authorizationRequest.setRedirectUri(resolvedRedirect);
+                // We intentionally only validate the parameters requested by the client (ignoring any data that may have
+                // been added to the request by the manager).
+                oauth2RequestValidator.validateScope(authorizationRequest, client);
+                // Some systems may allow for approval decisions to be remembered or approved by default. Check for
+                // such logic here, and set the approved flag on the authorization request accordingly.
+                authorizationRequest = userApprovalHandler.checkForPreApproval(authorizationRequest,
+                        (Authentication) principal);
+                // TODO: is this call necessary?
+                boolean approved = userApprovalHandler.isApproved(authorizationRequest, (Authentication) principal);
+                authorizationRequest.setApproved(approved);
+                // Validation is all done, so we can check for auto approval...
+                if (authorizationRequest.isApproved()) {
+                    if (responseTypes.contains("token")) {
+                        ModelAndView implicitModelAndView = getImplicitGrantResponse(authorizationRequest);
+                        ehrRedisApiAccessValidator.putVerificationApi(authorizationRequest.getClientId(), userName);
+                        return implicitModelAndView;
+                    }
+                    if (responseTypes.contains("code")) {
+                        return new ModelAndView(getAuthorizationCodeResponse(authorizationRequest,
+                                (Authentication) principal));
+                    }
+                }
+                // Place auth request into the model so that it is stored in the session
+                // for approveOrDeny to use. That way we make sure that auth request comes from the session,
+                // so any auth request parameters passed to approveOrDeny will be ignored and retrieved from the session.
+                model.put("authorizationRequest", authorizationRequest);
+                return getUserApprovalPageResponse(model, authorizationRequest, (Authentication) principal);
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        }finally {
+            sessionStatus.setComplete();
+        }
+    }
+
+    /**
+     * 单点登陆 - 简化模式
+     * @param model
+     * @param sessionStatus
+     * @param principal
+     * @param parameters
+     * @return
+     */
+    @RequestMapping(value = "/oauth/sso")
+    public ModelAndView sso(Map<String, Object> model, SessionStatus sessionStatus, Principal principal, @RequestParam Map<String, String> parameters){
+        // Pull out the authorization request first, using the OAuth2RequestFactory. All further logic should
+        // query off of the authorization request instead of referring back to the parameters map. The contents of the
+        // parameters map will be stored without change in the AuthorizationRequest object once it is created.
+        AuthorizationRequest authorizationRequest = getOAuth2RequestFactory().createAuthorizationRequest(parameters);
+        Set<String> responseTypes = authorizationRequest.getResponseTypes();
+        if (!responseTypes.contains("token") && !responseTypes.contains("code")) {
+            sessionStatus.setComplete();
+            throw new UnsupportedResponseTypeException("Unsupported response types: " + responseTypes);
+        }
+        if (authorizationRequest.getClientId() == null) {
+            sessionStatus.setComplete();
+            throw new InvalidClientException("A client id must be provided");
+        }
+        try {
+            if (!(principal instanceof Authentication) || !((Authentication) principal).isAuthenticated()) {
+                if(parameters.containsKey("user")) {
+                    String userName = parameters.get("user");
+                    UserDetails userDetails = ehrUserDetailsService.loadUserByUsername(userName);
+                    UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities());
+                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                    securityContext.setAuthentication(userToken);
+                    SecurityContextHolder.setContext(securityContext);
+                    principal = userToken;
+                }
+                else {
+                    throw new InsufficientAuthenticationException(
+                            "User must be authenticated with Spring Security before authorization can be completed.");
+                }
+            }
+            ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());
+            // The resolved redirect URI is either the redirect_uri from the parameters or the one from
+            // clientDetails. Either way we need to store it on the AuthorizationRequest.
+            //String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
+            String redirectUriParameter = ehrJDBCAccessUrlService.getValidUrl(authorizationRequest.getClientId(), authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI));
+            String resolvedRedirect = redirectResolver.resolveRedirect(redirectUriParameter, client);
+            if (!StringUtils.hasText(resolvedRedirect)) {
+                throw new RedirectMismatchException(
+                        "A redirectUri must be either supplied or preconfigured in the ClientDetails");
+            }
+            authorizationRequest.setRedirectUri(ehrJDBCAccessUrlService.getRealUrl(authorizationRequest.getClientId(), authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI)));
+            // We intentionally only validate the parameters requested by the client (ignoring any data that may have
+            // been added to the request by the manager).
+            oauth2RequestValidator.validateScope(authorizationRequest, client);
+            // Some systems may allow for approval decisions to be remembered or approved by default. Check for
+            // such logic here, and set the approved flag on the authorization request accordingly.
+            authorizationRequest = userApprovalHandler.checkForPreApproval(authorizationRequest,
+                    (Authentication) principal);
+            // TODO: is this call necessary?
+            boolean approved = userApprovalHandler.isApproved(authorizationRequest, (Authentication) principal);
+            authorizationRequest.setApproved(approved);
+            // Validation is all done, so we can check for auto approval...
+            if (authorizationRequest.isApproved()) {
+                if (responseTypes.contains("token")) {
+                    return getImplicitGrantResponse(authorizationRequest);
+                }
+                if (responseTypes.contains("code")) {
+                    return new ModelAndView(getAuthorizationCodeResponse(authorizationRequest,
+                            (Authentication) principal));
+                }
+            }
+            // Place auth request into the model so that it is stored in the session
+            // for approveOrDeny to use. That way we make sure that auth request comes from the session,
+            // so any auth request parameters passed to approveOrDeny will be ignored and retrieved from the session.
+            model.put("authorizationRequest", authorizationRequest);
+            return getUserApprovalPageResponse(model, authorizationRequest, (Authentication) principal);
+        } catch (RuntimeException e) {
+            throw e;
+        }finally {
+            sessionStatus.setComplete();
+        }
     }
 
     @RequestMapping("/oauth/confirm_access")
@@ -110,106 +297,6 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         return new ModelAndView("/oauth/confirm_access", model);
     }
 
-    /**
-     * 获取code
-     * @param model
-     * @param parameters
-     * @param sessionStatus
-     * @param principal
-     * @return
-     */
-    @RequestMapping(value = "/oauth/authorize")
-    public ModelAndView authorize(Map<String, Object> model, @RequestParam Map<String, String> parameters,
-                                  SessionStatus sessionStatus, Principal principal) {
-
-        // Pull out the authorization request first, using the OAuth2RequestFactory. All further logic should
-        // query off of the authorization request instead of referring back to the parameters map. The contents of the
-        // parameters map will be stored without change in the AuthorizationRequest object once it is created.
-        AuthorizationRequest authorizationRequest = getOAuth2RequestFactory().createAuthorizationRequest(parameters);
-
-        Set<String> responseTypes = authorizationRequest.getResponseTypes();
-
-        if (!responseTypes.contains("token") && !responseTypes.contains("code")) {
-            throw new UnsupportedResponseTypeException("Unsupported response types: " + responseTypes);
-        }
-
-        if (authorizationRequest.getClientId() == null) {
-            throw new InvalidClientException("A client id must be provided");
-        }
-
-        try {
-
-            if (!(principal instanceof Authentication) || !((Authentication) principal).isAuthenticated()) {
-                if(parameters.containsKey("user"))
-                {
-                    UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(parameters.get("user"), "",null);
-
-                    SecurityContext sc = new SecurityContextImpl();
-                    sc.setAuthentication((Authentication) userToken);
-                    SecurityContextHolder.setContext(sc);
-
-                    principal = userToken;
-                }
-                else {
-                    throw new InsufficientAuthenticationException(
-                            "User must be authenticated with Spring Security before authorization can be completed.");
-                }
-            }
-
-            ClientDetails client = getClientDetailsService().loadClientByClientId(authorizationRequest.getClientId());
-
-            // The resolved redirect URI is either the redirect_uri from the parameters or the one from
-            // clientDetails. Either way we need to store it on the AuthorizationRequest.
-
-            //String redirectUriParameter = authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI);
-
-            String redirectUriParameter = ehrAppsService.getValidUrl(authorizationRequest.getClientId(), authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI));
-
-            String resolvedRedirect = redirectResolver.resolveRedirect(redirectUriParameter, client);
-            if (!StringUtils.hasText(resolvedRedirect)) {
-                throw new RedirectMismatchException(
-                        "A redirectUri must be either supplied or preconfigured in the ClientDetails");
-            }
-
-            authorizationRequest.setRedirectUri(ehrAppsService.getRealUrl(authorizationRequest.getClientId(), authorizationRequest.getRequestParameters().get(OAuth2Utils.REDIRECT_URI)));
-
-            // We intentionally only validate the parameters requested by the client (ignoring any data that may have
-            // been added to the request by the manager).
-            oauth2RequestValidator.validateScope(authorizationRequest, client);
-
-            // Some systems may allow for approval decisions to be remembered or approved by default. Check for
-            // such logic here, and set the approved flag on the authorization request accordingly.
-            authorizationRequest = userApprovalHandler.checkForPreApproval(authorizationRequest,
-                    (Authentication) principal);
-            // TODO: is this call necessary?
-            boolean approved = userApprovalHandler.isApproved(authorizationRequest, (Authentication) principal);
-            authorizationRequest.setApproved(approved);
-
-            // Validation is all done, so we can check for auto approval...
-            if (authorizationRequest.isApproved()) {
-                if (responseTypes.contains("token")) {
-                    return getImplicitGrantResponse(authorizationRequest);
-                }
-                if (responseTypes.contains("code")) {
-                    return new ModelAndView(getAuthorizationCodeResponse(authorizationRequest,
-                            (Authentication) principal));
-                }
-            }
-
-            // Place auth request into the model so that it is stored in the session
-            // for approveOrDeny to use. That way we make sure that auth request comes from the session,
-            // so any auth request parameters passed to approveOrDeny will be ignored and retrieved from the session.
-            model.put("authorizationRequest", authorizationRequest);
-
-            return getUserApprovalPageResponse(model, authorizationRequest, (Authentication) principal);
-
-        } catch (RuntimeException e) {
-            sessionStatus.setComplete();
-            throw e;
-        }
-
-    }
-
     @RequestMapping("/oauth/error")
     public ModelAndView handleError(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<String, Object>();
@@ -217,18 +304,17 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         if (error == null) {
             error = Collections.singletonMap("summary", "Unknown error");
         }
-
         model.put("error", error);
-
         return new ModelAndView("/oauth/error", model);
     }
+
 
     public void setUserApprovalPage(String userApprovalPage) {
         this.userApprovalPage = userApprovalPage;
     }
 
-    public void setAuthorizationCodeServices(EhrJDBCAuthorizationCodeService authorizationCodeServices) {
-        this.authorizationCodeServices = authorizationCodeServices;
+    public void setAuthorizationCodeServices(AuthorizationCodeServices authorizationCodeServices) {
+        this.inMemoryAuthorizationCodeServices = authorizationCodeServices;
     }
 
     public void setRedirectResolver(RedirectResolver redirectResolver) {
@@ -276,7 +362,6 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
     }
 
     private String appendAccessToken(AuthorizationRequest authorizationRequest, OAuth2AccessToken accessToken) {
-
         Map<String, Object> vars = new LinkedHashMap<String, Object>();
         Map<String, String> keys = new HashMap<String, String>();
 
@@ -296,8 +381,8 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             long expires_in = (expiration.getTime() - System.currentTimeMillis()) / 1000;
             vars.put("expires_in", expires_in);
         }
-        Map<String,String> map =authorizationRequest.getRequestParameters();
-        vars.put("redirect_uri",map.get("redirect_uri"));
+        Map<String,String> map = authorizationRequest.getRequestParameters();
+        vars.put("redirect_uri", map.get("redirect_uri"));
 
 
         String originalScope = authorizationRequest.getRequestParameters().get(OAuth2Utils.SCOPE);
@@ -312,6 +397,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
                 vars.put("extra_" + key, value);
             }
         }
+
         // Do not include the refresh token (even if there is one)
         return append(authorizationRequest.getRedirectUri(), vars, keys, true);
     }
@@ -324,7 +410,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             OAuth2Request storedOAuth2Request = getOAuth2RequestFactory().createOAuth2Request(authorizationRequest);
 
             OAuth2Authentication combinedAuth = new OAuth2Authentication(storedOAuth2Request, authentication);
-            String code = authorizationCodeServices.createAuthorizationCode(combinedAuth);
+            String code = inMemoryAuthorizationCodeServices.createAuthorizationCode(combinedAuth);
             return code;
 
         } catch (OAuth2Exception e) {
@@ -448,6 +534,7 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
             if (accessToken == null) {
                 throw new UnsupportedResponseTypeException("Unsupported response type: token");
             }
+
             return new ModelAndView(new RedirectView(appendAccessToken(authorizationRequest, accessToken), false, true,
                     false));
         } catch (OAuth2Exception e) {
@@ -456,15 +543,18 @@ public class EhrAuthorizationEndpoint extends AbstractEndpoint {
         }
     }
 
-    private OAuth2AccessToken getAccessTokenForImplicitGrant(TokenRequest tokenRequest,
-                                                             OAuth2Request storedOAuth2Request) {
+    private OAuth2AccessToken getAccessTokenForImplicitGrant(TokenRequest tokenRequest, OAuth2Request storedOAuth2Request) {
         OAuth2AccessToken accessToken = null;
         // These 1 method calls have to be atomic, otherwise the ImplicitGrantService can have a race condition where
         // one thread removes the token request before another has a chance to redeem it.
         synchronized (this.implicitLock) {
-            accessToken = getTokenGranter().grant("implicit",
-                    new ImplicitTokenRequest(tokenRequest, storedOAuth2Request));
+            accessToken = getTokenGranter().grant("implicit", new ImplicitTokenRequest(tokenRequest, storedOAuth2Request));
         }
         return accessToken;
+    }
+
+    @Override
+    protected TokenGranter getTokenGranter() {
+        return this.ehrTokenGranter;
     }
 }

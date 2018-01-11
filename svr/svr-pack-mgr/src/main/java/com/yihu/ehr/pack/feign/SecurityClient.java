@@ -17,7 +17,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * @created 2016.02.01 14:58
  */
 @ApiIgnore
-@FeignClient(value = MicroServices.Security)
+@FeignClient(value = MicroServices.Basic)
 public interface SecurityClient {
     @RequestMapping(value = ApiVersion.Version1_0+ ServiceApi.Securities.UserKey, method = GET)
     MKey getUserKey(@PathVariable(value = "user_id") String userId);

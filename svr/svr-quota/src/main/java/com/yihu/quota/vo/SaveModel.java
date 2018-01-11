@@ -40,6 +40,10 @@ public class SaveModel {
     private String areaLevel;// 1 省 2 市 3 区县 4 机构 5团队
     private String year;
     private String yearName;
+    private String orgHealthCategoryCode;     //卫生机构类型代码
+    private String orgHealthCategoryName;   //卫生机构类型名字
+    private String orgHealthCategoryId;
+    private String orgHealthCategoryPid;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")// 2017-06-24T11:51:30+080
     @CreatedDate
@@ -275,5 +279,37 @@ public class SaveModel {
 
     public void setYearName(String yearName) {
         this.yearName = yearName;
+    }
+
+    public String getOrgHealthCategoryCode() {
+        return orgHealthCategoryCode;
+    }
+
+    public void setOrgHealthCategoryCode(String orgHealthCategoryCode) {
+        this.orgHealthCategoryCode = orgHealthCategoryCode;
+    }
+
+    public String getOrgHealthCategoryName() {
+        return orgHealthCategoryName;
+    }
+
+    public void setOrgHealthCategoryName(String orgHealthCategoryName) {
+        this.orgHealthCategoryName = orgHealthCategoryName;
+    }
+
+    public String getOrgHealthCategoryId() {
+        return orgHealthCategoryId;
+    }
+
+    public void setOrgHealthCategoryId(String orgHealthCategoryId) {
+        this.orgHealthCategoryId = orgHealthCategoryId;
+    }
+
+    public String getOrgHealthCategoryPid() {
+        return orgHealthCategoryPid;
+    }
+
+    public void setOrgHealthCategoryPid(String orgHealthCategoryPid) {
+        this.orgHealthCategoryPid = orgHealthCategoryPid;
     }
 }

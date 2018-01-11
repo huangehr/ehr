@@ -77,6 +77,8 @@ public class QuotaService {
                     }else{
                         if(null != listMap.get(i).get(dimensions[k]+"Name")){
                             nameVal = listMap.get(i).get(dimensions[k]+"Name").toString();
+                        }else {
+                            nameVal = listMap.get(i).get(dimensions[k]).toString();
                         }
                     }
                     cloumns.add(nameVal);
