@@ -173,6 +173,17 @@ public class ResourceStatisticService extends BaseJpaService {
         return query.list();
     }
 
+    public List<Object[]> newStatisticsDemographicsAgeCount() {
+        Session session = currentSession();;
+        String sql = "SELECT count(1), tt.age ,tt.gender from( SELECT t1.id , gender, " +
+                "ELT( CEIL( FLOOR( TIMESTAMPDIFF(MONTH, STR_TO_DATE(t1.id ,'%Y%m%d'), CURDATE())/12) /10+1 ), \n" +
+                "'0-1','1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','> 90') as age from ( " +
+                " SELECT CASE when length(id)=15  then CONCAT('19',substr(id ,7,6)) ELSE substr(id ,7,8) end  id ,gender from demographics t )t1 " +
+                " )tt WHERE tt.age is not null AND  gender IN ('1', '2') GROUP BY tt.age, tt.gender";
+        SQLQuery query = session.createSQLQuery(sql);
+        return query.list();
+    }
+
     public List getJsonArchiveReceiveDateGroup(Date before) {
         Session session = currentSession();
         String hql = "SELECT DATE_FORMAT(receiveDate, '%Y-%m-%d'), COUNT(*) FROM JsonArchives jsonArchives WHERE jsonArchives.receiveDate > :before GROUP BY DATE_FORMAT(receiveDate, '%Y-%m-%d')";
