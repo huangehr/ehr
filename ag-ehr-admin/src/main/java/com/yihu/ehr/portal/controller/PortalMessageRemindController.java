@@ -2,11 +2,12 @@ package com.yihu.ehr.portal.controller;
 
 import com.yihu.ehr.agModel.portal.MessageRemindModel;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.portal.MMessageRemind;
 import com.yihu.ehr.model.user.MUser;
-import com.yihu.ehr.portal.service.MessageRemindClient;
+import com.yihu.ehr.portal.client.PortalMessageRemindClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
 import com.yihu.ehr.users.service.UserClient;
 import com.yihu.ehr.util.datetime.DateTimeUtil;
@@ -30,17 +31,88 @@ import java.util.List;
  * Created at 2017/2/21.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 + "/admin")
+@RequestMapping(ApiVersion.Version1_0 + ServiceApi.GateWay.admin)
 @RestController
-@Api(value = "messageRemind", description = "待办事项管理", tags = {"云门户-待办事项管理"})
-public class MessageRemindController extends BaseController {
+@Api(value = "PortalMessageRemindController", description = "待办事项管理", tags = {"云门户-待办事项管理"})
+public class PortalMessageRemindController extends BaseController {
 
     @Autowired
-    private MessageRemindClient remindClient;
+    private PortalMessageRemindClient portalMessageRemindClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
     @Autowired
     private UserClient userClient;
+
+    @RequestMapping(value = ServiceApi.Portal.MessageRemind, method = RequestMethod.GET)
+    @ApiOperation(value = "获取消息提醒列表", notes = "根据查询条件获取消息提醒列表在前端表格展示")
+    public Envelop searchPortalMessageRemind(
+            @RequestParam(value = "userId", required = false) String userId,
+            @RequestParam(value = "readed", required = false) String readed,
+            @RequestParam(value = "size", required = false) int size,
+            @RequestParam(value = "page", required = false) int page
+    ) throws Exception{
+        String filters = "";
+        if(!org.apache.commons.lang.StringUtils.isEmpty(userId)){
+            filters += "toUserId="+userId+";";
+        }
+        if(!org.apache.commons.lang.StringUtils.isEmpty(readed)){
+            filters += "readed="+readed+";";
+        }
+        String sorts = "+createDate";
+        ResponseEntity<List<MMessageRemind>> responseEntity = portalMessageRemindClient.searchMessageRemind(null, filters, sorts, size, page);
+        List<MMessageRemind> mPortalMessageRemindList = responseEntity.getBody();
+        List<MessageRemindModel> portalMessageRemindModels = new ArrayList<>();
+        for (MMessageRemind mPortalMessageRemind : mPortalMessageRemindList) {
+            MessageRemindModel portalMessageRemindModel = convertToModel(mPortalMessageRemind, MessageRemindModel.class);
+            portalMessageRemindModel.setCreateDate(mPortalMessageRemind.getCreateDate() == null ? "" : DateTimeUtil.simpleDateTimeFormat(mPortalMessageRemind.getCreateDate()));
+            if (org.apache.commons.lang.StringUtils.isNotEmpty(portalMessageRemindModel.getFromUserId()) ){
+                MUser mUser = userClient.getUser(portalMessageRemindModel.getFromUserId());
+                portalMessageRemindModel.setFromUserName(mUser == null ? "" : mUser.getRealName());
+            }
+            portalMessageRemindModels.add(portalMessageRemindModel);
+        }
+        //获取总条数
+        int totalCount = getTotalCount(responseEntity);
+        Envelop envelop = getResult(portalMessageRemindModels, totalCount, page, size);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Portal.MessageRemindCount, method = RequestMethod.GET)
+    @ApiOperation(value = "获取消息数量", notes = "获取消息数量")
+    public Envelop getPortalMessageRemindCount(
+            @ApiParam(name = "userId", value = "用戶ID", defaultValue = "")
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(name = "readed", value = "阅读标识", defaultValue = "0")
+            @RequestParam(value = "readed") int readed) {
+        String filters = "";
+        if(!org.apache.commons.lang.StringUtils.isEmpty(userId)){
+            filters += "toUserId="+userId+";";
+        }
+        filters += "readed="+readed+";";
+        int num = portalMessageRemindClient.getMessageRemindCount(filters);
+        Envelop envelop = new Envelop();
+        envelop.setSuccessFlg(true);
+        envelop.setObj(num);
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.Portal.MessageRemindRead, method = RequestMethod.GET)
+    @ApiOperation(value = "更新待办事项的阅读状态", notes = "更新待办事项的阅读状态")
+    public Envelop updateMsgRemindReaded(@PathVariable(value = "remindId") Long remindId){
+        try {
+            MMessageRemind mPortalMessageRemind = portalMessageRemindClient.updateMsgRemindReaded(remindId);
+            if (mPortalMessageRemind == null) {
+                return failed("消息状态更新失败!");
+            }
+            return success("消息状态更新成功");
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
+    //-------------------------------------  以上为云平台网关移动过来的接口 ----------------------------------
 
     @RequestMapping(value = "/messageRemindList", method = RequestMethod.GET)
     @ApiOperation(value = "获取消息列表", notes = "根据查询条件获取消息列表在前端表格展示")
@@ -57,7 +129,7 @@ public class MessageRemindController extends BaseController {
             @RequestParam(value = "page", required = false) int page) {
         try {
             List<MessageRemindModel> messageModels = new ArrayList<>();
-            ResponseEntity<List<MMessageRemind>> responseEntity = remindClient.searchMessageRemind(fields, filters, sorts, size, page);
+            ResponseEntity<List<MMessageRemind>> responseEntity = portalMessageRemindClient.searchMessageRemind(fields, filters, sorts, size, page);
             List<MMessageRemind> messages = responseEntity.getBody();
             for (MMessageRemind message : messages) {
                 MessageRemindModel messageModel = convertToModel(message, MessageRemindModel.class);
@@ -105,7 +177,7 @@ public class MessageRemindController extends BaseController {
             }
 
             String messageJsonStr = objectMapper.writeValueAsString(mMessage);
-            MMessageRemind newMessage = remindClient.createMessageRemind(messageJsonStr);
+            MMessageRemind newMessage = portalMessageRemindClient.createMessageRemind(messageJsonStr);
             if (newMessage == null) {
                 return failed("保存失败!");
             }
@@ -134,7 +206,7 @@ public class MessageRemindController extends BaseController {
                 return failed(errorMsg);
             }
             MMessageRemind mMessageRemind = convertToMMessageRemind(detailModel);
-            mMessageRemind = remindClient.updateMessageRemind(objectMapper.writeValueAsString(mMessageRemind));
+            mMessageRemind = portalMessageRemindClient.updateMessageRemind(objectMapper.writeValueAsString(mMessageRemind));
             if(mMessageRemind==null){
                 return failed("保存失败!");
             }
@@ -165,7 +237,7 @@ public class MessageRemindController extends BaseController {
             @ApiParam(name = "messageRemind_id", value = "", defaultValue = "")
             @PathVariable(value = "messageRemind_id") Long messageRemindId) {
         try {
-            MMessageRemind mMessageRemind = remindClient.getMessageRemind(messageRemindId);
+            MMessageRemind mMessageRemind = portalMessageRemindClient.getMessageRemind(messageRemindId);
             if (mMessageRemind == null) {
                 return failed("提醒消息信息获取失败!");
             }else{
@@ -191,7 +263,7 @@ public class MessageRemindController extends BaseController {
             @ApiParam(name = "messageRemind_id", value = "提醒消息编号", defaultValue = "")
             @PathVariable(value = "messageRemind_id") String messageRemindId) {
         try {
-            boolean result = remindClient.deleteMessageRemind(messageRemindId);
+            boolean result = portalMessageRemindClient.deleteMessageRemind(messageRemindId);
             if (!result) {
                 return failed("删除失败!");
             }
