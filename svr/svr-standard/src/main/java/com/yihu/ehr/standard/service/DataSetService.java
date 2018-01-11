@@ -3,11 +3,13 @@ package com.yihu.ehr.standard.service;
 
 import com.yihu.ehr.constants.ErrorCode;
 import com.yihu.ehr.exception.ApiException;
+import com.yihu.ehr.model.standard.MStdDataSet;
 import com.yihu.ehr.standard.model.BaseDataSet;
 import com.yihu.ehr.util.CDAVersionUtil;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -217,5 +219,17 @@ public class DataSetService extends BaseHbmService<BaseDataSet> {
     public int getMetaHash(Map<String, Object> model, long dataSetId, int nullable, int primaryKey) {
         return  Objects.hash(dataSetId, model.get("dict_id"), model.get("code"), model.get("definition"), model.get("format"), model.get("inner_code"),
                 model.get("name"),model.get("type"),model.get("columnLength"),model.get("columnType"), nullable, primaryKey);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Map<String,Object> getDataSetByCode(String code, String versionid) {
+        String dataSetTable = CDAVersionUtil.getDataSetTableName(versionid);
+        String sql = "select * from " + dataSetTable+"  where code = '"+code+"'";
+        List<Map<String,Object>> records = jdbcTemplate.queryForList(sql);
+        if(records!=null&&records.size()>0){
+            return records.get(0);
+        }else{
+            return null;
+        }
     }
 }

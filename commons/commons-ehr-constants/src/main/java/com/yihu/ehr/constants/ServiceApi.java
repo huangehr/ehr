@@ -630,6 +630,7 @@ public class ServiceApi {
         public static final String DataSetCodeIsExist = "/std/data_set/is_exist/code";
         public static final String DataSetsIds = "/std/{ids}data_sets";
         public static final String DataSetsBatch = "/std/data_set/bacth";
+        public static final String GetDataSetByCode = "/std/data_set/getDataSetByCode";
 
         public static final String MetaDatas = "/std/data_sets/meta_datas";
         public static final String MetaData = "/std/data_sets/meta_datas/{id}";

@@ -26,14 +26,14 @@ import java.net.SocketException;
 @EnableDiscoveryClient
 @EnableFeignClients
 @EnableEurekaClient
-public class AuthenticationApp extends SpringBootServletInitializer {
+public class AuthenticationServer extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws SocketException {
-		SpringApplication.run(AuthenticationApp.class, args);
+		SpringApplication.run(AuthenticationServer.class, args);
 	}
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(AuthenticationApp.class);
+        return application.sources(AuthenticationServer.class);
     }
 }

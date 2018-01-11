@@ -1,8 +1,10 @@
 package com.yihu.ehr.analysis.config.kafka;
 
 import com.yihu.ehr.analysis.listener.LabelDataListener;
+import com.yihu.ehr.analysis.listener.save.LogSaver;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +29,8 @@ public class KafkaConsumerConfig {
     private String kafkaBrokerAddress;
     @Value("${zookeeper.broker.address}")
     private String zookeeperBrokerAddress;
+    @Autowired
+    private LogSaver logSaver;
 
     @Bean
     KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
@@ -62,6 +66,8 @@ public class KafkaConsumerConfig {
 
     @Bean
     public LabelDataListener labelDataListener() {
-        return new LabelDataListener();
+        LabelDataListener labelDataListener= new LabelDataListener();
+        labelDataListener.setLogSaveManager(logSaver);
+        return labelDataListener;
     }
 }

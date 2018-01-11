@@ -52,6 +52,8 @@
         <version.swagger>2.4.0</version.swagger>
         <version.swagger-ui>2.4.0</version.swagger-ui>
         <version.tomcat-embed>8.0.28</version.tomcat-embed>
+        <version.elasticsearch>2.4.4</version.elasticsearch>
+        <version.jest>2.4.0</version.jest>
     </properties>
 
     <dependencies>
@@ -205,19 +207,18 @@
         </dependency>
 
 
-
         <!--<dependency>-->
-            <!--<groupId>org.springframework.kafka</groupId>-->
-            <!--<artifactId>spring-kafka</artifactId>-->
-            <!--<version>1.1.0.RELEASE</version>-->
+        <!--<groupId>org.springframework.kafka</groupId>-->
+        <!--<artifactId>spring-kafka</artifactId>-->
+        <!--<version>1.1.0.RELEASE</version>-->
         <!--</dependency>-->
 
         <dependency>
-        <groupId>org.springframework.kafka</groupId>
-        <artifactId>kafka-clients</artifactId>
-        <version>0.9.0.2.3.4.0-3485</version>
-        <!--<scope>system</scope>-->
-        <!--<systemPath>E:\repository\repository\org\springframework\kafka\kafka-clients\0.9.0.2.3.4.0-3485\kafka-clients-0.9.0.2.3.4.0-3485.jar</systemPath>-->
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>0.9.0.2.3.4.0-3485</version>
+            <!--<scope>system</scope>-->
+            <!--<systemPath>E:\repository\repository\org\springframework\kafka\kafka-clients\0.9.0.2.3.4.0-3485\kafka-clients-0.9.0.2.3.4.0-3485.jar</systemPath>-->
         </dependency>
 
         <dependency>
@@ -237,10 +238,10 @@
             <artifactId>spring-kafka</artifactId>
             <version>1.0.6.RELEASE</version>
             <exclusions>
-            <exclusion>
-            <artifactId>kafka-clients</artifactId>
-            <groupId>org.apache.kafka</groupId>
-            </exclusion>
+                <exclusion>
+                    <artifactId>kafka-clients</artifactId>
+                    <groupId>org.apache.kafka</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -399,9 +400,14 @@
             <version>${version.spring-boot}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-            <version>${version.spring-boot}</version>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${version.elasticsearch}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.searchbox</groupId>
+            <artifactId>jest</artifactId>
+            <version>${version.jest}</version>
         </dependency>
         <!--<dependency>-->
         <!--<groupId>org.springframework.boot</groupId>-->
@@ -469,6 +475,16 @@
             <groupId>org.ansj</groupId>
             <artifactId>ansj_seg</artifactId>
             <version>5.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nlpcn</groupId>
+            <artifactId>elasticsearch-sql</artifactId>
+            <version>2.4.1.0</version>
         </dependency>
     </dependencies>
 

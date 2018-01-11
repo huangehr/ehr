@@ -22,8 +22,9 @@ import java.util.List;
  */
 @Service
 public class EhrUserDetailsService implements UserDetailsService {
+
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * 用户登录判读接口
@@ -44,6 +45,7 @@ public class EhrUserDetailsService implements UserDetailsService {
         /*if (username.equals("admin")){
             return new User("admin", "e10adc3949ba59abbe56e057f20f883e", getGrantedAuthorities(username));
         }
+
 
         return null;*/
     }
