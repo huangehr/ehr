@@ -1,5 +1,7 @@
 package com.yihu.quota.etl.extract;
 
+import com.yihu.ehr.entity.address.AddressDict;
+import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.quota.etl.Contant;
@@ -18,6 +20,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -92,6 +95,23 @@ public class ExtractUtil {
                 if (dictData == null) {
                     throw new Exception("主纬度配置有误");
                 } else {
+                    if(dimensionMain.getMainCode().equals("org")){//机构关联出区县
+                        for(SaveModel model: dictData){
+                            String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision from organizations where org_code=";
+                            dictSql += "'"+ model.getOrg() + "'";
+                            List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
+                            if(organizations != null && organizations.size() > 0){
+                                if(!StringUtils.isEmpty(organizations.get(0).getAdministrativeDivision())){
+                                    model.setCity("shangrao");
+                                    model.setCityName("上饶市");
+                                    String townSql = "SELECT id ,name from address_dict where id = " + organizations.get(0).getAdministrativeDivision();
+                                    List<AddressDict> addressDicts = jdbcTemplate.query(townSql, new BeanPropertyRowMapper(AddressDict.class));
+                                    model.setTown(String.valueOf(addressDicts.get(0).getId()));
+                                    model.setTownName(addressDicts.get(0).getName());
+                                }
+                            }
+                        }
+                    }
                     //设置到map里面
                     setAllData(allData, dictData, dimensionMain.getType());
                 }
@@ -140,6 +160,23 @@ public class ExtractUtil {
             for (int i = 0; i < dimensionMains.size(); i++) {
                 if (i != 0) {
                     List<SaveModel> saveDataMain = jdbcTemplate.query(dimensionMains.get(i).getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
+                    if(dimensionMains.get(i).getMainCode().equals("org")){//机构关联出区县
+                        for(SaveModel model: saveDataMain){
+                            String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision from organizations where org_code=";
+                            dictSql += "'"+ model.getOrg() + "'";
+                            List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
+                            if(organizations != null && organizations.size() > 0){
+                                if(!StringUtils.isEmpty(organizations.get(0).getAdministrativeDivision())){
+                                    model.setCity("shangrao");
+                                    model.setCityName("上饶市");
+                                    String townSql = "SELECT id ,name from address_dict where id = " + organizations.get(0).getAdministrativeDivision();
+                                    List<AddressDict> addressDicts = jdbcTemplate.query(townSql, new BeanPropertyRowMapper(AddressDict.class));
+                                    model.setTown(String.valueOf(addressDicts.get(0).getId()));
+                                    model.setTownName(addressDicts.get(0).getName());
+                                }
+                            }
+                        }
+                    }
                     allData = setOtherMainData(allData, saveDataMain, dimensionMains.get(i).getMainCode(), dimensionMains.get(i).getType());
                 }
             }
