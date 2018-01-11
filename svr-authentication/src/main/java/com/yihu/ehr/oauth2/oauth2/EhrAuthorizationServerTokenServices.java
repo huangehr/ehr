@@ -28,13 +28,13 @@ import java.util.UUID;
  * 并取消{@link TokenEnhancer}对Token的二次处理。原功能中使用{@link TokenEnhancer}作为在生成Token后，
  * 在存储之前对Token对二次处理，新实现直接修改生成逻辑。
  *
- * Token存储由 {@link TokenStore} 接口的子类{@link EhrJDBCTokenStoreService}实现。
+ * Token存储由 {@link TokenStore} 接口的子类{@link EhrJDBCTokenStore}实现。
  *
  * @author Sand
  * @version 1.0
  * @created 2016.03.05 15:30
  */
-public class EhrTokenServices implements AuthorizationServerTokenServices, ResourceServerTokenServices, ConsumerTokenServices, InitializingBean {
+public class EhrAuthorizationServerTokenServices implements AuthorizationServerTokenServices, ResourceServerTokenServices, ConsumerTokenServices, InitializingBean {
 
     private int refreshTokenValiditySeconds = 60 * 60 * 24 * 30; // default 30 days.
 
@@ -59,9 +59,10 @@ public class EhrTokenServices implements AuthorizationServerTokenServices, Resou
      * Initialize these token services. If no random generator is set, one will be created.
      */
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(tokenStore, "tokenStore 未设置");
+        Assert.notNull(tokenStore, "tokenStore ot set");
     }
 
+    @Override
     public OAuth2AccessToken createAccessToken(OAuth2Authentication authentication) throws AuthenticationException {
 
         OAuth2AccessToken existingAccessToken = tokenStore.getAccessToken(authentication);
@@ -111,16 +112,17 @@ public class EhrTokenServices implements AuthorizationServerTokenServices, Resou
 
     }
 
+    @Override
     public OAuth2AccessToken refreshAccessToken(String refreshTokenValue, TokenRequest tokenRequest)
             throws AuthenticationException {
 
         if (!supportRefreshToken) {
-            throw new InvalidGrantException("Invalid refresh token: " + refreshTokenValue);
+            throw new InvalidTokenException("Invalid refresh token: " + refreshTokenValue);
         }
 
         OAuth2RefreshToken refreshToken = tokenStore.readRefreshToken(refreshTokenValue);
         if (refreshToken == null) {
-            throw new InvalidGrantException("Invalid refresh token: " + refreshTokenValue);
+            throw new InvalidTokenException("Invalid refresh token: " + refreshTokenValue);
         }
 
         OAuth2Authentication authentication = tokenStore.readAuthenticationForRefreshToken(refreshToken);
@@ -162,6 +164,7 @@ public class EhrTokenServices implements AuthorizationServerTokenServices, Resou
         return accessToken;
     }
 
+    @Override
     public OAuth2AccessToken getAccessToken(OAuth2Authentication authentication) {
         return tokenStore.getAccessToken(authentication);
     }

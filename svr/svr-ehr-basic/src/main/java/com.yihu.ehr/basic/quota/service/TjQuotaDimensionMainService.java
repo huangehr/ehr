@@ -38,8 +38,9 @@ public class TjQuotaDimensionMainService extends BaseJpaService<TjQuotaDimension
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public void addTjQuotaDimensionMainBatch(List<Map<String, Object>> QuotaDimensionMainLs) throws SQLException, InstantiationException, IllegalAccessException {
-        TjQuotaDimensionMain data = new TjQuotaDimensionMain();
+        TjQuotaDimensionMain data;
         for(Map<String, Object> map: QuotaDimensionMainLs){
+            data = new TjQuotaDimensionMain();
             data.setQuotaCode(String.valueOf(map.get("quotaCode")));
             data.setMainCode(String.valueOf(map.get("mainCode")));
             data.setDictSql(String.valueOf(map.get("dictSql")));

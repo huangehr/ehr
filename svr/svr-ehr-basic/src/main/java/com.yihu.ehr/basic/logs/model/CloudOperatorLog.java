@@ -1,22 +1,32 @@
 package com.yihu.ehr.basic.logs.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.searchbox.annotations.JestId;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "CloudOperatorLog")
+import java.util.Date;
+
 public class CloudOperatorLog {
-    @Id
-    private String id;              //uuid
-    private String caller;         //业务操作者
-    private String time;           //操作时间
-    private String responseTime;       //响应时间
-    private String params;          //参数
-    private String data;          //相关信息
-    private String function; // 操作页面名称
-    private String operation;// 操作内容（增、删、改、查、导入）
-    private String patient;       //关联居民 - 与caller相同
-    private String logType;       //日志类型
-    private String response;     //
+    protected String id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX")
+    @CreatedDate
+    @JSONField(format = "yyyy-MM-dd'T'HH:mm:ssXX")
+    protected Date time;//时间
+    protected String caller; //调用者
+    protected String logType;//日志类型 1接口 2业务
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX")
+    @CreatedDate
+    @JSONField(format = "yyyy-MM-dd'T'HH:mm:ssXX")
+    private Date responseTime;
+    private String responseCode;
+    private String response;
+    private String api;
+    private String appKey;
+    private String url;
+    private String params;
 
     public String getId() {
         return id;
@@ -24,6 +34,14 @@ public class CloudOperatorLog {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
     }
 
     public String getCaller() {
@@ -34,20 +52,60 @@ public class CloudOperatorLog {
         this.caller = caller;
     }
 
-    public String getTime() {
-        return time;
+    public String getLogType() {
+        return logType;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setLogType(String logType) {
+        this.logType = logType;
     }
 
-    public String getResponseTime() {
+    public Date getResponseTime() {
         return responseTime;
     }
 
-    public void setResponseTime(String responseTime) {
+    public void setResponseTime(Date responseTime) {
         this.responseTime = responseTime;
+    }
+
+    public String getResponseCode() {
+        return responseCode;
+    }
+
+    public void setResponseCode(String responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public String getApi() {
+        return api;
+    }
+
+    public void setApi(String api) {
+        this.api = api;
+    }
+
+    public String getAppKey() {
+        return appKey;
+    }
+
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getParams() {
@@ -58,51 +116,4 @@ public class CloudOperatorLog {
         this.params = params;
     }
 
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public String getFunction() {
-        return function;
-    }
-
-    public void setFunction(String function) {
-        this.function = function;
-    }
-
-    public String getOperation() {
-        return operation;
-    }
-
-    public void setOperation(String operation) {
-        this.operation = operation;
-    }
-
-    public String getPatient() {
-        return patient;
-    }
-
-    public void setPatient(String patient) {
-        this.patient = patient;
-    }
-
-    public String getLogType() {
-        return logType;
-    }
-
-    public void setLogType(String logType) {
-        this.logType = logType;
-    }
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
 }

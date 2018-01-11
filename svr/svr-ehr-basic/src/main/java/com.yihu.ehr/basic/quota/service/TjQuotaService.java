@@ -117,25 +117,20 @@ public class TjQuotaService extends BaseJpaService<TjQuota, XTjQuotaRepository> 
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public void tjQuotaBatch(List<Map<String, Object>> models) throws SQLException, InstantiationException, IllegalAccessException {
-        //数据源
-        String sql = "INSERT INTO tj_quota_data_source "+  "( quota_code, source_code, config_json ) VALUES ";
-        //数据存储
-        String saveSql = "INSERT INTO tj_quota_data_save "+  "( quota_code, save_code, config_json ) VALUES ";
-        int i = 1;
-        int j = 0;
-        StringBuilder sb = new StringBuilder(sql);
         for(Map<String, Object> map: models) {
             addTjQuota(map);
-            sb.append("('" + String.valueOf(map.get("code")) + "',");
-            sb.append("'" + String.valueOf(map.get("quotaDataSource")) + "',");
-            sb.append("'" + String.valueOf(map.get("quotaDataSourceConfigJson")) + "')");
-            currentSession().createSQLQuery(sb.toString()).executeUpdate();
-
-            sb = new StringBuilder(saveSql);
-            sb.append("('" + String.valueOf(map.get("code")) + "',");
-            sb.append("'" + String.valueOf(map.get("quotaDataSave")) + "',");
-            sb.append("'" + String.valueOf(map.get("quotaDataSaveConfigJson")) + "')");
-            currentSession().createSQLQuery(sb.toString()).executeUpdate();
+            //数据源
+            TjQuotaDataSource dataSource = new TjQuotaDataSource();
+            dataSource.setQuotaCode(String.valueOf(map.get("code")));
+            dataSource.setSourceCode(String.valueOf(map.get("quotaDataSource")));
+            dataSource.setConfigJson(String.valueOf(map.get("quotaDataSourceConfigJson")));
+            tjQuotaDataSourceService.save(dataSource);
+            //数据存储
+            TjQuotaDataSave dataSave = new TjQuotaDataSave();
+            dataSave.setQuotaCode(String.valueOf(map.get("code")));
+            dataSave.setSaveCode(String.valueOf(map.get("quotaDataSave")));
+            dataSave.setConfigJson(String.valueOf(map.get("quotaDataSaveConfigJson")));
+            tjQuotaDataSaveService.save(dataSave);
         }
     }
 
