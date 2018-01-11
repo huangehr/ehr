@@ -54,7 +54,6 @@ public class DataModel {
     protected Date time;//时间
     protected String caller; //调用者
     protected String logType;//日志类型 1接口 2业务
-    protected String code;
 
     public String getId() {
         return id;
@@ -90,13 +89,5 @@ public class DataModel {
 
     protected Date changeTime(String time) {
         return DateUtil.strToDate(time);
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 }

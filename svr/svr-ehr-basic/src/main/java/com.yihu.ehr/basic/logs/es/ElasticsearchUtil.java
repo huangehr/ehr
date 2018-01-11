@@ -88,6 +88,9 @@ public class ElasticsearchUtil {
                         String key = null;
                         Object value = one.get(i);
                         key = heads.get(i);
+                        if("_id".equals(key)){
+                            key="id";
+                        }
                         oneMap.put(key, value);
                     }
                     returnModels.add(oneMap);
