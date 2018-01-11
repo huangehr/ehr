@@ -15,8 +15,8 @@ public class ResourceStatisticService extends BaseJpaService<JsonArchives, XJson
     //统计最近七天采集总数
     public List<Object> getCollectTocalCount() {
         Session session = currentSession();
-        String sql = "SELECT count(1), date_format(receive_date, '%Y-%c-%d') as date FROM json_archives " +
-                " where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(receive_date) GROUP BY date_format(receive_date, '%Y-%c-%d')";
+        String sql = "SELECT count(1), date_format(receive_date, '%Y-%m-%d') as date FROM json_archives " +
+                " where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(receive_date) GROUP BY date_format(receive_date, '%Y-%m-%d')";
         SQLQuery query = session.createSQLQuery(sql);
         return query.list();
     }
@@ -24,8 +24,8 @@ public class ResourceStatisticService extends BaseJpaService<JsonArchives, XJson
     //统计最近七天采集门诊、住院各总数
     public List<Object> getCollectEventTypeCount(int eventType) {
         Session session = currentSession();
-        String sql = "SELECT count(1), date_format(receive_date, '%Y-%c-%d') as date, event_type FROM json_archives " +
-                "where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(receive_date) and  event_type=:eventType  GROUP BY date_format(receive_date, '%Y-%c-%d'), event_type;";
+        String sql = "SELECT count(1), date_format(receive_date, '%Y-%m-%d') as date, event_type FROM json_archives " +
+                "where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(receive_date) and  event_type=:eventType  GROUP BY date_format(receive_date, '%Y-%m-%d'), event_type;";
         SQLQuery query = session.createSQLQuery(sql);
         query.setParameter("eventType", eventType);
         return query.list();
