@@ -699,7 +699,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 }
             }
             envelop.setSuccessFlg(true);
-            envelop.setObj(dataMap);
+            envelop.setObj(dataMap.isEmpty()? 0:dataMap);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -725,7 +725,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 }
             }
             envelop.setSuccessFlg(true);
-            envelop.setObj(dataMap);
+            envelop.setObj(dataMap.isEmpty()? 0 : dataMap);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
