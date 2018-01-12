@@ -1,11 +1,11 @@
 package com.yihu.ehr.oauth2.oauth2.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * Created by progr1mmer on 2018/1/8.
@@ -24,14 +24,26 @@ public class EhrJdbcUserSecurityService {
     }
 
     public String getDefaultKeyIdSelectStatement(String publicKey) {
-        return jdbcTemplate.queryForObject(DEFAULT_KEY_ID_SELECT_STATEMENT, new String []{publicKey}, String.class);
+        List<String> keyId = jdbcTemplate.queryForList(DEFAULT_KEY_ID_SELECT_STATEMENT, new String []{publicKey}, String.class);
+        if(keyId.size() <= 0) {
+            throw new InsufficientAuthenticationException("Illegal authorized pk.");
+        }
+        return keyId.get(0);
     }
 
     public String getDefaultUserIdByKeyIdSelectStatement(String keyId) {
-        return jdbcTemplate.queryForObject(DEFAULT_USER_ID_BY_KEY_ID_SELECT_STATEMENT, new String []{keyId}, String.class);
+        List<String> userId =  jdbcTemplate.queryForList(DEFAULT_USER_ID_BY_KEY_ID_SELECT_STATEMENT, new String []{keyId}, String.class);
+        if(userId.size() <= 0) {
+            throw new InsufficientAuthenticationException("Unauthorized security key. please check you pk.");
+        }
+        return userId.get(0);
     }
 
     public String getDefaultUserNameByUserId(String userId) {
-        return jdbcTemplate.queryForObject(DEFAULT_USER_NAME_BY_USER_ID, new String []{userId}, String.class);
+        List<String> username = jdbcTemplate.queryForList(DEFAULT_USER_NAME_BY_USER_ID, new String []{userId}, String.class);
+        if(username.size() <= 0) {
+            throw new InsufficientAuthenticationException("Illegal user id. please check you pk.");
+        }
+        return username.get(0);
     }
 }

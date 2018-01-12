@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -38,7 +37,7 @@ public class EhrRedisApiAccessValidator {
     public void putVerificationApi (String clientId, String userName) {
         List<String> userId = jdbcTemplate.queryForList(DEFAULT_USER_ID_BY_USER_NAME_STATEMENT, new String []{userName}, String.class);
         if(userId.size() <= 0) {
-            throw new InsufficientAuthenticationException("Illegal auth user.");
+            throw new InsufficientAuthenticationException("Illegal authorized user.");
         }
         List<String> appApiList = jdbcTemplate.queryForList(DEFAULT_APP_API_STATEMENT, new String[]{userId.get(0), clientId}, String.class);
         if(appApiList.size() > 0) {
@@ -52,8 +51,10 @@ public class EhrRedisApiAccessValidator {
             long expire = tomorrow.getTime() - today.getTime();
             for (String api : appApiList) {
                 String key = clientId + "$" + userName + "$" + api;
-                redisTemplate.opsForValue().set(key, 0);
-                redisTemplate.expire(key, expire, TimeUnit.MILLISECONDS);
+                if(null == redisTemplate.opsForValue().get(key)) {
+                    redisTemplate.opsForValue().set(key, 200);
+                    redisTemplate.expire(key, expire, TimeUnit.MILLISECONDS);
+                }
             }
         }
     }
@@ -61,7 +62,18 @@ public class EhrRedisApiAccessValidator {
     public boolean verificationApi(String clientId, String userName, String api) {
         String key = clientId + "$" + userName + "$" + api;
         Serializable serializable = redisTemplate.opsForValue().get(key);
-        return  serializable != null;
+        if(serializable != null) {
+            int count = new Integer(serializable.toString());
+            if(count > 0 ) {
+                long expire = redisTemplate.getExpire(key);
+                redisTemplate.opsForValue().set(key, --count);
+                redisTemplate.expire(key, expire, TimeUnit.SECONDS);
+                return true;
+            }else {
+                return false;
+            }
+        }
+        return false;
     }
 
 }

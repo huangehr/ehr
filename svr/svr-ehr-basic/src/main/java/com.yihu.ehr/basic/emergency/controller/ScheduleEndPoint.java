@@ -8,10 +8,12 @@ import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.entity.emergency.Ambulance;
 import com.yihu.ehr.entity.emergency.Schedule;
+import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -228,7 +230,7 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleUpdate, method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ApiOperation("更新单条记录，只允许更新时间或状态")
+    @ApiOperation("更新单条记录，历史记录不能更新")
     public Envelop update(
             @ApiParam(name = "schedule", value = "排班")
             @RequestBody String schedule){
@@ -239,6 +241,11 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
             if(oldSchedule == null) {
                 envelop.setSuccessFlg(false);
                 envelop.setErrorMsg("无相关排班信息");
+                return envelop;
+            }
+            if(new Date().getTime() > oldSchedule.getDate().getTime()) {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("历史记录不能更新");
                 return envelop;
             }
             Ambulance ambulance = ambulanceService.findById(newSchedule.getCarId());
@@ -261,7 +268,7 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
     }
 
     @RequestMapping(value = ServiceApi.Emergency.ScheduleBathUpdate, method = RequestMethod.PUT)
-    @ApiOperation("更新多条数据")
+    @ApiOperation("更新多条数据，历史记录不能更新")
     public Envelop bathUpdate(
             @ApiParam(name = "schedules", value = "排班")
             @RequestParam(value = "schedules") String schedules) throws IOException{
@@ -300,5 +307,17 @@ public class ScheduleEndPoint extends EnvelopRestEndPoint {
         return true;
     }
 
-
+    @RequestMapping(value = ServiceApi.Emergency.ScheduleCleanData, method = RequestMethod.POST)
+    @ApiOperation("删除历史数据之外的某个时间段内的数据，基本单位为天")
+    public int cleanData(
+            @ApiParam(name = "carId", value = "车牌号码", required = true)
+            @RequestParam(value = "carId") String carId,
+            @ApiParam(name = "start", value = "开始时间", required = true)
+            @RequestParam(value = "start") String start,
+            @ApiParam(name = "end", value = "结束时间", required = true)
+            @RequestParam(value = "end") String end) throws Exception{
+        Date start1 = DateUtil.strToDate(start);
+        Date end1 = DateUtil.strToDate(end);
+        return scheduleService.cleanData(carId, start1, end1);
+    }
 }
