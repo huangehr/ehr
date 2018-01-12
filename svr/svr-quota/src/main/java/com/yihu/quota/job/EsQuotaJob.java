@@ -1,6 +1,5 @@
 package com.yihu.quota.job;
 
-import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.quota.dao.jpa.TjQuotaLogDao;
 import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractHelper;
@@ -14,7 +13,10 @@ import com.yihu.quota.util.SpringUtil;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.quartz.*;
@@ -42,11 +44,12 @@ import java.util.Map;
 public class EsQuotaJob implements Job {
     private Logger logger = LoggerFactory.getLogger(EsQuotaJob.class);
 
-    private String saasid;//saasid
-    private QuotaVo quotaVo=new QuotaVo();//指标对象
-    private String endTime;//结束时间
-    private String startTime;//开始时间
-    private String timeLevel;//时间
+    private String saasid; // saasid
+    private QuotaVo quotaVo=new QuotaVo(); // 指标对象
+    private String endTime; // 结束时间
+    private String startTime; //开始时间
+    private String timeLevel; //时间
+
     @Autowired
     private TjQuotaLogDao tjQuotaLogDao;
     @Autowired
@@ -65,7 +68,7 @@ public class EsQuotaJob implements Job {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             //初始化参数
             initParams(context);
-            //统计
+            //统计并保存
             quota();
         } catch (Exception e) {
             //如果出錯立即重新執行
@@ -180,26 +183,20 @@ public class EsQuotaJob implements Job {
         if(object!=null){
             BeanUtils.copyProperties(object,this.quotaVo);
         }
-
         this.saasid = map.getString("saasid");
-        this.timeLevel = (String) map.get("timeLevel");
-        if (StringUtils.isEmpty(this.timeLevel)) {
-            this.timeLevel = Contant.main_dimension_timeLevel.day;
-        }
-        if( ! quotaVo.getExecType().equals("1")){  //1 立即执行  初始化所有数据
+        // 默认按天，如果指标有配置时间维度，ES抽取过程中维度字典项转换为 SaveModel 时再覆盖。
+        this.timeLevel = Contant.main_dimension_timeLevel.day;
+        String executeFlag =  map.get("executeFlag").toString();
+        if("2".equals(executeFlag.toString())){
             this.startTime = map.getString("startTime");
             if (StringUtils.isEmpty(startTime)) {
                 startTime = Contant.main_dimension_timeLevel.getStartTime(timeLevel);
             }
-
             this.endTime = map.getString("endTime");
             if (StringUtils.isEmpty(endTime)) {
-                endTime = LocalDate.now().toString("yyyy-MM-dd");
+                endTime = LocalDate.now().toString("yyyy-MM-dd'T'00:00:00'Z'");
             }
         }
-
-
-
     }
 
     @Transactional

@@ -1,7 +1,5 @@
 package com.yihu.ehr.model.tj;
 
-import java.util.Date;
-
 /**
  * Created by Administrator on 2017/6/12.
  */
@@ -30,6 +28,7 @@ public class MTjQuotaModel {
     private Integer quotaType;
     private String quotaTypeName;
     private String metadataCode;
+    private String isInitExec; // 是否初始执行过，0：否，1：是。
     private String jobClazzName;
 
     public String getQuotaTypeName() {
@@ -222,6 +221,14 @@ public class MTjQuotaModel {
 
     public void setMetadataCode(String metadataCode) {
         this.metadataCode = metadataCode;
+    }
+
+    public String getIsInitExec() {
+        return isInitExec;
+    }
+
+    public void setIsInitExec(String isInitExec) {
+        this.isInitExec = isInitExec;
     }
 
     public String getJobClazzName() {
