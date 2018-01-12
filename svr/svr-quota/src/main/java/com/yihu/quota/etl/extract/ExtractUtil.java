@@ -53,7 +53,7 @@ public class ExtractUtil {
     public void compute(List<TjQuotaDimensionMain> qdm,
                         List<TjQuotaDimensionSlave> qds,
                         List<SaveModel> returnList,
-                        Map<String, Long> countsMap,
+                        Map<String, Integer> countsMap,
                         Map<String, String> daySlaveDictMap,
                         QuotaVo quotaVo) throws Exception {
         if (countsMap == null || countsMap.size() == 0) {
@@ -70,7 +70,7 @@ public class ExtractUtil {
         }
 
         // 设置维度组合的统计值
-        for (Map.Entry<String, Long> entry : countsMap.entrySet()) {
+        for (Map.Entry<String, Integer> entry : countsMap.entrySet()) {
             String key = entry.getKey();
             SaveModel saveModel = allData.get(key);
             if (saveModel != null) {

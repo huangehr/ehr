@@ -132,12 +132,12 @@ public class SolrExtract {
 
         // 维度字段及最后一个维度基于其他维度组合作为条件的统计结果的集合
         List<Map<String, Object>> list = solrQuery.getGroupMultList(core, dimensionGroupList, null, q, fq);
-        Map<String, Long> countsMap = new LinkedHashMap<>(); // 统计结果集
+        Map<String, Integer> countsMap = new LinkedHashMap<>(); // 统计结果集
         Map<String, String> daySlaveDictMap = new LinkedHashMap<>(); // 按天统计的所有日期项
         if (list != null && list.size() > 0) {
             for (Map<String, Object> objectMap : list) {
                 String quotaDate = objectMap.get(timeKey).toString();
-                long count = 0;
+                Integer count = 0;
                 String mainSlavesStr = "";
                 int num = 1;
                 for (String key : objectMap.keySet()) {
@@ -150,7 +150,7 @@ public class SolrExtract {
                         }
                     } else if (key.equals("$count")) {
                         if (objectMap.get(key) != null) {
-                            count = Long.valueOf(objectMap.get(key).toString());
+                            count = Integer.valueOf(objectMap.get(key).toString());
                         }
                     }
                 }
