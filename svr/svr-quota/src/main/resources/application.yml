@@ -5,6 +5,11 @@ server:
 management:
   port: ${server.port}
 
+elasticsearch:
+  pool:
+    init-size: 5
+    max-size: 10
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -43,6 +48,9 @@ spring:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
 
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 ---
 spring:
   profiles: test
@@ -56,6 +64,9 @@ spring:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
 
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 
 ---
 spring:
@@ -70,6 +81,9 @@ spring:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
 
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 ---
 spring:
   profiles: prod_fz
@@ -81,6 +95,10 @@ spring:
   data:
     solr:
       zk-host: node1.ehr.h3c.com,node2.ehr.h3c.com,node3.ehr.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
+
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
 
 ---
 spring:
@@ -95,3 +113,6 @@ spring:
     solr:
       zk-host: node1.hde.h3c.com,node2.hde.h3c.com:2181/solr # ZooKeeper host address in the form HOST:PORT.
 
+elasticsearch:
+  cluster-name: elasticsearch
+  cluster-nodes: 172.17.110.17:9300
