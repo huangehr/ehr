@@ -21,7 +21,8 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 /**
- * 对solr抽取数据，基于指标配置维度(不包括按周、月年等时间范围维度)+按天维度统计值作为最小单位分组聚合，
+ * 对solr抽取数据，基于指标配置维度(不能包括按周、月、年等时间维度) +
+ * 默认按天维度统计值作为最小单位分组聚合，
  * 保存聚合结果到ES。二次统计基于以上的聚合结果进行统计。
  * <p>
  * Created by janseny on 2017/7/10.
@@ -51,7 +52,7 @@ public class SolrExtract {
                                    List<TjQuotaDimensionSlave> qds,//细维度
                                    String startTime,//开始时间
                                    String endTime, //结束时间
-                                   String timeLevel, // 时间维度，按天统计
+                                   String timeLevel, // 时间维度，默认且只按天统计
                                    QuotaVo quotaVo,//指标code
                                    EsConfig esConfig //es配置
     ) throws Exception {
