@@ -411,13 +411,13 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
             }
         }
         Map<String, Object> doctorMap = new HashMap<>(4);
-        doctorMap.put("name", "Doctor");
+        doctorMap.put("name", "医生");
         doctorMap.put("xData", xData);
         doctorMap.put("yData", yData);
         doctorMap.put("dataModels", null);
         eChartReportModels.add(doctorMap);
         Map<String, Object> nurseMap = new HashMap<>(4);
-        nurseMap.put("name", "Nurse");
+        nurseMap.put("name", "护士");
         nurseMap.put("xData", xData1);
         nurseMap.put("yData", yData1);
         nurseMap.put("dataModels", null);
@@ -436,13 +436,13 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         BigInteger doctorCount = statisticService.getMedicalCountByRoleType("Doctor");
         List<MapDataModel> MapDataModelList = new ArrayList<>();
         MapDataModel mapDataModel = new MapDataModel();
-        mapDataModel.setName("Doctor");
+        mapDataModel.setName("医生");
         mapDataModel.setValue(String.valueOf(doctorCount));
         MapDataModelList.add(mapDataModel);
 
         BigInteger nurseCount = statisticService.getMedicalCountByRoleType("Nurse");
         mapDataModel = new MapDataModel();
-        mapDataModel.setName("Nurse");
+        mapDataModel.setName("护士");
         mapDataModel.setValue(String.valueOf(nurseCount));
         MapDataModelList.add(mapDataModel);
         echartReportModel.setDataModels(MapDataModelList);
@@ -480,15 +480,15 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         BigInteger medicalExam = statisticService.getArchiveRelationCountByEventType("2");
         List<Map> eChartReportModelList = new ArrayList<>(3);
         Map<String, Object> clinicMap = new HashMap<>(2);
-        clinicMap.put("name", "clinic");
+        clinicMap.put("name", "门诊");
         clinicMap.put("value", clinic);
         eChartReportModelList.add(clinicMap);
         Map<String, Object> residentMap = new HashMap<>(2);
-        residentMap.put("name", "resident");
+        residentMap.put("name", "住院");
         residentMap.put("value", resident);
         eChartReportModelList.add(residentMap);
         Map<String, Object> medicalExamMap = new HashMap<>(2);
-        medicalExamMap.put("name", "medicalExam");
+        medicalExamMap.put("name", "体检");
         medicalExamMap.put("value", medicalExam);
         eChartReportModelList.add(medicalExamMap);
         List<Map> resultList = new ArrayList<>(1);
