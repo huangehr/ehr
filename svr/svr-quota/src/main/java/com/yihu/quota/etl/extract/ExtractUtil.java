@@ -1,5 +1,6 @@
 package com.yihu.quota.etl.extract;
 
+import com.sun.net.httpserver.Headers;
 import com.yihu.ehr.entity.address.AddressDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.query.services.SolrQuery;
@@ -8,6 +9,7 @@ import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionSlave;
+import com.yihu.quota.util.BasesicUtil;
 import com.yihu.quota.vo.DictModel;
 import com.yihu.quota.vo.QuotaVo;
 import com.yihu.quota.vo.SaveModel;
@@ -40,7 +42,6 @@ public class ExtractUtil {
     SolrUtil solrUtil;
     @Autowired
     SolrQuery solrQuery;
-
     private QuotaVo quotaVo;
     private String startTime;
     private String endTime;
@@ -79,6 +80,67 @@ public class ExtractUtil {
                 returnList.add(saveModel);
             }
         }
+
+       boolean orgFlag = false;
+        List<String> dimins = new ArrayList<>();
+        for(TjQuotaDimensionSlave slave : qds){
+            if( slave.getId() !=null){
+                dimins.add(slave.getSlaveCode());
+            }
+        }
+        for(TjQuotaDimensionMain main : qdm){
+            if( !main.getMainCode().equals("org")){
+                dimins.add(main.getMainCode());
+            }else{
+                orgFlag = true;
+            }
+        }
+        if(orgFlag){
+
+            dimins.add("quotaDate");
+            BasesicUtil baseUtil = new BasesicUtil();
+            Map<String,String> diminMap = new HashMap<>();
+            for(SaveModel saveModel :returnList){
+                String diminStr = "";
+                for(String key :dimins){
+                    diminStr += baseUtil.getFieldValueByName(key, saveModel);
+                }
+                diminMap.put(diminStr,diminStr);
+            }
+
+            for(String dimin : diminMap.keySet()){
+                SaveModel saveAllModel = new SaveModel();
+                double count = 0;
+                for(int i=0;i < returnList.size();i++){
+                    String diminStr = "";
+                    SaveModel saveModel = returnList.get(i);
+                    for(String key :dimins){
+                        diminStr += baseUtil.getFieldValueByName(key, saveModel);
+                    }
+                    if(dimin.equals(diminStr)){
+                        saveAllModel.setSlaveKey1(saveModel.getSlaveKey1());
+                        saveAllModel.setSlaveKey1Name(saveModel.getSlaveKey1Name());
+                        saveAllModel.setSlaveKey2(saveModel.getSlaveKey2());
+                        saveAllModel.setSlaveKey2Name(saveModel.getSlaveKey2Name());
+                        saveAllModel.setSlaveKey3(saveModel.getSlaveKey3());
+                        saveAllModel.setSlaveKey3Name(saveModel.getSlaveKey3Name());
+                        saveAllModel.setQuotaDate(saveModel.getQuotaDate());
+                        saveAllModel.setQuotaCode(saveModel.getQuotaCode());
+                        saveAllModel.setQuotaName(saveModel.getQuotaName());
+                        count = count + Double.valueOf(saveModel.getResult());
+                    }
+                }
+                saveAllModel.setOrg("ALL");
+                saveAllModel.setOrgName("");
+                saveAllModel.setTown("ALL");
+                saveAllModel.setTownName("上饶市");
+                saveAllModel.setCity("shangrao");
+                saveAllModel.setCityName("上饶市");
+                saveAllModel.setResult(String.valueOf(count));
+                returnList.add(saveAllModel);
+            }
+        }
+
     }
 
     /**
@@ -89,7 +151,7 @@ public class ExtractUtil {
                                                  Map<String, SaveModel> allData,
                                                  Map<String, String> daySlaveDictMap) throws Exception {
         try {
-            if (dimensionMain != null) {
+            if (dimensionMain != null && !StringUtils.isEmpty(dimensionMain.getDictSql())) {
                 //查询字典数据
                 List<SaveModel> dictData = jdbcTemplate.query(dimensionMain.getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
                 if (dictData == null) {
