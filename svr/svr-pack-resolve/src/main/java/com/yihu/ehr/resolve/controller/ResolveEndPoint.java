@@ -317,8 +317,8 @@ public class ResolveEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "data", required = false) String data,
             @ApiParam(name = "clientId", value = "模拟应用ID")
             @RequestParam(value = "clientId", required = false) String clientId,
-            @ApiParam(name = "echo", value = "返回档案数据", required = true, defaultValue = "true")
-            @RequestParam(value = "echo") boolean echo) throws Throwable {
+            @ApiParam(name = "echo", value = "返回档案数据")
+            @RequestParam(value = "echo",required = false,defaultValue = "true") boolean echo) throws Throwable {
 
         try {
             long start = System.currentTimeMillis();

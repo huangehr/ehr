@@ -69,7 +69,7 @@ public class MysqlExtract {
         logger.debug(mysql);
         System.out.println("统计mysql :" + mysql);
         if( !StringUtils.isEmpty(mysql)){
-            Map<String,Long> resultMap = new HashMap<>();
+            Map<String,Integer> resultMap = new HashMap<>();
             Map<String, String> daySlaveDictMap = new HashMap<>();
             //执行MySQL
             List<Map<String, Object>> mapList = null;
@@ -88,7 +88,7 @@ public class MysqlExtract {
                     }
                     int result = Integer.parseInt(map.get("result").toString());
                     String mapKey = keyVal.substring(0, keyVal.length() - 1);
-                    resultMap.put(mapKey, (long)result);
+                    resultMap.put(mapKey, result);
                     daySlaveDictMap.put(mapKey,map.get("quotaDate").toString());
                 }
                 TjQuotaDimensionSlave tjQuotaDimensionSlave = new TjQuotaDimensionSlave();

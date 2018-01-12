@@ -137,6 +137,14 @@
         </dependency>
         <dependency>
             <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-data-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
+            <artifactId>commons-entity</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yihu.ehr</groupId>
             <artifactId>commons-data-hbase</artifactId>
             <scope>compile</scope>
             <exclusions>

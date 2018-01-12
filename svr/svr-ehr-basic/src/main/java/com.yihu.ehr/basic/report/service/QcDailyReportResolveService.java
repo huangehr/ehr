@@ -18,7 +18,7 @@ import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.model.report.json.*;
 import com.yihu.ehr.model.standard.MStdDataSet;
 import com.yihu.ehr.model.standard.MStdMetaData;
-import com.yihu.ehr.report.feign.StandardClient;
+import com.yihu.ehr.basic.report.feign.StandardClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.StringUtils;
@@ -433,6 +433,9 @@ public class QcDailyReportResolveService {
             page++;
             mPackages = packMgrClient.packageList("", "receiveDate>=" + beginDate + ";receiveDate<" + endDate, "+receiveDate", page, pageSize);
         }
+
+        getData(map);
+
         this.setQcBeginDate(endDate);
 
         //TODO:需要发送1个消息，通知统计，不发消息直接统计也是可以。

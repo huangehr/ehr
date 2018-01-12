@@ -13,6 +13,9 @@ public class EsConfig {
     private String table;// 数据库表
     private String molecular;  // 统计百分比时的分子  指标code
     private String denominator;// 统计百分比时的分母  指标code
+    private String percentOperation;//运算方式  1 乘法  2 除法  默认乘法
+    private String percentOperationValue;//运算对应的值  默认 100
+
     private String timekey;//根据sql去查询的key 时间控制字段
     private String filter;  // where条件
     private String aggregation;//聚合方式  默认count，另有sum
@@ -23,7 +26,6 @@ public class EsConfig {
     private String thousandDenominator; //每千，每万 统计分母
 
     private String especialType; //特殊类型  orgHealthCategory：卫生机构类型
-
     private String superiorCode;//上级指标code
 
     public String getHost() {
@@ -123,7 +125,6 @@ public class EsConfig {
         this.aggregationKey = aggregationKey;
     }
 
-
     public String getThousandFlag() {
         return thousandFlag;
     }
@@ -148,7 +149,6 @@ public class EsConfig {
         this.thousandDenominator = thousandDenominator;
     }
 
-
     public String getEspecialType() {
         return especialType;
     }
@@ -163,5 +163,21 @@ public class EsConfig {
 
     public void setSuperiorCode(String superiorCode) {
         this.superiorCode = superiorCode;
+    }
+
+    public String getPercentOperation() {
+        return percentOperation;
+    }
+
+    public void setPercentOperation(String percentOperation) {
+        this.percentOperation = percentOperation;
+    }
+
+    public String getPercentOperationValue() {
+        return percentOperationValue;
+    }
+
+    public void setPercentOperationValue(String percentOperationValue) {
+        this.percentOperationValue = percentOperationValue;
     }
 }
