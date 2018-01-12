@@ -116,6 +116,7 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
      */
     public boolean addSchedulesBatch(List<Map<String, Object>> schedules) {
         Map<String, Object> map;
+        Date now = new Date();
         try{
             for(int i = 1; i <= schedules.size(); i++){
                 map = schedules.get(i - 1);
@@ -154,36 +155,39 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
                 Date end = DateUtil.strToDate(map.get("end").toString());
                 int diff = DateUtil.getDifferenceOfDays(start, end);
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                for(int j = 0; j <= diff; j ++) {
-                    Schedule schedule = new Schedule();
-                    java.sql.Date today = new java.sql.Date(DateUtils.addDays(start, j).getTime());
-                    java.sql.Time startTime;
-                    java.sql.Time endTime;
-                    if(0 == j) {
-                        startTime = new java.sql.Time(start.getTime());
-                        Date tomorrow = DateUtils.addDays(dateFormat.parse(today.toString()), 1);
-                        endTime = new java.sql.Time(tomorrow.getTime() - 1);
-                    }else if(diff == j) {
-                        startTime = new java.sql.Time(dateFormat.parse(today.toString()).getTime());
-                        endTime = new java.sql.Time(end.getTime());
-                    }else {
-                        startTime = new java.sql.Time(dateFormat.parse(today.toString()).getTime());
-                        Date tomorrow = DateUtils.addDays(dateFormat.parse(today.toString()), 1);
-                        endTime = new java.sql.Time(tomorrow.getTime() - 1);
+                if(start.getTime() > now.getTime()) { //历史记录不能更新
+                    cleanData(carId, start, end); //清除之前的数据, 基本单位为天
+                    for(int j = 0; j <= diff; j ++) {
+                        Schedule schedule = new Schedule();
+                        java.sql.Date today = new java.sql.Date(DateUtils.addDays(start, j).getTime());
+                        java.sql.Time startTime;
+                        java.sql.Time endTime;
+                        if (0 == j) {
+                            startTime = new java.sql.Time(start.getTime());
+                            Date tomorrow = DateUtils.addDays(dateFormat.parse(today.toString()), 1);
+                            endTime = new java.sql.Time(tomorrow.getTime() - 1);
+                        } else if (diff == j) {
+                            startTime = new java.sql.Time(dateFormat.parse(today.toString()).getTime());
+                            endTime = new java.sql.Time(end.getTime());
+                        } else {
+                            startTime = new java.sql.Time(dateFormat.parse(today.toString()).getTime());
+                            Date tomorrow = DateUtils.addDays(dateFormat.parse(today.toString()), 1);
+                            endTime = new java.sql.Time(tomorrow.getTime() - 1);
+                        }
+                        schedule.setDate(today);
+                        schedule.setStart(startTime);
+                        schedule.setEnd(endTime);
+                        schedule.setDutyName(dutyName);
+                        schedule.setGender(gender);
+                        schedule.setMain(main);
+                        schedule.setDutyNum(dutyNum);
+                        schedule.setDutyRole(dutyRole);
+                        schedule.setDutyPhone(dutyPhone);
+                        schedule.setCarId(carId);
+                        schedule.setCreator(creator);
+                        schedule.setStatus(Schedule.Status.on);
+                        scheduleDao.save(schedule);
                     }
-                    schedule.setDate(today);
-                    schedule.setStart(startTime);
-                    schedule.setEnd(endTime);
-                    schedule.setDutyName(dutyName);
-                    schedule.setGender(gender);
-                    schedule.setMain(main);
-                    schedule.setDutyNum(dutyNum);
-                    schedule.setDutyRole(dutyRole);
-                    schedule.setDutyPhone(dutyPhone);
-                    schedule.setCarId(carId);
-                    schedule.setCreator(creator);
-                    schedule.setStatus(Schedule.Status.on);
-                    scheduleDao.save(schedule);
                 }
             }
         } catch (Exception e) {
@@ -200,4 +204,19 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
         query.setFlushMode(FlushMode.COMMIT);
         return query.list();
     }
+
+    @Transactional
+    public int cleanData(String carId, Date start, Date end) {
+        java.sql.Date start1 = new java.sql.Date(start.getTime());
+        java.sql.Date end1 = new java.sql.Date(end.getTime());
+        String sql = "DELETE FROM eme_schedule WHERE car_id = :carId AND date BETWEEN :start AND :end ";
+        Session session = currentSession();
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setString("carId", carId);
+        query.setDate("start", start1);
+        query.setDate("end", end1);
+        return query.executeUpdate();
+    }
+
 }
