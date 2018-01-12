@@ -11,6 +11,7 @@ import com.yihu.ehr.solr.SolrUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -512,63 +513,126 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
     @ApiOperation(value = "健康档案 - 健康档案分布情况")
     public Envelop getArchiveDistribution() {
         Envelop envelop = new Envelop();
-        List<EchartReportModel> echartReportModels = new ArrayList<>();
+        //获取年龄字典
         List<SystemDictEntry> ageDictEntryList = statisticService.getSystemDictEntry((long)89);
         if (ageDictEntryList != null) {
             Map<String, Integer> ageMap = new LinkedHashMap<>();
             for (SystemDictEntry systemDictEntry : ageDictEntryList) {
                 ageMap.put(systemDictEntry.getValue(), 0);
             }
-            List<Object> list = statisticService.getStatisticsDemographicsAgeCount();
-            if (list != null && list.size() > 0) {
-                EchartReportModel echartReportModel = new EchartReportModel();
-                Map<String, Integer> newAgeMap = ageMap;
-                for (int i = 0; i < list.size(); i++) {
-                    Object[] dataArr = (Object [])list.get(i);
-                    int val = Integer.valueOf(dataArr[0].toString());
-                    String age = dataArr[1].toString();
-                    for (String key : ageMap.keySet()) {
-                        if (key.equals(age)) {
-                            newAgeMap.put(key, val);
-                            break;
-                        }
-                    }
+            List<Object []> allGroup = statisticService.newStatisticsDemographicsAgeCount();
+            Map<String, BigInteger> maleGroup = new HashMap<>(ageMap.size());
+            Map<String, BigInteger> femaleGroup = new HashMap<>(ageMap.size());
+            for(Object [] dataArr : allGroup) {
+                String gender = (String) dataArr[2];
+                String age = (String) dataArr[1];
+                BigInteger count = (BigInteger) dataArr[0];
+                if(gender.equals("1")) {
+                    maleGroup.put(age, count);
+                }else {
+                    femaleGroup.put(age, count);
                 }
-                Object[] xObdata = new String[newAgeMap.size()];
-                Object[] yObdata = new Integer[newAgeMap.size()];
-                String[] xdata = new String[newAgeMap.size()];
-                int[] ydata = new int[newAgeMap.size()];
-                yObdata = newAgeMap.values().toArray();
-                xObdata = newAgeMap.keySet().toArray();
-                for (int i = 0; i < newAgeMap.size(); i++) {
-                    ydata[i] = Integer.valueOf(yObdata[i].toString());
-                    xdata[i] = xObdata[i].toString();
-                }
-                echartReportModel.setName("健康档案分布情况");
-                echartReportModel.setxData(xdata);
-                echartReportModel.setyData(ydata);
-                echartReportModels.add(echartReportModel);
             }
-        } else {
-            List<Object> list = statisticService.getStatisticsDemographicsAgeCount();
-            if (list != null && list.size() > 0) {
-                EchartReportModel echartReportModel = new EchartReportModel();
-                String[] xdata = new String[list.size()];
-                int[] ydata = new int[list.size()];
-                for (int i = 0; i < list.size(); i++) {
-                    Object[] dataArr = (Object [])list.get(i);
-                    ydata[i] = Integer.valueOf(dataArr[0].toString());
-                    xdata[i] = dataArr[1].toString();
+            List<String> xData = new ArrayList<>(ageMap.size());
+            List<BigInteger> yData = new ArrayList<>(ageMap.size());
+            List<String> xData1 = new ArrayList<>(ageMap.size());
+            List<BigInteger> yData1 = new ArrayList<>(ageMap.size());
+            for(String key : ageMap.keySet()) {
+                xData.add(key);
+                xData1.add(key);
+                if(maleGroup.containsKey(key)) {
+                    yData.add(maleGroup.get(key));
+                }else {
+                    yData.add(new BigInteger("0"));
                 }
-                echartReportModel.setName("健康档案分布情况");
-                echartReportModel.setxData(xdata);
-                echartReportModel.setyData(ydata);
-                echartReportModels.add(echartReportModel);
+                if(femaleGroup.containsKey(key)) {
+                    yData1.add(femaleGroup.get(key));
+                }else {
+                    yData1.add(new BigInteger("0"));
+                }
             }
+            List<Map> resultList = new ArrayList<>(2);
+            Map<String, Object> resultMap = new HashMap<>(4);
+            resultMap.put("name", "男");
+            resultMap.put("dataModels", null);
+            resultMap.put("xData", xData);
+            resultMap.put("yData", yData);
+            resultList.add(resultMap);
+            Map<String, Object> resultMap1 = new HashMap<>(4);
+            resultMap1.put("name", "女");
+            resultMap1.put("dataModels", null);
+            resultMap1.put("xData", xData1);
+            resultMap1.put("yData", yData1);
+            resultList.add(resultMap1);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(resultList);
+            return envelop;
+        } else { //年龄字典为空的时候
+            Map<String, Integer> ageMap = getDefaultAgeMap();
+            List<Object []> allGroup = statisticService.newStatisticsDemographicsAgeCount();
+            Map<String, BigInteger> maleGroup = new HashMap<>();
+            Map<String, BigInteger> femaleGroup = new HashMap<>();
+            for(Object [] dataArr : allGroup) {
+                String gender = (String) dataArr[2];
+                String age = (String) dataArr[1];
+                BigInteger count = (BigInteger) dataArr[0];
+                if(gender.equals("1")) {
+                    maleGroup.put(age, count);
+                }else {
+                    femaleGroup.put(age, count);
+                }
+            }
+            List<String> xData = new ArrayList<>();
+            List<BigInteger> yData = new ArrayList<>();
+            List<String> xData1 = new ArrayList<>();
+            List<BigInteger> yData1 = new ArrayList<>();
+            for(String key : ageMap.keySet()) {
+                xData.add(key);
+                xData1.add(key);
+                if(maleGroup.containsKey(key)) {
+                    yData.add(maleGroup.get(key));
+                }else {
+                    yData.add(new BigInteger("0"));
+                }
+                if(femaleGroup.containsKey(key)) {
+                    yData1.add(femaleGroup.get(key));
+                }else {
+                    yData1.add(new BigInteger("0"));
+                }
+            }
+            List<Map> resultList = new ArrayList<>(2);
+            Map<String, Object> resultMap = new HashMap<>(4);
+            resultMap.put("name", "男");
+            resultMap.put("dataModels", null);
+            resultMap.put("xData", xData);
+            resultMap.put("yData", yData);
+            resultList.add(resultMap);
+            Map<String, Object> resultMap1 = new HashMap<>(4);
+            resultMap1.put("name", "女");
+            resultMap1.put("dataModels", null);
+            resultMap1.put("xData", xData1);
+            resultMap1.put("yData", yData1);
+            resultList.add(resultMap1);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(resultList);
+            return envelop;
         }
-        envelop.setDetailModelList(echartReportModels);
-        envelop.setSuccessFlg(true);
-        return envelop;
+    }
+
+    private  Map<String, Integer> getDefaultAgeMap() {
+        Map<String, Integer> map = new LinkedHashMap<>(11);
+        map.put("0-1", 0);
+        map.put("1-10", 0);
+        map.put("11-20", 0);
+        map.put("21-30", 0);
+        map.put("31-40", 0);
+        map.put("41-50", 0);
+        map.put("51-60", 0);
+        map.put("61-70", 0);
+        map.put("71-80", 0);
+        map.put("81-90", 0);
+        map.put("> 90", 0);
+        return map;
     }
 
     @RequestMapping(value = ServiceApi.Resources.GetStorageAnalysis, method = RequestMethod.GET)
@@ -699,7 +763,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 }
             }
             envelop.setSuccessFlg(true);
-            envelop.setObj(dataMap.isEmpty()? 0:dataMap);
+            envelop.setObj(dataMap);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
@@ -725,7 +789,7 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
                 }
             }
             envelop.setSuccessFlg(true);
-            envelop.setObj(dataMap.isEmpty()? 0 : dataMap);
+            envelop.setObj(dataMap);
         }catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
