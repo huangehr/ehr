@@ -62,10 +62,10 @@ public class JobController extends BaseController {
     public boolean executeQuota(
             @ApiParam(name = "id", value = "指标ID", required = true)
             @RequestParam(value = "id", required = true) Integer id,
-            @ApiParam(name = "startDate", value = "起始日期", required = true)
-            @RequestParam(value = "startDate") String startDate,
-            @ApiParam(name = "endDate", value = "截止日期", required = true)
-            @RequestParam(value = "endDate") String endDate) {
+            @ApiParam(name = "startDate", value = "起始日期")
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @ApiParam(name = "endDate", value = "截止日期")
+            @RequestParam(value = "endDate", required = false) String endDate) {
         try {
             jobService.executeJob(id, "2", startDate, endDate);
             return true;

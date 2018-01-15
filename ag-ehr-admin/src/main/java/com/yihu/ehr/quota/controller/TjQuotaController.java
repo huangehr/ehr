@@ -252,10 +252,10 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
     public Envelop execuJob(
             @ApiParam(name = "id", value = "指标ID", required = true)
             @RequestParam(value = "id") int id,
-            @ApiParam(name = "startDate", value = "起始日期", required = true)
-            @RequestParam(value = "startDate") String startDate,
-            @ApiParam(name = "endDate", value = "截止日期", required = true)
-            @RequestParam(value = "endDate") String endDate) throws Exception {
+            @ApiParam(name = "startDate", value = "起始日期")
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @ApiParam(name = "endDate", value = "截止日期")
+            @RequestParam(value = "endDate", required = false) String endDate) throws Exception {
         Date date = new Date();
         tjQuotaJobClient.tjQuotaExecute(id, startDate, endDate);
         MTjQuotaModel quotaModel = tjQuotaClient.getById(Long.valueOf(String.valueOf(id)));
