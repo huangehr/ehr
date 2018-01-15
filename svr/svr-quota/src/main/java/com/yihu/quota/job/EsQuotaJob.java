@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -49,6 +50,7 @@ public class EsQuotaJob implements Job {
     private String endTime; // 结束时间
     private String startTime; //开始时间
     private String timeLevel; //时间
+    private String executeFlag; // 执行动作
 
     @Autowired
     private TjQuotaLogDao tjQuotaLogDao;
@@ -60,6 +62,8 @@ public class EsQuotaJob implements Job {
     private ExtractHelper extractHelper;
     @Autowired
     ElasticsearchUtil elasticsearchUtil;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -104,8 +108,10 @@ public class EsQuotaJob implements Job {
                     }
                 }else{
                     String quoataDate =  new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd");
+
                     //查询是否已经统计过,如果已统计 先删除后保存
                     deleteRecord();
+
                     List<SaveModel> dataSaveModels = new ArrayList<>();
                     for(SaveModel saveModel :dataModels){
                         if(saveModel.getResult() != null ){//&& Double.valueOf(saveModel.getResult())>0
@@ -127,6 +133,12 @@ public class EsQuotaJob implements Job {
             }else {
                 tjQuotaLog.setStatus(Contant.save_status.fail);
                 tjQuotaLog.setContent("没有抽取到数据");
+            }
+
+            // 初始执行时，更新该指标为已初始执行过
+            if (executeFlag.equals("1")) {
+                String sql = "UPDATE tj_quota SET is_init_exec = '1' WHERE id = " + quotaVo.getId();
+                jdbcTemplate.update(sql);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -186,7 +198,7 @@ public class EsQuotaJob implements Job {
         this.saasid = map.getString("saasid");
         // 默认按天，如果指标有配置时间维度，ES抽取过程中维度字典项转换为 SaveModel 时再覆盖。
         this.timeLevel = Contant.main_dimension_timeLevel.day;
-        String executeFlag =  map.getString("executeFlag");
+        this.executeFlag =  map.getString("executeFlag");
         if("2".equals(executeFlag)){
             if (StringUtils.isEmpty(map.getString("startTime"))) {
                 startTime = Contant.main_dimension_timeLevel.getStartTime(timeLevel);
