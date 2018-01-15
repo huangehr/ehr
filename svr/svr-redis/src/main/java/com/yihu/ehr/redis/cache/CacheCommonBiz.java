@@ -193,7 +193,7 @@ public class CacheCommonBiz {
     }
 
     // 测试
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 //        String keyRule = "zjj"; // yes
         String keyRule = "zjj.{aa}xx{b}xx"; // yes
 //        String keyRule = "zjj.{aa{a}a}"; // no
@@ -206,6 +206,6 @@ public class CacheCommonBiz {
 
         String newKeyRule = replaceParams(keyRule, "*");
 //        System.out.println(newKeyRule);
-    }
+    }*/
 
 }
