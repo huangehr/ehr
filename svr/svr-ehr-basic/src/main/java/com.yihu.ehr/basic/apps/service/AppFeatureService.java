@@ -63,6 +63,7 @@ public class AppFeatureService extends BaseJpaService<AppFeature, AppApiFeatureR
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> contentMap = new HashMap<>();
         contentMap.put("id", appFeature.getId());
+        contentMap.put("code", appFeature.getCode());
         contentMap.put("level", appFeature.getLevel());
         contentMap.put("text", appFeature.getName());
         contentMap.put("type", appFeature.getType());
