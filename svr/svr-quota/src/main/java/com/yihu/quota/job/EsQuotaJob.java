@@ -186,15 +186,15 @@ public class EsQuotaJob implements Job {
         this.saasid = map.getString("saasid");
         // 默认按天，如果指标有配置时间维度，ES抽取过程中维度字典项转换为 SaveModel 时再覆盖。
         this.timeLevel = Contant.main_dimension_timeLevel.day;
-        String executeFlag =  map.get("executeFlag").toString();
-        if("2".equals(executeFlag.toString())){
+        String executeFlag =  map.getString("executeFlag");
+        if("2".equals(executeFlag)){
             this.startTime = map.getString("startTime");
             if (StringUtils.isEmpty(startTime)) {
                 startTime = Contant.main_dimension_timeLevel.getStartTime(timeLevel);
             }
-            this.endTime = map.getString("endTime");
+            this.endTime = map.getString("endTime").split("T")[0] + "T23:59:59Z";
             if (StringUtils.isEmpty(endTime)) {
-                endTime = LocalDate.now().toString("yyyy-MM-dd'T'00:00:00'Z'");
+                endTime = LocalDate.now().toString("yyyy-MM-dd'T'23:59:59'Z'");
             }
         }
     }
