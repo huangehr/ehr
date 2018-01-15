@@ -188,13 +188,15 @@ public class EsQuotaJob implements Job {
         this.timeLevel = Contant.main_dimension_timeLevel.day;
         String executeFlag =  map.getString("executeFlag");
         if("2".equals(executeFlag)){
-            this.startTime = map.getString("startTime");
-            if (StringUtils.isEmpty(startTime)) {
+            if (StringUtils.isEmpty(map.getString("startTime"))) {
                 startTime = Contant.main_dimension_timeLevel.getStartTime(timeLevel);
+            } else {
+                this.startTime = map.getString("startTime").split("T")[0] + "T00:00:00Z";
             }
-            this.endTime = map.getString("endTime").split("T")[0] + "T23:59:59Z";
-            if (StringUtils.isEmpty(endTime)) {
-                endTime = LocalDate.now().toString("yyyy-MM-dd'T'23:59:59'Z'");
+            if (StringUtils.isEmpty(map.getString("endTime"))) {
+                endTime = LocalDate.now().toString("yyyy-MM-dd'T'00:00:00'Z'");
+            } else {
+                this.endTime = map.getString("endTime").split("T")[0] + "T23:59:59Z";
             }
         }
     }
