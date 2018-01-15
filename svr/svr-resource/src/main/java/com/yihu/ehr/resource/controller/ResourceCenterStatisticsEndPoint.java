@@ -714,11 +714,11 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         try {
             long clinic = solrUtil.count("HealthProfile", "event_type:0");
             Map<String, Object> clinicMap = new HashedMap(2);
-            clinicMap.put("name", "clinic");
+            clinicMap.put("name", "门诊");
             clinicMap.put("value", clinic);
             long resident = solrUtil.count("HealthProfile", "event_type:1");
             Map<String, Object> residentMap = new HashedMap(2);
-            residentMap.put("name", "resident");
+            residentMap.put("name", "住院");
             residentMap.put("value", resident);
             List<Map> dataModels = new ArrayList<>(2);
             dataModels.add(clinicMap);
@@ -731,9 +731,9 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
             dataMap.put("dataModels", dataModels);
             resultList.add(dataMap);
             Map<String, Object> resultMap = new HashMap<>(3);
-            resultMap.put("clinic/residentMap", clinic + resident);
-            resultMap.put("clinic", clinic);
-            resultMap.put("resident", resident);
+            resultMap.put("门诊/住院", clinic + resident);
+            resultMap.put("门诊", clinic);
+            resultMap.put("住院", resident);
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(resultList);
             envelop.setObj(resultMap);
