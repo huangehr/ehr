@@ -11,7 +11,6 @@ import java.util.Date;
 
 public class CloudOperatorLog {
     protected String id;
-    protected String code;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX")
     @CreatedDate
     @JSONField(format = "yyyy-MM-dd'T'HH:mm:ssXX")
@@ -30,11 +29,11 @@ public class CloudOperatorLog {
     private String params;
 
     public String getId() {
-        return code;
+        return id;
     }
 
-    public void setId(String code) {
-        this.id = code;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Date getTime() {
@@ -117,11 +116,4 @@ public class CloudOperatorLog {
         this.params = params;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
 }

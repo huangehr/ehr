@@ -116,16 +116,15 @@ public class ResourceStatisticService extends BaseJpaService {
             sql = "SELECT o.administrative_division, COUNT(*) " +
                     "FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
-                    "WHERE d.role_type = :roleType OR d.role_type IS NULL GROUP BY d.orgCode, o.administrative_division";
+                    "WHERE d.role_type IN ('1', '5') OR d.role_type IS NULL GROUP BY d.orgCode, o.administrative_division";
         }else {
             sql = "SELECT o.administrative_division, COUNT(*) " +
                     "FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
-                    "WHERE d.role_type = :roleType GROUP BY d.orgCode, o.administrative_division";
+                    "WHERE d.role_type IN ('4', '8') GROUP BY d.orgCode, o.administrative_division";
         }
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
-        query.setString("roleType", roleType);
         return query.list();
     }
 
@@ -133,13 +132,12 @@ public class ResourceStatisticService extends BaseJpaService {
         Session session = currentSession();
         String sql;
         if("Doctor".equals(roleType)) {
-            sql = "SELECT COUNT(*) FROM doctors WHERE LENGTH(orgCode) > 0 AND (role_type = :roleType OR role_type IS NULL)";
+            sql = "SELECT COUNT(*) FROM doctors WHERE LENGTH(orgCode) > 0 AND (role_type IN ('1', '5') OR role_type IS NULL)";
         }else {
-            sql = "SELECT COUNT(*) FROM doctors WHERE role_type = :roleType";
+            sql = "SELECT COUNT(*) FROM doctors WHERE role_type IN ('4', '8')";
         }
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
-        query.setString("roleType", roleType);
         return  (BigInteger) query.uniqueResult();
     }
 
@@ -169,6 +167,17 @@ public class ResourceStatisticService extends BaseJpaService {
                 " '0-1','1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','> 90') as age from ( "+
                 " SELECT CASE when length(id)=15  then CONCAT('19',substr(id ,7,6)) ELSE substr(id ,7,8) end  id  from demographics t )t1 "+
                 " )tt WHERE tt.age is not null  GROUP BY tt.age";
+        SQLQuery query = session.createSQLQuery(sql);
+        return query.list();
+    }
+
+    public List<Object[]> newStatisticsDemographicsAgeCount() {
+        Session session = currentSession();;
+        String sql = "SELECT count(1), tt.age ,tt.gender from( SELECT t1.id , gender, " +
+                "ELT( CEIL( FLOOR( TIMESTAMPDIFF(MONTH, STR_TO_DATE(t1.id ,'%Y%m%d'), CURDATE())/12) /10+1 ), \n" +
+                "'0-1','1-10','11-20','21-30','31-40','41-50','51-60','61-70','71-80','81-90','> 90') as age from ( " +
+                " SELECT CASE when length(id)=15  then CONCAT('19',substr(id ,7,6)) ELSE substr(id ,7,8) end  id ,gender from demographics t )t1 " +
+                " )tt WHERE tt.age is not null AND  gender IN ('1', '2') GROUP BY tt.age, tt.gender";
         SQLQuery query = session.createSQLQuery(sql);
         return query.list();
     }

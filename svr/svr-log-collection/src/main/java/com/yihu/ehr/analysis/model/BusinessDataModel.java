@@ -28,19 +28,19 @@ import java.util.*;
  * 6 register  // 注册
  * 7 archive // 健康档案
  * {
-     * time:"" 时间
-     * ,logType:2 日志类型
-     * ,caller:"" 调用者
-     * ,data:{
-         * ,businessType:""  业务类型
-         * ,patient:"" 居民
-         * ,data:{} 业务数据
-     * } 数据
+ * time:"" 时间
+ * ,logType:2 日志类型
+ * ,caller:"" 调用者
+ * ,data:{
+ * ,businessType:""  业务类型
+ * ,patient:"" 居民
+ * ,data:{} 业务数据
+ * } 数据
  * }
  */
 @Component
 public class BusinessDataModel extends DataModel implements Serializable {
-
+    Map<String, Map<String, String>> cache = new HashMap<>();
     @Autowired
     private AppFeatureService appFeatureService;
     private String data;
@@ -62,7 +62,6 @@ public class BusinessDataModel extends DataModel implements Serializable {
     public BusinessDataModel getByJsonObject(JSONObject jsonObject) throws Exception {
         BusinessDataModel businessDataModel = new BusinessDataModel();
         try {
-            businessDataModel.setCode(UUID.randomUUID().toString().replace("-",""));
             businessDataModel.setLogType(String.valueOf(jsonObject.get("logType")));
             businessDataModel.setCaller(jsonObject.getString("caller"));
             businessDataModel.setTime(changeTime(jsonObject.getString("time")));
@@ -76,16 +75,20 @@ public class BusinessDataModel extends DataModel implements Serializable {
             businessDataModel.setAppKey(chlidren.getString("appKey"));
 
             String url = chlidren.getString("url");
-            if( ! StringUtils.isEmpty(url) ){
+            if (!StringUtils.isEmpty(url)) {
+                Map<String, String> map = new HashMap<>();
+                if (cache.containsKey(url)) {
+                    map = cache.get(url);
+                } else {
                 /*String a = url.substring(url.lastIndexOf(":"));
                 String b = a.substring(a.indexOf("/") + 1);
                 String urlApi = b.substring(b.indexOf("/") + 1);*/
-                Object obj = appFeatureService.appFeatureFindUrl(url);
-                Map<String,String> map = new HashMap<>();
-                if(obj != null){
-                    map = appFeatureService.getOperatPageName(obj);
+                    Object obj = appFeatureService.appFeatureFindUrl(url);
+                    if (obj != null) {
+                        map = appFeatureService.getOperatPageName(obj);
+                    }
                 }
-                if(map != null && map.size() > 0){
+                if (map != null && map.size() > 0) {
                     businessDataModel.setOperation(map.get("operation"));
                     businessDataModel.setFunction(map.get("function"));
                 }

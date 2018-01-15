@@ -121,7 +121,7 @@ public class ExtractPercentHelper {
                     Map<String,Map<String, Object>>  moleResultMap = quotaService.getQuotaResult(moleTjQuota.getId(), objectMapper.writeValueAsString(param), moleDimension.substring(0, moleDimension.length() - 1));
                     Map<String,Map<String, Object>>  denoResultMap = quotaService.getQuotaResult(denoTjQuota.getId(), objectMapper.writeValueAsString(param), denoDimension.substring(0, denoDimension.length() - 1));
 
-                    List<SaveModel>  resultModel = getPercentResult(moleResultMap, denoResultMap,quotaVo);
+                    List<SaveModel>  resultModel = getPercentResult(moleResultMap, denoResultMap,quotaVo,esConfig);
                     return resultModel;
                 }else{
                     message = "配置错误，分子或分母指标没有配置";
@@ -211,7 +211,7 @@ public class ExtractPercentHelper {
         return map;
     }
 
-    public List<SaveModel> getPercentResult(Map<String,Map<String, Object>> moleReultMap,Map<String,Map<String, Object>> denoReultMap,QuotaVo quotaVo){
+    public List<SaveModel> getPercentResult(Map<String,Map<String, Object>> moleReultMap,Map<String,Map<String, Object>> denoReultMap,QuotaVo quotaVo,EsConfig esConfig){
 
         List<SaveModel> saveModelList = new ArrayList<>();
         for(String dekey :denoReultMap.keySet()){
@@ -229,7 +229,15 @@ public class ExtractPercentHelper {
                            int point = 0;
                            float moleVal = Float.valueOf(moleMap.get("result").toString());
                            float denoVal = Float.valueOf(denoMap.get("result").toString());
-                           point = (int)(moleVal/denoVal)*100;
+                            int percentOperationValue = 100;
+                            if(StringUtils.isNotEmpty(esConfig.getPercentOperationValue())){
+                                percentOperationValue = Integer.valueOf(esConfig.getPercentOperationValue());
+                            }
+                            if(esConfig.getPercentOperation().equals(1)){
+                                point = (int)(moleVal/denoVal)*percentOperationValue;
+                            }else if(esConfig.getPercentOperation().equals(2)){
+                                point = (int)(moleVal/denoVal)/percentOperationValue;
+                            }
                            moleMap.remove("result");
                            moleMap.put("result",point);
                            map = moleMap;

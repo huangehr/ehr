@@ -1,20 +1,19 @@
 package com.yihu.ehr.portal.controller;
 
 import com.yihu.ehr.agModel.portal.PortalSettingModel;
-import com.yihu.ehr.apps.service.AppApiClient;
 import com.yihu.ehr.apps.service.AppClient;
 import com.yihu.ehr.constants.ApiVersion;
+import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.controller.BaseController;
 import com.yihu.ehr.model.app.MApp;
-import com.yihu.ehr.model.app.MAppApi;
+import com.yihu.ehr.model.common.ListResult;
+import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.dict.MConventionalDict;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.model.portal.MPortalSetting;
-import com.yihu.ehr.organization.service.OrgDeptClient;
 import com.yihu.ehr.organization.service.OrganizationClient;
-import com.yihu.ehr.portal.service.PortalSettingClient;
+import com.yihu.ehr.portal.client.PortalSettingClient;
 import com.yihu.ehr.systemdict.service.ConventionalDictEntryClient;
-import com.yihu.ehr.util.datetime.DateTimeUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +32,7 @@ import java.util.List;
  * Created by zhoujie on 2017/3/11.
  */
 @EnableFeignClients
-@RequestMapping(ApiVersion.Version1_0 + "/admin")
+@RequestMapping(ApiVersion.Version1_0 + ServiceApi.GateWay.admin)
 @RestController
 @Api(value = "portalSetting", description = "应用功能页面展示", tags = {"云门户-应用功能页面展示"})
 public class ProtalSettingController extends BaseController {
@@ -41,12 +40,40 @@ public class ProtalSettingController extends BaseController {
     @Autowired
     private PortalSettingClient portalSettingClient;
     @Autowired
-    AppClient appClient;
+    private AppClient appClient;
     @Autowired
     private OrganizationClient organizationClient;
     @Autowired
     private ConventionalDictEntryClient conventionalDictClient;
 
+    @RequestMapping(value = ServiceApi.Portal.Setting, method = RequestMethod.GET)
+    @ApiOperation(value = "获取门户配置列表", notes = "根据查询条件获取门户配置列表在前端表格展示")
+    public Result portalSetting(
+            @ApiParam(name = "fields", value = "返回的字段，为空返回全部字段", defaultValue = "id")
+            @RequestParam(value = "fields", required = false) String fields,
+            @ApiParam(name = "filters", value = "过滤器，为空检索所有条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "sorts", value = "排序，规则参见说明文档", defaultValue = "")
+            @RequestParam(value = "sorts", required = false) String sorts,
+            @ApiParam(name = "size", value = "分页大小", defaultValue = "15")
+            @RequestParam(value = "size", required = false) int size,
+            @ApiParam(name = "page", value = "页码", defaultValue = "1")
+            @RequestParam(value = "page", required = false) int page) throws Exception {
+
+        if(org.springframework.util.StringUtils.isEmpty(filters)){
+            filters = "status=0;";
+        }else{
+            filters = filters + "status=0;";
+        }
+        ResponseEntity<List<MPortalSetting>> responseEntity = portalSettingClient.searchPortalSetting(fields, filters, sorts, size, page);
+
+        ListResult re = new ListResult(page, size);
+        re.setTotalCount(getTotalCount(responseEntity));
+        re.setDetailModelList(responseEntity.getBody());
+
+        return re;
+
+    }
 
     @RequestMapping(value = "/portalSetting", method = RequestMethod.GET)
     @ApiOperation(value = "获取门户配置列表", notes = "根据查询条件获取门户配置列表在前端表格展示")

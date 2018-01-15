@@ -72,8 +72,8 @@ public class QuotaController extends BaseController {
 //            }else if(数据源为 solr){
 //
 //            }
-
-//            envelop.setDetailModelList(result);
+            QuotaReport  quotaReport = quotaService.getQuotaReport(tjQuota, filters, dimension,1000);
+            envelop.setDetailModelList(quotaReport.getReultModelList());
             envelop.setSuccessFlg(true);
             return envelop;
         } catch (Exception e) {
@@ -155,15 +155,26 @@ public class QuotaController extends BaseController {
             }
             List<String> dimensionValList = null;
             TjQuota tjQuota= quotaService.findByCode(code);
-            List<Map<String, Object>> dimenListResult = quotaService.searcherByGroup(tjQuota, filters, dimension);
-            for(Map<String,Object> map : dimenListResult){
-                dimensionValList = new ArrayList<String>(map.keySet());
+            if(tjQuota != null){
+                List<Map<String, Object>> dimenListResult = quotaService.searcherByGroup(tjQuota, filters, dimension);
+                for(Map<String,Object> map : dimenListResult){
+                    dimensionValList = new ArrayList<String>(map.keySet());
+                }
             }
             List<Map<String,Object>> result = new ArrayList<>();
             List<Map<String,Object>> orgHealthCategoryList = new ArrayList<>();
 
             orgHealthCategoryList = orgHealthCategoryStatisticsService.getOrgHealthCategoryTreeByPid(-1);
-            result = setResult(orgHealthCategoryList,dimensionValList,filters,dimension,tjQuota);
+
+            Map<String, List<Map<String, Object>>>  resultMap = new HashMap<>();
+            for(String val : dimensionValList){
+                Map<String, Object> param = new HashMap<>();
+                param.put(dimension,val);
+                List<Map<String, Object>>  mapList = quotaService.queryResultPageByCode(tjQuota.getCode(), objectMapper.writeValueAsString(param), 1, 10000);
+                resultMap.put(val,mapList);
+            }
+
+            result = setResult(orgHealthCategoryList,dimensionValList,filters,dimension,tjQuota,resultMap);
 
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(result);
@@ -177,31 +188,34 @@ public class QuotaController extends BaseController {
     }
 
 
+    /**
+     * 从维度结果集中抽取机构类型的数据 返回机构类型树状结构数据
+     * @param orgHealthCategoryList
+     * @param dimensionValList
+     * @param filters
+     * @param dimension
+     * @param tjQuota
+     * @return
+     * @throws Exception
+     */
     public List<Map<String,Object>> setResult(List<Map<String,Object>> orgHealthCategoryList ,
                                               List<String> dimensionValList ,String filters,
-                                              String dimension,TjQuota tjQuota) throws Exception {
+                                              String dimension,TjQuota tjQuota, Map<String, List<Map<String, Object>>>  resultMap ) throws Exception {
         List<Map<String,Object>> result = new ArrayList<>();
         for(int i=0 ; i < orgHealthCategoryList.size() ; i++ ){
             Map<String,Object> mapCategory = orgHealthCategoryList.get(i);
-            List<String> codeList = new ArrayList<String>( mapCategory.keySet());
-            for(String key :codeList){
-                if( !key.equals("text") &&  !key.equals("children") && !key.equals("id") && !key.equals("pid") ){
-                    mapCategory.remove(key);
-                }
-            }
+            String code = mapCategory.get("code").toString();
             for(String val : dimensionValList){
-                if(StringUtils.isNotEmpty(filters)){
-                    filters +=  " and " + dimension + "=" + val;
-                }else {
-                    filters = dimension + "=" + val;
+                if(resultMap.get(val) != null ){
+                    for(Map<String,Object> map : resultMap.get(val)){
+                        mapCategory.put(val, map.get(code) != null ? map.get(code).toString() : "0");
+                    }
                 }
-                Map<String, Integer>  resultMap = quotaService.searcherSumByGroupBySql(tjQuota, dimension, filters,"result",null,null);
-                mapCategory.put(val, resultMap != null ? resultMap.get(val).toString() : "0");
-                result.add(mapCategory);
             }
+            result.add(mapCategory);
             if(mapCategory.get("children") != null){
                 List<Map<String,Object>> childrenOrgHealthCategoryList = (List<Map<String, Object>>) mapCategory.get("children");
-                mapCategory.put("children",setResult(childrenOrgHealthCategoryList,dimensionValList,filters,dimension,tjQuota));
+                mapCategory.put("children",setResult(childrenOrgHealthCategoryList,dimensionValList,filters,dimension,tjQuota,resultMap));
             }
         }
         return  result;

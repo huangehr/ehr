@@ -307,19 +307,16 @@ public class ServiceApi {
         public static final String MedicationUsed = "/{demographic_id}/profile/medication_used"; //患者常用药（按次数）
         public static final String MedicalEvent = "/{event_no}/info"; //某次住院/门诊事件信息
 
-
         public static final String MedicationMaster = "/profile/medication/master"; //处方主表
         public static final String MedicationPrescription = "/profile/medication/prescription"; //处方笺
         public static final String MedicationDetail = "/profile/medication/detail/{prescription_no}"; //处方细表
         public static final String MedicationDetailChinese = "/profile/medication/detail/chinese"; //中药处方
         public static final String MedicationDetailWestern = "/profile/medication/detail/western"; //西药处方
 
-
         public static final String OutpatientDiagnosis = "/{demographic_id}/outpatient/diagnosis"; //门诊诊断
         public static final String OutpatientSymptom = "/{demographic_id}/outpatient/symptom"; //门诊症状
         public static final String OutpatientCostMaster = "/{demographic_id}/outpatient/cost/master"; //门诊费用汇总
         public static final String OutpatientCostDetail = "/{demographic_id}/outpatient/cost/detail"; //门诊费用明细
-
 
         public static final String HospitalizedDiagnosis = "/{demographic_id}/hospitalized/diagnosis"; //住院诊断
         public static final String HospitalizedSymptom = "/{demographic_id}/hospitalized/symptom"; //住院症状
@@ -411,8 +408,6 @@ public class ServiceApi {
         public static final String GetUserAppListById = "/userApp/getUserAppByAppId";
     }
 
-
-
     public static class Packages {
         public static final String Packages = "/packages";
         public static final String AcquirePackage = "/packages/acquire";
@@ -470,7 +465,6 @@ public class ServiceApi {
         public static final String GetArchiveRelationList = "/patientArchive/getArRelationList";//根据查询条件查询个人档案申请列表
         public static final String GetArchiveRelation = "/patientArchive/{applyId}/getArRelation";//根据查询条件查询个人档案申请列表
 
-
         public static final String FindArchiveRelation = "/patient/findArchiveRelation";
         public static final String UpdateArchiveRelation = "/patient/updateArchiveRelation";
         public static final String DelArchiveRelation = "/patient/delArchiveRelation";
@@ -485,11 +479,6 @@ public class ServiceApi {
 
         public static final String Authentications = "/patient/authentications";
         public static final String Authentication = "/patient/Authentication/{id}";
-
-
-
-
-
 
         /******************************* 旧接口 **********************************************************/
         public static final String ArApplications = "/archive/applications";
@@ -507,24 +496,40 @@ public class ServiceApi {
         public static final String RefreshToken = "/oauth/refreshToken";
     }
 
+    public static class MessageRemind{
+        public static final String MessageRemind = "/messageRemind";
+        public static final String MessageRemindTop = "/messageRemindTop";
+        public static final String MessageRemindCount = "/messageRemindCount";
+        public static final String MessageRemindAdmin = "/messageRemind/admin/{messageRemind_id}";
+        public static final String MessageRemindReaded = "/messageRemind/readed/{remindId}";
+    }
+
+    public static class Portal {
+        public static final String Login = "/portal/login";
+        public static final String UserAppList = "/portal/userApp/list";
+        public static final String UserAppShow = "/portal/userApp/show";
+        public static final String MessageRemind = "/portal/messageRemind";
+        public static final String MessageRemindCount = "/portal/messageRemind/count";
+        public static final String MessageRemindRead = "/portal/messageRemind/read/{remindId}";
+        public static final String NoticesTop = "/portal/notices/top";
+        public static final String NoticesAdmin = "/portal/notices/admin/{portalNotice_id}";
+        public static final String Feedback = "/portal/feedback";
+        public static final String ResourceTop = "/portal/resource/top";
+        public static final String QuotaCategoryOfChild =  "/portal/quotaCategoryOfChild";
+        public static final String TjQuotaWarn = "/portal/tj/tjQuotaWarn";
+        public static final String Setting = "/portal/setting";
+    }
+
     public static class PortalNotices {
         public static final String PortalNotices = "/portalNotices";
         public static final String PortalNoticesTop = "/portalNoticesTop";
         public static final String PortalNoticeAdmin = "/portalNotices/admin/{portalNotice_id}";
     }
 
-    public static class MessageRemind{
-        public static final String MessageRemind                            = "/messageRemind";
-        public static final String MessageRemindTop                            = "/messageRemindTop";
-        public static final String MessageRemindCount                         = "/messageRemindCount";
-        public static final String MessageRemindAdmin                        = "/messageRemind/admin/{messageRemind_id}";
-        public static final String MessageRemindReaded                         = "/messageRemind/readed/{remindId}";
-    }
-
     public static class PortalResources{
-        public static final String PortalResources                            = "/portalResources";
-        public static final String PortalResourcesTop                         = "/portalResourcesTop";
-        public static final String PortalResourcesAdmin                       = "/portalResources/admin/{portalResources_id}";
+        public static final String PortalResources = "/portalResources";
+        public static final String PortalResourcesTop = "/portalResourcesTop";
+        public static final String PortalResourcesAdmin = "/portalResources/admin/{portalResources_id}";
     }
 
     public static class PortalFeedback {
@@ -535,7 +540,6 @@ public class ServiceApi {
     public static class PortalLogin {
         public static final String PortalLogin = "/login";
     }
-
 
     public static class PortalSetting {
         public static final String PortalSetting = "/portalSetting";
@@ -630,6 +634,7 @@ public class ServiceApi {
         public static final String DataSetCodeIsExist = "/std/data_set/is_exist/code";
         public static final String DataSetsIds = "/std/{ids}data_sets";
         public static final String DataSetsBatch = "/std/data_set/bacth";
+        public static final String GetDataSetByCode = "/std/data_set/getDataSetByCode";
 
         public static final String MetaDatas = "/std/data_sets/meta_datas";
         public static final String MetaData = "/std/data_sets/meta_datas/{id}";
@@ -1160,6 +1165,7 @@ public class ServiceApi {
         public static final String TjGetQuotaResult = "/tj/tjGetQuotaResult";
         public static final String TjGetOrgHealthCategoryQuotaResult = "/tj/tjGetOrgHealthCategoryQuotaResult";
         public static final String TjQuotaExecute = "/job/execuJob";
+        public static final String FirstExecuteQuota = "/job/firstExecuteQuota";
 
 
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";
@@ -1282,6 +1288,7 @@ public class ServiceApi {
         public static final String ScheduleSave = "/schedule/save";
         public static final String ScheduleUpdate = "/schedule/update";
         public static final String ScheduleBathUpdate = "/schedule/bathUpdate";
+        public static final String ScheduleCleanData = "/schedule/cleanData";
         public static final String ScheduleBatch = "/schedules/batch";
 
         // 待命地点

@@ -22,9 +22,10 @@ import java.util.Date;
  * @version 1.0
  * @created 2017.02.21 11:03
  */
-public class EhrJDBCAuthorizationCodeService extends RandomValueAuthorizationCodeServices {
+/** new version 使用内存存储 */
+public class EhrJdbcAuthorizationCodeService extends RandomValueAuthorizationCodeServices {
     private static final String DEFAULT_SELECT_STATEMENT = "select code, authentication from oauth_code where code = ?";
-    private static final String DEFAULT_INSERT_STATEMENT = "insert into oauth_code (code, authentication,create_time) values (?, ?,?)";
+    private static final String DEFAULT_INSERT_STATEMENT = "insert into oauth_code (code, authentication, create_time) values (?, ?, ?)";
     private static final String DEFAULT_DELETE_STATEMENT = "delete from oauth_code where code = ?";
 
     private String selectAuthenticationSql = DEFAULT_SELECT_STATEMENT;
@@ -33,7 +34,7 @@ public class EhrJDBCAuthorizationCodeService extends RandomValueAuthorizationCod
 
     private final JdbcTemplate jdbcTemplate;
 
-    public EhrJDBCAuthorizationCodeService(DataSource dataSource) {
+    public EhrJdbcAuthorizationCodeService(DataSource dataSource) {
         Assert.notNull(dataSource, "DataSource required");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }

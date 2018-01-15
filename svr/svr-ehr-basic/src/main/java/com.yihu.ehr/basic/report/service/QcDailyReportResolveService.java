@@ -16,6 +16,9 @@ import com.yihu.ehr.entity.report.*;
 import com.yihu.ehr.model.packs.MPackage;
 import com.yihu.ehr.model.report.MQcDailyReportDetail;
 import com.yihu.ehr.model.report.json.*;
+import com.yihu.ehr.model.standard.MStdDataSet;
+import com.yihu.ehr.model.standard.MStdMetaData;
+import com.yihu.ehr.basic.report.feign.StandardClient;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.rest.Envelop;
 import org.apache.commons.lang.StringUtils;
@@ -59,6 +62,8 @@ public class QcDailyReportResolveService {
     private PackMgrClient packMgrClient;
     @Autowired
     private PackResolveClient packResolveClient;
+    @Autowired
+    private StandardClient standardClient;
 
     /**
      * 解析质控压缩包 并入库
@@ -378,29 +383,203 @@ public class QcDailyReportResolveService {
         if (!envelop.isSuccessFlg()) {
             return; //
         }
-
         String beginDate = (String) envelop.getObj();
         Date date = DateUtil.strToDate(beginDate);
         Date addDate = DateUtil.addDate(1, date);
         String endDate = DateUtil.toString(addDate);
         int page = 1;
         int pageSize = 1000;
-
+        Map<String,List<Map<String,Object>>> map = new HashMap<String,List<Map<String,Object>>>();
         Collection<MPackage> mPackages = packMgrClient.packageList("", "receiveDate>=" + beginDate + ";receiveDate<" + endDate, "+receiveDate", page, pageSize);
         while (!mPackages.isEmpty()) {
             for (MPackage mPackage : mPackages) {
-                loadQcDetailData(mPackage);
+                try{
+                    ResponseEntity<String> entity = packResolveClient.fetch(mPackage.getId());
+                    if (entity.getStatusCode() != HttpStatus.OK) {
+                        continue;
+                    }
+
+                    String body = entity.getBody();
+                    JsonNode jsonNode = objectMapper.readTree(body);
+                    String patientId = jsonNode.get("patientId").asText();
+                    String eventNo = jsonNode.get("eventNo").asText();
+                    String innerVersion = jsonNode.get("cdaVersion").asText();
+                    String eventTime = jsonNode.get("eventTime").asText();
+                    String orgCode = jsonNode.get("orgCode").asText();
+                    String eventType = jsonNode.get("eventType").asText();
+                    JsonNode dataSets = jsonNode.get("dataSets");
+                    Map<String,Object> patient = new HashMap<String,Object>();
+                    patient.put("patient_id",patientId);
+                    patient.put("event_no",eventNo);
+                    patient.put("event_time",eventTime);
+                    patient.put("inner_version",innerVersion);
+                    patient.put("event_type",eventType);
+                    patient.put("dataSets",dataSets);
+                    List<Map<String,Object>> list = map.get(orgCode);
+                    //根据orgCode分组
+                    if(list!=null){
+                        list.add(patient);
+                    }else{
+                        list = new ArrayList<Map<String,Object>>();
+                        list.add(patient);
+                        map.put(orgCode, list);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    continue;
+                }
             }
 
             page++;
             mPackages = packMgrClient.packageList("", "receiveDate>=" + beginDate + ";receiveDate<" + endDate, "+receiveDate", page, pageSize);
         }
-        //更改数量
-        qcDailyReportService.updateNum(beginDate);
-        qcDailyReportDatasetsService.updateNum(beginDate);
+
+        getData(map);
+
         this.setQcBeginDate(endDate);
 
         //TODO:需要发送1个消息，通知统计，不发消息直接统计也是可以。
+    }
+
+    /**
+     * 根据分组好的orgCode统计数据
+     * @param map
+     */
+    public void getData(Map<String,List<Map<String,Object>>> map){
+        if(map!=null) {
+            for (String key : map.keySet()) {
+                Map<String,Object> qc = new HashMap<String,Object>();
+                Map<String,Object> datasets = new HashMap<String,Object>();
+                qc.put("org_code", key);
+                qc.put("create_date", new Date());
+                datasets.put("org_code", key);
+                datasets.put("create_date", new Date());
+                List<Map<String,Object>> list = map.get(key);//获取orgcode下的数据
+                List<Map<String,Object>> inpatient = new ArrayList<Map<String,Object>>();//住院
+                List<Map<String,Object>> outpatient = new ArrayList<Map<String,Object>>();//门诊
+                List<String> realList = new ArrayList<String>();//上传的数据集
+                List<String> totalList = new ArrayList<String>();//全部数据集
+                Map<String,List<String>> dataSetsMap = new HashMap<String,List<String>>();//所以数据集对应的数据源
+                if(list!=null&&list.size()>0) {
+                    Collection<MStdDataSet> sets = standardClient.searchSourcesWithoutPaging("", list.get(0).get("inner_version") + "");//获取所有数据集
+                    Collection<MStdMetaData> mStdMetaData = standardClient.searchDataSets("", "", "", -1, 15, list.get(0).get("inner_version") + "");
+                    for (MStdDataSet stdDataSet : sets) {
+                        totalList.add(stdDataSet.getCode());//所以数据集
+                    }
+                    for (int i = 0; i < list.size(); i++) {
+                        //获取版本号和事件时间
+                        if (i == 0) {
+                            qc.put("inner_version", list.get(0).get("inner_version"));
+                            datasets.put("event_time", list.get(0).get("event_time"));
+                            datasets.put("inner_version", list.get(0).get("inner_version"));
+                        }
+                        Map<String, Object> patient = list.get(i);
+                        JsonNode dataSetsNode = (JsonNode) patient.get("dataSets");
+                        patient.remove("dataSets");
+                        Iterator<Map.Entry<String, JsonNode>> iterator = dataSetsNode.fields();
+
+                        while (iterator.hasNext()) {
+                            Map.Entry<String, JsonNode> item = iterator.next();
+                            realList.add(item.getKey());//获取数据集
+                            JsonNode records = item.getValue().get("records");
+                            //遍历数据元
+                            Iterator<Map.Entry<String, JsonNode>> iterator1 = records.fields();
+                            while (iterator1.hasNext()) {
+                                Map.Entry<String, JsonNode> item1 = iterator1.next();
+                                Iterator<Map.Entry<String, JsonNode>> iterator2 = item1.getValue().fields();
+                                while (iterator2.hasNext()) {
+                                    Map.Entry<String, JsonNode> item2 = iterator2.next();
+                                    List<String> dataSetsList = dataSetsMap.get(item.getKey());
+                                    if (dataSetsList != null) {
+                                        dataSetsList.add(item2.getKey());
+                                    } else {
+                                        dataSetsList = new ArrayList<String>();
+                                        dataSetsList.add(item2.getKey());
+                                        dataSetsMap.put(item.getKey(), dataSetsList);
+                                    }
+                                }
+                            }
+                        }
+                        if ("Resident".equals(patient.get("event_type"))) {//住院
+                            patient.remove("inner_version");
+                            patient.remove("event_type");
+                            inpatient.add(patient);
+                        } else {//门诊
+                            patient.remove("inner_version");
+                            patient.remove("event_type");
+                            outpatient.add(patient);
+                        }
+                    }
+                    qc.put("total_outpatient_num", outpatient.size());
+                    qc.put("real_outpatient_num", outpatient.size());
+                    qc.put("total_hospital_num", inpatient.size());
+                    qc.put("real_hospital_num", inpatient.size());
+                    qc.put("total_outpatient", outpatient);
+                    qc.put("real_outpatient", outpatient);
+                    qc.put("total_hospital", inpatient);
+                    qc.put("real_hospital", inpatient);
+                    datasets.put("real_num", realList.size());
+                    datasets.put("real", realList);
+                    datasets.put("total_num", totalList.size());
+                    datasets.put("total", totalList);
+                    try {
+                        //数据元统计情况
+                        for (String datasetsKey : dataSetsMap.keySet()) {
+                            Map<String,Object> dataSetMap = new HashMap<String,Object>();
+                            dataSetMap.put("org_code",key);
+                            dataSetMap.put("event_time",datasets.get("event_time"));
+                            dataSetMap.put("inner_version",datasets.get("inner_version"));
+                            dataSetMap.put("create_date",datasets.get("create_date"));
+                            dataSetMap.put("dataset",datasetsKey);
+                            dataSetMap.put("data",getDateSets(mStdMetaData,datasetsKey,dataSetsMap.get(datasetsKey),datasets.get("inner_version")+""));
+                            System.out.println(objectMapper.writeValueAsString(dataSetMap));
+                        }
+                        System.out.println(objectMapper.writeValueAsString(qc));
+                        System.out.println(objectMapper.writeValueAsString(datasets));
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * 获取数据元
+     * @param mStdMetaData
+     * @param dataSet
+     * @return
+     */
+    public List<Map<String,Object>> getDateSets(Collection<MStdMetaData> mStdMetaData, String dataSet, List<String> dataSetList, String innerVersion){
+        Map<String,Object> datasetMap = new HashMap<String,Object>();
+        List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+        List<String> all = new ArrayList<String>();
+        //去掉重复的数据源
+        HashSet h = new HashSet(dataSetList);
+        dataSetList.clear();
+        dataSetList.addAll(h);
+        //根据code获取数据集
+        Map<String,Object> map = standardClient.getDataSetByCode(innerVersion,dataSet);
+        for(MStdMetaData data : mStdMetaData){
+            if(data.getDataSetId()==Integer.parseInt(map.get("id")+"")){
+                all.add(data.getCode());
+            }
+        }
+        datasetMap.put("total",all.size());
+        datasetMap.put("error",all.size()-dataSetList.size());
+        //把不存在的数据集错误代码设置为empty
+        for(String str1 : all){
+            boolean flag = false;
+            for(String str2 : dataSetList){
+                if(str1.equals(str2)){
+                    flag = true;
+                }
+            }
+            if(!flag){
+                datasetMap.put(str1,"empty");
+            }
+        }
+        list.add(datasetMap);
+        return list;
     }
 
     private void loadQcDetailData(MPackage mPackage) {

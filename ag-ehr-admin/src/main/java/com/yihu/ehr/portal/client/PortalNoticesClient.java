@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.service;
+package com.yihu.ehr.portal.client;
 
         import com.yihu.ehr.constants.ServiceApi;
         import com.yihu.ehr.constants.ApiVersion;
@@ -21,6 +21,13 @@ package com.yihu.ehr.portal.service;
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface PortalNoticesClient {
+
+    @RequestMapping(value = ServiceApi.PortalNotices.PortalNoticesTop, method = RequestMethod.GET)
+    @ApiOperation(value = "获取通知公告前10数据", notes = "根据日期查询前10的数据在前端表格展示")
+    ResponseEntity<List<MPortalNotice>> getPortalNoticeTop10();
+
+
+    // ------------------------------------ 以上为云平台网关新增接口 ----------------------------
 
     @RequestMapping(value = ServiceApi.PortalNotices.PortalNotices, method = RequestMethod.GET)
     @ApiOperation(value = "获取通知公告列表", notes = "根据查询条件获取通知公告列表在前端表格展示")

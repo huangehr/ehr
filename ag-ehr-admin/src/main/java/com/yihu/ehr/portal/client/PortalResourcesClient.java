@@ -1,4 +1,4 @@
-package com.yihu.ehr.portal.service;
+package com.yihu.ehr.portal.client;
 
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.constants.ApiVersion;
@@ -21,6 +21,10 @@ import java.util.List;
 @RequestMapping(ApiVersion.Version1_0)
 @ApiIgnore
 public interface PortalResourcesClient {
+
+    @RequestMapping(value = ServiceApi.PortalResources.PortalResourcesTop, method = RequestMethod.GET)
+    @ApiOperation(value = "获取所有资源信息数据", notes = "查询的数据在前端表格展示")
+    ResponseEntity<List<MPortalResources>> getAllPortalResources();
 
     @RequestMapping(value = ServiceApi.PortalResources.PortalResources, method = RequestMethod.GET)
     @ApiOperation(value = "获取资源列表", notes = "根据查询条件获取资源列表在前端表格展示")

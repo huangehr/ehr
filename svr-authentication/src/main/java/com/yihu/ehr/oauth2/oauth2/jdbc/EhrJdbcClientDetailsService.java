@@ -14,9 +14,9 @@ import javax.sql.DataSource;
  * @version 1.0
  * @created 2017.02.21 11:03
  */
-public class EhrJDBCClientDetailsService extends JdbcClientDetailsService {
+public class EhrJdbcClientDetailsService extends JdbcClientDetailsService {
 
-    public EhrJDBCClientDetailsService(DataSource dataSource) {
+    public EhrJdbcClientDetailsService(DataSource dataSource) {
         super(dataSource);
     }
 

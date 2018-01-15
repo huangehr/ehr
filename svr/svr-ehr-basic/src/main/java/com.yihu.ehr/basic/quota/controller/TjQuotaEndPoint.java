@@ -110,6 +110,7 @@ public class TjQuotaEndPoint extends EnvelopRestEndPoint {
             tjQuota.setUpdateTime(new Date());
             tjQuota.setCreateTime(DateUtil.strToDate(tjQuotaModel.getCreateTime()));
         } else{
+            tjQuota.setIsInitExec("0");
             tjQuota.setStatus(1);
             tjQuota.setCreateTime(new Date());
         }
