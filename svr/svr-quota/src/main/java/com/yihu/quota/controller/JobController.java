@@ -7,7 +7,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,8 +26,6 @@ public class JobController extends BaseController {
 
     @Autowired
     private JobService jobService;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     /**
      * 初始执行指标
@@ -41,11 +38,6 @@ public class JobController extends BaseController {
             @RequestParam(value = "id", required = true) Integer id) {
         try {
             jobService.executeJob(id, "1", null, null);
-
-            // 标识该指标为已初始执行过
-            String sql = "UPDATE tj_quota SET is_init_exec = '1' WHERE id = " + id;
-            jdbcTemplate.update(sql);
-
             return true;
         } catch (Exception e) {
             error(e);
