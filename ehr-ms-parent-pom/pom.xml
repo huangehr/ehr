@@ -39,12 +39,12 @@
         <module>../svr-authentication</module>
         <module>../ag-ehr-admin</module>
         <module>../ag-ehr-cloud</module>
-        <module>../ag-portal-cloud</module>
+        <!--<module>../ag-portal-cloud</module>-->
         <module>../svr/svr-redis</module>
         <module>../svr/svr-redis-memory</module>
         <module>../svr/svr-quota</module>
         <module>../svr/svr-log-collection</module>
-        <module>../ag-zuul</module>
+       <!-- <module>../ag-zuul</module>-->
     </modules>
 
     <build>
