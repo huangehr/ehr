@@ -62,8 +62,8 @@ public class BaseStatistsService {
      * @throws Exception
      */
     public Map<String, Object> divisionQuota(String molecular, String denominator, String dimension, String filters,String operation,String operationValue) throws Exception {
-        Map<String, Integer> moleMap = getQuotaResultList(molecular,filters,dimension);
-        Map<String, Integer> denoMap =  getQuotaResultList(denominator,filters,dimension);
+        Map<String, Integer> moleMap = getQuotaResultList(molecular,dimension,filters);
+        Map<String, Integer> denoMap =  getQuotaResultList(denominator,dimension,filters);
         int type= 2;
        return division(moleMap,  denoMap,Integer.valueOf(operation),Integer.valueOf(operationValue),type);
     }
@@ -105,7 +105,7 @@ public class BaseStatistsService {
                 if(type==1){
                     dimeVal = Float.valueOf(dimeMap.get("result").toString());
                 }else {
-                    dimeVal = Float.valueOf(dimeMap.get("moleKey").toString());
+                    dimeVal = Float.valueOf(dimeMap.get(moleKey) != null ? dimeMap.get(moleKey).toString() : "0");
                 }
                 if(operation == 1){
                     point = (int)(moleVal/dimeVal) * operationValue;
@@ -173,29 +173,46 @@ public class BaseStatistsService {
 
     /**
      * 时间聚合查询指标结果
-     *
-     * //目前先实现一个维度，多个维度后续扩展
      * @param code
-     * @param dimension
+     * @param dimension 多维度 ; 分开
      * @param filter
      * @throws Exception
      */
     public  List<Map<String, Object>> getTimeAggregationResult(String code,String dimension, String filter,String dateDime) throws Exception {
         TjQuota tjQuota= quotaDao.findByCode(code);
-        List<Map<String, Object>> dimenListResult = esResultExtract.searcherSumByGroupByTime(tjQuota, dimension, filter, dateDime);
+        Map<String,String>  dimensionDicMap = new HashMap<>();
+        List<String> dimenList = new ArrayList<>();
+        String groupDimension = "";
+        if(dimension != orgHealthCategoryCode){
+            String[] dimens =  dimension.split(";");
+            for(int i =0 ;i<dimens.length ;i++){
+                dimenList.add(dimens[i]);
+                String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimens[i]);
+                Map<String,String> dicMap = getDimensionMap(dictSql, dimens[i]);
+                if(dicMap != null && dicMap.size() > 0){
+                    dimensionDicMap.putAll(dicMap);
+                }
+                groupDimension += dimens[i] + ",";
+            }
+            groupDimension = groupDimension.substring(0,groupDimension.length()-1);
+        }else {
+            groupDimension = dimension;
+        }
+        List<Map<String, Object>> dimenListResult = esResultExtract.searcherSumByGroupByTime(tjQuota, groupDimension, filter, dateDime);
 
         List<Map<String, Object>> resultList = new ArrayList<>();
         String dateHist = "date_histogram(field=quotaDate,interval="+ dateDime +")";
-        Map<String,String>  dimensionDicMap = new HashMap<>();
-        if(dimension != orgHealthCategoryCode){
-            String dictSql = getQuotaDimensionDictSql(tjQuota.getCode(), dimension);
-            dimensionDicMap = getDimensionMap(dictSql, dimension);
-        }
+
         for(Map<String, Object> map : dimenListResult){
             Map<String,Object> dataMap = new HashMap<>();
             for(String key :map.keySet()){
-                if(key.equals(dimension) && !dimension.equals(orgHealthCategoryCode)){
-                    dataMap.put(dimensionDicMap.get(map.get(key).toString()),dimensionDicMap.get(map.get(key).toString()));
+                if(dimenList.contains(key) && !dimension.equals(orgHealthCategoryCode)){
+                    if(dimensionDicMap.get(map.get(key))  != null){
+                        String dictVal = dimensionDicMap.get(map.get(key).toString());
+                        dataMap.put(dictVal,dictVal);
+                    }else {
+                        dataMap.put(key,map.get(key));
+                    }
                 }
                 if(dimension.equals(orgHealthCategoryCode)){
                     dataMap.put(map.get(orgHealthCategoryCode).toString(),map.get(orgHealthCategoryCode));
