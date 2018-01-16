@@ -100,12 +100,13 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
         return query.list().size();
     }
 
-    public List<Schedule> getDateMatch(java.sql.Date date) {
+    public List<Schedule> getDateMatch(java.sql.Date date, int main) {
         Session session = currentSession();
-        String hql = "SELECT schedule FROM Schedule schedule WHERE schedule.date = :date1 ORDER BY schedule.date ASC";
+        String hql = "SELECT schedule FROM Schedule schedule WHERE schedule.date = :date1 AND schedule.main = :main ORDER BY schedule.date ASC";
         Query query = session.createQuery(hql);
         query.setFlushMode(FlushMode.COMMIT);
         query.setDate("date1", date);
+        query.setInteger("main", main);
         return query.list();
     }
 
@@ -156,7 +157,7 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
                 int diff = DateUtil.getDifferenceOfDays(start, end);
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 if(start.getTime() > now.getTime()) { //历史记录不能更新
-                    cleanData(carId, start, end); //清除之前的数据, 基本单位为天
+                    cleanData(carId, start, end, dutyRole, dutyName); //清除之前的数据, 基本单位为天
                     for(int j = 0; j <= diff; j ++) {
                         Schedule schedule = new Schedule();
                         java.sql.Date today = new java.sql.Date(DateUtils.addDays(start, j).getTime());
@@ -206,10 +207,26 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
     }
 
     @Transactional
-    public int cleanData(String carId, Date start, Date end) {
+    public int cleanData(String carId, Date start, Date end, String dutyRole, String dutyName) {
         java.sql.Date start1 = new java.sql.Date(start.getTime());
         java.sql.Date end1 = new java.sql.Date(end.getTime());
-        String sql = "DELETE FROM eme_schedule WHERE car_id = :carId AND date BETWEEN :start AND :end ";
+        String sql = "DELETE FROM eme_schedule WHERE car_id = :carId AND date BETWEEN :start AND :end AND duty_role = :dutyRole AND duty_name = :dutyName";
+        Session session = currentSession();
+        Query query = session.createSQLQuery(sql);
+        query.setFlushMode(FlushMode.COMMIT);
+        query.setString("carId", carId);
+        query.setDate("start", start1);
+        query.setDate("end", end1);
+        query.setString("dutyRole", dutyRole);
+        query.setString("dutyName", dutyName);
+        return query.executeUpdate();
+    }
+
+    @Transactional
+    public int cleanAllData(String carId, Date start, Date end) {
+        java.sql.Date start1 = new java.sql.Date(start.getTime());
+        java.sql.Date end1 = new java.sql.Date(end.getTime());
+        String sql = "DELETE FROM eme_schedule WHERE car_id = :carId AND date BETWEEN :start AND :end";
         Session session = currentSession();
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
@@ -218,5 +235,4 @@ public class ScheduleService extends BaseJpaService<Schedule, ScheduleDao> {
         query.setDate("end", end1);
         return query.executeUpdate();
     }
-
 }
