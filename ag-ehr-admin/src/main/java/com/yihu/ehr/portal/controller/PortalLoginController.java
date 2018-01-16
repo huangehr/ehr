@@ -8,8 +8,11 @@ import com.yihu.ehr.model.common.ObjectResult;
 import com.yihu.ehr.model.common.Result;
 import com.yihu.ehr.model.user.MUser;
 import com.yihu.ehr.users.service.UserClient;
+import com.yihu.ehr.util.datetime.DateTimeUtil;
+import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,42 +29,39 @@ public class PortalLoginController extends BaseController {
     @Autowired
     private UserClient userClient;
 
-    @RequestMapping(value = ServiceApi.Portal.Login, method = RequestMethod.GET)
+    @RequestMapping(value = ServiceApi.Portal.Login, method = RequestMethod.POST)
     @ApiOperation(value = "用户名密码验证", notes = "用户名密码验证")
-    Result login(
-            @ApiParam(name = "userName", value = "登录账号", defaultValue = "")
-            @RequestParam(value = "userName") String userName,
-            @ApiParam(name = "password", value = "密码", defaultValue = "")
-            @RequestParam(value = "password") String password) {
-        try {
-            UsersModel usersModel = new UsersModel();
-            MUser user = userClient.getUserByNameAndPassword(userName, password);
-            if (user == null) {
-                return Result.error("登录失败，用户名或密码不正确!");
-            }else {
-                if(!user.getActivated()){
-                    return Result.error("该账户已被锁定，请联系系统管理员重新生效!");
-                }
+    public Envelop login(
+        @ApiParam(name = "username", value = "登录账号")
+        @RequestParam(value = "username") String username,
+        @ApiParam(name = "password", value = "密码")
+        @RequestParam(value = "password") String password) {
+        Envelop envelop = new Envelop();
+        UsersModel usersModel = new UsersModel();
+        MUser user = userClient.getUserByNameAndPassword(username, password);
+        if (null == user) {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("登录失败，用户名或密码不正确!");
+            return envelop;
+        }else {
+            if(!user.getActivated()){
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg("该账户已被锁定，请联系系统管理员重新生效!");
+                return envelop;
             }
-            //允许开放的用户信息
-            usersModel.setId(user.getId());
-            usersModel.setRealName(user.getRealName());
-            usersModel.setEmail(user.getEmail());
-            usersModel.setOrganizationCode(user.getOrganization());
-            usersModel.setTelephone(user.getTelephone());
-            usersModel.setLoginCode(user.getLoginCode());
-            usersModel.setUserTypeName(user.getUserType());
-            usersModel.setActivated(user.getActivated());
-            ObjectResult re = new ObjectResult(true,"登录成功!");
-            re.setData(usersModel);
-            return re;
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return Result.error(ex.getMessage());
         }
+        //允许开放的用户信息
+        usersModel.setId(user.getId());
+        usersModel.setRealName(user.getRealName());
+        usersModel.setEmail(user.getEmail());
+        usersModel.setOrganizationCode(user.getOrganization());
+        usersModel.setTelephone(user.getTelephone());
+        usersModel.setLoginCode(user.getLoginCode());
+        usersModel.setUserType(user.getUserType());
+        usersModel.setActivated(user.getActivated());
+        usersModel.setLastLoginTime(DateTimeUtil.simpleDateTimeFormat(user.getLastLoginTime()));
+        envelop.setSuccessFlg(true);
+        envelop.setObj(usersModel);
+        return envelop;
     }
-
-
-
 }
