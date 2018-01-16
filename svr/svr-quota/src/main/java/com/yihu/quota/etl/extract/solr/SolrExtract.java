@@ -3,7 +3,6 @@ package com.yihu.quota.etl.extract.solr;
 import com.yihu.ehr.query.common.model.SolrGroupEntity;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
-import com.yihu.quota.etl.Contant;
 import com.yihu.quota.etl.extract.ExtractUtil;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.dimension.TjQuotaDimensionMain;
@@ -100,22 +99,8 @@ public class SolrExtract {
 
         // 拼接增量或全量的筛选条件
         if (!StringUtils.isEmpty(timeKey)) {
-            if (quotaVo != null && quotaVo.getDataLevel().equals(Contant.quota.dataLevel_increase)) {
-                fq = timeKey + ":[";
-                //起始时间
-                if (!StringUtils.isEmpty(startTime)) {
-                    fq += startTime + "T00:00:00Z";
-                } else {
-                    fq += "*";
-                }
-                fq += " TO ";
-                //结束时间
-                if (!StringUtils.isEmpty(endTime) && !StringUtils.isEmpty(startTime)) {
-                    fq += startTime + "T23:59:59Z";
-                } else {
-                    fq += "*";
-                }
-                fq += "]";
+            if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
+                fq = String.format("%s:[%s TO %s]", timeKey, startTime, endTime);
             } else {
                 fq = timeKey + ":[* TO *]";
             }

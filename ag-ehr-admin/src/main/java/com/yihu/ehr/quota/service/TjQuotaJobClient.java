@@ -25,9 +25,9 @@ public interface TjQuotaJobClient {
 
     @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.POST)
     @ApiOperation(value = "执行指标任务")
-    boolean tjQuotaExecute(@RequestParam("id") Integer id,
-                           @RequestParam("startDate") String startDate,
-                           @RequestParam("endDate") String endDate);
+    boolean tjQuotaExecute(@RequestParam(value = "id") Integer id,
+                           @RequestParam(value = "startDate", required = false) String startDate,
+                           @RequestParam(value = "endDate", required = false) String endDate);
 
     @RequestMapping(value = ServiceApi.TJ.TjGetQuotaResult, method = RequestMethod.GET)
     @ApiOperation(value = "获取指标执行结果")

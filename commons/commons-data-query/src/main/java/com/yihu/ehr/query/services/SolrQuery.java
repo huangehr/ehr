@@ -32,8 +32,9 @@ public class SolrQuery {
     SolrUtil solrUtil;
 
     public void initParams(String startTime, String endTime) {
-        this.startTime = startTime;
-        this.endTime = endTime;
+        // 初始执行指标，起止日期没有值，默认分组聚合前50年的。
+        this.startTime = startTime == null ? "NOW/YEAR-50YEAR" : startTime;
+        this.endTime = endTime == null ? "NOW" : endTime;
     }
 
     /**
