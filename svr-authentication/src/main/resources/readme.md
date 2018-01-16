@@ -45,4 +45,7 @@
     grant_type=refresh_token&refresh_token=6b010e33-8bc3-4f3f-8123-66df589dc82f&client_id=uzs5G0HgTp
 
 单点登陆 sso
-1.GET http://localhost:10260/oauth/sso?response_type=token&client_id=uzs5G0HgTp&state=sxy&scope=read&redirect_uri=http://192.168.1.221:8010/ehr/browser/common/login/signin&user=admin
+
+1.GET http://localhost:10260/oauth/sso?response_type=token&client_id=uzs5G0HgTp&state=sxy&scope=read&redirect_uri=http://192.168.1.221:8010/ehr/browser/common/login/signin?idCardNo=362321200108017313&user=admin
+2.GET http://localhost:10260/oauth/sso?response_type=token&client_id=uzs5G0HgTp&state=sxy&scope=read&redirect_uri=http://localhost:8010/ehr/browser/common/login/signin?idCardNo=362321200108017313&user=admin
+
