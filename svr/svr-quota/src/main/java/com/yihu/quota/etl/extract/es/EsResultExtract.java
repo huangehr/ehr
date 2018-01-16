@@ -349,7 +349,7 @@ public class EsResultExtract {
 
 
     //根据mysql 指标分组 按时间聚合
-    public Map<String, Integer> searcherSumByGroupByTime(TjQuota tjQuota , String aggsFields ,String filter, String sumField,String orderFild,String order,String dateDime) throws Exception {
+    public List<Map<String, Object>> searcherSumByGroupByTime(TjQuota tjQuota , String aggsFields ,String filter,String dateDime) throws Exception {
         initialize(tjQuota,null);
         if(StringUtils.isEmpty(filter)){
             filter =  " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
@@ -359,7 +359,17 @@ public class EsResultExtract {
         Client client = getEsClient();
         Map<String, String> map = null;
         try {
-            map = elasticsearchUtil.searcherTimeDate(client, dateDime);
+            //SELECT sum(result) FROM medical_service_index group by town,date_histogram(field='quotaDate','interval'='year')
+            StringBuffer mysql = new StringBuffer("SELECT ")
+                    .append(aggsFields)
+                    .append(",sum(result) FROM ").append(esConfig.getIndex())
+                    .append(" where ").append(filter)
+                    .append(" group by ").append(aggsFields)
+                    .append(" ,date_histogram(field='quotaDate','interval'='")
+                    .append(dateDime).append("')");
+            System.out.println("查询分组 mysql= " + mysql.toString());
+            List<Map<String, Object>> listMap = elasticsearchUtil.excuteDataModel(mysql.toString());
+            return  listMap;
         }catch (Exception e){
             e.getMessage();
         }finally {

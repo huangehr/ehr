@@ -107,15 +107,12 @@ public class EsQuotaJob implements Job {
                         System.out.println("特殊卫生机构类型 统计数据ElasticSearch保存失败");
                     }
                 }else{
-                    String quoataDate =  new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd");
-
                     //查询是否已经统计过,如果已统计 先删除后保存
                     deleteRecord();
 
                     List<SaveModel> dataSaveModels = new ArrayList<>();
                     for(SaveModel saveModel :dataModels){
                         if(saveModel.getResult() != null ){//&& Double.valueOf(saveModel.getResult())>0
-                            saveModel.setQuotaDate(quoataDate);
                             dataSaveModels.add(saveModel);
                         }
                     }

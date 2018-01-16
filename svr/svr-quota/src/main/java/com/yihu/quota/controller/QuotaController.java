@@ -223,9 +223,9 @@ public class QuotaController extends BaseController {
 
             //特殊机构类型查询输出结果
             if( (!StringUtils.isEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-                Map<String, Integer> result  =  baseStatistsService.getTimeAggregationResult(code, dimension,filters);
-//                List<Map<String, Object>> result = baseStatistsService.getOrgHealthCategory(code, filters);
-                envelop.setObj(result);
+//                List<Map<String, Object>> result  =  baseStatistsService.getTimeAggregationResult(code, dimension,filters,"year");
+                List<Map<String, Object>> result2 = baseStatistsService.getOrgHealthCategory(code,dimension,filters);
+                envelop.setObj(result2);
             }else if( (!StringUtils.isEmpty(esConfig.getMolecular())) && !StringUtils.isEmpty(esConfig.getDenominator())){//除法
              //除法指标查询输出结果
                 Map<String, Object> resultMap =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue());
