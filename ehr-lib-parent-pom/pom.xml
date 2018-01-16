@@ -36,11 +36,5 @@
         <module>../commons/commons-data-query</module>
         <module>../commons/commons-metrics</module>
         <module>../commons/commons-entity</module>
-        <!--..
-        <module>../commons/commons-redis-keyschema</module>
-        <module>../commons/commons-thrift-services</module>
-        <module>../commons/commons-thrift-client</module>
-        <module>../commons/commons-thrift-server</module>
-        -->
     </modules>
 </project>
