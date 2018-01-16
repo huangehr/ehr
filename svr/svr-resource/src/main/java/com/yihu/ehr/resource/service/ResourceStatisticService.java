@@ -116,16 +116,15 @@ public class ResourceStatisticService extends BaseJpaService {
             sql = "SELECT o.administrative_division, COUNT(*) " +
                     "FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
-                    "WHERE d.role_type = :roleType OR d.role_type IS NULL GROUP BY d.orgCode, o.administrative_division";
+                    "WHERE d.role_type IN ('10', '11') OR d.role_type IS NULL GROUP BY d.orgCode, o.administrative_division";
         }else {
             sql = "SELECT o.administrative_division, COUNT(*) " +
                     "FROM doctors d " +
                     "LEFT JOIN organizations o ON o.org_code = d.orgCode " +
-                    "WHERE d.role_type = :roleType GROUP BY d.orgCode, o.administrative_division";
+                    "WHERE d.role_type = '8' GROUP BY d.orgCode, o.administrative_division";
         }
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
-        query.setString("roleType", roleType);
         return query.list();
     }
 
@@ -133,13 +132,12 @@ public class ResourceStatisticService extends BaseJpaService {
         Session session = currentSession();
         String sql;
         if("Doctor".equals(roleType)) {
-            sql = "SELECT COUNT(*) FROM doctors WHERE LENGTH(orgCode) > 0 AND (role_type = :roleType OR role_type IS NULL)";
+            sql = "SELECT COUNT(*) FROM doctors WHERE LENGTH(orgCode) > 0 AND (role_type IN ('10', '11') OR role_type IS NULL)";
         }else {
-            sql = "SELECT COUNT(*) FROM doctors WHERE role_type = :roleType";
+            sql = "SELECT COUNT(*) FROM doctors WHERE role_type = '8'";
         }
         Query query = session.createSQLQuery(sql);
         query.setFlushMode(FlushMode.COMMIT);
-        query.setString("roleType", roleType);
         return  (BigInteger) query.uniqueResult();
     }
 

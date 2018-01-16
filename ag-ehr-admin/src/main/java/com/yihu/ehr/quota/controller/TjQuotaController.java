@@ -209,15 +209,55 @@ public class TjQuotaController extends ExtendController<MTjQuotaModel> {
         return tjQuotaClient.hasExistsCode(code);
     }
 
-
-
-    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.GET)
-    @ApiOperation(value = "指标执行")
+    @RequestMapping(value = ServiceApi.TJ.FirstExecuteQuota, method = RequestMethod.POST)
+    @ApiOperation(value = "初始指标执行")
     public Envelop execuJob(
-            @ApiParam(name = "id")
+            @ApiParam(name = "id", value = "指标ID", required = true)
             @RequestParam(value = "id") int id) throws Exception {
         Date date = new Date();
-        tjQuotaJobClient.tjQuotaExecute(id);
+        tjQuotaJobClient.firstExecuteQuota(id);
+        MTjQuotaModel quotaModel = tjQuotaClient.getById(Long.valueOf(String.valueOf(id)));
+        Envelop envelop = new Envelop();
+        MTjQuotaLog mTjQuotaLog = null;
+        boolean flag = true;
+        int count = 1;
+        while (flag) {
+            Thread.sleep(5 * 1000L);
+            mTjQuotaLog = tjQuotaLogClient.getRecentRecord(quotaModel.getCode(),DateUtil.toStringLong(date));
+            if(mTjQuotaLog != null ){
+                flag = false;
+            }else {
+                count ++;
+            }
+            if(count > 3){
+                flag = false;
+            }
+        }
+        if(mTjQuotaLog != null ){
+            if(mTjQuotaLog.getStatus() == 1){
+                envelop.setSuccessFlg(true);
+            }else {
+                envelop.setSuccessFlg(false);
+                envelop.setErrorMsg(mTjQuotaLog.getContent());
+            }
+        }else {
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg("任务还在执行中，请稍后再进行查看日志！");
+        }
+        return envelop;
+    }
+
+    @RequestMapping(value = ServiceApi.TJ.TjQuotaExecute, method = RequestMethod.POST)
+    @ApiOperation(value = "指标执行")
+    public Envelop execuJob(
+            @ApiParam(name = "id", value = "指标ID", required = true)
+            @RequestParam(value = "id") int id,
+            @ApiParam(name = "startDate", value = "起始日期")
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @ApiParam(name = "endDate", value = "截止日期")
+            @RequestParam(value = "endDate", required = false) String endDate) throws Exception {
+        Date date = new Date();
+        tjQuotaJobClient.tjQuotaExecute(id, startDate, endDate);
         MTjQuotaModel quotaModel = tjQuotaClient.getById(Long.valueOf(String.valueOf(id)));
         Envelop envelop = new Envelop();
         MTjQuotaLog mTjQuotaLog = null;

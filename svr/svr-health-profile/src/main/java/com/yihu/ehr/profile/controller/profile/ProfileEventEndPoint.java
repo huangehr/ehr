@@ -35,14 +35,14 @@ public class ProfileEventEndPoint extends BaseRestEndPoint {
     @Autowired
     private XTransformClient transform;
 
-    @ApiOperation("门诊/住院事件(时间轴)OK")
+    @ApiOperation("门诊/住院事件(时间轴)")
     @RequestMapping(value = ServiceApi.Profiles.MedicalEvents, method = RequestMethod.GET)
     public List<Map<String, Object>> MedicalEvents(
-            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue="422724197105101686")
+            @ApiParam(name = "demographic_id", value = "身份证号", required = true, defaultValue = "422724197105101686")
             @RequestParam(value = "demographic_id") String demographic_id,
-            @ApiParam(name = "events_type", value = "就诊事件类别")
-            @RequestParam(value = "events_type", required = false) String events_type) {
-        return patientEvent.getPatientEvents(demographic_id, events_type);
+            @ApiParam(name = "filter", value = "过滤条件")
+            @RequestParam(value = "filter", required = false) String filter) {
+        return patientEvent.getPatientEvents(demographic_id, filter);
     }
 
     /**
