@@ -2,6 +2,7 @@ package com.yihu.ehr.pack.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yihu.ehr.constants.*;
+import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.exception.ApiException;
 import com.yihu.ehr.fastdfs.FastDFSUtil;
 import com.yihu.ehr.model.packs.MPackage;
@@ -11,8 +12,6 @@ import com.yihu.ehr.pack.feign.SecurityClient;
 import com.yihu.ehr.pack.feign.UserClient;
 import com.yihu.ehr.pack.service.Package;
 import com.yihu.ehr.pack.service.PackageService;
-import com.yihu.ehr.pack.task.MessageBuffer;
-import com.yihu.ehr.controller.EnvelopRestEndPoint;
 import com.yihu.ehr.util.datetime.DateUtil;
 import com.yihu.ehr.util.encrypt.RSA;
 import com.yihu.ehr.util.log.LogService;
@@ -112,17 +111,17 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @ApiParam(name = "package_crypto", value = "档案包解压密码,二次加密")
             @RequestParam(value = "package_crypto") String packageCrypto) throws Exception {
         MKey key = securityClient.getOrgKey(orgCode);
-        if (key == null ||  key.getPublicKey()==null) {
+        if (key == null || key.getPublicKey() == null) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
         }
 
-        return RSA.encrypt(packageCrypto,RSA.genPublicKey(key.getPublicKey()));
+        return RSA.encrypt(packageCrypto, RSA.genPublicKey(key.getPublicKey()));
     }
 
 
     @RequestMapping(value = ServiceApi.Packages.Packages, method = RequestMethod.POST)
     @ApiOperation(value = "接收档案", notes = "从集成开放平台接收健康档案数据包")
-    public void savePackageWithOrg (
+    public void savePackageWithOrg(
             @ApiParam(name = "pack", value = "档案包", allowMultiple = true)
             @RequestPart() MultipartFile pack,
             @ApiParam(name = "org_code", value = "机构代码")
@@ -135,7 +134,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
 
         MKey key = securityClient.getOrgKey(orgCode);
         Package aPackage;
-        if (key == null ||  key.getPrivateKey()==null) {
+        if (key == null || key.getPrivateKey() == null) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Invalid private key, maybe you miss the organization code?");
         }
         try {
@@ -156,7 +155,7 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(required = false) String id) throws Exception {
         String re = "";
         Package aPackage = packService.acquirePackage(id);
-        if(aPackage != null) {
+        if (aPackage != null) {
             re = objectMapper.writeValueAsString(aPackage);
         }
         return re;
@@ -193,22 +192,20 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         aPackage.setMessage(message);
         if (status == ArchiveStatus.Finished) {
             //入库成功
-            Map<String,String> map = objectMapper.readValue(message,Map.class);
+            Map<String, String> map = objectMapper.readValue(message, Map.class);
             aPackage.setEventType(map.get("eventType"));
             aPackage.setEventNo(map.get("eventNo"));
             aPackage.setEventDate(DateUtil.strToDate(map.get("eventDate")));
             aPackage.setPatientId(map.get("patientId"));
             aPackage.setFinishDate(new Date());
-        }
-        else if(status == ArchiveStatus.Acquired) {
+        } else if (status == ArchiveStatus.Acquired) {
             aPackage.setParseDate(new Date()); //入库执行时间
-        }
-        else {
+        } else {
             aPackage.setFinishDate(null);
-            Package oldPackage =  packService.getPackage(aPackage.getId());
-            if(oldPackage.getFailCount() < 3) {
+            Package oldPackage = packService.getPackage(aPackage.getId());
+            if (oldPackage.getFailCount() < 3) {
                 int failCount = oldPackage.getFailCount();
-                failCount ++;
+                failCount++;
                 aPackage.setFailCount(failCount);
             }
         }
@@ -256,17 +253,17 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
             @RequestParam(value = "sorts", required = false) String sorts,
             @ApiParam(name = "count", value = "数量（不要超过10000）", required = true, defaultValue = "500")
             @RequestParam(value = "count") int count) throws Exception {
-        if(status == ArchiveStatus.Received || status == ArchiveStatus.Acquired) {
-            if(redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
+        if (status == ArchiveStatus.Received || status == ArchiveStatus.Acquired) {
+            if (redisTemplate.opsForList().size(RedisCollection.PackageList) > 0) {
                 return "添加失败，队列中存在消息！";
-            }else {
+            } else {
                 List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
-                for(Package rPackage : packageList) {
+                for (Package rPackage : packageList) {
                     MPackage mPackage = convertToModel(rPackage, MPackage.class);
                     redisTemplate.opsForList().leftPush(RedisCollection.PackageList, objectMapper.writeValueAsString(mPackage));
                 }
             }
-        }else {
+        } else {
             List<Package> packageList = packService.search(null, "archiveStatus=" + status, sorts, 1, count);
             for (Package rPackage : packageList) {
                 rPackage.setArchiveStatus(ArchiveStatus.Received);
@@ -311,4 +308,31 @@ public class PackageEndPoint extends EnvelopRestEndPoint {
         //messageBuffer.putMessage(convertToModel(aPackage, MPackage.class));
     }
 
+    @RequestMapping(value = ServiceApi.PackageAnalyzer.Status, method = {RequestMethod.PUT})
+    @ApiOperation(value = "更新档案包分析状态", notes = "更新档案包分析状态")
+    public ResponseEntity<MPackage> analyzeStatus(
+            @ApiParam(value = "档案包编号")
+            @PathVariable(value = "id") String id,
+            @ApiParam(value = "分析状态")
+            @RequestParam(value = "status") Integer status) throws Exception {
+        Package aPackage = packService.getPackage(id);
+        if (aPackage == null) {
+            return new ResponseEntity<>((MPackage) null, HttpStatus.NOT_FOUND);
+        }
+
+        if (status == 2) {  //出错时记录错误次数
+            aPackage.setAnalyzeFailCount(aPackage.getAnalyzeFailCount() + 1);
+        } else {
+            aPackage.setAnalyzeFailCount(0); //避免手动修改状态后无法解析
+        }
+        aPackage.setAnalyzeStatus(status);
+        packService.save(aPackage);
+        return new ResponseEntity<>((MPackage) null, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = ServiceApi.PackageAnalyzer.Queue, method = RequestMethod.GET)
+    @ApiOperation(value = "获取档案包分析消息队列状态")
+    public Long analyzeQueueSize() throws Exception {
+        return redisTemplate.opsForList().size(RedisCollection.AnalyzeQueue);
+    }
 }
