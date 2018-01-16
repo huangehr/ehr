@@ -87,7 +87,6 @@ public class EsQuotaPercentJob implements Job {
             List<SaveModel> dataModels = extract();
 
             if(dataModels != null && dataModels.size() > 0){
-                String quoataDate =  new org.joda.time.LocalDate(new DateTime().minusDays(1)).toString("yyyy-MM-dd");
                 //查询是否已经统计过,如果已统计 先删除后保存
                 EsConfig esConfig = extractHelper.getEsConfig(quotaVo.getCode());
 
@@ -113,7 +112,6 @@ public class EsQuotaPercentJob implements Job {
                 List<SaveModel> dataSaveModels = new ArrayList<>();
                 for(SaveModel saveModel :dataModels){
                     if(saveModel.getResult() != null){
-                        saveModel.setQuotaDate(quoataDate);
                         dataSaveModels.add(saveModel);
                     }
                 }
