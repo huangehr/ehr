@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-protal-statistics-zhoujie
+    name: svr-protal-statistics
 
 ---
 spring:

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: svr-quota-zhoujie
+    name: svr-quota
 
 ---
 spring:
