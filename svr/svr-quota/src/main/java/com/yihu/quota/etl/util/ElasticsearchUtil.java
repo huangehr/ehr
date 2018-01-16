@@ -19,6 +19,8 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistogram;
 import org.elasticsearch.search.aggregations.bucket.histogram.InternalHistogram;
 import org.elasticsearch.search.aggregations.bucket.terms.*;
 import org.elasticsearch.search.aggregations.metrics.max.MaxBuilder;
@@ -307,6 +309,54 @@ public class ElasticsearchUtil {
                 map.put(sbTemp.toString() , (int)count.getValue());
             }
         }
+    }
+
+
+    /**
+     * 根据mysql 语句进行  时间分组查询
+     * @return
+     */
+    public Map<String, String> searcherTimeDate(Client client,String dataHistogram) {
+        Map<String,String> map = new LinkedHashMap<>();
+        //SELECT sum(result) FROM medical_service_index group by date_histogram(field='quotaDate','interval'='year')
+        StringBuffer mysql = new StringBuffer("SELECT  sum(result) FROM medical_service_index group by town, date_histogram(field='quotaDate','interval'='");
+        mysql.append(dataHistogram).append("')");
+        try {
+            System.out.println("查询分组 mysql= " + mysql.toString());
+            SQLExprParser parser = new ElasticSqlExprParser(mysql.toString());
+            SQLExpr expr = parser.expr();
+            if (parser.getLexer().token() != Token.EOF) {
+                throw new ParserException("illegal sql expr : " + mysql);
+            }
+            SQLQueryExpr queryExpr = (SQLQueryExpr) expr;
+            //通过抽象语法树，封装成自定义的Select，包含了select、from、where group、limit等
+            Select select = null;
+            select = new SqlParser().parseSelect(queryExpr);
+
+            AggregationQueryAction action = null;
+            DefaultQueryAction queryAction = null;
+            SqlElasticSearchRequestBuilder requestBuilder = null;
+            if (select.isAgg) {
+                //包含计算的的排序分组的
+                action = new AggregationQueryAction(client, select);
+                requestBuilder = action.explain();
+            } else {
+                //封装成自己的Select对象
+                queryAction = new DefaultQueryAction(client, select);
+                requestBuilder = queryAction.explain();
+            }
+            //之后就是对ES的操作
+            SearchResponse response = (SearchResponse) requestBuilder.get();
+            InternalHistogram dateHistogram = (InternalHistogram) response.getAggregations().asList().get(0);
+            List<Histogram.Bucket> buckets = (List<Histogram.Bucket>) dateHistogram.getBuckets();
+            for(Histogram.Bucket b:buckets){
+                map.put(b.toString(),b.toString());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 
 }

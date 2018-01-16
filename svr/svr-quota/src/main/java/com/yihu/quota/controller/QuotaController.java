@@ -4,15 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yihu.ehr.constants.ApiVersion;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
+import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.TjQuota;
+import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.model.rest.QuotaReport;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
+import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
+import com.yihu.quota.service.source.TjDataSourceService;
 import com.yihu.quota.vo.OrgHealthCategoryShowModel;
 import com.yihu.quota.vo.SaveModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hdfs.server.namenode.Quota;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,46 +48,15 @@ public class QuotaController extends BaseController {
     @Autowired
     private QuotaService quotaService;
     @Autowired
+    private TjDataSourceService dataSourceService;
+    @Autowired
+    private BaseStatistsService baseStatistsService;
+    @Autowired
     private OrgHealthCategoryStatisticsService orgHealthCategoryStatisticsService;
+    private static String orgHealthCategory = "orgHealthCategory";
 
 
-    /**
-     * 获取指标统计不同维度结果总量
-     * @param id
-     * @return
-     */
-    @ApiOperation(value = "获取指标统计不同维度结果数据")
-    @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
-    public Envelop getQuotaTotalCount(
-            @ApiParam(name = "id", value = "指标任务ID", required = true)
-            @RequestParam(value = "id" , required = true) int id,
-            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
-            @RequestParam(value = "filters", required = false) String filters,
-            @ApiParam(name = "dimension", value = "需要统计不同维度字段多个维度用;隔开", defaultValue = "quotaDate")
-            @RequestParam(value = "dimension", required = false) String dimension
-    ) {
-        Envelop envelop = new Envelop();
-        try {
-            TjQuota tjQuota = quotaService.findOne(id);
 
-//            if(数据源为 es){
-//                quotaService.searcherByGroup()
-//            }else if(数据源为 mysql){
-//
-//            }else if(数据源为 solr){
-//
-//            }
-            QuotaReport  quotaReport = quotaService.getQuotaReport(tjQuota, filters, dimension,1000);
-            envelop.setDetailModelList(quotaReport.getReultModelList());
-            envelop.setSuccessFlg(true);
-            return envelop;
-        } catch (Exception e) {
-            error(e);
-            invalidUserException(e, -1, "查询失败:" + e.getMessage());
-        }
-        envelop.setSuccessFlg(false);
-        return envelop;
-    }
 
 
     /**
@@ -131,23 +105,58 @@ public class QuotaController extends BaseController {
         return envelop;
     }
 
+    /**
+     * 获取指标统计不同维度结果总量
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "获取指标统计不同维度结果数据")
+    @RequestMapping(value = ServiceApi.TJ.GetQuotaTotalCount, method = RequestMethod.GET)
+    public Envelop getQuotaTotalCount(
+            @ApiParam(name = "id", value = "指标任务ID", required = true)
+            @RequestParam(value = "id" , required = true) int id,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "dimension", value = "需要统计不同维度字段多个维度用;隔开", defaultValue = "quotaDate")
+            @RequestParam(value = "dimension", required = false) String dimension
+    ) {
+        Envelop envelop = new Envelop();
+        try {
+            TjQuota tjQuota = quotaService.findOne(id);
+
+//            if(数据源为 es){
+//                quotaService.searcherByGroup()
+//            }else if(数据源为 mysql){
+//
+//            }else if(数据源为 solr){
+//
+//            }
+            QuotaReport  quotaReport = quotaService.getQuotaReport(tjQuota, filters, dimension,1000);
+            envelop.setDetailModelList(quotaReport.getReultModelList());
+            envelop.setSuccessFlg(true);
+            return envelop;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+        }
+        envelop.setSuccessFlg(false);
+        return envelop;
+    }
 
     /**
-     * 获取特殊机构指标执行结果分页
+     * 根据指标code获取 指标统计结果
      * @param
      * @return
      */
-    @ApiOperation(value = "获取特殊机构指标执行结果分页")
+    @ApiOperation(value = "获取特殊机构指标执行结果")
     @RequestMapping(value = ServiceApi.TJ.TjGetOrgHealthCategoryQuotaResult, method = RequestMethod.GET)
     public Envelop getOrgHealthCategoryQuotaResult(
-            @ApiParam(name = "code", value = "指标任务code", required = true)
+            @ApiParam(name = "code", value = "指标code", required = true)
             @RequestParam(value = "code" , required = true) String code,
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
-            @RequestParam(value = "dimension", required = false) String dimension
-
-    ) {
+            @RequestParam(value = "dimension", required = false) String dimension ) {
         Envelop envelop = new Envelop();
         try {
             if(filters!=null){
@@ -178,6 +187,56 @@ public class QuotaController extends BaseController {
 
             envelop.setSuccessFlg(true);
             envelop.setDetailModelList(result);
+            return envelop;
+        } catch (Exception e) {
+            error(e);
+            invalidUserException(e, -1, "查询失败:" + e.getMessage());
+        }
+        envelop.setSuccessFlg(false);
+        return envelop;
+    }
+
+
+    /**
+     * 根据指标code获取指标统计结果
+     * @param
+     * @return
+     */
+    @ApiOperation(value = "根据指标code获取指标统计结果")
+    @RequestMapping(value = ServiceApi.TJ.TjGetReportQuotaResult, method = RequestMethod.GET)
+    public Envelop geQuotaReportResultByFilter(
+            @ApiParam(name = "code", value = "指标code", required = true)
+            @RequestParam(value = "code" , required = true) String code,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension
+    ) {
+        Envelop envelop = new Envelop();
+        try {
+            if(filters!=null){
+                filters = URLDecoder.decode(filters, "UTF-8");
+            }
+            TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
+            JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
+            EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+
+            //特殊机构类型查询输出结果
+            if( (!StringUtils.isEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+                Map<String, Integer> result  =  baseStatistsService.getTimeAggregationResult(code, dimension,filters);
+//                List<Map<String, Object>> result = baseStatistsService.getOrgHealthCategory(code, filters);
+                envelop.setObj(result);
+            }else if( (!StringUtils.isEmpty(esConfig.getMolecular())) && !StringUtils.isEmpty(esConfig.getDenominator())){//除法
+             //除法指标查询输出结果
+                Map<String, Object> resultMap =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue());
+                envelop.setObj(resultMap);
+            }else {
+                Map<String, Integer> resultMap = baseStatistsService.getQuotaResultList(code, dimension,filters);
+                envelop.setObj(resultMap);
+            }
+
+            envelop.setSuccessFlg(true);
+
             return envelop;
         } catch (Exception e) {
             error(e);
@@ -220,7 +279,5 @@ public class QuotaController extends BaseController {
         }
         return  result;
     }
-
-
 
 }

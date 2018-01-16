@@ -348,5 +348,26 @@ public class EsResultExtract {
     }
 
 
+    //根据mysql 指标分组 按时间聚合
+    public Map<String, Integer> searcherSumByGroupByTime(TjQuota tjQuota , String aggsFields ,String filter, String sumField,String orderFild,String order,String dateDime) throws Exception {
+        initialize(tjQuota,null);
+        if(StringUtils.isEmpty(filter)){
+            filter =  " quotaCode='" + tjQuota.getCode().replaceAll("_", "") + "' ";
+        }else {
+            filter = filter + " and quotaCode='" + tjQuota.getCode().replaceAll("_","") + "' ";
+        }
+        Client client = getEsClient();
+        Map<String, String> map = null;
+        try {
+            map = elasticsearchUtil.searcherTimeDate(client, dateDime);
+        }catch (Exception e){
+            e.getMessage();
+        }finally {
+            client.close();
+        }
+        return null;
+    }
+
+
 
 }

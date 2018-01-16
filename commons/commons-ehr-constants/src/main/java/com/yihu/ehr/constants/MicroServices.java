@@ -12,17 +12,17 @@ public class MicroServices {
     public static final String Configuration = "svr-configuration";
 
     //以下几个微服务聚合svr-ehr-basic
-    public static final String Basic = "svr-ehr-basic";
-    public static final String Application = "svr-ehr-basic";
-    public static final String Geography = "svr-ehr-basic";
-    public static final String Patient = "svr-ehr-basic";
-    public static final String Portal = "svr-ehr-basic";
-    public static final String Security = "svr-ehr-basic";
-    public static final String User = "svr-ehr-basic";
-    public static final String Family = "svr-ehr-basic";
-    public static final String FileResource = "svr-ehr-basic";
-    public static final String Dictionary = "svr-ehr-basic";
-    public static final String Organization = "svr-ehr-basic";
+    public static final String Basic = "svr-ehr-basic-zhoujie";
+    public static final String Application = "svr-ehr-basic-zhoujie";
+    public static final String Geography = "svr-ehr-basic-zhoujie";
+    public static final String Patient = "svr-ehr-basic-zhoujie";
+    public static final String Portal = "svr-ehr-basic-zhoujie";
+    public static final String Security = "svr-ehr-basic-zhoujie";
+    public static final String User = "svr-ehr-basic-zhoujie";
+    public static final String Family = "svr-ehr-basic-zhoujie";
+    public static final String FileResource = "svr-ehr-basic-zhoujie";
+    public static final String Dictionary = "svr-ehr-basic-zhoujie";
+    public static final String Organization = "svr-ehr-basic-zhoujie";
 
     //以下几个微服务聚合svr-standard
     public static final String Adaption = "svr-standard";
@@ -43,9 +43,9 @@ public class MicroServices {
 
     public static final String Redis = "svr-redis";
 
-    public static final String Quota = "svr-quota";
+    public static final String Quota = "svr-quota-zhoujie";
 
-    public static final String Dfs = "svr-dfs";
+    public static final String Dfs = "svr-dfs-zhoujie";
 
     public static final String Cipher = "svr-cipher";
     public static final String ArchiveSecurity = "svr-archive-security";
