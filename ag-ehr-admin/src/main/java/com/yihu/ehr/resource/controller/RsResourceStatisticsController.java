@@ -40,4 +40,25 @@ public class RsResourceStatisticsController extends ExtendController {
         return envelop;
     }
 
+    @ApiOperation(value = "获取特殊机构指标执行结果分页")
+    @RequestMapping(value = ServiceApi.TJ.TjGetOrgHealthCategoryQuotaResult, method = RequestMethod.GET)
+    public Envelop getOrgHealthCategoryQuotaResult(
+            @ApiParam(name = "code", value = "指标任务code", required = true)
+            @RequestParam(value = "code" , required = true) String code,
+            @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
+            @RequestParam(value = "filters", required = false) String filters,
+            @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
+            @RequestParam(value = "dimension", required = false) String dimension ) {
+        try {
+            Envelop envelop = null;
+            envelop = rsResourceStatisticsClient.getOrgHealthCategoryQuotaResult(code,filters,dimension);
+            return envelop;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            return failedSystem();
+        }
+    }
+
 }

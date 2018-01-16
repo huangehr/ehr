@@ -3,8 +3,10 @@ package com.yihu.quota.service.quota;
 import com.yihu.quota.dao.jpa.TjQuotaDao;
 import com.yihu.quota.etl.extract.es.EsResultExtract;
 import com.yihu.quota.model.jpa.TjQuota;
+import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.model.rest.QuotaReport;
 import com.yihu.quota.model.rest.ResultModel;
+import com.yihu.quota.service.source.TjDataSourceService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ public class QuotaService {
     private TjQuotaDao quotaDao;
     @Autowired
     private EsResultExtract esResultExtract;
+    @Autowired
+    private TjDataSourceService dataSourceService;
 
     public TjQuota findOne(int id){
         return quotaDao.findOne(id);
@@ -220,6 +224,15 @@ public class QuotaService {
     }
 
 
+    /**
+     * 获取指标报表结果集
+     * @param code
+     * @param filters
+     * @param dimension
+     */
+    public void getQuotaReportResult(String code, String filters, String dimension) {
+        TjQuota tjQuota= quotaDao.findByCode(code);
+        TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
 
-
+    }
 }

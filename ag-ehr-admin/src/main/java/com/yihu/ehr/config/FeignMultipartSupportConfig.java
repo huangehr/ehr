@@ -1,9 +1,8 @@
 package com.yihu.ehr.config;
 
 import feign.codec.Encoder;
-import feign.form.spring.SpringFormEncoder;
+//import feign.form.spring.SpringFormEncoder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 
@@ -18,7 +17,7 @@ public class FeignMultipartSupportConfig {
     @Primary
     @Scope("prototype")
     public Encoder multipartFormEncoder() {
-        return new SpringFormEncoder();
+        return null;
     }
 
     @Bean
