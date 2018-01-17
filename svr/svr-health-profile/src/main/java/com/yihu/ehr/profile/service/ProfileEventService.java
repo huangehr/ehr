@@ -35,15 +35,99 @@ public class ProfileEventService {
      *  获取病人门诊住院事件
      */
     public List<Map<String,Object>> getPatientEvents(String demographicId, String filter) {
-        //事件类型
-        String query = "{\"q\":\"demographic_id:" + demographicId;
-        if (!StringUtils.isEmpty(filter)) {
-            query += " AND " + filter;
-        }
-        query += "\"}";
-        //门诊住院事件
-        Envelop envelop = resource.getMasterData(query, null, null, null);
         List<Map<String, Object>> resultList = new ArrayList<Map<String,Object>>();
+        String query;
+        Envelop envelop;
+        if(StringUtils.isEmpty(filter)) {
+            query = "{\"q\":\"demographic_id:" + demographicId + "\"}";
+        }else if("0".equals(filter)) { //门诊
+            query = "{\"q\":\"demographic_id:" + demographicId + "%20AND%20event_type:0\"}";
+        }else if("1".equals(filter)) { //住院
+            query = "{\"q\":\"demographic_id:" + demographicId + "%20AND%20event_type:1\"}";
+        }else if("3".equals(filter)) { //体检
+            query = "{\"q\":\"demographic_id:" + demographicId + "%20AND%20event_type:2\"}";
+        }else if("4".equals(filter)) { //检验
+            try {
+                query = "{\"q\":\"demographic_id:" + demographicId + "%20AND%20EHR_000379:*%20OR%20EHR_000353:*%20OR%20EHR_000341:*%20OR%20EHR_000338:*%20OR%20EHR_000366:*\"}";
+                envelop = resource.getMasterData(query, null, null, null);
+                if (envelop.isSuccessFlg()) {
+                    List<Map<String, Object>> eventList = envelop.getDetailModelList();
+                    if (eventList != null && eventList.size() > 0) {
+                        for (Map<String, Object> temp : eventList) {
+                            Map<String, Object> resultMap = new HashMap<>();
+                            resultMap.put("profileId", temp.get("rowkey"));
+                            resultMap.put("orgCode", temp.get("org_code"));
+                            resultMap.put("orgName", temp.get("org_name"));
+                            resultMap.put("demographicId", temp.get("demographic_id"));
+                            resultMap.put("cdaVersion", temp.get("cda_version"));
+                            resultMap.put("eventDate", temp.get("event_date"));
+                            resultMap.put("profileType", temp.get("profile_type"));
+                            resultMap.put("eventType", temp.get("event_type"));
+                            resultMap.put("eventNo", temp.get("event_no"));
+                            resultList.add(resultMap);
+                        }
+                    }
+                }
+                return resultList;
+            }catch (Exception e) { // 为主细表变更做的临时处理
+                query = "{\"q\":\"demographic_id:" + demographicId + "\"}";
+                envelop = resource.getMasterData(query, null, null, null);
+                List<Map<String, Object>> masterList = envelop.getDetailModelList();
+                if(masterList != null && masterList.size() > 0) {
+                    for(Map<String ,Object> temp : masterList) {
+                        String masterRowKey = (String) temp.get("rowkey");
+                        String subQ = "{\"q\":\"rowkey:" + masterRowKey + "$HDSD00_77$*" + "\"}";
+                        envelop = resource.getSubData(subQ, null, null, null);
+                        List<Map<String, Object>> subList = envelop.getDetailModelList();
+                        if(subList != null && subList.size() > 0) {
+                            Map<String, Object> resultMap = new HashMap<>();
+                            resultMap.put("profileId", temp.get("rowkey"));
+                            resultMap.put("orgCode", temp.get("org_code"));
+                            resultMap.put("orgName", temp.get("org_name"));
+                            resultMap.put("demographicId", temp.get("demographic_id"));
+                            resultMap.put("cdaVersion", temp.get("cda_version"));
+                            resultMap.put("eventDate", temp.get("event_date"));
+                            resultMap.put("profileType", temp.get("profile_type"));
+                            resultMap.put("eventType", temp.get("event_type"));
+                            resultMap.put("eventNo", temp.get("event_no"));
+                            resultList.add(resultMap);
+                        }
+                    }
+                }
+                return resultList;
+            }
+        }else if("6".equals(filter)) { //免疫
+            query = "{\"q\":\"demographic_id:" + demographicId + "%20AND%20EHR_002443:*\"}";
+        }else if("2".equals(filter)){ //影像
+            query = "{\"q\":\"demographic_id:" + demographicId + "\"}";
+            envelop = resource.getMasterData(query, null, null, null);
+            List<Map<String, Object>> masterList = envelop.getDetailModelList();
+            if(masterList != null && masterList.size() > 0) {
+                for(Map<String ,Object> temp : masterList) {
+                    String masterRowKey = (String) temp.get("rowkey");
+                    String subQ = "{\"q\":\"rowkey:" + masterRowKey + "$HDSD00_19_02$*" + "\"}";
+                    envelop = resource.getSubData(subQ, null, null, null);
+                    List<Map<String, Object>> subList = envelop.getDetailModelList();
+                    if(subList != null && subList.size() > 0) {
+                        Map<String, Object> resultMap = new HashMap<>();
+                        resultMap.put("profileId", temp.get("rowkey"));
+                        resultMap.put("orgCode", temp.get("org_code"));
+                        resultMap.put("orgName", temp.get("org_name"));
+                        resultMap.put("demographicId", temp.get("demographic_id"));
+                        resultMap.put("cdaVersion", temp.get("cda_version"));
+                        resultMap.put("eventDate", temp.get("event_date"));
+                        resultMap.put("profileType", temp.get("profile_type"));
+                        resultMap.put("eventType", temp.get("event_type"));
+                        resultMap.put("eventNo", temp.get("event_no"));
+                        resultList.add(resultMap);
+                    }
+                }
+            }
+            return resultList;
+        }else {
+            return resultList;
+        }
+        envelop = resource.getMasterData(query, null, null, null);
         if(envelop.isSuccessFlg()) {
             List<Map<String, Object>> eventList = envelop.getDetailModelList();
             if(eventList != null && eventList.size() > 0) {
@@ -60,8 +144,6 @@ public class ProfileEventService {
                     resultMap.put("eventNo", temp.get("event_no"));
                     resultList.add(resultMap);
                 }
-            }else {
-                return resultList;
             }
         }
         return resultList;
