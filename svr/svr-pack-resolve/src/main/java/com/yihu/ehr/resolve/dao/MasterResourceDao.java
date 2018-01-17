@@ -37,9 +37,7 @@ public class MasterResourceDao {
                 MasterRecord masterRecord = resBucket.getMasterRecord();
                 Map<String, String> supplement = masterRecord.getDataGroup();
                 for(String key : supplement.keySet()) {
-                    if(!originResult.containsKey(key)) {
-                        originResult.put(key, supplement.get(key));
-                    }
+                    originResult.put(key, supplement.get(key));
                 }
                 hbaseDao.deleteFamily(ResourceCore.MasterTable, rowKey, MasterResourceFamily.Data);
                 bundle.addValues(rowKey, MasterResourceFamily.Data, originResult);

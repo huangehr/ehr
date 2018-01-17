@@ -5,4 +5,5 @@ package com.yihu.ehr.constants;
  */
 public class RedisCollection {
     public static final String PackageList = "package_list";
+    public static final String AnalyzeQueue = "analyze_queue";
 }
