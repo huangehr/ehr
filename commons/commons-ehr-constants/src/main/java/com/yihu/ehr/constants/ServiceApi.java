@@ -1167,6 +1167,7 @@ public class ServiceApi {
         public static final String TjGetReportQuotaResult = "/tj/tjGetReportQuotaResult";
         public static final String TjQuotaExecute = "/job/execuJob";
         public static final String FirstExecuteQuota = "/job/firstExecuteQuota";
+        public static final String FindByQuotaCodes = "/quota/findByQuotaCodes";
 
 
         public static final String GetTjQuotaWarn = "tj/getTjQuotaWarn";

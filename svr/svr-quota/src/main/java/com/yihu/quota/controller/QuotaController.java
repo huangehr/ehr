@@ -7,6 +7,7 @@ import com.yihu.ehr.util.rest.Envelop;
 import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
+import com.yihu.quota.model.rest.HospitalComposeModel;
 import com.yihu.quota.model.rest.QuotaReport;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
 import com.yihu.quota.service.quota.BaseStatistsService;
@@ -280,4 +281,92 @@ public class QuotaController extends BaseController {
         return  result;
     }
 
+    @ApiOperation(value = "根据编码获取指标执行结果")
+    @RequestMapping(value = ServiceApi.TJ.FindByQuotaCodes, method = RequestMethod.GET)
+    public Envelop findByQuotaCodes(
+            @ApiParam(name = "quotaCodes", value = "指标code", required = true)
+            @RequestParam(value = "quotaCodes") String quotaCodes,
+            @ApiParam(name = "orgCode", value = "机构code", required = true)
+            @RequestParam(value = "orgCode") String orgCode) {
+        List<HospitalComposeModel> hospitalComposeModels = new ArrayList<>();
+        HospitalComposeModel hospitalComposeModel = new HospitalComposeModel();
+        hospitalComposeModel.setTitle("按性别分");
+        Envelop envelop = new Envelop();
+        String[] code = quotaCodes.split(",");
+
+        List<Map<String, Object>> myListMap = new ArrayList<>();
+        try {
+            for (String quotaCode : code) {
+                List<Map<String, Object>> mapList = quotaService.queryResultPageByCode(quotaCode, "{\"org\":\""+ orgCode+ "\"}", 1, 10000);
+                if (null != mapList && mapList.size() > 0) {
+                    Map<String, Object> title = new HashMap<>();
+                    Map<String, Object> myMap = new HashMap<>();
+                    for (Map<String, Object> map : mapList) {
+                        SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
+                        if(saveModel != null){
+                            title.put("title", saveModel.getQuotaName());
+                            if ("1".equals(saveModel.getSlaveKey1())) {
+                                myMap.put("男", saveModel.getResult());
+                            } else if ("2".equals(saveModel.getSlaveKey1())) {
+                                myMap.put("女", saveModel.getResult());
+                            }
+                        }
+                    }
+                    myMap.putAll(title);
+                    myListMap.add(myMap);
+                } else {
+                    String title = exchangeCode(quotaCode);
+                    Map<String, Object> map = new HashMap<>();
+                    Map<String, Object> titleMap = new HashMap<>();
+                    map.put("男", 0);
+                    map.put("女", 0);
+                    titleMap.put("title", title);
+                    map.putAll(titleMap);
+                    myListMap.add(map);
+                }
+            }
+            HospitalComposeModel hos = new HospitalComposeModel();
+            hos.setListMap(myListMap);
+            hospitalComposeModel.setChildren(hos);
+            hospitalComposeModels.add(hospitalComposeModel);
+            envelop.setDetailModelList(hospitalComposeModels);
+            envelop.setSuccessFlg(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
+
+    public String exchangeCode(String code) {
+        String value = "";
+        switch (code) {
+            case "HC_02_0101" :
+                value = "注册护士";
+                break;
+            case "HC_02_0102" :
+                value = "药师";
+                break;
+            case "HC_02_0103" :
+                value = "技师";
+                break;
+            case "HC_02_0104" :
+                value = "其他";
+                break;
+            case "HC_02_0105" :
+                value = "执业医师";
+                break;
+            case "HC_02_0106" :
+                value = "执业（助理）医师";
+                break;
+            case "HC_02_0107" :
+                value = "其他技术人员";
+                break;
+            case "HC_02_0108" :
+                value = "管理人员";
+                break;
+        }
+        return value;
+    }
 }
