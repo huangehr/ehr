@@ -5,9 +5,11 @@ import com.yihu.ehr.constants.MicroServices;
 import com.yihu.ehr.constants.ServiceApi;
 import com.yihu.ehr.util.rest.Envelop;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -57,4 +59,23 @@ public interface ResourceStatisticsClient {
     @RequestMapping(value =  ServiceApi.StasticReport.getStatisticsCityDoctorByRoleType, method = RequestMethod.GET)
     @ApiOperation(value = "全市医生、护士、床位的统计")
     Envelop getStatisticsCityDoctorByRoleType();
+
+    @RequestMapping(value =  ServiceApi.StasticReport.GetArchiveReportAll, method = RequestMethod.GET)
+    @ApiOperation(value = "获取一段时间内健康档案数据")
+    Envelop getArchiveReportAll(@ApiParam(name = "startDate", value = "开始日期")
+                                @RequestParam(name = "startDate") String startDate,
+                                @ApiParam(name = "endDate", value = "结束日期")
+                                @RequestParam(name = "endDate") String endDate);
+
+    @RequestMapping(value =  ServiceApi.StasticReport.GetRecieveOrgCount, method = RequestMethod.GET)
+    @ApiOperation(value = "根据接收日期统计各个医院的数据解析情况")
+    Envelop getRecieveOrgCount(@ApiParam(name = "date", value = "日期")
+                                @RequestParam(name = "date") String date);
+
+    @RequestMapping(value =  ServiceApi.StasticReport.GetArchivesInc, method = RequestMethod.GET)
+    @ApiOperation(value = "根据接收日期统计各个医院的数据解析情况")
+    Envelop getArchivesInc(@ApiParam(name = "date", value = "日期")
+                                @RequestParam(name = "date") String date,
+                           @ApiParam(name = "orgCode", value = "医院代码")
+                           @RequestParam(name = "orgCode") String orgCode);
 }
