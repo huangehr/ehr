@@ -217,4 +217,8 @@ public interface OrganizationClient {
     @RequestMapping(value = "/organizations/getHospital", method = RequestMethod.GET)
     @ApiOperation("查询所有经纬度医院列表")
     Envelop getHospital();
+
+    @RequestMapping(value = "/organizations/getOrgListByAddressPid", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域查询机构列表")
+    Envelop getOrgListByAddressPid(@RequestParam(value = "pid") Integer pid);
 }
