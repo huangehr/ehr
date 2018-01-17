@@ -8,6 +8,7 @@ import com.yihu.quota.etl.model.EsConfig;
 import com.yihu.quota.model.jpa.TjQuota;
 import com.yihu.quota.model.jpa.source.TjQuotaDataSource;
 import com.yihu.quota.model.rest.QuotaReport;
+import com.yihu.quota.model.rest.ResultModel;
 import com.yihu.quota.service.orgHealthCategory.OrgHealthCategoryStatisticsService;
 import com.yihu.quota.service.quota.BaseStatistsService;
 import com.yihu.quota.service.quota.QuotaService;
@@ -120,19 +121,53 @@ public class QuotaController extends BaseController {
             @ApiParam(name = "dimension", value = "需要统计不同维度字段多个维度用;隔开", defaultValue = "quotaDate")
             @RequestParam(value = "dimension", required = false) String dimension
     ) {
-        Envelop envelop = new Envelop();
-        try {
-            TjQuota tjQuota = quotaService.findOne(id);
 
-//            if(数据源为 es){
-//                quotaService.searcherByGroup()
-//            }else if(数据源为 mysql){
-//
-//            }else if(数据源为 solr){
-//
-//            }
-            QuotaReport  quotaReport = quotaService.getQuotaReport(tjQuota, filters, dimension,1000);
-            envelop.setDetailModelList(quotaReport.getReultModelList());
+        Envelop envelop = new Envelop();
+        TjQuota tjQuota = quotaService.findOne(id);
+        String code = tjQuota.getCode();
+        String dateType = null;
+        try {
+            if(filters!=null){
+                filters = URLDecoder.decode(filters, "UTF-8");
+            }
+            TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
+            JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
+            EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
+            List<Map<String, Object>>  resultList = new ArrayList<>();
+            if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+                //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
+                resultList = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
+
+            }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
+                //除法指标查询输出结果
+                resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
+
+            }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
+                //除法指标查询输出结果
+                resultList =  baseStatistsService.divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, filters, "1", esConfig.getThousandFlag(),dateType);
+
+            }else {
+                //普通指标查询
+                resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
+
+            }
+            List<ResultModel> resultModelList = new ArrayList<>();
+            String [] dimens = dimension.split(";");
+            for(Map<String, Object> map :resultList){
+                List<String> cloumns = new ArrayList<>();
+                ResultModel resultModel = new ResultModel();
+                resultModel.setValue(map.get("result"));
+                for(int i = 0;i < dimens.length;i++){
+                    cloumns.add(map.get(dimens[i]).toString());
+                }
+                resultModel.setCloumns(cloumns);
+                resultModelList.add(resultModel);
+            }
+
+            envelop.setDetailModelList(resultModelList);
+
+//            QuotaReport  quotaReport = quotaService.getQuotaReport(tjQuota, filters, dimension,1000);
+//            envelop.setDetailModelList(quotaReport.getReultModelList());
             envelop.setSuccessFlg(true);
             return envelop;
         } catch (Exception e) {
@@ -158,7 +193,7 @@ public class QuotaController extends BaseController {
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
             @RequestParam(value = "dimension", required = true) String dimension,
-            @ApiParam(name = "dateType", value = "时间聚合类型", defaultValue = "")
+            @ApiParam(name = "dateType", value = "时间聚合类型 year,month,week,day", defaultValue = "")
             @RequestParam(value = "dateType", required = false) String dateType
     ) {
         Envelop envelop = new Envelop();

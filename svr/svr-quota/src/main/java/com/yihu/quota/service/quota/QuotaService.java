@@ -105,7 +105,7 @@ public class QuotaService {
                     //如果有重复 先删除listl里面的数据，然后添加新数据
                     reultModelList.remove(oldresult);
                     reultModel.setCloumns(cloumns);
-                    Object totalResultVal = ( Integer.valueOf(resultVal.toString()) + Integer.valueOf(oldresult.getValue().toString()) );
+                    Object totalResultVal = ( Double.valueOf(resultVal.toString()) + Double.valueOf(oldresult.getValue().toString()) );
                     reultModel.setValue(totalResultVal);
                     reultModelList.add(reultModel);
                 }
