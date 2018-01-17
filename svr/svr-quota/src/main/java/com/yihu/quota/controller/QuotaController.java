@@ -157,7 +157,7 @@ public class QuotaController extends BaseController {
             @ApiParam(name = "filters", value = "检索条件", defaultValue = "")
             @RequestParam(value = "filters", required = false) String filters,
             @ApiParam(name = "dimension", value = "需要统计不同维度字段", defaultValue = "")
-            @RequestParam(value = "dimension", required = false) String dimension,
+            @RequestParam(value = "dimension", required = true) String dimension,
             @ApiParam(name = "dateType", value = "时间聚合类型", defaultValue = "")
             @RequestParam(value = "dateType", required = false) String dateType
     ) {
@@ -170,22 +170,24 @@ public class QuotaController extends BaseController {
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
 
-            //特殊机构类型查询输出结果
-            if( (!StringUtils.isEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-                List<Map<String, Object>> result  =  baseStatistsService.getTimeAggregationResult(code, dimension,filters,dateType);
-                List<Map<String, Object>> result2 = baseStatistsService.getOrgHealthCategory(code,dimension,filters);
-                envelop.setObj(result2);
-            }else if( (!StringUtils.isEmpty(esConfig.getMolecular())) && !StringUtils.isEmpty(esConfig.getDenominator())){//除法
-             //除法指标查询输出结果
-                Map<String, Object> resultMap =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue());
-                envelop.setObj(resultMap);
+            if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+                //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
+                List<Map<String, Object>> result = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
+                envelop.setObj(result);
+            }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
+                //除法指标查询输出结果
+                List<Map<String, Object>> result =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
+                envelop.setObj(result);
+            }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
+                //除法指标查询输出结果
+                List<Map<String, Object>> result =  baseStatistsService.divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, filters, "1", esConfig.getThousandFlag(),dateType);
+                envelop.setObj(result);
             }else {
-                Map<String, Integer> resultMap = baseStatistsService.getQuotaResultList(code, dimension,filters);
+                //普通指标查询
+                List<Map<String, Object>>  resultMap = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
                 envelop.setObj(resultMap);
             }
-
             envelop.setSuccessFlg(true);
-
             return envelop;
         } catch (Exception e) {
             error(e);
