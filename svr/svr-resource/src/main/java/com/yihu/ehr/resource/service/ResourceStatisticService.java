@@ -59,7 +59,7 @@ public class ResourceStatisticService extends BaseJpaService {
 
     public List getOrgAreaIdGroup() {
         Session session = currentSession();
-        String sql = "SELECT o.administrative_division, COUNT(*) " +
+        String sql = "SELECT o.administrative_division, COUNT(1) " +
                 "FROM archive_relation a " +
                 "LEFT JOIN organizations o ON a.org_code = o.org_code " +
                 "GROUP BY a.org_code, o.administrative_division";
