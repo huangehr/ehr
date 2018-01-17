@@ -14,12 +14,12 @@ public class ResultModel {
         return cloumns;
     }
 
-    public Object getValue() {
-        return value;
-    }
-
     public void setCloumns(List<String> cloumns) {
         this.cloumns = cloumns;
+    }
+
+    public Object getValue() {
+        return value;
     }
 
     public void setValue(Object value) {
