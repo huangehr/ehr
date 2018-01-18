@@ -1189,6 +1189,8 @@ public class ServiceApi {
         public static final String GetQuotaNestedPieReportPreviews = "tj/getQuotaNestedPieReportPreviews";
         public static final String GetQuotaTotalCount = "tj/getQuotaTotalCount";
         public static final String GetQuotaGroupBy = "tj/getQuotaGroupBy";
+        public static final String GetQuotaReportTwoDimensionalTable = "tj/getQuotaReportTwoDimensionalTable";
+
 
 
         public static final String TjQuotaChart = "/tj/tjQuotaChart";
