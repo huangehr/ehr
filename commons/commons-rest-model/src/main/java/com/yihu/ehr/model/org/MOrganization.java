@@ -59,6 +59,8 @@ public class MOrganization implements Serializable{
 
     private boolean checked;    //是否选中
 
+    private String hosEconomic; // 经济类型代码
+
     public MOrganization() {
     }
 
@@ -367,5 +369,13 @@ public class MOrganization implements Serializable{
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public String getHosEconomic() {
+        return hosEconomic;
+    }
+
+    public void setHosEconomic(String hosEconomic) {
+        this.hosEconomic = hosEconomic;
     }
 }

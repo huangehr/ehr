@@ -320,8 +320,8 @@ public class QuotaController extends BaseController {
     public Envelop findByQuotaCodes(
             @ApiParam(name = "quotaCodes", value = "指标code", required = true)
             @RequestParam(value = "quotaCodes") String quotaCodes,
-            @ApiParam(name = "orgCode", value = "机构code", required = true)
-            @RequestParam(value = "orgCode") String orgCode) {
+            @ApiParam(name = "town", value = "区域town", required = true)
+            @RequestParam(value = "town") String town) {
         List<HospitalComposeModel> hospitalComposeModels = new ArrayList<>();
         List<HospitalComposeModel> hospitalComposeModelList = new ArrayList<>();
         HospitalComposeModel hospitalComposeModel = new HospitalComposeModel();
@@ -334,7 +334,7 @@ public class QuotaController extends BaseController {
             for (int i = 0; i < code.length; i++) {
                 HospitalComposeModel hos = new HospitalComposeModel();
 
-                List<Map<String, Object>> mapList = quotaService.queryResultPageByCode(code[i], "{\"org\":\""+ orgCode+ "\"}", 1, 10000);
+                List<Map<String, Object>> mapList = quotaService.queryResultPageByCode(code[i], "{\"town\":\""+ town + "\"}", 1, 10000);
                 if (null != mapList && mapList.size() > 0) {
                     for (Map<String, Object> map : mapList) {
                         SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
@@ -372,10 +372,10 @@ public class QuotaController extends BaseController {
             int sum1 = 0;
             int sum2 = 0;
             for (int i = 0; i < hospitalComposeModels.size(); i++) {
-                map1.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX1());
-                map2.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX2());
-                sum1 += Integer.parseInt(hospitalComposeModels.get(i).getX1());
-                sum2 += Integer.parseInt(hospitalComposeModels.get(i).getX2());
+                map1.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX1() == null ? "0" : hospitalComposeModels.get(i).getX1());
+                map2.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX2() == null ? "0" : hospitalComposeModels.get(i).getX2());
+                sum1 += Integer.parseInt(hospitalComposeModels.get(i).getX1() == null ? "0" : hospitalComposeModels.get(i).getX1());
+                sum2 += Integer.parseInt(hospitalComposeModels.get(i).getX2() == null ? "0" : hospitalComposeModels.get(i).getX2());
             }
             map1.put("name", "男");
             map1.put("sum", sum1);

@@ -2,6 +2,7 @@ package com.yihu.quota.etl.extract;
 
 import com.sun.net.httpserver.Headers;
 import com.yihu.ehr.entity.address.AddressDict;
+import com.yihu.ehr.entity.dict.SystemDictEntry;
 import com.yihu.ehr.model.org.MOrganization;
 import com.yihu.ehr.query.services.SolrQuery;
 import com.yihu.ehr.solr.SolrUtil;
@@ -159,7 +160,7 @@ public class ExtractUtil {
                 } else {
                     if(dimensionMain.getMainCode().equals("org")){//机构关联出区县
                         for(SaveModel model: dictData){
-                            String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision from organizations where org_code=";
+                            String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision, hos_economic as hosEconomic from organizations where org_code=";
                             dictSql += "'"+ model.getOrg() + "'";
                             List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
                             if(organizations != null && organizations.size() > 0){
@@ -170,6 +171,18 @@ public class ExtractUtil {
                                     List<AddressDict> addressDicts = jdbcTemplate.query(townSql, new BeanPropertyRowMapper(AddressDict.class));
                                     model.setTown(String.valueOf(addressDicts.get(0).getId()));
                                     model.setTownName(addressDicts.get(0).getName());
+                                }
+                                if (!StringUtils.isEmpty(organizations.get(0).getHosEconomic())) {
+                                    String economicSql = "SELECT DISTINCT catalog from system_dict_entries WHERE dict_id = 102 and code =" + organizations.get(0).getHosEconomic();
+                                    List<SystemDictEntry> systemDictEntries = jdbcTemplate.query(economicSql, new BeanPropertyRowMapper(SystemDictEntry.class));
+                                    String name = systemDictEntries.get(0).getCatalog();
+                                    if ("公立".equals(name)) {
+                                        model.setEconomic("1021");
+                                        model.setEconomicName("公立");
+                                    } else {
+                                        model.setEconomic("1022");
+                                        model.setEconomicName("非公立");
+                                    }
                                 }
                             }
                         }
@@ -224,7 +237,7 @@ public class ExtractUtil {
                     List<SaveModel> saveDataMain = jdbcTemplate.query(dimensionMains.get(i).getDictSql(), new BeanPropertyRowMapper(SaveModel.class));
                     if(dimensionMains.get(i).getMainCode().equals("org")){//机构关联出区县
                         for(SaveModel model: saveDataMain){
-                            String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision from organizations where org_code=";
+                            String dictSql = "SELECT org_code as orgCode,hos_type_id as hosTypeId,administrative_division as administrativeDivision, hos_economic as hosEconomic from organizations where org_code=";
                             dictSql += "'"+ model.getOrg() + "'";
                             List<MOrganization> organizations = jdbcTemplate.query(dictSql, new BeanPropertyRowMapper(MOrganization.class));
                             if(organizations != null && organizations.size() > 0){
@@ -235,6 +248,18 @@ public class ExtractUtil {
                                     List<AddressDict> addressDicts = jdbcTemplate.query(townSql, new BeanPropertyRowMapper(AddressDict.class));
                                     model.setTown(String.valueOf(addressDicts.get(0).getId()));
                                     model.setTownName(addressDicts.get(0).getName());
+                                }
+                            }
+                            if (!StringUtils.isEmpty(organizations.get(0).getHosEconomic())) {
+                                String economicSql = "SELECT DISTINCT catalog from system_dict_entries WHERE dict_id = 102 and code =" + organizations.get(0).getHosEconomic();
+                                List<SystemDictEntry> systemDictEntries = jdbcTemplate.query(economicSql, new BeanPropertyRowMapper(SystemDictEntry.class));
+                                String name = systemDictEntries.get(0).getCatalog();
+                                if ("公立".equals(name)) {
+                                    model.setEconomic("1021");
+                                    model.setEconomicName("公立");
+                                } else {
+                                    model.setEconomic("1022");
+                                    model.setEconomicName("非公立");
                                 }
                             }
                         }
