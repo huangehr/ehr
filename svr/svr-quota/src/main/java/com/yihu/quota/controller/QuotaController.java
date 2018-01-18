@@ -84,12 +84,14 @@ public class QuotaController extends BaseController {
                 filters = URLDecoder.decode(filters, "UTF-8");
             }
             System.out.println(filters);
-            List<Map<String, Object>> resultList = quotaService.queryResultPage(id, filters, pageNo, pageSize);
             List<SaveModel> saveModelList = new ArrayList<SaveModel>();
-            for(Map<String, Object> map : resultList){
-                SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
-                if(saveModel != null){
-                    saveModelList.add(saveModel);
+            List<Map<String, Object>> resultList = quotaService.queryResultPage(id, filters, pageNo, pageSize);
+            if(resultList != null && resultList.size() > 0){
+                for(Map<String, Object> map : resultList){
+                    SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
+                    if(saveModel != null){
+                        saveModelList.add(saveModel);
+                    }
                 }
             }
             long totalCount = quotaService.getQuotaTotalCount(id,filters);
@@ -130,19 +132,22 @@ public class QuotaController extends BaseController {
         try {
             if(filters!=null){
                 filters = URLDecoder.decode(filters, "UTF-8");
+                if(filters.equals("{}")){
+                    filters = null;
+                }
             }
             TjQuotaDataSource quotaDataSource = dataSourceService.findSourceByQuotaCode(code);
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             List<Map<String, Object>>  resultList = new ArrayList<>();
             if(tjQuota.getResultGetType().equals("1")){
-                if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-                    //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
-                    resultList = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
-                }else {
+//                if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+//                    //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
+//                    resultList = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
+//                }else {
                     //普通指标直接查询
                     resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
-                }
+//                }
             }else {
                 if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
                     //除法指标查询输出结果

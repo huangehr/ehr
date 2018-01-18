@@ -442,7 +442,7 @@ public class BaseStatistsService {
      * @param dimension
      * @return
      */
-    private Map<String,String> getDimensionMap(String dictSql, String dimension) {
+    public Map<String,String> getDimensionMap(String dictSql, String dimension) {
         Map<String,String> dimensionDicMap = new HashMap<>();
         if(StringUtils.isNotEmpty(dictSql)) {
             BasesicUtil baseUtil = new BasesicUtil();
