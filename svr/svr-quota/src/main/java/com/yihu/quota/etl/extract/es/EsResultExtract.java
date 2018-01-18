@@ -196,6 +196,7 @@ public class EsResultExtract {
     public BoolQueryBuilder getBoolQueryBuilder(BoolQueryBuilder boolQueryBuilder){
 
         if( !StringUtils.isEmpty(result)){
+            result = "1";
             RangeQueryBuilder rangeQueryResult = QueryBuilders.rangeQuery("result").gte(result);
             boolQueryBuilder.must(rangeQueryResult);
         }
@@ -247,7 +248,6 @@ public class EsResultExtract {
             QueryStringQueryBuilder termTown = QueryBuilders.queryStringQuery("town:" + town);
             boolQueryBuilder.must(termTown);
         }
-
         if( !StringUtils.isEmpty(year) ){
             QueryStringQueryBuilder termYear = QueryBuilders.queryStringQuery("year:" + year);
             boolQueryBuilder.must(termYear);
