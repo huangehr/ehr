@@ -323,33 +323,37 @@ public class QuotaController extends BaseController {
             @ApiParam(name = "orgCode", value = "机构code", required = true)
             @RequestParam(value = "orgCode") String orgCode) {
         List<HospitalComposeModel> hospitalComposeModels = new ArrayList<>();
+        List<HospitalComposeModel> hospitalComposeModelList = new ArrayList<>();
         HospitalComposeModel hospitalComposeModel = new HospitalComposeModel();
-        hospitalComposeModel.setTitle("按性别分");
+        hospitalComposeModel.setName("按性别分");
         Envelop envelop = new Envelop();
         String[] code = quotaCodes.split(",");
 
         List<Map<String, Object>> myListMap = new ArrayList<>();
         try {
-            for (String quotaCode : code) {
-                List<Map<String, Object>> mapList = quotaService.queryResultPageByCode(quotaCode, "{\"org\":\""+ orgCode+ "\"}", 1, 10000);
+            for (int i = 0; i < code.length; i++) {
+                HospitalComposeModel hos = new HospitalComposeModel();
+
+                List<Map<String, Object>> mapList = quotaService.queryResultPageByCode(code[i], "{\"org\":\""+ orgCode+ "\"}", 1, 10000);
                 if (null != mapList && mapList.size() > 0) {
-                    Map<String, Object> title = new HashMap<>();
-                    Map<String, Object> myMap = new HashMap<>();
                     for (Map<String, Object> map : mapList) {
                         SaveModel saveModel =  objectMapper.convertValue(map, SaveModel.class);
                         if(saveModel != null){
-                            title.put("title", saveModel.getQuotaName());
+                            hos.setName(saveModel.getQuotaName());
                             if ("1".equals(saveModel.getSlaveKey1())) {
-                                myMap.put("男", saveModel.getResult());
+                                hos.setX1(saveModel.getResult());
                             } else if ("2".equals(saveModel.getSlaveKey1())) {
-                                myMap.put("女", saveModel.getResult());
+                                hos.setX2(saveModel.getResult());
                             }
+
                         }
                     }
-                    myMap.putAll(title);
-                    myListMap.add(myMap);
+                    hospitalComposeModels.add(hos);
                 } else {
-                    String title = exchangeCode(quotaCode);
+                    String title = exchangeCode(code[i]);
+                    hos.setName(title);
+                    hos.setX1("0");
+                    hos.setX2("0");
                     Map<String, Object> map = new HashMap<>();
                     Map<String, Object> titleMap = new HashMap<>();
                     map.put("男", 0);
@@ -357,14 +361,31 @@ public class QuotaController extends BaseController {
                     titleMap.put("title", title);
                     map.putAll(titleMap);
                     myListMap.add(map);
+                    hospitalComposeModels.add(hos);
                 }
             }
-            HospitalComposeModel hos = new HospitalComposeModel();
-            hos.setListMap(myListMap);
-            hospitalComposeModel.setChildren(hos);
-            hospitalComposeModels.add(hospitalComposeModel);
-            envelop.setDetailModelList(hospitalComposeModels);
             envelop.setSuccessFlg(true);
+
+            List<Map<String, Object>> list = new ArrayList<>();
+            Map<String, Object> map1 = new HashMap<>();
+            Map<String, Object> map2 = new HashMap<>();
+            int sum1 = 0;
+            int sum2 = 0;
+            for (int i = 0; i < hospitalComposeModels.size(); i++) {
+                map1.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX1());
+                map2.put(hospitalComposeModels.get(i).getName(), hospitalComposeModels.get(i).getX2());
+                sum1 += Integer.parseInt(hospitalComposeModels.get(i).getX1());
+                sum2 += Integer.parseInt(hospitalComposeModels.get(i).getX2());
+            }
+            map1.put("name", "男");
+            map1.put("sum", sum1);
+            map2.put("name", "女");
+            map2.put("sum", sum2);
+            list.add(map1);
+            list.add(map2);
+            hospitalComposeModel.setChildren(list);
+            hospitalComposeModelList.add(hospitalComposeModel);
+            envelop.setObj(hospitalComposeModelList);
         } catch (Exception e) {
             e.printStackTrace();
             envelop.setSuccessFlg(false);
