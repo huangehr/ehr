@@ -135,23 +135,31 @@ public class QuotaController extends BaseController {
             JSONObject obj = new JSONObject().fromObject(quotaDataSource.getConfigJson());
             EsConfig esConfig= (EsConfig) JSONObject.toBean(obj,EsConfig.class);
             List<Map<String, Object>>  resultList = new ArrayList<>();
-            if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
-                //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
-                resultList = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
-
-            }else if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
-                //除法指标查询输出结果
-                resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
-
-            }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
-                //除法指标查询输出结果
-                resultList =  baseStatistsService.divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, filters, "1", esConfig.getThousandFlag(),dateType);
-
+            if(tjQuota.getResultGetType().equals("1")){
+                if( (StringUtils.isNotEmpty(esConfig.getEspecialType())) && esConfig.getEspecialType().equals(orgHealthCategory)){
+                    //特殊机构类型查询输出结果  只有查询条件没有维度 默认是 机构类型维度
+                    resultList = baseStatistsService.getOrgHealthCategory(code,filters,dateType);
+                }else {
+                    //普通指标直接查询
+                    resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
+                }
             }else {
-                //普通指标查询
-                resultList = baseStatistsService.getQuotaResultList(code, dimension,filters,dateType);
+                if( (StringUtils.isNotEmpty(esConfig.getMolecular())) && StringUtils.isNotEmpty(esConfig.getDenominator())){//除法
+                    //除法指标查询输出结果
+                    resultList =  baseStatistsService.divisionQuota(esConfig.getMolecular(), esConfig.getDenominator(), dimension, filters, esConfig.getPercentOperation(), esConfig.getPercentOperationValue(),dateType);
 
+                }else if( (StringUtils.isNotEmpty(esConfig.getThousandDmolecular())) && StringUtils.isNotEmpty(esConfig.getThousandDenominator())){//除法
+                    //除法指标查询输出结果
+                    resultList =  baseStatistsService.divisionQuota(esConfig.getThousandDmolecular(), esConfig.getThousandDenominator(), dimension, filters, "1", esConfig.getThousandFlag(),dateType);
+
+                }else {
+                    if(StringUtils.isNotEmpty(esConfig.getSuperiorBaseQuotaCode())){
+                        //通过基础指标 抽取查询
+                        resultList = baseStatistsService.getQuotaResultList(esConfig.getSuperiorBaseQuotaCode(), dimension,filters,dateType);
+                    }
+                }
             }
+
             List<ResultModel> resultModelList = new ArrayList<>();
             String [] dimens = dimension.split(";");
             for(Map<String, Object> map :resultList){

@@ -30,6 +30,7 @@ public class MTjQuotaModel {
     private String metadataCode;
     private String isInitExec; // 是否初始执行过，0：否，1：是。
     private String jobClazzName;
+    private String resultGetType;
 
     public String getQuotaTypeName() {
         return quotaTypeName;
@@ -237,5 +238,13 @@ public class MTjQuotaModel {
 
     public void setJobClazzName(String jobClazzName) {
         this.jobClazzName = jobClazzName;
+    }
+
+    public String getResultGetType() {
+        return resultGetType;
+    }
+
+    public void setResultGetType(String resultGetType) {
+        this.resultGetType = resultGetType;
     }
 }
