@@ -135,17 +135,25 @@ public class ResourceCenterStatisticsEndPoint extends EnvelopRestEndPoint {
         Envelop envelop = new Envelop();
         List<Map> resultList = new ArrayList(1);
         List areaIdGroupList = statisticService.getOrgAreaIdGroup();
-        List<String> xData = new ArrayList<>(areaIdGroupList.size());
-        List<BigInteger> yData = new ArrayList<>(areaIdGroupList.size());
-        for(int i = 0; i < areaIdGroupList.size(); i ++ ) {
+        Map<Integer, BigInteger> distinctMap = new HashMap();
+        for(int i = 0; i < areaIdGroupList.size(); i ++) {
             Object [] dataArr = (Object[]) areaIdGroupList.get(i);
             Integer areaId = (Integer) dataArr[0];
             BigInteger count = (BigInteger) dataArr[1];
             if(areaId != null) {
-                String areaName = statisticService.getAreaNameById(areaId);
-                xData.add(areaName);
-                yData.add(count);
+                if (distinctMap.containsKey(areaId)) {
+                    distinctMap.put(areaId, count.add(distinctMap.get(areaId)));
+                } else {
+                    distinctMap.put(areaId, count);
+                }
             }
+        }
+        List<String> xData = new ArrayList<>(areaIdGroupList.size());
+        List<BigInteger> yData = new ArrayList<>(areaIdGroupList.size());
+        for(Integer areaId : distinctMap.keySet()) {
+            String areaName = statisticService.getAreaNameById(areaId);
+            xData.add(areaName);
+            yData.add(distinctMap.get(areaId));
         }
         Map<String, Object> resultMap = new HashMap<>(4);
         resultMap.put("name", "人口个案信息分布");

@@ -273,4 +273,9 @@ public class OrgService extends BaseJpaService<Organization, OrganizationReposit
         List<Organization> list =  organizationRepository.getHospital();
         return list;
     }
+
+    public List<Organization> getOrgListByAddressPid(Integer pid) {
+        List<Organization> list = organizationRepository.getOrgListByAddressPid(pid);
+        return list;
+    }
 }

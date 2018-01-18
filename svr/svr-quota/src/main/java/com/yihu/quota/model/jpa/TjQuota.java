@@ -29,6 +29,7 @@ public class TjQuota implements java.io.Serializable {
 	private String updateUserName;
 	private String status;//1: 正常 0：不可用  -1删除
 	private String remark;
+	private String resultGetType; // 指标结果获取方式 1：直接库中获取，2：二次统计获取。
 
 	// Constructors
 
@@ -199,5 +200,14 @@ public class TjQuota implements java.io.Serializable {
 
 	public void setExecType(String execType) {
 		this.execType = execType;
+	}
+
+	@Column(name = "result_get_type", length = 2)
+	public String getResultGetType() {
+		return resultGetType;
+	}
+
+	public void setResultGetType(String resultGetType) {
+		this.resultGetType = resultGetType;
 	}
 }

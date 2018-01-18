@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 /**
  * Service - 居民信息注册
@@ -27,11 +28,13 @@ public class PatientService extends BaseJpaService<DemographicInfo, PatientDao>{
 
     @Autowired
     private PatientDao patientDao;
+    private String regex = "^[A-Za-z0-9\\-]+$";
+    private Pattern pattern = Pattern.compile(regex);
 
     public void checkPatient(ResourceBucket resourceBucket, String packId) throws Exception {
         //获取注册信息
         String idCardNo = resourceBucket.getDemographicId() == null ? "":resourceBucket.getDemographicId().toString().trim();
-        if(!idCardNo.equals("")) {
+        if(!idCardNo.equals("") && pattern.matcher(idCardNo).find()) {
             boolean isRegistered = isExists(idCardNo);
             if (!isRegistered) {
                 DemographicInfo demographicInfo = new DemographicInfo();

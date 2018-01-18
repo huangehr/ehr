@@ -457,4 +457,22 @@ public class OrgEndPoint extends EnvelopRestEndPoint {
         }
         return envelop;
     }
+
+    @RequestMapping(value = "/organizations/getOrgListByAddressPid", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域查询机构列表")
+    public Envelop getOrgListByAddressPid(
+            @ApiParam(name = "pid", value = "区域id", defaultValue = "")
+            @RequestParam(value = "pid") Integer pid) {
+        Envelop envelop = new Envelop();
+        try {
+            List<Organization> orgList = orgService.getOrgListByAddressPid(pid);
+            envelop.setSuccessFlg(true);
+            envelop.setDetailModelList(orgList);
+        }catch (Exception e) {
+            e.printStackTrace();
+            envelop.setSuccessFlg(false);
+            envelop.setErrorMsg(e.getMessage());
+        }
+        return envelop;
+    }
 }

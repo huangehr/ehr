@@ -799,4 +799,13 @@ public class OrganizationController extends BaseController {
     public Envelop getHospital() throws Exception {
         return orgClient.getHospital();
     }
+
+    @RequestMapping(value = "/organizations/getOrgListByAddressPid", method = RequestMethod.GET)
+    @ApiOperation(value = "根据区域查询机构列表")
+    public Envelop getOrgListByAddressPid(
+            @ApiParam(name = "pid", value = "区域id", defaultValue = "")
+            @RequestParam(value = "pid") Integer pid) {
+        Envelop envelop = orgClient.getOrgListByAddressPid(pid);
+        return envelop;
+    }
 }
