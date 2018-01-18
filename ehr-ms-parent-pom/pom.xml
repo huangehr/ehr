@@ -21,6 +21,7 @@
         <module>../svr/svr-health-profile</module>
         <module>../svr/svr-pack-mgr</module>
         <module>../svr/svr-pack-resolve</module>
+        <module>../svr/svr-pack-analyzer</module>
         <module>../svr/svr-resource</module>
         <module>../svr/svr-standard</module>
         <module>../svr/svr-ehr-basic</module>
@@ -32,7 +33,7 @@
         <module>../svr/svr-redis-memory</module>
         <module>../svr/svr-quota</module>
         <module>../svr/svr-log-collection</module>
-       <!-- <module>../ag-zuul</module>-->
+        <!-- <module>../ag-zuul</module>-->
     </modules>
 
     <build>
@@ -272,8 +273,8 @@
                         <exclude>**/Abstract*.java</exclude>
                     </excludes>
                     <!--<systemPropertyVariables>-->
-                        <!--<java.security.egd>file:/dev/./urandom</java.security.egd>-->
-                        <!--<java.awt.headless>true</java.awt.headless>-->
+                    <!--<java.security.egd>file:/dev/./urandom</java.security.egd>-->
+                    <!--<java.awt.headless>true</java.awt.headless>-->
                     <!--</systemPropertyVariables>-->
                     <argLine>-Xmx1024m</argLine>
                 </configuration>
@@ -419,9 +420,9 @@
                 <version>${version.ehr}</version>
             </dependency>
             <!--<dependency>-->
-                <!--<groupId>com.yihu.ehr</groupId>-->
-                <!--<artifactId>commons-metrics</artifactId>-->
-                <!--<version>${version.ehr}</version>-->
+            <!--<groupId>com.yihu.ehr</groupId>-->
+            <!--<artifactId>commons-metrics</artifactId>-->
+            <!--<version>${version.ehr}</version>-->
             <!--</dependency>-->
             <dependency>
                 <groupId>com.yihu.ehr</groupId>
