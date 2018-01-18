@@ -538,26 +538,34 @@ public class UserController extends BaseController {
     /**
      * 重新分配秘钥
      *
-     * @param userName 账号
+     * @param userId 账号
      * @return map  key{publicKey:公钥；validTime：有效时间; startTime：生效时间}
      */
-    @RequestMapping(value = "/users/key/{login_code}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/user/key", method = RequestMethod.PUT)
     @ApiOperation(value = "重新分配密钥", notes = "重新分配密钥")
     public Map<String, String> distributeKey(
-            @ApiParam(name = "login_code", value = "登录帐号", defaultValue = "")
-            @PathVariable(value = "login_code") String userName) {
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId) {
         try {
-            MUser mUser = userClient.getUserByUserName(userName);
-            if (mUser == null) {
-                return null;
-            }
-            return userClient.distributeKey(mUser.getId());
+            return userClient.distributeKey(userId);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
     }
 
+    /**
+     * 查询用户公钥
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/user/key", method = RequestMethod.GET)
+    @ApiOperation(value = "查询用户公钥", notes = "查询用户公钥")
+    public Envelop getKey(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam(value = "userId") String userId) {
+        return userClient.getKey(userId);
+    }
 
     /**
      * 根据登陆用户名及密码验证用户.
